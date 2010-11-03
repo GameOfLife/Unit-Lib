@@ -159,6 +159,9 @@ WFSEventEditor {
 				SCButton( composite, 40@20 ).states_( [["open"]] )
 					.action_({ event.wfsSynth.edit( parent );  });
 				views[ \duration ].enabled_( false );
+				SCStaticText( composite, 60@20	).string_( "Name:" );
+				SCTextField( composite, 70@16 ).string_(event.wfsSynth.name).action_({
+					arg field; event.wfsSynth.name = field.value });
 				}
 			{		/////// is no folder
 		
