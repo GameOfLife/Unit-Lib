@@ -389,6 +389,19 @@ WFSScoreEditor {
 					}
 				});
 				
+		RoundButton( window.window, Rect( 259, 2, 20, 20 ) )
+			.states_( [[ "M", Color.black, Color.clear ]] )
+			.radius_( 0 )
+			.action_({ |b|
+				var eventsToMix = if(this.selectedEvents.size != 0)
+				{
+						this.selectedEvents
+				}{
+						score.events
+				};
+				WFSMixer(eventsToMix,List.new);
+			});
+
 		SCButton( window.window, Rect( 280, 2, 55, 20 ) )
 			.states_( [[ "plot", Color.black, Color.clear ]] )
 			.action_({ WFSMixedArray.with( 
