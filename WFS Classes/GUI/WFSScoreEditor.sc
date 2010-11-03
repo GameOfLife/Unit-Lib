@@ -126,7 +126,7 @@ WFSScoreEditor {
 			var audioType, outString;
 			audioType = item.wfsSynth.audioType;
 			outString = (case { audioType == \folder }
-				{ i.asString ++ ": folder (" ++ item.wfsSynth.events.size ++ " events)"  }
+				{ i.asString ++ ": folder "++ item.wfsSynth.name++" (" ++ item.wfsSynth.events.size ++ " events)"  }
 				{ [\buf, \disk].includes( audioType ) }
 				{ i.asString ++ ": " ++ item.wfsSynth.filePath.basename; }
 				{ audioType === \blip }
@@ -389,8 +389,8 @@ WFSScoreEditor {
 					}
 				});
 				
-		SCButton( window.window, Rect( 328, 2, 55, 20 ) )
-			.states_( [[ "plot all", Color.black, Color.clear ]] )
+		SCButton( window.window, Rect( 280, 2, 55, 20 ) )
+			.states_( [[ "plot", Color.black, Color.clear ]] )
 			.action_({ WFSMixedArray.with( 
 				*( score.events.collect({ |event|
 						if( event.isFolder.not )
@@ -398,6 +398,18 @@ WFSScoreEditor {
 								.currentTime_( event.startTime.neg +
 									 WFSTransport.pos )
 								} { nil };
+						}).select( _.notNil ) ) ).plotSmooth; 
+				});		
+				
+		SCButton( window.window, Rect( 340, 2, 55, 20 ) )
+			.states_( [[ "plot all", Color.black, Color.clear ]] )
+			.action_({ WFSMixedArray.with( 
+				*( score.allEvents.collect({ |event|
+						
+							 event.wfsSynth.wfsPath
+								.currentTime_( event.startTime.neg +
+									 WFSTransport.pos )
+								
 						}).select( _.notNil ) ) ).plotSmooth; 
 				});
 		
@@ -422,7 +434,9 @@ WFSScoreEditor {
 				"-", "folder from selected events", "unpack selected folders",
 				"-", "select all", "select similar",
 				"-", "mute selected", "solo selected", "unmute selected", "unmute all",
-				"-", "check all soundfiles", "copy all soundfiles to folder.." ] )
+				"-", "check all soundfiles", "copy all soundfiles to folder..",
+				"-", "trim start of events at playhead", "trim end of events at playhead",
+				"-", "batch tweak events"] )
 			.resize_( 3 )
 			//.background_( Color.gray(0.7) )
 			.action_( { |popUp| 
@@ -556,7 +570,60 @@ WFSScoreEditor {
 						}); };
 					copyToFolderFunc.value;
 						
-					};
+					}
+					{ popUp.value == 22  } // trim events start
+					{
+						var cutFunction = { |events,pos,isFolder=false|
+							
+							events.do{ |event|
+								var dur = event.dur;
+								var start = event.startTime;
+								if((start < pos) && ((start + dur) > pos)){
+									if(event.wfsSynth.class == WFSSynth){
+										event.dur = event.dur - (pos - start);
+										event.wfsSynth.startFrame = 44100 * (pos - start);
+										
+										if(isFolder){
+											event.startTime = 0;
+										}{
+											event.startTime = pos;
+										}		
+									}{
+										cutFunction.(event.wfsSynth.events,pos-start,true);
+										if(isFolder){
+											event.startTime = 0;
+										}{
+											event.startTime = pos;
+										}											}
+								}
+							}
+						};
+						var score = this.score;
+						cutFunction.(score.events,WFSTransport.pos);
+						this.update;
+						
+					}
+					{ popUp.value == 23  } // trim events end
+					{
+						var cutFunction = { |events,pos|
+							events.do{ |event|
+								var dur, newdur, start = event.startTime;
+								dur = event.dur;
+								if((start < pos) && ((start + dur) > pos)){
+									if(event.wfsSynth.class == WFSSynth){
+										newdur = pos - event.startTime;
+										event.dur = newdur;
+									}{
+										cutFunction.(event.wfsSynth.events,pos-start);
+									}			
+								}											}
+						};
+						cutFunction.(this.score.events,WFSTransport.pos);
+						this.update;
+						
+					}
+					{ popUp.value == 25  }
+					{ WFSBatch.new };
 						
 						  
 				popUp.value = 0; } );
