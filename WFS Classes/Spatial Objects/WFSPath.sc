@@ -252,15 +252,12 @@ WFSPath {
 	*current { ^WFSPathEditor.current }
 		
 	*newFrom { |aWFSPath|
-		^this.new( aWFSPath.positions.collect( _.copy ), aWFSPath.times, aWFSPath.name )
-			.sndFileName_( aWFSPath.sndFileName )
-			.sndFileStart_(aWFSPath.sndFileStart)
-			.sndFileEnd_(aWFSPath.sndFileEnd);
+		^this.new( aWFSPath.positions.collect( _.copy ), aWFSPath.times, aWFSPath.name );
 		}
 		
 	copyNew { ^this.class.newFrom( this ); }
 	
-	fix { backup = [positions, times, name]; ^this } // keep changes
+	fix { backup = [positions.copy, times.copy, name]; ^this } // keep changes
 	undo {  #positions, times, name = backup; ^this } // undo changes since last fix
 	
 	backup { ^WFSPath( *backup ) }
@@ -342,11 +339,13 @@ WFSPath {
 	asRect { ^this.positions.asWFSPointArray.asRect }
 	
 	plotSmoothInput { |size, color, pointsColor, lineOnly = false, div=10, 
-		intType=\hermite, pointOnly = false, fromRect, onlyShowWhenActive=true|
+		intType=\hermite, pointOnly = false, fromRect, onlyShowWhenActive=true, pointRadius = 3|
 	
 		var path, tempPath2, firstPoint, show = true, showPoint = true;
 		
 		size = size ? 400;
+		
+		//Pen.setSmoothing( false );
 		
 		
 		if( onlyShowWhenActive ) { if( (currentTime < 0) or: 
@@ -376,7 +375,9 @@ WFSPath {
 							
 						// points
 						pointsColor.set;
-						path.do({ |item| Pen.addAnnularWedge( item, 3, 3, 0, 2pi ) });
+						path.do({ |item|
+							Pen.moveTo( item + (pointRadius@0) ); 
+							Pen.addArc( item, pointRadius, 0, 2pi ) });
 						Pen.stroke; 
 					 };
 						
@@ -421,8 +422,11 @@ WFSPath {
 		
 		originalCurrentTime = currentTime;
 		
-		if( plotWindow.view.children.asCollection[0].isNil )
-			{ RoundButton(plotWindow, Rect( plotWindow.view.bounds.width - 25,5,20,20) )
+		//if( plotWindow.view.children.asCollection
+		//		.select({ |vw| vw.class == RoundButton })[0].isNil )
+		if( WFSPlotSmooth.playButton.isNil )
+			{  WFSPlotSmooth.playButton = 
+					RoundButton(plotWindow, Rect( plotWindow.view.bounds.width - 25,5,20,20) )
 				.states_( [ 
 					[ \play, Color.white,Color.white.alpha_(0.25)],
 					[ \stop, Color.white,Color.red.alpha_(0.25) ],					[ \return, Color.white,Color.green.alpha_(0.25)]
@@ -430,7 +434,8 @@ WFSPath {
 				.resize_( 3 );
 			};
 	
-		plotWindow.view.children[0]
+		//plotWindow.view.children.select({ |vw| vw.class == RoundButton })[0]
+		WFSPlotSmooth.playButton
 			.value_( 0 )
 			.action_({ |button|
 					case { button.value == 1 }
@@ -682,6 +687,8 @@ WFSPath {
 	speeds { ^this.distances / times } // speeds in m/s
 	speedsKMH { ^this.speeds * 3.6 }   // speeds in km/h  ;-)
 	avgSpeed { ^this.speeds.sum / times.size } //avarage speed per node (rms)
+	
+	avgSpeed2 { ^(( this.speeds * times ).sum / times.sum ) }
 
 	asXYArray {  ^positions.collect({ |item| [item.x,item.y] }); } //2D
 	asXYZArray {  ^positions.collect({ |item| [item.x,item.y,item.z] }); }
@@ -923,9 +930,9 @@ WFSPath {
 					3, 
 					action: { |thisBuffer|
 						buffersLoaded[0] = true;
-						//"buffer % for % loaded\n".postf(thisBuffer.bufnum this.name );
-						WFS.debug("XYZ buffer (%/%) loaded for path %", thisBuffer.bufnum,
-						oneServer.name, name);
+						if( WFSPan2D.silent.not )
+							{  ("XYZ buffer (" ++ 
+								thisBuffer.bufnum ++  ") loaded for path" ++ name ).postln; };
 						if( buffersLoaded.every( _.value ) )
 							{ loadedAction.value };
 							} )
@@ -936,8 +943,9 @@ WFSPath {
 					1, 
 					action: { |thisBuffer|
 						buffersLoaded[1] = true;
-						WFS.debug("Times buffer (%/%) loaded for path %", thisBuffer.bufnum,
-							oneServer.name, name);
+						if( WFSPan2D.silent.not ) 
+							{("Times buffer (" ++ 
+								thisBuffer.bufnum ++  ") loaded for path" ++ name ).postln;  };
 						if( buffersLoaded.every( _.value ) )
 							{ loadedAction.value };
 						} )
@@ -956,7 +964,7 @@ WFSPath {
 		buffers = [nil, nil];
 		buffersLoaded = [false, false];
 		}
-		
+	
 	resetBuffers {
 		if( this.buffersLoaded ) { "WFSPath '%' buffers might have been loaded but lost\n"
 				.postf( name ) };
