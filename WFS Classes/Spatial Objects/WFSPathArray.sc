@@ -75,8 +75,10 @@ WFSPathArray[slot]: RawArray {
 		originalCurrentTimes = this.collect( _.currentTime);
 		maxDuration = this.collect({ |item| item.length - item.currentTime; }).maxItem;
 		
-		if( window.view.children.asCollection[0].isNil )
-			{ RoundButton(window, Rect( window.view.bounds.width - 25,5,20,20) )
+		//if( window.view.children.asCollection.select({ |vw| vw.class == RoundButton })[0].isNil )
+		if( WFSPlotSmooth.playButton.isNil )
+			{ WFSPlotSmooth.playButton = RoundButton(window, 
+						Rect( window.view.bounds.width - 25,5,20,20) )
 				.states_( [ 
 					[ \play, Color.white,Color.white.alpha_(0.25)],
 					[ \stop, Color.white,Color.red.alpha_(0.25) ],					[ \return, Color.white,Color.green.alpha_(0.25)]
@@ -84,7 +86,7 @@ WFSPathArray[slot]: RawArray {
 				.resize_( 3 );
 			};
 	
-		window.view.children[0]
+		WFSPlotSmooth.playButton
 			.action_({ |button|
 				case { button.value == 1 }
 				{ routine = Routine({ ((maxDuration / 0.05) + 1).do({ |i|
