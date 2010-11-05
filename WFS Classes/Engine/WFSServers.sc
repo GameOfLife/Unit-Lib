@@ -206,7 +206,9 @@ WFSServers {
 					.action_( { SCAlert( "Do you really want to shut down\nboth host servers?",
 							 ["cancel", "unmount only", "restart SC", "Shut Down"], 
 							 [{}, 
-							 { "~/Unmount servers.app".openInFinder },
+							 { // "~/Unmount servers.app".openInFinder 
+							  "umount /WFSSoundFiles".unixCmd;
+								 },
 							 { //"~/Stop_SC_Servers.command".openInFinder;
 			"ssh gameoflife@192.168.2.11 \"open \\\"Stop_SC.app\\\"\"".systemCmd;
 			"ssh gameoflife@192.168.2.12 \"open \\\"Stop_SC.app\\\"\"".systemCmd; 
@@ -220,7 +222,7 @@ WFSServers {
 							  	 }] );
 							  },
 							 {
-							  "~/Unmount servers.app".openInFinder;
+							  //"~/Unmount servers.app".openInFinder;
 							  "umount /WFSSoundFiles".unixCmd;
 							  
 							{	var win, views;
