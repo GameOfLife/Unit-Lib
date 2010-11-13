@@ -22,21 +22,30 @@ WFSScoreEditor {
 	classvar <>current, <all;
 	classvar <>askForSave = true;
 	
-	var <score, <isMainEditor, <parent;
-	var <>window, selectedRects;
+	var <score, <isMainEditor, <parent, <filePath;
+	var <>window, <currentIndex;
 	var <snapActive, <>snapH, <>numTracks;
 	var id;
 	var <undoStates; // not finished yet
+	var <dirty = true;
+	var selectedRects; // indexes of selection
+
 	
 	*initClass { UI.registerForShutdown({ WFSScoreEditor.askForSave = false }); }
 	
-	*new { |wfsScore, isMainEditor = true, parent |
-		^super.newCopyArgs( wfsScore, isMainEditor, parent)
+	*new { |wfsScore, isMainEditor = true, parent, filePath |
+		^super.newCopyArgs( wfsScore, isMainEditor, parent, filePath)
 			.init
 			.newWindow
 			.makeCurrent
 			.addToAll;
 		}
+	
+	*open{
+		CocoaDialog.getPaths( { |paths|	
+			var score = WFSScore.readWFSFile( paths[0] );
+			WFSScoreEditor( score, true, nil, paths[0] );		}) 
+	}
 	
 	init { 
 		undoStates = [];
@@ -80,6 +89,120 @@ WFSScoreEditor {
 
 	selectedEvents { ^score.events[ selectedRects ];  }
 	
+	save{
+		if(filePath.notNil){	
+			score.writeWFSFile( filePath ,true, false);
+		}{
+			this.saveAs
+		}
+	}
+	
+	saveAs{
+		CocoaDialog.savePanel( 
+			{ |path| score.writeWFSFile( path ); filePath = path});
+	} 
+	
+	combineAppend{
+		CocoaDialog.getPaths( { |paths|
+						var nextFunc;
+						nextFunc = { |index = 0|
+							var path, newScore;
+							path = paths[index];
+							if( path.notNil )
+								{ newScore = WFSScore.readWFSFile( path );
+								  if( newScore.notNil )
+								  	{ if( score.events.size == 0 )
+								  		{ score = WFSScore.readWFSFile( paths[0] ) ? score;
+											this.update;  nextFunc.value(index+1); }
+										{ SCAlert( "where do you want to place '%'?"
+											.format( path.basename ),
+										[ "cancel", "skip",
+											"as folder", 
+											"at start", "current pos", "at end"],
+										[ { }, { nextFunc.value(index+1) },
+											{ score.events = score.events.add(
+												   WFSEvent( 0, newScore ) );
+											score.cleanOverlaps;
+										   	this.update; 
+										   	nextFunc.value(index+1);  },
+										   { score.events = 
+										   		score.events ++ newScore.events;
+										   	score.cleanOverlaps;
+										   	this.update; 
+										   	nextFunc.value(index+1); },
+										   { newScore.events.do({ |event|
+												event.startTime = 
+												   WFSTransport.pos + event.startTime;
+												});
+											score.events = score.events ++ newScore.events;
+											score.cleanOverlaps;
+											this.update;
+											nextFunc.value(index+1);
+											},
+											{ newScore.events.do({ |event|
+												event.startTime = 
+												   event.startTime + score.duration;
+												});
+											score.events = score.events ++ newScore.events;
+											score.cleanOverlaps;
+											this.update;
+											nextFunc.value(index+1);
+											} ]	);
+										};
+									};
+								};
+							};
+						nextFunc.value; });	
+		
+	}
+	
+	addAudioFiles{ 
+		var copiedEvents, newTrack;
+		CocoaDialog.getPaths( { |paths|
+				var newEvents;
+				newEvents = paths.collect({ |path, i|
+					var newEvent;
+					newEvent = WFSEvent( 
+						WFSTransport.pos, 
+						WFSSynth( 
+							'static_buf', 
+							WFSPoint(0,0,0),
+							Server.default,
+							path ), i );
+					newEvent.wfsSynth.useSoundFileDur;
+					newEvent; });
+				score.events = score.events ++ newEvents;
+				score.cleanOverlaps;
+				this.update;
+				} ); 
+	}
+	
+	addTestEvent{
+		var copiedEvents, newTrack; 
+		score.events = 
+			score.events.add( WFSEvent( WFSTransport.pos ) );						score.cleanOverlaps;
+				this.update;
+	}
+	
+	duplicateSelected{
+		var copiedEvents, newTrack;
+					
+		if( selectedRects.size > 0 )
+			{ 
+			copiedEvents = 
+				score.events[ selectedRects ]
+					.collect({ |event| 
+						newTrack = event.track + 1;
+						if( ( newTrack + 1 ) > numTracks )
+							{ newTrack =  event.track - 1 };
+						event.duplicate.track_( newTrack );
+						});
+			score.events = score.events ++ copiedEvents;
+			score.cleanOverlaps;
+			this.update;
+			};
+	}
+		
 	newWindow {		
 		
 		var rects, events;
@@ -210,80 +333,6 @@ WFSScoreEditor {
 			
 		//window.window.acceptsMouseOver_( true );
 		
-		fileMenu = SCPopUpMenu( window.window, Rect( 4, 2, 50, 20 ) )
-			.items_( [ "(file", /*)*/ "open score..", "save score..", 
-					"-", "combine or append scores..", "-", "add audio file.." ] )
-			.action_( { |v| 
-				case { v.value == 2 } // save
-					{ CocoaDialog.savePanel( { |path|
-							score.writeWFSFile( path ); } ); }
-					{ v.value == 1 } // open
-					{ CocoaDialog.getPaths( { |paths|
-							score = WFSScore.readWFSFile( paths[0] ) ? score;
-							this.update;
-							} ); }
-					{ v.value == 4 } // combine multiple with current
-					{ CocoaDialog.getPaths( { |paths|
-						var nextFunc;
-						nextFunc = { |index = 0|
-							var path, newScore;
-							path = paths[index];
-							if( path.notNil )
-								{ newScore = WFSScore.readWFSFile( path );
-								  if( newScore.notNil )
-								  	{ if( score.events.size == 0 )
-								  		{ score = WFSScore.readWFSFile( paths[0] ) ? score;
-											this.update;  nextFunc.value(index+1); }
-										{ SCAlert( "where do you want to place '%'?"
-											.format( path.basename ),
-										[ "cancel", "skip",
-											"as folder", 
-											"at start", "current pos", "at end"],
-										[ { }, { nextFunc.value(index+1) },
-											{ score.events = score.events.add(
-												   WFSEvent( 0, newScore ) );
-											score.cleanOverlaps;
-										   	this.update; 
-										   	nextFunc.value(index+1);  },
-										   { score.events = 
-										   		score.events ++ newScore.events;
-										   	score.cleanOverlaps;
-										   	this.update; 
-										   	nextFunc.value(index+1); },
-										   { newScore.events.do({ |event|
-												event.startTime = 
-												   WFSTransport.pos + event.startTime;
-												});
-											score.events = score.events ++ newScore.events;
-											score.cleanOverlaps;
-											this.update;
-											nextFunc.value(index+1);
-											},
-											{ newScore.events.do({ |event|
-												event.startTime = 
-												   event.startTime + score.duration;
-												});
-											score.events = score.events ++ newScore.events;
-											score.cleanOverlaps;
-											this.update;
-											nextFunc.value(index+1);
-											} ]	);
-										};
-									};
-								};
-							};
-						nextFunc.value; });
-					}
-					{ v.value == 6 }
-					{ addEventMenu.valueAction_( 1 ); };
-				v.value = 0 } );
-				
-		if( isMainEditor.not ) {
-			fileMenu.items =  [ "(file", /*)*/ "(open score..", /*)*/
-					"save as separate score..", 
-					"-", "combine or append scores..", "-", "add audio file.." ] 
-			};
-		
 		SCStaticText( window.window, Rect( 62, 2, 56, 20 ) ).string_( "event" ).align_( \right );
 		SCButton( window.window, Rect( 122, 2, 35, 20 ) )
 			.states_( [[ "edit", Color.black, Color.yellow.alpha_(0.125) ]] )
@@ -326,54 +375,10 @@ WFSScoreEditor {
 					eventsToDelete = selectedRects.collect{ |i| score.events[i] }; 
 					eventsToDelete.do({ |event| score.events.remove( event ); });
 					this.update;
+
 				}
 			});
-				
-		addEventMenu = SCPopUpMenu( window.window, Rect( 195, 2, 40, 20 ) )
-			.items_( [ "(add", /*)*/ "audiofile..", "test event", "duplicate selected" ] )
-			.action_( { |v| 
-				var copiedEvents, newTrack;
-				case { v.value == 1 }
-					{ CocoaDialog.getPaths( { |paths|
-							var newEvents;
-							newEvents = paths.collect({ |path, i|
-								var newEvent;
-								newEvent = WFSEvent( 
-									WFSTransport.pos, 
-									WFSSynth( 
-										'static_buf', 
-										WFSPoint(0,0,0),
-										Server.default,
-										path ), i );
-								newEvent.wfsSynth.useSoundFileDur;
-								newEvent; });
-							score.events = score.events ++ newEvents;
-							score.cleanOverlaps;
-							this.update;
-							} ); }
-					{ v.value == 2 }
-					{ score.events = 
-						score.events.add( WFSEvent( WFSTransport.pos ) );						score.cleanOverlaps;
-							this.update;
-					 }
-					 { v.value == 3 }
-					 { if( selectedRects.size > 0 )
-						{ 
-						copiedEvents = 
-							score.events[ selectedRects ]
-								.collect({ |event| 
-									newTrack = event.track + 1;
-									if( ( newTrack + 1 ) > numTracks )
-										{ newTrack =  event.track - 1 };
-									event.duplicate.track_( newTrack );
-									});
-						score.events = score.events ++ copiedEvents;
-						score.cleanOverlaps;
-						this.update;
-						};
-					};
-				v.value = 0 } );
-				
+
 		RoundButton( window.window, Rect( 237, 2, 20, 20 ) )
 			.states_( [[ \speaker, Color.black, Color.clear ]] )
 			.radius_( 0 )
