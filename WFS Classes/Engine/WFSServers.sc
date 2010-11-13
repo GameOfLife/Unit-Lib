@@ -167,38 +167,12 @@ WFSServers {
 				.states_([["?", Color.black, Color.clear]])
 				.font_( Font( "Monaco", 9 ) )
 				.action_( { WFS.openHelpFile } );
-				
 			
-			SCStaticText( window, 15@16 )
-				.font_( Font( "Monaco", 9 ) )
-				.string_( "" ) // spacer
-				.align_( \right );		
-				
-			 SCButton( window, Rect( 0,0,60,16) )
-				.font_( Font( "Monaco", 9 ) )
-				.states_( [[ "controls" ]] )
-				.action_({ WFSTransport.new; WFSLevelBus.makeWindow;
-					WFSEQ.new; });
-		
-			
-			SCButton( window, Rect( 0,0,80,16) )
-				.font_( Font( "Monaco", 9 ) )
-				.states_( [[ "score editor" ]] )
-				.action_({ WFSScoreEditor( WFSScore.new ); });
-			
-			SCButton( window, Rect( 0,0,80,16) )
-				.font_( Font( "Monaco", 9 ) )
-				.states_( [[ "path editor" ]] )
-				.action_({ WFSPathEditor.new; });
-						
-			
-			window.view.decorator.nextLine;
-			
-			SCStaticText( window, Rect( 0, 0, 200, 15 ) )
+			SCStaticText( window, Rect( 0, 0, 140, 15 ) )
 				.string_( "master (" ++ ( NetAddr.myIP ? "127.0.0.1" ) ++ ")" )
 				.font_( Font( "Monaco", 9 ) );
-				
-			pulsesRunningView = SCStaticText( window, Rect( 0, 0, 90, 16 ) )
+
+			pulsesRunningView = SCStaticText( window, Rect( 0, 0, 100, 16 ) )
 				.stringColor_( Color.red )
 				.font_( Font( "Monaco", 9 ) )
 				.string_( "" );
