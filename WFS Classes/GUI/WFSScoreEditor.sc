@@ -23,7 +23,7 @@ WFSScoreEditor {
 	classvar <>askForSave = true;
 	
 	var <score, <isMainEditor, <parent;
-	var <>window, <currentIndex;
+	var <>window, selectedRects;
 	var <snapActive, <>snapH, <>numTracks;
 	var id;
 	var <undoStates; // not finished yet
@@ -78,18 +78,17 @@ WFSScoreEditor {
 				}
 	removeFromAll { if( all.notNil ) { all.remove( this ); WFSTransport.refreshScoreMenu; }; }
 
-	selectedEvents { ^score.events[ currentIndex ];  }
+	selectedEvents { ^score.events[ selectedRects ];  }
 	
 	newWindow {		
 		
 		var rects, events;
 		
-		var n, moveFlag, moveOrigin, movingRect; // moving
+		var n, moveFlag, moveOrigin, movingRects; // moving
 		
-		var selectedRects; // indexes of selection
 		var createRects, eventsFromRects, getNames, getObjects; // functions
-		var possibleSelectedRects, selectionPoint;
-		var selectedPoint, position;
+		var possibleSelectedRects, selectionPoint, selectionStartPoint, selectionFunc, updateTransport = false, initialMouseDownSelection;
+		var selectedPoint, position, minimumMov = 3, moveOriginAbs;
 		var getTypeColors;
 		var createSelectedRects;
 		
@@ -163,8 +162,7 @@ WFSScoreEditor {
 				color;
 				 }); 
 			};
-		
-			
+
 		window = ScaledUserView.window( "WFSScoreEditor (" ++ 
 				(id ?? { "folder of " ++ ( parent !? { parent.id } ) } ) ++ ")", 
 			Rect(230 + 20.rand2, 230 + 20.rand2, 680, 300),
@@ -206,7 +204,7 @@ WFSScoreEditor {
 		
 		moveFlag = false;
 		moveOrigin = 0@0;
-		movingRect = nil;
+		movingRects = nil;
 		
 		selectedRects = [ ];
 		possibleSelectedRects = [ ];
@@ -505,7 +503,7 @@ WFSScoreEditor {
 						} { SCAlert( "Sorry, no folders selected." ) };
 					}
 					{ popUp.value == 11 } // select all
-					{ currentIndex = selectedRects = score.events.collect({ |item, i| i });
+					{ selectedRects = score.events.collect({ |item, i| i });
 						this.update; }
 					{ popUp.value == 12 } // select similar
 					{ selectedTypes = score.events[ selectedRects ]
@@ -513,7 +511,7 @@ WFSScoreEditor {
 							(event.wfsSynth.audioType.asString ++ "_" ++
 								event.wfsSynth.intType).asSymbol });
 					
-					currentIndex = selectedRects = score.events.detectAll({ |event|
+					selectedRects = score.events.detectAll({ |event|
 						selectedTypes.includes( (event.wfsSynth.audioType.asString ++ "_" ++
 								event.wfsSynth.intType).asSymbol ); });
 						this.update; }
@@ -641,106 +639,149 @@ WFSScoreEditor {
 						  
 				popUp.value = 0; } );
 		
-		
+					
+		selectionFunc = { |x,y,shiftDown,isInside|
+					
+			if( isInside ){
+				if(shiftDown){
+					selectedRects = (selectedRects ++ rects.detectAll{ |rect,i| 
+						rect.intersects( Rect.fromPoints(moveOrigin,[ x,y ].asPoint)) 
+					}).as(Set).as(Array);			
+				}{
+					selectedRects = rects.detectAll{ |rect,i| 
+						rect.intersects( Rect.fromPoints(moveOrigin,[ x,y ].asPoint)) 
+					}
+				};
+			};
+		};				
 		
 		window.userView
-			.mouseDownAction_( { |v, x, y| 	 // only drag when one event is selected for now
-				var scaledPoint, rects;
+			.mouseDownAction_( { |v, x, y,mod,x2,y2| 	 // only drag when one event is selected for now
+				var scaledPoint, rects, selectedIndexes, shiftDown;
 				scaledPoint = [ x,y ].asPoint;
-				rects = createRects.value;
-				possibleSelectedRects = rects.select({ |rect|
-						rect.containsPoint( scaledPoint  );
-							});
-					if( (selectedRects.size != 0) && 
-						{ rects[ selectedRects[0] ].containsPoint( scaledPoint) } )
-							{ moveFlag = true; moveOrigin = scaledPoint; }
-							{ moveFlag = false };
-				} )
+				shiftDown = ModKey( mod ).shift( \only );
 				
+				rects = createRects.value;
+				selectedIndexes = rects.detectAll({ |rect|
+						rect.containsPoint( scaledPoint  );
+				});
+				
+				if(selectedIndexes.size == 0) {
+					//starting drag select
+					if(shiftDown.not){
+						selectedRects = [];
+						updateTransport = true;
+					};					
+					moveFlag = false;
+				} {
+					//starting move or shift select rects
+					if(shiftDown){
+						selectedIndexes.do{ |index|
+							if(selectedRects.includes(index)){
+								selectedRects.remove(index)
+							} {
+								selectedRects = selectedRects.add( index )
+							};
+							updateTransport = false;
+						};						
+					}{
+						initialMouseDownSelection = selectedIndexes;
+					};
+					moveFlag = true; 
+				};
+				moveOrigin = scaledPoint;
+				moveOriginAbs = [x2,y2].asPoint;
+				
+			} )				
 			.mouseMoveAction_( { |v, x, y, mod, x2, y2, isInside| 
 				var rects, shiftDown;
-				rects = createRects.value;
-				shiftDown = ModKey( mod ).shift( \only );
-				//shiftDown.postln;
-				possibleSelectedRects = rects.select({ |rect| 
-					rect.containsPoint( [ x,y ].asPoint );
-							});
-						if( moveFlag )
-							{ 	if( isInside )
-									{    movingRect = rects[ selectedRects[0] ].translate(  
-											Point( x - moveOrigin.x, (y - moveOrigin.y)
-												.round( v.gridSpacingV)  ) )
-											.max( 0 );
-										if( snapActive )
-											{ movingRect.left_( 
-											movingRect.left.round( snapH * v.gridSpacingH )  
-											) };
-									if( shiftDown ) // change track only 
-										// -- only works when shift was
-										// pressed before mousedown
-										{   movingRect.left_( 
-											rects[ selectedRects[0] ].left ); };
-											   }
-									{ movingRect = rects[ selectedRects[0] ] };
-								 };
-				} )
 				
+				if( (moveOriginAbs.x-x2).abs > minimumMov) {
+					rects = createRects.value;
+					shiftDown = ModKey( mod ).shift( \only );
+					
+					if( moveFlag ) {
+					//moving	
+						if( isInside ) {     
+							movingRects = selectedRects.collect{ |i|
+								var movingRect = rects[i].translate(  
+									Point( x - moveOrigin.x, (y - moveOrigin.y).round( v.gridSpacingV))
+								).max( 0 );
+								if( snapActive ) { 
+									movingRect.left_( 
+										movingRect.left.round( snapH * v.gridSpacingH)
+									) 
+								};
+								if( shiftDown ) {// change track only 
+									// -- only works when shift was
+									// pressed before mousedown
+									movingRect.left_( 
+										rects[ selectedRects[i] ].left 
+									); 
+								};
+								(\rect: movingRect, \index: i);
+							};
+						} {
+							movingRects = selectedRects.collect{ |i| (\rect: rects[i], \index:i) };
+						};
+					} {
+					//drag selecting
+						selectionFunc.(x,y,shiftDown,isInside);
+						updateTransport = false;
+					};
+				}
+			} )				
 			.mouseUpAction_( { |v, x, y, mod, x2, y2, isInside|
 				var sr;
 				var rects, names, objects, currentObject, currentName;
-				var copiedEvent;
+				var copiedEvents, selectionRectangle;
 				rects = createRects.value;
-				if( moveFlag && { movingRect.notNil } )
-					{ if(  isInside )
-						{ 	if( ModKey( mod ).alt( \only ) )  
-								{ 
-									copiedEvent = score.events[ selectedRects[0] ].duplicate;
-									score.events = score.events.add( copiedEvent );
-									rects = rects.add( movingRect );
-									score.events = eventsFromRects.value( rects );
-									selectedRects = [rects.size -1];
-									//firstSelectionIndex = selectedRects[0];
-									if( WFSEventEditor.current.notNil && 
-										{ selectedRects[0].notNil } )
-										{  score.events[ selectedRects[0] ]
-												.edit( parent: this );
-											window.window.front };
-									
-									
-								}
-								{ rects[ selectedRects[0] ] = movingRect; };
-								
-							//selectedRects = rects[ selectedRects[0] ]; 
+				
+				if( moveFlag && { movingRects.notNil } ) { 
+				//moving
+					if(  isInside ) {
+						if( ModKey( mod ).alt( \only ) ) {
+						
+							copiedEvents = selectedRects.collect{ |i| score.events[i].duplicate };
+							score.events = score.events ++ copiedEvents;
+							rects = rects ++ movingRects.collect(_.at(\rect));
 							score.events = eventsFromRects.value( rects );
-						};
-						movingRect = nil; 
-						moveFlag = false; }
-							{ 
-							sr =  rects.detectAll({ |rect| 
-								rect.containsPoint( [ x,y ].asPoint ); });
-							if( isInside )
-								{ 
-								if( ModKey( mod ).shift( \only ) )
-									{ /* selectedRects = 
-										selectedRects.asCollection ++ sr; */
-									sr.do({ |item|
-										if( selectedRects.asCollection.includes( item ).not )											{ selectedRects = 
-											selectedRects.asCollection ++ [ item ] };
-										});
-									currentIndex = selectedRects.asCollection; }
-									{ currentIndex = (selectedRects = sr)   };
-								};
+							selectedRects = ((rects.size-selectedRects.size) .. (rects.size -1));
 							//firstSelectionIndex = selectedRects[0];
-							if( WFSEventEditor.current.notNil && 
-									{ selectedRects[0].notNil } )
-								{  score.events[ selectedRects[0] ]
-										.edit( parent: this );
-									window.window.front };
-							};
-					possibleSelectedRects = [];
-					if( WFSEventEditor.current.notNil )
-						{ WFSEventEditor.current.update };
-				} )
+							if( WFSEventEditor.current.notNil && { selectedRects[0].notNil } ) {
+								score.events[ selectedRects[0] ]
+									.edit( parent: this );
+								window.window.front 
+							}														
+						} { 
+							movingRects.do{ |movRect| rects[movRect[\index]] = movRect[\rect] };
+							score.events = eventsFromRects.value( rects ); 
+						};						
+						
+					};
+					movingRects = nil; 
+					moveFlag = false; 
+				} { 
+					if(initialMouseDownSelection.notNil){
+						selectedRects = initialMouseDownSelection;
+						initialMouseDownSelection = nil;
+					}{
+						if(updateTransport){
+							WFSTransport.pos_(moveOrigin.x);
+						};	
+					};
+					if( WFSEventEditor.current.notNil && { selectedRects[0].notNil } ) {
+						score.events[ selectedRects[0] ]
+								.edit( parent: this );
+							window.window.front 
+					};
+				};
+				if( WFSEventEditor.current.notNil ){ 
+					WFSEventEditor.current.update 
+				};
+				updateTransport = false;
+						
+			} )
 				
 			
 			.keyDownAction_( { |v, a,b,c|
@@ -765,9 +806,12 @@ WFSScoreEditor {
 			.drawFunc_( {
 					Color.yellow.alpha_(0.2).set;
 					possibleSelectedRects.do({ |item| Pen.fillRect( item ) });
-					if( movingRect.notNil )
+					if( movingRects.notNil )
 						{	Color.red.set;
-							Pen.fillRect( movingRect ) };
+							movingRects.do{ |rect|
+								Pen.fillRect( rect[\rect] )
+							}
+						};
 				} )
 						
 			.unscaledDrawFunc_( { |v|
