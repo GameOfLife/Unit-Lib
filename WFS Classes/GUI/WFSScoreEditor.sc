@@ -322,13 +322,13 @@ WFSScoreEditor {
 			.states_( [[ \delete, Color.black, Color.red.alpha_(0.125) ]] )
 			.radius_( 0 )
 			.action_({ |b|
-				var copiedEvents;
-				if( selectedRects.size > 0 )
-					{ 
-					selectedRects.do({ |item| score.events.removeAt( item ); });
+				var eventsToDelete;
+				if( selectedRects.size > 0 ) {
+					eventsToDelete = selectedRects.collect{ |i| score.events[i] }; 
+					eventsToDelete.do({ |event| score.events.remove( event ); });
 					this.update;
-					}
-				});
+				}
+			});
 				
 		addEventMenu = SCPopUpMenu( window.window, Rect( 195, 2, 40, 20 ) )
 			.items_( [ "(add", /*)*/ "audiofile..", "test event", "duplicate selected" ] )
