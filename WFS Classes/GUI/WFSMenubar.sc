@@ -84,11 +84,17 @@ WFSMenubar {
 		SCMenuItem.new(defaultMenu, "Lissajous").action_( {WFSPath.lissajous.edit; });
 		SCMenuItem.new(defaultMenu, "Line").action_( {WFSPath.line.edit; });
 		SCMenuItem.new(defaultMenu, "Rect").action_( {WFSPath.rect.edit; });
-								
+
+		//view
 		viewMenu = SCMenuGroup.new(nil, "View",5);
 		SCMenuItem.new(viewMenu, "All").action_( {WFSEQ.new; WFSTransport.new; WFSLevelBus.makeWindow;});
 		SCMenuItem.new(viewMenu, "EQ").action_( {WFSEQ.new; });
-		SCMenuItem.new(viewMenu, "Transport").action_( {WFSTransport.new; });		SCMenuItem.new(viewMenu, "Level").action_( {WFSLevelBus.makeWindow; });	
+		SCMenuItem.new(viewMenu, "Transport").action_( {WFSTransport.new; });		SCMenuItem.new(viewMenu, "Level").action_( {WFSLevelBus.makeWindow; });
+		if(WFSServers.default.isSingle){
+			SCMenuItem.new(viewMenu, "Meter").action_({
+				ServerMeter(WFSServers.default.masterServer,0,2);
+			});
+		};
 
 	}
 }
