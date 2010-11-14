@@ -24,7 +24,7 @@ WFSEvent {
 	classvar <>allEvents;
 	classvar <>wait = 5; // default wait time ( between load and play )
 	
-	var <>startTime, <>wfsSynth, <>track, <>muted = false, <>currentSynth;
+	var <>startTime, <>wfsSynth, <>track, <muted = false, <>currentSynth;
 	
 	// wfsSynth should not already be loaded
 		
@@ -61,10 +61,18 @@ WFSEvent {
 	
 	endTime { ^startTime + this.dur; }
 	
-	mute { muted = true }
-	unMute { muted = false }
+	muted_{ |bool|
+		("doing mute "++bool).postln;
+		muted = bool;
+		if(wfsSynth.class == WFSScore){
+			wfsSynth.events.do{ |event| event.muted = bool };
+		}
+	}
+
+	mute { this.muted_(true) }
+	unMute { this.muted_(false) }
 	
-	toggleMute { muted = muted.not }
+	toggleMute { this.muted_(muted.not) }
 	
 	notMuted { ^muted.not }
 	
@@ -281,7 +289,4 @@ WFSScore {
 			});
 		}
 	
-	}
-		
-			
-	
+}
