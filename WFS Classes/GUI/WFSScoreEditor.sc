@@ -812,7 +812,7 @@ WFSScoreEditor {
 				} )
 						
 			.unscaledDrawFunc_( { |v|
-				var names, scPos, objects, colors, muted;
+				var names, scPos, objects, colors, muted, fades;
 				var rect;
 				
 				
@@ -843,13 +843,20 @@ WFSScoreEditor {
 				names = getNames.value;
 				colors = getTypeColors.value;
 				muted = score.events.collect( _.muted );
+				fades = score.events.collect{ |event| 
+					if((event.wfsSynth.class == WFSScore) or: { event.wfsSynth.fadeTimes.isNil }) {
+						[0,0]
+					} {
+						event.wfsSynth.fadeTimes
+					}
+				};
 				
 				scPos = v.translateScale( WFSTransport.pos@0 );
 				
 				Pen.font = Font( Font.defaultSansFace, 10 );
 				
 				v.translateScale( rects ).do({ |item, i| 
-					var lineAlpha, selected, textrect;
+					var lineAlpha, selected, textrect, innerItem;
 					
 					if(rect.intersects( item ))
 						{	
@@ -871,14 +878,26 @@ WFSScoreEditor {
 							if( selected ) { 1.0 * lineAlpha } { 0.66 * lineAlpha }
 							); 
 							
-						Pen.fillRect( item.insetBy(0.5,0.5) );
+						//Pen.fillRect( innerItem.insetBy(0.5,0.5) );
+						innerItem = item.insetBy(0.5,0.5);
 						
+						Pen.moveTo(innerItem.leftBottom);
+						Pen.lineTo(innerItem.rightBottom);
+						Pen.lineTo(innerItem.rightBottom - v.translateScale(Point(fades[i][1],0)) - Point(0,item.height) );
+						Pen.lineTo(innerItem.leftBottom + v.translateScale(Point(fades[i][0],0)) + Point(0,item.height.neg));
+						Pen.moveTo(innerItem.leftBottom);
+
+						Pen.fill;
 						
 						Pen.color = Color.black.alpha_( lineAlpha );
 						
 						if( item.height > 4 )
 							{
-							textrect = item.sect( rect.insetBy(-3,0) );
+							innerItem = Rect.fromPoints(
+								innerItem.leftBottom + v.translateScale(Point(fades[i][0],0) ),
+								innerItem.rightBottom - v.translateScale( Point(fades[i][1],0) ) - Point(0,item.height) 
+							);
+							textrect = innerItem.sect( rect.insetBy(-3,0) );
 							Pen.use({		
 								Pen.addRect( textrect ).clip;
 								Pen.stringLeftJustIn( 
