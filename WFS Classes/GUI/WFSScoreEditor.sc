@@ -87,7 +87,7 @@ WFSScoreEditor {
 		var n, moveFlag, moveOrigin, movingRects; // moving
 		
 		var createRects, eventsFromRects, getNames, getObjects; // functions
-		var possibleSelectedRects, selectionPoint, selectionStartPoint, selectionFunc, updateTransport = false, initialMouseDownSelection;
+		var selectionPoint, selectionStartPoint, selectionFunc, updateTransport = false, initialMouseDownSelection;
 		var selectedPoint, position, minimumMov = 3, moveOriginAbs;
 		var getTypeColors;
 		var createSelectedRects;
@@ -207,7 +207,6 @@ WFSScoreEditor {
 		movingRects = nil;
 		
 		selectedRects = [ ];
-		possibleSelectedRects = [ ];
 			
 		//window.window.acceptsMouseOver_( true );
 		
@@ -804,8 +803,6 @@ WFSScoreEditor {
 				} )
 			
 			.drawFunc_( {
-					Color.yellow.alpha_(0.2).set;
-					possibleSelectedRects.do({ |item| Pen.fillRect( item ) });
 					if( movingRects.notNil )
 						{	Color.red.set;
 							movingRects.do{ |rect|
