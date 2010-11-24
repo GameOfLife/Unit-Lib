@@ -883,8 +883,8 @@ WFSScoreEditor {
 						
 						Pen.moveTo(innerItem.leftBottom);
 						Pen.lineTo(innerItem.rightBottom);
-						Pen.lineTo(innerItem.rightBottom - v.translateScale(Point(fades[i][1],0)) - Point(0,item.height) );
-						Pen.lineTo(innerItem.leftBottom + v.translateScale(Point(fades[i][0],0)) + Point(0,item.height.neg));
+						Pen.lineTo(innerItem.rightBottom - v.scale(Point(fades[i][1],0)) - Point(0,item.height) );
+						Pen.lineTo(innerItem.leftBottom + v.scale(Point(fades[i][0],0)) + Point(0,item.height.neg));
 						Pen.moveTo(innerItem.leftBottom);
 
 						Pen.fill;
@@ -894,8 +894,8 @@ WFSScoreEditor {
 						if( item.height > 4 )
 							{
 							innerItem = Rect.fromPoints(
-								innerItem.leftBottom + v.translateScale(Point(fades[i][0],0) ),
-								innerItem.rightBottom - v.translateScale( Point(fades[i][1],0) ) - Point(0,item.height) 
+								innerItem.leftBottom + v.scale(Point(fades[i][0],0) ),
+								innerItem.rightBottom - v.scale( Point(fades[i][1],0) ) - Point(0,item.height) 
 							);
 							textrect = innerItem.sect( rect.insetBy(-3,0) );
 							Pen.use({		
