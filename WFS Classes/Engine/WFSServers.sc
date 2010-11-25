@@ -145,9 +145,11 @@ WFSServers {
 				.states_([["K", Color.black, Color.clear]])
 				.font_( Font( "Monaco", 9 ) )
 				.action_( { Server.killAll;
-					"ssh gameoflife@192.168.2.11 \"killAll scsynth\"".systemCmd;
-					"ssh gameoflife@192.168.2.12 \"killAll scsynth\"".systemCmd;
-					 } );
+					if(this.isMaster) {
+						"ssh gameoflife@192.168.2.11 \"killAll scsynth\"".systemCmd;
+						"ssh gameoflife@192.168.2.12 \"killAll scsynth\"".systemCmd;
+					}
+				} );
 			
 			SCButton(window, Rect(0,0, 16, 16))
 				.states_([["F", Color.black, Color.clear]])
