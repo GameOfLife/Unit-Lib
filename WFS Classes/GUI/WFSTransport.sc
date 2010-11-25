@@ -200,17 +200,18 @@ WFSTransport {
 					{ WFS.graphicsMode = \slow };
 				} )
 			.canFocus_( false );
-					
-		RoundButton( window.window, Rect( window.window.bounds.width - 160, 62, 55, 16 ) )
-			.states_( [ 	["prepare", Color.red(0.25), Color.red(0.75).alpha_(0.5) ] ] )
-			.action_( { |bt| 
-				WFSScore.current.writePathData;
-				"WFSTransport:prepare
-				All path data is now saved to a file and uploaded to both servers.
-				do this once every time a new score is loaded or the score is changed".postln;
-				} )
-			.canFocus_( false );
-			
+
+		if(WFSServers.default.isSingle.not){
+			RoundButton( window.window, Rect( window.window.bounds.width - 160, 62, 55, 16 ) )
+				.states_( [ 	["prepare", Color.red(0.25), Color.red(0.75).alpha_(0.5) ] ] )
+				.action_( { |bt| 
+					WFSScore.current.writePathData;
+					"WFSTransport:prepare
+					All path data is now saved to a file and uploaded to both servers.
+					do this once every time a new score is loaded or the score is changed".postln;
+					} )
+				.canFocus_( false );
+		};
 		
 		scoreMenu = SCPopUpMenu( window.window, 
 				Rect( window.window.bounds.width - 100, 80, 95, 16 ) )

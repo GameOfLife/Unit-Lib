@@ -70,7 +70,7 @@
 				var delta;
 				delta = (event.startTime - currentTime);
 				delta.wait;
-				event.wfsSynth.playNowSync3( wfsServers, event.startTime );
+				event.wfsSynth.playNow( wfsServers, event.startTime );
 				currentTime = currentTime + delta;
 				});
 			}, WFSSynth.clock).start;
@@ -80,7 +80,52 @@
 	
 + WFSSynth {
 
-	 playNowSync3 { |wfsServers, startTime = 0|
+	playNow{  |wfsServers, startTime = 0|
+		if(WFSServers.default.isSingle){
+			this.playNowSyncOffline(wfsServers,startTime)
+		}{
+			this.playNowSync3(wfsServers,startTime)
+		}
+	}
+
+	playNowSyncOffline { |wfsServers, startTime = 0|
+		var nodeID, serverIndex, servers, delayOffset;
+		
+		#serverIndex, servers, delayOffset =  
+			wfsServers.nextArray( this.typeActivity );
+
+		/*
+		if( this.useSwitch )
+			{ this.copyNew.intType_( \switch ).playNowSync2( wfsServers, startTime ); };
+		*/
+		this.prepareForPlayback;
+					 
+		WFS.debug( "% - s:%, %", WFS.secsToTimeCode( startTime ),			serverIndex,
+			filePath );
+		
+		//nodeID = this.nextNodeID(startTime, true);
+		
+		nodeID = servers.nextNodeID;
+		
+		if ( sampleAccurateTiming )
+			{ delayOffset = delayOffset + startTime.nodeIDTimeOffset  };
+			
+		this.loadFreeSync( servers, nodeID, delayOffset, serverIndex );
+		
+		clock.sched( WFSEvent.wait - 0.1, // sync latency = 0.1 
+			{ loadedSynths.asCollection.do({ |synth|
+				synth.synth.asCollection.do({ |subsynth|
+					subsynth.server.sendBundle( 0.1, 
+						subsynth.runMsg( true ) );
+						});
+				});
+			});
+		
+		
+	}
+
+
+	playNowSync3 { |wfsServers, startTime = 0|
 		var nodeID, serverIndex, servers, delayOffset;
 		
 		if( this.intType == \switch ) { "playing switch".postln; };

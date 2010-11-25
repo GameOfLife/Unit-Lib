@@ -236,7 +236,7 @@ WFSPan2D {
 	^[ ( if( speakerSpec.useSwitch && ( location.class != WFSPlane ) )
 			{ ((0 < distSqr ).binaryValue * 2) - 1 }
 			{ 1 } ), 
-		(if( nonMoving ) 
+		(if( nonMoving or: { speakerSpec.useSwitch.not } )
 			{ 1 }
 			{ distSqr.fadeOut( 0, speakerSpec.fadeRange / 2, speakerSpec.fadeRange / 2 ) })
 		];
