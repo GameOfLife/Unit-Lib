@@ -75,7 +75,8 @@ WFSServers {
 				serversPerSystem, 
 				basicName ++ (i+1) ++ "_", 
 				NetAddr( ip, startPort ), 
-				Server.local.options );
+				Server.default.options , 
+				synthDefDir: "/Applications/WFSCollider.app/Contents/Resources/synthdefs/");
 			}) ? [];
 			
 		syncDelays = { { 0 }!serversPerSystem }!ips.size;
@@ -114,7 +115,7 @@ WFSServers {
 	
 	boot { if( masterServer.notNil )
 			{ masterServer.boot; };
-		multiServers.do( _.boot );
+		multiServers.do( _.boot(10) );
 		}
 	
 	cmdPeriod { pulsesRunning = false; counterRunning = false; Server.freeAllRemote( false ); }
