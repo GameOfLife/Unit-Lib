@@ -82,35 +82,29 @@
 
 	playNow{  |wfsServers, startTime = 0|
 		if(WFSServers.default.isSingle){
-			this.playNowSyncOffline(wfsServers,startTime)
+			this.playNowOffline(wfsServers,startTime)
 		}{
-			this.playNowSync3(wfsServers,startTime)
+			this.playNowSync(wfsServers,startTime)
 		}
 	}
 
-	playNowSyncOffline { |wfsServers, startTime = 0|
+	playNowOffline { |wfsServers, startTime = 0|
 		var nodeID, serverIndex, servers, delayOffset;
 		
 		#serverIndex, servers, delayOffset =  
 			wfsServers.nextArray( this.typeActivity );
 
-		/*
-		if( this.useSwitch )
-			{ this.copyNew.intType_( \switch ).playNowSync2( wfsServers, startTime ); };
-		*/
 		this.prepareForPlayback;
 					 
 		WFS.debug( "% - s:%, %", WFS.secsToTimeCode( startTime ),			serverIndex,
 			filePath );
-		
-		//nodeID = this.nextNodeID(startTime, true);
-		
+				
 		nodeID = servers.nextNodeID;
 		
 		if ( sampleAccurateTiming )
 			{ delayOffset = delayOffset + startTime.nodeIDTimeOffset  };
 			
-		this.loadFreeSync( servers, nodeID, delayOffset, serverIndex );
+		this.loadFree( servers, nodeID, delayOffset, serverIndex );
 		
 		clock.sched( WFSEvent.wait - 0.1, // sync latency = 0.1 
 			{ loadedSynths.asCollection.do({ |synth|
@@ -124,14 +118,11 @@
 		
 	}
 
-
-	playNowSync3 { |wfsServers, startTime = 0|
+	playNowSync { |wfsServers, startTime = 0|
 		var nodeID, serverIndex, servers, delayOffset;
 		
-		if( this.intType == \switch ) { "playing switch".postln; };
-		//#serverIndex, servers, delayOffset =  
-		//	wfsServers.nextArray( this.typeActivity );
-		
+		//if( this.intType == \switch ) { "playing switch".postln; };
+
 		wfsServers = wfsServers ? WFSServers.default; 
 		
 		if( prefServer.notNil )
@@ -142,7 +133,7 @@
 	
 		if( this.useSwitch && (this.intType != \switch) )
 			{ this.copyNew
-				.intType_( \switch ).playNowSync3( wfsServers, startTime ); };
+				.intType_( \switch ).playNowSync( wfsServers, startTime ); };
 		
 		this.prepareForPlayback;
 					 
@@ -155,9 +146,9 @@
 			{ delayOffset = delayOffset + startTime.nodeIDTimeOffset  };
 			
 		this.loadFreeSync3( servers, nodeID, delayOffset );
-		}
+		}		
 		
-	loadFreeSync3 { |servers, nodeID, delayOffset = 0|
+	loadFree { |servers, nodeID, delayOffset = 0|
 	
 		this.loadSync( servers, nodeID, delayOffset );
 		clock.sched( WFSEvent.wait + 0.5 + dur, 
