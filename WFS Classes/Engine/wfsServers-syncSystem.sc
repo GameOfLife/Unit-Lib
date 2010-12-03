@@ -285,106 +285,10 @@
 		^( 'linear': 12, 'static': 3.5, 'cubic': 18, 'index': 0.5, 'plane': 3.5 )[ type ] ? 0
 		*/
 		}
-
-	playSync { |wfsServers, startTimeOffset = 0, startTimeAdd = 0| 
-			// pulses should follow after one s
-		var synthCopy, serverIndex;
-		wfsServers = wfsServers ? WFSServers.default;
-		
-		if( muted.not )
-			{ if ( this.isFolder )
-				{ wfsSynth.playSync( wfsServers, startTimeOffset, startTimeAdd + startTime, 
-					startTime ); }
-				{ 
-				"%:  %\n".postf(   
-					WFS.secsToTimeCode(
-						(( startTime - startTimeOffset ) + startTimeAdd).max(0) ),
-						this ); 
-				WFSSynth.clock.sched( ( ( startTime - startTimeOffset ) + startTimeAdd).max(0), 
-					{ var synthCopy;
-					serverIndex =  wfsServers.nextArray( this.typeActivity );
-					 synthCopy = this.wfsSynth.prepareForPlayback;
-					 
-					 
-					//"adding activity to % %\n".postf(serverIndex[0], wfsServers.activityIndex);
-					//wfsServers.addActivity( this.typeActivity, serverIndex );
-					WFS.debug( "started % at %s", synthCopy.filePath, startTime );
-					
-						synthCopy.playNowSync( 
-							serverIndex[1], startTime + startTimeAdd,
-							serverIndex[2], serverIndex[0] );
-						
-					});
-				/*
-				if( usePulses.not )
-					{ WFSSynth.clock.sched( startTime + wait, { synthCopy.run }) };
-				*/ 
-			};
-				
-			
-			};
-		}
-		
-	playSync2 { |wfsServers, startTimeOffset = 0, startTimePlus = 0, calledThisAt = 0|
-		var schedTime;
-		// startTimePlus is the added starttime if the event is inside a folder
-		wfsServers = wfsServers ? WFSServers.default;
-		
-		if( muted.not )  // do nothing if muted
-			{ 
-			schedTime = (((startTime - startTimeOffset) + startTimePlus) - calledThisAt).max(0);
-			// schedule the event at the startTime, 
-			// increased with startTimePlus, decreased with calledThisAt
-
-			if( this.isFolder )
-				{ WFSSynth.clock.sched( schedTime, { 
-					wfsSynth.playSync2( 
-						wfsServers, 
-						startTimeOffset, 
-						startTimePlus + startTime, 
-						schedTime + calledThisAt);  
-					});
-				}
-				{ WFSSynth.clock.sched( schedTime,
-					{ 
-					wfsSynth.playNowSync2( wfsServers, startTime + startTimePlus ); });    
-				};
-			};
-		}
-	
-	
 	}
 	
 + WFSScore {
 
-	playSync2 { |wfsServers, startTimeOffset = 0, startTimePlus = 0, calledThisAt = 0|
-		wfsServers = wfsServers ? WFSServers.default;
-		//"calledThisAt: %\n".postf( calledThisAt );
-		if( startTimeOffset == 0 )
-			{ events.do({ |event| 
-					event.playSync2( wfsServers, startTimeOffset, startTimePlus, calledThisAt )
-				}); }
-			{ events.select({ |event| (event.startTime + startTimePlus) >= startTimeOffset })
-				 .do({ |event| event.playSync2( wfsServers, startTimeOffset, startTimePlus,
-				 	calledThisAt ) }); 
-			};
-		 }
-		
-	playSync { |wfsServers, startTimeOffset = 0, startTimeAdd = 0| 
-			// pulses should follow after WFSEvent.wait s
-		wfsServers = wfsServers ? WFSServers.default;
-		"% : score\n".postf( WFS.secsToTimeCode(startTimeAdd) );
-		if( startTimeOffset == 0 )
-			{ events.do({ |event| 
-				event.playSync( wfsServers, startTimeOffset, startTimeAdd )
-					}); 
-					 }
-			{ 	//"startTimeOffset %\n".postf( startTimeOffset );
-				events.select({ |event| (event.startTime + startTimeAdd) >= startTimeOffset })
-				 .do({ |event| event.playSync( wfsServers, startTimeOffset, startTimeAdd ) });
-				 }
-		}
-		
 	*stop { WFSSynth.clock.clear; 
 			SystemClock.clear;
 			WFSSynth.freeAllSynths;
@@ -418,42 +322,6 @@
 		// feb 2009 (AES)	
 		^( 'linear': 6.6, 'static': 3.8, 'cubic': 10.4, 'index': 0.4, 'plane': 3.2,
 			'switch': 6.6 )[ type ] ? 0
-		}
-
-	playNowSync { |servers, startTime = 0, delayOffset = 0, serverIndex = 0|
-		var nodeID;
-		nodeID = this.nextNodeID(startTime, true);
-		if ( sampleAccurateTiming )
-			{ delayOffset = delayOffset + startTime.nodeIDTimeOffset  };
-		this.loadFreeSync( servers, nodeID, delayOffset, serverIndex );
-		}
-		
-		
-	playNowSync2 { |wfsServers, startTime = 0|
-		var nodeID, serverIndex, servers, delayOffset;
-		
-		if( this.intType == \switch ) { "playing switch".postln; };
-		#serverIndex, servers, delayOffset =  
-			wfsServers.nextArray( this.typeActivity );
-			
-		if( prefServer.notNil )
-			{ servers = [servers[ prefServer ]] };
-			
-		if( this.useSwitch && (this.intType != \switch) )
-			{ this.copyNew
-				.intType_( \switch ).playNowSync2( wfsServers, startTime ); };
-		
-		this.prepareForPlayback;
-					 
-		WFS.debug( "% - s:%, %", WFS.secsToTimeCode( startTime ),			serverIndex,
-			filePath );
-		
-		nodeID = this.nextNodeID(startTime, true);
-		
-		if ( sampleAccurateTiming )
-			{ delayOffset = delayOffset + startTime.nodeIDTimeOffset  };
-			
-		this.loadFreeSync( servers, nodeID, delayOffset, serverIndex );
 		}
 
 	*resetUsedNodeIDs { usedNodeIDs = []; }
