@@ -93,8 +93,18 @@ WFS {
 		this.setServerOptions(20);
 
 		server = WFSServers.single.makeDefault;
-		server.singleWFSConfiguration = WFSConfiguration.stereoLine;
+		server.singleWFSConfiguration = WFSConfiguration.stereoLine(1.3).useSwitch_( false );
+		server.boot;
 		server.makeWindow;
+		server.m.waitForBoot({ 
+			server.loadAllSync; 
+			server.loadWFSSynthDefs;
+
+			"\n\tWelcome to the WFS Offline System".postln	
+		});
+		
+		"\n\tWelcome to the WFS Offline System".postln
+		
 		^server
 		
 	}
