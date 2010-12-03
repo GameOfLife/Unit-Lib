@@ -449,23 +449,6 @@
 				
 			  } { "WFSSynth-load: WFSSynth is probably already loaded".postln; };
 			}
-			
-	loadFreeSync { |servers, nodeID, delayOffset = 0, serverIndex = 0|
-		this.loadSync( servers, nodeID, delayOffset );
-		clock.sched( WFSEvent.wait + 0.25 + dur, 
-			{ this.freeBuffers; isRunning = false; loadedSynths.remove( this );
-				WFSServers.default.removeActivity( this.typeActivity, serverIndex );
-				WFS.debug("loaded synths: % (removed one) / activity: %",
-					loadedSynths.size,  wfsServers.activityIndex);
-
-			
-			 }
-			);
-		// loads synth and buffers and frees them after 1.25 + duration
-		// 1.25 = default load time (1) + extra 0.1 to be sure the synth is finished
-		// this depends on the sync pulse system for playback, and should be called
-		// approx. 1 second before actual play time
-		}
 		
 	*generateSynthSync { |wfsDefName, wfsPath, nodeID, servers, delayBuffer, sfBuffer, 
 			delayOffset = 0, pbRate = 1, level = 1, loop = 1, dur = 5, input = 0, args,
