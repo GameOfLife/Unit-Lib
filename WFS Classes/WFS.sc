@@ -45,8 +45,8 @@ WFS {
 		 WFSTransport.autoReturnToZero = true;  // performance mode
 		 WFSTransport.autoSwitchToNext = false;
 
-		if( File.exists( "/WFSCollider_configuration.txt" ) ) {
-			file = File("/WFSCollider_configuration.txt","r");
+		if( File.exists( "/Library/Application Support/WFSCollider/WFSCollider_configuration.txt" ) ) {
+			file = File("/Library/Application Support/WFSCollider/WFSCollider_configuration.txt","r");
 			dict = file.readAllString.interpret;
 			file.close;
 			dict.postln;
