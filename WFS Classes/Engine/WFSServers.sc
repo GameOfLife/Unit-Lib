@@ -49,6 +49,7 @@ WFSServers {
 	var pulsesRunningView;
 	var delayViews;
 	var <>singleWFSConfiguration;
+	var <>debugWatchers;
 	
 	var <>activityDict; // added 16/04/2009 - split activity spreading
 	
@@ -440,5 +441,23 @@ WFSServers {
 			{ "please load synthdefs locally on your server machines".postln };
 			 
 		}
+
+	startDebugWatcher {
+		if(multiServers.notNil){
+			debugWatchers = multiServers.collect{ |multiServer|
+				multiServer.servers.collect{ |server|
+					var debug = DebugNodeWatcher(server);
+					debug.start;
+					debug;
+				}
+			}.flat
+		}
+	}
+
+	stopDebugWatcher {
+		debugWatchers.do{ |watcher|
+				watcher.stop
+		}
+	}
 	
 	}
