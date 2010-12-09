@@ -145,7 +145,7 @@
 		if ( sampleAccurateTiming )
 			{ delayOffset = delayOffset + startTime.nodeIDTimeOffset  };
 			
-		this.loadFreeSync3( servers, nodeID, delayOffset );
+		this.loadFree( servers, nodeID, delayOffset );
 		}		
 		
 	loadFree { |servers, nodeID, delayOffset = 0|
