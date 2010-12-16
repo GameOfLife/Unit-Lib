@@ -108,7 +108,7 @@
 	
 	writePathData { |filePath, updateServers = true|
 		var paths, file, filePos = 0;
-		filePath = filePath ? ("/wfspathdata/paths_" ++ Date.getDate.stamp ++ ".aiff");
+		filePath = filePath ? ("/Library/Application Support/WFSCollider/wfspathdata/paths_" ++ Date.getDate.stamp ++ ".aiff");
 		paths = this.allPositions.select({ |item| item.class == WFSPath; });
 		file =  SoundFile.new.headerFormat_("AIFF").sampleFormat_("float")
 			.path_( filePath.standardizePath ).numChannels_(4);
@@ -117,10 +117,10 @@
 		file.close;
 		if( updateServers )
 			{ 
-			("rsync -vrut --delete" + "/wfspathdata/".quote + 
-				"gameoflife@192.168.2.11:/wfspathdata/".quote).unixCmd;
-			("rsync -vrut --delete" + "/wfspathdata/".quote + 
-				"gameoflife@192.168.2.12:/wfspathdata/".quote).unixCmd;
+			("rsync -vrut --delete" + "/Library/Application Support/WFSCollider/wfspathdata/".quote + 
+				"gameoflife@192.168.2.11:/Library/Application\\ Support/WFSCollider/wfspathdata/".quote).unixCmd;
+			("rsync -vrut --delete" + "/Library/Application Support/WFSCollider/wfspathdata/".quote + 
+				"gameoflife@192.168.2.12:/Library/Application\\ Support/WFSCollider/wfspathdata/".quote).unixCmd;
 			};
 		}
 	
