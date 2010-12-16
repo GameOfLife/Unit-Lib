@@ -133,7 +133,7 @@ WFS {
 		server.makeWindow;	
 		
 		server.m.waitForBoot({ 
-			server.loadAllSync;
+			server.loadClientSyncSynthDefs;
 			"\n\tWelcome to the WFS System".postln; 
 		});	
 		^server	
@@ -161,6 +161,7 @@ WFS {
 				{ 0.2.wait; });
 			allTypes = WFSSynthDef.allTypes( server.wfsConfigurations[0] );
 			allTypes.do({ |def| def.def.writeDefFile });
+			server.writeServerSyncSynthDefs;
 			server.multiServers[0].servers.do({ |server|
 				server.loadDirectory( SynthDef.synthDefDir );
 				});

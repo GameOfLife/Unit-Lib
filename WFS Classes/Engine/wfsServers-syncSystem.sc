@@ -21,6 +21,7 @@
 
 + WFSServers {
 
+	//SynthDefs
 	*syncSynthDef { 
 		
 		^SynthDef( "wfs_sync_get_delay", { |out = 0, input = 1|
@@ -48,36 +49,6 @@
 			Out.ar(out, Impulse.ar( ControlRate.ir ) - 0.001 ); 
 			// 0.001 offset to ensure zerocrossing
 			});
-		}
-		
-	sendSyncSynthDef { var def;
-		def = this.class.syncSynthDef;
-		multiServers.do({ |ms| 
-			ms.servers.do({ |server|
-				def.send( server );
-				}); 
-			});
-		}
-		
-	loadSyncSynthDef { var def;
-		def = this.class.syncSynthDef;
-		multiServers.do({ |ms| 
-			var dir;
-			dir = dir ? ms.synthDefDir;
-			if( dir.pathMatch.size != 0 )
-				{ def.writeDefFile(dir);
-					ms.servers.do( _.listSendMsg(
-						["/d_load", dir ++ def.name ++ ".scsyndef"]
-					) ); }
-				{ ("WFSServers-loadSyncSynthDef: defFile could not be written in:\n\t"++
-					dir ++ "\n\tThe SynthDef was sent instead").postln;
-					this.sendSyncSynthDef; };
-			});
-		}
-		
-	loadSyncPulsesSynthDef {
-		this.class.syncPulsesSynthDef.load( masterServer );
-		
 		}
 		
 	*pulseCountSynthDef {
@@ -117,40 +88,18 @@
 			//Out.ar(0,0); 
 			});
 		}
+
+	writeServerSyncSynthDefs{
+		this.class.syncSynthDef.writeDefFile;
+		this.class.pulseCountSynthDef.writeDefFile;
+	}
 		
-	sendPulseCountSynthDef { var def;
-		def = this.class.pulseCountSynthDef;
-		multiServers.do({ |ms| 
-			ms.servers.do({ |server|
-				def.send( server );
-				}); 
-			});
-		}
-		
-	loadPulseCountSynthDefs {
-		 var def;
+	loadClientSyncSynthDefs {
+		this.class.syncPulsesSynthDef.load( masterServer );
 		this.class.localPulseCountSynthDef.load( masterServer );
-		def = this.class.pulseCountSynthDef;
-		multiServers.do({ |ms| 
-			var dir;
-			dir = dir ? ms.synthDefDir;
-			if( dir.pathMatch.size != 0 )
-				{ def.writeDefFile(dir);
-					ms.servers.do( _.listSendMsg(
-						["/d_load", dir ++ def.name ++ ".scsyndef"]
-					) ); }
-				{ ("WFSServers-loadPulseCountSynthDef: defFile could not be written in:\n\t"++
-					dir ++ "\n\tThe SynthDef was sent instead").postln;
-					this.sendPulseCountSynthDef; };
-			});
-		}
-		
-	loadAllSync { 
-		this.loadSyncSynthDef; 
-		this.loadSyncPulsesSynthDef; 
-		this.loadPulseCountSynthDefs;
-		 }
+	}
 		 
+	//instatiation
 	startCounter { |startTime = 0|
 		if( counterRunning.not )
 			{
@@ -233,7 +182,6 @@
 		Routine({
 			silent !? { "WFSServers-getSync:".postln; };
 			this.startPulses;
-			//this.sendSyncSynthDef;
 			silent !? { "\tstarted sync pulse, measuring..".postln; };
 			0.2.wait;
 			this.playSyncSynthDef;
@@ -593,5 +541,5 @@
 			out = out ++ [ a, b.asCollection.wrapAt( index ) ];
 			});
 		^out;
-		}
 	}
+}
