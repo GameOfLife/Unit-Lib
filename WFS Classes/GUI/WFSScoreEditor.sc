@@ -22,7 +22,7 @@ WFSScoreEditor {
 	classvar <>current, <all;
 	classvar <>askForSave = true;
 	
-	var <score, <isMainEditor, <parent, <filePath;
+	var <score, <isMainEditor, <parent;
 	var <>window, <currentIndex;
 	var <snapActive, <>snapH, <>numTracks;
 	var id;
@@ -33,8 +33,8 @@ WFSScoreEditor {
 	
 	*initClass { UI.registerForShutdown({ WFSScoreEditor.askForSave = false }); }
 	
-	*new { |wfsScore, isMainEditor = true, parent, filePath |
-		^super.newCopyArgs( wfsScore, isMainEditor, parent, filePath)
+	*new { |wfsScore, isMainEditor = true, parent |
+		^super.newCopyArgs( wfsScore, isMainEditor, parent)
 			.init
 			.newWindow
 			.makeCurrent
@@ -43,8 +43,8 @@ WFSScoreEditor {
 	
 	*open{
 		CocoaDialog.getPaths( { |paths|	
-			var score = WFSScore.readWFSFile( paths[0] );
-			WFSScoreEditor( score, true, nil, paths[0] );		}) 
+			var score = WFSScore.readWFSFile( paths[0] ).filePath_(paths[0]);
+			WFSScoreEditor( score, true, nil);		}) 
 	}
 	
 	init { 
@@ -90,8 +90,8 @@ WFSScoreEditor {
 	selectedEvents { ^score.events[ selectedRects ];  }
 	
 	save{
-		if(filePath.notNil){	
-			score.writeWFSFile( filePath ,true, false);
+		if(score.filePath.notNil){	
+			score.writeWFSFile( score.filePath ,true, false);
 		}{
 			this.saveAs
 		}
@@ -99,7 +99,7 @@ WFSScoreEditor {
 	
 	saveAs{
 		CocoaDialog.savePanel( 
-			{ |path| score.writeWFSFile( path ); filePath = path});
+			{ |path| score.writeWFSFile( path ); score.filePath = path});
 	} 
 	
 	combineAppend{

@@ -111,6 +111,7 @@ WFSScore {
 	
 	var <>events, <>name = "untitled";
 	var <>clickTrackPath; // clicktrack addition 29/10/08 ws
+	var <>filePath;
 	
 	*new { |... events| 
 		^super.newCopyArgs( events.select({ |item| item.class == WFSEvent }) );
