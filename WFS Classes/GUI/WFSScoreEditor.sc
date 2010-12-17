@@ -1,7 +1,7 @@
 /*
     GameOfLife WFSCollider - Wave Field Synthesis spatialization for SuperCollider.
     The Game Of Life Foundation. http://gameoflife.nl
-    Copyright 2006-2010 Wouter Snoei.
+    Copyright 2006-2010 Wouter Snoei, Miguel Negr‹o.
 
     GameOfLife WFSCollider software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -104,55 +104,55 @@ WFSScoreEditor {
 	
 	combineAppend{
 		CocoaDialog.getPaths( { |paths|
-						var nextFunc;
-						nextFunc = { |index = 0|
-							var path, newScore;
-							path = paths[index];
-							if( path.notNil )
-								{ newScore = WFSScore.readWFSFile( path );
-								  if( newScore.notNil )
-								  	{ if( score.events.size == 0 )
-								  		{ score = WFSScore.readWFSFile( paths[0] ) ? score;
-											this.update;  nextFunc.value(index+1); }
-										{ SCAlert( "where do you want to place '%'?"
-											.format( path.basename ),
-										[ "cancel", "skip",
-											"as folder", 
-											"at start", "current pos", "at end"],
-										[ { }, { nextFunc.value(index+1) },
-											{ score.events = score.events.add(
-												   WFSEvent( 0, newScore ) );
-											score.cleanOverlaps;
-										   	this.update; 
-										   	nextFunc.value(index+1);  },
-										   { score.events = 
-										   		score.events ++ newScore.events;
-										   	score.cleanOverlaps;
-										   	this.update; 
-										   	nextFunc.value(index+1); },
-										   { newScore.events.do({ |event|
-												event.startTime = 
-												   WFSTransport.pos + event.startTime;
-												});
-											score.events = score.events ++ newScore.events;
-											score.cleanOverlaps;
-											this.update;
-											nextFunc.value(index+1);
-											},
-											{ newScore.events.do({ |event|
-												event.startTime = 
-												   event.startTime + score.duration;
-												});
-											score.events = score.events ++ newScore.events;
-											score.cleanOverlaps;
-											this.update;
-											nextFunc.value(index+1);
-											} ]	);
-										};
-									};
-								};
+			var nextFunc;
+			nextFunc = { |index = 0|
+				var path, newScore;
+				path = paths[index];
+				if( path.notNil )
+					{ newScore = WFSScore.readWFSFile( path );
+					  if( newScore.notNil )
+					  	{ if( score.events.size == 0 )
+					  		{ score = WFSScore.readWFSFile( paths[0] ) ? score;
+								this.update;  nextFunc.value(index+1); }
+							{ SCAlert( "where do you want to place '%'?"
+								.format( path.basename ),
+							[ "cancel", "skip",
+								"as folder", 
+								"at start", "current pos", "at end"],
+							[ { }, { nextFunc.value(index+1) },
+								{ score.events = score.events.add(
+									   WFSEvent( 0, newScore ) );
+								score.cleanOverlaps;
+							   	this.update; 
+							   	nextFunc.value(index+1);  },
+							   { score.events = 
+							   		score.events ++ newScore.events;
+							   	score.cleanOverlaps;
+							   	this.update; 
+							   	nextFunc.value(index+1); },
+							   { newScore.events.do({ |event|
+									event.startTime = 
+									   WFSTransport.pos + event.startTime;
+									});
+								score.events = score.events ++ newScore.events;
+								score.cleanOverlaps;
+								this.update;
+								nextFunc.value(index+1);
+								},
+								{ newScore.events.do({ |event|
+									event.startTime = 
+									   event.startTime + score.duration;
+									});
+								score.events = score.events ++ newScore.events;
+								score.cleanOverlaps;
+								this.update;
+								nextFunc.value(index+1);
+								} ]	);
 							};
-						nextFunc.value; });	
+						};
+					};
+				};
+			nextFunc.value; });	
 		
 	}
 	
@@ -441,16 +441,11 @@ WFSScoreEditor {
 		var selectedPoint, position, minimumMov = 3, moveOriginAbs;
 		var getTypeColors;
 		var createSelectedRects;
-		
+
 		var addEventMenu, fileMenu;
 	
-		
-		//n = numTracks; // number of tracks
-		
 		numTracks = ((score.events.collect( _.track ).maxItem ? 14) + 2).max(16);
-		
-		
-		
+
 		selectionPoint = 0@0;
 		position = 0;
 			
@@ -487,9 +482,6 @@ WFSScoreEditor {
 				{ outString };
 			});
 		};
-
-			
-		//getObjects = { score.events.collect({ |item, i| "xxx"; }); };
 		
 		getTypeColors = { score.events.collect({ |item, i|
 				var color;
@@ -879,18 +871,11 @@ WFSScoreEditor {
 							  Pen.color = Color.red;
 							  Pen.strokeRect( item );
 							 };
-							   
-						/*
-							{ Pen.width = 1;
-								Color.black.alpha_( lineAlpha ).set; };
-						*/
-						
 						
 						Pen.color = colors[i].alpha_(
 							if( selected ) { 1.0 * lineAlpha } { 0.66 * lineAlpha }
 							); 
 							
-						//Pen.fillRect( innerItem.insetBy(0.5,0.5) );
 						innerItem = item.insetBy(0.5,0.5);
 						
 						fadeinScaled = (Point(fades[i][0],0)*v.scale*v.drawBounds.extent.x/v.fromBounds.extent.x);
@@ -922,55 +907,15 @@ WFSScoreEditor {
 							}
 						}
 					});
-
-				/*	
-				v.translateScale( { |i| 0@i } ! n ).do({ |point, i|
-					i.asString.drawAtPoint( 0@(point.y), Font( "Monaco", 9 ) )
-					});
-				*/
 				
 				Pen.width = 2;
 			
 				Pen.color = Color.black.alpha_(0.5);
 				Pen.line( (scPos.x)@0, (scPos.x)@v.bounds.height);
-				Pen.stroke;
-				
-				/*
-				v.translateScale( { |i| 
-					Rect.fromPoints(0@i, 0@i+1) } ! numTracks ).do({ |rect, i|
-					if( ( rect.top >= -10 ) && { rect.top < (v.bounds.height - 10)  } )
-						{ i.asString
-							//.reverse.extend( 2, $ ).reverse
-							.drawRightJustInM9( rect.left_( -14).width_(13),
-								Color.black.alpha_(0.75) ) };
-					});
-				*/
-				
+				Pen.stroke;				
+						
 				} )
-				
-			/*
-			.unclippedUnscaledDrawFunc_( { |v|
-				
-				/*
-				Pen.width = 2;
-				Color.black.alpha_(0.5).set;
-				Pen.moveTo( (-1)@(-1) );
-				Pen.lineTo( v.bounds.width@(-1) );
-				Pen.moveTo( 0@0 );
-				Pen.lineTo( 0@v.bounds.height );
-				Pen.stroke;
-				
-				Color.white.alpha_(0.5).set;
-				Pen.moveTo( (0)@(v.bounds.height - 1) );
-				Pen.lineTo( (v.bounds.width - 1)@(v.bounds.height -1));
-				Pen.lineTo( (v.bounds.width - 1)@(0) );
-				Pen.stroke;
-				*/
-				
-			
-				} );
-			*/
-				
+							
 		}
 	
 	}
