@@ -97,7 +97,7 @@ WFS {
 		server.boot;
 		server.makeWindow;
 		server.m.waitForBoot({ 
-			server.loadAllSync; 
+			server.loadClientSyncSynthDefs; 
 			server.loadWFSSynthDefs;
 
 			"\n\tWelcome to the WFS Offline System".postln	
