@@ -202,7 +202,234 @@ WFSScoreEditor {
 			this.update;
 			};
 	}
+	
+	editSelected {
 		
+		var selectedEvent;
+		selectedEvent = score.events[ selectedRects[0] ? 0 ];
+		selectedEvent !?	{	
+			selectedEvent.edit( window.window.bounds.rightTop + (5@0), parent: this );
+			if( selectedEvent.isFolder )
+				{ selectedEvent.wfsSynth.edit( this ); }; };
+	}
+	
+	deleteSelected {
+		var eventsToDelete;
+		if( selectedRects.size > 0 ) {
+			eventsToDelete = selectedRects.collect{ |i| score.events[i] }; 
+			eventsToDelete.do({ |event| score.events.remove( event ); });
+			this.update;
+
+		}
+	}
+	
+	selectAll { 
+		selectedRects = score.events.collect({ |item, i| i });
+		this.update;
+	}
+	
+	selectSimilar{
+		var selectedTypes = score.events[ selectedRects ]
+			.collect({ |event| 
+				(event.wfsSynth.audioType.asString ++ "_" ++ event.wfsSynth.intType).asSymbol
+			});
+		selectedRects = score.events.detectAll({ |event|
+			selectedTypes.includes( 
+				(event.wfsSynth.audioType.asString ++ "_" ++ event.wfsSynth.intType).asSymbol
+			);
+		});
+		this.update;		
+	}
+	
+	muteSelected {
+		score.events[ selectedRects ? [] ].do( _.mute );
+		this.update;
+	}
+	
+	unmuteSelected {
+		score.events[ selectedRects ? [] ].do( _.unMute );
+		this.update;	
+	}
+	
+	unmuteAll {
+		score.events.do( _.unMute );
+		this.update;
+	}
+	
+	soloSelected {
+		if( selectedRects.size > 0 ) { 
+			score.events.do({ |event, i|
+				if( selectedRects.includes( i ) ) {
+					event.unMute
+				} { 
+					event.mute
+				};
+			});
+			this.update;
+		};
+	}
+	
+	addTrack {
+		numTracks = numTracks + 1; 
+		this.update;
+	}
+		
+	removeUnusedTracks {
+		numTracks = ((score.events.collect( _.track )
+			.maxItem ? 14) + 2).max( 16 );
+		this.update;
+	}	
+	
+	folderFromSelectedEvents {
+		var folderEvents, folderStartTime;
+		if( selectedRects.size > 0 ) {
+			folderEvents = score.events[ selectedRects ];
+			folderEvents.do({ |item|
+				score.events.remove( item ); });
+			 	folderStartTime = folderEvents.sort[0].startTime;
+				score.events = score.events.add( 
+					WFSEvent( folderStartTime,
+						WFSScore(
+							*folderEvents.collect({ |event|
+								event.startTime_( 
+									event.startTime - folderStartTime )
+								}) ),
+						folderEvents[0].track )
+					);
+			selectedRects = [];
+			this.update;
+		
+		} {
+			SCAlert( "Sorry, no events selected.\nUse shift to select multiple." )
+		}
+	}
+	
+	unpackSelectedFolders{
+		var folderEvents;
+		if( selectedRects.size > 0 and: {	 						folderEvents = score.events[ selectedRects ].select( _.isFolder );
+				folderEvents.size > 0  
+				}
+		) {
+			folderEvents.do({ |folderEvent|
+				score.events = score.events
+					++ folderEvent.wfsSynth.events.collect({ |item|
+						item.startTime_( item.startTime + folderEvent.startTime )
+					});
+					score.events.remove( folderEvent );
+			}); 
+			selectedRects = [];
+			score.cleanOverlaps;
+			this.update;
+		} { 
+			SCAlert( "Sorry, no folders selected." ) 
+		}	
+	}
+		
+	trimEventsStartAtPos{
+		var cutFunction = { |events,pos,isFolder=false|
+			
+			events.do{ |event|
+				var dur = event.dur;
+				var start = event.startTime;
+				if((start < pos) && ((start + dur) > pos) ) {
+					if(event.wfsSynth.class == WFSSynth ) {
+						if( event.wfsSynth.wfsPath.class == WFSPoint ) {
+							event.dur = event.dur - (pos - start);
+							event.wfsSynth.startFrame = 44100 * (pos - start);
+							
+							if(isFolder){
+								event.startTime = 0;
+							}{
+								event.startTime = pos;
+							}
+						}		
+					}{
+						cutFunction.(event.wfsSynth.events,pos-start,true);
+						if(isFolder){
+							event.startTime = 0;
+						}{
+							event.startTime = pos;
+						}											}
+				}
+			}
+		};
+		var score = this.score;
+		cutFunction.(score.events,WFSTransport.pos);
+		this.update;
+	}
+	
+	trimEventsEndAtPos{
+		var cutFunction = { |events,pos|
+			events.do{ |event|
+				var dur, newdur, start = event.startTime;
+				dur = event.dur;
+				if((start < pos) && ((start + dur) > pos) ) {
+					if(event.wfsSynth.class == WFSSynth) {
+						if( event.wfsSynth.wfsPath.class == WFSPoint ) {
+							newdur = pos - event.startTime;
+							event.dur = newdur;
+						}
+					}{
+						cutFunction.(event.wfsSynth.events,pos-start);
+					}			
+				}											}
+		};
+		cutFunction.(this.score.events,WFSTransport.pos);
+		this.update;
+	}
+	
+	checkSoundFiles {
+		var errorString = "";
+		score.checkSoundFile( 
+			 { |synth, sf| errorString = 
+			 	errorString ++ "soundfile '" ++ 
+			 		sf.path.deStandardizePath ++ "' has > 1 channels\n" },
+			 { |synth, sf| errorString = 
+			 	errorString ++ "soundfile '" ++
+			 		sf.path.deStandardizePath ++ "' sampleRate != 44100\n" },
+			 { |synth, sf| errorString = 
+			 	errorString ++ "soundfile '" ++ 
+			 		sf.path.deStandardizePath ++ "' could not be opened\n" }
+		);
+		if( errorString.size > 0 ) {
+			Document( "WFSScoreEditor:check all soundfiles - Report", errorString ); 
+		} {
+			"\nWFSScoreEditor:check all soundfiles - no problems found".postln
+		}
+	}
+	
+	copySoundFiles {
+		var copyToFolderFunc = {
+			CocoaDialog.savePanel({ |path|
+				//score.copySoundFileTo( path.dirname, 
+				// doneAction: { this.update } )
+				var filePaths, duplicates, dupString;
+				filePaths = score.collectFilePaths;
+				duplicates = score.detectDupFileNames( filePaths );
+				SCAlert( "There are % soundfiles used in this score".format( filePaths.size ) ++
+					"\nof which % have one or more duplicate\nnames in different folders.".format( duplicates.keys.size ) ++
+					"\n\nDo you really want to copy to\n'%/'?".format( path ),
+					[ "cancel", "inspect", "change folder", "ok" ],
+					[ { },
+				 	{ dupString = "WFSScore duplicate file report:\n";
+				  	duplicates.sortedKeysValuesDo({ |key, value|
+				  		dupString = dupString ++ key ++ ":\n\t";
+				  		dupString = dupString ++ 
+				  			filePaths.detect({ |item| 
+				  				item.asString.basename.asSymbol == key }) ++ "\n";
+				  		value.do({ |item| dupString = 
+				  			dupString ++ "\t" ++ item ++ "\n" });
+				  		});
+				   	Document.new.string_( dupString );
+				  	},
+				  	copyToFolderFunc,
+				  	{ score.copyFilesToFolder( path, doneAction: { this.update } ); } ] 
+				);
+			});
+		};
+		copyToFolderFunc.value;
+	}
+					
 	newWindow {		
 		
 		var rects, events;
@@ -333,52 +560,33 @@ WFSScoreEditor {
 			
 		//window.window.acceptsMouseOver_( true );
 		
-		SCStaticText( window.window, Rect( 62, 2, 56, 20 ) ).string_( "event" ).align_( \right );
-		SCButton( window.window, Rect( 122, 2, 35, 20 ) )
-			.states_( [[ "edit", Color.black, Color.yellow.alpha_(0.125) ]] )
-			.action_({ |b| 
-				var selectedEvent;
-				selectedEvent = score.events[ selectedRects[0] ? 0 ];
-				selectedEvent !?	{	
-					selectedEvent.edit( window.window.bounds.rightTop + (5@0), parent: this );
-					if( selectedEvent.isFolder )
-						{ selectedEvent.wfsSynth.edit( this ); }; };				});
-				
-		/*
-		SCButton( window.window, Rect( 162, 2, 60, 20 ) )
-			.states_( [[ "duplicate", Color.black, Color.green.alpha_(0.125) ]] )
+		SCButton( window.window, Rect( 22, 2, 35, 20 ) )
+			.states_( [[ \i, Color.black, Color.yellow.alpha_(0.125) ]] )
 			.action_({ |b|
-				var copiedEvents, newTrack;
-				if( selectedRects.size > 0 )
-					{ 
-					copiedEvents = 
-						score.events[ selectedRects ]
-							.collect({ |event| 
-								newTrack = event.track + 1;
-								if( ( newTrack + 1 ) > numTracks )
-									{ newTrack =  event.track - 1 };
-								event.duplicate.track_( newTrack );
-								});
-					score.events = score.events ++ copiedEvents;
-					score.cleanOverlaps;
-					this.update;
-					}
-				});
-		*/
+				this.editSelected
+			});				
 			
-		RoundButton( window.window, Rect( 158, 2, 35, 20 ) )
+		RoundButton( window.window, Rect( 58, 2, 35, 20 ) )
 			.states_( [[ \delete, Color.black, Color.red.alpha_(0.125) ]] )
 			.radius_( 0 )
-			.action_({ |b|
-				var eventsToDelete;
-				if( selectedRects.size > 0 ) {
-					eventsToDelete = selectedRects.collect{ |i| score.events[i] }; 
-					eventsToDelete.do({ |event| score.events.remove( event ); });
-					this.update;
-
-				}
+			.action_({ 
+				this.deleteSelected				
 			});
-
+		
+		RoundButton( window.window, Rect( 108, 2, 35, 20 ) )
+			.states_( [[ "[", Color.black, Color.clear ]] )
+			.radius_( 0 )
+			.action_({ 
+				this.trimEventsStartAtPos				
+			});
+			
+		RoundButton( window.window, Rect( 144, 2, 35, 20 ) )
+			.states_( [[ "]", Color.black, Color.clear ]] )
+			.radius_( 0 )
+			.action_({ 
+				this.trimEventsEndAtPos				
+			});	
+		
 		RoundButton( window.window, Rect( 237, 2, 20, 20 ) )
 			.states_( [[ \speaker, Color.black, Color.clear ]] )
 			.radius_( 0 )
@@ -429,6 +637,7 @@ WFSScoreEditor {
 				});
 		
 		SCStaticText( window.window, Rect( 400, 2, 50, 20 ) ).string_( "snap" ).align_( \right );
+		
 		SCPopUpMenu( window.window, Rect( 454, 2, 50, 20 ) )
 			.items_( [ "off", "0.001", "0.01", "0.1", "0.25", "0.333", "1" ] )
 			.value_(4)
@@ -442,208 +651,6 @@ WFSScoreEditor {
 				
 		SCStaticText( window.window, Rect( 508, 2, 20, 20 ) ).string_( "s" );
 		
-		SCPopUpMenu( window.window, Rect( 605, 2, 72, 20 ) )
-			.items_( [ "(options", /*)*/
-				"-", "sort events", "overlapping events to new tracks",
-				"-", "add track", "remove unused tracks",
-				"-", "folder from selected events", "unpack selected folders",
-				"-", "select all", "select similar",
-				"-", "mute selected", "solo selected", "unmute selected", "unmute all",
-				"-", "check all soundfiles", "copy all soundfiles to folder..",
-				"-", "trim start of events at playhead", "trim end of events at playhead",
-				"-", "batch tweak events"] )
-			.resize_( 3 )
-			//.background_( Color.gray(0.7) )
-			.action_( { |popUp| 
-				var folderEvents, folderStartTime = 0;
-				var selectedTypes, errorString, copyToFolderFunc;
-				case { popUp.value == 2  } // sort events
-					{ score.sort; this.update; }
-					{ popUp.value == 3 } // sort events
-					{ score.cleanOverlaps; this.update; }
-					{ popUp.value == 5  } // add track
-					{ numTracks = numTracks + 1; this.update; }
-					{ popUp.value == 6  } // remove unused tracks
-					{ numTracks = 
-						((score.events.collect( _.track )
-							.maxItem ? 14) + 2).max( 16 );
-						this.update;
-					}
-					{ popUp.value == 8 }
-					{  if( selectedRects.size > 0 )
-						{  folderEvents = score.events[ selectedRects ];
-							folderEvents.do({ |item|
-								score.events.remove( item ); });
-						 folderStartTime = 
-						 	folderEvents.sort[0].startTime;
-						 score.events = score.events.add( 
-								WFSEvent( folderStartTime,
-									WFSScore(
-										*folderEvents.collect({ |event|
-											event.startTime_( 
-												event.startTime - folderStartTime )
-											}) ),
-										folderEvents[0].track )
-									);
-						selectedRects = [];
-							this.update;
-						 } { 
-				SCAlert( "Sorry, no events selected.\nUse shift to select multiple." ) }
-						   }
-					{ popUp.value == 9 }
-					{ if( selectedRects.size > 0 && {	 						folderEvents = 
-								score.events[ selectedRects ].select( _.isFolder );
-							folderEvents.size > 0  } )
-						{ folderEvents.do({ |folderEvent|
-							score.events = score.events ++ 
-								folderEvent.wfsSynth.events.collect({ |item|
-									item.startTime_( item.startTime + folderEvent.startTime )
-									});
-							score.events.remove( folderEvent );
-							}); 
-						selectedRects = [];
-						score.cleanOverlaps;
-						this.update;
-						} { SCAlert( "Sorry, no folders selected." ) };
-					}
-					{ popUp.value == 11 } // select all
-					{ selectedRects = score.events.collect({ |item, i| i });
-						this.update; }
-					{ popUp.value == 12 } // select similar
-					{ selectedTypes = score.events[ selectedRects ]
-						.collect({ |event| 
-							(event.wfsSynth.audioType.asString ++ "_" ++
-								event.wfsSynth.intType).asSymbol });
-					
-					selectedRects = score.events.detectAll({ |event|
-						selectedTypes.includes( (event.wfsSynth.audioType.asString ++ "_" ++
-								event.wfsSynth.intType).asSymbol ); });
-						this.update; }
-					{ popUp.value == 14 } // mute
-					{ score.events[ selectedRects ? [] ].do( _.mute );
-						this.update; } 
-					{ popUp.value == 15 } // solo
-					{ if( selectedRects.size > 0 )
-							{ score.events.do({ |event, i|
-									if( selectedRects.includes( i ) )
-										{ event.unMute } 
-										{ event.mute   };
-									});
-								this.update; };
-					} 
-					{ popUp.value == 16 } // unmute sel
-					{ score.events[ selectedRects ? [] ].do( _.unMute );
-						this.update; }   
-					{ popUp.value == 17 } // unmute all
-					{ score.events.do( _.unMute );
-						this.update; } 
-					{ popUp.value == 19  } // check soundfile
-					{ errorString = "";
-					score.checkSoundFile( 
-						 { |synth, sf| errorString = 
-						 	errorString ++ "soundfile '" ++ 
-						 		sf.path.deStandardizePath ++ "' has > 1 channels\n" },
-						 { |synth, sf| errorString = 
-						 	errorString ++ "soundfile '" ++
-						 		sf.path.deStandardizePath ++ "' sampleRate != 44100\n" },
-						 { |synth, sf| errorString = 
-						 	errorString ++ "soundfile '" ++ 
-						 		sf.path.deStandardizePath ++ "' could not be opened\n" } );
-						 if( errorString.size > 0 )
-						 	{ Document( "WFSScoreEditor:check all soundfiles - Report",
-						 		 errorString ); }
-						 	{ "\nWFSScoreEditor:check all soundfiles - no problems found"
-						 		.postln };
-					}
-					{ popUp.value == 20  } // copy soundfiles;
-					{ copyToFolderFunc = {CocoaDialog.savePanel({ |path|
-						//score.copySoundFileTo( path.dirname, 
-						// doneAction: { this.update } )
-						var filePaths, duplicates, dupString;
-						filePaths = score.collectFilePaths;
-						duplicates = score.detectDupFileNames( filePaths );
-						SCAlert( "There are % soundfiles used in this score"
-								.format( filePaths.size ) ++
-				"\nof which % have one or more duplicate\nnames in different folders."
-								.format( duplicates.keys.size ) ++
-				"\n\nDo you really want to copy to\n'%/'?".format( path ),
-						[ "cancel", "inspect", "change folder", "ok" ],
-						[ { },
-						  { dupString = "WFSScore duplicate file report:\n";
-						  	duplicates.sortedKeysValuesDo({ |key, value|
-						  		dupString = dupString ++ key ++ ":\n\t";
-						  		dupString = dupString ++ 
-						  			filePaths.detect({ |item| 
-						  				item.asString.basename.asSymbol == key }) ++ "\n";
-						  		value.do({ |item| dupString = 
-						  			dupString ++ "\t" ++ item ++ "\n" });
-						  		});
-						   Document.new.string_( dupString );
-						  },
-						  copyToFolderFunc,
-						  { score.copyFilesToFolder( path, doneAction: { this.update } ); } ] );
-						}); };
-					copyToFolderFunc.value;
-						
-					}
-					{ popUp.value == 22  } // trim events start
-					{
-						var cutFunction = { |events,pos,isFolder=false|
-							
-							events.do{ |event|
-								var dur = event.dur;
-								var start = event.startTime;
-								if((start < pos) && ((start + dur) > pos)){
-									if(event.wfsSynth.class == WFSSynth){
-										event.dur = event.dur - (pos - start);
-										event.wfsSynth.startFrame = 44100 * (pos - start);
-										
-										if(isFolder){
-											event.startTime = 0;
-										}{
-											event.startTime = pos;
-										}		
-									}{
-										cutFunction.(event.wfsSynth.events,pos-start,true);
-										if(isFolder){
-											event.startTime = 0;
-										}{
-											event.startTime = pos;
-										}											}
-								}
-							}
-						};
-						var score = this.score;
-						cutFunction.(score.events,WFSTransport.pos);
-						this.update;
-						
-					}
-					{ popUp.value == 23  } // trim events end
-					{
-						var cutFunction = { |events,pos|
-							events.do{ |event|
-								var dur, newdur, start = event.startTime;
-								dur = event.dur;
-								if((start < pos) && ((start + dur) > pos)){
-									if(event.wfsSynth.class == WFSSynth){
-										newdur = pos - event.startTime;
-										event.dur = newdur;
-									}{
-										cutFunction.(event.wfsSynth.events,pos-start);
-									}			
-								}											}
-						};
-						cutFunction.(this.score.events,WFSTransport.pos);
-						this.update;
-						
-					}
-					{ popUp.value == 25  }
-					{ WFSBatch.new };
-						
-						  
-				popUp.value = 0; } );
-		
-					
 		selectionFunc = { |x,y,shiftDown,isInside|
 					
 			if( isInside ){
