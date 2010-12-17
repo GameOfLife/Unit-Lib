@@ -182,14 +182,14 @@ WFSEventEditor {
 		
 		SCStaticText( composite, 94@20	).string_( "fadetime in/out" ).align_( \right );
 		views[ \fadeIn ] = ScrollingNBox( composite, 40@20 )
-			.value_( 0 ).step_( 0.1 ).clipLo_( 0 )
+			.value_( 0 ).step_( 0.1 ).clipLo_( 0 ).clipHi_(event.dur/2)
 			.action_({ |box|
 				event.wfsSynth.fadeInTime = box.value;
 				editAction.value( event, \fadeInTime, box.value.dbamp );
 				});
 	
 		views[ \fadeOut ] = ScrollingNBox( composite, 40@20 )
-			.value_( 0 ).step_( 0.1 ).clipLo_( 0 )
+			.value_( 0 ).step_( 0.1 ).clipLo_( 0 ).clipHi_(event.dur/2)
 			.action_({ |box|
 				event.wfsSynth.fadeOutTime = box.value;
 				editAction.value( event, \fadeOutTime, box.value.dbamp );
