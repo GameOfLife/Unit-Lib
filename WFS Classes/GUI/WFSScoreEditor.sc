@@ -861,7 +861,7 @@ WFSScoreEditor {
 				Pen.font = Font( Font.defaultSansFace, 10 );
 				
 				v.translateScale( rects ).do({ |item, i| 
-					var lineAlpha, selected, textrect, innerItem;
+					var lineAlpha, selected, textrect, innerItem, fadeinScaled, fadeoutScaled;
 					
 					if(rect.intersects( item ))
 						{	
@@ -886,10 +886,13 @@ WFSScoreEditor {
 						//Pen.fillRect( innerItem.insetBy(0.5,0.5) );
 						innerItem = item.insetBy(0.5,0.5);
 						
+						fadeinScaled = (Point(fades[i][0],0)*v.scale*v.drawBounds.extent.x/v.fromBounds.extent.x);
+						fadeoutScaled = (Point(fades[i][1],0)*v.scale*v.drawBounds.extent.x/v.fromBounds.extent.x);
+
 						Pen.moveTo(innerItem.leftBottom);
 						Pen.lineTo(innerItem.rightBottom);
-						Pen.lineTo(innerItem.rightBottom - v.scale(Point(fades[i][1],0)) - Point(0,item.height) );
-						Pen.lineTo(innerItem.leftBottom + v.scale(Point(fades[i][0],0)) + Point(0,item.height.neg));
+						Pen.lineTo(innerItem.rightBottom - fadeoutScaled - Point(0,innerItem.height) );
+						Pen.lineTo(innerItem.leftBottom + fadeinScaled + Point(0,innerItem.height.neg));
 						Pen.moveTo(innerItem.leftBottom);
 
 						Pen.fill;
@@ -899,8 +902,8 @@ WFSScoreEditor {
 						if( item.height > 4 )
 							{
 							innerItem = Rect.fromPoints(
-								innerItem.leftBottom + v.scale(Point(fades[i][0],0) ),
-								innerItem.rightBottom - v.scale( Point(fades[i][1],0) ) - Point(0,item.height) 
+								innerItem.leftBottom + fadeinScaled ,
+								innerItem.rightBottom - fadeoutScaled - Point(0,innerItem.height) 
 							);
 							textrect = innerItem.sect( rect.insetBy(-3,0) );
 							Pen.use({		
