@@ -62,7 +62,6 @@ WFSEvent {
 	endTime { ^startTime + this.dur; }
 	
 	muted_{ |bool|
-		("doing mute "++bool).postln;
 		muted = bool;
 		if(wfsSynth.class == WFSScore){
 			wfsSynth.events.do{ |event| event.muted = bool };
