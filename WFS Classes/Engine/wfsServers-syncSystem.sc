@@ -294,7 +294,7 @@
 					SMPTE( startTime ).toString,
 					 ((nodeID - startNodeID) / range) * (128/44.1).round(0.1) ); };
 		if ( use ) { usedNodeIDs = usedNodeIDs ++ [ nodeID ]; };
-		^nodeID;
+		^nodeID.asInteger;
 		}
 		
 	nextNodeID {  |startTime = 0, use = true|
