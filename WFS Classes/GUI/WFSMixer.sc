@@ -6,7 +6,7 @@ WFSMixer{
 		count = 0;
 		spec = [-90,12,\db].asSpec;
 		
-		width = (4+(44*(events.size.postln))).max(300);
+		width = (4+(44*(events.size))).max(300);
 		w = Window.new(
 			"mix - level "++parentEvents.size,
 			Rect(if(rect.notNil){rect.left}{100},if(rect.notNil){rect.top}{100},800,342)
