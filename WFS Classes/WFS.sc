@@ -66,7 +66,8 @@ WFS {
 		}{
 			"starting offline".postln;
 			WFS.startupOffline
-		}		
+		};
+		WFSMenubar.add;
 	}	
 	
 	*setServerOptions{ |numOuts=96|
