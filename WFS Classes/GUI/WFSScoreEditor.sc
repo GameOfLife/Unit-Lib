@@ -333,16 +333,20 @@ WFSScoreEditor {
 				var start = event.startTime;
 				if((start < pos) && ((start + dur) > pos) ) {
 					if(event.wfsSynth.class == WFSSynth ) {
-						if( event.wfsSynth.wfsPath.class == WFSPoint ) {
-							event.dur = event.dur - (pos - start);
-							event.wfsSynth.startFrame = 44100 * (pos - start);
+						
+						event.dur = event.dur - (pos - start);
+						event.wfsSynth.startFrame = 44100 * (pos - start);
+						
+						if( event.wfsSynth.wfsPath.class == WFSPath ) { 
+							event.wfsSynth.wfsPath.length_(event.dur);
+						};
 							
-							if(isFolder){
-								event.startTime = 0;
-							}{
-								event.startTime = pos;
-							}
-						}		
+						if(isFolder){
+							event.startTime = 0;
+						}{
+							event.startTime = pos;
+						}
+						
 					}{
 						cutFunction.(event.wfsSynth.events,pos-start,true);
 						if(isFolder){
@@ -365,10 +369,11 @@ WFSScoreEditor {
 				dur = event.dur;
 				if((start < pos) && ((start + dur) > pos) ) {
 					if(event.wfsSynth.class == WFSSynth) {
-						if( event.wfsSynth.wfsPath.class == WFSPoint ) {
-							newdur = pos - event.startTime;
-							event.dur = newdur;
-						}
+						newdur = pos - event.startTime;
+						event.dur = newdur;
+						if( event.wfsSynth.wfsPath.class == WFSPath ) { 
+							event.wfsSynth.wfsPath.length_(newdur);
+						}		
 					}{
 						cutFunction.(event.wfsSynth.events,pos-start);
 					}			
