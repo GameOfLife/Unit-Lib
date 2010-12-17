@@ -301,11 +301,34 @@
 		^this.class.nextNodeID( startTime, use );
 		}
 		
-	freeSync { this.free } // same as non-sync
-	releaseSync { this.release }
-	freeBuffersSync { this.freeBuffers }
+	free { synth.asCollection.do( _.free ); isRunning = false; }
 	
-	loadBuffersSync { |servers|
+	release { synth.asCollection.do( _.release ); isRunning = false; }
+	
+	freeBuffers {
+		// for any number of servers
+		 
+		 //loadedSynths.remove( this );
+		 
+		//this.post; ": buffers freed".postln;
+		if( buffersLoaded.not ) { 
+			"WFSSynth-freeBuffers: buffers are probably not loaded".postln; };
+		
+		if( wfsPath.class == WFSPath ) { wfsPath.freeBuffers; };
+		
+		delayBuffer.asCollection.do( _.free );
+	
+		if( wfsDefName.wfsAudioType === 'disk')
+			{ sfBuffer.asCollection.do( _.close ); };
+		
+		if( sfBuffer.notNil ) { sfBuffer.asCollection.do( _.free ) };
+			
+		buffersLoaded = false;
+			
+	}
+
+	
+	loadBuffers { |servers|
 			if( buffersLoaded.not )
 			  {	
 			  	if(wfsPath.class == WFSPath ) 
@@ -367,7 +390,7 @@
 			
 	loadFree { |servers, nodeID, delayOffset = 0|
 	
-		this.loadSync( servers, nodeID, delayOffset );
+		this.load( servers, nodeID, delayOffset );
 		clock.sched( WFSEvent.wait + 0.5 + dur, 
 			{ this.freeBuffers; isRunning = false; loadedSynths.remove( this );
 				WFSServers.default.removeDictActivity( this.typeActivity, servers );
@@ -380,14 +403,14 @@
 		// approx. 1 second before actual play time
 	}
 				
-	loadSync { |servers, nodeID, delayOffset = 0|
+	load { |servers, nodeID, delayOffset = 0|
 			var defName;
 			
 			//[servers, nodeID, delayOffset].postln;
 			
 			if( loaded.not )
 			  {
-			  	this.loadBuffersSync( servers );
+			  	this.loadBuffers( servers );
 			  	
 			  	clock.sched( WFSEvent.wait * 0.9, { 
 			  	
@@ -400,7 +423,7 @@
 			  			  }
 			  			{ defName = wfsDefName };
 			  	 	
-			  	 	synth = WFSSynth.generateSynthSync( wfsDefName, wfsPath, nodeID,
+			  	 	synth = WFSSynth.generateSynth( wfsDefName, wfsPath, nodeID,
 							servers, delayBuffer, sfBuffer, delayOffset, 
 							pbRate, level, loop, dur, input, args, fadeTimes,
 							wfsPathStartIndex );
@@ -412,12 +435,22 @@
 				
 			  } { "WFSSynth-load: WFSSynth is probably already loaded".postln; };
 			}
+			
+	prepareForPlayback { 
+			if( wfsPath.class == WFSPath )
+				{ wfsPath.resetBuffers };
+			^this.resetFlags.clearVars;
+			// really copy..
+			/* ^this.class.new(  wfsDefName, wfsPath.copyNew, server, filePath, dur, 
+				level, pbRate, loop, input, args, fadeTimes, startFrame );
+			*/
+	}		
 		
-		playNow{  |wfsServers, startTime = 0|
+	playNow{  |wfsServers, startTime = 0|
 		if(WFSServers.default.isSingle){
 			this.playNowOffline(wfsServers,startTime)
 		}{
-			this.playNowSync(wfsServers,startTime)
+			this.playNowClient(wfsServers,startTime)
 		}
 	}
 
@@ -451,7 +484,7 @@
 		
 	}
 
-	playNowSync { |wfsServers, startTime = 0|
+	playNowClient { |wfsServers, startTime = 0|
 		var nodeID, serverIndex, servers, delayOffset;
 		
 		//if( this.intType == \switch ) { "playing switch".postln; };
@@ -466,7 +499,7 @@
 	
 		if( this.useSwitch && (this.intType != \switch) )
 			{ this.copyNew
-				.intType_( \switch ).playNowSync( wfsServers, startTime ); };
+				.intType_( \switch ).playNowClient( wfsServers, startTime ); };
 		
 		this.prepareForPlayback;
 					 
@@ -482,7 +515,7 @@
 	}		
 			
 		
-	*generateSynthSync { |wfsDefName, wfsPath, nodeID, servers, delayBuffer, sfBuffer, 
+	*generateSynth { |wfsDefName, wfsPath, nodeID, servers, delayBuffer, sfBuffer, 
 			delayOffset = 0, pbRate = 1, level = 1, loop = 1, dur = 5, input = 0, args,
 				fadeTimes, wfsPathStartIndex = 0|
 		
