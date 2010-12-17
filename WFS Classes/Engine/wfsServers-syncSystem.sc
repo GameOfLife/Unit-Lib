@@ -363,8 +363,23 @@
 				
 			  } { "WFSSynth-loadBuffers: Buffers are probably already loaded".postln; };
 		
-			}
+	}
 			
+	loadFree { |servers, nodeID, delayOffset = 0|
+	
+		this.loadSync( servers, nodeID, delayOffset );
+		clock.sched( WFSEvent.wait + 0.5 + dur, 
+			{ this.freeBuffers; isRunning = false; loadedSynths.remove( this );
+				WFSServers.default.removeDictActivity( this.typeActivity, servers );
+				WFS.debug("loaded synths: % (removed one)", loadedSynths.size);
+			 }
+			);
+		// loads synth and buffers and frees them after 1.25 + duration
+		// 1.25 = default load time (1) + extra 0.1 to be sure the synth is finished
+		// this depends on the sync pulse system for playback, and should be called
+		// approx. 1 second before actual play time
+	}
+				
 	loadSync { |servers, nodeID, delayOffset = 0|
 			var defName;
 			
@@ -397,6 +412,75 @@
 				
 			  } { "WFSSynth-load: WFSSynth is probably already loaded".postln; };
 			}
+		
+		playNow{  |wfsServers, startTime = 0|
+		if(WFSServers.default.isSingle){
+			this.playNowOffline(wfsServers,startTime)
+		}{
+			this.playNowSync(wfsServers,startTime)
+		}
+	}
+
+	playNowOffline { |wfsServers, startTime = 0|
+		var nodeID, serverIndex, servers, delayOffset;
+		
+		#serverIndex, servers, delayOffset =  
+			wfsServers.nextArray( this.typeActivity );
+
+		this.prepareForPlayback;
+					 
+		WFS.debug( "% - s:%, %", WFS.secsToTimeCode( startTime ),			serverIndex,
+			filePath );
+				
+		nodeID = servers.nextNodeID;
+		
+		if ( sampleAccurateTiming )
+			{ delayOffset = delayOffset + startTime.nodeIDTimeOffset  };
+			
+		this.loadFree( servers, nodeID, delayOffset, serverIndex );
+		
+		clock.sched( WFSEvent.wait - 0.1, // sync latency = 0.1 
+			{ loadedSynths.asCollection.do({ |synth|
+				synth.synth.asCollection.do({ |subsynth|
+					subsynth.server.sendBundle( 0.1, 
+						subsynth.runMsg( true ) );
+						});
+				});
+			});
+		
+		
+	}
+
+	playNowSync { |wfsServers, startTime = 0|
+		var nodeID, serverIndex, servers, delayOffset;
+		
+		//if( this.intType == \switch ) { "playing switch".postln; };
+
+		wfsServers = wfsServers ? WFSServers.default; 
+		
+		if( prefServer.notNil )
+			{ servers = [ wfsServers.nextDictServer(  this.typeActivity, prefServer ) ];  }
+			{ servers = wfsServers.nextDictServers( this.typeActivity );  };
+		
+		delayOffset = servers.collect({ |srv| wfsServers.syncDelayOf( srv ) / 44100 });
+	
+		if( this.useSwitch && (this.intType != \switch) )
+			{ this.copyNew
+				.intType_( \switch ).playNowSync( wfsServers, startTime ); };
+		
+		this.prepareForPlayback;
+					 
+		WFS.debug( "% - s:%, %", WFS.secsToTimeCode( startTime ),			serverIndex,
+			filePath );
+		
+		nodeID = this.nextNodeID(startTime, true);
+		
+		if ( sampleAccurateTiming )
+			{ delayOffset = delayOffset + startTime.nodeIDTimeOffset  };
+			
+		this.loadFree( servers, nodeID, delayOffset );
+	}		
+			
 		
 	*generateSynthSync { |wfsDefName, wfsPath, nodeID, servers, delayBuffer, sfBuffer, 
 			delayOffset = 0, pbRate = 1, level = 1, loop = 1, dur = 5, input = 0, args,
