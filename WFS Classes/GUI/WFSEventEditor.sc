@@ -182,17 +182,29 @@ WFSEventEditor {
 		
 		SCStaticText( composite, 94@20	).string_( "fadetime in/out" ).align_( \right );
 		views[ \fadeIn ] = ScrollingNBox( composite, 40@20 )
-			.value_( 0 ).step_( 0.1 ).clipLo_( 0 ).clipHi_(event.dur/2)
+			.value_( 0 ).step_( 0.1 ).clipLo_( 0 )
 			.action_({ |box|
-				event.wfsSynth.fadeInTime = box.value;
-				editAction.value( event, \fadeInTime, box.value.dbamp );
+				var value =  box.value.clip(0.0,event.dur);
+				box.value_(value);
+				event.wfsSynth.fadeInTime = value;
+				if(event.wfsSynth.fadeOutTime > (event.dur - value)) {
+					event.wfsSynth.fadeOutTime = event.dur - value;
+					this.update;
+				};
+				editAction.value;
 				});
 	
 		views[ \fadeOut ] = ScrollingNBox( composite, 40@20 )
-			.value_( 0 ).step_( 0.1 ).clipLo_( 0 ).clipHi_(event.dur/2)
+			.value_( 0 ).step_( 0.1 ).clipLo_( 0 )
 			.action_({ |box|
-				event.wfsSynth.fadeOutTime = box.value;
-				editAction.value( event, \fadeOutTime, box.value.dbamp );
+				var value =  box.value.clip(0.0,event.dur);
+				box.value_(value);
+				event.wfsSynth.fadeOutTime = value;
+				if(event.wfsSynth.fadeInTime > (event.dur - value)) {
+					event.wfsSynth.fadeInTime = event.dur - value;
+					this.update;
+				};
+				editAction.value;
 				});
 
 		composite.decorator.nextLine;
