@@ -937,7 +937,7 @@ WFSPath {
 		
 		// server can be array of servers
 		buffers = [nil, nil];
-		
+		{
 		server.asCollection.do({ |oneServer|
 			
 			buffers[0] = buffers[0].asCollection.add( 
@@ -967,7 +967,7 @@ WFSPath {
 						} )
 					);
 				});
-		
+		}.fork;
 		^this;
 		}
 	
