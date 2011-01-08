@@ -68,6 +68,16 @@ WFS {
 			WFS.startupOffline
 		};
 		WFSMenubar.add;
+		Document.initAction = { |doc|
+		if( (doc.string(0, 9) ? "").toLower == "<xml:wfs>" )
+			{ SCAlert( 
+				"This document appears to be a WFS score file. Do you want to open it in the score editor?", 
+					[ "no", "yes" ], [ { }, { 
+						WFSScore.readWFSFile( doc.path ).edit;
+						doc.close;
+				 } ]);
+			};
+		};
 	}	
 	
 	*setServerOptions{ |numOuts=96|
@@ -100,7 +110,8 @@ WFS {
 		server.m.waitForBoot({ 
 			server.loadClientSyncSynthDefs; 
 			server.loadWFSSynthDefs;
-
+			WFSEQ.new; WFSTransport.new; WFSLevelBus.makeWindow;
+			
 			"\n\tWelcome to the WFS Offline System".postln	
 		});
 		
