@@ -19,12 +19,12 @@
 
 WFSMenubar {
 
-	*add {
+	*add { |index = 3|
 		
 		var wfsMenu, scoreMenu, pathMenu, helpMenu, viewMenu, defaultMenu, addEvent, events;
 		
 		//score	
-		scoreMenu = SCMenuGroup.new(nil, "Score",2);
+		scoreMenu = SCMenuGroup.new(nil, "Score", index);
 		SCMenuItem.new(scoreMenu,  "New").action_({
 			WFSScore.new.edit 
 		}).setShortCut("n",true);
@@ -65,7 +65,7 @@ WFSMenubar {
 		});
 		
 		//events
-		events = SCMenuGroup.new(nil, "Events",3);
+		events = SCMenuGroup.new(nil, "Events", index + 1);
 		//add
 		addEvent = SCMenuGroup.new(events, "Add");
 		SCMenuItem.new(addEvent, "Audiofile").action_({
@@ -195,7 +195,7 @@ WFSMenubar {
 		
 		
 		//paths			
-		pathMenu = SCMenuGroup.new(nil, "Paths",4);
+		pathMenu = SCMenuGroup.new(nil, "Paths", index + 2);
 		
 		SCMenuItem.new(pathMenu, "Generate New").action_(  
 			{ WFSPathEditor.newEditor( 
@@ -242,7 +242,7 @@ WFSMenubar {
 								});
 
 		//view
-		viewMenu = SCMenuGroup.new(nil, "View",5);
+		viewMenu = SCMenuGroup.new(nil, "View", index + 3);
 		SCMenuItem.new(viewMenu, "All").action_( {WFSEQ.new; WFSTransport.new; WFSLevelBus.makeWindow;}).setShortCut("t",true);
 		SCMenuSeparator.new(viewMenu);
 		SCMenuItem.new(viewMenu, "EQ").action_( {WFSEQ.new; });
