@@ -380,8 +380,13 @@ WFSScoreEditor {
 		}
 	}
 		
-	trimEventsStartAtPos{
-		this.cutEventsStart(this.selectedEventsOrAll,WFSTransport.pos);
+	trimEventsStartAtPos{ |onlySelected = true|
+		var events = if(onlySelected) {
+			this.selectedEventsOrAll
+		} {
+			score.events
+		};			
+		this.cutEventsStart(events,WFSTransport.pos);
 		this.update;
 	}
 		
@@ -400,7 +405,12 @@ WFSScoreEditor {
 			}											}
 	}	
 	
-	trimEventsEndAtPos{
+	trimEventsEndAtPos{ |onlySelected = true|
+		var events = if(onlySelected) {
+			this.selectedEventsOrAll
+		} {
+			score.events
+		};	
 		this.cutEventsEnd(this.selectedEventsOrAll,WFSTransport.pos);
 		this.update;
 	}
@@ -475,14 +485,15 @@ WFSScoreEditor {
 	}
 					
 	newWindow {		
-			
+		
+		var font = Font( Font.defaultSansFace, 11 ), header;	
 		numTracks = ((score.events.collect( _.track ).maxItem ? 14) + 2).max(16);
 	
 		window = ScaledUserView.window( "WFSScoreEditor (" ++ 
 				(id ?? { "folder of " ++ ( parent !? { parent.id } ) } ) ++ ")", 
 			Rect(230 + 20.rand2, 230 + 20.rand2, 680, 300),
 			fromBounds: Rect( 0, 0, score.duration.ceil.max(1), numTracks ),
-			viewOffset: [4, 25] );
+			viewOffset: [4, 27] );
 			
 		window.userView.background = Color.gray(0.8);
 			 
@@ -519,57 +530,122 @@ WFSScoreEditor {
 		
 		//window.window.acceptsMouseOver_( true );
 		
-		SCButton( window.window, Rect( 22, 2, 35, 20 ) )
-			.states_( [[ \i, Color.black, Color.yellow.alpha_(0.125) ]] )
+		header = CompositeView( window.window, Rect(0,0, window.window.view.bounds.width, 25 ) );
+		header.addFlowLayout;
+		//header.background_( Color.gray(0.95) );
+		//header.resize_(2);
+        
+		SmoothButton( header, 18@18 )
+			.states_( [[ \i, Color.black, Color.blue.alpha_(0.125) ]] )
+			.canFocus_(false)
+			.border_(1)
+			.border_(1)
 			.action_({ |b|
 				this.editSelected
 			});				
 			
-		RoundButton( window.window, Rect( 58, 2, 35, 20 ) )
-			.states_( [[ \delete, Color.black, Color.red.alpha_(0.125) ]] )
-			.radius_( 0 )
+		header.decorator.shift(10);    
+            
+		SmoothButton( header, 18@18 )
+			.states_( [[ '-' ]] )
+			.canFocus_(false)
+			.border_(1)
 			.action_({ 
 				this.deleteSelected				
 			});
+			
+		SmoothButton( header, 18@18 )
+			.states_( [[ '+' ]] )
+			.canFocus_(false)
+			.border_(1)			
+			.action_({ 
+				if( this.selectedEvents.size > 0 )
+					{ this.duplicateSelected } 
+					{ this.addAudioFiles }		
+			});
+			
+		header.decorator.shift(10);	
 		
-		RoundButton( window.window, Rect( 108, 2, 35, 20 ) )
-			.states_( [[ "[", Color.black, Color.clear ]] )
+		SmoothButton( header, 18@18  )
+ 			.states_( [[ "[", Color.black, Color.clear ]] )
+ 			.canFocus_(false)
 			.radius_( 0 )
+			.border_(1)
+			.font_( Font( font.name, 10 ).boldVariant )
+			.radius_([8,0,0,8])
 			.action_({ 
 				this.trimEventsStartAtPos			
 			});
 			
-		RoundButton( window.window, Rect( 144, 2, 35, 20 ) )
+		SmoothButton( header, 18@18  )
+			.states_( [[ "|", Color.black, Color.clear ]] )
+			.canFocus_(false)
+			.radius_(0)
+			.border_(1)
+			.action_({ 
+				this.splitEventsAtPos				
+			});	
+			
+		SmoothButton( header, 18@18  )
 			.states_( [[ "]", Color.black, Color.clear ]] )
-			.radius_( 0 )
+			.canFocus_(false)
+			.radius_([0,8,8,0])
+			.border_(1)
 			.action_({ 
 				this.trimEventsEndAtPos				
 			});	
 			
-		RoundButton( window.window, Rect( 180, 2, 35, 20 ) )
-			.states_( [[ "|", Color.black, Color.clear ]] )
-			.radius_( 0 )
-			.action_({ 
-				this.splitEventsAtPos				
-			});	
+		header.decorator.shift(10);		
 		
-		RoundButton( window.window, Rect( 237, 2, 20, 20 ) )
+		SmoothButton( header, 18@18  )
 			.states_( [[ \speaker, Color.black, Color.clear ]] )
-			.radius_( 0 )
+			.canFocus_(false)
+			.border_(1)
 			.action_({ |b|
 				this.selectedEvents.do( _.toggleMute );
 				this.update; 
 			});
 				
-		RoundButton( window.window, Rect( 259, 2, 20, 20 ) )
-			.states_( [[ "M", Color.black, Color.clear ]] )
+		SmoothButton( header, 18@18  )
+			.states_( [[ \folder, Color.black, Color.clear ]] )
+			.canFocus_(false)
+			.border_(1)
+			.action_({ 
+				if( this.selectedEvents.every(_.isFolder) ) {
+					this.unpackSelectedFolders
+				}{
+					this.folderFromSelectedEvents; 
+				};
+			});
+				
+		header.decorator.shift(10);	
+				
+		SmoothButton( header, 40@18  )
+			.states_( [[ "mixer", Color.black, Color.clear ]] )
+			.canFocus_(false)
+			.font_( font )
+			.border_(1)
 			.radius_( 0 )
 			.action_({ |b|
 				WFSMixer(this.selectedEventsOrAll,List.new);
 			});
+			
+		SmoothButton( header, 40@18  )
+			.states_( [[ "batch", Color.black, Color.clear ]] )
+			.canFocus_(false)
+			.font_( font )
+			.border_(1)
+			.action_({ 
+				WFSBatch.new 
+			});
+			
+		header.decorator.shift(10);		
 
-		SCButton( window.window, Rect( 280, 2, 55, 20 ) )
+		SmoothButton( header, 40@18  )
 			.states_( [[ "plot", Color.black, Color.clear ]] )
+			.canFocus_(false)
+			.font_( font )
+			.border_(1)
 			.action_({ WFSMixedArray.with( 
 				*( score.events.collect({ |event|
 						if( event.isFolder.not )
@@ -580,8 +656,11 @@ WFSScoreEditor {
 						}).select( _.notNil ) ) ).plotSmooth; 
 				});		
 				
-		SCButton( window.window, Rect( 340, 2, 55, 20 ) )
+		SmoothButton( header, 50@18  )
 			.states_( [[ "plot all", Color.black, Color.clear ]] )
+			.canFocus_(false)
+			.font_( font )
+			.border_(1)
 			.action_({ WFSMixedArray.with( 
 				*( score.allEvents.collect({ |event|
 						
@@ -592,10 +671,11 @@ WFSScoreEditor {
 						}).select( _.notNil ) ) ).plotSmooth; 
 				});
 		
-		SCStaticText( window.window, Rect( 400, 2, 50, 20 ) ).string_( "snap" ).align_( \right );
-		
-		SCPopUpMenu( window.window, Rect( 454, 2, 50, 20 ) )
+		StaticText( header, 50@18 ).string_( "snap" ).font_( font ).align_( \right );		
+		PopUpMenu( header, 50@18 )
 			.items_( [ "off", "0.001", "0.01", "0.1", "0.25", "0.333", "1" ] )
+			.canFocus_(false)
+			.font_( font )
 			.value_(4)
 			.action_({ |v|
 				if (v.value == 0)
@@ -605,7 +685,7 @@ WFSScoreEditor {
 				snapH = [0, 0.001, 0.01, 0.1, 0.25, 1/3, 1][ v.value ];
 				});
 				
-		SCStaticText( window.window, Rect( 508, 2, 20, 20 ) ).string_( "s" );
+		StaticText( header, 20@18 ).string_( "s" ).font_( font );
 		
 		window.userView
 			.mouseDownAction_( { |v, x, y,mod,x2,y2| 	 // only drag when one event is selected for now
