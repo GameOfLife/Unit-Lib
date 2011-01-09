@@ -38,6 +38,12 @@ WFSEventEditor {
 	*new { arg event, leftTop, closeOldWindow = true, parent;
 		^super.newCopyArgs( event.asWFSEvent, parent ).newWindow( closeOldWindow, leftTop );
 		}
+		
+	storeUndoState{
+		if(parent.notNil) {
+			parent.storeUndoState
+		}
+	}	
 	
 	update { 
 		if( window.notNil && { window.dataptr.notNil } )
@@ -130,6 +136,7 @@ WFSEventEditor {
 			.action_({ |box|	
 					//box.value = box.value.round( 10e-12 );
 					//if( box.value < 0 ) { box.value = 0 };
+					this.storeUndoState;
 					event.startTime = box.value; 
 					editAction.value( event, \startTime, box.value );
 				});
@@ -143,7 +150,7 @@ WFSEventEditor {
 			.step_( 0.1 )
 			//.enabled_( false )
 			.action_({ |box|
-					
+					this.storeUndoState;
 					if( box.value < 0 ) { box.value = 0 };
 					event.dur = box.value; 
 					editAction.value( event, \duration, box.value );
@@ -161,7 +168,10 @@ WFSEventEditor {
 				views[ \duration ].enabled_( false );
 				SCStaticText( composite, 60@20	).string_( "Name:" );
 				SCTextField( composite, 70@16 ).string_(event.wfsSynth.name).action_({
-					arg field; event.wfsSynth.name = field.value });
+					arg field; 
+					this.storeUndoState;
+					event.wfsSynth.name = field.value 
+				});
 				}
 			{		/////// is no folder
 		
@@ -173,6 +183,7 @@ WFSEventEditor {
 			.action_({ |box|	
 					//box.value = box.value.round( 10e-12 );
 					//if( box.value < 0 ) { box.value = 0 };
+					this.storeUndoState;
 					event.wfsSynth.level = box.value.dbamp; 
 					editAction.value( event, \level, box.value.dbamp );
 				});
@@ -185,6 +196,7 @@ WFSEventEditor {
 			.value_( 0 ).step_( 0.1 ).clipLo_( 0 )
 			.action_({ |box|
 				var value =  box.value.clip(0.0,event.dur);
+				this.storeUndoState;
 				box.value_(value);
 				event.wfsSynth.fadeInTime = value;
 				if(event.wfsSynth.fadeOutTime > (event.dur - value)) {
@@ -198,6 +210,7 @@ WFSEventEditor {
 			.value_( 0 ).step_( 0.1 ).clipLo_( 0 )
 			.action_({ |box|
 				var value =  box.value.clip(0.0,event.dur);
+				this.storeUndoState;
 				box.value_(value);
 				event.wfsSynth.fadeOutTime = value;
 				if(event.wfsSynth.fadeInTime > (event.dur - value)) {
@@ -216,6 +229,7 @@ WFSEventEditor {
 			.items_( [ "both servers", "server 1", "server 2" ] )
 			.value_( (event.wfsSynth.prefServer ? -1) + 1)
 			.action_({ |box|
+				this.storeUndoState;
 				event.wfsSynth.prefServer = [nil, 0, 1][ box.value ];
 				editAction.value( event, \prefServer, [nil, 0, 1][ box.value ] );
 				});
@@ -279,7 +293,8 @@ WFSEventEditor {
 			
 		SCButton( intTypeViews.linear, 68@20 )
 			.states_( [ [ "from editor", Color.black, Color.clear ] ] )
-			.action_({ |button| 
+			.action_({ |button|
+				this.storeUndoState; 
 				event.wfsSynth.wfsPath = 
 					WFSPathEditor.current ? event.wfsSynth.wfsPath;
 				this.update;
@@ -287,7 +302,10 @@ WFSEventEditor {
 				
 		SCButton( intTypeViews.linear, 30@20 )
 			.states_( [ [ "plot", Color.black, Color.clear ] ] )
-			.action_({ event.wfsSynth.wfsPath.currentTime_( 0 ).plotSmooth; });
+			.action_({
+				this.storeUndoState;
+				event.wfsSynth.wfsPath.currentTime_( 0 ).plotSmooth;
+			});
 		
 		views[ \linear ][ \switch ] = RoundButton( intTypeViews.linear, 40@20 )
 			.states_( [[ "switch", Color.black, Color.clear ], 
@@ -295,6 +313,7 @@ WFSEventEditor {
 			.value_( event.wfsSynth.useSwitch.binaryValue )
 			.radius_( 0 ).border_( 1 )
 			.action_( { |bt|
+				this.storeUndoState;
 				 views[ \cubic ][ \switch ].value = bt.value;
 				 if( bt.value == 0 )
 							{ event.wfsSynth.useSwitch = false }
@@ -317,7 +336,8 @@ WFSEventEditor {
 			
 		SCButton( intTypeViews.cubic, 68@20 )
 			.states_( [ [ "from editor", Color.black, Color.clear ] ] )
-			.action_({ |button| 
+			.action_({ |button|
+				this.storeUndoState; 
 				event.wfsSynth.wfsPath = 
 					WFSPathEditor.current ? event.wfsSynth.wfsPath;
 				this.update;
@@ -348,6 +368,7 @@ WFSEventEditor {
 			.value_( event.x ? 0 ).action_({ 
 				/* if( event.wfsSynth.wfsPath.class == WFSPath )
 					{ wfsPathBackup = event.wfsSynth.wfsPath }; */
+				this.storeUndoState;	
 				event.wfsSynth.wfsPath_( WFSPoint(
 					views[ \static ][ \x ].value, views[ \static ][ \y ].value, 0 ),
 					false );
@@ -366,7 +387,8 @@ WFSEventEditor {
 		RoundButton( intTypeViews.static, 60@16 ).states_( [[ "rotate 90" ]] )
 			.radius_( 0 )
 			.textOffset_( Point(6,0) )
-			.action_({ 
+			.action_({
+				this.storeUndoState; 
 				event.wfsSynth.wfsPath_(
 				Point( event.x, event.y )
 					.rotate( -0.5pi )
@@ -382,7 +404,8 @@ WFSEventEditor {
 		RoundButton( intTypeViews.static, 60@16 ).states_( [[ "random" ]] )
 			.radius_( 0 )
 			.textOffset_( Point(9,0) )
-			.action_({ 
+			.action_({
+				this.storeUndoState; 
 				event.wfsSynth.wfsPath_(
 					WFSPoint( 15.0.rand2.round(0.1), 15.0.rand2.round(0.1), 
 						event.wfsSynth.wfsPath.z ), false );
@@ -402,6 +425,7 @@ WFSEventEditor {
 			.value_( event.angle ? 0).action_({ 
 				/* if( event.wfsSynth.wfsPath.class == WFSPath )
 					{ wfsPathBackup = event.wfsSynth.wfsPath }; */
+				this.storeUndoState;	
 				event.wfsSynth.wfsPath_( WFSPlane(
 					views[ \plane ][ \angle ].value, views[ \plane ][ \distance ].value, 0 ),
 					false );
@@ -421,7 +445,8 @@ WFSEventEditor {
 		RoundButton( intTypeViews.plane, 60@16 ).states_( [[ "rotate 90" ]] )
 			.radius_( 0 )
 			.textOffset_( Point(6,0) )
-			.action_({ 
+			.action_({
+				this.storeUndoState; 
 				event.wfsSynth.wfsPath_(
 					WFSPlane( (event.angle + 90) % 360, event.distance )
 					, false );
@@ -434,7 +459,8 @@ WFSEventEditor {
 		RoundButton( intTypeViews.plane, 60@16 ).states_( [[ "random" ]] )
 			.radius_( 0 )
 			.textOffset_( Point(9,0) )
-			.action_({ 
+			.action_({
+				this.storeUndoState; 
 				event.wfsSynth.wfsPath_(
 					WFSPlane( 360.0.rand.round(1), 7.5 + ( 15.0.rand.round(0.1) ) ), false );
 				
@@ -456,9 +482,10 @@ WFSEventEditor {
 			.clipLo_( 0 ).action_({ 
 				/* if( event.wfsSynth.wfsPath.class == WFSPath )
 					{ wfsPathBackup = event.wfsSynth.wfsPath }; */
+				this.storeUndoState;	
 				event.wfsSynth.wfsPath_( views[ \index ][ \index ].value ,
 					false );
-			if( WFSPlotSmooth.isOpen ) 
+				if( WFSPlotSmooth.isOpen ) 
 					{WFSConfiguration.default.allSpeakers.wrapAt( 
 					 views[ \index ][ \index ].value.round( 1 ) )
 					.asWFSPoint.plotSmooth( toFront: false ) };
@@ -476,7 +503,7 @@ WFSEventEditor {
 		
 		views[ \intType ].action_({ |box| 
 					
-					
+					this.storeUndoState;
 					intTypeViews.values.do({ |item| item.visible = false });
 					intTypeViews[ box.items[ box.value ] ].visible = true;
 
@@ -532,18 +559,19 @@ WFSEventEditor {
 					.decorator_( FlowLayout( intTypeBounds ) )
 					.visible_( false ) );
 					
-		views[ \audioType ].action_({ |box| 
-					audioTypeViews.values.do({ |item| item.visible = false });
-					audioTypeViews[ box.items[ box.value ] ].visible = true;
-					event.wfsSynth.audioType = box.items[ box.value ];
-					
-					views[ \buf ][ \startFrameMode ].action.value( 
-						views[ \buf ][ \startFrameMode ] );
-					views[ \disk ][ \startFrameMode ].action.value( 
-						views[ \disk ][ \startFrameMode ] );
+		views[ \audioType ].action_({ |box|
+			this.storeUndoState; 
+			audioTypeViews.values.do({ |item| item.visible = false });
+			audioTypeViews[ box.items[ box.value ] ].visible = true;
+			event.wfsSynth.audioType = box.items[ box.value ];
+			
+			views[ \buf ][ \startFrameMode ].action.value( 
+				views[ \buf ][ \startFrameMode ] );
+			views[ \disk ][ \startFrameMode ].action.value( 
+				views[ \disk ][ \startFrameMode ] );
 
-					editAction.value( event, \audioType, box.items[ box.value ] );
-					});
+			editAction.value( event, \audioType, box.items[ box.value ] );
+		});
 					
 					
 		SCStaticText( audioTypeViews.func, 140@50	).string_( "not supported yet" );
@@ -559,14 +587,15 @@ WFSEventEditor {
 		views[ \blip ][ \freq ] = ScrollingNBox( audioTypeViews.blip, 40@20 )
 			.value_( (event.wfsSynth.args.asArgsDict ? ())[ \freq ] ? 100 )
 			.step_( 1 )
-			.action_({ |box|	
-					if( box.value < 20 ) { box.value = 20 };
-					if( box.value > 10000 ) { box.value = 10000 };
-					event.wfsSynth.args = 
-						( (event.wfsSynth.args.asArgsDict ? () )[\freq] = box.value ) 
-							.asArgsArray;
-					editAction.value( event, \freq, box.value );
-				});
+			.action_({ |box|
+				this.storeUndoState;	
+				if( box.value < 20 ) { box.value = 20 };
+				if( box.value > 10000 ) { box.value = 10000 };
+				event.wfsSynth.args = 
+					( (event.wfsSynth.args.asArgsDict ? () )[\freq] = box.value ) 
+						.asArgsArray;
+				editAction.value( event, \freq, box.value );
+			});
 		
 		// rate
 		SCStaticText( audioTypeViews.blip, 30@20	).string_( "rate" ).align_( \right );
@@ -574,10 +603,11 @@ WFSEventEditor {
 			.value_( event.wfsSynth.pbRate )
 			.step_( 0.1 )
 			.action_({ |box|
-					if( box.value < 0.1 ) { box.value = 0.1 };
-					event.wfsSynth.pbRate = box.value; 
-					editAction.value( event, \rate, box.value );
-				});
+				this.storeUndoState;
+				if( box.value < 0.1 ) { box.value = 0.1 };
+				event.wfsSynth.pbRate = box.value; 
+				editAction.value( event, \rate, box.value );
+			});
 				
 		audioTypeViews.blip.decorator.nextLine;
 			
@@ -586,7 +616,8 @@ WFSEventEditor {
 		views[ \blip ][ \noiseLevel ] = ScrollingNBox( audioTypeViews.blip, 40@20 )
 			.value_( (event.wfsSynth.args.asArgsDict ? ())[ \noiseLevel ] ? 0.125 )
 			.step_( 0.125 )
-			.action_({ |box|	
+			.action_({ |box|
+				this.storeUndoState;	
 					if( box.value < 0 ) { box.value = 0 };
 					if( box.value > 2 ) { box.value = 2 };
 					event.wfsSynth.args = 
@@ -602,7 +633,8 @@ WFSEventEditor {
 		views[ \blip ][ \blipLevel ] = ScrollingNBox( audioTypeViews.blip, 40@20 )
 			.value_( (event.wfsSynth.args.asArgsDict ? ())[ \blipLevel ] ? 1.0 )
 			.step_( 0.125 )
-			.action_({ |box|	
+			.action_({ |box|
+				this.storeUndoState;	
 					if( box.value < 0 ) { box.value = 0 };
 					if( box.value > 2 ) { box.value = 2 };
 					event.wfsSynth.args = 
@@ -967,7 +999,10 @@ WFSEventEditor {
 			
 		SCButton( audioTypeViews.buf, 40@20 )
 			.states_( [["use"]] )
-			.action_({ event.wfsSynth.useSoundFileDur( true, { this.update } ); });
+			.action_({
+				this.storeUndoState;
+				event.wfsSynth.useSoundFileDur( true, { this.update } ); 
+			});
 			
 		audioTypeViews.buf.decorator.nextLine;	
 		
@@ -978,6 +1013,7 @@ WFSEventEditor {
 			.value_( 0.0 )
 			.clipLo_( 0 )
 			.action_({ |box|
+				this.storeUndoState;
 				case { views[ \buf ][ \startFrameMode ].value == 0 }
 					{ event.wfsSynth.startTime_( box.value ); }
 					{ views[ \buf ][ \startFrameMode ].value == 1 }
@@ -1010,6 +1046,7 @@ WFSEventEditor {
 			.value_( event.wfsSynth.pbRate )
 			.step_( 0.1 )
 			.action_({ |box|
+					this.storeUndoState;
 					if( box.value < 0.1 ) { box.value = 0.1 };
 					event.wfsSynth.pbRate = box.value; 
 					views[ \buf ][ \dur ].value =  event.wfsSynth.soundFileDur;
@@ -1031,6 +1068,7 @@ WFSEventEditor {
 			.items_( [ "off", "on" ] )
 			.value_( event.wfsSynth.loop.asInt )
 			.action_({ |box|
+				this.storeUndoState;
 					event.wfsSynth.loop = box.value; 
 					editAction.value( event, \loop, box.value );
 				});
@@ -1059,6 +1097,7 @@ WFSEventEditor {
 			.action_({ 
 				CocoaDialog.getPaths( { |paths|
 					var newName;
+					this.storeUndoState;
 					newName = paths[0];
 					views[ \disk ][ \dirName ].string = newName.dirname.deStandardizePath;
 					views[ \disk ][ \fileName ].string = newName.basename;
@@ -1191,7 +1230,10 @@ WFSEventEditor {
 			
 		SCButton( audioTypeViews.disk, 40@20 )
 			.states_( [["use"]] )
-			.action_({ event.wfsSynth.useSoundFileDur( true, { this.update }, false ); });
+			.action_({
+				this.storeUndoState;
+				event.wfsSynth.useSoundFileDur( true, { this.update }, false ); 
+			});
 			
 		audioTypeViews.buf.decorator.nextLine;	
 			
