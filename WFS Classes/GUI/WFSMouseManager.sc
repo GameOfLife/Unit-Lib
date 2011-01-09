@@ -124,6 +124,10 @@ WFSMouseEventsManager {
 		xLimit = this.selectedEvents.collect({ |ev| ev.event.startTime }).minItem;
 		yLimit = this.selectedEvents.collect({ |ev| ev.event.track }).minItem;
 		
+		if([\nothing, \selecting].includes(state).not) {
+			wfsScoreEditor.storeUndoState
+		};
+		
 		("Current state is "++state);
 	}
 	

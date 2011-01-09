@@ -26,7 +26,7 @@ WFSScoreEditor {
 	var <>window;
 	var <snapActive, <>snapH, <>numTracks;
 	var id;
-	var <undoStates; // not finished yet
+	var <undoStates, <redoStates, maxUndoStates = 40;
 	var <dirty = true;
 	var <>wfsEventViews, <wfsMouseEventsManager;
 
@@ -47,7 +47,8 @@ WFSScoreEditor {
 	}
 	
 	init { 
-		undoStates = [];
+		undoStates = List.new;
+		redoStates = List.new;
 		snapActive = true;
 		snapH = 0.25;
 		numTracks = 16;
@@ -61,11 +62,33 @@ WFSScoreEditor {
 		};
 		wfsMouseEventsManager = WFSMouseEventsManager(wfsEventViews,this);
 	}
-		
-	setUndoState { undoStates = ( [ score.copyNew ] ++ undoStates ) }
-	cleanUndoStates { undoStates = []; }
 	
-	getUndoState { |index = 0| undoStates[ index ];  }
+	//undo
+	storeUndoState { 
+		redoStates = List.new;
+		undoStates.add(score.duplicate);		
+		if(undoStates.size > maxUndoStates) {
+			undoStates.removeAt(0);
+		}
+	}
+
+	undo { 
+		if(undoStates.size > 0) {
+			redoStates.add(score);
+			score = undoStates.pop;			
+			this.createWFSEventViews;
+			this.update;
+		}		
+	}
+	
+	redo {
+		if( redoStates.size > 0 ) {
+			undoStates.add(score);
+			score = redoStates.pop;			
+			this.createWFSEventViews;
+			this.update;
+		}
+	}	
 			
 	update { "updating".postln;
 		if( window.window.notNil && { window.window.dataptr.notNil } ) { 
@@ -182,6 +205,7 @@ WFSScoreEditor {
 		var copiedEvents, newTrack, newEventsSize;
 		Dialog.getPaths( { |paths|
 				var newEvents;
+				this.storeUndoState;
 				newEvents = paths.collect({ |path, i|
 					var newEvent;
 					newEvent = WFSEvent( 
@@ -204,7 +228,8 @@ WFSScoreEditor {
 	}
 	
 	addTestEvent{
-		var copiedEvents, newTrack; 
+		var copiedEvents, newTrack;
+		this.storeUndoState; 
 		score.events = 
 			score.events.add( WFSEvent( WFSTransport.pos ) );		score.cleanOverlaps;
 		this.createWFSEventViews;
@@ -214,6 +239,7 @@ WFSScoreEditor {
 	duplicateSelected{
 		var copiedEvents, newTrack;
 		var selectedEvents = this.selectedEvents;
+		this.storeUndoState;
 		("		selectedEvents "++selectedEvents).postln;	
 		if( selectedEvents.size > 0 ) { 
 			copiedEvents = selectedEvents.collect({ |event| 
@@ -245,6 +271,7 @@ WFSScoreEditor {
 	}
 	
 	deleteSelected {
+		this.storeUndoState;
 		this.selectedEventViews.do({ |eventView|
 			score.events.remove(eventView.event);
 			wfsEventViews.remove(eventView);
@@ -271,22 +298,26 @@ WFSScoreEditor {
 	}
 	
 	muteSelected {
+		this.storeUndoState;
 		this.selectedEvents.do( _.mute );
 		this.update;
 	}
 	
 	unmuteSelected {
+		this.storeUndoState;
 		this.selectedEvents.do( _.unMute );
 		this.update;	
 	}
 	
 	unmuteAll {
+		this.storeUndoState;
 		score.events.do( _.unMute );
 		this.update;
 	}
 	
 	soloSelected {
 		var selectedEvents = this.selectedEvents;
+		this.storeUndoState;
 		if( selectedEvents.size > 0 ) { 
 			score.events.do({ |event|
 				if( selectedEvents.includes( event ) ) {
@@ -313,6 +344,7 @@ WFSScoreEditor {
 	folderFromSelectedEvents {
 		var folderEvents, folderStartTime;
 		var selectedEvents = this.selectedEvents;
+		this.storeUndoState;
 		if( selectedEvents.size > 0 ) {
 			selectedEvents.do({ |item|
 				score.events.remove( item ); 
@@ -342,6 +374,7 @@ WFSScoreEditor {
 				folderEvents.size > 0  
 				}
 		) {
+			this.storeUndoState;
 			folderEvents.do({ |folderEvent|
 				score.events = score.events
 					++ folderEvent.wfsSynth.events.collect({ |item|
@@ -385,7 +418,8 @@ WFSScoreEditor {
 			this.selectedEventsOrAll
 		} {
 			score.events
-		};			
+		};
+		this.storeUndoState;			
 		this.cutEventsStart(events,WFSTransport.pos);
 		this.update;
 	}
@@ -410,13 +444,15 @@ WFSScoreEditor {
 			this.selectedEventsOrAll
 		} {
 			score.events
-		};	
+		};
+		this.storeUndoState;	
 		this.cutEventsEnd(this.selectedEventsOrAll,WFSTransport.pos);
 		this.update;
 	}
 	
 	splitEventsAtPos{
 		var frontEvents, backEvents;
+		this.storeUndoState;
 		frontEvents = this.selectedEventsOrAll.select({ |event|
 			var dur = event.dur;
 			var start = event.startTime;
@@ -595,6 +631,24 @@ WFSScoreEditor {
 				this.trimEventsEndAtPos				
 			});	
 			
+		header.decorator.shift(10);
+		
+		SmoothButton( header, 18@18 )
+			.states_( [[ 'back' ]] )
+			.canFocus_(false)
+			.border_(1)			
+			.action_({ 
+				this.undo		
+			});
+			
+		SmoothButton( header, 18@18 )
+			.states_( [[ 'play' ]] )
+			.canFocus_(false)
+			.border_(1)			
+			.action_({ 
+				this.redo		
+			});
+		
 		header.decorator.shift(10);		
 		
 		SmoothButton( header, 18@18  )
@@ -602,6 +656,7 @@ WFSScoreEditor {
 			.canFocus_(false)
 			.border_(1)
 			.action_({ |b|
+				this.storeUndoState;
 				this.selectedEvents.do( _.toggleMute );
 				this.update; 
 			});
@@ -625,7 +680,6 @@ WFSScoreEditor {
 			.canFocus_(false)
 			.font_( font )
 			.border_(1)
-			.radius_( 0 )
 			.action_({ |b|
 				WFSMixer(this.selectedEventsOrAll,List.new);
 			});
