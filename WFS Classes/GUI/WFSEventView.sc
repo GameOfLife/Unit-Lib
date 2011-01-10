@@ -66,12 +66,14 @@ WFSEventView {
 	}
 
 	mouseDownEvent{ |mousePos,scaledUserView,shiftDown|
-		var px6Scaled = scaledUserView.doReverseScale(Point(6,0)).x;
+		//var px6Scaled = scaledUserView.doReverseScale(Point(6,0)).x;
 		var px5Scaled =  scaledUserView.doReverseScale(Point(5,0)).x; 
 		var px10Scaled = scaledUserView.doReverseScale(Point(10,0)).x;
-		var resizeFrontDetectArea,resizeBackDetectArea,fadeInDetectArea,fadeOutDetectArea, fadeInB10, fadeOutB10;
+		var resizeFrontDetectArea,resizeBackDetectArea,fadeInDetectArea,fadeOutDetectArea, fadeInB10, fadeOutB10, fadeAreaHeight;
 		
 		this.createRect;
+		
+		fadeAreaHeight = (rect.height*0.3);
 		
 		if(event.isFolder.not) {
 		
@@ -80,7 +82,7 @@ WFSEventView {
 			if(fadeInB10) {
 				resizeFrontDetectArea = rect.copy.width_(px5Scaled);
 			} {
-				resizeFrontDetectArea = rect.copy.width_(px5Scaled).height_(rect.height-px6Scaled).top_(rect.top+px6Scaled);
+				resizeFrontDetectArea = rect.copy.width_(px5Scaled).height_(rect.height-fadeAreaHeight).top_(rect.top+fadeAreaHeight);
 			};
 			//resize front
 			if(resizeFrontDetectArea.containsPoint( mousePos )) {
@@ -95,7 +97,7 @@ WFSEventView {
 					resizeBackDetectArea = rect.copy.width_(px5Scaled).left_((rect.left + rect.width - px5Scaled))
 				} {
 					resizeBackDetectArea = rect.copy.width_(px5Scaled).left_((rect.left + rect.width - px5Scaled))
-					.height_(rect.height-px6Scaled).top_(rect.top+px6Scaled)
+					.height_(rect.height-fadeAreaHeight).top_(rect.top+fadeAreaHeight)
 				};
 				//resize back	
 				if(resizeBackDetectArea.containsPoint( mousePos )) {
@@ -108,7 +110,7 @@ WFSEventView {
 					if(event.fadeInTime > px10Scaled) {
 						fadeInDetectArea = rect.copy.width_(px10Scaled).left_(rect.left + event.fadeInTime - px5Scaled);
 					} {
-						fadeInDetectArea = rect.copy.width_(px5Scaled).height_(px6Scaled);
+						fadeInDetectArea = rect.copy.width_(px5Scaled).height_(fadeAreaHeight);
 					};
 					//fade in
 					if( fadeInDetectArea.contains( mousePos ) ) {
@@ -118,7 +120,7 @@ WFSEventView {
 					} {
 						if(event.fadeOutTime > px10Scaled) {						fadeOutDetectArea = rect.copy.width_(px10Scaled).left_((rect.right - event.fadeOutTime - px5Scaled)) 
 						} {
-							fadeOutDetectArea = rect.copy.width_(px5Scaled).left_((rect.right - px5Scaled)).height_(px6Scaled);	
+							fadeOutDetectArea = rect.copy.width_(px5Scaled).left_((rect.right - px5Scaled)).height_(fadeAreaHeight);	
 						};
 						//fade out
 						if(fadeOutDetectArea.contains( mousePos ) ) {

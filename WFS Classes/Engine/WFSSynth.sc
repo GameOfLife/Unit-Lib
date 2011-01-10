@@ -102,11 +102,11 @@ WFSSynth {
 		fadeOutTime { ^( fadeTimes ? [0,0] )[1]  }
 		
 		fadeInTime_ { |time = 0| 
-			fadeTimes = ( ( fadeTimes ? [0,0] )[0] = time ); 
+			fadeTimes = ( ( fadeTimes ? [0,0] )[0] = time.max(0) ); 
 			}
 			
 		fadeOutTime_ { |time = 0| 
-			fadeTimes = ( ( fadeTimes ? [0,0] )[1] = time ); 
+			fadeTimes = ( ( fadeTimes ? [0,0] )[1] = time.max(0) ); 
 			}
 		
 		*basicNew {|wfsDefName, wfsPath, server, path = "", dur = 5, 
