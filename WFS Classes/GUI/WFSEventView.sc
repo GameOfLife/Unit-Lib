@@ -39,10 +39,10 @@ WFSEventView {
 					'disk': Color.magenta,
 					'blip': Color.red  )
 					[ event.wfsSynth.audioType ] ? Color.gray ).blend(
-				 ( ( 	'linear': Color.cyan(0.5), 
+				 ( ( 	'linear': Color(0.35,0.95,0.35), 
 						'cubic': Color.cyan(0.75),
-						'static': Color.green(0.5),
-						'plane': Color.yellow(0.5) )
+						'static': Color.green(0.75),
+						'plane': Color.yellow(0.75) )
 					[ event.wfsSynth.intType ] ? Color.gray ), 0.5 )
 			};
 
@@ -232,32 +232,31 @@ WFSEventView {
 	draw { |scaledUserView|
 		var textrect;
 		var muted = event.muted;
-		var lineAlpha =  if( muted ) { 0.8  } { 1.0  };
+		var lineAlpha =  if( muted ) { 0.5  } { 1.0  };
 		var selectedAlpha = if( selected ) { 0.8 } { 1 };
 		var scaledRect = scaledUserView.translateScale(rect);
 		var innerRect = scaledRect.insetBy(0.5,0.5);
 		var px10Scaled = scaledUserView.doReverseScale(Point(10,0)).x;
 		var px5Scaled =  scaledUserView.doReverseScale(Point(5,0)).x;
+		var clipRect = scaledUserView.view.drawBounds.moveTo(0,0).insetBy(2,2);
 		
 		this.createRect;		
 		("Event dur: "++event.dur++" eventNum "++i).postln;
-		//outline				
-		/*
+		
+		//selected outline		
 		if( selected ) {
-			Pen.width = 3;
-			Pen.color = Color.red;
+			Pen.width = 2;
+			Pen.color = Color.grey(0.2);
 			this.drawShape(scaledRect);
 			Pen.stroke;
-		};
-		*/
+		};		
 		
 		//fill inside
 		Pen.color = this.getTypeColor.alpha_(
-			lineAlpha * 0.8 * selectedAlpha
-		).scaleByAlpha.alpha_(0.9);		
+			lineAlpha * 0.4);	
 		this.drawShape(innerRect);	
 		Pen.fill;
-		
+		 
 		//draw fades
 		if(((event.wfsSynth.class == WFSScore) or: { event.wfsSynth.fadeTimes.isNil }).not) {
 			Pen.use({
@@ -268,9 +267,7 @@ WFSEventView {
 				this.drawShape(innerRect);
 				Pen.clip;
 				
-				Pen.color = this.getTypeColor.alpha_(
-					selectedAlpha * lineAlpha
-				).scaleByAlpha.alpha_(0.9);
+				Pen.color = this.getTypeColor.alpha_(lineAlpha * 0.8);
 				
 				fadeinScaled = scaledUserView.doScale(Point(fades[0],0));
 				fadeoutScaled = scaledUserView.doScale(Point(fades[1],0));						
@@ -281,6 +278,9 @@ WFSEventView {
 				Pen.moveTo(innerRect.leftBottom);
 				
 				Pen.fill;
+				
+				//fade lines
+				Pen.width = 1;
 				Pen.color = Color.grey(0.3).alpha_(0.5);
 				Pen.moveTo(innerRect.rightBottom - fadeoutScaled - Point(0,innerRect.height));
 				Pen.lineTo(innerRect.rightBottom - fadeoutScaled);
@@ -288,14 +288,13 @@ WFSEventView {
 				Pen.moveTo(innerRect.leftBottom + fadeinScaled + Point(0,innerRect.height.neg));
 				Pen.lineTo(innerRect.leftBottom + fadeinScaled);
 				Pen.stroke;
-
 				
 			});
 
 		};
 		
 				
-		Pen.color = Color.black.alpha_( lineAlpha * if( selected ) { 0.5 } { 1  } );
+		Pen.color = Color.black.alpha_( lineAlpha  );
 				
 		if( scaledRect.height > 4 ) {
 
