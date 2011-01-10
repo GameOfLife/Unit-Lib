@@ -792,11 +792,7 @@ WFSScoreEditor {
 					GUI.pen.fill;
 				});
 				
-				Pen.width = 1;
-				Color.black.alpha_(0.5).set;
-				Pen.strokeRect( rect.insetBy(1,1) );
-				Pen.font = Font( Font.defaultSansFace, 10 );
-												
+				Pen.font = Font( Font.defaultSansFace, 10 );												
 				//draw events
 				wfsEventViews.do({ |wfsEventView|
 					wfsEventView.draw(v);
@@ -811,13 +807,18 @@ WFSScoreEditor {
 					Pen.addRect(v.translateScale(wfsMouseEventsManager.selectionRect));
 					Pen.fill;
 				};
-
+				
 				//draw Transport line
 				Pen.width = 2;			
 				Pen.color = Color.black.alpha_(0.5);
 				scPos = v.translateScale( WFSTransport.pos@0 );
 				Pen.line( (scPos.x)@0, (scPos.x)@v.bounds.height);
-				Pen.stroke;				
+				Pen.stroke;	
+				
+				Pen.width = 1;
+				Color.grey(0.5,1).set;
+				Pen.strokeRect( rect.insetBy(0.5,0.5) );
+							
 						
 		})
 							
