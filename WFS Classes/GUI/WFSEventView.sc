@@ -27,7 +27,7 @@ WFSEventView {
 	}
 	
 	createRect {
-		rect = Rect( event.startTime, event.track, event.dur, 1 ).postln;
+		rect = Rect( event.startTime, event.track, event.dur, 1 );
 	}
 
 	getTypeColor { 
@@ -234,14 +234,15 @@ WFSEventView {
 		var muted = event.muted;
 		var lineAlpha =  if( muted ) { 0.5  } { 1.0  };
 		var selectedAlpha = if( selected ) { 0.8 } { 1 };
-		var scaledRect = scaledUserView.translateScale(rect);
-		var innerRect = scaledRect.insetBy(0.5,0.5);
+		var scaledRect, innerRect, clipRect;
 		var px10Scaled = scaledUserView.doReverseScale(Point(10,0)).x;
 		var px5Scaled =  scaledUserView.doReverseScale(Point(5,0)).x;
-		var clipRect = scaledUserView.view.drawBounds.moveTo(0,0).insetBy(2,2);
 		
-		this.createRect;		
-		("Event dur: "++event.dur++" eventNum "++i).postln;
+		this.createRect;
+		
+		scaledRect = scaledUserView.translateScale(rect);
+		innerRect = scaledRect.insetBy(0.5,0.5);
+		clipRect = scaledUserView.view.drawBounds.moveTo(0,0).insetBy(2,2);
 		
 		//selected outline		
 		if( selected ) {
@@ -325,6 +326,7 @@ WFSEventView {
 				}
 			}
 		};
+		
 		/*
 		// DEBUG resize area
 		Pen.color = Color.red;
