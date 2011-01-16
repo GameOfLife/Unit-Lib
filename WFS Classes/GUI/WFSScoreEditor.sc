@@ -90,7 +90,7 @@ WFSScoreEditor {
 		}
 	}	
 			
-	update { "updating".postln;
+	update {
 		if( window.window.notNil && { window.window.dataptr.notNil } ) { 
 			window.refresh; };
 			if( parent.notNil ) { parent.update };
@@ -403,7 +403,10 @@ WFSScoreEditor {
 						event.startTime = 0;
 					};
 					
-				}{
+				}{	
+					event.wfsSynth.events = event.wfsSynth.events.reject({ |ev|
+						ev.endTime < (pos-start)
+					});
 					this.cutEventsStart(event.wfsSynth.events,pos-start,true,removeFadeIn);
 					event.startTime = pos;
 					if(isFolder){
@@ -424,19 +427,26 @@ WFSScoreEditor {
 		this.update;
 	}
 		
-	cutEventsEnd { |events,pos,removeFadeOut = false|
-		"WFSScoreEditor:cutEventsEnd".postln;
+	cutEventsEnd { |events,pos,isFolder = false, removeFadeOut = false|
+	
 		events.do{ |event|
-			
-			if((event.startTime < pos) && ((event.startTime + event.dur) > pos) ) {
+			var dur = event.dur;
+			var start = event.startTime;
+			event.postln;
+			if((event.startTime < pos) && (( event.startTime + event.dur ) > pos) ) {
 				
 				if(event.isFolder) {
+					
+					event.wfsSynth.events = event.wfsSynth.events.reject({ |ev|
+						ev.startTime > ( pos - start )
+					});
 									
-					this.cutEventsEnd(event.wfsSynth.events,pos - event.startTime);
+					this.cutEventsEnd(event.wfsSynth.events,pos - event.startTime,true,removeFadeOut);
 				}{					
 					event.trimEnd(pos,true);				
 				}			
-			}											}
+			} 
+		}
 	}	
 	
 	trimEventsEndAtPos{ |onlySelected = true|
@@ -446,7 +456,7 @@ WFSScoreEditor {
 			score.events
 		};
 		this.storeUndoState;	
-		this.cutEventsEnd(this.selectedEventsOrAll,WFSTransport.pos);
+		this.cutEventsEnd(events,WFSTransport.pos);
 		this.update;
 	}
 	
@@ -783,7 +793,6 @@ WFSScoreEditor {
 			.unscaledDrawFunc_( { |v|
 				var scPos, rect;
 				rect = v.view.drawBounds.moveTo(0,0);
-				"unscaledDrawFunc_".postln;
 				//draw border
 				GUI.pen.use({	 
 					GUI.pen.addRect( rect.insetBy(0.5,0.5) );
