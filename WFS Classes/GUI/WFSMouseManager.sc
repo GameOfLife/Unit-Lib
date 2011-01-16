@@ -5,8 +5,9 @@ WFSMouseEventsManager {
 	var <selectionRect, event;
 	var <xLimit, <yLimit;
 	var <isCopying = false, copyed = false;
+	var <>mode = \all;
 	//state is \nothing, \moving, \resizingFront, \resizingBack, \selecting, \fadeIn, \fadeOut;
-	
+	//mode is \all, \move, \resize, \fades
 	//protocol:
 	
 	//initial click:
@@ -39,13 +40,13 @@ WFSMouseEventsManager {
 			eventView.selected
 		}
 	}		
-	
+		
 	mouseDownEvent{ |mousePos,unscaledMousePos,shiftDown,altDown,scaledUserView|
 		
 		mouseDownPos = mousePos;
 		unscaledMouseDownPos = unscaledMousePos;
 		eventViews.do{ |eventView|
-			eventView.mouseDownEvent(mousePos,scaledUserView,shiftDown)
+			eventView.mouseDownEvent(mousePos,scaledUserView,shiftDown,mode)
 		};
 		
 		event = eventViews.select{ |eventView|

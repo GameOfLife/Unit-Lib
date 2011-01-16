@@ -735,7 +735,8 @@ WFSScoreEditor {
 						}).select( _.notNil ) ) ).plotSmooth; 
 				});
 		
-		StaticText( header, 50@18 ).string_( "snap" ).font_( font ).align_( \right );		
+		StaticText( header, 30@18 ).string_( "snap" ).font_( font ).align_( \right );
+				
 		PopUpMenu( header, 50@18 )
 			.items_( [ "off", "0.001", "0.01", "0.1", "0.25", "0.333", "1" ] )
 			.canFocus_(false)
@@ -749,7 +750,21 @@ WFSScoreEditor {
 				snapH = [0, 0.001, 0.01, 0.1, 0.25, 1/3, 1][ v.value ];
 				});
 				
-		StaticText( header, 20@18 ).string_( "s" ).font_( font );
+		StaticText( header, 10@18 ).string_( "s" ).font_( font );
+		
+		header.decorator.shift(4);
+		
+		StaticText( header, 30@18 ).string_( "Mode:" ).font_( font );
+				
+		PopUpMenu( header, 50@18 )
+			.items_( [ "all","move","resize","fades"] )
+			.canFocus_(false)
+			.font_( font )
+			.value_(0)
+			.action_({ |v|
+				wfsMouseEventsManager.mode = v.items[v.value].asSymbol;
+			});
+
 		
 		window.userView
 			.mouseDownAction_( { |v, x, y,mod,x2,y2| 	 // only drag when one event is selected for now
