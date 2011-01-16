@@ -45,6 +45,7 @@ WFSMouseEventsManager {
 		
 		mouseDownPos = mousePos;
 		unscaledMouseDownPos = unscaledMousePos;
+		
 		eventViews.do{ |eventView|
 			eventView.mouseDownEvent(mousePos,scaledUserView,shiftDown,mode)
 		};
