@@ -240,7 +240,7 @@ WFSScoreEditor {
 		var copiedEvents, newTrack;
 		var selectedEvents = this.selectedEvents;
 		this.storeUndoState;
-		("		selectedEvents "++selectedEvents).postln;	
+
 		if( selectedEvents.size > 0 ) { 
 			copiedEvents = selectedEvents.collect({ |event| 
 				newTrack = event.track + 1;
@@ -432,7 +432,7 @@ WFSScoreEditor {
 		events.do{ |event|
 			var dur = event.dur;
 			var start = event.startTime;
-			event.postln;
+
 			if((event.startTime < pos) && (( event.startTime + event.dur ) > pos) ) {
 				
 				if(event.isFolder) {
