@@ -47,19 +47,8 @@ WFSMixer{
 					cview = CompositeView(main,40@300);
 					cview.decorator = FlowLayout(cview.bounds);
 					cview.background_(Color(0.58208955223881, 0.70149253731343, 0.83582089552239, 1.0););
-					RoundNumberBox(cview, 30@20)
-						.value_(if(event.wfsSynth.fadeTimes.notNil){event.wfsSynth.fadeTimes[0]}{1})
-						.action({ |v| 
-							event.wfsSynth.fadeTimes[0] = v.value 
-						});
-					cview.decorator.nextLine;
-					RoundNumberBox(cview, 30@20)
-							.value_(if(event.wfsSynth.fadeTimes.notNil){event.wfsSynth.fadeTimes[1]}{1})
-						.action({ |v| 
-							event.wfsSynth.fadeTimes[1] = v.value
-						});
-					cview.decorator.nextLine;
-					EZSmoothSlider.new(cview, Rect(0,0,32,200), events.indexOf(event), spec, layout:\vert)
+					cview.decorator.shift(0,24);
+					EZSmoothSlider.new(cview, Rect(0,0,32,260), events.indexOf(event), spec, layout:\vert)
 						.value_(event.wfsSynth.level.ampdb)
 						.action_({ |v|				
 								event.wfsSynth.level = v.value.dbamp;
