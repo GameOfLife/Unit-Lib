@@ -404,7 +404,7 @@
 	}
 				
 	load { |servers, nodeID, delayOffset = 0|
-			var defName;
+			var defName, time;
 			
 			//[servers, nodeID, delayOffset].postln;
 			
@@ -427,6 +427,27 @@
 							servers, delayBuffer, sfBuffer, delayOffset, 
 							pbRate, level, loop, dur, input, args, fadeTimes,
 							wfsPathStartIndex );
+							
+					if(WFS.debugMode){
+						("STARTING SYNTH "++thisThread.seconds++"nodeID: "++nodeID++" wfsDefName:"++wfsDefName).postln;						time = thisThread.seconds;
+			
+						synth.do{ |syn|
+							var didUnpause = false;
+							syn.register(true);
+							syn.runAction_({ 
+								(" "++ (thisThread.seconds - time) ++" synth "++syn.nodeID++" unpaused").postln;
+								didUnpause = true;
+							});
+							syn.freeAction_({ 
+								("synth "++syn.nodeID++" freed").postln; 
+								if(didUnpause.not){
+									("SYNTH FAILED TO UNPAUSE nodeid: "++syn.nodeID++", wfsDefName:"++wfsDefName).postln;
+								}
+							});
+							
+						};
+					};
+
 									
 					loaded = true;
 					loadedSynths = loadedSynths.asCollection.add( this );
