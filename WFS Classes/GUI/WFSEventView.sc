@@ -173,9 +173,7 @@ WFSEventView {
 		var resizeFrontDetectArea,resizeBackDetectArea,fadeInDetectArea,fadeOutDetectArea, fadeInB10, fadeOutB10, fadeAreaHeight;
 		
 		this.createRect;
-		
-		fadeAreaHeight = (rect.height*0.3);
-		
+			
 		if(event.isFolder.not) {		
 			//moving
 			if(rect.containsPoint(mousePos)) {
@@ -266,29 +264,24 @@ WFSEventView {
 	mouseDownFades{ |mousePos,scaledUserView,shiftDown|
 		var px5Scaled =  scaledUserView.doReverseScale(Point(5,0)).x; 
 		var px10Scaled = scaledUserView.doReverseScale(Point(10,0)).x;
-		var resizeFrontDetectArea,resizeBackDetectArea,fadeInDetectArea,fadeOutDetectArea, fadeInB10, fadeOutB10, fadeAreaHeight;
+		var resizeFrontDetectArea,resizeBackDetectArea,fadeInDetectArea,fadeOutDetectArea, fadeInB10, fadeOutB10;
 		
 		this.createRect;
-				
+							
 		if(event.isFolder.not) {
 			
 			if(rect.containsPoint(mousePos)) {		
 			
-				if(event.fadeInTime > px10Scaled) {
-					fadeInDetectArea = rect.copy.width_(px10Scaled).left_(rect.left + event.fadeInTime - px5Scaled);
-				} {
-					fadeInDetectArea = rect.copy.width_(px5Scaled).height_(fadeAreaHeight);
-				};
+				fadeInDetectArea = rect.copy.width_(px10Scaled).left_(rect.left + event.fadeInTime - px5Scaled);
+			
 				//fade in
 				if( fadeInDetectArea.contains( mousePos ) ) {
 					state = \fadeIn;
 					originalFades = event.wfsSynth.fadeTimes.copy;
 					
 				} {
-					if(event.fadeOutTime > px10Scaled) {						fadeOutDetectArea = rect.copy.width_(px10Scaled).left_((rect.right - event.fadeOutTime - px5Scaled)) 
-					} {
-						fadeOutDetectArea = rect.copy.width_(px5Scaled).left_((rect.right - px5Scaled)).height_(fadeAreaHeight);	
-					};
+					fadeOutDetectArea = rect.copy.width_(px10Scaled).left_((rect.right - event.fadeOutTime - px5Scaled));
+					
 					//fade out
 					if(fadeOutDetectArea.contains( mousePos ) ) {
 						"fade out";
