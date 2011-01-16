@@ -75,76 +75,78 @@ WFSEventView {
 		fadeAreaHeight = (rect.height*0.3);
 		
 		if(event.isFolder.not) {
-		
-			fadeInB10 = event.fadeInTime > px10Scaled;
 			
-			if(fadeInB10) {
-				resizeFrontDetectArea = rect.copy.width_(px5Scaled);
-			} {
-				resizeFrontDetectArea = rect.copy.width_(px5Scaled).height_(rect.height-fadeAreaHeight).top_(rect.top+fadeAreaHeight);
-			};
-			//resize front
-			if(resizeFrontDetectArea.containsPoint( mousePos )) {
+			if(rect.containsPoint(mousePos)) {
+		
+				fadeInB10 = event.fadeInTime > px10Scaled;
 				
-				state = \resizingFront;
-				originalStartTime = event.startTime;
-				event.wfsSynth.checkSoundFile;
-				
-			}{
-				fadeOutB10 = event.fadeOutTime > px10Scaled;
-				if(fadeOutB10) {
-					resizeBackDetectArea = rect.copy.width_(px5Scaled).left_((rect.left + rect.width - px5Scaled))
+				if(fadeInB10) {
+					resizeFrontDetectArea = rect.copy.width_(px5Scaled);
 				} {
-					resizeBackDetectArea = rect.copy.width_(px5Scaled).left_((rect.left + rect.width - px5Scaled))
-					.height_(rect.height-fadeAreaHeight).top_(rect.top+fadeAreaHeight)
+					resizeFrontDetectArea = rect.copy.width_(px5Scaled).height_(rect.height-fadeAreaHeight).top_(rect.top+fadeAreaHeight);
 				};
-				//resize back	
-				if(resizeBackDetectArea.containsPoint( mousePos )) {
+				//resize front
+				if(resizeFrontDetectArea.containsPoint( mousePos )) {
 					
-					state = \resizingBack;
-					originalEndTime = event.endTime;
+					state = \resizingFront;
+					originalStartTime = event.startTime;
 					event.wfsSynth.checkSoundFile;
 					
-				} {
-					if(event.fadeInTime > px10Scaled) {
-						fadeInDetectArea = rect.copy.width_(px10Scaled).left_(rect.left + event.fadeInTime - px5Scaled);
+				}{
+					fadeOutB10 = event.fadeOutTime > px10Scaled;
+					if(fadeOutB10) {
+						resizeBackDetectArea = rect.copy.width_(px5Scaled).left_((rect.left + rect.width - px5Scaled))
 					} {
-						fadeInDetectArea = rect.copy.width_(px5Scaled).height_(fadeAreaHeight);
+						resizeBackDetectArea = rect.copy.width_(px5Scaled).left_((rect.left + rect.width - px5Scaled))
+						.height_(rect.height-fadeAreaHeight).top_(rect.top+fadeAreaHeight)
 					};
-					//fade in
-					if( fadeInDetectArea.contains( mousePos ) ) {
-						state = \fadeIn;
-						originalFades = event.wfsSynth.fadeTimes.copy;
+					//resize back	
+					if(resizeBackDetectArea.containsPoint( mousePos )) {
+						
+						state = \resizingBack;
+						originalEndTime = event.endTime;
+						event.wfsSynth.checkSoundFile;
 						
 					} {
-						if(event.fadeOutTime > px10Scaled) {						fadeOutDetectArea = rect.copy.width_(px10Scaled).left_((rect.right - event.fadeOutTime - px5Scaled)) 
+						if(event.fadeInTime > px10Scaled) {
+							fadeInDetectArea = rect.copy.width_(px10Scaled).left_(rect.left + event.fadeInTime - px5Scaled);
 						} {
-							fadeOutDetectArea = rect.copy.width_(px5Scaled).left_((rect.right - px5Scaled)).height_(fadeAreaHeight);	
+							fadeInDetectArea = rect.copy.width_(px5Scaled).height_(fadeAreaHeight);
 						};
-						//fade out
-						if(fadeOutDetectArea.contains( mousePos ) ) {
-							"fade out";
-							state = \fadeOut;
-						originalFades = event.wfsSynth.fadeTimes.copy;
+						//fade in
+						if( fadeInDetectArea.contains( mousePos ) ) {
+							state = \fadeIn;
+							originalFades = event.wfsSynth.fadeTimes.copy;
 							
-						} {	//moving
-							if(rect.containsPoint(mousePos)) {
+						} {
+							if(event.fadeOutTime > px10Scaled) {						fadeOutDetectArea = rect.copy.width_(px10Scaled).left_((rect.right - event.fadeOutTime - px5Scaled)) 
+							} {
+								fadeOutDetectArea = rect.copy.width_(px5Scaled).left_((rect.right - px5Scaled)).height_(fadeAreaHeight);	
+							};
+							//fade out
+							if(fadeOutDetectArea.contains( mousePos ) ) {
+								"fade out";
+								state = \fadeOut;
+							originalFades = event.wfsSynth.fadeTimes.copy;
+								
+							} {	//moving
 								state = \moving;
 								originalTrack = event.track;
 								originalStartTime = event.startTime;
 								originalEndTime = event.endTime;
-	
-							} {
-								if(selected) {
-									originalStartTime = event.startTime;
-									originalEndTime = event.endTime;
-									originalFades = event.wfsSynth.fadeTimes.copy;
-									originalTrack = event.track;
-									event.wfsSynth.checkSoundFile;
-								}
+		
+							
 							}
-						}
-					}				
+						}				
+					}
+				}
+			} {
+				if(selected) {
+					originalStartTime = event.startTime;
+					originalEndTime = event.endTime;
+					originalFades = event.wfsSynth.fadeTimes.copy;
+					originalTrack = event.track;
+					event.wfsSynth.checkSoundFile;
 				}
 			}
 		} {
@@ -186,7 +188,6 @@ WFSEventView {
 				if(selected) {
 					originalStartTime = event.startTime;
 					originalEndTime = event.endTime;
-					originalFades = event.wfsSynth.fadeTimes.copy;
 					originalTrack = event.track;
 					event.wfsSynth.checkSoundFile;
 				}
@@ -216,49 +217,48 @@ WFSEventView {
 		var resizeFrontDetectArea,resizeBackDetectArea,fadeInDetectArea,fadeOutDetectArea, fadeInB10, fadeOutB10, fadeAreaHeight;
 		
 		this.createRect;
-		
-		fadeAreaHeight = (rect.height*0.3);
-		
+				
 		if(event.isFolder.not) {
-		
-			fadeInB10 = event.fadeInTime > px10Scaled;
 			
-			if(fadeInB10) {
-				resizeFrontDetectArea = rect.copy.width_(px5Scaled);
-			} {
-				resizeFrontDetectArea = rect.copy.width_(px5Scaled).height_(rect.height-fadeAreaHeight).top_(rect.top+fadeAreaHeight);
-			};
-			//resize front
-			if(resizeFrontDetectArea.containsPoint( mousePos )) {
+			if(rect.containsPoint(mousePos)) {
+		
+				fadeInB10 = event.fadeInTime > px10Scaled;
 				
-				state = \resizingFront;
-				originalStartTime = event.startTime;
-				event.wfsSynth.checkSoundFile;
-				
-			}{
-				fadeOutB10 = event.fadeOutTime > px10Scaled;
-				if(fadeOutB10) {
-					resizeBackDetectArea = rect.copy.width_(px5Scaled).left_((rect.left + rect.width - px5Scaled))
+				if(fadeInB10) {
+					resizeFrontDetectArea = rect.copy.width_(px5Scaled);
 				} {
-					resizeBackDetectArea = rect.copy.width_(px5Scaled).left_((rect.left + rect.width - px5Scaled))
-					.height_(rect.height-fadeAreaHeight).top_(rect.top+fadeAreaHeight)
+					resizeFrontDetectArea = rect.copy.width_(px5Scaled).height_(rect.height-fadeAreaHeight).top_(rect.top+fadeAreaHeight);
 				};
-				//resize back	
-				if(resizeBackDetectArea.containsPoint( mousePos )) {
+				//resize front
+				if(resizeFrontDetectArea.containsPoint( mousePos )) {
 					
-					state = \resizingBack;
-					originalEndTime = event.endTime;
+					state = \resizingFront;
+					originalStartTime = event.startTime;
 					event.wfsSynth.checkSoundFile;
 					
-				} {					
-					if(selected) {
-						originalStartTime = event.startTime;
+				}{
+					fadeOutB10 = event.fadeOutTime > px10Scaled;
+					if(fadeOutB10) {
+						resizeBackDetectArea = rect.copy.width_(px5Scaled).left_((rect.left + rect.width - px5Scaled))
+					} {
+						resizeBackDetectArea = rect.copy.width_(px5Scaled).left_((rect.left + rect.width - px5Scaled))
+						.height_(rect.height-fadeAreaHeight).top_(rect.top+fadeAreaHeight)
+					};
+					//resize back	
+					if(resizeBackDetectArea.containsPoint( mousePos )) {
+						
+						state = \resizingBack;
 						originalEndTime = event.endTime;
-						originalFades = event.wfsSynth.fadeTimes.copy;
-						originalTrack = event.track;
 						event.wfsSynth.checkSoundFile;
-					}				
+						
+					}
 				}
+			} {					
+				if(selected) {
+					originalStartTime = event.startTime;
+					originalEndTime = event.endTime;
+					event.wfsSynth.checkSoundFile;
+				}				
 			}
 		}	
 	}
@@ -270,39 +270,39 @@ WFSEventView {
 		
 		this.createRect;
 				
-		if(event.isFolder.not) {		
+		if(event.isFolder.not) {
 			
-			if(event.fadeInTime > px10Scaled) {
-				fadeInDetectArea = rect.copy.width_(px10Scaled).left_(rect.left + event.fadeInTime - px5Scaled);
-			} {
-				fadeInDetectArea = rect.copy.width_(px5Scaled).height_(fadeAreaHeight);
-			};
-			//fade in
-			if( fadeInDetectArea.contains( mousePos ) ) {
-				state = \fadeIn;
-				originalFades = event.wfsSynth.fadeTimes.copy;
-				
-			} {
-				if(event.fadeOutTime > px10Scaled) {						fadeOutDetectArea = rect.copy.width_(px10Scaled).left_((rect.right - event.fadeOutTime - px5Scaled)) 
+			if(rect.containsPoint(mousePos)) {		
+			
+				if(event.fadeInTime > px10Scaled) {
+					fadeInDetectArea = rect.copy.width_(px10Scaled).left_(rect.left + event.fadeInTime - px5Scaled);
 				} {
-					fadeOutDetectArea = rect.copy.width_(px5Scaled).left_((rect.right - px5Scaled)).height_(fadeAreaHeight);	
+					fadeInDetectArea = rect.copy.width_(px5Scaled).height_(fadeAreaHeight);
 				};
-				//fade out
-				if(fadeOutDetectArea.contains( mousePos ) ) {
-					"fade out";
-					state = \fadeOut;
-				originalFades = event.wfsSynth.fadeTimes.copy;
+				//fade in
+				if( fadeInDetectArea.contains( mousePos ) ) {
+					state = \fadeIn;
+					originalFades = event.wfsSynth.fadeTimes.copy;
 					
-				} {	
-					if(selected) {
-						originalStartTime = event.startTime;
-						originalEndTime = event.endTime;
-						originalFades = event.wfsSynth.fadeTimes.copy;
-						originalTrack = event.track;
-						event.wfsSynth.checkSoundFile;
-					}
-				
+				} {
+					if(event.fadeOutTime > px10Scaled) {						fadeOutDetectArea = rect.copy.width_(px10Scaled).left_((rect.right - event.fadeOutTime - px5Scaled)) 
+					} {
+						fadeOutDetectArea = rect.copy.width_(px5Scaled).left_((rect.right - px5Scaled)).height_(fadeAreaHeight);	
+					};
+					//fade out
+					if(fadeOutDetectArea.contains( mousePos ) ) {
+						"fade out";
+						state = \fadeOut;
+					originalFades = event.wfsSynth.fadeTimes.copy;
+						
+					} 
 				}
+			} {	
+				if(selected) {
+					originalFades = event.wfsSynth.fadeTimes.copy;
+					event.wfsSynth.checkSoundFile;
+				}
+			
 			}				
 			
 		}	
