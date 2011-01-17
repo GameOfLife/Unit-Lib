@@ -21,7 +21,7 @@
 WFSSynth {
 		
 		var <>wfsDefName, <wfsPath, <server, <>filePath, <>dur, <level = 1;
-		var <>pbRate = 1, <>loop = 1.0, <>input = 0, <>args, <>fadeTimes, <>startFrame = 0; 
+		var <>pbRate = 1, <>loop = 1.0, <>input = 0, <>args, >fadeTimes, <>startFrame = 0; 
 			// args: extra arguments for specific synthdefs
 		var <>synth, <delayBuffer, <sfBuffer;
 		var <loaded = false, <buffersLoaded = false, <isRunning = false;
@@ -108,6 +108,8 @@ WFSSynth {
 		fadeOutTime_ { |time = 0| 
 			fadeTimes = ( ( fadeTimes ? [0,0] )[1] = time.max(0) ); 
 			}
+
+		fadeTimes { ^( fadeTimes ? [0,0] ) }
 		
 		*basicNew {|wfsDefName, wfsPath, server, path = "", dur = 5, 
 					level = 1, pbRate = 1, loop = 1.0, input = 0, args, fadeTimes, 
