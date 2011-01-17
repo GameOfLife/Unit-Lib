@@ -203,7 +203,7 @@
 		element = document.getDocumentElement.getElement("score");
 		
 		if( element.notNil )
-			{ ^this.fromDOMElement( element ); }
+			{ ^this.fromDOMElement( element ).filePath_(path) }
 			{ "WFSScore-readWFSFile: file doesn't contain a valid <score/> element"
 				^nil };
 		

@@ -294,18 +294,41 @@
 					SMPTE( startTime ).toString,
 					 ((nodeID - startNodeID) / range) * (128/44.1).round(0.1) ); };
 		if ( use ) { usedNodeIDs = usedNodeIDs ++ [ nodeID ]; };
-		^nodeID;
+		^nodeID.asInteger;
 		}
 		
 	nextNodeID {  |startTime = 0, use = true|
 		^this.class.nextNodeID( startTime, use );
 		}
 		
-	freeSync { this.free } // same as non-sync
-	releaseSync { this.release }
-	freeBuffersSync { this.freeBuffers }
+	free { synth.asCollection.do( _.free ); isRunning = false; }
 	
-	loadBuffersSync { |servers|
+	release { synth.asCollection.do( _.release ); isRunning = false; }
+	
+	freeBuffers {
+		// for any number of servers
+		 
+		 //loadedSynths.remove( this );
+		 
+		//this.post; ": buffers freed".postln;
+		if( buffersLoaded.not ) { 
+			"WFSSynth-freeBuffers: buffers are probably not loaded".postln; };
+		
+		if( wfsPath.class == WFSPath ) { wfsPath.freeBuffers; };
+		
+		delayBuffer.asCollection.do( _.free );
+	
+		if( wfsDefName.wfsAudioType === 'disk')
+			{ sfBuffer.asCollection.do( _.close ); };
+		
+		if( sfBuffer.notNil ) { sfBuffer.asCollection.do( _.free ) };
+			
+		buffersLoaded = false;
+			
+	}
+
+	
+	loadBuffers { |servers|
 			if( buffersLoaded.not )
 			  {	
 			  	if(wfsPath.class == WFSPath ) 
@@ -363,16 +386,31 @@
 				
 			  } { "WFSSynth-loadBuffers: Buffers are probably already loaded".postln; };
 		
-			}
+	}
 			
-	loadSync { |servers, nodeID, delayOffset = 0|
-			var defName;
+	loadFree { |servers, nodeID, delayOffset = 0|
+	
+		this.load( servers, nodeID, delayOffset );
+		clock.sched( WFSEvent.wait + 0.5 + dur, 
+			{ this.freeBuffers; isRunning = false; loadedSynths.remove( this );
+				WFSServers.default.removeDictActivity( this.typeActivity, servers );
+				WFS.debug("loaded synths: % (removed one)", loadedSynths.size);
+			 }
+			);
+		// loads synth and buffers and frees them after 1.25 + duration
+		// 1.25 = default load time (1) + extra 0.1 to be sure the synth is finished
+		// this depends on the sync pulse system for playback, and should be called
+		// approx. 1 second before actual play time
+	}
+				
+	load { |servers, nodeID, delayOffset = 0|
+			var defName, time;
 			
 			//[servers, nodeID, delayOffset].postln;
 			
 			if( loaded.not )
 			  {
-			  	this.loadBuffersSync( servers );
+			  	this.loadBuffers( servers );
 			  	
 			  	clock.sched( WFSEvent.wait * 0.9, { 
 			  	
@@ -385,10 +423,31 @@
 			  			  }
 			  			{ defName = wfsDefName };
 			  	 	
-			  	 	synth = WFSSynth.generateSynthSync( wfsDefName, wfsPath, nodeID,
+			  	 	synth = WFSSynth.generateSynth( wfsDefName, wfsPath, nodeID,
 							servers, delayBuffer, sfBuffer, delayOffset, 
 							pbRate, level, loop, dur, input, args, fadeTimes,
 							wfsPathStartIndex );
+							
+					if(WFS.debugMode){
+						("STARTING SYNTH "++thisThread.seconds++"nodeID: "++nodeID++" wfsDefName:"++wfsDefName).postln;						time = thisThread.seconds;
+			
+						synth.do{ |syn|
+							var didUnpause = false;
+							syn.register(true);
+							syn.runAction_({ 
+								(" "++ (thisThread.seconds - time) ++" synth "++syn.nodeID++" unpaused").postln;
+								didUnpause = true;
+							});
+							syn.freeAction_({ 
+								("synth "++syn.nodeID++" freed").postln; 
+								if(didUnpause.not){
+									("SYNTH FAILED TO UNPAUSE nodeid: "++syn.nodeID++", wfsDefName:"++wfsDefName).postln;
+								}
+							});
+							
+						};
+					};
+
 									
 					loaded = true;
 					loadedSynths = loadedSynths.asCollection.add( this );
@@ -397,8 +456,87 @@
 				
 			  } { "WFSSynth-load: WFSSynth is probably already loaded".postln; };
 			}
+			
+	prepareForPlayback { 
+			if( wfsPath.class == WFSPath )
+				{ wfsPath.resetBuffers };
+			^this.resetFlags.clearVars;
+			// really copy..
+			/* ^this.class.new(  wfsDefName, wfsPath.copyNew, server, filePath, dur, 
+				level, pbRate, loop, input, args, fadeTimes, startFrame );
+			*/
+	}		
 		
-	*generateSynthSync { |wfsDefName, wfsPath, nodeID, servers, delayBuffer, sfBuffer, 
+	playNow{  |wfsServers, startTime = 0|
+		if(WFSServers.default.isSingle){
+			this.playNowOffline(wfsServers,startTime)
+		}{
+			this.playNowClient(wfsServers,startTime)
+		}
+	}
+
+	playNowOffline { |wfsServers, startTime = 0|
+		var nodeID, serverIndex, servers, delayOffset;
+		
+		#serverIndex, servers, delayOffset =  
+			wfsServers.nextArray( this.typeActivity );
+
+		this.prepareForPlayback;
+					 
+		WFS.debug( "% - s:%, %", WFS.secsToTimeCode( startTime ),			serverIndex,
+			filePath );
+				
+		nodeID = servers.nextNodeID;
+		
+		if ( sampleAccurateTiming )
+			{ delayOffset = delayOffset + startTime.nodeIDTimeOffset  };
+			
+		this.loadFree( servers, nodeID, delayOffset, serverIndex );
+		
+		clock.sched( WFSEvent.wait - 0.1, // sync latency = 0.1 
+			{ loadedSynths.asCollection.do({ |synth|
+				synth.synth.asCollection.do({ |subsynth|
+					subsynth.server.sendBundle( 0.1, 
+						subsynth.runMsg( true ) );
+						});
+				});
+			});
+		
+		
+	}
+
+	playNowClient { |wfsServers, startTime = 0|
+		var nodeID, serverIndex, servers, delayOffset;
+		
+		//if( this.intType == \switch ) { "playing switch".postln; };
+
+		wfsServers = wfsServers ? WFSServers.default; 
+		
+		if( prefServer.notNil )
+			{ servers = [ wfsServers.nextDictServer(  this.typeActivity, prefServer ) ];  }
+			{ servers = wfsServers.nextDictServers( this.typeActivity );  };
+		
+		delayOffset = servers.collect({ |srv| wfsServers.syncDelayOf( srv ) / 44100 });
+	
+		if( this.useSwitch && (this.intType != \switch) )
+			{ this.copyNew
+				.intType_( \switch ).playNowClient( wfsServers, startTime ); };
+		
+		this.prepareForPlayback;
+					 
+		WFS.debug( "% - s:%, %", WFS.secsToTimeCode( startTime ),			serverIndex,
+			filePath );
+		
+		nodeID = this.nextNodeID(startTime, true);
+		
+		if ( sampleAccurateTiming )
+			{ delayOffset = delayOffset + startTime.nodeIDTimeOffset  };
+			
+		this.loadFree( servers, nodeID, delayOffset );
+	}		
+			
+		
+	*generateSynth { |wfsDefName, wfsPath, nodeID, servers, delayBuffer, sfBuffer, 
 			delayOffset = 0, pbRate = 1, level = 1, loop = 1, dur = 5, input = 0, args,
 				fadeTimes, wfsPathStartIndex = 0|
 		
