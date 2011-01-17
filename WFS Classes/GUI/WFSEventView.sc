@@ -365,6 +365,7 @@ WFSEventView {
 	drawShape { |rectToDraw|
 		var radius = 5;
 
+		radius = radius.min( rectToDraw.height*0.5 );
 		Pen.moveTo(rectToDraw.rightTop - Point(rectToDraw.width*0.5,0));
 		Pen.arcTo(rectToDraw.rightTop,rectToDraw.rightBottom,radius);
 		Pen.lineTo(rectToDraw.rightBottom);
