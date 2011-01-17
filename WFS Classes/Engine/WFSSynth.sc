@@ -44,16 +44,6 @@ WFSSynth {
 					{ ^useSwitch } { ^false }
 				}
 		
-		/*
-		level_ { |newLevel| level = newLevel ? level;
-				if( loaded )
-					{	synth.asCollection.do({ |syn|
-							syn.set( \level, level );
-						});
-					};
-			}
-		*/
-		
 		level_ { |newLevel| 
 			level = newLevel ? level; 
 			synth.asCollection.do({ |syn| 
@@ -90,8 +80,7 @@ WFSSynth {
 		
 			var synth, outSynth;
 			
-			server = server ? Server.default;
-			
+			server = server ? Server.default;		
 			
 			if( wfsDefName.class == WFSSynthDef ) 
 				{ wfsDefName = wfsDefName.def.name; }
@@ -113,11 +102,11 @@ WFSSynth {
 		fadeOutTime { ^( fadeTimes ? [0,0] )[1]  }
 		
 		fadeInTime_ { |time = 0| 
-			fadeTimes = ( ( fadeTimes ? [0,0] )[0] = time ); 
+			fadeTimes = ( ( fadeTimes ? [0,0] )[0] = time.max(0) ); 
 			}
 			
 		fadeOutTime_ { |time = 0| 
-			fadeTimes = ( ( fadeTimes ? [0,0] )[1] = time ); 
+			fadeTimes = ( ( fadeTimes ? [0,0] )[1] = time.max(0) ); 
 			}
 		
 		*basicNew {|wfsDefName, wfsPath, server, path = "", dur = 5, 
@@ -135,225 +124,16 @@ WFSSynth {
 				{ if( ( wfsDefName.wfsIntType === 'linear') or: 
 					 ( wfsDefName.wfsIntType === 'cubic'))
 					{ dur = wfsPath.length; }; };
-			}
-
-		
-		loadBuffers { |altServer|
-			if( altServer.notNil ) { server = altServer };
-			if( buffersLoaded.not )
-			  {
-				if( [ 'linear', 'cubic','switch','static','plane'
-					 ].includes( wfsDefName.wfsIntType ) )
-					{ delayBuffer = WFSPan2D.makeBuffer( server ); };
-				
-				if(wfsPath.class == WFSPath ) { wfsPath.loadBuffers( server ); };
-				
-				if( wfsDefName.wfsAudioType === 'buf')
-					{ sfBuffer = Buffer.readChannel(   // compatible with older sc's ?
-						server, filePath, startFrame ? 0,
-							numFrames: (-1), 
-							channels: [0] ); };
-					
-				if( wfsDefName.wfsAudioType === 'disk')
-					{ sfBuffer = Buffer.cueSoundFile( server, filePath, startFrame,
-							numChannels:1, bufferSize: 2**18 ); };
-				
-				buffersLoaded = true;
-				
-			  } { "WFSSynth-loadBuffers: Buffers are probably already loaded".postln; };
-		
-			}
-		
-		load { |altServer|
-			if( altServer.notNil ) { server = altServer };
-			if( loaded.not )
-			  {
-			  	this.loadBuffers( altServer );
-			  	
-				synth = WFSSynth.generateSynth( wfsDefName, wfsPath, server, 
-								delayBuffer, sfBuffer, pbRate, level, loop, dur, 
-								input, args, fadeTimes ? [0,0] );
-								
-				loaded = true;
-				loadedSynths = loadedSynths.asCollection.add( this );
-				
-			  } { "WFSSynth-load: WFSSynth is probably already loaded".postln; };
 		}
-			
+
 		intType { ^wfsDefName.wfsIntType; }
 		audioType {  ^wfsDefName.wfsAudioType; } 
 		
 		intType_ { |type = \linear | wfsDefName = wfsDefName.wfsIntType_( type ) ; }
 		audioType_ { |type = \blip | wfsDefName = wfsDefName.wfsAudioType_( type ); } 
 		
-		
-		
-		*generateSynth { |wfsDefName, wfsPath, server, delayBuffer, sfBuffer, 
-				pbRate = 1, level = 1, loop = 1, dur = 5, input = 0, args, fadeTimes|
-			var sfBufNum = 0, wfsDefIntType;
-			
-			wfsDefIntType = wfsDefName.wfsIntType;
-			
-			fadeTimes = fadeTimes ? [0,0];
-			
-			//wfsDefName.postln;
-			
-			if( sfBuffer.notNil )
-				{ sfBufNum = sfBuffer.bufnum };
-			
-			case { wfsDefIntType == 'static' }
-				{ ^Synth.newPaused( wfsDefName,
-					[	\i_x, wfsPath.x,
-						\i_y, wfsPath.y,
-						\i_z, wfsPath.z,									\bufD, delayBuffer.bufnum,
-						\bufP, sfBufNum,
-						\input, input,
-						\totalTime, dur,
-						\level, level,
-						\loop, loop,
-						\rate, pbRate,
-						\outOffset, outOffset,
-						\i_fadeInTime, fadeTimes.wrapAt(0),
-						\i_fadeOutTime, fadeTimes.wrapAt(1) ] ++ args, server); } 
-						
-				 { wfsDefIntType == 'plane' }
-				 { ^Synth.newPaused( wfsDefName,
-					[	\i_a, wfsPath.angle,
-						\i_d, wfsPath.distance,
-						\bufD, delayBuffer.bufnum,
-						\bufP, sfBufNum,
-						\input, input,
-						\totalTime, dur,
-						\level, level,
-						\loop, loop,
-						\rate, pbRate,
-						\outOffset, outOffset,
-						\i_fadeInTime, fadeTimes.wrapAt(0),
-						\i_fadeOutTime, fadeTimes.wrapAt(1)  ] ++ args, server); }
-				 { wfsDefIntType == 'index' }
-				 { ^Synth.newPaused( wfsDefName,
-					[	\i_index, wfsPath,
-						\i_use, 1,
-						// \bufD, delayBuffer.bufnum,
-						\input, input,
-						\totalTime, dur,
-						\level, level,
-						\loop, loop,
-						\rate, pbRate,
-						\outOffset, outOffset,
-						\i_fadeInTime, fadeTimes.wrapAt(0),
-						\i_fadeOutTime, fadeTimes.wrapAt(1)  ] ++ args, server); }
-						
-				{ true }
-				{  ^Synth.newPaused( wfsDefName,
-					[	\bufT , wfsPath.timesBuffer.bufnum,
-						\bufXYZ, wfsPath.positionsBuffer.bufnum,
-						\bufD, delayBuffer.bufnum,
-						\bufP, sfBufNum,
-						\input, input,
-						\totalTime, dur,
-						\rate, pbRate,
-						\level, level,
-						\loop, loop,
-						\outOffset, outOffset,
-						\i_fadeInTime, fadeTimes.wrapAt(0),
-						\i_fadeOutTime, fadeTimes.wrapAt(1)  ] ++ args, server); };
-			
-		}
-		
-	
-		
-		*run { |wfsDefName, wfsPath, server, path = "", dur = 5, level = 1, 
-				pbRate = 1, loop = 1.0, input = 0, args, wait = 1| 
-			var out;		
-				//wfsDefName, wfsPath, server, path, dur, level, pbRate, loop, input, args
-			out = this.newLoad( wfsDefName, wfsPath, server, path, dur, 
-					level, pbRate, loop, input, args );
-			clock.sched( wait, { out.run } );
-			^out;
-			}
-		
-		*runFree { |wfsDefName, wfsPath, server, path = "", dur = 5, level = 1, 
-				pbRate = 1, loop = 1.0, input = 0, args, wait = 1| 
-			// run and auto free
-			var out;       
-			// wfsDefName, wfsPath, server, path, dur, level, pbRate, loop, input, args
-			out = this.newLoad( wfsDefName, wfsPath, server, path, dur, level, 
-				pbRate, loop, input, args );
-			clock.sched( wait, { out.run } );
-			clock.sched( wait + 0.01 + out.dur, { out.freeBuffers } );
-			^out;
-			}
-		
-		*play { |wfsDefName, wfsPath, server, path = "", dur = 5, level = 1, 
-				pbRate = 1, loop = 1.0, input = 0, args, wait = 1| 
-			^this.runFree( wfsDefName, wfsPath, server, path, dur, level, 
-				pbRate, loop, input, args ) 
-			} // synonym for runFree
-			
-		run { 
-			 if( isRunning ) { "WFSSynth-run: WFSSynth may be already running".postln; };
-				if( loaded ) 
-					{ synth.asCollection.do(_.run); isRunning = true;  } 
-					{ synth.asCollection.do(_.run); isRunning = true; 
-						"WFSSynth-run: WFSSynth is probably not yet loaded".postln; }
-			}
-	
-			
-		free { synth.asCollection.do( _.free ); isRunning = false; }
-		release { synth.asCollection.do( _.release ); isRunning = false; }
-		
-		runFree { 
-			this.run; 
-			clock.sched( 0.01 + dur, { this.freeBuffers; isRunning = false;  } );
-			}
-		
-		loadRun { |server, wait = 1| 
-			this.load( server ); 
-			clock.sched( wait, { this.run } ); 
-			}
-			
-		loadRunFree { |server, wait = 1| 
-			this.load( server ); 
-			clock.sched( wait, { this.runFree } ); 
-			}
-		
-		play { |altServer, wait = 1| 
-			if( loaded ) 
-				{ clock.sched( wait, { this.runFree( altServer ); }); }
-				{ this.loadRunFree( altServer, wait ); };
-
-			}
-		
-		loadAgain { |altServer|
-			loaded = false; buffersLoaded = false;
-			this.load( altServer );
-			}
-		
 		cancel { synth.free; this.freeBuffers; }
 		releaseFree { this.release; this.freeBuffers; }
-		
-		freeBuffers {
-			// for any number of servers
-			 
-			 //loadedSynths.remove( this );
-			 
-			//this.post; ": buffers freed".postln;
-			if( buffersLoaded.not ) { 
-				"WFSSynth-freeBuffers: buffers are probably not loaded".postln; };
-			
-			if( wfsPath.class == WFSPath ) { wfsPath.freeBuffers; };
-			
-			delayBuffer.asCollection.do( _.free );
-		
-			if( wfsDefName.wfsAudioType === 'disk')
-				{ sfBuffer.asCollection.do( _.close ); };
-			
-			if( sfBuffer.notNil ) { sfBuffer.asCollection.do( _.free ) };
-				
-			buffersLoaded = false;
-			
-			}
 			
 		resetFlags { loaded = false; buffersLoaded = false; isRunning = false;  } 
 		clearVars { synth = nil; delayBuffer = nil; sfBuffer = nil; }
@@ -365,17 +145,8 @@ WFSSynth {
 					.useSwitch_( useSwitch )
 					.prefServer_( prefServer )
 					.useFocused_( useFocused )
-					; } // bugfix switch 20/11/2008 ws
-				
-		prepareForPlayback { 
-			if( wfsPath.class == WFSPath )
-				{ wfsPath.resetBuffers };
-			^this.resetFlags.clearVars;
-			// really copy..
-			/* ^this.class.new(  wfsDefName, wfsPath.copyNew, server, filePath, dur, 
-				level, pbRate, loop, input, args, fadeTimes, startFrame );
-			*/
-				 }
+					; 
+		} // bugfix switch 20/11/2008 ws
 		
 		checkSoundFile { |nChaAlert, srAlert, notFoundAction|
 			var sf;

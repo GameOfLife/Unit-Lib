@@ -24,7 +24,7 @@ WFSEvent {
 	classvar <>allEvents;
 	classvar <>wait = 5; // default wait time ( between load and play )
 	
-	var <>startTime, <>wfsSynth, <>track, <>muted = false, <>currentSynth;
+	var <>startTime, <>wfsSynth, <>track, <muted = false, <>currentSynth;
 	
 	// wfsSynth should not already be loaded
 		
@@ -61,10 +61,17 @@ WFSEvent {
 	
 	endTime { ^startTime + this.dur; }
 	
-	mute { muted = true }
-	unMute { muted = false }
+	muted_{ |bool|
+		muted = bool;
+		if(wfsSynth.class == WFSScore){
+			wfsSynth.events.do{ |event| event.muted = bool };
+		}
+	}
+
+	mute { this.muted_(true) }
+	unMute { this.muted_(false) }
 	
-	toggleMute { muted = muted.not }
+	toggleMute { this.muted_(muted.not) }
 	
 	notMuted { ^muted.not }
 	
@@ -103,6 +110,7 @@ WFSScore {
 	
 	var <>events, <>name = "untitled";
 	var <>clickTrackPath; // clicktrack addition 29/10/08 ws
+	var <>filePath;
 	
 	*new { |... events| 
 		^super.newCopyArgs( events.select({ |item| item.class == WFSEvent }) );
@@ -281,7 +289,4 @@ WFSScore {
 			});
 		}
 	
-	}
-		
-			
-	
+}
