@@ -93,21 +93,18 @@ WFSEventEditor {
 		leftTop = (leftTop ?? { (32 + 20.rand2)@(300 + 20.rand2) }).asPoint;
 		windowBounds = Rect( leftTop.x, leftTop.y, 200, 364 );
 		
-		if( closeOldWindow )
-			{ if( this.class.current.notNil )
-				{  if(  this.class.current.window.notNil && 
-						{ this.class.current.window.dataptr.notNil } )
-					 {  	windowBounds = this.class.current.window.bounds;
-					 	this.class.current.window.close };
-				};
-			};
+		if( 	closeOldWindow && this.class.current.notNil && 
+			{ this.class.current.window.notNil && { this.class.current.window.isClosed.not } } ) {  
+					window = this.class.current.window;
+					window.asView.removeAll; // don't close, just empty
+		} {
+					window = Window( "WFSEventEditor" ++ ( ( parent !? 
+						{ " (" ++ parent.id ++ ")" } ) ? ""), windowBounds, false ).front; 
+		};
 			
 		this.class.current = this;
-		
-		window = Window( "WFSEventEditor" ++ ( ( parent !? 
-			{ " (" ++ parent.id ++ ")" } ) ? ""), windowBounds, false ).front; 
-			
-		//window.view.decorator = FlowLayout( window.view.bounds );
+					
+		window.onClose = { this.class.current = nil };
 								
 		composite = CompositeView( window, Rect(4,4,190,94 + 30) )
 			.background_( Color.white.alpha_(0.25) );
