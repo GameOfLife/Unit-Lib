@@ -29,6 +29,7 @@ WFSScoreEditor {
 	var <undoStates, <redoStates, maxUndoStates = 40;
 	var <dirty = true;
 	var <>wfsEventViews, <wfsMouseEventsManager;
+	var views;
 
 	*initClass { UI.registerForShutdown({ WFSScoreEditor.askForSave = false }); }
 	
@@ -64,29 +65,50 @@ WFSScoreEditor {
 	}
 	
 	//undo
-	storeUndoState { 
+	storeUndoState {
+		if(undoStates.size == 0) {
+			views[\undo].enabled_(true)
+		};
 		redoStates = List.new;
+		views[\redo].enabled_(false);
 		undoStates.add(score.duplicate);		
 		if(undoStates.size > maxUndoStates) {
 			undoStates.removeAt(0);
 		}
+
 	}
 
 	undo { 
+		
+		if( redoStates.size == 0 ) {
+			views[\redo].enabled_(true)
+		};
 		if(undoStates.size > 0) {
 			redoStates.add(score);
 			score = undoStates.pop;			
 			this.createWFSEventViews;
 			this.update;
-		}		
+		};
+		if( undoStates.size == 0 ) {
+			views[\undo].enabled_(false)
+		};
+
+					
 	}
 	
 	redo {
+		
+		if( undoStates.size == 0 ) {
+			views[\undo].enabled_(true)
+		};
 		if( redoStates.size > 0 ) {
 			undoStates.add(score);
 			score = redoStates.pop;			
 			this.createWFSEventViews;
 			this.update;
+		};
+		if( redoStates.size == 0 ) {
+			views[\redo].enabled_(false)
 		}
 	}	
 			
@@ -533,6 +555,8 @@ WFSScoreEditor {
 	newWindow {		
 		
 		var font = Font( Font.defaultSansFace, 11 ), header;	
+		views = ();
+		
 		numTracks = ((score.events.collect( _.track ).maxItem ? 14) + 2).max(16);
 	
 		window = ScaledUserView.window( "WFSScoreEditor (" ++ 
@@ -643,18 +667,20 @@ WFSScoreEditor {
 			
 		header.decorator.shift(10);
 		
-		SmoothButton( header, 18@18 )
-			.states_( [[ 'back' ]] )
+		views[\undo] = SmoothButton( header, 18@18 )
+			.states_( [[ 'arrow_pi' ]] )
 			.canFocus_(false)
-			.border_(1)			
+			.border_(1)
+			.enabled_(false)
 			.action_({ 
 				this.undo		
 			});
 			
-		SmoothButton( header, 18@18 )
-			.states_( [[ 'play' ]] )
+		views[\redo] = SmoothButton( header, 18@18 )
+			.states_( [[ 'arrow' ]] )
 			.canFocus_(false)
-			.border_(1)			
+			.border_(1)
+			.enabled_(false)
 			.action_({ 
 				this.redo		
 			});
