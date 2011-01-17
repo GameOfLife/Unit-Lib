@@ -568,8 +568,6 @@ WFSScoreEditor {
 			 
 		if( isMainEditor.not ) { window.window.view.background_( Color.gray(0.33).alpha_(0.5 ) ) };
 			
-		window.userView.view.canFocus_( false );
-		
 		window.drawHook = { this.makeCurrent };
 		
 		window.onClose = { 
@@ -815,12 +813,8 @@ WFSScoreEditor {
 	
 			} )			
 			.keyDownAction_( { |v, a,b,c|
-				var eventView;
 				if( c == 127 ) {
-					eventView = this.selectedEventViews[0];
-					score.events.remove(eventView.event);
-					wfsEventViews.remove(eventView);	
-					this.update;		
+					this.deleteSelected
 				}
 			})				
 			.beforeDrawFunc_( {
