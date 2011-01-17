@@ -27,7 +27,6 @@ WFSScoreEditor {
 	var <snapActive, <>snapH, <>numTracks;
 	var id;
 	var <undoStates, <redoStates, maxUndoStates = 40;
-	var <dirty = true;
 	var <>wfsEventViews, <wfsMouseEventsManager;
 	var views;
 
