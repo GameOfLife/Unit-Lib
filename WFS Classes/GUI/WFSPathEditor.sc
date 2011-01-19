@@ -1507,7 +1507,7 @@ WFSPathEditor {
 			fixView.radius_(0).border_(1).states_([["keep changes", Color.black, Color.red.alpha_(0.33) ]]);
 			fix.value};
 			
-		fixView.addUniqueMethod('makeRed', { 
+		fixView.view.addUniqueMethod('makeRed', { 
 			if(fixView.states.at(0).at(1).asArray != Color.red.asArray)
 					{fix.value;
 					fixView.radius_(0).border_(1).states_([["keep changes", Color.red, Color.red.alpha_(0.25) ]]);
