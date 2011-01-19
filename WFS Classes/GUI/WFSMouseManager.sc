@@ -163,7 +163,7 @@ WFSMouseEventsManager {
 				
 				wfsScoreEditor.wfsEventViews = eventViews = eventViews ++ newEventViews;
 
-				wfsScoreEditor.score.events = wfsScoreEditor.score.events++ eventViews.collect(_.event);
+				wfsScoreEditor.score.events = wfsScoreEditor.score.events++ newEventViews.collect(_.event);
 				("scoreEvents "++wfsScoreEditor.score.events.size);
 				
 			
