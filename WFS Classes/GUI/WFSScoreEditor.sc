@@ -29,6 +29,7 @@ WFSScoreEditor {
 	var <undoStates, <redoStates, maxUndoStates = 40;
 	var <>wfsEventViews, <wfsMouseEventsManager;
 	var views;
+	var <dirty = false;
 
 	*initClass { UI.registerForShutdown({ WFSScoreEditor.askForSave = false }); }
 	
@@ -65,6 +66,8 @@ WFSScoreEditor {
 	
 	//undo
 	storeUndoState {
+		
+		dirty = true;
 		if(undoStates.size == 0) {
 			views[\undo].enabled_(true)
 		};
@@ -158,14 +161,18 @@ WFSScoreEditor {
 	save{
 		if(score.filePath.notNil){	
 			score.writeWFSFile( score.filePath ,true, false);
+			dirty = false;
 		}{
 			this.saveAs
 		}
 	}
 	
 	saveAs{
-		Dialog.savePanel( 
-			{ |path| score.writeWFSFile( path ); score.filePath = path});
+		Dialog.savePanel( { |path| 
+			score.writeWFSFile( path );
+			dirty = false;
+			score.filePath = path
+		});
 	} 
 	
 	combineAppend{
@@ -575,18 +582,20 @@ WFSScoreEditor {
 			this.removeFromAll;
 			
 			{ 0.1.wait;  
-			if( askForSave && isMainEditor ) 
-				{ if( score.events.size != 0 )
-					{ SCAlert( "Do you want to save your score? (" ++ id ++ ")" , 
-						[ [ "Don't save" ], [ "Cancel" ], [ "Save" ] ], 
-						[ 	nil, 
-							{ WFSScoreEditor( score ); },  
-							{ Dialog.savePanel( 
-								{ |path| score.writeWFSFile( path ); },
-								{ WFSScoreEditor( score ); }); } 
+			if( askForSave && isMainEditor ) {
+				if( dirty ) {
+					if( score.events.size != 0 ) {
+						SCAlert( "Do you want to save your score? (" ++ id ++ ")" , 
+							[ [ "Don't save" ], [ "Cancel" ], [ "Save" ] ], 
+							[ 	nil, 
+								{ WFSScoreEditor( score ); },  
+								{ Dialog.savePanel( 
+									{ |path| score.writeWFSFile( path ); },
+									{ WFSScoreEditor( score ); }); } 
 							] ); 
-						};
-					}
+					};
+				}
+			}
 			}.fork( AppClock ); // prevent crash at shutdown
 			
 		};
