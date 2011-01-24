@@ -68,6 +68,8 @@ WFSEventEditor {
 					views[ \linear ][ \switch ].value = event.wfsSynth.useSwitch.binaryValue;
 					views[ \cubic ][ \name ].string = { event.wfsSynth.wfsPath.name }.try;
 					views[ \cubic ][ \switch ].value = event.wfsSynth.useSwitch.binaryValue;
+					views[ \static ][ \x ].value = { event.wfsSynth.wfsPath.x }.try;
+					views[ \static ][ \y ].value = { event.wfsSynth.wfsPath.y }.try;
 					views[ \buf ][ \startFrameMode ].action.value( 
 						views[ \buf ][ \startFrameMode ] );
 					views[ \disk ][ \startFrameMode ].action.value( 
@@ -97,14 +99,17 @@ WFSEventEditor {
 			{ this.class.current.window.notNil && { this.class.current.window.isClosed.not } } ) {  
 					window = this.class.current.window;
 					window.asView.removeAll; // don't close, just empty
+					this.class.current.event.removeDependant(this.class.current);
 		} {
 					window = Window( "WFSEventEditor" ++ ( ( parent !? 
 						{ " (" ++ parent.id ++ ")" } ) ? ""), windowBounds, false ).front; 
 		};
 			
 		this.class.current = this;
+		
+		event.addDependant(this);
 					
-		window.onClose = { this.class.current = nil };
+		window.onClose = { this.class.current = nil; event.removeDependant(this); };
 								
 		composite = CompositeView( window, Rect(4,4,190,94 + 30) )
 			.background_( Color.white.alpha_(0.25) );
