@@ -245,18 +245,21 @@ WFSMixedArray[slot] : WFSArrayBase {
 		^rect;
 		}
 	
-	plotSmooth { |speakerConf = \default, toFront = true|	
+	plotSmooth { |speakerConf = \default, toFront = true, events|	
 		var path, angles;
 		var window, fromRect;
 		var originalCurrentTimes;
 		var maxDuration;
 		var routine;
 		var wfsPaths;
+		var wfsPlotSmooth;
+		var currentIndex;
+		var toRect, newRect, factor, width, mousePos, mouseMod, originalPos, originalPath;
 		/*
 		window = SCWindow(this.class.asString, Rect(128, 64, 400, 400)).front;
 		window.view.background_(Color.black);
 		*/
-		
+
 		window = WFSPlotSmooth( this.class.asString, toFront: toFront );
 		
 		window.onClose_({ if( routine.notNil ) { routine.stop } });
@@ -276,9 +279,10 @@ WFSMixedArray[slot] : WFSArrayBase {
 					.action_({ |button|
 						case { button.value == 1 }
 						{ routine = Routine({ ((maxDuration / 0.05) + 1).do({ |i|
+							
 								wfsPaths.do({ |item| item.currentTime = 
 									item.currentTime + 0.05; });
-								{ window.refresh }.defer;
+								{ window.view.refresh }.defer;
 								0.05.wait; });
 								{ button.value = 2 }.defer;
 							}).play; }
@@ -288,7 +292,7 @@ WFSMixedArray[slot] : WFSArrayBase {
 						{ button.value == 0 }
 						{  wfsPaths.do({ |item, i| 
 							item.currentTime = originalCurrentTimes[i]; });
-							window.refresh; }
+							window.view.refresh; }
 						})
 					.resize_( 3 ); 
 			};
@@ -300,8 +304,14 @@ WFSMixedArray[slot] : WFSArrayBase {
 			
 		if( speakerConf.notNil )
 				{ fromRect = fromRect.union( speakerConf.asRect ) };
+				
+		toRect = Rect(0,0,window.view.bounds.width,window.view.bounds.height);
+		width = toRect.width;
+		factor = (toRect.width / fromRect.width).min( toRect.height / fromRect.height );
+		newRect = Rect(0,0,fromRect.width*factor,fromRect.height*factor);
+		newRect.origin = newRect.centerIn(toRect);
 							
-		window.drawHook = { var tempPath, tempPath2, firstPoint, bounds;
+		WFSPlotSmooth.view.drawFunc_({ var tempPath, tempPath2, firstPoint, bounds, x, y;
 			bounds = [window.view.bounds.width, window.view.bounds.height]; 
 			bounds = bounds.minItem;
 			
@@ -309,8 +319,85 @@ WFSMixedArray[slot] : WFSArrayBase {
 				{ speakerConf.plotSmoothInput( bounds, fromRect: fromRect ) };
 				
 			this.do( _.plotSmoothInput( bounds, fromRect: fromRect ) );
-			//this.do({ |item| item.plotSmoothInput( bounds, fromRect: fromRect ) }); 
-		};
+			
+			//post x,y positions when moving
+			if(currentIndex.notNil) {
+				Pen.font = Font( "Monaco", 9 );
+				Pen.color = Color.white.alpha_(0.8);
+				if( this[currentIndex].isWFSPoint ) {
+					x = this[currentIndex].x;
+					y = this[currentIndex].y;
+				} {
+					x = this[currentIndex].center.x;
+					y = this[currentIndex].center.y;
+				};
+				Pen.stringAtPoint("x: "++x.round(0.1)++", y: "++y.round(0.1),mousePos + Point(7,0))
+			}
+		})
+		.mouseDownAction_({|v, x, y, mod|
+			var point;
+			mouseMod = mod;
+			
+			this.do{ |path,i|
+				if( path.isWFSPoint ) {
+					point = path;
+					
+				} {
+					point = path.center;
+				};
+				point = WFSPointArray[point].scaleToRect(toRect, fromRect)[0].asPoint;
+				point.y = width - point.y;
+				originalPos = mousePos = x@y;	
+				if(Rect.fromPoints(point - 	Point(4,4),point + Point(4,4)).containsPoint(x@y)) {
+					currentIndex = i;
+					if(path.isWFSPath) {
+						originalPath = path.copy
+					}
+				}
+			}
+				
+		})
+		.mouseMoveAction_({|v, x, y, mod|
+			var point, tempPath, dif;
+			if(currentIndex.notNil) {
+				x = x.clip(0,width);
+				y = y.clip(0,window.view.bounds.height);
+				point = WFSPointArray[WFSPoint(x,window.view.bounds.height-y)].scaleFromRect(newRect, fromRect)[0];
+				if( this[currentIndex].isWFSPoint ) {
+					this[currentIndex] = point;
+				} {
+					if(mouseMod.isAlt) {
+						dif = originalPos.y-mousePos.y;
+						this[currentIndex].positions = originalPath.copy.scale((1 + (dif*0.05)).max(0.001)).positions;
+					} {
+						if(mouseMod.isShift) {
+							dif = originalPos.y-mousePos.y;
+							this[currentIndex].positions = originalPath.copy.rotate(dif).positions;
+							
+						} {
+						this[currentIndex].moveCenterTo(point)
+						}
+					}
+					
+				};
+				mousePos = x@y;
+				v.refresh;
+			}
+			
+		})
+		.mouseUpAction_({ |v,x,y|
+			if(currentIndex.notNil) {
+				if( this[currentIndex].isWFSPoint ) {
+					events[currentIndex].wfsSynth.wfsPath = this[currentIndex]
+				};
+				events[currentIndex].changed;
+				currentIndex = nil;
+				v.refresh
+			};
+			
+			
+		});
+		
 		window.refresh;
 		}
 	}
