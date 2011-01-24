@@ -18,7 +18,7 @@
 */
 
 WFSPlotSmooth {
-	classvar <>window;
+	classvar <>window, <>view;
 	classvar <>playButton;
 	
 	*new { |title = "WFS", bounds, toFront = true, removeButtons = true|
@@ -51,10 +51,13 @@ WFSPlotSmooth {
 	window { ^window }
 	
 	*addDragView { |theWindow| 
-		SCUserView( theWindow, theWindow.view.bounds )
+		view = UserView( theWindow, theWindow.view.bounds )
 			.resize_(5)
 			.canReceiveDragHandler_( { SCView.currentDrag.respondsTo( \plotSmooth ) })
-			.receiveDragHandler_( { SCView.currentDrag.plotSmooth; } );
+			.receiveDragHandler_( { SCView.currentDrag.plotSmooth; } )
+			.background_(Color.black)
+			
+
 		
 		   }
 	
