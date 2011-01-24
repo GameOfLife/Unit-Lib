@@ -557,6 +557,26 @@ WFSScoreEditor {
 		};
 		copyToFolderFunc.value;
 	}
+	
+	plot{ |all = false|
+		var events, paths;
+		
+		events = if( all ) {
+			score.allEvents.select{ |event|
+				event.wfsSynth.wfsPath.notNil
+			}
+		}{
+			score.events.select{ |event|
+				event.isFolder.not and: {event.wfsSynth.wfsPath.notNil }
+			}
+		};
+		paths = events.collect{ |event|
+			event.wfsSynth.wfsPath
+				.currentTime_( event.startTime.neg + WFSTransport.pos )
+		};
+				
+		WFSMixedArray.with(*paths).plotSmooth(events:events); 
+	}
 					
 	newWindow {		
 		
@@ -742,30 +762,18 @@ WFSScoreEditor {
 			.canFocus_(false)
 			.font_( font )
 			.border_(1)
-			.action_({ WFSMixedArray.with( 
-				*( score.events.collect({ |event|
-						if( event.isFolder.not )
-							{ event.wfsSynth.wfsPath
-								.currentTime_( event.startTime.neg +
-									 WFSTransport.pos )
-								} { nil };
-						}).select( _.notNil ) ) ).plotSmooth; 
-				});		
+			.action_({ 
+				this.plot;
+			});		
 				
 		SmoothButton( header, 50@18  )
 			.states_( [[ "plot all", Color.black, Color.clear ]] )
 			.canFocus_(false)
 			.font_( font )
 			.border_(1)
-			.action_({ WFSMixedArray.with( 
-				*( score.allEvents.collect({ |event|
-						
-							 event.wfsSynth.wfsPath
-								.currentTime_( event.startTime.neg +
-									 WFSTransport.pos )
-								
-						}).select( _.notNil ) ) ).plotSmooth; 
-				});
+			.action_({ 
+				this.plot(true);
+			});
 		
 		StaticText( header, 30@18 ).string_( "snap" ).font_( font ).align_( \right );
 				
