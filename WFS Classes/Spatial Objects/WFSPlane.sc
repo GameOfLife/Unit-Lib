@@ -125,7 +125,7 @@ WFSPlane {  /// plane wave
 		
 		fromRect = fromRect.union( speakerConf.asRect );
 		
-		window.drawHook = { var tempPath, tempPath2, firstPoint, bounds;
+		WFSPlotSmooth.view.drawFunc = { var tempPath, tempPath2, firstPoint, bounds;
 			bounds = [window.view.bounds.width, window.view.bounds.height]; 
 			bounds = bounds.minItem;
 						
@@ -136,6 +136,9 @@ WFSPlane {  /// plane wave
 			this.plotSmoothInput( bounds, fromRect: fromRect );
 			
 			};
+			
+		WFSPlotSmooth.view.mouseDownAction_(nil).mouseMoveAction_(nil);	
+		
 			
 		window.refresh;
 		}
