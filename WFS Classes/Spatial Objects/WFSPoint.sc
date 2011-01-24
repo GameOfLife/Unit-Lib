@@ -289,16 +289,17 @@ WFSPoint {
 		^path;
 		}
 		
-	plotSmooth { |speakerConf = \default, toFront = true|
+	plotSmooth { |speakerConf = \default, toFront = true, event|
 		
 		var window;
 		var point, point2;
 		var fromRect;
+		var toRect, newRect, factor, width, moving = false, mousePos;
 		/*
 		window = SCWindow("WFSPoint", Rect(128, 64, 400, 400)).front;
 		window.view.background_(Color.black );
 		*/
-		
+
 		window = WFSPlotSmooth( "WFSPoint", toFront: toFront );
 		
 		if( speakerConf == \default )
@@ -310,7 +311,13 @@ WFSPoint {
 		
 		fromRect = fromRect.union( speakerConf.asRect );
 		
-		window.drawHook = { var tempPath, tempPath2, firstPoint, bounds;
+		toRect = Rect(0,0,window.view.bounds.width,window.view.bounds.height);
+		width = toRect.width;
+		factor = (toRect.width / fromRect.width).min( toRect.height / fromRect.height );
+		newRect = Rect(0,0,fromRect.width*factor,fromRect.height*factor);
+		newRect.origin = newRect.centerIn(toRect);
+		
+		WFSPlotSmooth.view.drawFunc_({ var tempPath, tempPath2, firstPoint, bounds;
 			bounds = [window.view.bounds.width, window.view.bounds.height]; 
 			bounds = bounds.minItem;
 						
@@ -320,7 +327,48 @@ WFSPoint {
 			
 			this.plotSmoothInput( bounds, fromRect: fromRect );
 			
-			};
+			if(moving) {
+				Pen.font = Font( "Helvetica-Bold", 10 );
+				Pen.color = Color.white;
+				Pen.stringAtPoint("x: "++this.x.round(0.1)++", y: "++this.y.round(0.1),mousePos + Point(7,0))
+			}
+			
+		})
+		.mouseDownAction_({|v, x, y, mod|
+			var point;
+			
+			
+			point = WFSPointArray[this].scaleToRect(toRect, fromRect)[0].asPoint;
+			point.y = width - point.y;
+			if(Rect.fromPoints(point - 	Point(4,4),point + Point(4,4)).containsPoint(x@y)) {
+				moving = true;
+				mousePos = x@y;
+			}
+					
+		})
+		.mouseMoveAction_({|v, x, y, mod|
+			var point;
+			if(moving) {
+				x = x.clip(0,width);
+				y = y.clip(0,window.view.bounds.height);
+				point = WFSPointArray[WFSPoint(x,window.view.bounds.height-y)].scaleFromRect(newRect, fromRect)[0];
+				this.x = point.x;
+				this.y = point.y;
+				mousePos = x@y;
+				v.refresh;
+				
+			}
+			
+		})
+		.mouseUpAction_({ |v,x,y|
+			if( moving ) {
+				event.changed;
+				moving = false;
+				v.refresh
+			}	
+			
+		});
+			
 			
 		window.refresh;
 		}
