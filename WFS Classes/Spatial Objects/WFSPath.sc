@@ -378,9 +378,9 @@ WFSPath {
 					path = [path[0], 1 - path[1]];
 					
 					
-					tempPlotPath = tempPlotPath ?? { // create this once per plot session
+					tempPlotPath = 
 						path.collect({ |item|
-								item.interpolate( div, intType, false ) }) };
+								item.interpolate( div, intType, false ) });
 								
 					tempPath2 = ( tempPlotPath * size ).flop
 							.collect({ |item| item[0]@item[1] });
@@ -410,7 +410,10 @@ WFSPath {
 			if( showPoint )
 				{ this.atCurrentTime( intType, false )
 						.plotSmoothInput( size, Color(1, 0.75, 0.75, 0.75), 
-					fromRect: fromRect ?? { this.asRect } ); }
+					fromRect: fromRect ?? { this.asRect } ); };
+			this.center.plotSmoothInput( size, Color(0.5, 0.3, 0.8, 0.65), 
+					fromRect: fromRect ?? { this.asRect } );
+				
 			};
 			
 		^path;
@@ -481,7 +484,7 @@ WFSPath {
 		if( speakerConf.notNil )
 				{ fromRect = fromRect.union( speakerConf.asRect ) };
 		
-		plotWindow.drawHook = { var tempPath, tempPath2, firstPoint, bounds;
+		WFSPlotSmooth.view.drawFunc = { var tempPath, tempPath2, firstPoint, bounds;
 			bounds = [plotWindow.view.bounds.width, plotWindow.view.bounds.height]; 
 			bounds = bounds.minItem;
 			
@@ -503,6 +506,8 @@ WFSPath {
 				  );
 			
 			};
+			
+		WFSPlotSmooth.view.mouseDownAction_(nil).mouseMoveAction_(nil);	
 			
 		plotWindow.refresh;
 	}
