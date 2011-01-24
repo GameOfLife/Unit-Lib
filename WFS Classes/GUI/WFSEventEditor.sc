@@ -369,19 +369,19 @@ WFSEventEditor {
 			.value_( event.x ? 0 ).action_({ 
 				/* if( event.wfsSynth.wfsPath.class == WFSPath )
 					{ wfsPathBackup = event.wfsSynth.wfsPath }; */
-				this.storeUndoState;	
+				this.storeUndoState;
 				event.wfsSynth.wfsPath_( WFSPoint(
 					views[ \static ][ \x ].value, views[ \static ][ \y ].value, 0 ),
 					false );
 				if( WFSPlotSmooth.isOpen ) 
-					{ event.wfsSynth.wfsPath.plotSmooth( toFront: false ) };
+					{ event.wfsSynth.wfsPath.plotSmooth( toFront: false , event: event) };
 			});
 					
 		views[ \static ][ \y ] = RoundNumberBox( intTypeViews.static, 30@20 )
 			.value_( event.y ? 0 ).action_( views[ \static ][ \x ].action );	
 		RoundButton( intTypeViews.static, 30@20 )
 			.states_( [ [ "plot", Color.black, Color.clear ] ] )
-			.action_({ event.wfsSynth.wfsPath.plotSmooth; });
+			.action_({ event.wfsSynth.wfsPath.plotSmooth(event:event); });
 			
 		intTypeViews.static.decorator.nextLine;
 		
@@ -398,7 +398,7 @@ WFSEventEditor {
 				views[ \static ][ \x ].value = event.x;
 				views[ \static ][ \y ].value = event.y;
 				if( WFSPlotSmooth.isOpen ) 
-					{ event.wfsSynth.wfsPath.plotSmooth( toFront: false ) };
+					{ event.wfsSynth.wfsPath.plotSmooth( toFront: false , event: event) };
 				});
 				
 		RoundButton( intTypeViews.static, 60@20 ).states_( [[ "random" ]] )
@@ -412,7 +412,7 @@ WFSEventEditor {
 				views[ \static ][ \x ].value = event.x;
 				views[ \static ][ \y ].value = event.y;
 				if( WFSPlotSmooth.isOpen ) 
-					{ event.wfsSynth.wfsPath.plotSmooth( toFront: false ) };
+					{ event.wfsSynth.wfsPath.plotSmooth( toFront: false, event: event) };
 				});
 			
 		// plane:
