@@ -254,7 +254,7 @@ WFSMixedArray[slot] : WFSArrayBase {
 		var wfsPaths;
 		var wfsPlotSmooth;
 		var currentIndex;
-		var toRect, newRect, factor, width, mousePos, mouseMod, originalPos, originalPath;
+		var toRect, newRect, factor, height, mousePos, mouseMod, originalPos, originalPath, bounds;
 		/*
 		window = SCWindow(this.class.asString, Rect(128, 64, 400, 400)).front;
 		window.view.background_(Color.black);
@@ -306,12 +306,9 @@ WFSMixedArray[slot] : WFSArrayBase {
 				{ fromRect = fromRect.union( speakerConf.asRect ) };
 				
 		toRect = Rect(0,0,window.view.bounds.width,window.view.bounds.height);
-		width = toRect.width;
-		factor = (toRect.width / fromRect.width).min( toRect.height / fromRect.height );
-		newRect = Rect(0,0,fromRect.width*factor,fromRect.height*factor);
-		newRect.origin = newRect.centerIn(toRect);
-							
-		WFSPlotSmooth.view.drawFunc_({ var tempPath, tempPath2, firstPoint, bounds, x, y;
+									
+		WFSPlotSmooth.view.drawFunc_({
+			var tempPath, tempPath2, firstPoint, x, y;
 			bounds = [window.view.bounds.width, window.view.bounds.height]; 
 			bounds = bounds.minItem;
 			
@@ -335,8 +332,11 @@ WFSMixedArray[slot] : WFSArrayBase {
 			}
 		})
 		.mouseDownAction_({|v, x, y, mod|
-			var point;
+			var point, side;
 			mouseMod = mod;
+			
+			bounds = [window.view.bounds.width, window.view.bounds.height]; 
+			bounds = bounds.minItem;
 			
 			this.do{ |path,i|
 				if( path.isWFSPoint ) {
@@ -345,11 +345,11 @@ WFSMixedArray[slot] : WFSArrayBase {
 				} {
 					point = path.center;
 				};
-				point = WFSPointArray[point].scaleToRect(toRect, fromRect)[0].asPoint;
-				point.y = width - point.y;
+				point = point.toScreenCoord(bounds, fromRect);
 				originalPos = mousePos = x@y;	
 				if(Rect.fromPoints(point - 	Point(4,4),point + Point(4,4)).containsPoint(x@y)) {
 					currentIndex = i;
+
 					if(path.isWFSPath) {
 						originalPath = path.copy
 					}
@@ -359,10 +359,13 @@ WFSMixedArray[slot] : WFSArrayBase {
 		})
 		.mouseMoveAction_({|v, x, y, mod|
 			var point, tempPath, dif;
+			
 			if(currentIndex.notNil) {
-				x = x.clip(0,width);
+				x = x.clip(0,window.view.bounds.width);
 				y = y.clip(0,window.view.bounds.height);
-				point = WFSPointArray[WFSPoint(x,window.view.bounds.height-y)].scaleFromRect(newRect, fromRect)[0];
+
+				point = WFSPoint(x,y).fromScreenCoord(bounds,fromRect);
+				
 				if( this[currentIndex].isWFSPoint ) {
 					this[currentIndex] = point;
 				} {
@@ -392,6 +395,7 @@ WFSMixedArray[slot] : WFSArrayBase {
 				};
 				events[currentIndex].changed;
 				currentIndex = nil;
+				
 				v.refresh
 			};
 			

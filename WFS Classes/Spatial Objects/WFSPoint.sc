@@ -271,22 +271,49 @@ WFSPoint {
 	flipX { ^this.class.new( -1 * x, y, z ) }
 	flipY { ^this.class.new( x, -1 * y, z ) }
 	
+	toScreenCoord{ |size, fromRect|
+		var point;
+		size = size ? 400;	
+		
+		point = ( WFSPointArray[ this ]).scaleToRect( Rect(0,0,1,1), fromRect )[0].asPoint;
+		
+		point.y = 1 - point.y;
+		
+		point = point * size;
+		
+		^point
+		
+	}
+	
+	fromScreenCoord{ |size, toRect|
+		var point;
+		var factor, newRect;
+		
+		factor = (1 /toRect.width).min( 1/ toRect.height );
+		newRect = Rect(0,0,toRect.width*factor,toRect.height*factor);
+		newRect.origin = newRect.centerIn(Rect(0,0,1,1));		
+		size = size ? 400;	
+		
+		point = this / size;
+		
+		point.y = 1 - point.y;
+		
+		^( WFSPointArray[ point ]).scaleFromRect( newRect, toRect )[0];
+		
+	}
+	
 	plotSmoothInput { |size, color, fromRect| // x/y
-		var path, backScaledRect;
-		size = size ? 400;
+		var point;
 		color = color ? Color(0.67, 0.84, 0.90, 0.75); // light blue
 			
-		path = ( WFSPointArray[ this ]).asEnvViewInput(true, fromRect);
-		
-		path = [path[0], 1 - path[1]];
-		path = ( path * size ).flop
-				.collect({ |item| item[0]@item[1] });
+		point = this.toScreenCoord(size, fromRect);
 		// points
 		color.set;
-		Pen.addArc( path[0], 3, 0, 2pi );
-		Pen.cross( path[0], 6, '+' );
+		
+		Pen.addArc( point, 3, 0, 2pi );
+		Pen.cross( point, 6, '+' );
 		Pen.stroke;
-		^path;
+		^point;
 		}
 		
 	plotSmooth { |speakerConf = \default, toFront = true, event|
