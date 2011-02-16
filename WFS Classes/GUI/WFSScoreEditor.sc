@@ -621,7 +621,7 @@ WFSScoreEditor {
 		numTracks = ((score.events.collect( _.track ).maxItem ? 14) + 2).max(16);
 	
 		window = ScaledUserView.window( "WFSScoreEditor (" ++ 
-				(id ?? { "folder of " ++ ( parent !? { parent.id } ) } ) ++ ")", 
+				(id ?? { "folder of " ++ ( parent !? { parent.id } ) } ) ++": "++score.name++ ")", 
 			Rect(230 + 20.rand2, 230 + 20.rand2, 680, 300),
 			fromBounds: Rect( 0, 0, score.duration.ceil.max(1), numTracks ),
 			viewOffset: [4, 27] );
