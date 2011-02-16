@@ -272,7 +272,7 @@ WFSMixedArray[slot] : WFSArrayBase {
 			maxDuration = wfsPaths
 				.collect({ |item| item.length - item.currentTime; }).maxItem;
 			
-			WFSPlotSmooth.playButton = RoundButton(window, Rect(375,5,20,20) )
+			WFSPlotSmooth.playButton = RoundButton(window, Rect(345,5,20,20) )
 				.states_( [
 					[ \play, Color.white,Color.white.alpha_(0.25)],
 					[ \stop, Color.white,Color.red.alpha_(0.25) ],
@@ -299,7 +299,8 @@ WFSMixedArray[slot] : WFSArrayBase {
 				.resize_( 3 ); 
 		};
 		
-		RoundButton(window, Rect(355,5,20,20) )
+		RoundButton(window, Rect(375,5,20,20) )
+			.canFocus_(false)
 			.states_( [
 				[ \sign, Color.black,Color.grey(0.3) ],
 				[ \sign, Color.black,Color.grey(0.7) ],
