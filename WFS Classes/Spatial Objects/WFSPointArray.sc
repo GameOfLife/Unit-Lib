@@ -317,10 +317,30 @@ WFSMixedArray[slot] : WFSArrayBase {
 				
 			this.do( _.plotSmoothInput( bounds, fromRect: fromRect ) );
 			
+			Pen.font = Font( "Monaco", 9 );
+			Pen.color = Color.white.alpha_(0.8);
+			
+			this.do{ |obj,i|
+				var st;
+				if( obj.isWFSPoint ) {
+					x = obj.x;
+					y = obj.y;
+				} {
+					x = obj.center.x;
+					y = obj.center.y;
+				};
+				st = WFSScore.current.events.indexOf(events[i]);
+				if( st.notNil ) {
+					Pen.stringAtPoint(
+						st.asString,
+						WFSPoint(x,y).toScreenCoord(bounds,fromRect).asPoint + Point(5,0)
+					)
+				}
+			};
+			
 			//post x,y positions when moving
 			if(currentIndex.notNil) {
-				Pen.font = Font( "Monaco", 9 );
-				Pen.color = Color.white.alpha_(0.8);
+				
 				if( this[currentIndex].isWFSPoint ) {
 					x = this[currentIndex].x;
 					y = this[currentIndex].y;
@@ -328,7 +348,7 @@ WFSMixedArray[slot] : WFSArrayBase {
 					x = this[currentIndex].center.x;
 					y = this[currentIndex].center.y;
 				};
-				Pen.stringAtPoint("x: "++x.round(0.1)++", y: "++y.round(0.1),mousePos + Point(7,0))
+				Pen.stringAtPoint("x: "++x.round(0.1)++", y: "++y.round(0.1),mousePos + Point(20,0))
 			}
 		})
 		.mouseDownAction_({|v, x, y, mod|
