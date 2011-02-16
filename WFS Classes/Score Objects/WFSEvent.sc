@@ -89,8 +89,8 @@ WFSEvent {
 		stream << this.class.name << "( " << startTime <<  ", " << wfsSynth << " )";
 		}
 	
-	edit { |leftTop, closeOldWindow = true, parent| 
-		WFSEventEditor.new( this, leftTop, closeOldWindow, parent ) }
+	edit { |leftTop, closeOldWindow = true, parent, toFront=false| 
+		WFSEventEditor.new( this, leftTop, closeOldWindow, parent, toFront ) }
 	
 	x { if( [ 'static', 'plane' ].includes( wfsSynth.intType ) )
 			{ ^wfsSynth.wfsPath.x } { ^nil } }
