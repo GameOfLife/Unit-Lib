@@ -288,12 +288,12 @@ WFSScoreEditor {
 			};
 	}
 	
-	editSelected {
+	editSelected { |front = false|
 		
 		var selectedEvent;
 		selectedEvent = this.selectedEvents[0];
 		selectedEvent !?	{	
-			selectedEvent.edit( window.window.bounds.rightTop + (5@0), parent: this );
+			selectedEvent.edit( window.window.bounds.rightTop + (5@0), parent: this, toFront: front );
 			if( selectedEvent.isFolder )
 				{ selectedEvent.wfsSynth.edit( this ); }; };
 	}
@@ -615,13 +615,27 @@ WFSScoreEditor {
 					
 	newWindow {		
 		
-		var font = Font( Font.defaultSansFace, 11 ), header;	
+		var font = Font( Font.defaultSansFace, 11 ), header, windowTitle;	
 		views = ();
 		
 		numTracks = ((score.events.collect( _.track ).maxItem ? 14) + 2).max(16);
 	
-		window = ScaledUserView.window( "WFSScoreEditor (" ++ 
-				(id ?? { "folder of " ++ ( parent !? { parent.id } ) } ) ++": "++score.name++ ")", 
+		windowTitle = "WFSScoreEditor ( "++
+			if( isMainEditor ) {
+				if( score.filePath.isNil ) {
+					"Untitled )"
+				} {
+					PathName(score.filePath).fileName.removeExtension++" )"
+				}
+			} {
+				if( parent.id.notNil ) {
+					("folder of " ++ ( parent !? { parent.id } ))++": " ++ score.name ++ " )"
+				} {
+					"folder: " ++ score.name ++ " )"
+				}
+			};
+			
+		window = ScaledUserView.window(windowTitle, 
 			Rect(230 + 20.rand2, 230 + 20.rand2, 680, 300),
 			fromBounds: Rect( 0, 0, score.duration.ceil.max(1), numTracks ),
 			viewOffset: [4, 27] );
@@ -672,7 +686,7 @@ WFSScoreEditor {
 			.border_(1)
 			.border_(1)
 			.action_({ |b|
-				this.editSelected
+				this.editSelected(true)
 			});				
 			
 		header.decorator.shift(10);    
