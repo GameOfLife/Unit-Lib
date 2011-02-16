@@ -150,7 +150,7 @@ WFSMenubar {
 		}).setShortCut("p",true);
 		
 		SCMenuSeparator.new(events);
-		
+		//TRIM
 		SCMenuItem.new(events, "Trim start").action_({
 			var scoreEditor = WFSScoreEditor.current;
 			if(scoreEditor.notNil){	 WFSScoreEditor.current.trimEventsStartAtPos }
@@ -160,6 +160,11 @@ WFSMenubar {
 			var scoreEditor = WFSScoreEditor.current;
 			if(scoreEditor.notNil){	 WFSScoreEditor.current.trimEventsEndAtPos }
 		}).setShortCut("y",true);
+		
+		SCMenuItem.new(events, "Split").action_({
+			var scoreEditor = WFSScoreEditor.current;
+			if(scoreEditor.notNil){	 WFSScoreEditor.current.splitEventsAtPos }
+		}).setShortCut("x",true);
 		
 		//tracks
 		SCMenuSeparator.new(events);
