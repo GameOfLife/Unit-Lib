@@ -134,7 +134,7 @@ WFSMouseEventsManager {
 	}
 	
 	mouseXDelta{ |mousePos,scaledUserView|
-		^mousePos.x.clip(scaledUserView.drawBounds.left,scaledUserView.drawBounds.left+scaledUserView.drawBounds.width) - mouseDownPos.x
+		^mousePos.x - mouseDownPos.x
 	}
 	
 	mouseYDelta{ |mousePos,scaledUserView|
