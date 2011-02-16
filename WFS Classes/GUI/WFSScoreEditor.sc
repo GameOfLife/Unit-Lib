@@ -245,8 +245,11 @@ WFSScoreEditor {
 							path ), i );
 					newEvent.wfsSynth.useSoundFileDur;
 					newEvent; });
-				score.events = score.events ++ newEvents;
-				score.cleanOverlaps;
+
+				newEvents.do({ |evt|
+					score.addEventToCompletelyEmptyTrack( evt );
+				});
+
 				this.createWFSEventViews;
 				wfsEventViews.keep(newEvents.size.neg).do{ |event|
 					event.selected_(true)
@@ -258,8 +261,9 @@ WFSScoreEditor {
 	addTestEvent{
 		var copiedEvents, newTrack;
 		this.storeUndoState; 
-		score.events = 
-			score.events.add( WFSEvent( WFSTransport.pos ) );		score.cleanOverlaps;
+
+		score.addEventToCompletelyEmptyTrack( WFSEvent( WFSTransport.pos ) );
+
 		this.createWFSEventViews;
 		this.update;
 	}
@@ -277,8 +281,11 @@ WFSScoreEditor {
 				};
 				event.duplicate.track_( newTrack );
 			});
-			score.events = score.events ++ copiedEvents;
-			score.cleanOverlaps;
+
+			copiedEvents.do({ |evt|
+				score.addEventToCompletelyEmptyTrack( evt );
+			});
+
 			this.createWFSEventViews;
 			wfsEventViews.keep(copiedEvents.size.neg).do{ |event|
 					event.selected_(true)
@@ -396,21 +403,28 @@ WFSScoreEditor {
 	}
 	
 	unpackSelectedFolders{
-		var folderEvents;
+		var folderEvents,newEvents;
 		var selectedEvents = this.selectedEvents;
-		if( selectedEvents.size > 0 and: {	 						folderEvents = selectedEvents.select( _.isFolder );
+		
+		newEvents = [];
+		
+		if( selectedEvents.size > 0 and: { folderEvents = selectedEvents.select( _.isFolder );
 				folderEvents.size > 0  
 				}
 		) {
 			this.storeUndoState;
 			folderEvents.do({ |folderEvent|
-				score.events = score.events
+				newEvents = newEvents
 					++ folderEvent.wfsSynth.events.collect({ |item|
 						item.startTime_( item.startTime + folderEvent.startTime )
 					});
 				score.events.remove( folderEvent );
 			}); 
-			score.cleanOverlaps;
+			
+			newEvents.do({ |evt|
+					score.addEventToCompletelyEmptyTrack( evt );
+			});
+			
 			this.createWFSEventViews;
 			this.update;
 		} { 
