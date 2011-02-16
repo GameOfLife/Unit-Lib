@@ -558,8 +558,10 @@ WFSScoreEditor {
 		copyToFolderFunc.value;
 	}
 	
-	plot{ |all = false|
-		var events, paths;
+	plotAtTimeline { |all = false|
+		var events, paths, pos;
+		
+		pos = WFSTransport.pos;
 		
 		events = if( all ) {
 			score.allEvents.select{ |event|
@@ -567,6 +569,39 @@ WFSScoreEditor {
 			}
 		}{
 			score.events.select{ |event|
+				event.isFolder.not and: {event.wfsSynth.wfsPath.notNil }
+			}
+		};
+		
+		events = events.select{ |event|
+			var dur = event.dur;
+			var start = event.startTime;
+			(start < pos) && ((start + dur) > pos)
+		};	
+		
+		paths = events.collect{ |event|
+			event.wfsSynth.wfsPath
+				.currentTime_( event.startTime.neg + WFSTransport.pos )
+		};
+				
+		WFSMixedArray.with(*paths).plotSmooth(events:events); 
+	}		
+
+	plot{ |all = false|
+		var events, paths;
+		
+		events = this.selectedEvents;
+		
+		if(events.size == 0){
+			events = score.events;
+		};
+		
+		events = if( all ) {
+			WFSScore.allEvents(events).select{ |event|
+				event.wfsSynth.wfsPath.notNil
+			}
+		}{
+			events.select{ |event|
 				event.isFolder.not and: {event.wfsSynth.wfsPath.notNil }
 			}
 		};

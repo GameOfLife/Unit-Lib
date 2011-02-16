@@ -192,6 +192,12 @@ WFSMenubar {
 		SCMenuItem.new(events, "Batch change").action_({
 			WFSBatch.new
 		}).setShortCut("B",true);
+		
+		SCMenuSeparator.new(events);
+		// PLOT
+		SCMenuItem.new(events, "Plot at timeline").action_({
+			var scoreEditor = WFSScoreEditor.current;
+			if(scoreEditor.notNil){	 WFSScoreEditor.current.plotAtTimeline }
 		});
 		
 		SCMenuSeparator.new(events);
