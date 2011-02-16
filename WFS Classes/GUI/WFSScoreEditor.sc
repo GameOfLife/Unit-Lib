@@ -854,7 +854,8 @@ WFSScoreEditor {
 			} )				
 			.mouseMoveAction_( { |v, x, y, mod, x2, y2, isInside| 
 				var snap = if(snapActive){snapH * v.gridSpacingH}{0};
-				wfsMouseEventsManager.mouseMoveEvent(Point(x,y),Point(x2,y2),v,snap);
+				var shiftDown = ModKey( mod ).shift( \only );
+				wfsMouseEventsManager.mouseMoveEvent(Point(x,y),Point(x2,y2),v,snap, shiftDown);
 
 			} )				
 			.mouseUpAction_( { |v, x, y, mod, x2, y2, isInside|
