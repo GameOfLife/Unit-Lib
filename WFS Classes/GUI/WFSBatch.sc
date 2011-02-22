@@ -1,6 +1,6 @@
 WFSBatch {
 
-*new {
+*new { |events|
 
 	var window = Window("Batch",Rect(50, 400, 113, 400),false).front;
 	window.addFlowLayout(8@6);
@@ -9,8 +9,7 @@ WFSBatch {
 		.canFocus_(false)
 		.border_(1)
 		.action_{
-			WFSScoreEditor.current.selectedEvents.do
-				{ |event| event.wfsSynth.audioType = 'buf' }
+			events.do{ |event| event.wfsSynth.audioType = 'buf' }
 		};
 	window.view.decorator.nextLine;
 	SmoothButton(window,Rect(10, 55, 90, 20))
@@ -18,7 +17,7 @@ WFSBatch {
 		.canFocus_(false)
 		.border_(1)
 		.action_{
-			WFSScoreEditor.current.selectedEvents.do
+			events.do
 				{ |event| event.wfsSynth.audioType = 'disk' }
 		};
 	window.view.decorator.nextLine;
@@ -27,7 +26,7 @@ WFSBatch {
 		.canFocus_(false)
 		.border_(1)
 		.action_{
-			WFSScoreEditor.current.selectedEvents.do
+			events.do
 				{ |event| [\cubic ].includes( event.wfsSynth.intType ).if({event.wfsSynth.intType = 'linear' }) }
 		};
 	window.view.decorator.nextLine;
@@ -36,7 +35,7 @@ WFSBatch {
 		.canFocus_(false)
 		.border_(1)
 		.action_{
-			WFSScoreEditor.current.selectedEvents.do
+			events.do
 				{ |event| [\linear ].includes( event.wfsSynth.intType ).if({event.wfsSynth.intType = 'cubic' }) }
 		};
 	window.view.decorator.nextLine;
@@ -45,7 +44,7 @@ WFSBatch {
 		.canFocus_(false)
 		.border_(1)
 		.action_{
-			WFSScoreEditor.current.selectedEvents.do
+			events.do
 				{ |event| event.wfsSynth.useSwitch = 'true' }
 		};
 	window.view.decorator.nextLine;
@@ -54,7 +53,7 @@ WFSBatch {
 		.canFocus_(false)
 		.border_(1)
 		.action_{
-			WFSScoreEditor.current.selectedEvents.do
+			events.do
 				{ |event| event.wfsSynth.useSwitch = 'false' }
 		};
 	window.view.decorator.nextLine;
@@ -65,7 +64,7 @@ WFSBatch {
 		.string_("Start pos");
 	NumberBox.new(window,Rect(60, 190, 40, 15))
 		.action_{ |num|
-			WFSScoreEditor.current.selectedEvents.do
+			events.do
 				{ |event| event.startTime = num.value }
 		};
 	window.view.decorator.nextLine;
@@ -73,7 +72,7 @@ WFSBatch {
 		.string_("Level");
 	NumberBox.new(window,Rect(60, 210, 40, 15))
 		.action_{ |num|
-			WFSScoreEditor.current.selectedEvents.do
+			events.do
 				{ |event| event.wfsSynth.level = num.value }
 		};
 	window.view.decorator.nextLine;
@@ -81,7 +80,7 @@ WFSBatch {
 		.string_("Dur");
 	NumberBox.new(window,Rect(60, 230, 40, 15))
 		.action_{ |num|
-			WFSScoreEditor.current.selectedEvents.do
+			events.do
 				{ |event| event.wfsSynth.dur = num.value }
 		};
 	window.view.decorator.nextLine;
@@ -89,7 +88,7 @@ WFSBatch {
 		.string_("Fade In");
 	NumberBox.new(window,Rect(60, 250, 40, 15))
 		.action_{ |num|
-			WFSScoreEditor.current.selectedEvents.do
+			events.do
 				{ |event|
 				if (event.wfsSynth.fadeTimes.isNil) 
 					{ event.wfsSynth.fadeTimes = [num.value,0] }
@@ -101,7 +100,7 @@ WFSBatch {
 		.string_("Fade out");
 	NumberBox.new(window,Rect(60, 270, 40, 15))
 		.action_{ |num|
-			WFSScoreEditor.current.selectedEvents.do
+			events.do
 				{ |event|
 				if (event.wfsSynth.fadeTimes.isNil) 
 					{ event.wfsSynth.fadeTimes = [0,num.value] }
@@ -113,7 +112,7 @@ WFSBatch {
 		.string_("StrtFrme");
 	NumberBox.new(window,Rect(60, 290, 40, 15))
 		.action_{ |num|
-			WFSScoreEditor.current.selectedEvents.do
+			events.do
 				{ |event| event.wfsSynth.startFrame = num.value*44100 }
 		};
 	window.view.decorator.nextLine;
@@ -123,7 +122,7 @@ WFSBatch {
 		.string_("x");
 	NumberBox.new(window,Rect(60, 270, 40, 15))
 		.action_{ |num|
-			WFSScore.allEvents(WFSScoreEditor.current.selectedEvents)
+			WFSScore.allEvents(events)
 				.select({ arg ev; ev.wfsSynth.wfsPath.class == WFSPoint })
 				.do{ arg ev; ev.wfsSynth.wfsPath.x = num.value }
 		};
@@ -133,7 +132,7 @@ WFSBatch {
 		.string_("y");
 	NumberBox.new(window,Rect(60, 270, 40, 15))
 		.action_{ |num|
-			WFSScore.allEvents(WFSScoreEditor.current.selectedEvents)
+			WFSScore.allEvents(events)
 				.select({ arg ev; ev.wfsSynth.wfsPath.class == WFSPoint })
 				.do{ arg ev; ev.wfsSynth.wfsPath.y = num.value }
 		};

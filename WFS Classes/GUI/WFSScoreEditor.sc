@@ -832,7 +832,7 @@ WFSScoreEditor {
 			.font_( font )
 			.border_(1)
 			.action_({ 
-				WFSBatch.new 
+				WFSBatch.new(this.selectedEventsOrAll);
 			});
 			
 		header.decorator.shift(10);		
