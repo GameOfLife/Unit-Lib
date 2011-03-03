@@ -209,6 +209,7 @@ WFSScoreEditor {
 					  if( newScore.notNil )
 					  	{ if( score.events.size == 0 )
 					  		{ score = WFSScore.readWFSFile( paths[0] ) ? score;
+						  		this.createWFSEventViews;
 								this.update;  nextFunc.value(index+1); }
 							{ SCAlert( "where do you want to place '%'?"
 								.format( path.basename ),
@@ -219,6 +220,7 @@ WFSScoreEditor {
 								{ score.events = score.events.add(
 									   WFSEvent( 0, newScore ) );
 								score.cleanOverlaps;
+								this.createWFSEventViews;
 							   	this.update; 
 							   	nextFunc.value(index+1);  },
 							   { score.events = 
@@ -232,6 +234,7 @@ WFSScoreEditor {
 									});
 								score.events = score.events ++ newScore.events;
 								score.cleanOverlaps;
+								this.createWFSEventViews;
 								this.update;
 								nextFunc.value(index+1);
 								},
@@ -241,6 +244,7 @@ WFSScoreEditor {
 									});
 								score.events = score.events ++ newScore.events;
 								score.cleanOverlaps;
+								this.createWFSEventViews;
 								this.update;
 								nextFunc.value(index+1);
 								} ]	);
