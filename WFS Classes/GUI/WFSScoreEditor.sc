@@ -343,9 +343,9 @@ WFSScoreEditor {
 	}
 	
 	selectSimilar{
-		var selectedTypes = WFSMouseEventsManager.selectedEvents
-			.collect({ |eventView| 
-				(eventView.event.wfsSynth.audioType.asString ++ "_" ++ eventView.event.wfsSynth.intType).asSymbol
+		var selectedTypes = this.selectedEvents
+			.collect({ |event| 
+				(event.wfsSynth.audioType.asString ++ "_" ++ event.wfsSynth.intType).asSymbol
 			});
 		wfsEventViews.do({ |eventView|
 			if(selectedTypes.includes( 
