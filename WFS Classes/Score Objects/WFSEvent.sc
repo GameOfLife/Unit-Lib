@@ -151,7 +151,7 @@ WFSScore {
 	edit { |parent| WFSScoreEditor( this, parent.isNil, parent ) }
 		
 	cleanOverlaps { |excludeFades = false|
-		events.do({ |evt| this.moveEventToEmptyTrack( evt, excludeFades ) });
+		events.do({ |evt| this.moveEventIfOverlapped( evt, excludeFades ) });
 	}
 		
 	checkSoundFile { |nChaAlert, srAlert, notFoundAction| 
@@ -253,19 +253,22 @@ WFSScore {
 		
 	// find empty track:
 	
-	findEmptyTrack { |startTime = 0, endTime = inf, prefTrack = 0|
+	findEmptyTrack { |startTime = 0, endTime = inf, prefTrack = 0, exclude|
 		var evts, tracks;
 
 		evts = events.select({ |item|
+			(item != exclude) and:
 			(item.startTime <= endTime) and: (item.endTime >= startTime )
 		});
 
-		tracks = evts.collect(_.track);
+		tracks = evts.collect(_.track).collect(_.asInt);
 		
-		if( tracks.includes( prefTrack ).not ) { ^prefTrack };
+		if( tracks.size == 0 ) { ^prefTrack };
+		
+		if( tracks.includes( prefTrack.asInt ).not ) { ^prefTrack };
 
 		(tracks.maxItem+2).do({ |i|
-			if( tracks.includes( i ).not ) { ^i };
+			if( tracks.includes( i.asInt ).not ) { ^i };
 		});
 	}
 
@@ -291,14 +294,18 @@ WFSScore {
 		^evts.isNil;
 	}
 
-	moveEventToEmptyTrack { |evt, excludeFades = false|
+	moveEventIfOverlapped { |evt, excludeFades = false, prefTrack = 0|
 		if( this.checkOverlapsFor( evt, excludeFades ).not ) {
-			evt.track = this.findEmptyTrack( evt.startTime, evt.endTime );
+			this.moveEventToEmptyTrack( evt, prefTrack );
 		};
 	}
 	
-	addEventToEmptyTrack { |evt, excludeFades = false|
-		this.moveEventToEmptyTrack( evt, excludeFades );
+	moveEventToEmptyTrack { |evt, prefTrack = 0|
+		evt.track = this.findEmptyTrack( evt.startTime, evt.endTime, prefTrack, evt );
+	}
+	
+	addEventToEmptyTrack { |evt, excludeFades = false, prefTrack = 0|
+		this.moveEventToEmptyTrack( evt, excludeFades, prefTrack );
 		events = events.add( evt );
 	}
 
