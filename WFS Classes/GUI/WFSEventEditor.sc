@@ -159,6 +159,9 @@ WFSEventEditor {
 					this.storeUndoState;
 					if( box.value < 0 ) { box.value = 0 };
 					event.dur = box.value; 
+					if( event.wfsSynth.wfsPath.class == WFSPath ) {
+						event.wfsSynth.wfsPath.length = box.value;
+					};
 					editAction.value( event, \duration, box.value );
 				});
 				
@@ -519,9 +522,11 @@ WFSEventEditor {
 											
 					event.wfsSynth.intType = box.items[ box.value ];
 					
+					/*
 					if( [ \static, \plane, \index ].includes( event.wfsSynth.intType ) )
 						{ views[ \duration ].enabled = true; }
 						{ views[ \duration ].enabled = false };
+					*/
 						
 					case { [ \linear, \cubic ].includes( event.wfsSynth.intType ) }
 						{ event.wfsSynth.wfsPath = wfsPathBackup ??
