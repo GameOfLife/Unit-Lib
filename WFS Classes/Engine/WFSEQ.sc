@@ -193,15 +193,15 @@ WFSEQ {
 		controls[ \eqTxt ] = StaticText( window, Rect( 10, 0, 300, 20 ) )
 			.string_( "Status: started" );
 		
-		LineView( window, Rect( 35 + 30, 129, 155, 1 ) ).full_(false);
+		LineView( window, Rect( 35 + 30, 129, 155, 1 ) );
 		
-		LineView( window, Rect(  65, 240, 1, 25 ) ).full_(false);
+		LineView( window, Rect(  65, 240, 1, 25 ) );
 		StaticText( window, Rect( 35, 265, 60, 15 ) ).string_( "100Hz" ).align_( \center );
 		
-		LineView( window, Rect(  142, 255, 1, 10 ) ).full_(false);
+		LineView( window, Rect(  142, 255, 1, 10 ) );
 		StaticText( window, Rect( 112, 265, 60, 15 ) ).string_( "1kHz" ).align_( \center );
 		
-		LineView( window, Rect(  219, 240, 1, 25 ) ).full_(false);
+		LineView( window, Rect(  219, 240, 1, 25 ) );
 		StaticText( window, Rect( 189, 265, 60, 15 ) ).string_( "6kHz" ).align_( \center );
 		
 		controls[ \eqLowGain ] = SmoothSlider( window, Rect(35 + 30, 30, 30, 200 ) )
