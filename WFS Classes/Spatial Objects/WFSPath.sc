@@ -431,7 +431,7 @@ WFSPath {
 		
 		plotWindow = WFSPlotSmooth( "WFSPath", toFront: toFront, removeButtons: false );
 		
-		/* if( plotWindow.isNil or: { plotWindow.dataptr.isNil } )
+		/* if( plotWindow.isNil or: { plotWindow.isClosed } )
 		  {	plotWindow = SCWindow(name, Rect(128, 64, 400, 400)).front;
 			plotWindow.view.background_(Color.black );
 			} { plotWindow.front };

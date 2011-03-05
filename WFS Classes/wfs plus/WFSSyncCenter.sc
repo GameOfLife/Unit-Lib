@@ -289,7 +289,7 @@ WFSSyncCenter {
 			
 	*updateGUI { |post| // post.postln;  
 		{ 
-		if( guiEnv[ \window ].notNil && {  guiEnv[ \window ].dataptr.notNil } )
+		if( guiEnv[ \window ].notNil && {  guiEnv[ \window ].isClosed.not } )
 			{
 			//remoteBlocks.postln;
 			guiEnv.use({

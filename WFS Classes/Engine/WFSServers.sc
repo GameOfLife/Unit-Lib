@@ -130,7 +130,7 @@ WFSServers {
 	makeWindow {
 		var comp;
 
-		if( window.notNil && { window.dataptr.notNil }) { window.front; ^this };
+		if( window.notNil && { window.isClosed.not }) { window.front; ^this };
 		
 		window = Window("WFSServers", Rect(10, 10, 340, 8 +
 			( (ips.size * serversPerSystem)  * (22)) + (ips.size * 16 ) ), false).front;

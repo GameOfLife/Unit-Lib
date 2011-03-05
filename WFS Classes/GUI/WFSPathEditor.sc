@@ -78,7 +78,7 @@ WFSPathEditor {
 	*new { arg wfsPaths, windowName = "WFSPathEditor";
 		if(wfsPaths.notNil)
 			{ WFSPathEditor.newEditor( wfsPaths, windowName); }
-			{ if( window.notNil && { window.dataptr.notNil } )
+			{ if( window.notNil && { window.isClosed.not } )
 				{ window.front; }
 				{ WFSPathEditor.newEmptyWindow; }
 			 };

@@ -60,7 +60,7 @@ WFSEQ {
 		^BHiShelf.ar( eqOut, eqHighFr, 1, eqHighGain );
 		}
 		
-	*new { if( window.notNil && { window.dataptr.notNil } )
+	*new { if( window.notNil && { window.isClosed.not } )
 			{ window.front; }
 			{ this.newWindow;  };
 		}

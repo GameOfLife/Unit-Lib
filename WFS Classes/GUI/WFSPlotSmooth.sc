@@ -61,8 +61,8 @@ WFSPlotSmooth {
 		
 		   }
 	
-	*isOpen { ^( window.notNil && { window.dataptr.notNil } ); }
-	*isClosed { ^( window.notNil && { window.dataptr.notNil } ).not; }
+	*isOpen { ^( window.notNil && { window.isClosed.not } ); }
+	*isClosed { ^( window.notNil && { window.isClosed.not } ).not; }
 	
 	*keep { window = nil; } // next *new call will open new window
 	

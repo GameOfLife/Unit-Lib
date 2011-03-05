@@ -115,12 +115,12 @@ WFSScoreEditor {
 	}	
 			
 	update {
-		if( window.window.notNil && { window.window.dataptr.notNil } ) { 
+		if( window.window.notNil && { window.window.isClosed.not } ) { 
 			window.refresh; };
 			if( parent.notNil ) { parent.update };
 			 }
 			 
-	toFront { if( window.window.notNil && { window.window.dataptr.notNil } ) 
+	toFront { if( window.window.notNil && { window.window.isClosed.not } ) 
 		{ window.window.front; };
 		 }
 			

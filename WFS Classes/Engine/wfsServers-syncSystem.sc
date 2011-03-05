@@ -147,7 +147,7 @@
 
 		
 	updatePulsesRunningView {
-		if( (window.notNil && { window.dataptr.notNil }) && { pulsesRunningView.notNil } )
+		if( (window.notNil && { window.isClosed.not }) && { pulsesRunningView.notNil } )
 			{ if( pulsesRunning )
 				{ pulsesRunningView.string_( "pulses running" );  }
 				{ pulsesRunningView.string_( "" );  };

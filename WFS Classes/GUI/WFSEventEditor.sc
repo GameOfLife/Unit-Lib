@@ -46,7 +46,7 @@ WFSEventEditor {
 	}	
 	
 	update { 
-		if( window.notNil && { window.dataptr.notNil } )
+		if( window.notNil && { window.isClosed.not } )
 			{ 	views[ \startTime ].pos = event.startTime;
 				views[ \duration ].value = event.dur;
 				if( event.muted )

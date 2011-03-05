@@ -35,17 +35,17 @@ WFSLevelBus {
 	 	
 	 	action = { |value| WFSLevelBus.set( value, false ); };
 	 	
-	 	if( window.notNil && { window.dataptr.notNil } )
+	 	if( window.notNil && { window.isClosed.not } )
 	 		{ window.close };
 	 	
-	 	window = SCWindow( "level", Rect( SCWindow.screenBounds.width - 120, 0, 120, 
-			SCWindow.screenBounds.height - 150 ), false ).front;
+	 	window = Window( "level", Rect( Window.screenBounds.width - 120, 0, 120, 
+			Window.screenBounds.height - 150 ), false ).front;
 	
 		slider = SmoothSlider( window, 
 				window.view.bounds.resizeBy( -30, -100 ).moveBy( 15, 15 ))
 			.mode_( \move ).canFocus_( false );
 			
-		nbox = ScrollingNBox( window, window.view.bounds
+		nbox = RoundNumberBox( window, window.view.bounds
 				.resizeTo( 90, 60 )
 				.moveBy( 15, window.view.bounds.height - 80 ) )
 			.value_( level )
@@ -70,7 +70,7 @@ WFSLevelBus {
 	 	}
 	 	
 	*updateWindow {
-		if( window.notNil && { window.dataptr.notNil } )
+		if( window.notNil && { window.isClosed.not } )
 	 		{ WFSLevelBus.get( { |value| {  
 				nbox.value = value.round(1);
 				slider.value =  ( value + ( defaultLevel - range ).neg ) 
