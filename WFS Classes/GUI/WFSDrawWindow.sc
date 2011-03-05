@@ -38,9 +38,9 @@ WFSDrawWindow {
 		var view;
 		tmppoints = [];
 		tmptimes = [];
-		window = SCWindow("draw WFSPath", Rect(128, 64, 340, 360));
+		window = Window("draw WFSPath", Rect(128, 64, 340, 360));
 		window.view.background_( Color.black );
-		view = SCUserView(window,Rect(0, 0, 340, 360))
+		view = UserView(window,Rect(0, 0, 340, 360))
 			.mouseDownAction_({|v,x,y,z|
 				
 				//z.postln;
@@ -61,7 +61,7 @@ WFSDrawWindow {
 				window.refresh;
 				});
 				
-		SCButton(window, Rect(5,5,20,20) )
+		Button(window, Rect(5,5,20,20) )
 			.states_( [[ ">", Color.white,Color.white.alpha_(0.25)]] )
 			.action_({ 
 				var tmpDeltaTimes, lastTime = 0;
@@ -81,11 +81,11 @@ WFSDrawWindow {
 						}).play;
 				}); 
 		
-		SCButton(window, Rect(30,5,20,20) )
+		Button(window, Rect(30,5,20,20) )
 			.states_( [[ "x", Color.white, Color.red.alpha_(0.25)]] )
 			.action_({ selected = 0; tmppoints = []; tmptimes = []; window.refresh; });
 			
-		SCButton(window, Rect(55,5,40,20) )
+		Button(window, Rect(55,5,40,20) )
 			.states_( [[ "Edit", Color.white, Color.green.alpha_(0.25)]] )
 			.action_({ 	
 				if( tmppoints.size > 1 )
@@ -98,7 +98,7 @@ WFSDrawWindow {
 						.timeLine_( tmptimes ).edit; }; */
 			});
 		
-		SCNumberBox( window, Rect( 5, window.bounds.height - 25, 40, 20 ) )
+		NumberBox( window, Rect( 5, window.bounds.height - 25, 40, 20 ) )
 			.background_( Color.black.alpha_(0.2) )
 			.stringColor_( Color.white )
 			.resize_( 7 )

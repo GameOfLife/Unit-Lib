@@ -69,9 +69,9 @@ WFSArrayBase[slot] : RawArray {
 	autoScaleFactor { ^0.45 / this.maxRadius }  // not used anymore
 		
 	plot { var a, b;
-		a = SCWindow(this.class.asString, Rect(450 , 400, 410, 410), false);
+		a = Window(this.class.asString, Rect(450 , 400, 410, 410), false);
 		a.view.decorator =  FlowLayout(a.view.bounds);
-		b = SCEnvelopeView(a, Rect(0, 0, 400, 400))
+		b = EnvelopeView(a, Rect(0, 0, 400, 400))
 			.thumbSize_(5)
 			.drawLines_( false )
 			.fillColor_(Color.green)
@@ -102,7 +102,7 @@ WFSArrayBase[slot] : RawArray {
 	plotSmooth { 	|speakerConf = \default|	
 		var path, angles;
 		var window, fromRect;
-		window = SCWindow(this.class.asString, Rect(128, 64, 400, 400)).front;
+		window = Window(this.class.asString, Rect(128, 64, 400, 400)).front;
 		window.view.background_(Color.black);
 		
 		fromRect = this.asRect;

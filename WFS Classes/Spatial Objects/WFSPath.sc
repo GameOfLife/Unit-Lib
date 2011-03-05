@@ -307,9 +307,9 @@ WFSPath {
 		}		
 	
 	plot { var a, b, c, d, e;
-		a = SCWindow("WFSPath '" ++ name ++ "'", Rect(200 , 450, 410, 435), false);
+		a = Window("WFSPath '" ++ name ++ "'", Rect(200 , 450, 410, 435), false);
 		a.view.decorator =  FlowLayout(a.view.bounds);
-		b = SCEnvelopeView(a, Rect(0, 0, 400, 400))
+		b = EnvelopeView(a, Rect(0, 0, 400, 400))
 			.thumbSize_(5)
 			.drawLines_(true)
 			.fillColor_(Color.green)
@@ -317,11 +317,11 @@ WFSPath {
 			.drawRects_(true)
 			.value_(this.asEnvViewInput(true) )
 			.setEditable(-1,false);
-		c = SCButton(a, Rect(0,0,60,20)).states_( [["refresh"]] )
+		c = Button(a, Rect(0,0,60,20)).states_( [["refresh"]] )
 			.action_({ b.value_(this.asEnvViewInput(true) )});
-		d = SCButton(a, Rect(0,0,60,20)).states_( [["edit"]] )
+		d = Button(a, Rect(0,0,60,20)).states_( [["edit"]] )
 			.action_({ a.close; this.simpleEdit; });
-		e = SCButton(a, Rect(0,0,180,20)).states_( [["add to WFSPathEditor"]] )
+		e = Button(a, Rect(0,0,180,20)).states_( [["add to WFSPathEditor"]] )
 			.action_({ this.edit; });
 		^a.front;
 		}
@@ -330,9 +330,9 @@ WFSPath {
 		// use undo to undo changes
 		var a, b, c, d, e;
 		this.fix;
-		a = SCWindow("Edit WFSPath '" ++ name ++ "'", Rect(200 , 450, 410, 435), false);
+		a = Window("Edit WFSPath '" ++ name ++ "'", Rect(200 , 450, 410, 435), false);
 		a.view.decorator =  FlowLayout(a.view.bounds);
-		b = SCEnvelopeView(a, Rect(0, 0, 400, 400))
+		b = EnvelopeView(a, Rect(0, 0, 400, 400))
 			.thumbSize_(5)
 			.drawLines_(true)
 			.fillColor_(Color.yellow)
@@ -341,10 +341,10 @@ WFSPath {
 			.value_(this.asEnvViewInput(true) )
 			.setEditable(-1,true)
 			.action_({ |view| this.fromEnvViewInput(view.value, true); });
-		c = SCButton(a, Rect(0,0,60,20)).states_( [["undo"]] )
+		c = Button(a, Rect(0,0,60,20)).states_( [["undo"]] )
 			.action_({ this.undo; b.value_(this.asEnvViewInput(true) )});
-		d = SCButton(a, Rect(0,0,60,20)).states_( [["fix"]] )
-			.action_({ this.fix; b.value_(this.asEnvViewInput(true) )});		e = SCButton(a, Rect(0,0,180,20)).states_( [["add to WFSPathEditor"]] )
+		d = Button(a, Rect(0,0,60,20)).states_( [["fix"]] )
+			.action_({ this.fix; b.value_(this.asEnvViewInput(true) )});		e = Button(a, Rect(0,0,180,20)).states_( [["add to WFSPathEditor"]] )
 			.action_({ a.close; this.plot; this.edit; });
 		a.front;
 		^this;

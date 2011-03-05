@@ -80,7 +80,7 @@ WFSTransport {
 				window.window.bounds.width - 35, 0, 30, 30 ) )
 					//.speed_( 1.025 / WFSEvent.wait )
 					.alphaWhenStopped_( 0 ),
-			text: SCStaticText( window.window,  Rect(
+			text: StaticText( window.window,  Rect(
 				window.window.bounds.width - 130, 0, 120, 40 ) )
 					.string_( "" ) 
 					.font_( Font( "Monaco", 9 ) )
@@ -213,7 +213,7 @@ WFSTransport {
 				.canFocus_( false );
 		};
 		
-		scoreMenu = SCPopUpMenu( window.window, 
+		scoreMenu = PopUpMenu( window.window, 
 				Rect( window.window.bounds.width - 100, 80, 95, 16 ) )
 			.canFocus_( false )
 			.items_( [ "current: " ++ 
@@ -232,7 +232,7 @@ WFSTransport {
 					window.window.front; };
 				});
 			
-		SCStaticText( window.window, Rect( window.window.bounds.width - 140, 80, 40, 16 ) )
+		StaticText( window.window, Rect( window.window.bounds.width - 140, 80, 40, 16 ) )
 			.string_( "score:" )
 			.font_( Font( "Monaco", 9 ) ); 
 		

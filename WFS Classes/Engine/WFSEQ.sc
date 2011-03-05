@@ -146,7 +146,7 @@ WFSEQ {
 		
 		controls = ();
 		
-		window = SCWindow( "WFS Equalizer", Rect(10, 394, 270, 292), false ).front;
+		window = Window( "WFS Equalizer", Rect(10, 394, 270, 292), false ).front;
 		
 		eqAction = { |paramName, value = 0, longParamName = "", format = ""|
 			controls[ \eqTxt ].string = "Status: " ++ longParamName ++ 
@@ -190,19 +190,19 @@ WFSEQ {
 				} { "WFS Equalizer: prefs file not found".postln; }
 			});
 		
-		controls[ \eqTxt ] = SCStaticText( window, Rect( 10, 0, 300, 20 ) )
+		controls[ \eqTxt ] = StaticText( window, Rect( 10, 0, 300, 20 ) )
 			.string_( "Status: started" );
 		
 		LineView( window, Rect( 35 + 30, 129, 155, 1 ) ).full_(false);
 		
 		LineView( window, Rect(  65, 240, 1, 25 ) ).full_(false);
-		SCStaticText( window, Rect( 35, 265, 60, 15 ) ).string_( "100Hz" ).align_( \center );
+		StaticText( window, Rect( 35, 265, 60, 15 ) ).string_( "100Hz" ).align_( \center );
 		
 		LineView( window, Rect(  142, 255, 1, 10 ) ).full_(false);
-		SCStaticText( window, Rect( 112, 265, 60, 15 ) ).string_( "1kHz" ).align_( \center );
+		StaticText( window, Rect( 112, 265, 60, 15 ) ).string_( "1kHz" ).align_( \center );
 		
 		LineView( window, Rect(  219, 240, 1, 25 ) ).full_(false);
-		SCStaticText( window, Rect( 189, 265, 60, 15 ) ).string_( "6kHz" ).align_( \center );
+		StaticText( window, Rect( 189, 265, 60, 15 ) ).string_( "6kHz" ).align_( \center );
 		
 		controls[ \eqLowGain ] = SmoothSlider( window, Rect(35 + 30, 30, 30, 200 ) )
 			.centered_( true ).value_( 0.5 )
@@ -218,11 +218,11 @@ WFSEQ {
 				calc.slider2lowFr( sl.value ), "Low Shelf freq", "Hz" )
 				 } );
 		
-		SCStaticText( window, Rect( 35, 30, 28, 15 ) ).string_( "+24" ).align_( \right );
-		SCStaticText( window, Rect( 35, 122, 28, 15 ) ).string_( "0" ).align_( \right ); 
-		SCStaticText( window, Rect( 35, 215, 28, 15 ) ).string_( "-24" ).align_( \right ); 
+		StaticText( window, Rect( 35, 30, 28, 15 ) ).string_( "+24" ).align_( \right );
+		StaticText( window, Rect( 35, 122, 28, 15 ) ).string_( "0" ).align_( \right ); 
+		StaticText( window, Rect( 35, 215, 28, 15 ) ).string_( "-24" ).align_( \right ); 
 			
-		SCStaticText( window, Rect( 35 + 30, 15, 30, 15 ) ).string_( "low" ).align_( \center ); 
+		StaticText( window, Rect( 35 + 30, 15, 30, 15 ) ).string_( "low" ).align_( \center ); 
 		
 		
 		controls[ \eqMidGain ] = SmoothSlider( window, Rect(97 + 30, 30, 30, 200 ) )
@@ -245,9 +245,9 @@ WFSEQ {
 				calc.slider2midRQ( sl.value ), "Mid Peak RQ", "" )
 				 } );
 		
-		SCStaticText( window, Rect( 97 + 30, 15, 30, 15 ) ).string_( "mid" ).align_( \center );
+		StaticText( window, Rect( 97 + 30, 15, 30, 15 ) ).string_( "mid" ).align_( \center );
 		
-		SCStaticText( window, Rect( 132 + 30, 45, 10, 15 ) ).string_( "Q" ).align_( \center );  
+		StaticText( window, Rect( 132 + 30, 45, 10, 15 ) ).string_( "Q" ).align_( \center );  
 		
 		controls[ \eqHighGain ] = SmoothSlider( window, Rect(160 + 30, 30, 30, 200 ) )
 			.centered_( true ).value_( 0.5 )
@@ -264,7 +264,7 @@ WFSEQ {
 				calc.slider2highFr( sl.value ), "High Shelf freq", "Hz" )
 				 } );
 		
-		SCStaticText( window, Rect( 160 + 30, 15, 30, 15 ) ).string_( "high" ).align_( \center ); 
+		StaticText( window, Rect( 160 + 30, 15, 30, 15 ) ).string_( "high" ).align_( \center ); 
 		
 		controls[ \eqButtons ][2].doAction;
 		

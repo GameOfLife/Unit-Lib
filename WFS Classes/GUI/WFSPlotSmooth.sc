@@ -39,7 +39,7 @@ WFSPlotSmooth {
 				//this.addDragView;
 				if( toFront ) { window.front };
 			}
-			{ window = SCWindow( title.asString ++ ":plotSmooth", bounds ).front;
+			{ window = Window( title.asString ++ ":plotSmooth", bounds ).front;
 			  window.view.background_( Color.black );
 			  this.addDragView( window );
 			  playButton = nil;
@@ -53,8 +53,8 @@ WFSPlotSmooth {
 	*addDragView { |theWindow| 
 		view = UserView( theWindow, theWindow.view.bounds )
 			.resize_(5)
-			.canReceiveDragHandler_( { SCView.currentDrag.respondsTo( \plotSmooth ) })
-			.receiveDragHandler_( { SCView.currentDrag.plotSmooth; } )
+			.canReceiveDragHandler_( { View.currentDrag.respondsTo( \plotSmooth ) })
+			.receiveDragHandler_( { View.currentDrag.plotSmooth; } )
 			.background_(Color.black)
 			
 

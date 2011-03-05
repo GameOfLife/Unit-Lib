@@ -94,7 +94,7 @@ WFSPathEditor {
 			
 		if( emptyWindow.isNil )
 			{ 	ewb = Rect(64 + 64.rand, 32 + 32.rand , 650, 700);
-				emptyWindow = SCWindow.new("WFSPathEditor", ewb, false);
+				emptyWindow = Window.new("WFSPathEditor", ewb, false);
 				emptyWindow.front;
 				StaticText( emptyWindow, Rect.aboutPoint( 
 						(ewb.width / 2)@(ewb.height * 0.125), 210, 40 ) 
@@ -148,7 +148,7 @@ WFSPathEditor {
 						});
 						
 						
-				SCPopUpMenu( emptyWindow, Rect.aboutPoint( 
+				PopUpMenu( emptyWindow, Rect.aboutPoint( 
 						(ewb.width / 2)@((ewb.height * 0.25) + 125 ) , 80, 10 ) )
 					.items_( [ "(create default WFSPath", /*)*/ "-", 
 						"circle", "rand", "spiral", "lissajous", "line", "rect" ] )
@@ -224,7 +224,7 @@ WFSPathEditor {
 			window.onClose.value; 
 			window.close;};
 		
-		lw = SCWindow(windowName, Rect(64 + 64.rand, 32 + 32.rand , 650, 700), false).front;
+		lw = Window(windowName, Rect(64 + 64.rand, 32 + 32.rand , 650, 700), false).front;
 		
 		
 		//window = lw;
@@ -316,18 +316,18 @@ WFSPathEditor {
 			62, // interpolate
 			22 // morph
 			].do({ |item, i| 
-				SCCompositeView(lw,Rect(498, lastItem, 152 ,item)).background_( Color.hsv(((i+1) / 4) % 1.0, 1.0, 
+				CompositeView(lw,Rect(498, lastItem, 152 ,item)).background_( Color.hsv(((i+1) / 4) % 1.0, 1.0, 
 					[0.8, 0.4].wrapAt(i)).alpha_(0.125) ); 
 				lastItem = lastItem + item;
 				});
 		}.value;
 		
-		SCCompositeView(lw,Rect(496,0 , 154 , 372)).background_( Color.white.alpha_(0.25) );  // presets
-		SCCompositeView(lw,Rect(476, 378 ,174, 58)).background_( Color.black.alpha_(0.125) );  // keep/history
-		SCCompositeView(lw,Rect(496, 446 , 154 , 45)).background_( Color.white.alpha_(0.25) );  // centermode
+		CompositeView(lw,Rect(496,0 , 154 , 372)).background_( Color.white.alpha_(0.25) );  // presets
+		CompositeView(lw,Rect(476, 378 ,174, 58)).background_( Color.black.alpha_(0.125) );  // keep/history
+		CompositeView(lw,Rect(496, 446 , 154 , 45)).background_( Color.white.alpha_(0.25) );  // centermode
 		
 		
-		presetSwitch = SCPopUpMenu.new(lw, Rect(500, 350, 80, 18));
+		presetSwitch = PopUpMenu.new(lw, Rect(500, 350, 80, 18));
 		presetSwitch.items_(presets.collect({arg item; item.at('name'); }) ++ ['-', 'new...']);
 		StaticText.new(lw, Rect(582, 350, 80, 18)).string_("presets");
 		presetSwitch.addUniqueMethod('select', {arg popUp, mode = true;
@@ -364,7 +364,7 @@ WFSPathEditor {
 		history = [[lvRealMulti.copy, lvNames.copy, lvTimes.copy]];
 		
 				
-		historySwitch = SCPopUpMenu.new(lw, Rect(480, 414, 80, 18));
+		historySwitch = PopUpMenu.new(lw, Rect(480, 414, 80, 18));
 		historySwitch.addUniqueMethod('itemFill', {
 			historySwitch.items_(
 				history.collect({arg item, i;
@@ -525,7 +525,7 @@ WFSPathEditor {
 		RoundButton.new(lw, Rect(5, 110 + 45, 40, 18)).radius_(0).border_(1).states_([["fit all"]]).action_({fitAll.value});
 		
 		/*
-		visualMode = SCPopUpMenu.new(lw, Rect(100, 452, 140, 18)) // (350, 472, 100, 18)
+		visualMode = PopUpMenu.new(lw, Rect(100, 452, 140, 18)) // (350, 472, 100, 18)
 				.items_(["show lines and points", "show points only", 
 						"show lines only", "hide lines and points"])
 				.action_({selectMovement.value});
@@ -552,7 +552,7 @@ WFSPathEditor {
 		
 		
 		/*		
-		SCPopUpMenu.new(lw, Rect(250, 452, 100, 18)) // (350, 472, 100, 18)
+		PopUpMenu.new(lw, Rect(250, 452, 100, 18)) // (350, 472, 100, 18)
 				.items_(["(plot smooth..", "-", "current", "all"])
 				.action_({ |popUp|
 				
@@ -598,7 +598,7 @@ WFSPathEditor {
 					array[1].sum / array[1].size]
 					};
 		
-		lxy = SCEnvelopeView(lw, Rect(50, 50, 400, 400))  //xy plane display 
+		lxy = EnvelopeView(lw, Rect(50, 50, 400, 400))  //xy plane display 
 				.drawLines_(true)
 				.resize_( 5 )
 				.value_([[0.0, 1.0, 0.5, 0.5], [0.5, 0.5, 0.0, 1.0]]);
@@ -613,7 +613,7 @@ WFSPathEditor {
 		lxy.setProperty(\strokeColor, Color(0.0, 0.0, 0.0, 0.5));
 		lxy.setProperty(\thumbWidth, [-1, 1.0]); lxy.setProperty(\thumbHeight, [-1, 1.0]); 
 		
-		selectView = SCEnvelopeView(lw, Rect(50, 50, 400, 400)) 
+		selectView = EnvelopeView(lw, Rect(50, 50, 400, 400)) 
 				.resize_( 5 )
 				.drawLines_(false)
 				.drawRects_(true);
@@ -627,7 +627,7 @@ WFSPathEditor {
 		
 		makeDisplay = {arg value, alpha = 0.5, name = "", index;
 			var out;
-			out = SCEnvelopeView(lw, Rect(50, 50, 400, 400));  //path display (on top of xy plane display)
+			out = EnvelopeView(lw, Rect(50, 50, 400, 400));  //path display (on top of xy plane display)
 			out.action = {
 					fixView.makeRed;
 					deZoom.value;
@@ -721,7 +721,7 @@ WFSPathEditor {
 							local}
 							);
 							
-		scale2D = SC2DSlider.new(lw, Rect(500, 0, 80, 80)); //2 dimensional scaling slider
+		scale2D = Slider2D(lw, Rect(500, 0, 80, 80)); //2 dimensional scaling slider
 		scale2D.addUniqueMethod('setXYw', {arg slider, xy;   //// Changed to setXYw since addition of setXY method to SC3
 							if(xy.isNil) {xy = [0.5, 0.5];};
 							scale2D.setProperty(\x, xy.at(0));
@@ -813,14 +813,14 @@ WFSPathEditor {
 		interpolateBox = RoundNumberBox.new(lw, Rect(546, 254, 34, 18)).value_(1).steps_(0.1);
 		interpolateBox.action = { |nBox| nBox.value = nBox.value.round(0.1).max(0.1);
 						transform.value;};
-		intCloseOpen = SCPopUpMenu.new(lw,Rect(500,254,45,18));
+		intCloseOpen = PopUpMenu.new(lw,Rect(500,254,45,18));
 		intCloseOpen.items = ["open", "close"];
 		intCloseOpen.value = 1;
 		intCloseOpen.action = {	|popUp|transform.value};
 				
 		StaticText.new(lw, Rect(582, 254, 80, 18)).string_("interpolate");
 		
-		SCPopUpMenu.new(lw,Rect(500,274,80,18))
+		PopUpMenu.new(lw,Rect(500,274,80,18))
 				.items_(["cubic spline", "hermite", "b-spline", "quadratic", "linear", "sinusoid x", 
 					"sinusoid y", "step x", "step y"])
 				.action_({ |butt| 
@@ -866,7 +866,7 @@ WFSPathEditor {
 		morph.action = { |nBox| nBox.value = nBox.value.clip(-1, 2).round(0.00000001);
 						transform.value };
 						
-		morphTo = SCPopUpMenu.new(lw, Rect(527, 316, 53, 18));
+		morphTo = PopUpMenu.new(lw, Rect(527, 316, 53, 18));
 		morphTo.action = {transform.value};
 		fillMorphTo = {morphTo.items_(['circle', '-'] ++ lvNames.copy)};
 		fillMorphTo.value;
@@ -894,7 +894,7 @@ WFSPathEditor {
 		
 		
 		
-		selected = SCPopUpMenu.new(lw, Rect(50 + 120, 30, 140, 18))
+		selected = PopUpMenu.new(lw, Rect(50 + 120, 30, 140, 18))
 			.items_(lvNames.copy ++ ['-', if(lvNames.size == 1) {'(all' /*)*/} {'all'}]); 
 		selected.value = 0;
 		selected.action_({selectMovement.value});
@@ -977,7 +977,7 @@ WFSPathEditor {
 						
 		
 		
-		SCPopUpMenu.new(lw, Rect(152 + 40 + 120, 30, 70, 18))
+		PopUpMenu.new(lw, Rect(152 + 40 + 120, 30, 70, 18))
 			.items_(["(actions..",  /*)*/ "-", "generate new..", "draw new..", "-", "duplicate", "remove", "-",
 				"rename"
 				//, "-", "plotSmooth", "plotSmooth all"
@@ -1033,11 +1033,11 @@ WFSPathEditor {
 				transform.value;
 					};
 		
-			gw = SCWindow.new("generate", Rect(window.bounds.right + 2, 
+			gw = Window.new("generate", Rect(window.bounds.right + 2, 
 				window.bounds.top + (window.bounds.height - 120), 250, 120), false);
 			//gw.onClose_({ if(lw.notNil) {fix.value}; });
 			gw.addUniqueMethod('createNew', {new = true; updateFunc.value});
-			mode = SCPopUpMenu.new(gw, Rect(5, 5, 80, 18)).items_(
+			mode = PopUpMenu.new(gw, Rect(5, 5, 80, 18)).items_(
 				['polygon','wave','spiral','lissajous','random']);
 				
 			update = RoundButton.new(gw, Rect(87, 5, 78, 18)).radius_(0).border_(1).states_([["update"]])
@@ -1049,7 +1049,7 @@ WFSPathEditor {
 			sets = Array.fill(mode.items.size, { |i|
 				var cp;
 				cp = CompositeView.new(gw, Rect(5, 25, 240, 70))
-					//.relativeOrigin_(false) /// CHANGE FOR SC 3.2.2
+					//.relativeOrigin_(false) /// CHANGE FOR  3.2.2
 					//.slotPut( \relativeOrigin, false )
 					.background_(	
 						[Color.black, Color.red, Color.green, 
@@ -1076,7 +1076,7 @@ WFSPathEditor {
 				RoundNumberBox.new(sets.at(0), Rect(130, 50, 38, 18)).value_(1).steps_(0.05) //odd ratio
 					.action_({ |nBox| nBox.value = nBox.value.max(-2).min(4).round(0.05);
 						currentAction.value;}),
-				SCPopUpMenu.new(sets.at(0), Rect(10, 70, 60, 18))  //open/close
+				PopUpMenu.new(sets.at(0), Rect(10, 70, 60, 18))  //open/close
 					.items_(["open", "closed"])
 					.action_({ |popUp|
 						polygonViews.at(0).valueAction = 
@@ -1115,7 +1115,7 @@ WFSPathEditor {
 				RoundNumberBox.new(sets.at(1), Rect(130, 50, 38, 18)).value_(1).steps_(0.1) //width
 					.action_({ |nBox| nBox.value = nBox.value.round(0.1);
 						currentAction.value;}),
-				SCPopUpMenu.new(sets.at(1), Rect(10, 70, 60, 18))  //type
+				PopUpMenu.new(sets.at(1), Rect(10, 70, 60, 18))  //type
 					.items_(["sine", "-", "tri", "saw", "square", "-", "vari-saw", "pulse"])
 					.action_({ |popUp| 
 						if(popUp.value < 6)
@@ -1281,7 +1281,7 @@ WFSPathEditor {
 					.action_({ |nBox| nBox.value = nBox.value.round(0.1);
 						currentAction.value;}),
 				RoundNumberBox.new(sets.at(4), Rect(160, 50, 28, 18)).value_(1).steps_(0.1) /*max y*/			.action_({ |nBox| nBox.value = nBox.value.round(0.1); currentAction.value;}),
-				SCPopUpMenu.new(sets.at(4), Rect(10, 70, 60, 18))  //type
+				PopUpMenu.new(sets.at(4), Rect(10, 70, 60, 18))  //type
 					.items_(["full", "x only", "y only", "walk"])
 					.action_({ |popUp|	currentAction.value; }),
 				
@@ -1558,7 +1558,7 @@ WFSPathEditor {
 		multipleText.string_("multiple selection");
 		multipleText.visible_("false");
 	
-		timeGrid = SCEnvelopeView.new(lw, Rect(53, tvOffset + 40, 523, 100));
+		timeGrid = EnvelopeView.new(lw, Rect(53, tvOffset + 40, 523, 100));
 		timeGrid.setProperty(\thumbSize, [-1, 1]);
 		timeGrid.setProperty(\thumbHeight, [-1,100]);
 		timeGrid.strokeColor_(Color.clear);
@@ -1622,7 +1622,7 @@ WFSPathEditor {
 					});
 			
 		timeGrid.fill;
-		timeSelectView = SCEnvelopeView(lw, Rect(50, tvOffset + 40, 530, 100)) 
+		timeSelectView = EnvelopeView(lw, Rect(50, tvOffset + 40, 530, 100)) 
 			.drawLines_(false)
 			.drawRects_(true);
 		timeSelectView.setProperty(\thumbSize, [-1,7]); 
@@ -1631,12 +1631,12 @@ WFSPathEditor {
 		timeSelectView.setProperty(\strokeColor, Color.clear);
 		timeSelectView.value_([0.5,0.5].collect({ |item| [item] }););
 		
-		timeBack = SCEnvelopeView.new(lw, Rect(50, tvOffset + 40, 530, 100));
+		timeBack = EnvelopeView.new(lw, Rect(50, tvOffset + 40, 530, 100));
 		timeBack.drawRects_(false).drawLines_(true);
 		//timeBack.strokeColor_(Color.red);
 		timeBack.setProperty(\thumbSize, [-1, 7]);
 		timeBack.setProperty(\thumbHeight, [-1, 7]);
-		timeView = SCEnvelopeView.new(lw, Rect(50, tvOffset + 40, 530, 100));
+		timeView = EnvelopeView.new(lw, Rect(50, tvOffset + 40, 530, 100));
 		timeView.drawLines_(false);
 		timeView.setProperty(\thumbSize, [-1, 7]);
 		timeView.setProperty(\thumbHeight, [-1, 7]);
@@ -1704,7 +1704,7 @@ WFSPathEditor {
 						.action_({centerMode.value = 3;
 								transform.value})];
 		
-		centerMode = SCPopUpMenu.new(lw, Rect(500, centerOffset + 20, 80, 18))
+		centerMode = PopUpMenu.new(lw, Rect(500, centerOffset + 20, 80, 18))
 					.items_(["absolute", "path", "selected point..", "(costum" /*)*/ ]);
 		
 		centerMode.action_({
@@ -1728,7 +1728,7 @@ WFSPathEditor {
 		
 		/////// POINTS
 		
-		numEdit = SCCompositeView(lw,Rect(50, 494, 442 ,44));  //400
+		numEdit = CompositeView(lw,Rect(50, 494, 442 ,44));  //400
 		numEdit.background = Color.gray(0.5).alpha_(0.5);
 		//numEdit.slotPut( \relativeOrigin, false  ); // CHANGE BEFORE 3.4!!
 		//numEdit.relativeOrigin = false;
@@ -1744,7 +1744,7 @@ WFSPathEditor {
 					});
 					
 		
-		addPoint = SCPopUpMenu.new(lw, Rect(370, 496, 80, 18)); //Rect(410, 496, 38, 18)
+		addPoint = PopUpMenu.new(lw, Rect(370, 496, 80, 18)); //Rect(410, 496, 38, 18)
 		
 		addPoint.addUniqueMethod('rebuild', {
 				addPoint.items = ["(add point..", /*)*/ "-", 
@@ -1832,11 +1832,11 @@ WFSPathEditor {
 			.string_("points").stringColor_(Color.black.alpha_(0.75))
 			.setProperty( \align, \right );
 		
-		nPoint = SCPopUpMenu.new(lw,
+		nPoint = PopUpMenu.new(lw,
 				Rect(50 + 40, 494 + 5, 60, 15))
 			.items_(Array.fill(10, {|i| "point " ++ (i + 1)})).font_(Font("Arial", 10));
 			
-		nRel = SCPopUpMenu.new(lw,
+		nRel = PopUpMenu.new(lw,
 				Rect(50 + 5, 494 + 25, 95, 15))
 			.items_(["absolute", "from prev. point", 
 					"from next point"]).font_(Font("Arial", 10));
@@ -2149,7 +2149,7 @@ WFSPathEditor {
 									ls.value.at(1).interpolate.(div, type, false)]);
 							timeFill.value(nil, times); });
 			
-		SCPopUpMenu( lw, Rect( 10, 0, 50,18 ) )
+		PopUpMenu( lw, Rect( 10, 0, 50,18 ) )
 			.items_( [ "(file", /*)*/ "-", "open..",
 				"-", "save selected path as..", "save all paths as..", 
 				"-", "import SVG..", "export SVG.." , "export EPS.."] )
@@ -2345,17 +2345,17 @@ WFSPathEditor {
 		
 		// colors to the edit section
 		/*
-		SCCompositeView(lw,Rect(498, 0 , 84 ,102)).background_( Color.black.alpha_(0.125) ); // scale
-		SCCompositeView(lw,Rect(498, 102 , 84 ,42)).background_( Color.yellow.alpha_(0.125) ); // rotate
-		SCCompositeView(lw,Rect(498, 144 , 84 ,44)).background_( Color.black.alpha_(0.125) ); // flip/repeat
-		SCCompositeView(lw,Rect(498, 188 , 84 ,42)).background_( Color.yellow.alpha_(0.125) ); // move
-		SCCompositeView(lw,Rect(498, 230 , 84 ,22)).background_( Color.black.alpha_(0.125) ); // quantize
-		SCCompositeView(lw,Rect(498, 252 , 84 ,62)).background_( Color.yellow.alpha_(0.125) );  // interpolate
-		SCCompositeView(lw,Rect(498, 314 , 84 ,22)).background_( Color.black.alpha_(0.125) );  // interpolate
+		CompositeView(lw,Rect(498, 0 , 84 ,102)).background_( Color.black.alpha_(0.125) ); // scale
+		CompositeView(lw,Rect(498, 102 , 84 ,42)).background_( Color.yellow.alpha_(0.125) ); // rotate
+		CompositeView(lw,Rect(498, 144 , 84 ,44)).background_( Color.black.alpha_(0.125) ); // flip/repeat
+		CompositeView(lw,Rect(498, 188 , 84 ,42)).background_( Color.yellow.alpha_(0.125) ); // move
+		CompositeView(lw,Rect(498, 230 , 84 ,22)).background_( Color.black.alpha_(0.125) ); // quantize
+		CompositeView(lw,Rect(498, 252 , 84 ,62)).background_( Color.yellow.alpha_(0.125) );  // interpolate
+		CompositeView(lw,Rect(498, 314 , 84 ,22)).background_( Color.black.alpha_(0.125) );  // interpolate
 		*/
 	
 		
-		//SCCompositeView(lw,Rect(0, 548 , 650 , 152)).background_( Color.gray.alpha_(0.3) );  // times
+		//CompositeView(lw,Rect(0, 548 , 650 , 152)).background_( Color.gray.alpha_(0.3) );  // times
 		
 		
 

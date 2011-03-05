@@ -59,35 +59,35 @@ WFSBatch {
 		};
 	window.view.decorator.nextLine;
 	
-	SCStaticText.new(window,Rect(12, 0, 100, 40))
+	StaticText.new(window,Rect(12, 0, 100, 40))
 		.string_("Batch Process");
-	SCStaticText.new(window,Rect(10, 190, 51, 17))
+	StaticText.new(window,Rect(10, 190, 51, 17))
 		.string_("Start pos");
-	SCNumberBox.new(window,Rect(60, 190, 40, 15))
+	NumberBox.new(window,Rect(60, 190, 40, 15))
 		.action_{ |num|
 			WFSScoreEditor.current.selectedEvents.do
 				{ |event| event.startTime = num.value }
 		};
 	window.view.decorator.nextLine;
-	SCStaticText.new(window,Rect(10, 210, 51, 17))
+	StaticText.new(window,Rect(10, 210, 51, 17))
 		.string_("Level");
-	SCNumberBox.new(window,Rect(60, 210, 40, 15))
+	NumberBox.new(window,Rect(60, 210, 40, 15))
 		.action_{ |num|
 			WFSScoreEditor.current.selectedEvents.do
 				{ |event| event.wfsSynth.level = num.value }
 		};
 	window.view.decorator.nextLine;
-	SCStaticText.new(window,Rect(10, 230, 51, 17))
+	StaticText.new(window,Rect(10, 230, 51, 17))
 		.string_("Dur");
-	SCNumberBox.new(window,Rect(60, 230, 40, 15))
+	NumberBox.new(window,Rect(60, 230, 40, 15))
 		.action_{ |num|
 			WFSScoreEditor.current.selectedEvents.do
 				{ |event| event.wfsSynth.dur = num.value }
 		};
 	window.view.decorator.nextLine;
-	SCStaticText.new(window,Rect(10, 250, 51, 17))
+	StaticText.new(window,Rect(10, 250, 51, 17))
 		.string_("Fade In");
-	SCNumberBox.new(window,Rect(60, 250, 40, 15))
+	NumberBox.new(window,Rect(60, 250, 40, 15))
 		.action_{ |num|
 			WFSScoreEditor.current.selectedEvents.do
 				{ |event|
@@ -97,9 +97,9 @@ WFSBatch {
 				}
 		};
 	window.view.decorator.nextLine;
-	SCStaticText.new(window,Rect(10, 270, 51, 17))
+	StaticText.new(window,Rect(10, 270, 51, 17))
 		.string_("Fade out");
-	SCNumberBox.new(window,Rect(60, 270, 40, 15))
+	NumberBox.new(window,Rect(60, 270, 40, 15))
 		.action_{ |num|
 			WFSScoreEditor.current.selectedEvents.do
 				{ |event|
@@ -109,9 +109,9 @@ WFSBatch {
 				}
 		};
 	window.view.decorator.nextLine;
-	SCStaticText.new(window,Rect(10, 290, 51, 17))
+	StaticText.new(window,Rect(10, 290, 51, 17))
 		.string_("StrtFrme");
-	SCNumberBox.new(window,Rect(60, 290, 40, 15))
+	NumberBox.new(window,Rect(60, 290, 40, 15))
 		.action_{ |num|
 			WFSScoreEditor.current.selectedEvents.do
 				{ |event| event.wfsSynth.startFrame = num.value*44100 }
@@ -119,9 +119,9 @@ WFSBatch {
 	window.view.decorator.nextLine;
 		
 		
-	SCStaticText.new(window,Rect(10, 270, 51, 17))
+	StaticText.new(window,Rect(10, 270, 51, 17))
 		.string_("x");
-	SCNumberBox.new(window,Rect(60, 270, 40, 15))
+	NumberBox.new(window,Rect(60, 270, 40, 15))
 		.action_{ |num|
 			WFSScore.allEvents(WFSScoreEditor.current.selectedEvents)
 				.select({ arg ev; ev.wfsSynth.wfsPath.class == WFSPoint })
@@ -129,9 +129,9 @@ WFSBatch {
 		};
 	window.view.decorator.nextLine;
 		
-	SCStaticText.new(window,Rect(10, 270, 51, 17))
+	StaticText.new(window,Rect(10, 270, 51, 17))
 		.string_("y");
-	SCNumberBox.new(window,Rect(60, 270, 40, 15))
+	NumberBox.new(window,Rect(60, 270, 40, 15))
 		.action_{ |num|
 			WFSScore.allEvents(WFSScoreEditor.current.selectedEvents)
 				.select({ arg ev; ev.wfsSynth.wfsPath.class == WFSPoint })

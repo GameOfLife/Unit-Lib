@@ -200,7 +200,7 @@ WFSEventEditor {
 		// fade in/out			
 		composite.decorator.nextLine;
 		
-		SCStaticText( composite, 94@20	).string_( "fadetime in/out" ).align_( \right );
+		StaticText( composite, 94@20	).string_( "fadetime in/out" ).align_( \right );
 		views[ \fadeIn ] = RoundNumberBox( composite, 40@20 )
 			.value_( 0 ).step_( 0.1 ).clipLo_( 0 )
 			.action_({ |box|
