@@ -1,16 +1,19 @@
 WFSMixer{
 	
-	*new{ |events,parentEvents,rect,name|
-		var spec, maxTrack,count, color, cview,w,level,bounds, width,top,main,scroll;
+	*new{ |events,parentEvents,rect,name,score|
+		var spec, maxTrack,count, color, cview,w,level,bounds, width,top,main,scroll, controllers;
 		maxTrack = events.collect{ |event| event.track }.maxItem + 1;
 		count = 0;
 		spec = [-90,12,\db].asSpec;
-		
 		width = (4+(44*(events.size))).max(300);
+		controllers = List.new;		
+			
 		w = Window.new(
 			"mix - level "++parentEvents.size,
 			Rect(if(rect.notNil){rect.left}{100},if(rect.notNil){rect.top}{100},800,342)
 		).front;
+		
+		w.onClose_({ controllers.do(_.remove); });
 		
 		if(name.isNil){name = List["Main"]};
 		
@@ -39,7 +42,7 @@ WFSMixer{
 			
 		maxTrack.do{ |j| 
 			events.do{ |event,i|
-				var cview,faders, eventsFromFolder;
+				var cview,faders, eventsFromFolder,slider;
 				
 				if(event.track == j){
 				color = Color.rand;
@@ -48,11 +51,15 @@ WFSMixer{
 					cview.decorator = FlowLayout(cview.bounds);
 					cview.background_(Color(0.58208955223881, 0.70149253731343, 0.83582089552239, 1.0););
 					cview.decorator.shift(0,24);
-					EZSmoothSlider.new(cview, Rect(0,0,32,260), events.indexOf(event), spec, layout:\vert)
+					slider = EZSmoothSlider.new(cview, Rect(0,0,32,260), events.indexOf(event), spec, layout:\vert)
 						.value_(event.wfsSynth.level.ampdb)
 						.action_({ |v|				
 								event.wfsSynth.level = v.value.dbamp;
-						});			
+								event.changed;
+						});
+						controllers.add(SimpleController(event).put(\updatedByEventEditor, {
+							slider.value_(event.wfsSynth.level.ampdb)
+						}));			
 				}{
 					eventsFromFolder = event.wfsSynth.allEvents.collect{ |event| (\event: event,\oldLevel: event.wfsSynth.level) };
 					cview = CompositeView(main,40@300);
@@ -62,6 +69,7 @@ WFSMixer{
 						.radius_(3)
 						.action_({
 							w.close;
+							controllers.do(_.remove);
 							parentEvents.add(events);
 							name.add(event.wfsSynth.name);
 							WFSMixer(event.wfsSynth.events,parentEvents,w.bounds,name)

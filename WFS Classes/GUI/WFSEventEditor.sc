@@ -195,6 +195,7 @@ WFSEventEditor {
 					this.storeUndoState;
 					event.wfsSynth.level = box.value.dbamp; 
 					editAction.value( event, \level, box.value.dbamp );
+					event.changed(\updatedByEventEditor);
 				});
 		
 		// fade in/out			
