@@ -575,25 +575,30 @@ WFSScoreEditor {
 				var filePaths, duplicates, dupString;
 				filePaths = score.collectFilePaths;
 				duplicates = score.detectDupFileNames( filePaths );
-				SCAlert( "There are % soundfiles used in this score".format( filePaths.size ) ++
-					"\nof which % have one or more duplicate\nnames in different folders.".format( duplicates.keys.size ) ++
-					"\n\nDo you really want to copy to\n'%/'?".format( path ),
-					[ "cancel", "inspect", "change folder", "ok" ],
-					[ { },
-				 	{ dupString = "WFSScore duplicate file report:\n";
-				  	duplicates.sortedKeysValuesDo({ |key, value|
-				  		dupString = dupString ++ key ++ ":\n\t";
-				  		dupString = dupString ++ 
-				  			filePaths.detect({ |item| 
-				  				item.asString.basename.asSymbol == key }) ++ "\n";
-				  		value.do({ |item| dupString = 
-				  			dupString ++ "\t" ++ item ++ "\n" });
-				  		});
-				   	Document.new.string_( dupString );
-				  	},
-				  	copyToFolderFunc,
-				  	{ score.copyFilesToFolder( path, doneAction: { this.update } ); } ] 
-				);
+				if( duplicates.keys.size > 1 ) {
+					SCAlert( "There are % soundfiles used in this score".format( filePaths.size ) ++
+						"\nof which % have one or more duplicate\nnames in different folders.".format( duplicates.keys.size ) ++
+						"\n\nDo you really want to copy to\n'%/'?".format( path ),
+						[ "cancel", "inspect", "change folder", "ok" ],
+						[ { },
+					 	{ dupString = "WFSScore duplicate file report:\n";
+					  	duplicates.sortedKeysValuesDo({ |key, value|
+					  		dupString = dupString ++ key ++ ":\n\t";
+					  		dupString = dupString ++ 
+					  			filePaths.detect({ |item| 
+					  				item.asString.basename.asSymbol == key }) ++ "\n";
+					  		value.do({ |item| dupString = 
+					  			dupString ++ "\t" ++ item ++ "\n" });
+					  		});
+					   	Document.new.string_( dupString );
+					  	},
+					  	copyToFolderFunc,
+					  	{ score.copyFilesToFolder( path.dirname , doneAction: { this.update } ); } ] 
+					);
+				} {
+					score.copyFilesToFolder( path.dirname , doneAction: { this.update } );
+				}
+					
 			});
 		};
 		copyToFolderFunc.value;
