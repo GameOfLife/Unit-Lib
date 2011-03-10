@@ -74,6 +74,7 @@ WFSTransport {
 		var loadViews;
 		if( window.notNil && { window.isClosed.not } ) { window.close };
 		window = TransportWindow( "WFSTransport" );
+		window.window.alwaysOnTop = false;
 		
 		loadViews = ( 
 			wait: WaitView( window.window, Rect(
