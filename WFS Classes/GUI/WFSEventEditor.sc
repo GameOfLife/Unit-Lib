@@ -304,11 +304,20 @@ WFSEventEditor {
 		RoundButton( intTypeViews.linear, 68@20 )
 			.states_( [ [ "from editor", Color.black, Color.clear ] ] )
 			.action_({ |button|
-				this.storeUndoState; 
+				this.storeUndoState;
+				SCAlert("Use duration from:",["new path","current event"],
+				[{ 
 				event.wfsSynth.wfsPath = 
 					WFSPathEditor.current ? event.wfsSynth.wfsPath;
 				this.update;
-				});
+				},
+				{ 
+				event.wfsSynth.wfsPath = 
+					(WFSPathEditor.current ? event.wfsSynth.wfsPath).length_(event.wfsSynth.dur);
+				this.update;
+				}]
+				);
+			});
 				
 		RoundButton( intTypeViews.linear, 30@20 )
 			.states_( [ [ "plot", Color.black, Color.clear ] ] )
@@ -346,11 +355,20 @@ WFSEventEditor {
 		RoundButton( intTypeViews.cubic, 68@20 )
 			.states_( [ [ "from editor", Color.black, Color.clear ] ] )
 			.action_({ |button|
-				this.storeUndoState; 
+				this.storeUndoState;
+				SCAlert("Use duration from:",["new path","current event"],
+				[{ 
 				event.wfsSynth.wfsPath = 
 					WFSPathEditor.current ? event.wfsSynth.wfsPath;
 				this.update;
-				});
+				},
+				{ 
+				event.wfsSynth.wfsPath = 
+					(WFSPathEditor.current ? event.wfsSynth.wfsPath).length_(event.wfsSynth.dur);
+				this.update;
+				}]
+				);
+			});
 				
 		RoundButton( intTypeViews.cubic, 30@20 )
 			.states_( [ [ "plot", Color.black, Color.clear ] ] )

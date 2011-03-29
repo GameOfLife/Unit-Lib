@@ -51,7 +51,7 @@ WFSPathEditor {
 		}	
 	
 	*current {
-		if( window.notNil )
+		if( window.notNil and: {window.isClosed.not} )
 			{ ^WFSPath( lvReal.flop, name: lvNames[selected.value].asSymbol ).timeLine_(times); }
 			{ ^nil }; 
 		}
