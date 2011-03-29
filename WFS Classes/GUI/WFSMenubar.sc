@@ -175,7 +175,7 @@ WFSMenubar {
 			if(scoreEditor.notNil){	 WFSScoreEditor.current.addTrack }
 		});
 		
-		SCMenuItem.new(events, "Remove Unused Tracks").action_({
+		SCMenuItem.new(events, "Reduce number of unused tracks").action_({
 			var scoreEditor = WFSScoreEditor.current;
 			if(scoreEditor.notNil){	 WFSScoreEditor.current.removeUnusedTracks }
 		});
