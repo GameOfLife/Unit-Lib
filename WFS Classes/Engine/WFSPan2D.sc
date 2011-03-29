@@ -282,12 +282,11 @@ WFSPan2D {
 				
 				
 			} {
-			amps = (1 / 48) * 20.dbamp * ( 2 / location.dist( WFSPoint( 0,0,0 ) ) ).min(1)
-				 //this.getAmpCorrection( speakerSpec, location )
-				 // * crossFades;
-				  * speakerSpec.speakerLines.collect({ |line,i|
+			amps = (1 / (speakerSpec.speakerLines.collect(_.size).mean) ) 
+				* 20.dbamp * ( 2 / location.dist( WFSPoint( 0,0,0 ) ) ).min(1)
+				* speakerSpec.speakerLines.collect({ |line,i|
 					crossFades[i].dup( line.size )
-						}).flat;
+				}).flat;
 				
 			};
 		 }
