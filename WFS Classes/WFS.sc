@@ -109,12 +109,11 @@ WFS {
 		server.makeWindow;
 		server.m.waitForBoot({ 
 			server.loadWFSSynthDefs;
+			WFSLive.loadSynthDefs( server.m );
 			WFSEQ.new; WFSTransport.new; WFSLevelBus.makeWindow;
 			
 			"\n\tWelcome to the WFS Offline System".postln	
 		});
-		
-		"\n\tWelcome to the WFS Offline System".postln
 		
 		^server
 		
@@ -139,7 +138,6 @@ WFS {
 		};
 		// end life eq
 		server.makeWindow;	
-		
 		server.m.waitForBoot({ 
 			"\n\tWelcome to the WFS System".postln;
 			server.loadClientSyncSynthDefs; 
