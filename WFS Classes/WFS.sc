@@ -22,6 +22,7 @@ WFS {
 	classvar <>graphicsMode = \fast;
 	classvar <>scVersion = \new;
 	classvar <>debugMode = false;
+	classvar <>mode = \score; // score or live 
 	
 	classvar <>debugSMPTE;
 	
@@ -167,6 +168,7 @@ WFS {
 				{ 0.2.wait; });
 			allTypes = WFSSynthDef.allTypes( server.wfsConfigurations[0] );
 			allTypes.do({ |def| def.def.writeDefFile });
+			WFSLive.writeSynthDefs;
 			server.writeServerSyncSynthDefs;
 			server.multiServers[0].servers.do({ |server|
 				server.loadDirectory( SynthDef.synthDefDir );
