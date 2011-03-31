@@ -68,6 +68,12 @@ WFSTransport {
 	*toFront {   if( window.notNil && { window.isClosed.not } )
 		{ window.window.front };
 		}
+		
+	*close { 
+		if( window.notNil && { window.isClosed.not } ) {
+			window.close
+		}
+	}		
 	
 	init { 
 		var loading, resp;
