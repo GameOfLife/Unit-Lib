@@ -126,7 +126,7 @@ WFSEQ {
 	*set { |paramName, value, doAction = true|
 		var argsDict = ();
 		argsDict[ paramName ] = value;
-		this.fromArgsDict( argsDict, doAction );
+		{ this.fromArgsDict( argsDict, doAction ); }.defer
 	  }
 	  
 	 *get { |paramName|
