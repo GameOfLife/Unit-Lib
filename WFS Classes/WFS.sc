@@ -141,7 +141,8 @@ WFS {
 		server.makeWindow;	
 		
 		server.m.waitForBoot({ 
-			"\n\tWelcome to the WFS System".postln; 
+			"\n\tWelcome to the WFS System".postln;
+			server.loadClientSyncSynthDefs; 
 		});	
 		^server	
 	}
