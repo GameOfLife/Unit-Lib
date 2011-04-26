@@ -69,7 +69,6 @@ WFSServers {
 	*single { ^super.newCopyArgs(nil,[58000],8).init; }
 		
 	init { |addMaster = true|
-		[ips,startPort,serversPerSystem].postln;
 		multiServers = ips.collect({ |ip, i|
 			MultiServer.row( 
 				serversPerSystem, 
@@ -395,7 +394,7 @@ WFSServers {
 				{ "WFSServers-openHosts: MultiServer %: hostname not specified\n".postf( i ) };
 			});
 		}
-		
+
 	loadWFSSynthDefs {
 		case { this.isSingle }
 			{ WFSSynthDef.allTypes( singleWFSConfiguration )
