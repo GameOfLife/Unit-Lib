@@ -293,6 +293,12 @@ WFSMenubar {
 			WFSLiveGui.startup;
 		});
 		
+		if(WFSServers.default.isMaster) {
+		SCMenuSeparator.new(viewMenu);
+		SCMenuItem.new(viewMenu, "Speaker configuration").action_( {
+			WFSConfiguration.makeWindow;
+		});
+		}
 
 	}
 }
