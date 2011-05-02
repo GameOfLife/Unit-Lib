@@ -4,7 +4,7 @@ WFSLiveGui {
 
 	*startup {
 
-		var routerGui, cview;
+		var routerGui, cview, font;
 
 		if( window.notNil ){
 			window.front
@@ -12,6 +12,8 @@ WFSLiveGui {
 			if( WFSLive.isStarted.not ) {
 				WFSLive.startup
 			};
+			
+			font = Font( Font.defaultSansFace, 12 );
 
 			routerGui = WFSLive.inputRouter.gui( nil, Rect(361, 253, 220, 244) );
 
@@ -53,46 +55,48 @@ WFSLiveGui {
 					types = WFSLive.tracks.collect( _.type );
 					conf = WFSConfiguration.default.asRect;
 					conf = vw.translateScale( conf );
+					
+					Pen.font = font;
 
 					Pen.width = 2;
 					Pen.color = Color.blue;
-					color = Color.white.alpha_(0.75);
 					Pen.strokeRect( conf );
+					
+					Pen.width = 0.5;
 
 					pos.do({ |pos, i|
 						var point, scaledPoints;
 						Pen.color = Color.blue( WFSLive.tracks[i].level );
-						if(WFSLive.tracks[i].type == \point) {
-							Pen.addArc( pos, 4, 0, 2pi ).fill
-						} {
-
+						
+						if( WFSLive.tracks[i].type === \plane ) {
+							
 							point = WFSLive.tracks[i].pos.asWFSPoint;
 
 							scaledPoints = 2.collect{ |i| WFSPoint(0,0,0).moveAZ( point.angle + 180 , point.rho*[0.9,1.1][i] ) };
 							scaledPoints = vw.translateScale( scaledPoints.collect( _.asPoint * (1@ -1) ) );
-							color.set;
+							
 							Pen.arrow( scaledPoints[1], scaledPoints[0] );
 							Pen.stroke;
 
-
 							scaledPoints = 2.collect{ |i| point.moveAZ(point.angle + (90*[1,-1][i]),100) };
 							scaledPoints = vw.translateScale( scaledPoints.collect( _.asPoint * (1@ -1) ) );
-							color.alpha_(0.33).set;
+							
 							Pen.moveTo( scaledPoints[0] );
 							Pen.lineTo( scaledPoints[1] );
 							Pen.stroke;
-
-							Pen.color = Color.blue( WFSLive.tracks[i].level );
-							Pen.addArc( pos, 4, 0, 2pi ).fill;
-						}
+						};
+						
+						Pen.addArc( pos, 4, 0, 2pi ).fill;
+						
 					});
-
+					
 					Pen.color = Color.black;
 					pos.do({ |pos, i|
 						Pen.stringAtPoint( (i+1).asString, pos + ( 6 @ -7 ) );
 					});
 
 					if( selected.notNil ) {
+						Pen.width = 2;
 						Pen.color = Color.yellow;
 						Pen.addArc( pos[ selected ], 4, 0, 2pi ).stroke;
 					};
