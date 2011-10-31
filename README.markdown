@@ -1,43 +1,22 @@
-GameOfLife WFSCollider - Wave Field Synthesis spatialization for SuperCollider.
+Unit Lib
 ===============================================================================
-
-GameOfLife WFSCollider is an adapted version of SuperCollider, the audio synthesis engine and programming language, for Wave Field Synthesis spatialization.
-
-It's currently being used in the 192 speakers system of the [Game Of Life Foundation](http://gameoflife.nl/en), based in Leiden, the Netherlands.
-
-WFSCollider consists of an audio spatialization engine that places individual sound sources in space according to the principles of [Wave Field Synthesis](http://en.wikipedia.org/wiki/Wave_field_synthesis).
-
-The system is currently allows to import mono sound files and place them in a score editor where start times, and durations can be set and trajectories or positions assigned to each event.
-
-Each score can be saved as an xml file.
+A project of the [Game Of Life Foundation](http://gameoflife.nl/en).
 
 ## System Requirements ##
 
-Mac OS X 10.5 or greater
-
-## Download ##
-
-A prepackaged version is available from the download section at [github](https://github.com/GameOfLife/WFSCollider).
+SuperCollider 3.5~dev 
 
 ## Installation ##
 
-To install, just drag the application to your applications folder.
+To install, just drag the folder to your SuperCollider extensions folder.
 
-## Building ##
+## Git Repo##
 
-Get the source:
-
-	git clone --recursive git://github.com/GameOfLife/WFSCollider.git
-
-switch to the wfscurrent branch
-
-	git checkout wfscurrent
-
-Then build according to the general SuperCollider instructions (see readme): In XCode, first build the Synth project, then the plugins project and finally in the language project build the target "WFSCollider". You should then have the application ready in the build folder.
+[github](https://github.com/GameOfLife/Unit-Lib)
 
 ## Acknowledgments ##
-WFSCollider was conceived by the Game Of Life Foundation, and developed by W. Snoei, R. Ganchrow and J. Truetzler and M. Negrão.
+Unit Lib was developed by Miguel Negrão and Wouter Snoei as a project of the Game of Life Foundation.
 
 ## License ##
-Both SuperCollider and the WFSCollider library are licensed under the GNU GENERAL PUBLIC LICENSE Version 3.  
+Unit Lib is licensed under the GNU GENERAL PUBLIC LICENSE Version 3.  
 
