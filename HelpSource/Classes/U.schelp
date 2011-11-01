@@ -1,0 +1,581 @@
+CLASS:: U
+summary:: (put short description here)
+categories:: Undocumented classes
+related:: Classes/SomeRelatedClass, Reference/SomeRelatedStuff, etc.
+
+DESCRIPTION::
+(put long description here)
+
+
+CLASSMETHODS::
+
+METHOD:: loadDef
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: synthDict
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: initClass
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: new
+(describe method here)
+
+argument:: defName
+(describe argument here)
+
+argument:: args
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: defClass
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: formatArgs
+(describe method here)
+
+argument:: inArgs
+(describe argument here)
+
+argument:: server
+(describe argument here)
+
+argument:: startPos
+(describe argument here)
+
+returns:: (returnvalue)
+
+
+INSTANCEMETHODS::
+
+METHOD:: disposeOnFree
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: preparedServers
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: env
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: init
+(describe method here)
+
+argument:: inName
+(describe argument here)
+
+argument:: inArgs
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: allKeys
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: allValues
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: set
+(describe method here)
+
+argument::  ... args
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: prSet
+(describe method here)
+
+argument::  ... args
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: get
+(describe method here)
+
+argument:: key
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: mapSet
+(describe method here)
+
+argument:: key
+(describe argument here)
+
+argument:: value
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: mapGet
+(describe method here)
+
+argument:: key
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: release
+(describe method here)
+
+argument:: releaseTime
+(describe argument here)
+
+argument:: doneAction
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: getArgsFor
+(describe method here)
+
+argument:: server
+(describe argument here)
+
+argument:: startPos
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: getIOKey
+(describe method here)
+
+argument:: mode
+(describe argument here)
+
+argument:: rate
+(describe argument here)
+
+argument:: id
+(describe argument here)
+
+argument:: what
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: setAudioIn
+(describe method here)
+
+argument:: id
+(describe argument here)
+
+argument:: bus
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: setControlIn
+(describe method here)
+
+argument:: id
+(describe argument here)
+
+argument:: bus
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: setAudioOut
+(describe method here)
+
+argument:: id
+(describe argument here)
+
+argument:: bus
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: setControlOut
+(describe method here)
+
+argument:: id
+(describe argument here)
+
+argument:: bus
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: getAudioIn
+(describe method here)
+
+argument:: id
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: getControlIn
+(describe method here)
+
+argument:: id
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: getAudioOut
+(describe method here)
+
+argument:: id
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: getControlOut
+(describe method here)
+
+argument:: id
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: audioIns
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: controlIns
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: audioOuts
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: controlOuts
+(describe method here)
+
+argument:: unit
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: canFreeSynth
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: shouldPlayOn
+(describe method here)
+
+argument:: target
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: doesNotUnderstand
+(describe method here)
+
+argument:: selector
+(describe argument here)
+
+argument::  ... args
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: rate
+(describe method here)
+
+argument:: new
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: loop
+(describe method here)
+
+argument:: new
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: def
+(describe method here)
+
+argument:: newDef
+(describe argument here)
+
+argument:: keepArgs
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: defName
+(describe method here)
+
+argument:: newName
+(describe argument here)
+
+argument:: keepArgs
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: cutStart
+(describe method here)
+
+argument:: amount
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: synths
+(describe method here)
+
+argument:: synths
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: addSynth
+(describe method here)
+
+argument:: synth
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: removeSynth
+(describe method here)
+
+argument:: synth
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: makeSynth
+(describe method here)
+
+argument:: target
+(describe argument here)
+
+argument:: startPos
+(describe argument here)
+
+argument:: synthAction
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: makeBundle
+(describe method here)
+
+argument:: targets
+(describe argument here)
+
+argument:: startPos
+(describe argument here)
+
+argument:: synthAction
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: start
+(describe method here)
+
+argument:: target
+(describe argument here)
+
+argument:: startPos
+(describe argument here)
+
+argument:: latency
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: free
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: stop
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: resetSynths
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: resetArgs
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: argSpecs
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: getSpec
+(describe method here)
+
+argument:: key
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: isPlaying
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: printOn
+(describe method here)
+
+argument:: stream
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: getInitArgs
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: storeArgs
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: asUnit
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: prSyncCollection
+(describe method here)
+
+argument:: targets
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: waitTime
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: valuesToPrepare
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: needsPrepare
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: apxCPU
+(describe method here)
+
+argument:: target
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: prepare
+(describe method here)
+
+argument:: target
+(describe argument here)
+
+argument:: startPos
+(describe argument here)
+
+argument:: action
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: prepareAnd
+(describe method here)
+
+argument:: target
+(describe argument here)
+
+argument:: loadDef
+(describe argument here)
+
+argument:: action
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: prepareAndStart
+(describe method here)
+
+argument:: target
+(describe argument here)
+
+argument:: loadDef
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: loadDefAndStart
+(describe method here)
+
+argument:: target
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: dispose
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: disposeArgsFor
+(describe method here)
+
+argument:: server
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: gui
+(describe method here)
+
+argument:: parent
+(describe argument here)
+
+argument:: bounds
+(describe argument here)
+
+returns:: (returnvalue)
+
+
+EXAMPLES::
+
+code::
+(some example code)
+::

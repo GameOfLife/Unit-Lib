@@ -1,0 +1,598 @@
+CLASS:: UChain
+summary:: (put short description here)
+categories:: UnitLib
+related:: Classes/U, Classes/UScore, Classes/USession
+
+DESCRIPTION::
+(put long description here)
+
+
+CLASSMETHODS::
+
+METHOD:: verbose
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: groupDict
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: initClass
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: new
+(describe method here)
+
+argument::  ... args
+(describe argument here)
+
+returns:: (returnvalue)
+
+
+INSTANCEMETHODS::
+
+METHOD:: units
+(describe method here)
+
+argument:: newUnits
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: prepareTasks
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: preparedServers
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: muted
+(describe method here)
+
+argument:: bool
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: init
+(describe method here)
+
+argument:: args
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: name
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: duplicate
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: prGetCanFreeSynths
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: canFreeSynth
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: prSetCanFreeSynths
+(describe method here)
+
+argument::  ... args
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: eventSustain
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: fadeOut
+(describe method here)
+
+argument:: fadeOut
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: fadeIn
+(describe method here)
+
+argument:: fadeIn
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: fadeTimes
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: useSndFileDur
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: getMaxDurUnit
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: prGetChainsDur
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: prSetChainsDur
+(describe method here)
+
+argument:: dur
+(describe argument here)
+
+argument:: clipFadeIn
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: duration
+(describe method here)
+
+argument:: dur
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: releaseSelf
+(describe method here)
+
+argument:: bool
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: dur
+(describe method here)
+
+argument:: x
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: gain
+(describe method here)
+
+argument:: gain
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: mute
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: unmute
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: setGain
+(describe method here)
+
+argument:: gain
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: getGain
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: setDoneAction
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: trimEnd
+(describe method here)
+
+argument:: newEnd
+(describe argument here)
+
+argument:: removeFade
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: cutEnd
+(describe method here)
+
+argument:: newEnd
+(describe argument here)
+
+argument:: removeFade
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: trimStart
+(describe method here)
+
+argument:: newStart
+(describe argument here)
+
+argument:: removeFade
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: cutStart
+(describe method here)
+
+argument:: newStart
+(describe argument here)
+
+argument:: belongsToFolder
+(describe argument here)
+
+argument:: removeFade
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: makeView
+(describe method here)
+
+argument:: i
+(describe argument here)
+
+argument:: maxWidth
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: groups
+(describe method here)
+
+argument:: groups
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: addGroup
+(describe method here)
+
+argument:: group
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: removeGroup
+(describe method here)
+
+argument:: group
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: makeGroupAndSynth
+(describe method here)
+
+argument:: target
+(describe argument here)
+
+argument:: startPos
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: makeBundle
+(describe method here)
+
+argument:: targets
+(describe argument here)
+
+argument:: startPos
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: start
+(describe method here)
+
+argument:: target
+(describe argument here)
+
+argument:: startPos
+(describe argument here)
+
+argument:: latency
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: stopPrepareTasks
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: free
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: stop
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: release
+(describe method here)
+
+argument:: time
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: shouldPlayOn
+(describe method here)
+
+argument:: target
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: apxCPU
+(describe method here)
+
+argument:: target
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: prepare
+(describe method here)
+
+argument:: target
+(describe argument here)
+
+argument:: startPos
+(describe argument here)
+
+argument:: action
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: prepareAndStart
+(describe method here)
+
+argument:: target
+(describe argument here)
+
+argument:: startPos
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: waitTime
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: prepareWaitAndStart
+(describe method here)
+
+argument:: target
+(describe argument here)
+
+argument:: startPos
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: dispose
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: resetGroups
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: at
+(describe method here)
+
+argument:: index
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: last
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: first
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: add
+(describe method here)
+
+argument:: unit
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: addAll
+(describe method here)
+
+argument:: inUnits
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: put
+(describe method here)
+
+argument:: index
+(describe argument here)
+
+argument:: unit
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: insert
+(describe method here)
+
+argument:: index
+(describe argument here)
+
+argument:: unit
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: removeAt
+(describe method here)
+
+argument:: index
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: <<
+(describe method here)
+
+argument:: uchain
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: <|
+(describe method here)
+
+argument:: unit
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: isFolder
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: getAllUChains
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: printOn
+(describe method here)
+
+argument:: stream
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: getInitArgs
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: storeArgs
+(describe method here)
+
+returns:: (returnvalue)
+
+METHOD:: gui
+(describe method here)
+
+argument:: parent
+(describe argument here)
+
+argument:: bounds
+(describe argument here)
+
+returns:: (returnvalue)
+
+METHOD:: sessionGUI
+(describe method here)
+
+argument:: view
+(describe argument here)
+
+returns:: (returnvalue)
+
+
+EXAMPLES::
+
+code::
+(
+// create some Udefs
+
+Udef( \mix2, { |balance = 0.5|
+	var l1, l2;
+	l1 = UIn.ar( 0 ) * (1-balance);
+	l2 = UIn.ar( 1 ) * balance;
+	UOut.ar( 0, l1 + l2 )
+} ).loadSynthDef;
+
+Udef( \vibrato, { |rate = 1, amount = #[0.0,1.0]|
+	UOut.ar( 0, SinOsc.kr( rate ).range(*amount) * UIn.ar( 0 ) )
+} ).loadSynthDef;
+
+)
+
+// \sine and \output are already in the Udef bank
+
+x = UChain( \sine, [ \sine, [ \freq, 550, \u_o_ar_0_bus, 1 ]], \mix2, \vibrato, \output );
+
+y = UChain( [ \sine, [ \freq, 660 ] ], \output );
+
+s.notify; // make sure the server is notified!!
+
+x.prepareAndStart;
+x.release;
+
+x.fadeOut = 0.5;
+x.fadeIn = 0.5;
+
+x.setDur( 5 );
+x.setDur( inf ); // infinite duration (default)
+
+x[1].setAudioOut( 0, 1 ); // 2nd sine output to bus 1, so it goes to second mix input
+
+x.gui; // gui without styling
+y.gui;
+
+( // gui with styling
+w = Window( "x", Rect( 300,25,200,300 ) ).front;
+RoundView.useWithSkin( ( 
+	labelWidth: 40, 
+	font: Font( Font.defaultSansFace, 10 ), 
+	hiliteColor: Color.gray(0.33)
+), { x.gui(w); };
+);
+)
+::
