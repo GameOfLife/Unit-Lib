@@ -4,124 +4,104 @@ categories:: UnitLib
 related:: Classes/U, Classes/UScore, Classes/USession
 
 DESCRIPTION::
-(put long description here)
 
+A Uchain represents a groups of units (link::Classes/U::) that together make up one audio chain where the audio output of one unit can be routed to subsequent units.The routing is done using private busses and the units are played together in one link::Classes/Group::. Units in this context can be thought of as effects or plugins in a DAW, although almost the full flexibility of SuperCollider is still available. To get input from and output to other units in the chain the link::Classes/UIn:: and link::Classes/UOut:: pseudo-ugens are used. These ugens create automatic names for controls that allow changing the private bus number. This then allows easy re-patching of the units from a gui.
+
+There should be only one chain playing per Server at a time, although it is not impossible to play multiple instancesof at once.
+
+subsection::Event
+
+UChain implements the UEvent interface, therefore it has a startTime, track, duration, muted, releaseSelf variables.
+
+The startTime determines when the UChain will start playing in a score, and the duration when it will stop. If the releaseSelf variable is set to True, then UChain will release itself using the doneAction of the envelope of one of the units (It is assumed that one of the units has the capability to free the UChain). If releaseSelf is False, then it will be the task that is playing the score that will free the UChain when it has finished playing. The difference between the two mode is that, if releaseSelf is true, when the score is paused, the chain will continue to play and will be freed, unaffected by the fact that the score is paused, on the other hand if it is false, then while the score is paused the chain will also not be freeed, and will only resume couting the time until the end of the envelope when the score is unpaused.
+
+subsection:: GUI
+
+There is a GUI for the UChain class, implemented by link::Classes/UChainGUI:: which can be invoked using the link::Classes/UChain#-gui:: method. Most parameters of the UChain can be set from the gui:
+
+image::UChain-GUI.png::
 
 CLASSMETHODS::
+private::initClass
 
 METHOD:: verbose
-(describe method here)
-
-returns:: (returnvalue)
+post debugging messages
 
 METHOD:: groupDict
-(describe method here)
+Returns the groupDict of type Event[UChain,Array[Group]]. The keys are instances of UChain and the values the corresponding Groups.
 
-returns:: (returnvalue)
-
-METHOD:: initClass
-(describe method here)
-
-returns:: (returnvalue)
+returns:: Event[UChain,Array[Group]]
 
 METHOD:: new
-(describe method here)
+Creates a new UChain from the arguments given.
+
+Syntaxes for UChain creation:
+code::
+	UChain(\defName)
+	UChain(startTime,\defName1,\defName2,...)
+	UChain(startTime,track,\defName1,\defName2,...)
+	UChain(startTime,track,duration,\defName1,\defName2,...)
+	Uchain(startTime,track,duration,releaseSelf,\defName1,\defName2,...)
+::
+
+Example of UChain instantiation:
+code::
+    UChain(\sine,\output)
+::
 
 argument::  ... args
-(describe argument here)
 
-returns:: (returnvalue)
-
+returns:: UChain
 
 INSTANCEMETHODS::
+private::prepareTasks, preparedServers, init, prGetCanFreeSynths, prSetCanFreeSynths, prGetChainsDur, prSetChainsDur, clipFadeIn, getInitArgs, printOn, stream, getInitArgs, storeArgs, makeView, sessionGUI, stopPrepareTasks, resetGroups
 
 METHOD:: units
-(describe method here)
+Set the units of the UChain
 
 argument:: newUnits
-(describe argument here)
+A collection of link::Classes/U::s.
 
-returns:: (returnvalue)
-
-METHOD:: prepareTasks
-(describe method here)
-
-returns:: (returnvalue)
-
-METHOD:: preparedServers
-(describe method here)
-
-returns:: (returnvalue)
 
 METHOD:: muted
-(describe method here)
+Determines if event will be played or not in a score.
 
 argument:: bool
-(describe argument here)
-
-returns:: (returnvalue)
-
-METHOD:: init
-(describe method here)
-
-argument:: args
-(describe argument here)
-
-returns:: (returnvalue)
 
 METHOD:: name
-(describe method here)
+Returns a string composed from the units held by the chain.
 
-returns:: (returnvalue)
+returns:: String
 
 METHOD:: duplicate
-(describe method here)
+Create a duplicate of the instance.
 
-returns:: (returnvalue)
-
-METHOD:: prGetCanFreeSynths
-(describe method here)
-
-returns:: (returnvalue)
+returns:: UChain
 
 METHOD:: canFreeSynth
-(describe method here)
+Returns a boolean indicating if the UChain contains a unit that can free the group due to it's doneAction.
 
-returns:: (returnvalue)
-
-METHOD:: prSetCanFreeSynths
-(describe method here)
-
-argument::  ... args
-(describe argument here)
-
-returns:: (returnvalue)
+returns:: Boolean
 
 METHOD:: eventSustain
-(describe method here)
+The time from the begging of the event until the moment when the chain should be released (to start the fade out).
 
-returns:: (returnvalue)
+returns:: Float
 
 METHOD:: fadeOut
-(describe method here)
+Set fade out time.
 
 argument:: fadeOut
-(describe argument here)
-
-returns:: (returnvalue)
+A Float bigger then zero.
 
 METHOD:: fadeIn
-(describe method here)
+Set fade in time.
 
 argument:: fadeIn
-(describe argument here)
-
-returns:: (returnvalue)
+A Float bigger then zero.
 
 METHOD:: fadeTimes
-(describe method here)
-
-returns:: (returnvalue)
+returns::Array of type [fadeIn,fadeOut]
 
 METHOD:: useSndFileDur
 (describe method here)
@@ -130,22 +110,6 @@ returns:: (returnvalue)
 
 METHOD:: getMaxDurUnit
 (describe method here)
-
-returns:: (returnvalue)
-
-METHOD:: prGetChainsDur
-(describe method here)
-
-returns:: (returnvalue)
-
-METHOD:: prSetChainsDur
-(describe method here)
-
-argument:: dur
-(describe argument here)
-
-argument:: clipFadeIn
-(describe argument here)
 
 returns:: (returnvalue)
 
@@ -256,17 +220,6 @@ argument:: removeFade
 
 returns:: (returnvalue)
 
-METHOD:: makeView
-(describe method here)
-
-argument:: i
-(describe argument here)
-
-argument:: maxWidth
-(describe argument here)
-
-returns:: (returnvalue)
-
 METHOD:: groups
 (describe method here)
 
@@ -327,28 +280,16 @@ argument:: latency
 
 returns:: (returnvalue)
 
-METHOD:: stopPrepareTasks
-(describe method here)
-
-returns:: (returnvalue)
 
 METHOD:: free
-(describe method here)
-
-returns:: (returnvalue)
+free synths
 
 METHOD:: stop
-(describe method here)
-
-returns:: (returnvalue)
+free synths
 
 METHOD:: release
-(describe method here)
-
+free synths by releasing the envelope in the duration give by the argument.
 argument:: time
-(describe argument here)
-
-returns:: (returnvalue)
 
 METHOD:: shouldPlayOn
 (describe method here)
@@ -367,183 +308,120 @@ argument:: target
 returns:: (returnvalue)
 
 METHOD:: prepare
-(describe method here)
+Prepare units.
 
 argument:: target
-(describe argument here)
+A collection of targets.
 
 argument:: startPos
-(describe argument here)
+Offset in seconds from the start of the event.
 
 argument:: action
-(describe argument here)
-
-returns:: (returnvalue)
+Action to perform when preparation is done.
 
 METHOD:: prepareAndStart
-(describe method here)
+Prepare and start UChain.
 
 argument:: target
-(describe argument here)
+A collection of targets.
 
 argument:: startPos
-(describe argument here)
-
-returns:: (returnvalue)
+Offset in seconds from the start of the event.
 
 METHOD:: waitTime
-(describe method here)
-
-returns:: (returnvalue)
+Time in seconds needed to prepare this UChain.
 
 METHOD:: prepareWaitAndStart
-(describe method here)
+Start preparation, then wait during waitTime seconds, and finally start the UChain.
 
 argument:: target
-(describe argument here)
+A collection of targets.
 
 argument:: startPos
-(describe argument here)
-
-returns:: (returnvalue)
+Offset in seconds from the start of the event.
 
 METHOD:: dispose
-(describe method here)
-
-returns:: (returnvalue)
-
-METHOD:: resetGroups
-(describe method here)
-
-returns:: (returnvalue)
+Calls .dispose on each unit. This will dispose of Buffers or other resources opened.
 
 METHOD:: at
-(describe method here)
-
-argument:: index
-(describe argument here)
-
-returns:: (returnvalue)
+Array support for accessing units.
 
 METHOD:: last
-(describe method here)
-
-returns:: (returnvalue)
+Array support for accessing units.
 
 METHOD:: first
-(describe method here)
-
-returns:: (returnvalue)
+Array support for accessing units.
 
 METHOD:: add
-(describe method here)
-
-argument:: unit
-(describe argument here)
-
-returns:: (returnvalue)
+Add unit to chian. Unit is added in after other units.
 
 METHOD:: addAll
-(describe method here)
+Add all units in collection to UChain.
 
 argument:: inUnits
-(describe argument here)
-
-returns:: (returnvalue)
+Collection with units.
 
 METHOD:: put
-(describe method here)
+Place unit at index.
 
 argument:: index
-(describe argument here)
+Int
 
 argument:: unit
-(describe argument here)
+link::Classes/U::
 
-returns:: (returnvalue)
 
 METHOD:: insert
-(describe method here)
+Insert unit at index.
 
 argument:: index
-(describe argument here)
+Int
 
 argument:: unit
-(describe argument here)
-
-returns:: (returnvalue)
+link::Classes/U::
 
 METHOD:: removeAt
-(describe method here)
+Remove unit at index.
 
 argument:: index
-(describe argument here)
-
-returns:: (returnvalue)
+Int
 
 METHOD:: <<
-(describe method here)
+Returns new UChain with the units from 'uchain' added to this UChain.
 
 argument:: uchain
-(describe argument here)
+link::Classes/UChain::
 
-returns:: (returnvalue)
+returns:: link::Classes/UChain::
 
 METHOD:: <|
-(describe method here)
+Returns new UChain containing all the units of this UChain plus the unit passed in the argument.
 
 argument:: unit
-(describe argument here)
+link::Classes/U::
 
-returns:: (returnvalue)
+returns:: link::Classes/UChain::
 
 METHOD:: isFolder
-(describe method here)
+Determine whether this object is a score.
 
-returns:: (returnvalue)
+returns:: False
 
 METHOD:: getAllUChains
-(describe method here)
+Returns this. This method is used to recursivly get all the UChains in a UScore.
 
-returns:: (returnvalue)
-
-METHOD:: printOn
-(describe method here)
-
-argument:: stream
-(describe argument here)
-
-returns:: (returnvalue)
-
-METHOD:: getInitArgs
-(describe method here)
-
-returns:: (returnvalue)
-
-METHOD:: storeArgs
-(describe method here)
-
-returns:: (returnvalue)
+returns:: link::Classes/UChain::
 
 METHOD:: gui
-(describe method here)
+Create a GUI.
 
 argument:: parent
-(describe argument here)
+A view
 
 argument:: bounds
-(describe argument here)
+A Rect
 
-returns:: (returnvalue)
-
-METHOD:: sessionGUI
-(describe method here)
-
-argument:: view
-(describe argument here)
-
-returns:: (returnvalue)
-
+returns:: link::Classes/UChaiGUI::
 
 EXAMPLES::
 
@@ -578,21 +456,12 @@ x.release;
 x.fadeOut = 0.5;
 x.fadeIn = 0.5;
 
-x.setDur( 5 );
-x.setDur( inf ); // infinite duration (default)
+x.dur_( 5 );
+x.dur_( inf ); // infinite duration (default)
 
 x[1].setAudioOut( 0, 1 ); // 2nd sine output to bus 1, so it goes to second mix input
 
-x.gui; // gui without styling
+//you can control all the parameters from the guis
+x.gui;
 y.gui;
-
-( // gui with styling
-w = Window( "x", Rect( 300,25,200,300 ) ).front;
-RoundView.useWithSkin( ( 
-	labelWidth: 40, 
-	font: Font( Font.defaultSansFace, 10 ), 
-	hiliteColor: Color.gray(0.33)
-), { x.gui(w); };
-);
-)
 ::
