@@ -514,14 +514,16 @@ U : ObjectWithArgs {
 	isPlaying { ^(this.synths.size != 0) }
 		
 	printOn { arg stream;
-		stream << "a " << this.class.name << "(" <<* this.storeArgs  <<")"
+		stream << this.class.name << "( " <<* this.storeArgs  <<" )"
 	}
+	
+	dontStoreArgNames { ^[ 'u_dur', 'u_doneAction' ] }
 	
 	getInitArgs {
 		var defArgs;
 		defArgs = (this.def.args( this ) ? []).clump(2);
 		^args.clump(2).select({ |item, i| 
-			item != defArgs[i]
+			(item != defArgs[i]) && { this.dontStoreArgNames.includes( item[0] ).not };
 		 }).flatten(1);
 	}
 	

@@ -543,7 +543,7 @@ UScore : UEvent {
 	gui { ^UScoreEditorGUI(UScoreEditor(this)) }
 
 	printOn { arg stream;
-		stream << "a " << this.class.name << "( " << events.size <<" events )"
+		stream << this.class.name << "( " << events.size <<" events )"
 	}
 	
 	getInitArgs {
@@ -561,6 +561,19 @@ UScore : UEvent {
 	}
 	
 	storeArgs { ^this.getInitArgs }
+	
+	storeParamsOn { arg stream;
+		var args = this.storeArgs;
+		stream << "(";
+		stream <<* args.collect({ |item|
+			if( item.isKindOf( UEvent ) ) {
+				"\n\t" ++ item.asCompileString
+			} {
+				item.asCompileString;
+			};
+		});
+		stream << ")";
+	}
 
 	onSaveAction { this.name = filePath.basename.removeExtension }
 

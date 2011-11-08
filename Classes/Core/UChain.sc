@@ -550,6 +550,14 @@ UChain : UEvent {
 	last { ^units.last }
 	first { ^units.first }
 	
+	set { |key, value| // sets all units that respond to  key
+		units.select({ |u| u.keys.includes( key ) }).do(_.set( key, value ));
+	}
+	
+	get { |key|
+		^units.select({ |u| u.keys.includes( key ) }).do(_.get(key));
+	}
+	
 	add { |unit|
 		units = units.add( unit.asUnit );
 		this.changed( \units );
@@ -597,7 +605,7 @@ UChain : UEvent {
     getAllUChains{ ^this }
 
 	printOn { arg stream;
-		stream << "a " << this.class.name << "(" <<* units.collect(_.defName)  <<")"
+		stream << this.class.name << "( " <<* units.collect(_.defName)  << " )"
 	}
 	
 	getInitArgs {
