@@ -250,7 +250,10 @@ MassEditUChain {
 					uchain.dur_( uchain.dur * mul, clipFadeIn );
 				};
 			});
+		} {
+		    uchains.do(_.dur_( dur ))
 		};
+		this.changed(\dur)
 	}
 	
 	duration { ^this.dur }
