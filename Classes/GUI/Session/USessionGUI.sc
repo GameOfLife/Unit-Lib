@@ -22,6 +22,7 @@ USessionGUI : UAbstractWindow {
 	var <session;
     var <sessionView, bounds;
     var <sessionController, objGuis;
+    var <selectedObject;
 
     *new { |session, bounds|
         ^super.new.init( session)
@@ -37,7 +38,8 @@ USessionGUI : UAbstractWindow {
 	    });
 	    sessionController.put(\name,{
             window.name = this.windowTitle
-        })
+        });
+
 	}
 
     windowTitle {
@@ -99,6 +101,16 @@ USessionGUI : UAbstractWindow {
 			    session.stopAll
 			});
 
+		topBarView.decorator.shift(10);
+
+        SmoothButton( topBarView, size@size )
+            .states_( [[ '-' ]] )
+            .canFocus_(false)
+            .border_(1).background_(Color.grey(0.8))
+            .action_({
+                selectedObject !? this.removeObject(_)
+            });
+
 		topBarView.decorator.nextLine;
 
 		CompositeView( topBarView, Rect( 0, 14, (topBarView.bounds.width - (margin * 2)), 2 ) )
@@ -112,7 +124,6 @@ USessionGUI : UAbstractWindow {
     removeObject { |object|
         if(object.class != UScore){
             session.remove(object);
-            { this.makeSessionView; window.refresh; }.defer(0.1)
         } {
             if( (object.events.size != 0) && (object.isDirty) ) {
                 SCAlert( "Do you want to save your score? (" ++ object.name ++ ")" ,
@@ -144,12 +155,21 @@ USessionGUI : UAbstractWindow {
 
         sessionView = CompositeView(view, Rect(0,topBarHeigth,bounds.width,bounds.height - topBarHeigth)).resize_(5);
         sessionView.addFlowLayout(margin@margin,margin@margin);
-        objGuis = session.objects.collect { |object|
+
+        objGuis = session.objects.collect { |object,i|
             var releaseTask, but, ctl, comp, gui;
 
-            comp = CompositeView( sessionView, (sessionView.bounds.width - (margin*2))@(sessionViewsHeight + (margin*2)) )
+            comp = ActiveCompositeView( sessionView, (sessionView.bounds.width - (margin*2))@(sessionViewsHeight + (margin*2)) )
             		.resize_(2)
             		.background_(Color.grey(0.9));
+            comp.mouseDownAction_({ selectedObject = object });
+            comp.uview.beginDragAction_({ object });
+            comp.canReceiveDragHandler_({ |sink|
+                [ UChain, UScore, Array ].includes(View.currentDrag.class)
+            })
+            .receiveDragHandler_({ |sink, x, y|
+                session.insertCollection(session.objects.indexOf(object)+1 ,View.currentDrag.asCollection.collect(_.deepCopy))
+            });
 
             comp.addFlowLayout;
 
@@ -166,15 +186,6 @@ USessionGUI : UAbstractWindow {
                     object.gui
 			    });
 
-			SmoothButton(comp,25@16)
-                .states_([["-",Color.black,Color.clear]])
-                .font_( font )
-			    .border_(1).background_(Color.grey(0.8))
-			    .radius_(5)
-			    .canFocus_(false)
-			    .action_({
-                    this.removeObject(object)
-			    });
 			comp.decorator.shift(22,0);
 			gui = object.sessionGUI(comp);
 			sessionView.decorator.nextLine;

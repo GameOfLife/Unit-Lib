@@ -269,6 +269,18 @@ UScoreView {
 	    scoreView.gridLines = [score.finiteDuration.ceil.max(1), numTracks];
 		scoreView.gridMode = ['blocks','lines'];
 		scoreView.sliderWidth = 8;
+		scoreView.userView.view
+		    .canReceiveDragHandler_({
+                [ UChain, UScore ].includes(View.currentDrag.class)
+            })
+            .receiveDragHandler_({ |sink, x, y|
+                View.currentDrag.postln;
+                this.currentScore.addEventToEmptyTrack(View.currentDrag.deepCopy);
+            })
+            .beginDragAction_({
+                this.selectedEvents;
+            });
+
 		//scoreView.maxZoom = [16,5];
 
 		usessionMouseEventsManager = UScoreEditorGuiMouseEventsManager(this);

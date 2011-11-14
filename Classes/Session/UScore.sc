@@ -114,7 +114,10 @@ UScore : UEvent {
     /*
     * newEvents -> UEvent or Array[UEvent]
     */
-	add { |newEvents| events = events ++ newEvents.asCollection }
+	add { |newEvents|
+	    events = events ++ newEvents.asCollection;
+	    this.changed(\numEventsChanged)
+	}
 	<| { |newEvents| this.add(newEvents) }
 
 	<< { |score|
@@ -209,6 +212,7 @@ UScore : UEvent {
 	addEventToEmptyTrack { |evt|
 		this.moveEventToEmptyTrack(evt);
 		events = events.add( evt );
+		 this.changed(\numEventsChanged)
 	}
 
 	addEventsToEmptyRegion { |events|

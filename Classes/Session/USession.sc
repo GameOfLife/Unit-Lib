@@ -51,7 +51,7 @@ USession : UArchivable{
     }
 
     remove { |item|
-        objects.remove(item);
+        objects = objects.select( _ != item);
         this.changed(\objectsChanged)
     }
 
