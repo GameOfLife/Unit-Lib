@@ -181,7 +181,7 @@ UChainGUI {
 					1, { chain.dur_( inf ) }
 				);
 		});
-			
+
 		views[ \fromSoundFile ] = SmoothButton( composite, 90@14 )
 			.border_( 1 )
 			.radius_( 3 )
@@ -383,6 +383,8 @@ UChainGUI {
 				drg = View.currentDrag;
 				case { drg.isKindOf( Udef ) } 
 					{ true }
+					{ drg.isKindOf( UnitRack ) }
+                    { true }
 					{ [ Symbol, String ].includes( drg.class ) }
 					{ Udef.all.keys.includes( drg.asSymbol ) }
 					{ drg.isKindOf( U ) }
@@ -392,9 +394,11 @@ UChainGUI {
 			.receiveDragHandler_({ |sink, x, y|
 					case { View.currentDrag.isKindOf( U ) } {
 						chain.units = [ View.currentDrag.deepCopy ];
-					} { View.currentDrag.isKindOf( Udef ) } {
+					}{ View.currentDrag.isKindOf( Udef ) }{
 						chain.units = [ U( View.currentDrag ) ];
-					} {   [ Symbol, String ].includes( View.currentDrag.class )  } {
+					}{ View.currentDrag.isKindOf( UnitRack ) } {
+                        chain.units = View.currentDrag.units;
+                    }{   [ Symbol, String ].includes( View.currentDrag.class )  } {
 						chain.units = [ U( View.currentDrag.asSymbol ) ];
 					};
 			})
@@ -426,6 +430,8 @@ UChainGUI {
 					drg = View.currentDrag;
 					case { drg.isKindOf( Udef ) } 
 						{ true }
+						{ drg.isKindOf( UnitRack ) }
+                        { true }
 						{ [ Symbol, String ].includes( drg.class ) }
 						{ Udef.all.keys.includes( drg.asSymbol ) }
 						{ drg.isKindOf( U ) }
@@ -444,7 +450,9 @@ UChainGUI {
 							chain.units = chain.units.insert( i, u.deepCopy );
 						};
 						
-					} { View.currentDrag.isKindOf( Udef ) } {
+					} { View.currentDrag.isKindOf( UnitRack ) } {
+                        chain.insertCollection( i, View.currentDrag.units );
+                    } { View.currentDrag.isKindOf( Udef ) } {
 						unit.defName = View.currentDrag;
 					} {   [ Symbol, String ].includes( View.currentDrag.class )  } {
 						unit.defName = View.currentDrag.asSymbol;
@@ -494,6 +502,8 @@ UChainGUI {
 					drg = View.currentDrag;
 					case { drg.isKindOf( Udef ) } 
 						{ true }
+						{ drg.isKindOf( UnitRack ) }
+                        { true }
 						{ [ Symbol, String ].includes( drg.class ) }
 						{ Udef.all.keys.includes( drg.asSymbol ) }
 						{ drg.isKindOf( U ) }
@@ -505,7 +515,9 @@ UChainGUI {
 							chain.units = chain.units ++ [ View.currentDrag.deepCopy ];
 						} { View.currentDrag.isKindOf( Udef ) } {
 							chain.units = chain.units ++ [ U( View.currentDrag ) ];
-						} {   [ Symbol, String ].includes( View.currentDrag.class )  } {
+						}{ View.currentDrag.isKindOf( UnitRack ) } {
+                            chain.units = chain.units ++ View.currentDrag.units;
+                        }{   [ Symbol, String ].includes( View.currentDrag.class )  } {
 							chain.units = chain.units ++ [ U( View.currentDrag.asSymbol ) ];
 						};
 				});
