@@ -89,9 +89,7 @@ UChainGUI {
 		if( parent.asView.class.name == 'SCScrollTopView' ) {
 			bounds.width = bounds.width - 12;
 		};
-		units = chain.units.collect({ |u| 
-			if( u.class == MetaU ) { u.unit; } { u; }
-		});
+		units = chain.units;
 		
 		this.getHeight( units, margin, gap );
 				

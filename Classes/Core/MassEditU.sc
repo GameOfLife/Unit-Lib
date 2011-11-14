@@ -124,9 +124,6 @@ MassEditUChain {
 		uchains.do({ |uchain|
 			uchain.units.do({ |unit|
 				var defName, index;
-				if( unit.class == MetaU ) {
-					unit = unit.unit;
-				};
 				defName = unit.defName;
 				if( allDefNames.includes( defName ).not ) {
 					allDefNames = allDefNames.add( defName );

@@ -44,14 +44,8 @@ UChainAudioAnalyzer {
 	init { 
 		
 		var units;
-		units = chain.units.collect({ |unit|
-			if( unit.class == MetaU ) { 
-				unit.unit 
-			} {
-				unit;
-			};
-		});
-		
+		units = chain.units;
+
 		// collects ins and outs in format:
 		// [  unit, index-of-unit, [indices], [buses] ]
 		
