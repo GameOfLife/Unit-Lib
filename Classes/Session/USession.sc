@@ -55,6 +55,16 @@ USession : UArchivable{
         this.changed(\objectsChanged)
     }
 
+    insert { |index,item|
+        objects = objects.insert(index,item);
+        this.changed(\objectsChanged)
+    }
+
+    insertCollection { |index,newObjects|
+        objects = objects[..(index-1)]++newObjects++objects[index..];
+        this.changed( \objectsChanged )
+    }
+
     startAll { |targets|
 		objects.do(_.prepareAndStart);
     }

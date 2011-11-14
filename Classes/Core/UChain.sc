@@ -579,6 +579,11 @@ UChain : UEvent {
 		this.changed( \units );
 
 	}
+
+	insertCollection { |index,newUnits|
+	    units = units[..(index-1)]++newUnits++units[(index+1)..];
+	    this.changed( \units )
+	}
 	
 	removeAt { |index|
 		var out;
