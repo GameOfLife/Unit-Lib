@@ -80,6 +80,16 @@ EQdef {
 		^dict[ key ]	
 	}
 	
+	*fromName { |name|
+		^dict[ name.asSymbol ];
+	}
+	
+	name { ^dict.findKeyForValue( this ); }
+	name_ { |name|
+		dict.removeAt( this.name );
+		dict[ name.asSymbol ] = this;
+	}
+	
 	init { |bandPairs|
 		var methods;
 		
@@ -226,11 +236,11 @@ EQSetting {
 		
 		if( def.isKindOf( EQdef ) ) {
 			eqdef = def;
-			def = EQdef.dict.findKeyForValue( def );
+			def = def.name;
 			if( def.isNil ) { def = eqdef };
 		} {
 			eqdef = EQdef.dict[ def ];
-			if( eqdef.isNil ) { eqdef = EQdef.dict[ \default ] };
+			if( eqdef.isNil ) { eqdef = EQdef.fromKey( \default ) };
 		};
 		
 		^eqdef;
