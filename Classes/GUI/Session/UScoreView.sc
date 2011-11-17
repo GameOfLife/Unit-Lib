@@ -271,11 +271,23 @@ UScoreView {
 		scoreView.sliderWidth = 8;
 		scoreView.userView.view
 		    .canReceiveDragHandler_({
-                [ UChain, UScore ].includes(View.currentDrag.class)
+                [ UChain, UScore ].includes(View.currentDrag.class) or: { 
+	                View.currentDrag.class == Array && {
+	                	View.currentDrag.flat.every({ |item| 
+		                	[ UChain, UScore ].includes(item.class) 
+	                	})
+                	}
+                }
             })
             .receiveDragHandler_({ |sink, x, y|
                 View.currentDrag.postln;
-                this.currentScore.addEventToEmptyTrack(View.currentDrag.deepCopy);
+                if( View.currentDrag.class == Array ) {
+	               View.currentDrag.do({ |item|
+		               this.currentScore.addEventToEmptyTrack(item.deepCopy);
+	               });
+                } {
+                	this.currentScore.addEventToEmptyTrack(View.currentDrag.deepCopy);
+                };
             })
             .beginDragAction_({
                 this.selectedEvents;
