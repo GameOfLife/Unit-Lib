@@ -36,6 +36,26 @@ UScoreList : UEvent {
             score
         });
     }
+    
+     at { |index| ^scores[ index ] }
+     copySeries { |first, second, last| ^scores.copySeries( first, second, last ) }
+	collect { |func|  ^scores.collect( func );  }
+	do { |func| scores.do( func ); }
+	last { ^scores.last }
+	first { ^scores.first }
+	indexOf { |obj|
+		var index;
+		index = scores.indexOf( obj );
+		if( index.isNil ) {
+			scores.do({ |item, i|
+				index = [ i, item.indexOf( obj ) ];
+				if( index[1].notNil ) { ^index; }
+			});
+			^nil;
+		} {
+			^index
+		};
+	}
 
     name { ^scores.collect(_.name).asString }
 

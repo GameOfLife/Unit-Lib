@@ -39,6 +39,25 @@ USession : UArchivable{
     }
 
     at { |index| ^objects[ index ] }
+    copySeries { |first, second, last| ^objects.copySeries( first, second, last ) }
+    collect { |func|  ^objects.collect( func );  }
+    do { |func| objects.do( func ); }
+    first { ^objects.first }
+    last { ^objects.last }
+    indexOf { |obj|
+		var index;
+		index = objects.indexOf( obj );
+		if( index.isNil ) {
+			objects.do({ |item, i|
+				index = [ i, item.indexOf( obj ) ];
+				if( index[1].notNil ) { ^index; }
+			});
+			^nil;
+		} {
+			^index
+		};
+	}
+
 
     add { |items|
         var oldSize = objects.size;

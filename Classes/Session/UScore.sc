@@ -106,10 +106,24 @@ UScore : UEvent {
     isFolder{ ^true }
 	//ARRAY SUPPORT
 	at { |index|  ^events[ index ];  }
+	copySeries { |first, second, last| ^events.copySeries( first, second, last ) }
 	collect { |func|  ^events.collect( func );  }
 	do { |func| events.do( func ); }
 	first { ^events.first }
 	last { ^events.last }
+	indexOf { |obj|
+		var index;
+		index = events.indexOf( obj );
+		if( index.isNil ) {
+			events.do({ |item, i|
+				index = [ i, item.indexOf( obj ) ];
+				if( index[1].notNil ) { ^index; }
+			});
+			^nil;
+		} {
+			^index
+		};
+	}
 
     /*
     * newEvents -> UEvent or Array[UEvent]

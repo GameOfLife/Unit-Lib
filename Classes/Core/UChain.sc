@@ -546,9 +546,12 @@ UChain : UEvent {
 	// indexing / access
 		
 	at { |index| ^units[ index ] }
-		
+	copySeries { |first, second, last| ^units.copySeries( first, second, last ) }
+	collect { |func|  ^units.collect( func );  }
+	do { |func| units.do( func ); }
 	last { ^units.last }
 	first { ^units.first }
+	indexOf { |obj| ^units.indexOf( obj ); }
 	
 	set { |key, value| // sets all units that respond to  key
 		units.select({ |u| u.keys.includes( key ) }).do(_.set( key, value ));

@@ -27,6 +27,14 @@ UChainGroup : UEvent {
     init { |inChains|
         chains = inChains;
     }
+    
+    at { |index| ^chains[ index ] }
+    copySeries { |first, second, last| ^chains.copySeries( first, second, last ) }
+	collect { |func|  ^chains.collect( func );  }
+	do { |func| chains.do( func ); }
+	last { ^chains.last }
+	first { ^chains.first }
+	indexOf { |obj| ^chains.indexOf( obj ); }
 
     name { ^chains.collect(_.name).asString }
 
