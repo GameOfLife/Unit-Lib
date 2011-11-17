@@ -37,7 +37,14 @@ UScoreList : UEvent {
         });
     }
     
-     at { |index| ^scores[ index ] }
+      at { |...path| 
+		 var out;
+		 out = scores;
+		 path.do({ |item|
+			 out = out[ item ];
+		 });
+		 ^out
+	}
      copySeries { |first, second, last| ^scores.copySeries( first, second, last ) }
 	collect { |func|  ^scores.collect( func );  }
 	do { |func| scores.do( func ); }

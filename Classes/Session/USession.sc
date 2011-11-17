@@ -38,7 +38,14 @@ USession : UArchivable{
         ^[UChain,UChainGroup,UScore,UScoreList]
     }
 
-    at { |index| ^objects[ index ] }
+    at { |...path| 
+		 var out;
+		 out = objects;
+		 path.do({ |item|
+			 out = out[ item ];
+		 });
+		 ^out
+	}
     copySeries { |first, second, last| ^objects.copySeries( first, second, last ) }
     collect { |func|  ^objects.collect( func );  }
     do { |func| objects.do( func ); }

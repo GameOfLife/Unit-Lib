@@ -105,7 +105,14 @@ UScore : UEvent {
     makeView{ |i,maxWidth| ^UScoreEventView(this,i,maxWidth) }
     isFolder{ ^true }
 	//ARRAY SUPPORT
-	at { |index|  ^events[ index ];  }
+	at { |...path| 
+		 var out;
+		 out = events;
+		 path.do({ |item|
+			 out = out[ item ];
+		 });
+		 ^out
+	}
 	copySeries { |first, second, last| ^events.copySeries( first, second, last ) }
 	collect { |func|  ^events.collect( func );  }
 	do { |func| events.do( func ); }
