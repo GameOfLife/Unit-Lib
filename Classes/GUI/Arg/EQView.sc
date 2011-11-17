@@ -356,7 +356,7 @@ EQEditView {
 			};
 			this.changed( \eqSetting, eqSetting );
 			this.update;
-			this.refresh;
+			//this.refresh;
 		};
 	}
 	
@@ -476,6 +476,15 @@ EQView {
 		plotView.eqSetting = new;
 		editView.eqSetting = new;
 	}
+	
+	value { ^this.eqSetting }
+	value_ { |val| this.eqSetting = val }
+	
+	doAction { action.value( this ) }
+	
+	onClose_ { |func| view.onClose = func }
+	
+	close { view.findWindow.close } 
 	
 	makeView { |parent, bounds, eqSetting|
 		if( eqSetting.isNil ) { eqSetting = EQSetting() };

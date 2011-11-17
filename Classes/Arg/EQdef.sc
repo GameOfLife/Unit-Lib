@@ -139,6 +139,9 @@ EQdef {
 		if( setting.isNil ) {
 			^default;
 		} {
+			if( setting[0].size == 0 ) { // from flat setting
+				setting = setting.clumps( default.collect(_.size) );
+			};
 			^default.collect({ |item, i|
 				item.collect({ |subItem, ii|
 					(setting[i] ? item).asCollection[ii] ? subItem
@@ -317,6 +320,10 @@ EQSetting {
 	 asControlInput { ^setting.flat.asControlInput }
 	 asOSCArgEmbeddedArray { | array| ^setting.flat.asOSCArgEmbeddedArray(array) }
 	 
+	 *ar { |in, setting, def|
+		^this.new( def ).ar( in, setting );
+	}
+	 
 	 ar { |in, setting|
 		var eqdef;
 	 	setting = setting.flat;
@@ -332,5 +339,7 @@ EQSetting {
 			class.magResponse( freqs ? 1000, 44100, *setting[i] );
 		});
 	 }
+	 
+	 storeArgs { ^[ def, setting ] }
 
 }
