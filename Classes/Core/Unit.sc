@@ -81,6 +81,7 @@ RoundView.useWithSkin( (
 Udef : GenericDef {
 	
 	classvar <>all, <>defsFolders, <>userDefsFolder;
+
 	
 	var <>func, <>category;
 	var <>synthDef;
@@ -94,24 +95,30 @@ Udef : GenericDef {
 		userDefsFolder = Platform.systemAppSupportDir ++ "/UnitDefs/";
 	}
 
-	*basicNew { |name, args, category|
-		^super.new( name, args ).category_( category ? \default );
+	*basicNew { |name, args, category, addToAll=true|
+		^super.new( name, args, addToAll ).category_( category ? \default );
 	}
 	
-	*new { |name, func, args, category|
-		^super.new( name, args ).init( func ).category_( category ? \default );
+	*new { |name, func, args, category, addToAll=true|
+		^super.new( name, args, addToAll ).init( func ).category_( category ? \default );
 	}
 	
 	*prefix { ^"u_" }
-		
+
+	*callByName { ^true }
+
+    prGenerateSynthDefName {
+       ^this.class.prefix ++ this.name.asString
+    }
+
 	init { |inFunc|
 		var argNames, values;
 		
 		func = inFunc;
 		
-		synthDef = SynthDef( this.class.prefix ++ this.name.asString, func );
+		this.synthDef = SynthDef( this.prGenerateSynthDefName, func );
 		
-		argSpecs = ArgSpec.fromSynthDef( synthDef, argSpecs );
+		argSpecs = ArgSpec.fromSynthDef( this.synthDef, argSpecs );
 		
 		this.initArgs;
 		this.changed( \init );
@@ -135,18 +142,22 @@ Udef : GenericDef {
 	loadSynthDef { |server|
 		server = server ? Server.default;
 		server.asCollection.do{ |s|
-		    synthDef.asCollection.do(_.send(s));
+		    this.synthDef.asCollection.do(_.send(s));
 		}
 	}
 	
 	sendSynthDef { |server|
 		server = server ? Server.default;
 		server.asCollection.do{ |s|
-			synthDef.asCollection.do(_.send(s));
+			this.synthDef.asCollection.do(_.send(s));
 		}
 	}
+
+	prepare { |servers, action|
+	    action.value;
+	}
 	
-	synthDefName { ^synthDef.name }
+	synthDefName { ^this.synthDef.name }
 	
 	load { |server| this.loadSynthDef( server ) }
 	send { |server| this.sendSynthDef( server ) }
@@ -260,37 +271,41 @@ U : ObjectWithArgs {
 	
 	classvar <>loadDef = false;
 	classvar <>synthDict;
-	
-	// var <def;
-	var defName;
-	var defClass;
+	classvar <>uneditableCategories;
+
+	var def, defName;
 	//var <>synths;
 	var <>disposeOnFree = true;
 	var <>preparedServers;
 	var >waitTime; // use only to override waittime from args
 	var <>env;
 	
-	*initClass { synthDict = IdentityDictionary( ) }
+	*initClass {
+	    synthDict = IdentityDictionary( );
+	    uneditableCategories = [];
+	}
 
-	*new { |defName, args|
-		^super.new.init( defName, args ? [] )
+	*addUneditableCategory { |category|
+	    uneditableCategories = uneditableCategories !? ( _.add(category) ) ? [category]
+	}
+
+	*new { |def, args|
+		^super.new.init( def, args ? [] )
 	}
 	
 	*defClass { ^Udef }
 	
-	init { |inName, inArgs|
-		var def;
-		if( inName.isKindOf( this.class.defClass ) ) {
-			def = inName;
-			defName = def.name;
-			if( defName.isNil ) { defName = def };
-			defClass = def.class;
+	init { |in, inArgs|
+	    var realDef;
+		if( in.isKindOf( this.class.defClass ) ) {
+			def = in;
+			defName = in.name;
 		} {
-			def = inName.asSymbol.asUdef;
-			
+			defName = in.asSymbol;
+			def = nil;
 		};
-		if( def.notNil ) {	
-			args = def.asArgsArray( inArgs ? [] )
+		if( this.def.notNil ) {
+			args = this.def.asArgsArray( inArgs ? [] )
 				.collect({ |item, i|
 					if( i.odd ) {
 						item.deepCopy.asUnitArg( this );
@@ -298,19 +313,32 @@ U : ObjectWithArgs {
 						item;
 					};
 				});
-			defName = def.name;
-		} { 
-			defName = inName;
-			"defName '%' not found".format(inName).warn; 
+		} {
+			"def '%' not found".format(in).warn;
 		};
 		preparedServers = [];
 		env = (); // a place to store things in (for FreeUdef)
 		this.changed( \init );
 	}
-	
 	allKeys { ^this.keys }
-	allValues { ^this.values }	
-	
+	allValues { ^this.values }
+
+    def {
+        ^def ?? { defName.asUdef }
+    }
+
+    defName {
+        ^defName ?? { def.name }
+    }
+
+    def_ { |newDef, keepArgs = true|
+        this.init( newDef, if( keepArgs ) { args } { [] }); // keep args
+    }
+
+    defName_ { |newDefName, keepArgs = true|
+        this.init( newDefName, if( keepArgs ) { args } { [] }); // keep args
+    }
+
 	set { |...args|
 		var synthArgs;
 		args.pairsDo({ |key, value|
@@ -443,18 +471,7 @@ U : ObjectWithArgs {
 	rate_ { |new| this.set( \rate, new ) }
 	loop { ^this.get( \loop ) }
 	loop_ { |new| this.set( \loop, new ) }
-	
-	def { ^defName.asUdef( defClass ) }
-	defName { ^if( defName.class == Symbol ) { defName } { defName.name } }
-	
-	def_ { |newDef, keepArgs = true|
-	  	this.defName_( newDef, keepArgs );
-	}
 
-	defName_ { |newName, keepArgs = true|
-		this.init( newName, if( keepArgs ) { args } { [] }); // keep args
-	}
-	
 	cutStart { |amount = 0|
 		this.values.do({ |value|
 			if( value.respondsTo( \cutStart ) ) {
@@ -527,7 +544,7 @@ U : ObjectWithArgs {
 	isPlaying { ^(this.synths.size != 0) }
 		
 	printOn { arg stream;
-		stream << this.class.name << "( " <<* this.storeArgs  <<" )"
+		stream << this.class.name << "( " <<* this.argsForPrint  <<" )"
 	}
 	
 	dontStoreArgNames { ^[ 'u_dur', 'u_doneAction' ] }
@@ -539,14 +556,30 @@ U : ObjectWithArgs {
 			(item != defArgs[i]) && { this.dontStoreArgNames.includes( item[0] ).not };
 		 }).flatten(1);
 	}
+
+	argsForPrint {
+        var initArgs, initDef;
+        initArgs = this.getInitArgs;
+        initDef = this.def.name;
+        if( initArgs.size > 0 ) {
+            ^[ initDef, initArgs ];
+        } {
+            ^[ initDef ];
+        };
+    }
 	
 	storeArgs { 
-		var initArgs;
+		var initArgs, initDef;
 		initArgs = this.getInitArgs;
-		if( initArgs.size > 0 ) {
-			^[ this.defName, initArgs ];
+		initDef = if( this.def.class.callByName ) {
+		    this.defName
 		} {
-			^[ this.defName ];
+		    this.def
+		};
+		if( initArgs.size > 0 ) {
+			^[ initDef, initArgs ];
+		} {
+			^[ initDef ];
 		};
 	}
 	
@@ -584,7 +617,7 @@ U : ObjectWithArgs {
 			this.shouldPlayOn( tg ) != false;
 		});
 		if( target.size > 0 ) {
-	   	 act = { preparedServers = preparedServers.addAll( target ); action.value };
+	   	    act = { preparedServers = preparedServers.addAll( target ); action.value };
 		    if( loadDef) {
 		        this.def.loadSynthDef( target );
 		    };
@@ -594,8 +627,9 @@ U : ObjectWithArgs {
 			    valuesToPrepare.do({ |val|
 				     val.prepare(target.asCollection, startPos, action: act.getAction)
 			    });
+			    this.def.prepare(target.asCollection, act.getAction)
 		    } {
-			    act.value; // if no prepare args done immediately
+			    this.def.prepare(target.asCollection, act);
 		    };
 		} {
 			action.value;

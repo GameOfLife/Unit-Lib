@@ -27,7 +27,7 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 	}
 	
 	init { |inUnits|
-		var firstDef, defs, def;
+		var firstDef, defs;
 		units = inUnits.asCollection;
 		defs = inUnits.collect(_.def);
 		firstDef = defs[0];
@@ -46,7 +46,6 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 				};
 			}).select(_.notNil);
 			args = argSpecs.collect({ |item| [ item.name, item.default ] }).flatten(1);
-			defName = def.name;
 		} {
 			"MassEditU:init - not all units are of the same Udef".warn;
 		};
@@ -122,7 +121,7 @@ MassEditUChain {
 		var allDefNames = [], allUnits = Order();
 		
 		uchains.do({ |uchain|
-			uchain.units.do({ |unit|
+			uchain.units.select({|x| x.def.class != LocalUdef}).do({ |unit|
 				var defName, index;
 				defName = unit.defName;
 				if( allDefNames.includes( defName ).not ) {

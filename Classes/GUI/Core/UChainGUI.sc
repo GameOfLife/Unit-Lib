@@ -307,7 +307,7 @@ UChainGUI {
 	}
 	
 	makeUnitHeader { |units, margin, gap|
-		var comp, header, min, io, defs;
+		var comp, header, min, io, defs, code;
 		
 		comp = CompositeView( composite, (composite.bounds.width - (margin.x * 2))@16 )
 			.resize_(2);
@@ -331,9 +331,24 @@ UChainGUI {
                     }.defer(0.01);
 
                 }).resize_(3);
+            code = SmoothButton( comp,
+                    Rect( comp.bounds.right - (36 + if( chain.class != MassEditUChain ) {4 + 36}{0}),
+                         1, 36, 12 ) )
+                .label_( "code" )
+                .border_( 1 )
+                .radius_( 2 )
+                .action_({
+                    var parent;
+                    parent = composite.parent;
+                    {
+                        composite.remove;
+                        UChainCodeGUI( parent, originalBounds, chain );
+                    }.defer(0.01);
+                }).resize_(3);
 		};
+
 		defs = SmoothButton( comp, 
-				Rect( comp.bounds.right - (36 + if( chain.class != MassEditUChain ) {4 + 36}{0}),
+				Rect( comp.bounds.right - (36 + if( chain.class != MassEditUChain ) {4 + 36 + 4 + 36}{0}),
 					 1, 36, 12 ) )
 			.label_( "defs" )
 			.border_( 1 )
@@ -452,7 +467,7 @@ UChainGUI {
 			
 			header = StaticText( comp, comp.bounds.moveTo(0,0) )
 				.applySkin( RoundView.skin )
-				.string_( " " ++ i ++ ": " ++ unit.defName )
+				.string_( " " ++ i ++ ": " ++ if(unit.def.class == LocalUdef){"[Local] "}{""}++unit.defName )
 				.background_( Color.white.alpha_(0.5) )
 				.resize_(2)
 				.font_( 
@@ -494,9 +509,9 @@ UChainGUI {
 					} { View.currentDrag.isKindOf( UnitRack ) } {
                         chain.insertCollection( i, View.currentDrag.units );
                     } { View.currentDrag.isKindOf( Udef ) } {
-						unit.defName = View.currentDrag;
+						unit.def = View.currentDrag;
 					} {   [ Symbol, String ].includes( View.currentDrag.class )  } {
-						unit.defName = View.currentDrag.asSymbol;
+						unit.def = View.currentDrag.asSymbol.asUdef;
 					};
 				})
 				.beginDragAction_({ 

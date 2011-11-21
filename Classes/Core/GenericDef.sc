@@ -17,15 +17,19 @@
     along with GameOfLife Unit Library.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-GenericDef {
+GenericDef : UArchivable {
 	
 	classvar <>all; // overwrite in subclass to create class specific lib
 	classvar <>defsFolders, <>userDefsFolder;
-	
+
 	var <>argSpecs;
 
-	*new { |name, args|
-		^super.new.initArgSpecs( args ).addToAll( name.asSymbol );
+	*new { |name, args, addToAll = true|
+		var x = super.new.initArgSpecs( args );
+		if(addToAll){
+		    x.addToAll( name.asSymbol );
+		 };
+		 ^x
 	}
 	
 	*fromName { |name|
