@@ -406,7 +406,38 @@ UChainGUI {
 		
 		ug = units.collect({ |unit, i|
 			var header, comp, uview, plus, min, defs, io;
+			var addBefore;
 			
+			addBefore = UserView( scrollView, width@6 )
+				.resize_(2);
+					
+			addBefore.canReceiveDragHandler_({ |sink|
+					var drg;
+					drg = View.currentDrag;
+					case { drg.isKindOf( Udef ) } 
+						{ true }
+						{ drg.isKindOf( UnitRack ) }
+                        { true }
+						{ [ Symbol, String ].includes( drg.class ) }
+						{ Udef.all.keys.includes( drg.asSymbol ) }
+						{ drg.isKindOf( U ) }
+						{ true }
+						{ false }
+				})
+				.receiveDragHandler_({ |sink, x, y|
+						case { View.currentDrag.isKindOf( U ) } {
+							chain.units = chain.units.insert( i, View.currentDrag.deepCopy );
+						} { View.currentDrag.isKindOf( Udef ) } {
+							chain.units = chain.units.insert( i,  U( View.currentDrag ) );
+						}{ View.currentDrag.isKindOf( UnitRack ) } {
+                           		chain.insertCollection( i, View.currentDrag.units ++ [ unit ]);                        
+                           }{   [ Symbol, String ].includes( View.currentDrag.class )  } {
+							chain.units = chain.units.insert( i, 
+								U( View.currentDrag.asSymbol )
+							);
+						};
+				});
+		
 			comp = CompositeView( scrollView, width@14 )
 				.resize_(2);
 			
@@ -439,16 +470,17 @@ UChainGUI {
 						{ false }
 				})
 				.receiveDragHandler_({ |sink, x, y|
-					var u;
+					var u, ii;
 					case { View.currentDrag.isKindOf( U ) } {
 						u = View.currentDrag;
-
-						if( chain.units.includes( u ) ) { 
-							chain.units.remove( u ); 
-							chain.units = chain.units.insert( i, u );
+						ii = chain.units.indexOf( u );
+						if( ii.notNil ) { 
+							chain.units[ii] = unit; 
+							chain.units[i] = u;
 						} {
-							chain.units = chain.units.insert( i, u.deepCopy );
+							chain.units[ i ] = u.deepCopy;
 						};
+						chain.units = chain.units; // force refresch
 						
 					} { View.currentDrag.isKindOf( UnitRack ) } {
                         chain.insertCollection( i, View.currentDrag.units );
@@ -494,7 +526,7 @@ UChainGUI {
 		});
 		
 		if( units.size > 0 ) {
-			addLast = UserView( scrollView, width@14 )
+			addLast = UserView( scrollView, width@6 )
 				.resize_(2);
 					
 			addLast.canReceiveDragHandler_({ |sink|
