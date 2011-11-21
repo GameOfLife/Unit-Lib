@@ -60,8 +60,8 @@ UArchivable {
 		    text = this.asTextArchive;
 		    File.checkDo( path, { |f|
 				f.write( text );
+				successAction.value(path);
 			}, overwrite, ask);
-			successAction.value(path);
 	    };
 
 	    if( path.isNil ) {
