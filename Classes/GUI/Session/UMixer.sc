@@ -22,16 +22,18 @@ UMixer {
      var <mainComposite, <mixerView, <scoreListView, font, <parent, <bounds;
      var <>scoreList;
      var <scoreController, <unitControllers;
+     var <soloedTracks;
 
      *new{ |score, parent, bounds| ^super.new.init(score, parent,bounds) }
 
      init { |score, inParent, inBounds|
 
         scoreList = [score];
+        soloedTracks  = [];
         font = Font( Font.defaultSansFace, 11 );
-        parent = inParent ? Window("UMixer",Rect(100,1000,800,342)).front;
+        parent = inParent ? Window("UMixer",Rect(100,1000,800,372)).front;
         if(parent.respondsTo(\onClose_)){ parent.onClose_({this.remove}) };
-        bounds = inBounds ? Rect(0,0,800,342);
+        bounds = inBounds ? Rect(0,0,800,372);
 
         this.addCurrentScoreControllers;
         unitControllers = List.new;
@@ -137,7 +139,7 @@ UMixer {
             mixerView.remove;
         };
 
-        mixerView = CompositeView(mainComposite, Rect(0,24,44*evs.size+4,308));
+        mixerView = CompositeView(mainComposite, Rect(0,24,44*evs.size+4,338));
         mixerView.addFlowLayout;
 
         maxTrack.do{ |j|
@@ -146,7 +148,7 @@ UMixer {
 				if(event.track == j){
 				color = Color.rand;
 				if(event.isFolder.not){
-					cview = CompositeView(mixerView,40@300);
+					cview = CompositeView(mixerView,40@330);
 					cview.decorator = FlowLayout(cview.bounds);
 					cview.background_(Color(0.58208955223881, 0.70149253731343, 0.83582089552239, 1.0););
 					cview.decorator.shift(0,24);
@@ -157,18 +159,29 @@ UMixer {
 						});
 					bt = SmoothButton(cview,32@20)
 					    .states_(
-					        [[ \speaker, Color.black, Color.clear ],
-					        [  \speaker, Color.red, Color.clear ]] )
+					        [[ "s", Color.black, Color.clear ],
+					        [  "s", Color.yellow, Color.clear ]] )
                         .canFocus_(false)
                         .border_(1).background_(Color.grey(0.8))
-                        .value_(event.muted.binaryValue)
+                        .value_(score.soloed.includes(event).binaryValue)
                         .action_({ |v|
-                            event.muted_(v.value.booleanValue)
+                            score.solo(event, v.value.booleanValue)
+                        });
+                    bt = SmoothButton(cview,32@20)
+                        .states_(
+                            [[ "m", Color.black, Color.clear ],
+                            [  "m", Color.red, Color.clear ]] )
+                        .canFocus_(false)
+                        .border_(1).background_(Color.grey(0.8))
+                        .value_(score.softMuted.includes(event).binaryValue)
+                        .action_({ |v|
+                            score.softMute(event, v.value.booleanValue)
                         });
                     ctl = SimpleController(event)
-                        .put(\gain,{ sl.value = event.getGain; })
-                        .put( \muted, { bt.value = event.muted.binaryValue } );
+                        .put(\gain,{ sl.value = event.getGain; });
+                        //.put( \muted, { bt.value = event.muted.binaryValue } );
                     unitControllers.add(ctl);
+
 				}{
 					eventsFromFolder = event.allEvents.collect{ |event| (\event: event,\oldLevel: event.getGain) };
 					cview = CompositeView(mixerView,40@300);
@@ -186,25 +199,34 @@ UMixer {
 								dict[\event].setGain(dict[\oldLevel]+v.value);
 							};
 						});
-						SmoothButton(cview,32@20)
-					    .states_(
-					        [[ \speaker, Color.black, Color.clear ],
-					        [  \speaker, Color.red, Color.clear ]] )
+				    bt = SmoothButton(cview,32@20)
+                        .states_(
+                            [[ "s", Color.black, Color.clear ],
+                            [  "s", Color.yellow, Color.clear ]] )
                         .canFocus_(false)
                         .border_(1).background_(Color.grey(0.8))
+                        .value_(score.soloed.includes(event).binaryValue)
                         .action_({ |v|
-                            eventsFromFolder.do{ |dict|
-								dict[\event].muted_(v.value.booleanValue)
-							};
+                            score.solo(event, v.value.booleanValue)
                         });
-					};
+                    bt = SmoothButton(cview,32@20)
+                        .states_(
+                            [[ "m", Color.black, Color.clear ],
+                            [  "m", Color.red, Color.clear ]] )
+                        .canFocus_(false)
+                        .border_(1).background_(Color.grey(0.8))
+                        .value_(score.softMuted.includes(event).binaryValue)
+                        .action_({ |v|
+                            score.softMute(event, v.value.booleanValue)
+                        });
+				};
 
 				}
 			}
 		}
 
 
-     }
+    }
 
      refresh{  }
 }

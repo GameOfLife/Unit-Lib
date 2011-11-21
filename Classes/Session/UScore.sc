@@ -29,6 +29,7 @@ UScore : UEvent {
 	var <>events, <name = "untitled";
 	var pos = 0, <>loop = false;
 	var <playState = \stopped, <updatePos = true;
+	var <soloed, <softMuted;
 
 
 	/* playState is a finite state machine. The transitions graph:
@@ -77,7 +78,8 @@ UScore : UEvent {
 			args = args[1..] 
 		};
 	    events = if(args.size >0){args}{Array.new};
-	    
+	    soloed = [];
+	    softMuted = [];
 	    this.changed( \init );
 	}
 
@@ -563,6 +565,32 @@ UScore : UEvent {
 	updatePos_ { |x|
 	    updatePos = x;
 	    this.changed(\updatePos,x)
+	}
+	// SOLO / MUTE
+	prSetHardMutes{
+	     events.do{ |ev| ev.muted_( (softMuted.includes(ev) || ( (soloed.size != 0) && soloed.includes(ev).not )).postln ) }
+	}
+
+	prSMSet { |event, array, bool, setArray|
+	    if(bool) {
+            if( array.includes(event).not.postln ){
+                setArray.(array.add(event));
+                this.prSetHardMutes;
+            }
+        } {
+            if( array.includes(event) ){
+                array.remove(event);
+                this.prSetHardMutes;
+            }
+        }
+	}
+
+	solo { |event, bool|
+	    this.prSMSet(event, soloed, bool, { |x| soloed = x})
+	}
+
+	softMute { |event, bool|
+	    this.prSMSet(event, softMuted, bool, { |x| softMuted = x})
 	}
 
 	gui { ^UScoreEditorGUI(UScoreEditor(this)) }
