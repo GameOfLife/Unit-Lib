@@ -425,8 +425,17 @@ UChainGUI {
 						{ false }
 				})
 				.receiveDragHandler_({ |sink, x, y|
+						var ii;
 						case { View.currentDrag.isKindOf( U ) } {
-							chain.units = chain.units.insert( i, View.currentDrag.deepCopy );
+							ii = chain.units.indexOf( View.currentDrag );
+							if( ii.notNil ) {
+								chain.units[ii] = nil;
+								chain.units.insert( i, View.currentDrag );
+								chain.units = chain.units.select(_.notNil);
+							} {
+								chain.units = chain.units.insert( i, 
+									View.currentDrag.deepCopy );
+							};
 						} { View.currentDrag.isKindOf( Udef ) } {
 							chain.units = chain.units.insert( i,  U( View.currentDrag ) );
 						}{ View.currentDrag.isKindOf( UnitRack ) } {
@@ -543,8 +552,17 @@ UChainGUI {
 						{ false }
 				})
 				.receiveDragHandler_({ |sink, x, y|
+						var ii;
 						case { View.currentDrag.isKindOf( U ) } {
-							chain.units = chain.units ++ [ View.currentDrag.deepCopy ];
+							ii = chain.units.indexOf( View.currentDrag );
+							if( ii.notNil ) {
+								chain.units[ii] = nil;
+								chain.units = chain.units.select(_.notNil) ++
+									[ View.currentDrag ];
+							} {
+								chain.units = chain.units ++ [ View.currentDrag.deepCopy ];
+							};
+							
 						} { View.currentDrag.isKindOf( Udef ) } {
 							chain.units = chain.units ++ [ U( View.currentDrag ) ];
 						}{ View.currentDrag.isKindOf( UnitRack ) } {
