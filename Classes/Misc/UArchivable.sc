@@ -37,6 +37,7 @@ UArchivable {
 	    sub = sub ? [];
 	    if( res.class == this or: { this.subclasses.includes( res.class ) } ) {
 	        res.filePath_(pathname);
+	        res.readTextArchiveAction;
 		   ^res;
 	    } {
 		    "%:readTextArchive - wrong type (%)\n".postf( this, res );
@@ -52,12 +53,17 @@ UArchivable {
 	    };
 	    filePath = pathname;
     }
+    
+    textArchiveFileExtension { ^nil }
 
     write { |path, overwrite=false, ask=true, successAction, cancelAction|
 	    var writeFunc;
 	    writeFunc = { |overwrite, ask, path|
 		    var text;
 		    text = this.asTextArchive;
+		    if( this.textArchiveFileExtension.notNil ) {
+			    path = path.replaceExtension( this.textArchiveFileExtension );
+		    };
 		    File.checkDo( path, { |f|
 				f.write( text );
 				successAction.value(path);
@@ -121,5 +127,7 @@ UArchivable {
 	}
 
 	onSaveAction{ this.subclassResponsibility(thisMethod) }
+	
+	readTextArchiveAction{ this.subclassResponsibility(thisMethod) }
 
 }

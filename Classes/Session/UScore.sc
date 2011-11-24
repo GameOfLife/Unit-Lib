@@ -627,8 +627,12 @@ UScore : UEvent {
 		});
 		stream << ")";
 	}
+	
+	textArchiveFileExtension { ^"uscore" }
 
 	onSaveAction { this.name = filePath.basename.removeExtension }
+	
+	readTextArchiveAction{ this.name = filePath.basename.removeExtension }
 
 	name_ { |x| name = x; this.changed(\name) }
 }

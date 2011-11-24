@@ -118,8 +118,12 @@ USession : UArchivable{
 	}
 
 	storeArgs { ^this.getInitArgs }
+	
+	textArchiveFileExtension { ^"usession" }
 
 	onSaveAction { this.name = filePath.basename.removeExtension }
+	
+	readTextArchiveAction{ this.name = filePath.basename.removeExtension }
 
 	name_ { |x| name = x; this.changed(\name) }
 
