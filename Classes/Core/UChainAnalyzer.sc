@@ -30,6 +30,7 @@ UChainAudioAnalyzer {
 	
 	*inGetter { ^\getAudioIn }
 	*outGetter { ^\getAudioOut }
+	*mixOutLevelGetter { ^\getAudioMixOutLevel }
 	*allInGetter { ^\audioIns }
 	*allOutGetter { ^\audioOuts }
 	
@@ -46,7 +47,7 @@ UChainAudioAnalyzer {
 		var units;
 		units = chain.units;
 
-		// collects ins and outs in format:
+		// collects ins in format:
 		// [  unit, index-of-unit, [indices], [buses] ]
 		
 		ins = units.collect({ |unit, i| 
@@ -61,6 +62,10 @@ UChainAudioAnalyzer {
 				];
 			});
 		
+		// collects outs in format:
+		// [  unit, index-of-unit, [indices], [buses], [mixoutlevels] ]
+		// mixoutlevels: nil or value; value means it has a mixout
+	
 		outs = units.collect({ |unit, i| 
 			[ unit, i, unit.perform( this.class.allOutGetter ) ]; 
 		})			
@@ -69,7 +74,10 @@ UChainAudioAnalyzer {
 				item ++ [ 
 					item[2].collect({ |index| 
 						item[0].perform( this.class.outGetter, index ) 
-					}) 
+					}),
+					item[2].collect({ |index| 
+						item[0].perform( this.class.mixOutLevelGetter, index ) 
+					})
 				];
 			});
 		
@@ -118,6 +126,11 @@ UChainAudioAnalyzer {
 	ioFor { |mode = \in, i = 0|
 		^switch( mode, \in, { this.insFor( i ) }, \out, { this.outsFor( i ) } );
 	}
+	
+	mixOutLevelsFor { |i = 0|
+		i = this.outsFor( i );
+		^if( i.notNil ) { i[4] } { nil };
+	}
 		
 	numInputsFor { |i = 0|
 		i = this.insFor( i );
@@ -139,6 +152,7 @@ UChainControlAnalyzer : UChainAudioAnalyzer {
 	
 	*inGetter { ^\getControlIn }
 	*outGetter { ^\getControlOut }
+	*mixOutLevelGetter { ^\getControlMixOutLevel }
 	*allInGetter { ^\controlIns }
 	*allOutGetter { ^\controlOuts }
 	

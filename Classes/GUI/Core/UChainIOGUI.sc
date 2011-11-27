@@ -157,6 +157,7 @@ UChainIOGUI : UChainGUI {
 		].do({ |item|
 			var rate, mode;
 			var io, etter, setter, getter;
+			var mixOutSetter;
 			#rate, mode = item;
 			etter = "et" ++ (rate.asString.firstToUpper ++ mode.asString.firstToUpper);
 			setter = ("s" ++ etter).asSymbol;
@@ -170,7 +171,7 @@ UChainIOGUI : UChainGUI {
 				views[ rate ][ mode ] = [ ];
 				
 				io[2].do({ |item, ii|
-					var nb, pu;
+					var nb, pu, mx;
 					
 					StaticText( scrollView, labelWidth @ 14 )
 						.applySkin( RoundView.skin )
@@ -198,7 +199,35 @@ UChainIOGUI : UChainGUI {
 						this.setPopUp( pu, nb.value, i, rate, mode, max[ rate ] );
 					});
 					
-					views[ rate ][ mode ] = views[ rate ][ mode ].add( [nb, pu] );
+					if( (mode === \out) && { io[4][ii].notNil }) {
+						
+						mixOutSetter = "set" ++ rate.asString.firstToUpper ++ "MixOutLevel";
+						mixOutSetter = mixOutSetter.asSymbol;
+							
+						mx = EZSmoothSlider(  scrollView, width@14,
+							"% mix %".format( rate, item ),
+							\amp.asSpec, 
+							{ |vw| 
+								unit.perform( mixOutSetter, ii, vw.value );
+							}, 
+							labelWidth: labelWidth
+						);
+						
+						mx.value = io[4][ii];
+						mx.view.resize = 2;
+						
+						ctrl.put( unit.getIOKey( mode, rate, ii, "lvl" ), {  |obj, what, val|
+							mx.value = val;				
+						});
+						
+						this.setMixSlider( mx, io[3][ii], i, rate );
+						
+						setPopUps = setPopUps.addFunc({
+							this.setMixSlider( mx, nb.value, i, rate );
+						});
+					};
+					
+					views[ rate ][ mode ] = views[ rate ][ mode ].add( [nb, pu, mx] );
 					
 					ctrl.put( unit.getIOKey( mode, rate, ii ), { |obj, what, val|
 						nb.value = val;
@@ -232,6 +261,13 @@ UChainIOGUI : UChainGUI {
 		}.defer;
 	}
 	
+	setMixSlider { |mx, bus = 0, i = 0, rate = \audio|
+		var busConnection;
+		busConnection = analyzers[ rate ].busConnection( \in, bus.asInt, i.asInt );
+		mx.sliderView.string = this.getBusLabel( busConnection, \in, bus );
+		mx.sliderView.hiliteColor = this.getPopUpColor( [busConnection], 0 );
+	}
+	
 	getBusConnections { |i = 0, rate = \audio, mode = \in, max = 10|
 		var items, lastNotNil = 0;
 		var func;
@@ -247,28 +283,27 @@ UChainIOGUI : UChainGUI {
 		^items[..lastNotNil + 1];
 	}
 	
-	prGetPopUpItems { |busConnections, mode = \in|
-		
+	getBusLabel { |busConnection, mode = \in, bus = 0|
 		var prefix;
 		
 		prefix = switch( mode, \in, "from", \out, "to" );
 		
-		^busConnections.collect({ |item, bus|
-			if( item.notNil ) {
-				"% %:% (%)"
-					.format( 
-						prefix,
-						item[1], 
-						item[0].defName,
-						item[2][ 
-							item[3].indexOfEqual( bus.asInt ) 
-						]
-					);
-			} {
-				"no signal"
-			};
-		});
-					
+		^if( busConnection.notNil ) {
+			"% %:% (%)".format( 
+				prefix,
+				busConnection[1], 
+				busConnection[0].defName,
+				busConnection[2][ 
+					busConnection[3].indexOfEqual( bus.asInt ) 
+				]
+			);
+		} {
+			"no signal"
+		};
+	}
+	
+	prGetPopUpItems { |busConnections, mode = \in|
+		^busConnections.collect({ |item, bus| this.getBusLabel( item, mode, bus ); });			
 	}
 
 	getPopUpItems { |i = 0, rate = \audio, mode = \in, max = 10|

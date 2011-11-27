@@ -391,6 +391,13 @@ U : ObjectWithArgs {
 	setControlOut { |id = 0, bus = 0|
 		this.set( this.getIOKey( \out, \control, id ), bus );
 	}
+	setAudioMixOutLevel { |id = 0, level = 0|
+		^this.set( this.getIOKey( \out, \audio, id, "lvl" ), level );
+	}
+	setControlMixOutLevel { |id = 0, level = 0|
+		^this.set( this.getIOKey( \out, \control, id, "lvl" ), level );
+	}
+	
 	
 	getAudioIn { |id = 0|
 		^this.get( this.getIOKey( \in, \audio, id ) );
@@ -403,6 +410,12 @@ U : ObjectWithArgs {
 	}
 	getControlOut { |id = 0|
 		^this.get( this.getIOKey( \out, \control, id ) );
+	}
+	getAudioMixOutLevel { |id = 0|
+		^this.get( this.getIOKey( \out, \audio, id, "lvl" ) );
+	}
+	getControlMixOutLevel { |id = 0|
+		^this.get( this.getIOKey( \out, \control, id, "lvl" ) );
 	}
 	
 	audioIns { ^this.def.audioIns( this ); }
