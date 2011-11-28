@@ -137,15 +137,15 @@ UScoreEditor {
 		score.changed(\numEventsChanged);
 	}
 
-	muteEvents { |events|
+	disableEvents { |events|
 		this.changeScore({
-		    events.do( _.mute );
+		    events.do( _.disable );
 		})
 	}
 
-	unmuteEvents { |events|
+	enableEvents { |events|
 		this.changeScore({
-		    events.do( _.unMute );
+		    events.do( _.enable );
 		})
 	}
 
@@ -155,20 +155,20 @@ UScoreEditor {
 	    })
 	}
 
-	unmuteAll {
+	enableAll {
 	    this.changeScore({
-		    this.unmuteEvents(score.events);
+		    this.enableEvents(score.events);
 		})
 	}
 
-	soloEvents { |events|
+	soloEnableEvents { |events|
 		this.changeScore({
             if( events.size > 0 ) {
                 score.events.do({ |event|
                     if( events.includes( event ) ) {
-                        event.unMute
+                        event.enable
                     } {
-                        event.mute
+                        event.disable
                     };
                 });
             };

@@ -140,16 +140,16 @@ UScoreView {
         this.update
     }
 
-    muteSelected {
-        this.currentEditor.muteEvents(this.selectedEvents)
+    disableSelected {
+        this.currentEditor.disableEvents(this.selectedEvents)
     }
 
-    unmuteSelected {
-        this.currentEditor.unmuteEvents(this.selectedEvents)
+    enableSelected {
+        this.currentEditor.enableEvents(this.selectedEvents)
     }
 
-    soloSelected {
-        this.currentEditor.soloEvents(this.selectedEvents)
+    soloEnableSelected {
+        this.currentEditor.soloEnableEvents(this.selectedEvents)
     }
 
     duplicateSelected {
