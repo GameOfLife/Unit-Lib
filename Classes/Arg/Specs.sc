@@ -69,6 +69,8 @@ ListSpec : Spec {
 	map { |value|
 		^list[ value.asInt ] ?? { list[ defaultIndex ] };
 	}
+
+	storeArgs { ^[list, defaultIndex] }
 	
 }
 
@@ -94,6 +96,8 @@ SMPTESpec : Spec {
 	}
 	
 	constrain { |value| ^value.clip( minval, maxval ); }
+
+	storeArgs { ^[minval, maxval, fps] }
 }
 
 BoolSpec : Spec {
@@ -128,6 +132,8 @@ BoolSpec : Spec {
 	default_ { |value| 
 		default = this.constrain( value );
 	}
+
+	storeArgs { ^[default, trueLabel, falseLabel] }
 }
 
 PointSpec : Spec {
@@ -202,6 +208,10 @@ PointSpec : Spec {
 	
 	unmap { |value|
 		^this.constrain( value.asPoint ).linlin( rect.leftTop, rect.rightBottom, 0, 1, \none );
+	}
+
+	storeArgs {
+	    ^[rect, step, default, units, mode]
 	}
 }
 
@@ -278,7 +288,11 @@ PolarSpec : Spec {
 	
 	unmap { |value|
 		^this.scaleRho( this.constrain( value ), 1/(maxRadius ? 1));
-	}	
+	}
+
+	storeArgs {
+	    ^[maxRadius, step, default, units]
+	}
 }
 
 RectSpec : Spec {
@@ -289,7 +303,7 @@ RectSpec : Spec {
 	// mode can be \point, \polar, \deg_cw, \deg_ccw
 	// only for gui; output will always be Point
 
-	*new { |rect, default, units, mode|
+	*new { |rect, default, units|
 		^super.newCopyArgs( rect ? inf, default, units ? "" ).init;
 	}
 	
@@ -349,7 +363,10 @@ RectSpec : Spec {
 	unmap { |value|
 		^this.constrain( value.asRect ).linlin( rect.leftTop, rect.rightBottom, 0, 1, \none );
 	}
-	
+
+	storeArgs {
+	    ^[rect, default, units]
+	}
 }
 
 RangeSpec : ControlSpec {
@@ -470,6 +487,8 @@ RichBufferSpec : Spec {
 			^RichBuffer( numChannels, numFrames.default );
 		};
 	}
+
+	storeArgs { ^[numChannels, numFrames] }
 	
 }
 
@@ -621,6 +640,8 @@ IntegerSpec : Spec {
 	default_ { |value|
 		default = this.constrain( value );
 	}
+
+    storeArgs { ^[default, minval, maxval] }
 }
 
 PositiveIntegerSpec : IntegerSpec {
@@ -648,6 +669,8 @@ PositiveRealSpec : Spec {
 	default_ { |value|
 		default = this.constrain( value );
 	}
+
+	storeArgs { ^[default] }
 }
 
 + Spec {
