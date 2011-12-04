@@ -30,6 +30,7 @@ x.postln; // -> [ an ArgSpec(a, 1), an ArgSpec(b, 2) ]
 ArgSpec : Spec {
 	var <>name, <>default, <>spec;
 	var <>private = false;
+	var <>mode = \sync; // \sync, \normal, \init
 	var >label;
 	
 	*new { |name, default, spec, private|

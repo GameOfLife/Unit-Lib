@@ -25,10 +25,10 @@ ObjectView {
 	var <>action;
 		// views can be anything; i.e. the output of the makeFunc in the def
 	
-	*new { |parent, bounds, object, key, spec, controller|
-		^super.newCopyArgs( object, key, spec ).init( parent, bounds, controller );	}
+	*new { |parent, bounds, object, key, spec, controller, label|
+		^super.newCopyArgs( object, key, spec ).init( parent, bounds, controller, label);	}
 		
-	init { |inParent, bounds, controller|
+	init { |inParent, bounds, controller, label|
 		var margin = 0, value;
 		parent = inParent;
 		if( parent.isNil ) { parent = Window( "%:%".format(object) ).front.decorate };
@@ -48,10 +48,10 @@ ObjectView {
 		if( bounds.isNumber ) { bounds = 
 			(bounds @ ((spec.viewNumLines * viewHeight) + ((spec.viewNumLines-1) * 4))) 
 		};
-		this.makeView( bounds, controller );
+		this.makeView( bounds, controller, label );
 	}
 	
-	makeView { | bounds, controller |
+	makeView { | bounds, controller, label |
 		var createdController = false, setter;
 		
 		controller = controller ?? { 
@@ -67,7 +67,7 @@ ObjectView {
 		
 		setter = key.asSetter;
 		
-		views = spec.makeView( composite, bounds.asRect.moveTo(0,0), key, 
+		views = spec.makeView( composite, bounds.asRect.moveTo(0,0), label ? key, 
 				{ |vw, value| 
 					object.perform( key.asSetter, value ); 
 					action.value( this, value ); 

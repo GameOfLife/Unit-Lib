@@ -79,7 +79,9 @@ UGUI {
 			
 			if( argSpec.private.not ) { // show only if not private
 				vw = ObjectView( composite, nil, unit, key, 
-						argSpec.spec, controller );
+					argSpec.spec, controller,
+					if( argSpec.mode == \init ) { key ++ " (i)" }
+				);
 				
 				vw.action = { action.value( this, key, value ); };
 				
