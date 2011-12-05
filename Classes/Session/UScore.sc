@@ -284,7 +284,6 @@ UScore : UEvent {
 
     arrayForPlayTask{ |startPos, assumePrepared = false, startEventsActiveAtStartPos = true, loop = false|
         var evs, prepareEvents, startEvents, releaseEvents, allEvents, doPrepare;
-
         evs = this.eventsThatWillPlay(startPos,startEventsActiveAtStartPos).sort;
 
 		prepareEvents = if(assumePrepared){evs.select({ |item| item.prepareTime >= startPos })}{evs};
@@ -292,7 +291,9 @@ UScore : UEvent {
 		releaseEvents = events
 			.select({ |item| (item.releaseSelf != true) && { (item.duration < inf) && { item.eventEndTime >= startPos } && item.isFolder.not } })
 			.sort({ |a,b| a.eventEndTime <= b.eventEndTime });
-
+        // returns collection of [duration, type, event]
+        // where type can be:
+        // 0 - prepare, 1 -start, 2 - release
 		allEvents = prepareEvents.collect{ |x| [x.prepareTime, 0, x]}
          ++ startEvents.collect{ |x| [ if(startEventsActiveAtStartPos) {x.startTime.max(startPos)}{ x.startTime }, 1, x]}
          ++ releaseEvents.collect{ |x| [x.eventEndTime, 2, x]};
@@ -408,14 +409,12 @@ UScore : UEvent {
             if( updatePosition ) {
                 dur = this.duration;
                 updatePosTask = Task({
-                    var t = startPos;
                     var waitTime = 0.1;
                     (startPos - preparePos).wait;
-                    while({t <= dur}, {
+                    while({playState == \playing}, {
                         waitTime.wait;
                         if(updatePos) {
-                            t = t + waitTime;
-                            this.pos_(t);
+                            this.pos = this.pos;
                         }
                     });
 
@@ -434,7 +433,6 @@ UScore : UEvent {
             }{
                 this.playState_(\playing);
             };
-
             playTask = Task({
                 var pos = preparePos;
                 allEvents.do({ |item|
@@ -463,19 +461,26 @@ UScore : UEvent {
 		    this.changed( \start, startPos );
         } {
 
-            if(loop) {
-                //if there is nothing to play in this run of the score and we are looping, just wait until the end
-                //and start again
+            if(this.duration == inf) {
+                //if there is nothing to play but the score is infinite just keep updating the position.
+                this.playState_(\playing);
                 updatePosFunc.value;
-                fork{
-                    this.changed(\playing);
-                    (this.duration - startPos).wait;
-                    this.pos = 0;
-                    this.prStartTasks(targets, 0, assumePrepared, updatePosition,
-                        startEventsActiveAtStartPos, loop)
-                }
             } {
-                this.playState_(\stopped);
+                if(loop) {
+                    //if there is nothing to play in this run of the score and we are looping, just wait until the end
+                    //and start again
+                    updatePosFunc.value;
+                    fork{
+                        this.playState_(\playing);
+                        (this.duration - startPos).wait;
+                        this.pos = 0;
+                        this.prStartTasks(targets, 0, assumePrepared, updatePosition,
+                            startEventsActiveAtStartPos, loop)
+                    }
+
+                } {
+                    this.playState_(\stopped);
+                }
             }
         };
 
@@ -534,7 +539,7 @@ UScore : UEvent {
 
 	resume { |targets|
 	    if(playState == \paused){
-		    this.prStart( targets, pausedAt, true, false, true, false, true );
+		    this.prStart( targets, pausedAt, true, false, true, false, loop );
 		    events.select(_.isFolder).do( _.prSubScoreResume(targets) );
 		    pausedAt = nil;
 		}
