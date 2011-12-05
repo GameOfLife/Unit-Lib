@@ -30,12 +30,19 @@ UChain : UEvent {
 	classvar <>verbose = false;
 	classvar <>groupDict;
 	
+	classvar <>makeDefaultFunc;
+
 	var <units; //, <>groups;
 	var <prepareTasks;
 	var <>preparedServers;
 	var <muted = false;
 	
-	*initClass { groupDict = IdentityDictionary( ) }
+	*initClass {
+		groupDict = IdentityDictionary( );
+		makeDefaultFunc = {
+			UChain( [ \sine, [ \freq, 440 ] ], \output ).duration_(10).fadeIn_(1).fadeOut_(1);
+		};
+	}
 	
 	*new { |...args|
 		^super.new.init( args );
@@ -78,6 +85,9 @@ UChain : UEvent {
 	}
 
     name { ^units.collect(_.defName).asString }
+
+    *default_ { |chain| makeDefaultFunc = { chain.deepCopy } }
+    *default { ^makeDefaultFunc.value; }
 
     //will this work ? Yes
 	duplicate{

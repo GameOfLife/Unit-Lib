@@ -118,7 +118,7 @@ UScoreEditor {
 
     addEvent{
         this.changeScore({
-            score.addEventToEmptyTrack( UChain(\sine,\output).duration_(10).fadeIn_(1).fadeOut_(1).startTime_(score.pos) )
+            score.addEventToEmptyTrack( UChain.default.startTime_(score.pos) )
         });
         score.changed(\numEventsChanged);
     }
