@@ -79,8 +79,8 @@ UScoreEditorGui_TransportBar {
 		    views[\update].value = updatePos.binaryValue;
 		});
 
-		scoreController.put(\pos, { |who,what,pos|
-            views[\counter].value = pos;
+		scoreController.put(\pos, { |who,what|
+            views[\counter].value = this.score.pos;
 		});
 
 		views[\play].value = this.score.isPlaying.binaryValue;

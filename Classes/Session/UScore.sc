@@ -417,7 +417,7 @@ UScore : UEvent {
                     while({playState == \playing}, {
                         waitTime.wait;
                         if(updatePos) {
-                            this.pos = this.pos;
+                            this.changed(\pos);
                         }
                     });
 
