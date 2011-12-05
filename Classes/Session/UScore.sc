@@ -26,7 +26,7 @@ UScore : UEvent {
 	*/
 
 	//public
-	var <>events, <name = "untitled";
+	var <events, <name = "untitled";
 	var pos = 0, <>loop = false;
 	var <playState = \stopped, <updatePos = true;
 	var <soloed, <softMuted;
@@ -50,7 +50,7 @@ UScore : UEvent {
 
 	//private
 	var <playTask, <updatePosTask, <startedAt, <pausedAt;
-	
+
 	*initClass {
 		activeScores = Set();
 	}
@@ -81,6 +81,11 @@ UScore : UEvent {
 	    soloed = [];
 	    softMuted = [];
 	    this.changed( \init );
+	}
+
+	events_ { |evs|
+	    events = evs;
+	    this.changed(\events);
 	}
 
 	isPlaying{ ^playState == \playing }
@@ -138,7 +143,7 @@ UScore : UEvent {
     * newEvents -> UEvent or Array[UEvent]
     */
 	add { |newEvents|
-	    events = events ++ newEvents.asCollection;
+	    this.events_(events ++ newEvents.asCollection);
 	    this.changed(\numEventsChanged)
 	}
 	<| { |newEvents| this.add(newEvents) }
@@ -234,8 +239,8 @@ UScore : UEvent {
 
 	addEventToEmptyTrack { |evt|
 		this.moveEventToEmptyTrack(evt);
-		events = events.add( evt );
-		 this.changed(\numEventsChanged)
+		this.events_(events.add( evt ));
+		this.changed(\numEventsChanged)
 	}
 
 	addEventsToEmptyRegion { |events|
@@ -253,7 +258,7 @@ UScore : UEvent {
 
 	addEventToCompletelyEmptyTrack { |evt|
 		evt.track = this.findCompletelyEmptyTrack;
-		events = events.add( evt );
+		this.events_(events.add( evt ));
 
 	}
 

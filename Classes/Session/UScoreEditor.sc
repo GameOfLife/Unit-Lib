@@ -132,7 +132,7 @@ UScoreEditor {
 
 	deleteEvents { |events|
 		this.changeScore({
-		    events.do( score.events.remove(_) );
+		    score.events_(score.events.select(events.includes(_).not))
 		});
 		score.changed(\numEventsChanged);
 	}
@@ -180,17 +180,15 @@ UScoreEditor {
 
 		if( events.size > 0 ) {
 		    this.changeScore({
-                events.do({ |item|
-                    score.events.remove( item );
-                });
+                score.events_(score.events.select(events.includes(_).not));
                 folderStartTime = events.sort[0].startTime;
-                score.events = score.events.add(
+                score.events_(score.events.add(
                     UScore(
                         *events.collect({ |event|
                             event.startTime_( event.startTime - folderStartTime )
                         })
                     ).startTime_(folderStartTime).track_(events[0].track)
-                );
+                ));
             })
 		};
 		score.changed(\numEventsChanged);

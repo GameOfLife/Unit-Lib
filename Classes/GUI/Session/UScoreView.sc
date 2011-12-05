@@ -31,7 +31,7 @@ UScoreView {
      var <>numTracks = 16;
      var <scoreView, <scoreListView, <mainComposite, font, <parent, <bounds;
      var <>scoreList;
-     var <currentScoreEditorController, <scoreController;
+     var <currentScoreEditorController, <scoreController, <eventControllers = #[];
 
      *new{ |parent, bounds, scoreEditor| ^super.new.init(scoreEditor, parent,bounds) }
 
@@ -64,11 +64,15 @@ UScoreView {
         if( scoreController.notNil ) {
 	        scoreController.remove;
 	    };
-        scoreController = SimpleController( scoreEditorsList.last.score );
+        scoreController = SimpleController( this.currentScore );
 
         scoreController.put(\pos, {
 		    { this.update }.defer;
 		});
+
+		scoreController.put(\events, {
+            this.makeEventControllers;
+        });
 
 		scoreController.put(\something, {
 		    this.update;
@@ -78,8 +82,19 @@ UScoreView {
 		});
 	}
 
+	makeEventControllers {
+	    eventControllers.do(_.remove);
+	    eventControllers = this.currentScore.collect{ |e|
+            var s = SimpleController(e);
+            [\startTime,\dur,\fadeIn,\fadeOut].do{ |key|
+                s.put(key,{ { this.update }.defer; })
+            };
+            s
+        }
+	}
+
 	remove {
-        [currentScoreEditorController, scoreController, usessionMouseEventsManager].do(_.remove)
+        ([currentScoreEditorController, scoreController, usessionMouseEventsManager]++eventControllers).do(_.remove)
     }
 
 	update {
