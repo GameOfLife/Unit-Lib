@@ -3,7 +3,7 @@ var udefs;
 
 udefs = [1,2,3,4,5,6,7,8,10,12,16,24,32].collect({ |numChannels|
 	HiddenUdef( "bufSoundFile_%".format( numChannels ).asSymbol, { |amp = 1|
-		UOut.ar( 0, BufSndFilePlayer.ar( numChannels ) * amp, true );
+		UMixOut.ar( 0, BufSndFilePlayer.ar( numChannels ) * amp, 0, true );
 	}, [ [ \soundFile, nil, BufSndFileSpec(nil) ] ], \soundFile )
 });
 
