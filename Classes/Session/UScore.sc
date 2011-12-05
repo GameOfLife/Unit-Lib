@@ -413,7 +413,7 @@ UScore : UEvent {
                 updatePosTask = Task({
                     var waitTime = 0.1;
                     var w = (startPos - preparePos);
-                    if(w == inf){ waitError.throw}{w.wait};
+                    if(w == inf){ waitError.warn; updatePosFunc.stop; }{w.wait};
                     while({playState == \playing}, {
                         waitTime.wait;
                         if(updatePos) {
@@ -430,7 +430,7 @@ UScore : UEvent {
         if( allEvents.size > 0) {
             if(deltaToStart !=0){
                 fork{
-                    if(deltaToStart == inf){ waitError.throw}{deltaToStart.wait};
+                    if(deltaToStart == inf){ waitError.warn;}{deltaToStart.wait};
                     this.playState_(\playing);
                 }
             }{
@@ -441,7 +441,7 @@ UScore : UEvent {
                 var w;
                 allEvents.do({ |item|
                     w = item[0] - pos;
-                    if(w == inf){ waitError.throw }{w.wait};
+                    if(w == inf){ waitError.warn }{w.wait};
                     pos = item[0];
                     //"prepare % at %, %".format( events.indexOf(item),
                     //	pos, thisThread.seconds ).postln;
@@ -449,7 +449,7 @@ UScore : UEvent {
                 });
                 if( this.isFinite ) {
                     w = this.duration - pos;
-                    if(w == inf){ waitError.throw }{w.wait};
+                    if(w == inf){ waitError.warn }{w.wait};
                     if(loop) {
                         this.pos = 0;
                         this.prStartTasks(targets, 0, assumePrepared, updatePosition,
@@ -480,7 +480,7 @@ UScore : UEvent {
                         var w;
                         this.playState_(\playing);
                         w = this.duration - startPos;
-                        if(w == inf){ waitError.throw }{w.wait};
+                        if(w == inf){ waitError.warn }{w.wait};
                         this.pos = 0;
                         this.prStartTasks(targets, 0, assumePrepared, updatePosition,
                             startEventsActiveAtStartPos, loop)
