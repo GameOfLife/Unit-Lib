@@ -76,7 +76,7 @@ UScoreEditor {
 	storeUndoState {
 
 		redoStates = List.new;
-		undoStates.add( score.duplicate.events );
+		undoStates.add( score.events.collect( _.duplicate ) );
 		if(undoStates.size > maxUndoStates) {
 			undoStates.removeAt(0);
 		}
