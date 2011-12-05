@@ -370,7 +370,9 @@ UScore : UEvent {
 	
 	prStartTasks { |targets, startPos = 0, assumePrepared = false, updatePosition = true, startEventsActiveAtStartPos = true, loop = false|
         var prepareEvents, startEvents, releaseEvents, prepStartRelEvents, preparePos,
-            allEvents, deltaToStart,dur, actions, needsPrepare, firtPrepareTime, updatePosFunc;
+            allEvents, deltaToStart,dur, actions, needsPrepare, firtPrepareTime, updatePosFunc, waitError;
+
+        waitError = "prStartTasks - was going to call .wait on inf";
 
         if(startEventsActiveAtStartPos) {
             actions = [
@@ -410,7 +412,8 @@ UScore : UEvent {
                 dur = this.duration;
                 updatePosTask = Task({
                     var waitTime = 0.1;
-                    (startPos - preparePos).wait;
+                    var w = (startPos - preparePos);
+                    if(w == inf){ waitError.throw}{w.wait};
                     while({playState == \playing}, {
                         waitTime.wait;
                         if(updatePos) {
@@ -427,7 +430,7 @@ UScore : UEvent {
         if( allEvents.size > 0) {
             if(deltaToStart !=0){
                 fork{
-                    deltaToStart.wait;
+                    if(deltaToStart == inf){ waitError.throw}{deltaToStart.wait};
                     this.playState_(\playing);
                 }
             }{
@@ -435,15 +438,18 @@ UScore : UEvent {
             };
             playTask = Task({
                 var pos = preparePos;
+                var w;
                 allEvents.do({ |item|
-                    (item[0] - pos).wait;
+                    w = item[0] - pos;
+                    if(w == inf){ waitError.throw }{w.wait};
                     pos = item[0];
                     //"prepare % at %, %".format( events.indexOf(item),
                     //	pos, thisThread.seconds ).postln;
                     actions[item[1]].value(item[2], (startPos - item[2].startTime).max(0) );
                 });
                 if( this.isFinite ) {
-                    (this.duration - pos).wait;
+                    w = this.duration - pos;
+                    if(w == inf){ waitError.throw }{w.wait};
                     if(loop) {
                         this.pos = 0;
                         this.prStartTasks(targets, 0, assumePrepared, updatePosition,
@@ -471,8 +477,10 @@ UScore : UEvent {
                     //and start again
                     updatePosFunc.value;
                     fork{
+                        var w;
                         this.playState_(\playing);
-                        (this.duration - startPos).wait;
+                        w = this.duration - startPos;
+                        if(w == inf){ waitError.throw }{w.wait};
                         this.pos = 0;
                         this.prStartTasks(targets, 0, assumePrepared, updatePosition,
                             startEventsActiveAtStartPos, loop)
