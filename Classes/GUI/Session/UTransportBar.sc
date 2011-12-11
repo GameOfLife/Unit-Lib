@@ -99,7 +99,7 @@ UTransportView {
 		});
 
 		scoreController.put(\pos, { |who,what,pos|
-            views[\counter].value = pos;
+            views[\counter].value = score.pos;
 		});
 
 		views[\play].value = score.isPlaying.binaryValue;
