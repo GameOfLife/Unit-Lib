@@ -484,8 +484,12 @@ RichBufferSpec : Spec {
 			value.numChannels = numChannels.asCollection.first;
 			^value;
 		} {
-			^RichBuffer( numChannels, numFrames.default );
+			^RichBuffer( numFrames.default, numChannels );
 		};
+	}
+	
+	default { 
+		^RichBuffer( numFrames.default, numChannels );
 	}
 
 	storeArgs { ^[numChannels, numFrames] }
