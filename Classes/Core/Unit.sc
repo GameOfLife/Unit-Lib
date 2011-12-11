@@ -300,6 +300,9 @@ U : ObjectWithArgs {
 		if( in.isKindOf( this.class.defClass ) ) {
 			def = in;
 			defName = in.name;
+			if( defName.notNil && { Udef.all.keys.includes( defName ) } ) {
+				def = nil;
+			};
 		} {
 			defName = in.asSymbol;
 			def = nil;
