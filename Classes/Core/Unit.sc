@@ -300,7 +300,7 @@ U : ObjectWithArgs {
 		if( in.isKindOf( this.class.defClass ) ) {
 			def = in;
 			defName = in.name;
-			if( defName.notNil && { Udef.all.keys.includes( defName ) } ) {
+			if( defName.notNil && { defName.asUdef == def } ) {
 				def = nil;
 			};
 		} {
