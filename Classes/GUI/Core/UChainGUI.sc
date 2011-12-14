@@ -112,7 +112,7 @@ UChainGUI {
 						startAction = { 
 							chain.start;
 							releaseTask = {
-								(chain.dur - chain.fadeOut).wait;
+								(chain.dur - chain.fadeOut).max(0).wait;
 								chain.release;
 							}.fork;
 						};
