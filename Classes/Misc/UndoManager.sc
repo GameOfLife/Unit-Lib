@@ -28,6 +28,13 @@ UndoManager {
 		current = 0;
 		if( history.size > max ) { history = history[..max+1] };
 		this.changed( \add );
+		if(  this.verbose  ) {
+			"% :: added state\n\tnew size: %)\n\tmessage: %\n".postf( 
+				thisMethod.asString, 
+				history.size,
+				msg 
+			);
+		};
 	}
 		
 	undo { |num = 1|
@@ -36,6 +43,12 @@ UndoManager {
 			current = num + current;
 			obj = history[current][0].copy;
 			this.changed( \undo );
+			if(  this.verbose  ) {
+				"% :: % ".postf( 
+					thisMethod.asString, 
+					num
+				);
+			};
 			^obj;
 		} { 
 			if( this.verbose ) {
@@ -56,6 +69,9 @@ UndoManager {
 		history = [];
 		current = 0;
 		this.changed( \clear );
+		if(  this.verbose  ) {
+			"% :: cleared".postf( thisMethod.asString );
+		};
 	}
 	
 	post {
