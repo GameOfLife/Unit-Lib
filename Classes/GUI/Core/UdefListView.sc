@@ -82,7 +82,7 @@ UdefListView {
 		if( parent.notNil ) {
 			bounds = bounds ?? { parent.bounds.moveTo(0,0).insetBy(4,4) };
 		} {
-			bounds = bounds ? 200@400;
+			bounds = bounds ? 220@400;
 		};
 		
 		view = EZCompositeView( parent, bounds ).resize_(5);
@@ -155,18 +155,11 @@ UdefListView {
 		RoundView.useWithSkin( UChainGUI.skin ++ (RoundView.skin ? ()), {
 			var comp;
 			
-			comp = CompositeView( views[ \scrollview ], (bounds.width - 18)@16 );
+			comp = CompositeView( views[ \scrollview ], (bounds.width - 18)@14 );
 			comp.addFlowLayout( 0@0, 4@0 );
-				
-			SmoothButton(comp, 50@16 )
-				.label_( "refresh" )
-				.border_(1)
-				.radius_(2)
-				.canFocus_(false)
-				.action_({ { this.rebuild }.defer( 0.01 ) });
-				
-			SmoothButton(comp, 70@16 )
-				.label_([ "expand all", "collapse all" ])
+			
+			SmoothButton(comp, 50@14 )
+				.label_([ "show all", "hide all" ])
 				.hiliteColor_( Color.clear )
 				.border_(1)
 				.radius_(2)
@@ -176,6 +169,28 @@ UdefListView {
 						1, { this.expandAll },
 						0, { this.collapseAll }
 					);
+				});
+				
+			SmoothButton(comp, 50@14 )
+				.label_( "refresh" )
+				.border_(1)
+				.radius_(2)
+				.canFocus_(false)
+				.action_({ { this.rebuild }.defer( 0.01 ) });
+				
+			SmoothButton(comp, 50@14 )
+				.label_([ "load all" ])
+				.hiliteColor_( Color.clear )
+				.border_(1)
+				.radius_(2)
+				.canFocus_(false)
+				.action_({ |bt|
+					Udef.loadAllFromDefaultDirectory.collect(_.synthDef).flat.select(_.notNil)
+						.do({ |def|
+							UServerCenter.servers.do({ |srv| def.send( srv ) });
+					});
+					UnitRack.loadAllFromDefaultDirectory;
+					{ this.rebuild }.defer( 0.01 );
 				});
 				
 			StaticText(views[ \scrollview],100@25).string_("UDefs");

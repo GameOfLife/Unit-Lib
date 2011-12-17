@@ -118,10 +118,14 @@ LoadBalancer {
 	}
 	
 	doesNotUnderstand { |selector ...args|
+		var res;
 		servers[0] !? { 
-			servers[0].perform( selector, *args );
+			res = servers[0].perform( selector, *args );
 		};
+		if( res == servers[0] ) { ^this } { ^res };
 	}
+	
+	asArray { ^servers }
 }
 
 + Server {
