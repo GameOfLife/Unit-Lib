@@ -46,6 +46,7 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 				};
 			}).select(_.notNil);
 			args = argSpecs.collect({ |item| [ item.name, item.default ] }).flatten(1);
+			this.changed( \init );
 		} {
 			"MassEditU:init - not all units are of the same Udef".warn;
 		};
@@ -103,6 +104,8 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 	}
 	
 	defName { ^((this.def !? { this.def.name }).asString + "(% units)".format( units.size )).asSymbol }
+	
+	def_ { |def|  units.do(_.def_( def ) ); this.init( units ); }
 	
 }
 

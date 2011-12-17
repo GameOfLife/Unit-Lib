@@ -308,6 +308,9 @@ UChainGUI {
 	
 	makeUnitHeader { |units, margin, gap|
 		var comp, header, min, io, defs, code;
+		var notMassEdit;
+		
+		notMassEdit = chain.class != MassEditUChain;
 		
 		comp = CompositeView( composite, (composite.bounds.width - (margin.x * 2))@16 )
 			.resize_(2);
@@ -317,7 +320,8 @@ UChainGUI {
 				.string_( " units" )
 				.align_( \left )
 				.resize_(2);
-		if( chain.class != MassEditUChain ) {
+				
+		if( notMassEdit ) {
             io = SmoothButton( comp, Rect( comp.bounds.right - (36), 1, 36, 12 ) )
                 .label_( "i/o" )
                 .border_( 1 )
@@ -332,7 +336,7 @@ UChainGUI {
 
                 }).resize_(3);
             code = SmoothButton( comp,
-                    Rect( comp.bounds.right - (36 + if( chain.class != MassEditUChain ) {4 + 36}{0}),
+                    Rect( comp.bounds.right - (36 + 4 + 36),
                          1, 36, 12 ) )
                 .label_( "code" )
                 .border_( 1 )
@@ -348,7 +352,7 @@ UChainGUI {
 		};
 
 		defs = SmoothButton( comp, 
-				Rect( comp.bounds.right - (36 + if( chain.class != MassEditUChain ) {4 + 36 + 4 + 36}{0}),
+				Rect( comp.bounds.right - (36 + if( notMassEdit ) {4 + 36 + 4 + 36} {0}),
 					 1, 36, 12 ) )
 			.label_( "defs" )
 			.border_( 1 )
@@ -368,6 +372,9 @@ UChainGUI {
 		var comp, uview;
 		var addLast, ug, header;
 		var width;
+		var notMassEdit;
+		
+		notMassEdit = chain.class != MassEditUChain;
 		
 		width = scrollView.bounds.width - 12 - (margin.x * 2);
 		
@@ -422,45 +429,48 @@ UChainGUI {
 		ug = units.collect({ |unit, i|
 			var header, comp, uview, plus, min, defs, io;
 			var addBefore;
-			
+				
+					
 			addBefore = UserView( scrollView, width@6 )
 				.resize_(2);
-					
-			addBefore.canReceiveDragHandler_({ |sink|
-					var drg;
-					drg = View.currentDrag;
-					case { drg.isKindOf( Udef ) } 
-						{ true }
-						{ drg.isKindOf( UnitRack ) }
-                        { true }
-						{ [ Symbol, String ].includes( drg.class ) }
-						{ Udef.all.keys.includes( drg.asSymbol ) }
-						{ drg.isKindOf( U ) }
-						{ true }
-						{ false }
-				})
-				.receiveDragHandler_({ |sink, x, y|
-						var ii;
-						case { View.currentDrag.isKindOf( U ) } {
-							ii = chain.units.indexOf( View.currentDrag );
-							if( ii.notNil ) {
-								chain.units[ii] = nil;
-								chain.units.insert( i, View.currentDrag );
-								chain.units = chain.units.select(_.notNil);
-							} {
+			
+			if( notMassEdit ) {
+				addBefore.canReceiveDragHandler_({ |sink|
+						var drg;
+						drg = View.currentDrag;
+						case { drg.isKindOf( Udef ) } 
+							{ true }
+							{ drg.isKindOf( UnitRack ) }
+	                        { true }
+							{ [ Symbol, String ].includes( drg.class ) }
+							{ Udef.all.keys.includes( drg.asSymbol ) }
+							{ drg.isKindOf( U ) }
+							{ true }
+							{ false }
+					})
+					.receiveDragHandler_({ |sink, x, y|
+							var ii;
+							case { View.currentDrag.isKindOf( U ) } {
+								ii = chain.units.indexOf( View.currentDrag );
+								if( ii.notNil ) {
+									chain.units[ii] = nil;
+									chain.units.insert( i, View.currentDrag );
+									chain.units = chain.units.select(_.notNil);
+								} {
+									chain.units = chain.units.insert( i, 
+										View.currentDrag.deepCopy );
+								};
+							} { View.currentDrag.isKindOf( Udef ) } {
+								chain.units = chain.units.insert( i,  U( View.currentDrag ) );
+							}{ View.currentDrag.isKindOf( UnitRack ) } {
+	                           		chain.insertCollection( i, View.currentDrag.units ++ [ unit ]);                        
+	                           }{   [ Symbol, String ].includes( View.currentDrag.class )  } {
 								chain.units = chain.units.insert( i, 
-									View.currentDrag.deepCopy );
+									U( View.currentDrag.asSymbol )
+								);
 							};
-						} { View.currentDrag.isKindOf( Udef ) } {
-							chain.units = chain.units.insert( i,  U( View.currentDrag ) );
-						}{ View.currentDrag.isKindOf( UnitRack ) } {
-                           		chain.insertCollection( i, View.currentDrag.units ++ [ unit ]);                        
-                           }{   [ Symbol, String ].includes( View.currentDrag.class )  } {
-							chain.units = chain.units.insert( i, 
-								U( View.currentDrag.asSymbol )
-							);
-						};
-				});
+					});
+			};
 		
 			comp = CompositeView( scrollView, width@14 )
 				.resize_(2);
@@ -476,48 +486,49 @@ UChainGUI {
 				);
 			
 			
-			if( chain.class != MassEditUChain ) {
+			//if( chain.class != MassEditUChain )
 				
-				uview = UserView( comp, comp.bounds.moveTo(0,0) );
-				
-				uview.canReceiveDragHandler_({ |sink|
-					var drg;
-					drg = View.currentDrag;
-					case { drg.isKindOf( Udef ) } 
-						{ true }
-						{ drg.isKindOf( UnitRack ) }
+			uview = UserView( comp, comp.bounds.moveTo(0,0) );
+			
+			uview.canReceiveDragHandler_({ |sink|
+				var drg;
+				drg = View.currentDrag;
+				case { drg.isKindOf( Udef ) } 
+					{ true }
+					{ drg.isKindOf( UnitRack ) }
                         { true }
-						{ [ Symbol, String ].includes( drg.class ) }
-						{ Udef.all.keys.includes( drg.asSymbol ) }
-						{ drg.isKindOf( U ) }
-						{ true }
-						{ false }
-				})
-				.receiveDragHandler_({ |sink, x, y|
-					var u, ii;
-					case { View.currentDrag.isKindOf( U ) } {
-						u = View.currentDrag;
-						ii = chain.units.indexOf( u );
-						if( ii.notNil ) { 
-							chain.units[ii] = unit; 
-							chain.units[i] = u;
-						} {
-							chain.units[ i ] = u.deepCopy;
-						};
-						chain.units = chain.units; // force refresch
-						
-					} { View.currentDrag.isKindOf( UnitRack ) } {
+					{ [ Symbol, String ].includes( drg.class ) }
+					{ Udef.all.keys.includes( drg.asSymbol ) }
+					{ drg.isKindOf( U ) }
+					{ true }
+					{ false }
+			})
+			.receiveDragHandler_({ |sink, x, y|
+				var u, ii;
+				case { View.currentDrag.isKindOf( U ) } {
+					u = View.currentDrag;
+					ii = chain.units.indexOf( u );
+					if( ii.notNil ) { 
+						chain.units[ii] = unit; 
+						chain.units[i] = u;
+					} {
+						chain.units[ i ] = u.deepCopy;
+					};
+					chain.units = chain.units; // force refresch
+					
+				} { View.currentDrag.isKindOf( UnitRack ) } {
                         chain.insertCollection( i, View.currentDrag.units );
                     } { View.currentDrag.isKindOf( Udef ) } {
-						unit.def = View.currentDrag;
-					} {   [ Symbol, String ].includes( View.currentDrag.class )  } {
-						unit.def = View.currentDrag.asSymbol.asUdef;
-					};
-				})
-				.beginDragAction_({ 
-					unit;
-				});
-				
+					unit.def = View.currentDrag;
+				} {   [ Symbol, String ].includes( View.currentDrag.class )  } {
+					unit.def = View.currentDrag.asSymbol.asUdef;
+				};
+			})
+			.beginDragAction_({ 
+				unit;
+			});
+			
+			if( notMassEdit ) {	
 				min = SmoothButton( comp, 
 							Rect( comp.bounds.right - (12 + 4 + 12), 1, 12, 12 ) )
 						.label_( '-' )
@@ -537,9 +548,8 @@ UChainGUI {
 					.action_({
 						chain.units = chain.units.insert( i, unit.deepCopy );
 					}).resize_(3);
+			};	
 					
-			};
-						
 			unit.addDependant( unitInitFunc );
 			header.onClose_({ unit.removeDependant( unitInitFunc ) });
 			unit.gui( scrollView, 
@@ -549,7 +559,7 @@ UChainGUI {
 			);
 		});
 		
-		if( units.size > 0 ) {
+		if( notMassEdit && { units.size > 0 } ) {
 			addLast = UserView( scrollView, width@6 )
 				.resize_(2);
 					
