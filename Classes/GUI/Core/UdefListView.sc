@@ -137,10 +137,24 @@ UdefListView {
                 .applySkin( RoundView.skin ? () );
 
             udefs.do({ |udef|
-                DragSource( views[ cat ], (bounds.width - 36)@18 )
+	            var hasFile = false, wd = 36;
+	            if( udef.isKindOf( GenericDef ) ) {
+		            hasFile = Udef.findDefFilePath( udef.name ).notNil;
+		            if( hasFile ) { wd = 36 + 4 + 18 };
+	            };
+                DragSource( views[ cat ], (bounds.width - wd)@18 )
                     .object_( udef )
                     .string_( " " ++ udef.name.asString )
                     .applySkin( RoundView.skin ? () );
+                  
+                if( hasFile ) {
+	               SmoothButton( views[ cat ], 18@18 )
+	                	.label_( \document )
+	                	.radius_(2)
+	                	.border_(1)
+	                	.resize_(3)
+	                	.action_({ udef.openDefFile });
+                };
             });
             
             collapsed[ cat ] = views[ cat ].collapsed;
