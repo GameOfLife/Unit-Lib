@@ -153,6 +153,7 @@ UdefListView {
 	                	.radius_(2)
 	                	.border_(1)
 	                	.resize_(3)
+	                	.canFocus_( false )
 	                	.action_({ udef.openDefFile });
                 };
             });
