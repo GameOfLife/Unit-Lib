@@ -551,6 +551,11 @@ UChain : UEvent {
 		preparedServers = [];
 	}
 	
+	disposeSynths {
+		units.do( _.disposeSynths );
+		this.groups.copy.do( _.changed( \n_end ) );
+	}
+	
 	resetGroups { this.groups = nil; } // after unexpected server quit
 	
 	// indexing / access

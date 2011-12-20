@@ -669,6 +669,10 @@ U : ObjectWithArgs {
 	    };
 	    preparedServers = [];
 	}
+	
+	disposeSynths {
+		this.synths.copy.do(_.changed( \n_end ));
+	}
 
 	disposeArgsFor { |server|
 	    this.values.do{ |val|
