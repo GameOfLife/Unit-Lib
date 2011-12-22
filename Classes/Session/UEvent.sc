@@ -69,5 +69,33 @@ UEvent : UArchivable {
             };
         }
     }
+    
+    asScore { |duration, timeOffset=0|
+	    
+	    if( duration.isNil ) {
+		    duration = this.finiteDuration;
+	    };
+	    
+	    ^Score( 
+	    		this.collectOSCBundles( Server.default, timeOffset, duration  ) 
+	    			++ [ [ duration, [ \c_set, 0,0 ] ] ]
+	    	);
+    }
+    
+    render { // standalone app friendly version
+		arg path, maxTime=60, sampleRate = 44100,
+			headerFormat = "AIFF", sampleFormat = "int16", options, inputFilePath, action;
+
+		var file, oscFilePath, score, oldpgm;
+		oldpgm = Score.program;
+		Score.program = Server.program;
+		oscFilePath = "/tmp/temp_oscscore" ++ UniqueID.next;
+		score = this.asScore(maxTime);
+		score.recordNRT(
+			oscFilePath, path, inputFilePath, sampleRate, headerFormat, sampleFormat,
+			options, "; rm" + oscFilePath, action: action;
+		);
+		Score.program = oldpgm;
+    }
 
 }

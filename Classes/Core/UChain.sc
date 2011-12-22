@@ -556,6 +556,44 @@ UChain : UEvent {
 		this.groups.copy.do( _.changed( \n_end ) );
 	}
 	
+	collectOSCBundles { |server, startOffset = 0, infdur = 60|
+		var array;
+		// returns a set of OSC bundles to be used by Score for NRT purposes
+		server = server ? Server.default;
+		
+		array = [ 
+			[ startOffset ] ++ server.makeBundle( false, { 
+				this.prepare(server);
+				this.start(server); 
+			})
+		];
+		
+		if( this.releaseSelf.not ) {
+			if( this.duration != inf ) {
+				array = array.add( 
+					[ startOffset + this.eventSustain ] ++ 
+						server.makeBundle( false, { this.release }).postln
+				);
+			} {
+				array = array.add( 
+					[ infdur - this.fadeOut ] ++ 
+						server.makeBundle( false, { this.release }) 
+				);
+			};
+		};
+		
+		if( this.duration == inf )  {
+			array = array.add( [ infdur ] ++ server.makeBundle( false, { this.disposeSynths }) );
+		} {
+			array = array.add( 
+				[ startOffset + this.duration ] ++ 
+					server.makeBundle( false, { this.disposeSynths })
+			);
+		};
+		
+		^array.sort({ |a,b| a[0] <= b[0] });
+	}
+	
 	resetGroups { this.groups = nil; } // after unexpected server quit
 	
 	// indexing / access

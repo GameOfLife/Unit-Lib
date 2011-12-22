@@ -558,6 +558,15 @@ UScore : UEvent {
 		}
 	}
 	
+	collectOSCBundles { |server, startOffset = 0, infdur = 60|
+		var array;
+		server = server ? Server.default;
+		array = events.collect({ |item|
+			item.collectOSCBundles( server, item.startTime + startOffset, infdur );
+		}).flatten(1);
+		^array.sort({ |a,b| a[0] <= b[0] });
+	}
+	
 	cmdPeriod {
 		this.stop;
 		CmdPeriod.remove( this ); // always remove;
