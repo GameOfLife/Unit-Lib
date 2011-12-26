@@ -109,7 +109,9 @@ SyncCenter {
 	}
 	
 	*loadMasterDefs{
-		this.masterDefs.do( _.load( master ) )
+		if( mode === 'sample' ) {
+			this.masterDefs.do( _.load( master ) )
+		};
 	}
 	
 	*sendDefs { |write = false|
