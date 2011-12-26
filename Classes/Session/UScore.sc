@@ -620,8 +620,6 @@ UScore : UEvent {
 	    this.prSMSet(event, softMuted, bool, { |x| softMuted = x})
 	}
 
-	gui { ^UScoreEditorGUI(UScoreEditor(this)) }
-
 	printOn { arg stream;
 		stream << this.class.name << "( " << events.size <<" events )"
 	}
