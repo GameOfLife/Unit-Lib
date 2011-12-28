@@ -556,10 +556,44 @@ UChain : UEvent {
 		this.groups.copy.do( _.changed( \n_end ) );
 	}
 	
-	collectOSCBundles { |server, startOffset = 0, infdur = 60|
+	collectOSCBundleFuncs { |server, startOffset = 0, infdur = 60|
 		var array;
 		// returns a set of OSC bundles to be used by Score for NRT purposes
 		server = server ? Server.default;
+		
+		array = [ 
+			[ startOffset, { 
+				this.prepare(server);
+				this.start(server); 
+			}]
+		];
+		
+		if( this.releaseSelf.not ) {
+			if( this.duration != inf ) {
+				array = array.add( [ startOffset + this.eventSustain, { this.release }] );
+			} {
+				array = array.add( [ infdur - this.fadeOut, { this.release }] );
+			};
+		};
+		
+		if( this.duration == inf )  {
+			array = array.add( [ infdur, { this.disposeSynths }]);
+		} {
+			array = array.add( [ startOffset + this.duration, { this.disposeSynths }]
+			);
+		};
+		
+		^array;
+		
+	}
+	
+	collectOSCBundles { |server, startOffset = 0, infdur = 60|
+		var array, wasCheckFree;
+		// returns a set of OSC bundles to be used by Score for NRT purposes
+		server = server ? Server.default;
+		
+		wasCheckFree = AbstractRichBuffer.useCheckFree;
+		AbstractRichBuffer.useCheckFree = false;
 		
 		array = [ 
 			[ startOffset ] ++ server.makeBundle( false, { 
@@ -572,7 +606,7 @@ UChain : UEvent {
 			if( this.duration != inf ) {
 				array = array.add( 
 					[ startOffset + this.eventSustain ] ++ 
-						server.makeBundle( false, { this.release }).postln
+						server.makeBundle( false, { this.release })
 				);
 			} {
 				array = array.add( 
@@ -590,6 +624,8 @@ UChain : UEvent {
 					server.makeBundle( false, { this.disposeSynths })
 			);
 		};
+		
+		AbstractRichBuffer.useCheckFree = wasCheckFree;
 		
 		^array.sort({ |a,b| a[0] <= b[0] });
 	}

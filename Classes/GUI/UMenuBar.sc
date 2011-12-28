@@ -140,7 +140,9 @@ UMenuBar {
 				var o;
 				// add an interactive panel for duration and numchannels later
 				Dialog.savePanel({ |path|
-					o = ServerOptions.new.numOutputBusChannels_(2);
+					o = ServerOptions.new
+						.numOutputBusChannels_(2)
+						.memSize_( 2**19 );
 					path = path.replaceExtension( "aif" );
 					x.render( 
 						path,

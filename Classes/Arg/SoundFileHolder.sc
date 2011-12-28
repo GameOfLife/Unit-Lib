@@ -22,6 +22,8 @@ AbstractRichBuffer {
 	classvar <>allBuffers;
 	classvar <>allUnits;
 	
+	classvar <>useCheckFree = true; // safer in high-traffic situations, but not for NRT
+	
     var <numFrames, <numChannels, <sampleRate;
 
 	// var <>buffers; // holder for all buffers
@@ -91,7 +93,12 @@ AbstractRichBuffer {
 	
 	freeBuffer { |buf, action|
 		if( buf.notNil ) {
-			buf.checkFree( action );
+			if( useCheckFree ) {
+				buf.checkFree( action );
+			} {
+				buf.free;
+				action.value( buf );
+			};
 			this.removeBuffer( buf );
 		} {
 			 "%:freeBuffer - no buffer to be freed"
@@ -627,7 +634,13 @@ DiskSndFile : AbstractSndFile {
 	}
 	
 	 freeBuffer { |buf, action|
-		buf.checkCloseFree( action );
+		 if( useCheckFree ) {
+			buf.checkCloseFree( action );
+		 } {
+			 buf.close;
+			 buf.free;
+			 action.value( buf );
+		 };
 		this.removeBuffer( buf );
 	}
 
