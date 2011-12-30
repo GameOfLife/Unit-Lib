@@ -583,7 +583,7 @@ UScore : UEvent {
 		
 		out = array.sort({ |a,b| a[0] <= b[0] }).collect({ |item|
 			[ item[0] ] ++ server.makeBundle( false, item[1] )
-		});
+		}).select({ |item| item.size > 1 });
 		
 		AbstractRichBuffer.useCheckFree = wasCheckFree;
 		
