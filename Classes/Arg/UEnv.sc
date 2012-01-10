@@ -70,7 +70,7 @@ UEnv : UIn {
 				Dseq( [ fadeIn, dur - (fadeIn+fadeOut), fadeOut, extraSilence ], 1 ),
 				doneAction: doneAction ) *
 			Env([ 1, 0, 0 ],[ fadeOut, extraSilence ], \lin, 0 )
-				.kr( doneAction, RunningMin.kr( gate + Impulse.kr(0) ) ) *
+				.kr( doneAction, RunningMin.kr( gate ) + Impulse.kr(0) ) *
 			UGlobalGain.kr( useGlobalGain ) * gain.dbamp * (1-mute);
 	}
 	
