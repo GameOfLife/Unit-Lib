@@ -278,30 +278,37 @@ UScore : UEvent {
 
     }
 
-	eventsToPrepareNow{ |startPos , loop = false|
+	eventsToPrepareNow{ |startPos=0 , loop = false|
 	    var evs, allevs = this.eventsThatWillPlay(startPos);
-	    evs = allevs.select(_.prepareTime < startPos);
+	    evs = allevs.select(_.prepareTime <= startPos);
 	    if( loop ){
-	        evs = evs ++ events.select{ |x| (x.prepareTime <= 0) && ( (x.prepareTime + this.duration) < startPos ) };
+	        evs = evs ++ events.select{ |x| (x.prepareTime <= 0) && ( (x.prepareTime + this.duration) <= startPos ) };
 	    };
 	    ^evs.sort({ |a,b| a.startTime <= b.startTime })
 	}
 
-    arrayForPlayTask{ |startPos, assumePrepared = false, startEventsActiveAtStartPos = true, loop = false|
-        var evs, prepareEvents, startEvents, releaseEvents, allEvents, doPrepare;
-        evs = this.eventsThatWillPlay(startPos,startEventsActiveAtStartPos).sort;
+    arrayForPlayTask{ |startPos=0, assumePrepared = false, startEventsActiveAtStartPos = true, loop = false|
+        var evs, prepareEvents, startEvents, releaseEvents, startAndReleaseEvents, allEvents, doPrepare, fStartAndRelease, fActualStartPos;
 
-		prepareEvents = if(assumePrepared){evs.select({ |item| item.prepareTime >= startPos })}{evs};
-		startEvents = evs.sort({ |a,b| a.startTime <= b.startTime });
+        fStartAndRelease = { |item| item.releaseSelf.not && (item.eventEndTime == item.startTime) };
+        fActualStartPos = { |x| if(startEventsActiveAtStartPos) {x.startTime.max(startPos)}{ x.startTime } };
+
+        evs = this.eventsThatWillPlay(startPos,startEventsActiveAtStartPos).sort;
+		prepareEvents = if(assumePrepared){evs.select({ |item| item.prepareTime > startPos })}{evs};
+		startEvents = evs.select({ |item| fStartAndRelease.(item).not }).sort({ |a,b| a.startTime <= b.startTime });
 		releaseEvents = events
-			.select({ |item| (item.releaseSelf != true) && { (item.duration < inf) && { item.eventEndTime >= startPos } && item.isFolder.not } })
+			.select({ |item| (item.releaseSelf != true) && { (item.duration < inf) && { item.eventEndTime >= startPos }
+			&& item.isFolder.not && (item.eventEndTime != item.startTime) } })
 			.sort({ |a,b| a.eventEndTime <= b.eventEndTime });
+		startAndReleaseEvents = events.select(fStartAndRelease);
+
         // returns collection of [duration, type, event]
         // where type can be:
-        // 0 - prepare, 1 -start, 2 - release
+        // 0 - prepare, 1 -start, 2 - release, 3 - start and release
 		allEvents = prepareEvents.collect{ |x| [x.prepareTime, 0, x]}
-         ++ startEvents.collect{ |x| [ if(startEventsActiveAtStartPos) {x.startTime.max(startPos)}{ x.startTime }, 1, x]}
-         ++ releaseEvents.collect{ |x| [x.eventEndTime, 2, x]};
+         ++ startEvents.collect{ |x| [ fActualStartPos.(x), 1, x]}
+         ++ releaseEvents.collect{ |x| [x.eventEndTime, 2, x]}
+         ++ startAndReleaseEvents.collect{ |x| [ fActualStartPos.(x), 3, x]};
 
         if( loop ) {
             allEvents = allEvents ++
@@ -345,7 +352,7 @@ UScore : UEvent {
 	}
 
     //start immediately, assume prepared by default
-    start{ |targets, startPos = 0, updatePosition = true|
+    start { |targets, startPos = 0, updatePosition = true|
         ^this.prStart(targets, startPos, true, true, updatePosition, true, loop)
     }
 
@@ -383,13 +390,15 @@ UScore : UEvent {
             actions = [
                 { |event,startOffset| event.prepare( targets, startOffset ) },
                 { |event, startOffset| event.start(targets, startOffset) },
-                { |event| event.release }
+                { |event| event.release },
+                { |event, startOffset| event.startAndRelease(targets, startOffset) }
             ];
         } {
             actions = [
                 { |event| event.prepare( targets ) },
                 { |event| event.start(targets) },
-                { |event| event.release }
+                { |event| event.release },
+                { |event| event.startAndRelease(targets) }
             ];
         };
 

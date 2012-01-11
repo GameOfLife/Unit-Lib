@@ -412,34 +412,51 @@ UChain : UEvent {
 	    };
 	}
 
-	makeBundle { |targets, startPos = 0|
+	makeBundle { |targets, startPos = 0, withRelease = false|
+		var bundles;
 		this.setDoneAction;
-	    ^targets.asCollection.collect{ |target|
+	    bundles = targets.asCollection.collect{ |target|
 	        target.asTarget.server.makeBundle( false, {
-                this.makeGroupAndSynth(target, startPos)
+                this.makeGroupAndSynth(target, startPos);
+                if( withRelease ) {
+                    this.release
+                }
             })
-		}
+		};
+		if( verbose ) {
+		    ("Bundles for "++this).postln;
+		    bundles.postln;
+		};
+		^bundles;
+	}
+
+	prStartBasic { |target, startPos = 0, latency, withRelease = false|
+        var targets, bundles;
+        startPos = startPos ? 0;
+        target = preparedServers ? target ? UServerCenter.servers ? Server.default;
+        preparedServers = nil;
+        targets = target.asCollection;
+         if( verbose ) { "% starting on %".format( this, targets ).postln; };
+        bundles = this.makeBundle( targets, startPos , withRelease );
+        latency = latency ?? { Server.default.latency; };
+        targets.do({ |target, i|
+            if( bundles[i].size > 0 ) {
+                target.asTarget.server.sendSyncedBundle( latency, nil, *bundles[i] );
+            };
+        });
+        if( target.size == 0 ) {
+            ^this.groups[0]
+        } {
+            ^this.groups;
+        };
 	}
 	
 	start { |target, startPos = 0, latency|
-		var targets, bundles;
-		startPos = startPos ? 0;		
-		target = preparedServers ? target ? UServerCenter.servers ? Server.default;
-		preparedServers = nil;
-		targets = target.asCollection;
-		 if( verbose ) { "% starting on %".format( this, targets ).postln; };
-		bundles = this.makeBundle( targets, startPos );
-		latency = latency ?? { Server.default.latency; };
-		targets.do({ |target, i|
-			if( bundles[i].size > 0 ) {
-				target.asTarget.server.sendSyncedBundle( latency, nil, *bundles[i] );
-			};
-		});
-		if( target.size == 0 ) {
-			^this.groups[0]
-		} {
-			^this.groups;
-		};
+		this.prStartBasic(target, startPos, latency, false )
+	}
+
+	startAndRelease { |target, startPos = 0, latency|
+        this.prStartBasic(target, startPos, latency, true )
 	}
 	
 	stopPrepareTasks {
