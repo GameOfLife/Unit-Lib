@@ -473,13 +473,8 @@ UChain : UEvent {
 		var releaseUnits;
 		releaseUnits = units.select({ |unit| unit.def.canFreeSynth });
 		if( releaseUnits.size > 0 ) {
-			if( time.isNil ) {
-				releaseUnits = releaseUnits.sort({ |a,b| // reversed sort
-					a.get( \u_fadeOut ) >= b.get( \u_fadeOut )
-				});
-			};
-			releaseUnits[0].release( time, 14 ); // longest fadeOut releases group
-			releaseUnits[1..].do( _.release( time, 14 ) );
+			if( time.isNil ) { time = this.fadeOut; };
+			releaseUnits.do( _.release( time, 14 ) );
 		} {
 			this.stop; // stop if no releaseable synths
 		};
