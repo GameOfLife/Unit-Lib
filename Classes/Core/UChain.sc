@@ -229,7 +229,9 @@ UChain : UEvent {
         this.changed( \dur );
         if(releaseSelf){
             this.prSetChainsDur(dur);
-        }
+        };
+        this.fadeOut_(this.fadeOut.min(dur));
+        this.fadeIn_(this.fadeIn.min(dur));
     }
 
     releaseSelf_ { |bool|
