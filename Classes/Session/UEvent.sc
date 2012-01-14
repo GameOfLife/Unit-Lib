@@ -18,6 +18,9 @@
 */
 
 UEvent : UArchivable {
+	
+	classvar <>renderNumChannels = 2;
+	classvar <>renderMaxTime = 60;
 
     var <startTime=0;
     var <>track=0;  //track number (horizontal segment) on the score editor
@@ -77,14 +80,14 @@ UEvent : UArchivable {
 	    };
 	    
 	    ^Score( 
-	    		this.collectOSCBundles( Server.default, timeOffset, duration  ) 
+	    		this.collectOSCBundles( UServerCenter.servers.first, timeOffset, duration  ) 
 	    			++ [ [ duration, [ \c_set, 0,0 ] ] ]
 	    	);
     }
     
     render { // standalone app friendly version
 		arg path, maxTime=60, sampleRate = 44100,
-			headerFormat = "AIFF", sampleFormat = "int16", options, inputFilePath, action;
+			headerFormat = "AIFF", sampleFormat = "int24", options, inputFilePath, action;
 
 		var file, oscFilePath, score, oldpgm;
 		oldpgm = Score.program;
@@ -96,6 +99,28 @@ UEvent : UArchivable {
 			options, "; rm" + oscFilePath, action: action;
 		);
 		Score.program = oldpgm;
+    }
+    
+    writeAudioFile { |path, maxTime, action, headerFormat = "AIFF", sampleFormat = "int24"|
+		var o;
+		
+		if( this.isFinite.not && { maxTime == nil } ) {
+			maxTime = this.finiteDuration + 60;
+		};
+		
+		o = ServerOptions.new
+			.numOutputBusChannels_(renderNumChannels ? 2)
+			.memSize_( 2**19 );
+		path = path.replaceExtension( headerFormat.toLower );
+		this.render( 
+			path,
+			maxTime, // explicit nil forces UScore to use score duration
+			sampleRate: UServerCenter.servers.first.sampleRate,
+			headerFormat: headerFormat, 
+			sampleFormat: sampleFormat,
+			options: o,
+			action: action
+		);		
     }
 
 }

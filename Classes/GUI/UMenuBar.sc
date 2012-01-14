@@ -137,22 +137,8 @@ UMenuBar {
 		
 		SCMenuItem.new(events, "Export as audio file..").action_({
 			UScore.current !! { |x| 
-				var o;
-				// add an interactive panel for duration and numchannels later
 				Dialog.savePanel({ |path|
-					o = ServerOptions.new
-						.numOutputBusChannels_(2)
-						.memSize_( 2**19 );
-					path = path.replaceExtension( "aif" );
-					x.render( 
-						path,
-						nil, // explicit nil forces UScore to use score duration
-						sampleRate: UServerCenter.servers.first.sampleRate,
-						headerFormat: "AIFF", 
-						sampleFormat: "int24",
-						options: o,
-						action: { "done rendering audiofile: %\n".postf( path.basename ); }
-					);
+					x.writeAudioFile( path );
 				});
 			};
 		});
