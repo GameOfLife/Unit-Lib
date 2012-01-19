@@ -700,4 +700,9 @@ UScore : UEvent {
 	readTextArchiveAction{ this.name = filePath.basename.removeExtension }
 
 	name_ { |x| name = x; this.changed(\name) }
+	
+	deepClearTags {   
+		UTagSystem.removeObject( this ); 
+		events.do(_.deepClearTags);
+	}
 }

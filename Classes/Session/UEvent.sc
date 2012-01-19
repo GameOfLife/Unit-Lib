@@ -122,5 +122,34 @@ UEvent : UArchivable {
 			action: action
 		);		
     }
+    
+    // tag system: for UScores and UChains
+	setTag { |tag| UTagSystem.add( this, tag ); }
+	
+	removeTag { |tag| UTagSystem.remove( this, tag ); }
+	
+	clearTags { UTagSystem.removeObject( this ); }
+	deepClearTags { UTagSystem.removeObject( this ); }
+	
+	tags { ^UTagSystem.getTags( this ); }
+	
+	tags_ { |tags|
+		UTagSystem.removeObject( this );
+		tags.asCollection.do({ |tag|
+			UTagSystem.add( this, tag );
+		});
+	}
+	
+	storeTags { |stream|
+		var tags;
+		tags = this.tags;
+		if( this.tags.size > 0 ) {
+			stream << ".tags_(" <<<* tags.asArray.sort << ")";
+		};
+	}
+	
+	storeModifiersOn { |stream|
+		this.storeTags( stream );
+	}
 
 }
