@@ -15,9 +15,8 @@ ULib {
 			UMenuBar();
 		};
 		
-		defs = Udef.loadAllFromDefaultDirectory.collect(_.synthDef).flat.select(_.notNil)
-        ++WFSPrePanSynthDefs.generateAll.flat++WFSPreviewSynthDefs.generateAll;
-        
+ 		defs = Udef.loadAllFromDefaultDirectory.collect(_.synthDef).flat.select(_.notNil);
+
         Server.default.waitForBoot({
 
             defs.do({|def|
