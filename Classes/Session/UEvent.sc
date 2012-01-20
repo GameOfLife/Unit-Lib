@@ -80,7 +80,7 @@ UEvent : UArchivable {
 	    };
 	    
 	    ^Score( 
-	    		this.collectOSCBundles( UServerCenter.servers.first, timeOffset, duration  ) 
+	    		this.collectOSCBundles( ULib.servers.first, timeOffset, duration  )
 	    			++ [ [ duration, [ \c_set, 0,0 ] ] ]
 	    	);
     }
@@ -115,7 +115,7 @@ UEvent : UArchivable {
 		this.render( 
 			path,
 			maxTime, // explicit nil forces UScore to use score duration
-			sampleRate: UServerCenter.servers.first.sampleRate,
+			sampleRate: ULib.servers.first.sampleRate,
 			headerFormat: headerFormat, 
 			sampleFormat: sampleFormat,
 			options: o,

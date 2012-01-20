@@ -74,7 +74,7 @@ UGlobalEQ {
 	
 	*update { |obj, what ... args|
 		if( what == \setting ) {
-			UServerCenter.servers.do({ |item|
+			ULib.servers.do({ |item|
 				if( item.class.name == 'LoadBalancer' ) {
 					item.servers.do({ |srv|
 						this.sendServer( srv );

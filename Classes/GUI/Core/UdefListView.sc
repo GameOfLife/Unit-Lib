@@ -202,7 +202,7 @@ UdefListView {
 				.action_({ |bt|
 					Udef.loadAllFromDefaultDirectory.collect(_.synthDef).flat.select(_.notNil)
 						.do({ |def|
-							UServerCenter.servers.do({ |srv| def.send( srv ) });
+							ULib.servers.do({ |srv| def.send( srv ) });
 					});
 					UnitRack.loadAllFromDefaultDirectory;
 					{ this.rebuild }.defer( 0.01 );

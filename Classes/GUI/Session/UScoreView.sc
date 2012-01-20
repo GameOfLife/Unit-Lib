@@ -344,7 +344,7 @@ UScoreView {
 				};
 				if( c == 32 ) {
 				    if(score.isStopped) {
-				        score.prepareAndStart( UServerCenter.servers, score.pos, true, score.loop);
+				        score.prepareAndStart( ULib.servers, score.pos, true, score.loop);
 				    } {
 				        score.stop;
 				    }

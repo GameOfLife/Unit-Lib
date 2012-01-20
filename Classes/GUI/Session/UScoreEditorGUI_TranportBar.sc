@@ -132,11 +132,11 @@ UScoreEditorGui_TransportBar {
 			    var startedPlaying;
 			    switch( v.value )
 			        {0} {
-                        this.score.prepareAndStart( UServerCenter.servers, this.score.pos, true);
+                        this.score.prepareAndStart( ULib.servers, this.score.pos, true);
 			        }{1} {
                         this.score.stop;
                     }{2} {
-                        this.score.start( UServerCenter.servers, this.score.pos, true);
+                        this.score.start( ULib.servers, this.score.pos, true);
                     }
 
 			});
@@ -159,7 +159,7 @@ UScoreEditorGui_TransportBar {
 			            this.score.prepare;
 			       }
 			    }{1} {
-			        this.score.resume(UServerCenter.servers);
+			        this.score.resume(ULib.servers);
 			    }{2}{
 			        this.score.stop;
 			    }

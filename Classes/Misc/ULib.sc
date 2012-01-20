@@ -1,6 +1,11 @@
 	
 	
 ULib {
+    classvar <>servers;
+
+    *initClass {
+        servers = [Server.default]
+    }
 	
 	*startup {
 		var defs;	

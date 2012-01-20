@@ -85,7 +85,7 @@ UGlobalGain {
 		if( view.isNil or: { view.view.isClosed } ) {
 			view.value = gain;
 		};
-		UServerCenter.servers.do({ |item|
+		ULib.servers.do({ |item|
 			if( item.class.name == 'LoadBalancer' ) {
 				item.servers.do({ |srv|
 					this.sendServer( srv );

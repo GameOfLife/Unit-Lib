@@ -107,7 +107,7 @@ UChainCodeGUI : UChainGUI {
                     .action_({
                         unit.def.saveAsUdef({ |x|
                             unit.def_(x);
-                            UServerCenter.servers.do{ |s| unit.def.sendSynthDef(s) }
+                            ULib.servers.do{ |s| unit.def.sendSynthDef(s) }
                         })
                     }).resize_(3);
             };

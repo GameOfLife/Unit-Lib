@@ -220,7 +220,7 @@ UMenuBar {
 		SCMenuItem.new(viewMenu, "EQ").action_( { UGlobalEQ.gui; });		SCMenuItem.new(viewMenu, "Level").action_( { UGlobalGain.gui; });
 		SCMenuItem.new(viewMenu, "UDefs").action_( { UdefListView(); });
 		SCMenuItem.new(viewMenu, "Meter").action_({
-			UServerCenter.servers.first.meter;
+			ULib.servers.first.meter;
 		});
 	}
 }

@@ -136,11 +136,11 @@ UTransportView {
 			    var startedPlaying;
 			    switch( v.value )
 			        {0} {
-                        score.prepareAndStart( UServerCenter.servers, score.pos, true);
+                        score.prepareAndStart( ULib.servers, score.pos, true);
 			        }{1} {
                         score.stop;
                     }{2} {
-                        score.start( UServerCenter.servers, score.pos, true);
+                        score.start( ULib.servers, score.pos, true);
                     }
 
 			});
@@ -163,7 +163,7 @@ UTransportView {
 			            score.prepare;
 			       }
 			    }{1} {
-			        score.resume(UServerCenter.servers);
+			        score.resume(ULib.servers);
 			    }{2}{
 			        score.stop;
 			    }

@@ -433,7 +433,7 @@ UChain : UEvent {
 	prStartBasic { |target, startPos = 0, latency, withRelease = false|
         var targets, bundles;
         startPos = startPos ? 0;
-        target = preparedServers ? target ? UServerCenter.servers ? Server.default;
+        target = preparedServers ? target ? ULib.servers ? Server.default;
         preparedServers = nil;
         targets = target.asCollection;
          if( verbose ) { "% starting on %".format( this, targets ).postln; };
@@ -510,7 +510,7 @@ UChain : UEvent {
 		var cpu;
 		action = MultiActionFunc( action );
 		if( target.isNil or: { target.size == 0 } ) {
-			target = UServerCenter.servers ? Server.default;
+			target = ULib.servers ? Server.default;
 		};
 		
 		target = target.asCollection.select({ |tg|
@@ -532,7 +532,7 @@ UChain : UEvent {
 	prepareAndStart{ |target, startPos = 0|
 		var task, cond;
 		if( target.isNil ) {
-			target = UServerCenter.servers ? Server.default;
+			target = ULib.servers ? Server.default;
 		};
 		cond = Condition(false);
 		task = fork { 
