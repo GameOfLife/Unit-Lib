@@ -9,4 +9,4 @@ Udef( \simpleReverb, { |time = 0.1, room = 0.5, amp = 0.2|
 } )
 	.category_( \effect )
 	.setSpec( \room, [ 0, 1, \lin, 0, 0.5 ] )
-	.setSpec( \amp, [0,1,\lin, 0.2] );
+	.setSpec( \amp, [0,1,\lin, 0.2], \normal )

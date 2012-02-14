@@ -8,6 +8,7 @@ Udef( \delay, { |time = 0.1, maxTime = 0.1, dry = 1, amp = 0.2|
 } )
 	.category_( \effect )
 	.setSpec( \time, [ 0, 2, \lin, 0, 0.1 ] )
-	.setSpec( \maxTime, [ 0, 2, \lin, 0, 0.1 ] )
-	.setSpec( \dry, [0,1,\lin,0] );
+	.setSpec( \maxTime, [ 0, 2, \lin, 0, 0.1 ], \init )
+	.setSpec( \dry, [0,1,\lin,0], \normal )
+	.setSpecMode( \amp, \normal );
 	

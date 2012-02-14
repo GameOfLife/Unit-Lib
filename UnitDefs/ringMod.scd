@@ -15,4 +15,5 @@ Udef( \ringMod, { |sine = 1, freq = 440, noise = 0, input = 0, mix = 1.0|
 	.category_( \effect )
 	.setSpec( \sine, \amp.asSpec )
 	.setSpec( \noise, \amp.asSpec )
-	.setSpec( \input, \amp.asSpec );
+	.setSpec( \input, \amp.asSpec )
+	.setSpecMode( \sine, \normal, \noise, \normal, \input, \normal, \mix, \normal );
