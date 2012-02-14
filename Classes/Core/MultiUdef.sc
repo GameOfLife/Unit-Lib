@@ -39,7 +39,7 @@ MultiUdef : Udef {
 	*new { |name, udefs, category, setter, setterIsPrivate = true| // first udef in list is default
 		^super.basicNew( name, [ 
 			ArgSpec( setter ? this.defNameKey, 
-				udefs[0].name, ListSpec( udefs.collect(_.name) ), setterIsPrivate )
+				udefs[0].name, ListSpec( udefs.collect(_.name) ), setterIsPrivate, \nonsynth )
 		], category )
 			.udefs_( udefs );
 	}

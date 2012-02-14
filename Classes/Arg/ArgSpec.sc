@@ -30,11 +30,11 @@ x.postln; // -> [ an ArgSpec(a, 1), an ArgSpec(b, 2) ]
 ArgSpec : Spec {
 	var <>name, <>default, <>spec;
 	var <>private = false;
-	var <>mode = \sync; // \sync, \normal, \init
+	var <>mode = \sync; // \sync, \normal, \init, \nonsynth
 	var >label;
 	
-	*new { |name, default, spec, private|
-		^super.newCopyArgs( name.asSymbol, default, spec, private ? false ).init;
+	*new { |name, default, spec, private, mode|
+		^super.newCopyArgs( name.asSymbol, default, spec, private ? false, mode ? \sync ).init;
 	}
 	
 	init { 
@@ -100,7 +100,8 @@ ArgSpec : Spec {
 			name.asCompileString, 
 			default.asCompileString, 
 			( spec.findKey ? spec ).asCompileString, 
-			private
+			private,
+			mode.asCompileString
 		]  <<")"
 	}
 

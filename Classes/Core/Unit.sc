@@ -236,16 +236,74 @@ Udef : GenericDef {
 		^Synth( this.synthDefName, unit.getArgsFor( target, startPos ), target, \addToTail );
 	}
 	
-	setSynth { |unit ...keyValuePairs|
-		// "set % for synths: %".format( keyValuePairs, unit.synths.collect(_.nodeID) ).postln;
-		unit.synths.do{ |s|
-		    var server = s.server;
-		    server.sendSyncedBundle( Server.default.latency, nil, *server.makeBundle( false, {
-			    		s.set(*keyValuePairs.clump(2).collect{ |arr| 
-			    			[arr[0],arr[1].asControlInputFor(server)] }.flatten)
-		    		})
-		    	);
+	setSpec { |name, spec, mode|
+		var asp;
+		asp = this.getArgSpec(name);
+		if( asp.notNil ) { 
+			asp.spec = spec.asSpec;
+			if( mode.notNil ) { asp.mode = mode; };
 		};
+	}
+	
+	setSpecMode { |...pairs|
+		pairs.pairsDo({ |name, mode|
+			var asp;
+			asp = this.getArgSpec( name );
+			if( asp.notNil ) { asp.mode = mode };
+		});
+	}
+	
+	argSpecModes { // collect all modes into a dict
+		var dict = IdentityDictionary(); 
+		argSpecs.do({ |item| dict[ item.name ] = item.mode; });
+		^dict;
+	}
+	setSynth { |unit ...keyValuePairs|
+		this.prSetSynth( unit.synths, *keyValuePairs );
+	}
+	
+	prSetSynth { |synths ...keyValuePairs|
+		var syncIndices, normalIndices;
+		var modes;
+		syncIndices = Array(keyValuePairs.size);
+		normalIndices = Array(keyValuePairs.size);
+		modes = this.argSpecModes;
+		keyValuePairs.pairsDo({ |key, value, index|
+			var mode;
+			mode = modes[key] ? \sync;
+			switch( mode,
+				\sync, { syncIndices.addAll( [ index, index + 1 ] ) },
+				\normal, { normalIndices.addAll( [ index, index + 1 ] ) }
+				// \init mode: ignore (only set at start of synth)
+				// \nonsynth mode: ignore
+			);
+		});
+		if( syncIndices.size > 0 ) {
+			synths.asCollection.do({ |synth|
+				this.prSetSynthSync( synth, *keyValuePairs[ syncIndices ] );
+			});
+		};
+		if( normalIndices.size > 0 ) {
+			synths.asCollection.do({ |synth|
+				this.prSetSynthNormal( synth, *keyValuePairs[ normalIndices ] );
+			});
+		};
+	}
+	
+	prSetSynthSync { |synth ...keyValuePairs|
+		var server;
+		server = synth.server;
+		server.sendSyncedBundle( Server.default.latency, nil, 
+			*server.makeBundle( false, {
+				this.prSetSynthNormal( synth, *keyValuePairs )			})
+		);
+	}
+	
+	prSetSynthNormal { |synth ...keyValuePairs|
+		synth.set(*keyValuePairs.clump(2).collect{ |arr|
+				[arr[0],arr[1].asControlInputFor(synth.server)] 
+			}.flatten
+		);
 	}
 	
 	printOn { arg stream;
@@ -392,7 +450,13 @@ U : ObjectWithArgs {
 	
 	getArgsFor { |server, startPos = 0|
 		server = server.asTarget.server;
-		^this.class.formatArgs( this.args, server, startPos );
+		^this.class.formatArgs( this.getSynthArgs, server, startPos );
+	}
+	
+	getSynthArgs {
+		var nonsynthKeys;
+		nonsynthKeys = this.argSpecs.select({ |item| item.mode == \nonsynth }).collect(_.name);
+		^this.args.clump(2).select({ |item| nonsynthKeys.includes( item[0] ).not }).flatten(1);
 	}
 	
 	*formatArgs { |inArgs, server, startPos = 0|
