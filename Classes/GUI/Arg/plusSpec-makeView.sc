@@ -623,6 +623,49 @@
 	viewClass { ^DiskSndFileView }
 }
 
++ PartConvBufferSpec {
+	
+	viewNumLines { ^PartConvBufferView.viewNumLines }
+	
+	viewClass { ^PartConvBufferView }
+	
+	makeView { |parent, bounds, label, action, resize|
+		var vws, view, labelWidth;
+		
+		vws = ();
+		
+		bounds.isNil.if{bounds= 350 @ (this.viewNumLines * 18) };
+		
+		#view, bounds = EZGui().prMakeMarginGap.prMakeView( parent, bounds );
+		 vws[ \view ] = view;
+		 view.addFlowLayout(0@0, 4@4);
+		if( label.notNil ) {
+			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
+			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ 14 )
+				.string_( label.asString ++ " " )
+				.align_( \right )
+				.resize_( 4 )
+				.applySkin( RoundView.skin );
+		} {
+			labelWidth = -4;
+		};
+		
+		if( resize.notNil ) { vws[ \view ].resize = resize };
+		
+		vws[ \bufferView ] = this.viewClass.new( vws[ \view ], 
+			( bounds.width - (labelWidth+4) ) @ bounds.height, { |vw|
+				action.value( vw, vw.value )
+			} )
+		
+		^vws;
+	}
+	
+	setView { |view, value, active = false|
+		view[ \bufferView ].value = value;
+		if( active ) { view.doAction };
+	}
+}
+
 + IntegerSpec {
 
 	makeView { |parent, bounds, label, action, resize|

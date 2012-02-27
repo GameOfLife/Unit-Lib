@@ -552,6 +552,30 @@ DiskSndFileSpec : BufSndFileSpec {
 	
 }
 
+PartConvBufferSpec : RichBufferSpec {
+	
+	*new {
+		^super.newCopyArgs().init;
+	}
+	
+	*testObject { |obj|
+		^obj.isKindOf( PartConvBuffer );
+	}
+	
+	constrain { |value|
+		^value.asPartConvBuffer;
+	}
+	
+	default { 
+		^nil.asBufSndFile;
+	}
+	
+	*newFromObject { |obj|
+		^this.new( obj.numChannels );
+	}
+	
+}
+
 MultiSpec : Spec {
 	
 	// an ordered and named collection of specs, with the option to re-map to another spec
