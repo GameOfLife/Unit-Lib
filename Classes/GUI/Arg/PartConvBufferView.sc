@@ -108,7 +108,8 @@ PartConvBufferView {
 					(fv.value.pathExists != false) && { fv.value.extension.toLower != "partconv" } 
 					}
 				) {
-					SCAlert( "The file '%' doesn't appear to be a .partconv file\ndo you want to convert it?",
+					SCAlert( "The file '%' doesn't appear to be a .partconv file\ndo you want to convert it?"
+							.format( fv.value.basename ),
 					 	[ "use anyway", "convert" ], 
 					 	[{ 
 							this.performPartConvBuffer( \path_ , fv.value );
