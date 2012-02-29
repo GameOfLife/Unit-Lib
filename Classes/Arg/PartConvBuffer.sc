@@ -42,7 +42,7 @@ PartConvBuffer : AbstractRichBuffer {
 	
 	prReadFromFile { |soundfile|
 		var test = true;
-		if( soundfile.isNil or: { soundfile.isOpen.not } ) {
+		if( soundfile.isNil or: { soundfile.isOpen.not and: { path.notNil }}) {
 			soundfile = soundfile ?? { SoundFile.new }; 
 			test = soundfile.openRead( path.getGPath.asPathFromServer );
 			soundfile.close; // close if it wasn't open
@@ -84,7 +84,7 @@ PartConvBuffer : AbstractRichBuffer {
 				"~/Desktop/%.partconv".format( Date.localtime.stamp ).getGPath
 			};
 		} {
-			(outPath ?? { inPath.replaceExtension( "partconv" ) }).getGPath;		};
+			outPath = (outPath ?? { inPath.replaceExtension( "partconv" ) }).getGPath;		};
 		server.do({ |srv|
 			var buf, irbuf, bufsize, cond;
 			{

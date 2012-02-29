@@ -63,7 +63,7 @@ PartConvBufferView {
 		
 		views[ \path ].value = inPartConvBuffer.path;
 		
-		{ views[ \duration ].string = (inPartConvBuffer.duration ? 0).asSMPTEString; }.defer;		
+		{ views[ \duration ].string = (inPartConvBuffer.duration ? 0).asSMPTEString(1000); }.defer;		
 	}
 	
 	setFont { |font|
@@ -104,9 +104,28 @@ PartConvBufferView {
 		views[ \path ] = FilePathView( view, bounds.width @ ( (viewHeight * 2) + 4) )
 			.resize_( 2 )
 			.action_({ |fv|
-				this.performPartConvBuffer( \path_ , fv.value );
-				this.performPartConvBuffer( \fromFile );
-				action.value( this );
+				if( fv.value.notNil && { 
+					(fv.value.pathExists != false) && { fv.value.extension.toLower != "partconv" } 
+					}
+				) {
+					SCAlert( "The file '%' doesn't appear to be a .partconv file\ndo you want to convert it?",
+					 	[ "use anyway", "convert" ], 
+					 	[{ 
+							this.performPartConvBuffer( \path_ , fv.value );
+							this.performPartConvBuffer( \fromFile );
+							action.value( this );
+						}, {
+							PartConvBuffer.convertIRFile( fv.value, 
+								server: ULib.servers, 
+								action: { |path| fv.value = path; fv.doAction }
+							);
+						}]
+					);
+				} {
+					this.performPartConvBuffer( \path_ , fv.value );
+					this.performPartConvBuffer( \fromFile );
+					action.value( this );
+				};
 			});
 			
 		views[ \operations ] = PopUpMenu( view, 80 @ viewHeight )
@@ -114,21 +133,72 @@ PartConvBufferView {
 			.items_( [
 				"operations",
 				"",
+				"convert ir file",
+				"generate danstowell",
+				"",
 				"reveal in Finder",
 				"move to..",
 				"copy to..",
 				"save as.."
 			] )
 			.action_({ |pu|
-				var pth, ext;
+				var pth, ext, closeFunc;
 				switch( pu.value.asInt,
-					2, {  // reveal in Finder
+					2, { // convert ir file
+						CocoaDialog.getPaths({ |paths|
+							PartConvBuffer.convertIRFile( paths[0], 
+								server: ULib.servers, 
+								action: { |path| 
+									views[ \path ].value = path; 
+									views[ \path ].doAction 
+								}
+							)
+						});
+					},
+					3, { // generate danstowell
+						if( views[ \genWindow ].isNil or: { views[ \genWindow ].isClosed } ) {
+							views[ \genWindow ] = Window( "danstowell", Rect(592, 534, 294, 102) ).front;
+							views[ \genWindow ].addFlowLayout;
+							StaticText( views[ \genWindow ], 50@18 ).string_( "duration" );
+							views[ \genDur ] = SMPTEBox( views[ \genWindow ], 80@18 )
+								.value_(1.3)
+								.applySmoothSkin;
+							SmoothButton( views[ \genWindow ], 80@18 )
+								.border_(1)
+								.extrude_(false)
+								.label_( "generate" )
+								.action_({
+									Dialog.savePanel({ |path|
+										PartConvBuffer.convertIRFile(
+											PartConvBuffer.generateDanStowelIR( views[ \genDur ].value ),
+											path.replaceExtension( "partconv" ),
+											ULib.servers, 
+											{ |path| 
+												views[ \path ].value = path; 
+												views[ \path ].doAction 
+											}
+										)
+									});
+								});
+								
+							closeFunc = { views[ \genWindow ] !? (_.close); };
+							
+							views[ \operations ].onClose = views[ \operations ].onClose.addFunc( closeFunc );
+							
+							views[ \genWindow ].onClose = { 
+								views[ \operations ].onClose.removeFunc( closeFunc ); 
+								views[ \genWindow ] = nil;
+							};
+						} {
+							views[ \genWindow ].front;						};
+					},
+					5, {  // reveal in Finder
 						pth = this.performPartConvBuffer( \path );
 						if( pth.notNil ) {
 							pth.getGPath.asPathFromServer.revealInFinder;
 						};
 					},
-					3, { // move to..
+					6, { // move to..
 						pth = this.performPartConvBuffer( \path );
 						if( pth.notNil ) {
 							pth = pth.getGPath;
@@ -146,7 +216,7 @@ PartConvBufferView {
 							});
 						};
 					},
-					4, { // copy to..
+					7, { // copy to..
 						pth = this.performPartConvBuffer( \path );
 						if( pth.notNil ) {
 							Dialog.savePanel({ |path|
@@ -160,7 +230,7 @@ PartConvBufferView {
 							});
 						};
 					},
-					5, { // save as..
+					8, { // save as..
 						pth = this.performPartConvBuffer( \path );
 						if( pth.notNil ) {
 							ext = pth.extension;
