@@ -382,6 +382,153 @@
 	
 }
 
++ RealVector3DSpec {
+
+    makeView { |parent, bounds, label, action, resize|
+		var vws, view, labelWidth;
+		var localStep;
+		var startVal;
+		vws = ();
+
+		vws[ \val ] = RealVector3D[0,0,0];
+
+		localStep = step.collect{ |x| if(x == 0 ){ 1 }{ x } };
+
+		bounds.isNil.if{bounds= 160@20};
+
+		#view, bounds = EZGui().prMakeMarginGap.prMakeView( parent, bounds );
+		 vws[ \view ] = view;
+
+		if( label.notNil ) {
+			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
+			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ bounds.height )
+				.string_( label.asString ++ " " )
+				.align_( \right )
+				.resize_( 4 )
+				.applySkin( RoundView.skin );
+		} {
+			labelWidth = 0;
+		};
+
+		vws[ \coord ] = 3.collect{ |i|
+
+            SmoothNumberBox( vws[ \view ], Rect( labelWidth + 2 + (i*42), 0, 40, bounds.height ) )
+                .action_({ |nb|
+                    vws[ \val ] = vws[ \coord ].collect(_.value).as(RealVector3D);
+                    action.value( vws, vws[ \val ]);
+                })
+                //.step_( localStep[i] )
+                .scroll_step_( localStep[i] )
+                .clipLo_( nrect.sortedConstraints[i][0] )
+                .clipHi_( nrect.sortedConstraints[i][1] )
+                .value_(0);
+         };
+
+		^vws;
+	}
+
+	setView { |view, value, active = false|
+		var constrained;
+		constrained = this.constrain( value );
+		[view[ \coord ], constrained].flopWith(_.value(_));
+		view[ \val ] = constrained;
+		if( active ) { view[ \x ].doAction };
+	}
+
+	mapSetView { |view, value, active = false|
+		var mapped;
+		mapped = this.map( value );
+		[view[ \coord ], mapped].flopWith(_.value(_));
+        view[ \val ] = mapped;
+		if( active ) { view[ \x ].doAction };
+	}
+
+}
+
++ UnitSphericalSpec {
+    	makeView { |parent, bounds, label, action, resize|
+		var vws, view, labelWidth;
+		var localStep;
+		var startVal;
+		vws = ();
+
+		vws[ \val ] = UnitSpherical(0,0);
+
+		localStep = step.copy;
+		if( step.theta == 0 ) { localStep.theta = 1 };
+		if( step.phi == 0 ) { localStep.phi = 1 };
+
+		bounds.isNil.if{bounds= 160@20};
+
+		#view, bounds = EZGui().prMakeMarginGap.prMakeView( parent, bounds );
+		 vws[ \view ] = view;
+
+		if( label.notNil ) {
+			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
+			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ bounds.height )
+				.string_( label.asString ++ " " )
+				.align_( \right )
+				.resize_( 4 )
+				.applySkin( RoundView.skin );
+		} {
+			labelWidth = 0;
+		};
+
+		vws[ \theta ] = SmoothNumberBox( vws[ \view ], Rect( labelWidth + 2, 0, 40, bounds.height ) )
+			.action_({ |nb|
+				vws[ \val ] = UnitSpherical( nb.value, vws[ \phi ].value );
+				action.value( vws, vws[ \val ]);
+			})
+			//.step_( localStep.theta )
+			.scroll_step_( localStep.theta )
+			.value_(0);
+
+		vws[ \thetaphi ] = XYView( vws[ \view ],
+			Rect( labelWidth + 2 + 42, 0, bounds.height, bounds.height ) )
+			.action_({ |xy|
+				startVal = startVal ?? { vws[ \val ].copy; };
+				vws[ \theta ].value = (startVal.theta + (xy.x * localStep.theta));
+				vws[ \phi ].value = (startVal.phi + (xy.y * localStep.phi.neg));
+				action.value( vws, UnitSpherical( vws[ \theta ].value, vws[ \phi ].value ) );
+			})
+			.mouseUpAction_({
+				vws[ \val ] = UnitSpherical( vws[ \theta ].value, vws[ \phi ].value );
+				startVal = nil;
+			});
+
+		vws[ \phi ] = SmoothNumberBox( vws[ \view ],
+				Rect( labelWidth + 2 + 42 + bounds.height + 2, 0, 40, bounds.height ) )
+			.action_({ |nb|
+				vws[ \val ] = UnitSpherical( vws[ \theta ].value, nb.value );
+				action.value( vws,  vws[ \val ] );
+			})
+			//.step_( localStep.phi )
+			.scroll_step_( localStep.phi )
+			.value_(0);
+
+		^vws;
+	}
+
+	setView { |view, value, active = false|
+		var constrained;
+		constrained = this.constrain( value );
+		view[ \theta ].value = constrained.theta;
+		view[ \phi ].value = constrained.phi;
+		view[ \val ] = constrained;
+		if( active ) { view[ \theta ].doAction };
+	}
+
+	mapSetView { |view, value, active = false|
+		var mapped;
+		mapped = this.map( value );
+		view[ \x ].value = mapped.theta;
+		view[ \y ].value = mapped.phi;
+		view[ \val ] = mapped;
+		if( active ) { view[ \x ].doAction };
+	}
+
+}
+
 + RectSpec {
 	
 	makeView { |parent, bounds, label, action, resize|

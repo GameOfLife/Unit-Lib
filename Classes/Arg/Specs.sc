@@ -157,8 +157,8 @@ PointSpec : Spec {
 	*newFromObject { |obj|
 		var cspecs;
 		cspecs = obj.asArray.collect({ |item| ControlSpec.newFromObject( item ) });
-		^this.new( Rect.fromPoints( 
-			(cspecs[0].minval)@(cspecs[1].minval), 
+		^this.new( Rect.fromPoints(
+			(cspecs[0].minval)@(cspecs[1].minval),
 			(cspecs[0].maxval)@(cspecs[1].maxval) ),
 			(cspecs[0].step)@(cspecs[1].step),
 			obj );
@@ -212,6 +212,75 @@ PointSpec : Spec {
 
 	storeArgs {
 	    ^[rect, step, default, units, mode]
+	}
+}
+
+RealVector3DSpec : Spec {
+
+	classvar <>defaultMode = \point;
+
+	var <nrect, <>step, >default, <>units, <>mode; // constrains inside rect
+
+	// mode can be \point, \polar, \deg_cw, \deg_ccw
+	// only for gui; output will always be Point
+
+	*new { |nrect, step, default, units, mode|
+		^super.newCopyArgs( nrect ? inf, (step ? 0).asRealVector3D, default, units ? "", mode ? \point ).init;
+	}
+
+	*testObject { |obj|
+		^RealVector.subclasses.includes( obj.class );
+	}
+
+	*newFromObject { |obj|
+		var cspecs;
+		cspecs = obj.as(Array).collect({ |item| ControlSpec.newFromObject( item ) });
+		^this.new( NRect(
+			cspecs.collect(_.minval).as(RealVector3D),
+			cspecs.collect(_.maxval).as(RealVector3D) ),
+			cspecs.collect(_.step).as(RealVector3D),
+			obj );
+	}
+
+	init {
+		// number becomes radius
+		if( nrect.isNumber ) { nrect = NRect.aboutPoint( 0.asRealVector3D, nrect.asRealVector3D ); };
+		nrect = nrect.asNRect;
+	}
+
+	default { ^default ?? { nrect.center } }
+
+	minval { ^nrect.origin }
+	maxval { ^nrect.endPoint }
+
+	minval_ { |value|
+		nrect.origin = value;
+	}
+
+	maxval_ { |value|
+		nrect.endPoint = value;
+	}
+
+	rect_ { |newNRect| nrect = newNRect; this.init }
+
+	clip { |value|
+		^nrect.clipVector(value);
+	}
+
+	constrain { |value|
+		^nrect.clipVector( value.as(RealVector3D).asRealVector3D );
+	}
+
+	map { |value|
+	    ^nrect.mapVector(value)
+	}
+
+	unmap { |value|
+		^nrect.unmapVector(value)
+	}
+
+	storeArgs {
+	    ^[nrect, step, default, units, mode]
 	}
 }
 
@@ -293,6 +362,45 @@ PolarSpec : Spec {
 	storeArgs {
 	    ^[maxRadius, step, default, units]
 	}
+}
+
+UnitSphericalSpec : Spec {
+
+	var <step, <>default, <>units;
+
+	*new { |step, default, units|
+		^super.newCopyArgs( step ? UnitSpherical(0,0), default ? UnitSpherical(0,0), units ? "" );
+	}
+
+	*testObject { |obj|
+		^obj.class == UnitSpherical;
+	}
+
+	step_ { |inStep| step = inStep.asUnitSpherical }
+
+	roundToStep { |value|
+		value = value.asUnitSpherical;
+		value.theta = value.theta.round( step.theta );
+		value.phi = value.phi.round( step.phi );
+		^value;
+	}
+
+	constrain { |value|
+		^this.roundToStep( value );
+	}
+
+	map { |value|
+		^this.constrain( value );
+	}
+
+	unmap { |value|
+		^this.constrain( value );
+	}
+
+	storeArgs {
+	    ^[step, default, units]
+	}
+
 }
 
 RectSpec : Spec {
