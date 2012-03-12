@@ -147,7 +147,7 @@ PointSpec : Spec {
 	// only for gui; output will always be Point
 
 	*new { |rect, step, default, units, mode|
-		^super.newCopyArgs( rect ? inf, (step ? 0).asPoint, default, units ? "", mode ? \point ).init;
+		^super.newCopyArgs( rect ? inf, (step ? 0).asPoint, default, units ? "", mode ? this.defaultMode ).init;
 	}
 	
 	*testObject { |obj|
