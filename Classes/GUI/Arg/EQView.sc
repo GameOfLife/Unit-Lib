@@ -20,10 +20,11 @@
 EQPlotView {
 	
 	var <eqSetting, <view, <plotView, <ctrl;
-	var <>active = true;
+	var <active = true;
 	var <selected;
 	var <>font, <>viewHeight = 14, <resize = 5;
 	var <min = 20, <max = 22050, <range = 24;
+	var <showLegend = true;
 	var <>action;
 	
 	*new { |parent, bounds, eqSetting|
@@ -63,6 +64,18 @@ EQPlotView {
 	range_ { |newRange|
 		range = newRange;
 		this.changed( \range );
+		this.refresh;
+	}
+	
+	active_ { |bool=true|
+		active = bool;
+		this.changed( \active );
+		this.refresh;
+	}
+	
+	showLegend_ { |bool=true|
+		showLegend = bool;
+		this.changed( \showLegend );
 		this.refresh;
 	}
 	
@@ -219,43 +232,45 @@ EQPlotView {
 				});
 			Pen.line( 0@zeroline, bounds.width@zeroline ).stroke;
 			
-			// draw grid labels
-			Pen.font = font;
-			
-			Pen.color = Color.gray(0.2).alpha_(0.5);
-			hlines.do({ |hline|
-				Pen.stringAtPoint( hline.asString ++ "dB", 
-					3@(hline.linlin( range.neg,range, bounds.height, 0, \none ) 
-						- strOffset) );
-				});
-			vlines.do({ |vline,i|
-				Pen.stringAtPoint( ["100Hz", "1KHz", "10KHz"][i], 
-					(vline+2)@(bounds.height - (strOffset + 1)) );
-				});
-					
-			// draw magResponses and hooks
-			values.do({ |svals,i|
-				var color;
-				color = Color.hsv( i.linlin( 0, values.size, 0, 1 ), 0.75, 0.5 )
-					.alpha_( if( selected == i ) { 0.75 } { 0.25 } );
-				Pen.color = color;
-				Pen.moveTo( 0@(svals[0]) );
-				svals[1..].do({ |val, i|
-					Pen.lineTo( (i+1)@val );
+			if( showLegend ) {	
+				// draw grid labels
+				Pen.font = font;
+				
+				Pen.color = Color.gray(0.2).alpha_(0.5);
+				hlines.do({ |hline|
+					Pen.stringAtPoint( hline.asString ++ "dB", 
+						3@(hline.linlin( range.neg,range, bounds.height, 0, \none ) 
+							- strOffset) );
 					});
-				Pen.lineTo( bounds.width@(bounds.height/2) );
-				Pen.lineTo( 0@(bounds.height/2) );
-				Pen.lineTo( 0@(svals[0]) );
-				Pen.fill;
-				
-				if( pts[i].notNil ) {
-					Pen.color = color.alpha_(0.75);
-					Pen.addArc( pts[i], 5, 0, 2pi );
-					Pen.stroke;
-				};
-				
-			});
+				vlines.do({ |vline,i|
+					Pen.stringAtPoint( ["100Hz", "1KHz", "10KHz"][i], 
+						(vline+2)@(bounds.height - (strOffset + 1)) );
+					});
+			};
 			
+				// draw magResponses and hooks
+				values.do({ |svals,i|
+					var color;
+					color = Color.hsv( i.linlin( 0, values.size, 0, 1 ), 0.75, 0.5 )
+						.alpha_( if( selected == i ) { 0.75 } { 0.25 } );
+					Pen.color = color;
+					Pen.moveTo( 0@(svals[0]) );
+					svals[1..].do({ |val, i|
+						Pen.lineTo( (i+1)@val );
+						});
+					Pen.lineTo( bounds.width@(bounds.height/2) );
+					Pen.lineTo( 0@(bounds.height/2) );
+					Pen.lineTo( 0@(svals[0]) );
+					Pen.fill;
+					
+					if( active && { pts[i].notNil }) {
+						Pen.color = color.alpha_(0.75);
+						Pen.addArc( pts[i], 5, 0, 2pi );
+						Pen.stroke;
+					};
+					
+				});
+				
 			// draw summed magResponse
 			Pen.color = Color.blue(0.5);
 			Pen.moveTo( 0@(svals[0]) );

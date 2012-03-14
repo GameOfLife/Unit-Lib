@@ -42,7 +42,8 @@ EQdef {
 			\a1: [-1,1,\lin, 0, 0 ].asSpec,
 			\b1: [-1,1,\lin, 0, 0 ].asSpec,
 			\b2: [-1,1,\lin, 0, 0 ].asSpec,
-			\radius: [ 0,1, \lin,0,0.8].asSpec 	
+			\radius: [ 0,1, \lin,0,0.8].asSpec,
+			\coef: [-0.999, 0.999, \lin, 0.001, 0 ].asSpec 
 		);
 		
 		global = EQdef( 
@@ -257,7 +258,7 @@ EQSetting {
 		setting = eqdef.formatSetting( setting );		
 	}
 	
-	set { |name, argName, value, constrain = true|
+	set { |name, argName, value, constrain = true, active = true|
 		#name, argName = this.getEQdef.indexOf( name, argName );
 		if( argName.notNil ) {
 			if( constrain == true ) {
@@ -265,13 +266,15 @@ EQSetting {
 			};
 			setting[name][argName] = value;
 			this.changed( \setting, this.names[name], this.argNames[name][argName], value );
+			action.value( this );
 		} {
 			if( value.isArray ) {
 				this.getEQdef.argNames[ name ].do({ |argName, i|
 					if( value[i].notNil ) {
-						this.set( name, argName, value[i], constrain );
+						this.set( name, argName, value[i], constrain, false );
 					};
 				});
+				action.value( this );
 			};
 		};
 	}
@@ -308,6 +311,7 @@ EQSetting {
 	setting_ { |new| 
 		setting = this.getEQdef.formatSetting( new );
 		this.changed( \setting );
+		action.value( this );
 	}
 	
 	 names { ^this.getEQdef.names }
