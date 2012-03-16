@@ -60,14 +60,18 @@ GenericDef : UArchivable {
 		if( name.notNil ) {
 			this.defsFolders.do({ |item|
 				path = this.createDefFilePath( item, name );
-				if( File.exists( path ) ) { ^path };
+				if(this.existsCaseSensitive( path ) ) { ^path };
 			});
 			path = this.createUserDefFilePath( name );
-			if( File.exists( path ) ) { ^path };
+			if( this.existsCaseSensitive( path ) ) { ^path };
 			^nil;
 		} {
 			^nil;
 		};
+	}
+	
+	*existsCaseSensitive { |path|
+		^path[..path.size-2].pathMatch.size > 0
 	}
 
 	*loadAllFromDefaultDirectory {
