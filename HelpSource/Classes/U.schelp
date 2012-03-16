@@ -1,28 +1,54 @@
 CLASS:: U
-summary:: (put short description here)
-categories:: Undocumented classes
-related:: Classes/SomeRelatedClass, Reference/SomeRelatedStuff, etc.
+summary:: a basic element in Unit Lib
+categories:: UnitLib
+related:: Classes/UChain, Classes/Udef, Classes/UScore, Classes/Synth
 
 DESCRIPTION::
-(put long description here)
+An U (short for "unit") represents a single audio or control process. U's are the basic building blocks of the link::Reference/Unit-Lib##Unit Library::. Units can be chained together in a link::Classes/UChain:: to form a series of processes. Each unit can perform it's own little task, analogous to 'plugins' in popular commercial sequencers such as Logic and Pro Tools. Each unit is an instance of a link::Classes/Udef::, which defines what the unit does and what it's parameters are. There is a global library of Udefs, where each Udef is stored by name. An U is created by giving the name of the desired Udef:
+code::
+x = U(\sine); // creates a unit based on the \sine Udef (a system default)
+::
+The U in the example above gets the following parameters from its Udef: \freq, \amp. There are various ways to set these:
+code::
+x.set( \freq, 660 ); // set the \freq to 660
+x.get( \freq ); // request value
 
+x.freq = 550; // alternative way to set
+x.freq; // request value
+::
+This unit can be played individually via .prepareAndStart(s) and .stop. But it will not be audible. In's output is on private link::Classes/Bus##busses::. It can only be made audible when combined with an U from one of the 'io' Udefs, for example \output, in a UChain:
+code::
+x = U(\sine);
+c = UChain( x, U(\output) ); 
+
+c.prepareAndStart(s); // start the chain
+
+x.freq = 880; // changing a parameter
+c[0].freq = 330; // access the U via index
+
+c.release; // release (stop) the chain
+::
+
+subsection:: GUI
+
+Units have extensive graphical editors. The gui below is of the UChain in the code example above.
+image::U-example1.png::
+Each parameter can be edited via a dedicated gui element. Where most of these are sliders, there can also be different kinds of editors, all based on the information stored in the Udef. Changes in parameters will be instantly audible if the U is playing at that moment. Changes made when the U is not playing will be remembered and used when playing. Changing values via code or via other gui instances will change the value visually on this editor as well.
+code::
+c = UChain( U(\sine), U(\output) );
+c.gui; // this shows the same gui as the example picture
+::
+In the gui you can also change the Udef for a unit by dragging it from the link::Classes/UdefListView##defs window::.
+
+image::U-example2.png::
+
+This basically does the same as code::c[0].defName = \saw ::, and it keeps all the corresponding parameter settings. The unit itself is not replaced, it is just based on a new Udef.
+
+subsection:: Synths
+
+U's are usually wrappers for link::Classes/Synth##Synths::. Each unit represents a single Synth in a processing chain. 
 
 CLASSMETHODS::
-
-METHOD:: loadDef
-(describe method here)
-
-returns:: (returnvalue)
-
-METHOD:: synthDict
-(describe method here)
-
-returns:: (returnvalue)
-
-METHOD:: initClass
-(describe method here)
-
-returns:: (returnvalue)
 
 METHOD:: new
 (describe method here)
