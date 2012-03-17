@@ -71,7 +71,7 @@ GenericDef : UArchivable {
 	}
 	
 	*existsCaseSensitive { |path|
-		^path[..path.size-2].pathMatch.size > 0
+		^(path.dirname+/+"*").pathMatch.detect{|x|x.compare(path)==0}.notNil
 	}
 
 	*loadAllFromDefaultDirectory {
