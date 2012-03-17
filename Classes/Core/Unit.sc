@@ -704,16 +704,16 @@ U : ObjectWithArgs {
 	    ^target; // returns targets actually prepared for
     }
     
-    prepareAnd { |target, loadDef = true, action|
+    prepareAnd { |target, action|
 	    fork{
-	        target = this.prepare(target, loadDef);
+	        target = this.prepare(target);
 	        this.prSyncCollection(target);
 	        action.value( this );
 	    }
     }
 
-	prepareAndStart { |target, loadDef = true|
-	   this.prepareAnd( target, loadDef, _.start(target) );
+	prepareAndStart { |target|
+	   this.prepareAnd( target, _.start(target) );
 	}
 
 	loadDefAndStart { |target|
