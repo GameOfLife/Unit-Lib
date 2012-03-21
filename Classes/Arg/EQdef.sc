@@ -275,6 +275,10 @@ EQSetting {
 					};
 				});
 				action.value( this );
+			} {
+				"%:set - value needs to be an array if no argName specified\n"
+					.format( this.class )
+					.postf;
 			};
 		};
 	}
@@ -323,6 +327,19 @@ EQSetting {
 	 asUGenInput { ^setting.flat.asUGenInput }
 	 asControlInput { ^setting.flat.asControlInput }
 	 asOSCArgEmbeddedArray { | array| ^setting.flat.asOSCArgEmbeddedArray(array) }
+	 
+	 doesNotUnderstand { |selector ...args|
+		 var split, ids;
+		 split = selector.asString.split( $_ ).select({|x|x.size>0}).collect(_.asSymbol);
+		 ids = this.getEQdef.indexOf( *split );
+		 if( ids[0].notNil ) {
+			 if( selector.isSetter ) {
+				 ^this.set( ids[0], ids[1], *args)
+			 } {
+				 ^this.get( ids[0], ids[1] );
+			 };
+		 };
+	 }
 	 
 	 *ar { |in, setting, def|
 		^this.new( def ).ar( in, setting );
