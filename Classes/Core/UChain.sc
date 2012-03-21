@@ -667,7 +667,13 @@ UChain : UEvent {
 	indexOf { |obj| ^units.indexOf( obj ); }
 	
 	set { |key, value| // sets all units that respond to  key
-		units.select({ |u| u.keys.includes( key ) }).do(_.set( key, value ));
+		var extid, subkey;
+		subkey = key;
+		extid = key.asString.find(".");
+		if( extid.notNil ) {
+			subkey = key.asString[..extid-1].asSymbol;
+		};
+		units.select({ |u| u.keys.includes( subkey ) }).do(_.set( key, value ));
 	}
 	
 	get { |key|

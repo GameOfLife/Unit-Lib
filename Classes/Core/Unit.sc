@@ -403,7 +403,20 @@ U : ObjectWithArgs {
 	set { |...args|
 		var synthArgs;
 		args.pairsDo({ |key, value|
-			value = value.asUnitArg( this );
+			var ext, extid;
+			ext = key.asString;
+			extid = ext.find( "." );
+			if( extid.notNil ) {
+				key = ext[..extid-1].asSymbol;
+				ext = ext[extid+1..];
+				if( ext[0].isDecDigit ) {
+					value = this.get( key ).put( ext.asInteger, value );
+				} {
+					value = this.get( key ).perform( ext.asSymbol.asSetter, value );
+				};
+			} {
+				value = value.asUnitArg( this );
+			};
 			this.setArg( key, value );
 			synthArgs = synthArgs.addAll( [ key, value ] ); 
 		});
