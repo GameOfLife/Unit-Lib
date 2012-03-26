@@ -108,7 +108,7 @@ UOSCsetter {
 						if( args[0] == \point ) { // special case
 							obj.set( \point, args[[1,2]].asPoint );
 						} {
-							obj.perform( *args );
+							obj.set( args[0], args[1..] ); // array
 						};
 					};
 				}
