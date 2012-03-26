@@ -24,8 +24,17 @@ It is used for UOSCsetter
 
 OSCMethodPatternDispatcher : OSCMessageDispatcher { 
 	
-	value {|time, addr, recvPort, msg| 
+	classvar <>compatibilityMode = false;
+	
+	*initClass { 
+		compatibilityMode = OSCMessageDispatcher.findMethod( \value ).argNames[1] == \time;
+	}
+	
+	value {|msg, time, addr, recvPort| 
 		var pattern;
+		if( compatibilityMode ) {
+			#time, addr, recvPort, msg = [ msg, time, addr, recvPort ];
+		};
 		pattern = msg[0];
 		active.keysValuesDo({|key, func|
 			if(pattern.matchOSCAddressPattern(key), {func.value(msg, time, addr, recvPort);});
