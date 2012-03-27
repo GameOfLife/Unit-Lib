@@ -22,13 +22,13 @@ ULib {
 		
  		defs = Udef.loadAllFromDefaultDirectory.collect(_.synthDef).flat.select(_.notNil);
 
-        Server.default.waitForBoot({
+        ULib.servers.do{ |sv| sv.waitForBoot({
 
-            defs.do({|def|
-                def.load( Server.default );
-            });
-            "\n\tUnit Lib started".postln
+            defs.do( _.load( sv ) );
+            
         });
+	   "\n\tUnit Lib started".postln
+        };
         
         UGlobalGain.gui;
         UGlobalEQ.gui;
