@@ -669,11 +669,11 @@ DiskSndFile : AbstractSndFile {
 + Object {
 	
 	asBufSndFile { 
-		^BufSndFile.newBasic("sounds/a11wlk01-44_1.aiff", 107520, 1, 44100, 0, nil, 1, false)
+		^BufSndFile.newBasic(String.scDir +/+ "sounds/a11wlk01-44_1.aiff", 107520, 1, 44100, 0, nil, 1, false)
 	}
 	
 	asDiskSndFile {
-		^DiskSndFile.newBasic("sounds/a11wlk01-44_1.aiff", 107520, 1, 44100, 0, nil, 1, false)
+		^DiskSndFile.newBasic(String.scDir +/+ "sounds/a11wlk01-44_1.aiff", 107520, 1, 44100, 0, nil, 1, false)
 	}
 }
 
