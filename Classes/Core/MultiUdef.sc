@@ -65,7 +65,7 @@ MultiUdef : Udef {
 	}
 	
 	asArgsArray { |argPairs, constrain = true|
-		var defName, argz;
+		var defName, argz, newDefName;
 		defName = (argPairs ? []).detectIndex({ |item| item == this.defNameKey });
 		if( defName.notNil ) {
 			defName = argPairs[ defName + 1 ];
@@ -74,9 +74,18 @@ MultiUdef : Udef {
 		};
 		argz = this.findUdef( defName ).asArgsArray( argPairs ? [], constrain );
 		if( chooseFunc.notNil ) {
-			defName = chooseFunc.value( argz );
+			newDefName = chooseFunc.value( argz );
+			if( newDefName != defName ) { // second pass
+				defName = newDefName;
+				argz = this.findUdef( defName ).asArgsArray( argPairs ? [], constrain );
+			};
 		};
 		^argz ++ [ this.defNameKey, defName ];
+	}
+	
+	args { |unit| 
+		^(this.findUdefFor( unit ).args( unit ) ? []) ++ 
+			argSpecs.collect({ |item| [ item.name, item.default ] }).flatten(1) 
 	}
 	
 	synthDef { ^udefs.collect(_.synthDef).flat }
