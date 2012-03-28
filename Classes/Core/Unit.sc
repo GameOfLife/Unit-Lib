@@ -551,6 +551,8 @@ U : ObjectWithArgs {
 	rate_ { |new| this.set( \rate, new ) }
 	loop { ^this.get( \loop ) }
 	loop_ { |new| this.set( \loop, new ) }
+	numChannels { ^this.get( \numChannels ) }
+	numChannels_ { |new| this.set( \numChannels, new ) }
 
 	cutStart { |amount = 0|
 		this.values.do({ |value|

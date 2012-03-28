@@ -22,8 +22,13 @@ HiddenUdef : Udef {
 	// these are not added to the global udef dict
 	
 	classvar <>all;
+	var <>extraPrefix;
 	
 	*prefix { ^"uh_" } // synthdefs get another prefix to avoid overwriting
+	
+	prGenerateSynthDefName {
+       ^this.class.prefix ++ (extraPrefix ? "") ++ this.name.asString
+    }
 }
 
 
@@ -41,6 +46,7 @@ MultiUdef : Udef {
 			ArgSpec( setter ? this.defNameKey, 
 				udefs[0].name, ListSpec( udefs.collect(_.name) ), setterIsPrivate, \nonsynth )
 		], category )
+			.defNameKey_( setter )
 			.udefs_( udefs );
 	}
 	
