@@ -12,6 +12,8 @@ ULib {
 		
 		Udef.userDefsFolder = File.getcwd +/+ "UnitDefs";
 		
+		GlobalPathDict.put( \resources, String.scDir );
+		
 		UChain.makeDefaultFunc = {
 			UChain( \bufSoundFile, \stereoOutput ).useSndFileDur
 		};

@@ -273,7 +273,7 @@ AbstractSndFile : AbstractRichBuffer {
 	}
 
 	initAbstractSndFile { |inPath, inStartFrame, inEndFrame, inRate, inLoop|
-		 path = inPath;
+		 path = inPath.formatGPath;
 		 startFrame = inStartFrame;
 		 endFrame = inEndFrame;
 		 rate = inRate;
