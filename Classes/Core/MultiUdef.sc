@@ -29,6 +29,12 @@ HiddenUdef : Udef {
 	prGenerateSynthDefName {
        ^this.class.prefix ++ (extraPrefix ? "") ++ this.name.asString
     }
+    
+    addToAll { |name|
+		this.class.all ?? { this.class.all = IdentityDictionary() };
+		this.class.all[ name ] = this; // name doesn't need to be a Symbol
+	}
+	
 }
 
 

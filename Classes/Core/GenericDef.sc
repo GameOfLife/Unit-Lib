@@ -27,7 +27,7 @@ GenericDef : UArchivable {
 	*new { |name, args, addToAll = true|
 		var x = super.new.initArgSpecs( args );
 		if(addToAll){
-		    x.addToAll( name.asSymbol );
+		    x.addToAll( name );
 		 };
 		 ^x
 	}
@@ -109,7 +109,7 @@ GenericDef : UArchivable {
 	
 	addToAll { |name|
 		this.class.all ?? { this.class.all = IdentityDictionary() };
-		this.class.all[ name ] = this;
+		this.class.all[ name.asSymbol ] = this;
 	}
 	
 	name { ^this.class.all !? { this.class.all.findKeyForValue( this ); } }
@@ -117,7 +117,7 @@ GenericDef : UArchivable {
 	name_ { |name|
 		this.class.all ?? { this.class.all = IdentityDictionary() };
 		this.class.all[ this.name ] = nil;
-		this.class.all[ name.asSymbol ] = this;
+		this.addToAll( name );
 	}
 	
 	*allNames { ^this.class.all.keys.as( Array ).sort }
