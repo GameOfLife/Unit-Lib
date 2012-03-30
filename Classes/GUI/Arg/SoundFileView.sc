@@ -282,7 +282,7 @@ BufSndFileView {
 				f = this.performSndFile( \asSoundFile );
 				
 				w = Window(f.path, Rect(200, 200, 850, 400), scroll: false);
-				a = SCSoundFileView.new(w, w.view.bounds);
+				a = SoundFileView.new(w, w.view.bounds);
 				a.resize_(5);
 				a.soundfile = f;
 				a.read(0, f.numFrames);
