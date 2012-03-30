@@ -21,7 +21,8 @@ The library comes with a comprehensive set of GUI's that allow for manipulation 
 
 ## System Requirements ##
 
-SuperCollider 3.5~dev 
+ - SuperCollider 3.5
+ - wslib quark.
 
 ## Installation ##
 
@@ -31,6 +32,16 @@ To install, just drag the folder to your SuperCollider extensions folder.
 
 [github](https://github.com/GameOfLife/Unit-Lib)
 
+## Basic Usage ##
+```supercollider
+
+ULib.startup;
+
+UChain(\sine, \output ).gui
+
+UScore( UChain(\sine, \output ) ).gui
+
+```
 ## Acknowledgments ##
 Unit Lib was developed by Miguel Negrão and Wouter Snoei as a project of the Game of Life Foundation.
 
