@@ -57,7 +57,7 @@ UScoreEditorGui_TransportBar {
                 views[\play].value = 0;
 		    };
 		    if( newState == \preparing  ) {
-		        {Â views[\prepare].start }.defer;
+		        {Êviews[\prepare].start }.defer;
                 views[\pause].value = 2;
 		    };
 		    //resuming
@@ -66,7 +66,7 @@ UScoreEditorGui_TransportBar {
 		    };
 		    if( newState == \prepared ) {
 
-                {Â views[\prepare].stop }.defer;
+                {Êviews[\prepare].stop }.defer;
                 views[\play].value = 2;
 		    };
 		    if( newState == \paused ) {
@@ -206,6 +206,21 @@ UScoreEditorGui_TransportBar {
             .value_(1)
             .radius_( bounds.height / 8 )
             .action_({ |bt| this.score.updatePos = bt.value.booleanValue; })
+            .canFocus_(false);
+            
+        // this should become MVC
+        StaticText(view, 60@size )
+            .string_("OSC:")
+            .align_('right');
+        views[\osc] = SmoothButton( view, size@size )
+            .label_( [ "", 'x' ] )
+            .value_(this.score.oscSetter.notNil.binaryValue )
+            .radius_( bounds.height / 8 )
+            .action_({ |bt| switch( bt.value.asInt,
+	            	1, { this.score.enableOSC },
+	            	0, {  this.score.disableOSC }
+	            )
+            })
             .canFocus_(false)
 
     }

@@ -27,6 +27,7 @@ UEvent : UArchivable {
     var <duration = inf;
     var <>disabled = false;
     var <releaseSelf = true;
+    var <oscSetter;
 
     /*
     If 'releaseSelf' is set to false, then uchains will not free themselves automatically when the events stop playing.
@@ -150,6 +151,28 @@ UEvent : UArchivable {
 	
 	storeModifiersOn { |stream|
 		this.storeTags( stream );
+	}
+	
+	//// UOSCsetter support
+	oscSetter_ { |newOSCsetter, removeOld = true|
+		if( removeOld ) {
+			if( oscSetter.notNil && { (oscSetter === newOSCsetter).not } ) {
+				oscSetter.remove;
+			};
+		};
+		oscSetter = newOSCsetter;
+		this.changed( \oscSetter );
+	}
+	
+	enableOSC { |name|
+		this.oscSetter = UOSCsetter( this, name );
+	}
+	
+	disableOSC { 
+		this.oscSetter = nil;
+	}
+	
+	listOSCMessages {
 	}
 
 }

@@ -49,6 +49,7 @@ UOSCsetter {
 		
 		oscfunc.permanent = true;
 		oscfunc.enable;
+		"started UOSCsetter for %\n - messages should start with '/%/'\n - port: %\n".postf( uobject, name, NetAddr.langPort );
 	}
 	
 	addToAll { all.add( this ) }
