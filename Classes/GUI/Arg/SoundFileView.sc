@@ -86,6 +86,7 @@ BufSndFileView {
 	setViews { |inSndFile|
 		
 		views[ \path ].value = inSndFile.path;
+		views[ \path ].stringColor = if( inSndFile.exists ) { Color.black; } { Color.red(0.66); };
 		
 		views[ \startFrame ].value = inSndFile.startFrame;
 		views[ \startFrame ].clipHi = inSndFile.numFrames ? inf;
@@ -226,8 +227,15 @@ BufSndFileView {
 							};
 							Dialog.savePanel({ |path|
 								var res;
-								res = pth.asPathFromServer.moveTo( path.dirname ); 
-								if( res ) {
+								if( File.exists( pth ).not ) {
+									res = pth.asPathFromServer.moveTo( path.dirname ); 
+									if( res ) {
+										this.performSndFile( \path_ ,
+											path.dirname +/+ pth.basename 
+										);
+									};
+								} {
+									"file % already exists, changing url".postf( pth.quote );
 									this.performSndFile( \path_ ,
 										path.dirname +/+ pth.basename 
 									);
@@ -240,8 +248,15 @@ BufSndFileView {
 						if( pth.notNil ) {
 							Dialog.savePanel({ |path|
 								var res;
-								res = pth.getGPath.asPathFromServer.copyTo( path.dirname ); 
-								if( res ) {
+								if( File.exists( pth ).not ) {
+									res = pth.getGPath.asPathFromServer.copyTo( path.dirname ); 
+									if( res ) {
+										this.performSndFile( \path_ ,
+											path.dirname +/+ pth.basename 
+										);
+									};
+								} {
+									"file % already exists, changing url".postf( pth.quote );
 									this.performSndFile( \path_ ,
 										path.dirname +/+ pth.basename 
 									);

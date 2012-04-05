@@ -62,6 +62,11 @@ PartConvBufferView {
 	setViews { |inPartConvBuffer|
 		
 		views[ \path ].value = inPartConvBuffer.path;
+		if( File.exists( inPartConvBuffer.path.getGPath ? "" ) ) {
+			views[ \path ].stringColor = Color.black;
+		} {
+			views[ \path ].stringColor = Color.red(0.66);
+		};
 		
 		{ views[ \duration ].string = (inPartConvBuffer.duration ? 0).asSMPTEString(1000); }.defer;		
 	}

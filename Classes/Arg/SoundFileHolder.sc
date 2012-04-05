@@ -279,6 +279,8 @@ AbstractSndFile : AbstractRichBuffer {
 		 rate = inRate;
 		 loop = inLoop;
 	}
+	
+	exists { ^File.exists(  path.getGPath.asPathFromServer ) }
 
 	*buf{ ^BufSndFile }
 	*disk{ ^DiskSndFile }
@@ -290,7 +292,7 @@ AbstractSndFile : AbstractRichBuffer {
 
 	fromFile { |soundfile|
 		if( this.prReadFromFile( soundfile ).not ) { 
-			"%:initFromFile - could not open file '%'\n".postf( this.class, path.basename ) 
+			"%:fromFile - could not open file '%'\n".postf( this.class, path.basename ) 
 		}
 	}
 	

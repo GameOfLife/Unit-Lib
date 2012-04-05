@@ -63,6 +63,17 @@ FilePathView {
 		}.defer;
 	}
 	
+	stringColor_ { |color|
+		this.setStringColor( color );
+	}
+	
+	setStringColor { |color|
+		{ 
+			views[ \basename ].stringColor = color;
+			views[ \dirname ].stringColor = color;
+		}.defer;
+	}
+	
 	resize_ { |resize|
 		view.resize = resize ? 5;
 	}
