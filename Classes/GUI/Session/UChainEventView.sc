@@ -25,13 +25,13 @@ UChainEventView : UEventView {
         ^case { 
 	        event.duration == inf 
 	   } {
-	        Color(0.33, 0.33, 0.665)
+	        Color(0.4, 0.4, 0.8)
         } {
 	        event.releaseSelf == true;
         } {
-	        Color(0.6421568627451, 0.25, 0.6421568627451);
+	        Color(0.768, 0.3,0.768);
         } {
-	        Color(0.33, 0.4975, 0.4975);
+	        Color(0.4, 0.6, 0.6);
         };
 	}
 
