@@ -291,7 +291,7 @@ UScore : UEvent {
         var evs, prepareEvents, startEvents, releaseEvents, startAndReleaseEvents, allEvents, doPrepare, fStartAndRelease, fActualStartPos;
 
         fStartAndRelease = { |item| item.releaseSelf.not && (item.eventEndTime == item.startTime) };
-        fActualStartPos = { |x| if(startEventsActiveAtStartPos) {x.startTime.max(startPos)}{ x.startTime } };
+        fActualStartPos = { |x| if(startEventsActiveAtStartPos) {x.startTime.max(startPos)}{ x.startTime } };
 
         evs = this.eventsThatWillPlay(startPos,startEventsActiveAtStartPos).sort;
 		prepareEvents = if(assumePrepared){evs.select({ |item| item.prepareTime > startPos })}{evs};
@@ -661,7 +661,7 @@ UScore : UEvent {
 	}
 
 	printOn { arg stream;
-		stream << this.class.name << "( " << events.size <<" events )"
+		stream << this.class.name << "( " << name << ", " << events.size <<" events )"
 	}
 	
 	getInitArgs {
