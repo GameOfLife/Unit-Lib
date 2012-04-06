@@ -16,6 +16,14 @@ MultiUdef( \diskSoundFile, udefs, \soundFile )
 		} {
 			\diskSoundFile_1
 		};
+	})
+	.nameFunc_({ |unit|
+		var sf, path;
+		if( (sf = unit.get( \soundFile )).notNil && { sf.path.notNil } ) {
+			"diskSoundFile : " ++  sf.path.basename
+		} {
+			"diskSoundFile"
+		};
 	});
 
 )

@@ -86,6 +86,7 @@ Udef : GenericDef {
 	var <>func, <>category;
 	var <>synthDef;
 	var <>shouldPlayOnFunc;
+	var <>nameFunc;
 	var <>apxCPU = 1; // indicator for the amount of cpu this unit uses (for load balancing)
 
 	*initClass{
@@ -398,6 +399,14 @@ U : ObjectWithArgs {
 
     defName_ { |newDefName, keepArgs = true|
         this.init( newDefName, if( keepArgs ) { args } { [] }); // keep args
+    }
+    
+    name {
+	    if( this.def.respondsTo( \nameFunc ) && { this.def.nameFunc.notNil } ) {
+		    ^this.def.nameFunc.value( this );
+	    } {
+		    ^this.defName;
+	    };
     }
 
 	set { |...args|

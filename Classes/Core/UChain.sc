@@ -84,7 +84,7 @@ UChain : UEvent {
 		this.changed( \init );
 	}
 
-    name { ^units.collect(_.defName).asString }
+    name { ^units.collect(_.name).asString }
 
     *default_ { |chain| makeDefaultFunc = { chain.deepCopy } }
     *default { ^makeDefaultFunc.value; }

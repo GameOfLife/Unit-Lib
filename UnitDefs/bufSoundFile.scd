@@ -16,6 +16,14 @@ MultiUdef( \bufSoundFile, udefs, \soundFile )
 		} {
 			\bufSoundFile_1
 		};
+	})
+	.nameFunc_({ |unit|
+		var sf, path;
+		if( (sf = unit.get( \soundFile )).notNil && { sf.path.notNil } ) {
+			"bufSoundFile : " ++  sf.path.basename
+		} {
+			"bufSoundFile"
+		};
 	});
 
 )
