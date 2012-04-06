@@ -105,6 +105,12 @@ BufSndFileView {
 		views[ \rateRatio ].value = inSndFile.rate;
 		views[ \rateSemitones ].value = inSndFile.rate.ratiomidi.round( 1e-6);
 		
+		{ views[ \numChannels ].string = "% channel%".format( 
+				inSndFile.numChannels, 
+				if( inSndFile.numChannels == 1 ) { "" } { "s" }
+			)
+		}.defer;
+		
 	}
 	
 	setTimeMode { |mode = \frames|
@@ -326,6 +332,10 @@ BufSndFileView {
 				bt.onClose = bt.onClose.addFunc( closeFunc );
 					
 			});
+			
+		views[ \numChannels ] = StaticText( view, 60 @ viewHeight )
+			.applySkin( RoundView.skin ? () )
+			.string_( "" );
 			
 		view.view.decorator.nextLine;
 					
