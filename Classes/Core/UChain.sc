@@ -378,7 +378,7 @@ UChain : UEvent {
 	
 	addGroup { |group|
 		 groupDict.put( this, groupDict.at( this ).add( group ) ); 
-		 this.class.changed( \groupDict ); 
+		 this.class.changed( \groupDict, \add, this ); 
 	}
 	
 	removeGroup { |group|
@@ -390,7 +390,7 @@ UChain : UEvent {
 		} {
 			groupDict.put( this, groups );  // not needed?
 		};
-		this.class.changed( \groupDict); 
+		this.class.changed( \groupDict, \remove, this); 
 	}
 
 	makeGroupAndSynth { |target, startPos = 0|
@@ -406,9 +406,10 @@ UChain : UEvent {
 	                    this.removeGroup( group );
 	                    this.changed( \end, group );
 	                });
+	        
+	        units.do( _.makeSynth(group, startPos) );
 	        this.addGroup( group );
 	        this.changed( \start, group );
-	        units.do( _.makeSynth(group, startPos) );
 	    };
 	}
 
