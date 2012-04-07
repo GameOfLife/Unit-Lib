@@ -51,7 +51,7 @@ UChainGUI {
 		};
 		if( parent.class == String ) {
 			if( singleWindow && current.notNil ) {
-				parent = current.parent;
+				parent = current.parent.asView.findWindow;
 				current.remove;
 				parent.front;
 			} {
@@ -60,7 +60,7 @@ UChainGUI {
 					bounds ?? { Rect(128 rrand: 256, 64 rrand: 128, 342, 400) }, 
 					scroll: false
 				).front;
-			}
+			};
 		};
 		
 		this.makeViews( bounds );
