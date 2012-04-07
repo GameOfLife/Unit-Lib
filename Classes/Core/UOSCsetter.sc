@@ -96,7 +96,11 @@ UOSCsetter {
 					};
 				}, 
 				2, {
-					obj.set( *args );
+					if( obj.respondsTo( \set ) ) {
+						obj.set( *args );
+					} {
+						obj.perform( *[args[0].asSymbol] ++ args[1..] );
+					};
 				},
 				{
 					if( args[1].class == Symbol ) {
@@ -109,7 +113,11 @@ UOSCsetter {
 						if( args[0] == \point ) { // special case
 							obj.set( \point, args[[1,2]].asPoint );
 						} {
-							obj.set( args[0], args[1..] ); // array
+							if( obj.respondsTo( \set ) ) {
+								obj.set( args[0], args[1..] ); // array
+							} {
+								obj.perform( *[args[0].asSymbol] ++ args[1..] );
+							};
 						};
 					};
 				}
