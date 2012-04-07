@@ -20,6 +20,8 @@
 UChainGUI {
 	
 	classvar <>skin;
+	classvar <>current;
+	classvar <>singleWindow = false;
 	
 	var <chain;
 	
@@ -38,7 +40,7 @@ UChainGUI {
 	}
 	
 	*new { |parent, bounds, chain|
-		^super.newCopyArgs( chain ).init( parent, bounds );
+		^super.newCopyArgs( chain ).init( parent, bounds ).makeCurrent;
 	}
 	
 	init { |inParent, bounds|
@@ -48,16 +50,23 @@ UChainGUI {
 			parent = chain.class.asString;
 		};
 		if( parent.class == String ) {
-			
-			parent = Window(
-				parent, 
-				bounds ?? { Rect(128 rrand: 256, 64 rrand: 128, 342, 400) }, 
-				scroll: false
-			).front;
+			if( singleWindow && current.notNil ) {
+				parent = current.parent;
+				current.remove;
+				parent.front;
+			} {
+				parent = Window(
+					parent, 
+					bounds ?? { Rect(128 rrand: 256, 64 rrand: 128, 342, 400) }, 
+					scroll: false
+				).front;
+			}
 		};
 		
 		this.makeViews( bounds );
 	}
+	
+	makeCurrent { current = this }
 	
 	makeViews { |bounds|
 		RoundView.useWithSkin( skin ++ (RoundView.skin ? ()), {
@@ -97,7 +106,7 @@ UChainGUI {
 		
 		composite = CompositeView( parent, bounds ).resize_(5);
 		composite.addFlowLayout( margin, gap );
-		composite.onClose = { controller.remove; };
+		composite.onClose = { controller.remove; if( current == this ) { current = nil } };
 		
 		// startbutton
 		views[ \startButton ] = SmoothButton( composite, 14@14 )
