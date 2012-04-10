@@ -88,6 +88,7 @@ Udef : GenericDef {
 	var <>shouldPlayOnFunc;
 	var <>nameFunc;
 	var <>apxCPU = 1; // indicator for the amount of cpu this unit uses (for load balancing)
+	var <>extraPrefix;
 
 	*initClass{
 		defsFolders = [ 
@@ -109,7 +110,7 @@ Udef : GenericDef {
 	*callByName { ^true }
 
     prGenerateSynthDefName {
-       ^this.class.prefix ++ this.name.asString
+       ^this.class.prefix ++ (extraPrefix ? "") ++ this.name.asString
     }
 
 	init { |inFunc|

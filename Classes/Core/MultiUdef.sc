@@ -22,13 +22,23 @@ HiddenUdef : Udef {
 	// these are not added to the global udef dict
 	
 	classvar <>all;
-	var <>extraPrefix;
 	
 	*prefix { ^"uh_" } // synthdefs get another prefix to avoid overwriting
+    
+    addToAll { |name|
+		this.class.all ?? { this.class.all = IdentityDictionary() };
+		this.class.all[ name ] = this; // name doesn't need to be a Symbol
+	}
 	
-	prGenerateSynthDefName {
-       ^this.class.prefix ++ (extraPrefix ? "") ++ this.name.asString
-    }
+}
+
+HiddenFreeUdef : FreeUdef {
+	
+	// these are not added to the global udef dict
+	
+	classvar <>all;
+	
+	*prefix { ^"uh_" } // synthdefs get another prefix to avoid overwriting
     
     addToAll { |name|
 		this.class.all ?? { this.class.all = IdentityDictionary() };
