@@ -678,7 +678,7 @@ UChain : UEvent {
 	}
 	
 	get { |key|
-		^units.select({ |u| u.keys.includes( key ) }).do(_.get(key));
+		^units.select({ |u| u.keys.includes( key ) }).collect(_.get(key));
 	}
 	
 	add { |unit|
