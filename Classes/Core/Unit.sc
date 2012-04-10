@@ -93,7 +93,7 @@ Udef : GenericDef {
 		defsFolders = [ 
 			this.filenameSymbol.asString.dirname.dirname.dirname +/+ "UnitDefs"
 		];
-		userDefsFolder = Platform.systemAppSupportDir ++ "/UnitDefs/";
+		userDefsFolder = Platform.userAppSupportDir ++ "/UnitDefs/";
 	}
 
 	*basicNew { |name, args, category, addToAll=true|

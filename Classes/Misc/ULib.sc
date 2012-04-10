@@ -9,9 +9,7 @@ ULib {
 	
 	*startup {
 		var defs;	
-		
-		Udef.userDefsFolder = File.getcwd +/+ "UnitDefs";
-		
+				
 		GlobalPathDict.put( \resources, String.scDir );
 		
 		UChain.makeDefaultFunc = {
@@ -23,6 +21,10 @@ ULib {
 		};
 		
  		defs = Udef.loadAllFromDefaultDirectory.collect(_.synthDef).flat.select(_.notNil);
+ 		
+ 		UnitRack.defsFolders = UnitRack.defsFolders.add( 
+			Platform.userAppSupportDir ++ "/UnitRacks/";
+		);
 
         ULib.servers.do{ |sv| sv.waitForBoot({
 
