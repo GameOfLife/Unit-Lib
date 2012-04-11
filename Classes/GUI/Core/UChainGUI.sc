@@ -21,7 +21,7 @@ UChainGUI {
 	
 	classvar <>skin;
 	classvar <>current;
-	classvar <>singleWindow = false;
+	classvar <>singleWindow = true;
 	
 	var <chain;
 	
@@ -134,6 +134,19 @@ UChainGUI {
 				} ]
 		 	);
 			
+		composite.decorator.shift( bounds.width - 14 - 80, 0 );
+		
+		views[ \singleWindow ] = SmoothButton( composite, 74@14 )
+			.label_( [ "single window", "single window" ] )
+			.border_( 1 )
+			.hiliteColor_( Color.green )
+			.value_( this.class.singleWindow.binaryValue )
+			.resize_(3)
+			.action_({ |bt|
+				this.class.singleWindow = bt.value.booleanValue;
+			});
+			
+		
 		if( chain.groups.size > 0 ) {
 			views[ \startButton ].value = 1;
 		};
