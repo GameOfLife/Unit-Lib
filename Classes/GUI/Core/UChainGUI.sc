@@ -21,7 +21,7 @@ UChainGUI {
 	
 	classvar <>skin;
 	classvar <>current;
-	classvar <>singleWindow = false;
+	classvar <>singleWindow = true;
 	
 	var <chain;
 	
@@ -52,14 +52,11 @@ UChainGUI {
 		if( parent.class == String ) {
 			if( singleWindow && current.notNil ) {
 				parent = current.parent.asView.findWindow;
-				{
-					current.remove;
-					parent.front;
-					{
-						this.makeViews( bounds );
-						this.makeCurrent;
-					}.defer(0.01);
-				}.defer(0.01);
+				current.views.singleWindow.focus;
+				current.remove;
+				this.makeViews( bounds );
+				this.makeCurrent;
+				parent.front;
 			} {
 				parent = Window(
 					parent, 
@@ -143,7 +140,7 @@ UChainGUI {
 					chain.release 
 				} ]
 		 	);
-		/*
+		
 		composite.decorator.shift( bounds.width - 14 - 80, 0 );
 		
 		views[ \singleWindow ] = SmoothButton( composite, 74@14 )
@@ -155,7 +152,7 @@ UChainGUI {
 			.action_({ |bt|
 				this.class.singleWindow = bt.value.booleanValue;
 			});
-		*/
+		
 		if( chain.groups.size > 0 ) {
 			views[ \startButton ].value = 1;
 		};
