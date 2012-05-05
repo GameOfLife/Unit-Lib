@@ -38,9 +38,16 @@ ArgSpec : Spec {
 	}
 	
 	init { 
-		spec = (spec ? name).asSpec; 
+		var specName;
 		if( spec.isNil ) {
-			spec = Spec.forObject( default );
+			specName = ControlSpec.specs.keys.detect({ |key|
+				name.matchOSCAddressPattern( key );
+			});
+			if( specName.notNil ) {
+				spec = ControlSpec.specs[ specName ];
+			} {
+				spec = Spec.forObject( default );
+			};
 		};
 		if( spec.notNil ) { default = default ? spec.default };
 		//default = this.constrain( default );
