@@ -58,6 +58,14 @@ UOut -> *ar { |id, channelsArray|
 
 UIn {
 	
+	*initClass {
+		Class.initClassTree(ControlSpec);
+		ControlSpec.specs = ControlSpec.specs.addAll([
+			'u_*_*r_*_bus' -> PositiveIntegerSpec(),	
+		]);
+	}
+
+	
 	*key { ^'u' } // 'wfsu_' controls automatically become private args
 	
 	*firstPrivateBus { ^NumOutputBuses.ir + NumInputBuses.ir }
@@ -118,6 +126,13 @@ UOut : UIn { // overwrites bus (ReplaceOut)
 }
 
 UMixOut : UIn {
+	
+	*initClass {
+		Class.initClassTree(ControlSpec);
+		ControlSpec.specs = ControlSpec.specs.addAll([
+			'u_o_*r_*_lvl' -> \amp.asSpec,	
+		]);
+	}
 	
 	*ar { |id = 0, channelsArray, inLevel = 0, offset = false |
 		^channelsArray.asCollection.collect({ |item, i| 
