@@ -154,7 +154,7 @@ UMenuBar {
 		}).setShortCut("i",true);
 
 		SCMenuItem.new(events, "Delete").action_({
-			UScoreEditorGUI.current !! { |x| x.scoreView.deleteSelected }
+			UScoreEditorGUI.current !! { |x| x.scoreView.deleteSelected }
 		}).setShortCut("r",true);
 
 		SCMenuSeparator.new(events);

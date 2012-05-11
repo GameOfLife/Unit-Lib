@@ -76,7 +76,10 @@ UdefListView {
 	init { |parent, bounds|
 		
 		var categories, names, rackCategories, g;
+		var scrollerMargin = 12;
 		
+		if( GUI.id == \qt ) { scrollerMargin = 20 };
+			
 		collapsed = collapsed ?? { () };
 		
 		if( parent.notNil ) {
@@ -126,14 +129,14 @@ UdefListView {
 
 		g = { |cat, udefs|
             views[ cat ] = ExpandView( views[ \scrollview ],
-                (bounds.width - 18)@( (udefs.size + 1) * 22 ),
-                (bounds.width - 18)@18,
+                (bounds.width - (scrollerMargin+6))@( (udefs.size + 1) * 22 ),
+                (bounds.width - (scrollerMargin+6))@18,
                 collapsed[ cat ] ? true
             );
 
             views[ cat ].addFlowLayout( 0@0, 4@4 );
 
-            StaticText( views[ cat ], (bounds.width - 36)@18 )
+            StaticText( views[ cat ], (bounds.width - (18 + scrollerMargin + 6))@18 )
                 .string_( " " ++ cat.asString )
                 .applySkin( RoundView.skin ? () );
 
@@ -141,7 +144,7 @@ UdefListView {
 	            var hasFile = false, wd = 36;
 	            if( udef.isKindOf( GenericDef ) ) {
 		            hasFile = Udef.findDefFilePath( udef.name ).notNil;
-		            if( hasFile ) { wd = 36 + 4 + 18 };
+		            if( hasFile ) { wd = 36 + 4 + scrollerMargin + 6 };
 	            };
                 DragSource( views[ cat ], (bounds.width - wd)@18 )
                     .object_( udef )
