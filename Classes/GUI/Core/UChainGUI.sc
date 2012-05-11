@@ -46,6 +46,10 @@ UChainGUI {
 	init { |inParent, bounds|
 		parent = inParent;
 		
+		if( skin.font.class != Font.implClass ) { // quick hack to make sure font is correct
+			skin.font = Font( Font.defaultSansFace, 10 );
+		};
+		
 		if( parent.isNil ) { 
 			parent = chain.class.asString;
 		};
@@ -401,10 +405,14 @@ UChainGUI {
 		var addLast, ug, header;
 		var width;
 		var notMassEdit;
+		var scrollerMargin = 12;
+		
+		if( GUI.id == \qt ) { scrollerMargin = 20 };
 		
 		notMassEdit = chain.class != MassEditUChain;
 		
-		width = scrollView.bounds.width - 12 - (margin.x * 2);
+		
+		width = scrollView.bounds.width - scrollerMargin - (margin.x * 2);
 		
 		unitInitFunc = { |unit, what ...args|
 			if( what === \init ) { // close all views and create new
@@ -582,7 +590,7 @@ UChainGUI {
 			header.onClose_({ unit.removeDependant( unitInitFunc ) });
 			unit.gui( scrollView, 
 				scrollView.bounds.copy.width_( 
-					scrollView.bounds.width - 12 - (margin.x * 2) 
+					scrollView.bounds.width - scrollerMargin - (margin.x * 2) 
 				)  
 			);
 		});
@@ -645,6 +653,7 @@ UChainGUI {
 		);
 		
 		scrollView
+			.hasBorder_( false )
 			.hasHorizontalScroller_( false )
 			.autohidesScrollers_( false )
 			.resize_(5)
