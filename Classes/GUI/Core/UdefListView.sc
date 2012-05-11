@@ -92,6 +92,7 @@ UdefListView {
 		
 		views[ \scrollview ] = ScrollView( view, view.bounds.moveTo(0,0) ).resize_(5);
 		views[ \scrollview ].addFlowLayout;
+		views[ \scrollview ].hasBorder = false;
 		
 		categories = [];
 		
