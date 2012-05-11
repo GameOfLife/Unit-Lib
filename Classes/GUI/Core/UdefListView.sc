@@ -209,7 +209,7 @@ UdefListView {
 					{ this.rebuild }.defer( 0.01 );
 				});
 				
-			StaticText(views[ \scrollview],100@25).string_("UDefs");
+			StaticText(views[ \scrollview],100@25).string_("Udefs");
 			views[ \scrollview].decorator.nextLine;
 			categories.pairsDo(g);
 			StaticText(views[ \scrollview],100@25).string_("UnitRacks");
