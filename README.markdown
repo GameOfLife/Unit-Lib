@@ -2,6 +2,8 @@ Unit Lib
 ===============================================================================
 A project of the [Game Of Life Foundation](http://gameoflife.nl/en).
 
+![](https://github.com/GameOfLife/Unit-Lib/raw/master/HelpSource/Classes/ULib%20screenshot.png)
+
 The Unit Library is a system that provides high level abstractions on top of the SuperCollider language. These abstractions simplify the process of creating synthesis units, preparing the resources needed to play those units, patching multiple units and assigning time events (with a start time and duration) to a group of units.
 The library was created to serve as the backbone of the Game of Life Foundation's WFSCollider V2.0, a spatialization software entirely based on SuperCollider that allows users without knowledge of computer programming languages to create spatial compositions for playback using the Wave Field Synthesis spatialization technique.  
 
@@ -26,7 +28,12 @@ The library comes with a comprehensive set of GUI's that allow for manipulation 
 
 ## Installation ##
 
-To install, just drag the folder to your SuperCollider extensions folder.
+
+1) Go to https://github.com/GameOfLife/Unit-Lib/tags, download zip for latest version (currently v1.0) and place in extensions folder.
+
+or 
+
+2) Clone with git: ‘git clone git://github.com/GameOfLife/Unit-Lib.git’
 
 ## Git Repo##
 
