@@ -38,12 +38,14 @@ EQdef {
 			\rs: [ 0.6, 10, \lin, 0.1, 1 ].asSpec,
 			\bw: [ 0.01, 10, \exp, 0.1, 1 ].asSpec,
 			\db: [ -36, 36, \lin, 0.25, 0 ].asSpec,
-			\a0: [-1,1,\lin, 0, 0 ].asSpec,
-			\a1: [-1,1,\lin, 0, 0 ].asSpec,
-			\b1: [-1,1,\lin, 0, 0 ].asSpec,
-			\b2: [-1,1,\lin, 0, 0 ].asSpec,
+			\a0: [-1,1,\lin, 0.001, 0 ].asSpec,
+			\a1: [-1,1,\lin, 0.001, 0 ].asSpec,
+			\a2: [-1,1,\lin, 0.001, 0 ].asSpec,
+			\b1: [-1,1,\lin, 0.001, 0 ].asSpec,
+			\b2: [-1,1,\lin, 0.001, 0 ].asSpec,
 			\radius: [ 0,1, \lin,0,0.8].asSpec,
-			\coef: [-0.999, 0.999, \lin, 0.001, 0 ].asSpec 
+			\coef: [-0.999, 0.999, \lin, 0.001, 0 ].asSpec,
+			\order: [0,5,\lin,1,2].asSpec
 		);
 		
 		global = EQdef( 
