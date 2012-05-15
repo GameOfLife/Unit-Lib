@@ -16,7 +16,7 @@ ULib {
 			UChain( \bufSoundFile, \stereoOutput ).useSndFileDur
 		};
 		
-		if(thisProcess.platform.class.asSymbol == 'OSXPlatform') {
+		if( (thisProcess.platform.class.asSymbol == 'OSXPlatform') && (GUI.id == \cocoa) ) {
 			UMenuBar();
 		};
 		
