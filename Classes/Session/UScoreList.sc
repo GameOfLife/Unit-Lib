@@ -95,5 +95,7 @@ UScoreList : UEvent {
     release{ ^this.stop }
 
     gui { }
+    
+    storeArgs { ^scores }
 
 }
