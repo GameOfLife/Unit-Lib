@@ -24,7 +24,7 @@ UMenuBar {
     *new { |index = 3|
 		
 		var wfsMenu, scoreMenu, pathMenu, helpMenu, viewMenu, defaultMenu, addEvent,
-		 events, menus, sessionMenu, sessionAdd, sessionNewAdd;
+		 events, menus, sessionMenu, sessionAdd, sessionNewAdd, sessionSelectedEvents;
 
 		menus = ();
 /* USession */
@@ -77,10 +77,11 @@ UMenuBar {
                         session.add( score.deepCopy )
                     }
                 }
-            }).setShortCut("A",true);
-
-
-        SCMenuItem.new(sessionAdd, "Selected events").action_({
+            });
+            
+        sessionSelectedEvents = SCMenuGroup.new(sessionAdd, "Selected events");
+        
+        SCMenuItem.new(sessionSelectedEvents, "all").action_({
             USession.current !! { |session|
                 UScoreEditorGUI.current !! { |editor|
                     editor.selectedEvents !! { |events|
@@ -88,9 +89,9 @@ UMenuBar {
                     }
                 }
             }
-        }).setShortCut("A",true);
+        });
 
-        SCMenuItem.new(sessionAdd, "Selected events flattened").action_({
+        SCMenuItem.new(sessionSelectedEvents, "flattened").action_({
             USession.current !! { |session|
                 UScoreEditorGUI.current !! { |editor|
                     editor.selectedEvents !! { |events|
@@ -98,9 +99,9 @@ UMenuBar {
                     }
                 }
             }
-        }).setShortCut("A",true);
+        });
 
-        SCMenuItem.new(sessionAdd, "Selected events into a UChainGroup").action_({
+        SCMenuItem.new(sessionSelectedEvents, "into a UChainGroup").action_({
                     USession.current !! { |session|
                         UScoreEditorGUI.current !! { |editor|
                             editor.selectedEvents !! { |events|
@@ -108,7 +109,18 @@ UMenuBar {
                             }
                         }
                     }
-                }).setShortCut("A",true);
+                });
+                
+          SCMenuItem.new(sessionSelectedEvents, "into a UScore").action_({
+                    USession.current !! { |session|
+                        UScoreEditorGUI.current !! { |editor|
+                            editor.selectedEvents !! { |events|
+                                session.add( UScore(* events.collect{ |x| x.deepCopy.getAllUChains }.flat ) )
+                            }
+                        }
+                    }
+                });
+
 
 		//events
 
