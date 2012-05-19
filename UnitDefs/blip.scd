@@ -6,5 +6,8 @@ Udef(\blip,{ |rate = 1, freq = 100, noiseLevel = 0.125, blipLevel = 1|
 		LFPulse.kr(10 * rate); 
 	UMixOut.ar(0, out, 0, true )
 }).category_( \synthesis )
+	.setSpec( \noiseLevel, \amp.asSpec )
+	.setSpec( \blipLevel, \amp.asSpec )
 	.setSpecMode( \noiseLevel, \normal )
 	.setSpecMode( \blipLevel, \normal )
+	
