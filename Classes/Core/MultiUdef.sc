@@ -139,6 +139,37 @@ MultiUdef : Udef {
 		};
 	}
 	
+	findUdefsWithArgName { |key|
+		if( key === this.defNameKey ) {
+			^[ this ];
+		} {
+			^udefs.select({ |udef|
+				udef.argNames.includes( key );
+			});
+		};
+	}
+	
+	setSpec { |name, spec, mode| // set the spec for all enclosed udefs
+		this.findUdefsWithArgName( name ).do({ |item|
+			item.setSpec( name, spec, mode );
+		});
+	}
+	
+	setSpecMode { |...pairs|
+		pairs.pairsDo({ |name, mode|
+			this.findUdefsWithArgName( name ).do({ |item|
+				item.setSpecMode( name, mode );
+			});
+		});
+	}
+	
+	setArgSpec { |argSpec|
+		argSpec = argSpec.asArgSpec;
+		this.findUdefsWithArgName( argSpec.name ).do({ |item|
+			item.setArgSpec( argSpec );
+		});
+	}
+	
 	argSpecs { |unit|
 		^this.findUdefFor( unit ).argSpecs( unit ) ++ argSpecs;
 	}
