@@ -1,14 +1,9 @@
 (
-var udefs;
-
-udefs = [1,2,3,4,5,6,7,8,10,12,16,24,32].collect({ |numChannels|
-	HiddenUdef( numChannels, { |bus|
-		Out.ar( bus, UGlobalEQ.ar( UIn.ar( 0, numChannels ) ) * UEnv.kr );
-	}).setSpec( \bus, PositiveIntegerSpec( 0 ) )
-	  .extraPrefix_( "output" )
-});
-
-MultiUdef( \output, udefs, \io, \numChannels, false )
+MultiChannelUdef( \output, { |bus|
+	Out.ar( bus, UGlobalEQ.ar( UIn.ar( 0, Udef.numChannels ) ) * UEnv.kr );
+})	
+	.category_( \io )
+	.setSpec( \bus, PositiveIntegerSpec( 0 ) )
 	.shouldPlayOnFunc_({ |unit, target|
 		target.asTarget.server.isLocal; // safety measure: no output on wfs servers
 	})
