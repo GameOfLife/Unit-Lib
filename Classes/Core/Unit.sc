@@ -81,15 +81,16 @@ RoundView.useWithSkin( (
 Udef : GenericDef {
 	
 	classvar <>all, <>defsFolders, <>userDefsFolder;
-
-	
+	classvar <>buildUdef; // the Udef currently under construction
+		
 	var <>func, <>category;
 	var <>synthDef;
 	var <>shouldPlayOnFunc;
 	var <>nameFunc;
 	var <>apxCPU = 1; // indicator for the amount of cpu this unit uses (for load balancing)
 	var <>extraPrefix;
-
+	var <>numChannels = 1;
+	
 	*initClass{
 		defsFolders = [ 
 			this.filenameSymbol.asString.dirname.dirname.dirname +/+ "UnitDefs"
@@ -108,6 +109,8 @@ Udef : GenericDef {
 	*prefix { ^"u_" }
 
 	*callByName { ^true }
+	
+	*numChannels { ^buildUdef !? { buildUdef.numChannels } ? 1 }
 
     prGenerateSynthDefName {
        ^this.class.prefix ++ (extraPrefix ? "") ++ this.name.asString
@@ -118,7 +121,9 @@ Udef : GenericDef {
 		
 		func = inFunc;
 		
+		this.class.buildUdef = this;
 		this.synthDef = SynthDef( this.prGenerateSynthDefName, func );
+		this.class.buildUdef = nil;
 		
 		argSpecs = ArgSpec.fromSynthDef( this.synthDef, argSpecs );
 		
