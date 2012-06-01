@@ -73,9 +73,17 @@ GenericDef : UArchivable {
 	*existsCaseSensitive { |path|
 		^(path.dirname+/+"*").pathMatch.detect{|x|x.compare(path)==0}.notNil
 	}
+	
+	*allDefsFolders {
+		if( this.userDefsFolder.notNil ) {
+			^this.defsFolders ++ [ this.userDefsFolder ];
+		} {
+			^this.defsFolders;
+		};
+	}
 
 	*loadAllFromDefaultDirectory {
-	    ^this.defsFolders.reverse.collect({ |path|
+	    ^this.allDefsFolders.reverse.collect({ |path|
 		    (path ++ "/*.scd").pathMatch.collect({ |path| path.load })
 	    }).flatten(1);
 	}
