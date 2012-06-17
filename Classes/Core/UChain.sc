@@ -251,7 +251,7 @@ UChain : UEvent {
 	dur_ { |x| this.duration_(x)}
 	
 	gain { ^this.getGain }
-	gain_ { |gain = 0| ^this.setGain }
+	gain_ { |gain = 0| ^this.setGain(gain) }
 	
 	muted_ { |bool|
 		muted = bool.booleanValue;
