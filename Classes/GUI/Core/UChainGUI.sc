@@ -34,7 +34,11 @@ UChainGUI {
 			skin = ( 
 				labelWidth: 80, 
 				font: Font( Font.defaultSansFace, 10 ), 
-				hiliteColor: Color.gray(0.33)
+				hiliteColor: Color.gray(0.33),
+				SmoothButton: (
+					border: 0.75,
+					background:  Gradient( Color.white, Color.gray(0.85), \v ) 
+				)
 			);
 		});
 	}
@@ -122,7 +126,10 @@ UChainGUI {
 		// startbutton
 		views[ \startButton ] = SmoothButton( composite, 14@14 )
 			.label_( ['power', 'power'] )
-			.hiliteColor_( Color.green.alpha_(0.5) )
+			.radius_(7)
+			.background_( Color.clear )
+			.border_(1)
+			.hiliteColor_( Color.green )
 			.action_( [ { 
 					var startAction;
 					releaseTask.stop;
