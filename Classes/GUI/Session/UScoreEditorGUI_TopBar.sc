@@ -144,6 +144,7 @@ UScoreEditorGui_TopBar {
 			.canFocus_(false)
 			.radius_(0)
 			.border_(1).background_(Color.grey(0.8))
+			.font_( Font( font.name, 12 ).boldVariant )
 			.action_({
 				this.selectedEventsOrAll !? { |x| this.scoreEditor.splitEventsAtPos( x ) }
 			});
@@ -153,6 +154,7 @@ UScoreEditorGui_TopBar {
 			.canFocus_(false)
 			.radius_([0,8,8,0])
 			.border_(1).background_(Color.grey(0.8))
+			.font_( Font( font.name, 10 ).boldVariant )
 			.action_({
 			    this.selectedEventsOrAll !? { |x| this.scoreEditor.trimEventsEndAtPos( x ) }
 		    });
