@@ -135,7 +135,7 @@ UChainCodeGUI : UChainGUI {
 		views = ();
 
 		//ctrl = SimpleController( unit );
-        if( (U.uneditableCategories.includes(unit.def.category) || [FreeUdef, MultiUdef].includes(unit.def.class)).not ) {
+        if( (U.uneditableCategories.includes(unit.def.category) || [FreeUdef, MultiUdef, MultiChannelUdef].includes(unit.def.class)).not ) {
             StaticText(comp, 200@17).font_(font).string_("Function:");
             comp.decorator.nextLine;
             views[\func] = CodeEditView.new(comp, width@100, unit.def.func)
