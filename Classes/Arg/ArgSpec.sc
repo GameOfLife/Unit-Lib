@@ -39,6 +39,16 @@ ArgSpec : Spec {
 	
 	init { 
 		var specName;
+		if( spec.class == Symbol ) {
+			specName = ControlSpec.specs.keys.detect({ |key|
+				spec.matchOSCAddressPattern( key );
+			});
+			if( specName.notNil ) {
+				spec = ControlSpec.specs[ specName ];
+			} {
+				spec = nil;
+			};
+		};
 		if( spec.isNil ) {
 			specName = ControlSpec.specs.keys.detect({ |key|
 				name.matchOSCAddressPattern( key );
@@ -103,10 +113,17 @@ ArgSpec : Spec {
 	}
 
 	storeOn { arg stream;
+		var spc;
+		spc = ( spec.findKey ? spec );
+		if( spc.class == Symbol ) {
+			spc = spc.asCompileString ++ ".asSpec";
+		} {
+			spc = spc.asCompileString;
+		};
 		stream << this.class.name << "(" <<* [
 			name.asCompileString, 
 			default.asCompileString, 
-			( spec.findKey ? spec ).asCompileString, 
+			spc, 
 			private,
 			mode.asCompileString
 		]  <<")"
