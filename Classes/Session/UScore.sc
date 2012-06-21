@@ -682,7 +682,7 @@ UScore : UEvent {
 	
 	storeParamsOn { arg stream;
 		var args = this.storeArgs;
-		stream << "(";
+		stream << "(*[";
 		stream <<* args.collect({ |item|
 			if( item.isKindOf( UEvent ) ) {
 				"\n\t" ++ item.asCompileString
@@ -690,7 +690,7 @@ UScore : UEvent {
 				item.asCompileString;
 			};
 		});
-		stream << ")";
+		stream << "])";
 	}
 	
 	textArchiveFileExtension { ^"uscore" }
