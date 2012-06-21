@@ -230,7 +230,7 @@ UMenuBar {
 		viewMenu = SCMenuGroup.new(nil, "View", index + 3);
 		SCMenuItem.new(viewMenu, "EQ").action_( { UGlobalEQ.gui; });		SCMenuItem.new(viewMenu, "Level").action_( { UGlobalGain.gui; });
 		SCMenuItem.new(viewMenu, "Udefs").action_( { UdefListView(); });
-		SCMenuItem.new(viewMenu, "Meter").action_({
+		SCMenuItem.new(viewMenu, "Level meters").action_({
 			ULib.servers.first.meter;
 		});
 	}
