@@ -31,7 +31,7 @@ UMenuBar {
 		sessionMenu = SCMenuGroup.new(nil, "Session", index);
 		SCMenuItem.new(sessionMenu,  "New").action_({
 			USession.new.gui
-		}).setShortCut("n",true);
+		});
 		
 		SCMenuItem.new(sessionMenu, "Open...").action_({
 			USession.read(nil, USessionGUI(_) )
@@ -39,13 +39,12 @@ UMenuBar {
 		
 		SCMenuItem.new(sessionMenu, "Save").action_({
 			USession.current !! _.save
-		})
-		.setShortCut("s",true);			
+		});	
 			
 		SCMenuItem.new(sessionMenu, "Save as...").action_({
 			USession.current !! _.saveAs
-		})
-		.setShortCut("S",true);
+		});
+		
 		SCMenuSeparator.new(sessionMenu);
 /* USession - ADD OBJECTS */
         sessionAdd = SCMenuGroup.new(sessionMenu, "Add");
@@ -69,7 +68,7 @@ UMenuBar {
                                 session.add( score )
                             }
                         }
-                    }).setShortCut("A",true);
+                    });
 
         SCMenuItem.new(sessionAdd, "Current score duplicated").action_({
                 USession.current !! { |session|
@@ -131,19 +130,19 @@ UMenuBar {
 
 		SCMenuItem.new(events,  "New").action_({
 			UScore.new.gui;
-		});
+		}).setShortCut("n",true);
 
 		SCMenuItem.new(events, "Open...").action_({
 			UScore.openWFS(nil, UScoreEditorGUI(_) )
-		});
+		}).setShortCut("o",true);
 
 		SCMenuItem.new(events, "Save").action_({
 			UScore.current !! _.save
-		});
+		}).setShortCut("s",true);
 
 		SCMenuItem.new(events, "Save as...").action_({
 			UScore.current !! _.saveAs
-		});
+		}).setShortCut("S",true);	
 
 		SCMenuSeparator.new(events);
 		
