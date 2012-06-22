@@ -364,5 +364,9 @@ EQSetting {
 	 }
 	 
 	 storeArgs { ^[ def, setting ] }
+	 
+	 gui { |parent, bounds|
+		 ^EQView( parent, bounds, this ); 
+	 }
 
 }
