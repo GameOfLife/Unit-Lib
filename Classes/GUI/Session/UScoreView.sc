@@ -121,18 +121,45 @@ UScoreView {
     selectedEventsOrAll { ^usessionMouseEventsManager.selectedEventsOrAll }
 
     editSelected{
-        var event, events = this.selectedEvents;
+        var event, events = this.selectedEvents, gui, currentScore, chains;
         switch(events.size)
-            {0}{}
+            {0}{ 
+	            currentScore = this.currentScore;
+	            chains = currentScore.getAllUChains;
+	            if( chains.size > 0 ) {
+	           	 gui = MassEditUChain( chains ).gui;
+	                 gui.windowName = "MassEditUChain : % (all % events)".format( 
+	                    currentScore.name, 
+	                    chains.size
+	                 );
+	            };
+	        }
             {1}{
                 event = events[0];
                 if(event.isFolder){
-                    MassEditUChain(event.getAllUChains).gui
+                    gui = MassEditUChain(event.getAllUChains).gui;
+                    currentScore = this.currentScore;
+                    gui.windowName = "MassEditUChain : % [ % ]".format( 
+                    	currentScore.name, 
+                    	currentScore.events.indexOf( event )
+                    );
                 } {
-                    event.gui
+                    gui = event.gui;
+                    currentScore = this.currentScore;
+                    gui.windowName = "UChain : % [ % ]".format( 
+                    	currentScore.name, 
+                    	currentScore.events.indexOf( event )
+                    );
                 }
             }
-            { MassEditUChain(events.collect(_.getAllUChains).flat).gui }
+            { 
+	            
+	            gui = MassEditUChain(events.collect(_.getAllUChains).flat).gui;
+                 gui.windowName = "MassEditUChain : % ( % events )".format( 
+                    this.currentScore.name, 
+                    gui.chain.uchains.size
+                 );
+	       }
 
     }
 

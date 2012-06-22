@@ -673,6 +673,17 @@ UChainGUI {
 		composite.remove;
 	}
 	
+	window { 
+		^composite.getParents.last.findWindow;
+	}
+	windowName { 
+		^this.window.name;
+	}
+	
+	windowName_ { |name| 
+		this.window.name = name;
+	}
+	
 	close {
 		if( composite.isClosed.not ) {
 			composite.getParents.last.findWindow.close;

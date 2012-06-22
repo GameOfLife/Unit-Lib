@@ -196,7 +196,7 @@ UScoreEditorGuiMouseEventsManager {
                         scoreView.addtoScoreList(theEventView.event);
                     }.defer }
                 } {
-                    theEventView.event.gui;
+                    scoreView.editSelected;
                 }
             }
 		};
