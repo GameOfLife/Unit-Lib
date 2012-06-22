@@ -53,14 +53,16 @@ EQdef {
 			'peak1', BPeakEQ,
 			'peak2', BPeakEQ,
 			'peak3', BPeakEQ,
-			'hiShelf', BHiShelf
+			'hiShelf', BHiShelf,
+			'gain', Gain
 		).defaultSetting_(
 			[ 
 				[ 100, 1, 0 ], 
 				[ 250, 1, 0 ], 
 				[ 1000, 1, 0 ], 
 				[ 3500, 1, 0 ], 
-				[ 6000, 1, 0 ]
+				[ 6000, 1, 0 ],
+				[ 0 ]
 			]
 		);
 		
