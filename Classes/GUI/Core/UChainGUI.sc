@@ -321,6 +321,7 @@ UChainGUI {
 						composite.children[0].focus; // this seems to prevent a crash..
 						composite.remove;
 						this.makeViews( originalBounds );
+						this.makeCurrent;
 					}.defer(0.01);
 				};
 			})
@@ -330,6 +331,7 @@ UChainGUI {
 						composite.children[0].focus; // this seems to prevent a crash..
 						composite.remove;
 						this.makeViews( originalBounds );
+						this.makeCurrent;
 					}.defer(0.01);
 				};
 			});
