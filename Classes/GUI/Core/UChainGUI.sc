@@ -34,7 +34,7 @@ UChainGUI {
 			skin = ( 
 				labelWidth: 80, 
 				font: Font( Font.defaultSansFace, 10 ), 
-				hiliteColor: Color.gray(0.33),
+				hiliteColor: Color.black.alpha_(0.33),
 				SmoothButton: (
 					border: 0.75,
 					background:  Gradient( Color.white, Color.gray(0.85), \v ) 
