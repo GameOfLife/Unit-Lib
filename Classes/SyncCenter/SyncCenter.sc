@@ -135,7 +135,7 @@ SyncCenter {
 			recdev = this.recDef;
 			recSynths = recSynths.addAll( 
 				this.servers.collect({ |server, i|  
-					if(verbose) { ("playing receve sync synthdef for server "++i).postln };
+					if(verbose) { ("playing receve sync synthdef for server %\n").postf(server) };
 					Synth( "sync_receive", [\id, 100+i,\in,inBus], server ).register
 				}) 
 			); 
