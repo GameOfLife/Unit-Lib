@@ -20,13 +20,12 @@
 
 
 UMenuBar {
+	
+	classvar <>wfsMenu, <>scoreMenu, <>pathMenu, <>helpMenu, <>viewMenu, <>defaultMenu, <>addEvent,
+		 <>events, <>sessionMenu, <>sessionAdd, <>sessionNewAdd, <>sessionSelectedEvents;
 
     *new { |index = 3|
-		
-		var wfsMenu, scoreMenu, pathMenu, helpMenu, viewMenu, defaultMenu, addEvent,
-		 events, menus, sessionMenu, sessionAdd, sessionNewAdd, sessionSelectedEvents;
-
-		menus = ();
+	    
 /* USession */
 		sessionMenu = SCMenuGroup.new(nil, "Session", index);
 		SCMenuItem.new(sessionMenu,  "New").action_({
