@@ -474,7 +474,6 @@ UChain : UEvent {
 		var releaseUnits;
 		releaseUnits = units.select({ |unit| unit.def.canFreeSynth });
 		if( releaseUnits.size > 0 ) {
-			if( time.isNil ) { time = this.fadeOut; };
 			releaseUnits.do( _.release( time, 14 ) );
 		} {
 			this.stop; // stop if no releaseable synths
