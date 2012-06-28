@@ -54,7 +54,7 @@ UEnv : UIn {
 		]);
 	}
 	
-	*kr { |gain = 0, fadeIn = 0, fadeOut = 0, extraSilence = 0, useGlobalGain = 1|
+	*kr { |gain = 0, fadeIn = 0, fadeOut = 0, extraSilence = 0, useGlobalGain = 1, ignoreFadeIn = false|
 		var name = this.getControlName( );
 		var gate = this.getControl( \kr, name, 'gate', 1 );
 		var mute = this.getControl( \kr, name, 'mute', 0 );
@@ -62,7 +62,9 @@ UEnv : UIn {
 		var doneAction = this.getControl( \kr, name, 'doneAction', 0 );
 		
 		gain = this.getControl( \kr, name, 'gain', gain, 0.5 ); // 0.5s lag time
-		fadeIn = this.getControl( \kr, name, 'fadeIn', fadeIn );
+		if( ignoreFadeIn != true ) {
+			fadeIn = this.getControl( \kr, name, 'fadeIn', fadeIn );
+		};
 		fadeOut = this.getControl( \kr, name, 'fadeOut', fadeOut );
 		
 		^DemandEnvGen.kr( 
