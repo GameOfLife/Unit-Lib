@@ -28,6 +28,7 @@ UEvent : UArchivable {
     var <>disabled = false;
     var <releaseSelf = true;
     var <oscSetter;
+    var <displayColor;
 
     /*
     If 'releaseSelf' is set to false, then uchains will not free themselves automatically when the events stop playing.
@@ -56,6 +57,11 @@ UEvent : UArchivable {
 	disable { this.disabled_(true) }
 	enable { this.disabled_(false) }
 	toggleDisable { this.disabled_(disabled.not) }
+	
+	displayColor_ { |color|
+		displayColor = color;
+		this.changed( \displayColor );
+	}
 
     /*
     *   server: Server or Array[Server]
@@ -149,8 +155,15 @@ UEvent : UArchivable {
 		};
 	}
 	
+	storeDisplayColor { |stream|
+		if( this.displayColor.notNil ) {
+			stream << ".displayColor_(" <<< this.displayColor << ")";
+		};
+	}
+	
 	storeModifiersOn { |stream|
 		this.storeTags( stream );
+		this.storeDisplayColor( stream );
 	}
 	
 	//// UOSCsetter support

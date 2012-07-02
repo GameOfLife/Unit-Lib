@@ -22,7 +22,11 @@ UChainEventView : UEventView {
     var <fadeAreaHeight;
 
 	getTypeColor {
-        ^case { 
+        ^case {
+	        event.displayColor.notNil;
+        } {
+	        event.displayColor;
+        } { 
 	        event.duration == inf 
 	   } {
 	        Color(0.4, 0.4, 0.8)
@@ -319,11 +323,10 @@ UChainEventView : UEventView {
 		};
 
 		//fill inside
-		Pen.color = this.getTypeColor.alpha_(
-			lineAlpha * 0.4);
-		this.drawShape(innerRect);
-		Pen.fill;
-
+		Pen.use({
+			this.drawShape(innerRect);
+			this.getTypeColor.penFill(innerRect, lineAlpha, nil, 10);
+		});
 		//draw fades
         Pen.use({
             var fadeinScaled, fadeoutScaled, fades;
@@ -332,16 +335,21 @@ UChainEventView : UEventView {
 
             this.drawShape(innerRect);
             Pen.clip;
-
-            Pen.color = this.getTypeColor.alpha_(lineAlpha * 0.8);
+            
+            Pen.color = Color.gray(0.75).alpha_(0.75);
 
             fadeinScaled = scaledUserView.doScale(Point(fades[0],0));
             fadeoutScaled = scaledUserView.doScale(Point(fades[1],0));
+            
             Pen.moveTo(innerRect.leftBottom);
+            Pen.lineTo(innerRect.leftBottom + fadeinScaled + Point(0,innerRect.height.neg));
+            Pen.lineTo(innerRect.leftTop);
+            Pen.lineTo(innerRect.leftBottom);
+            
             Pen.lineTo(innerRect.rightBottom);
             Pen.lineTo(innerRect.rightBottom - fadeoutScaled - Point(0,innerRect.height) );
-            Pen.lineTo(innerRect.leftBottom + fadeinScaled + Point(0,innerRect.height.neg));
-            Pen.moveTo(innerRect.leftBottom);
+            Pen.lineTo(innerRect.rightTop);
+            Pen.lineTo(innerRect.rightBottom);
 
             Pen.fill;
 
