@@ -300,74 +300,87 @@ UChainEventView : UEventView {
 	}
 
 	draw { |scaledUserView, maxWidth|
-		var textrect;
 		var lineAlpha =  if( event.disabled ) { 0.5  } { 1.0  };
 		var scaledRect, innerRect;
 
 		this.createRect(maxWidth);
-
+		
 		scaledRect = scaledUserView.translateScale(rect);
-		innerRect = scaledRect.insetBy(0.5,0.5);
-
-		//selected outline
-		if( selected ) {
-			Pen.width = 2;
-			Pen.color = Color.grey(0.2);
-			this.drawShape(scaledRect);
-			Pen.stroke;
-		};
-
-        Pen.use({
-            var fadeinScaled, fadeoutScaled, fades;
-            var heightPoint;
-
-            this.drawShape(innerRect);
-            Pen.clip;
-            
-            // fill inside
-            Pen.addRect( innerRect );
-            this.getTypeColor.penFill(innerRect, lineAlpha, nil, 10);
-            
-            //draw fades
-            fades = event.fadeTimes;
-            
-            if( fades.any(_!=0) ) { // draw only if needed
-	            
-	            Pen.color = Color.gray(0.75, 0.75);
-	            
-	            fadeinScaled = innerRect.leftBottom + scaledUserView.doScale(Point(fades[0],0));
-	            fadeoutScaled = innerRect.rightBottom - scaledUserView.doScale(Point(fades[1],0));
-	            
-	            heightPoint = Point(0,innerRect.height);
-	            	            
-	            // fade in
-	            Pen.moveTo(innerRect.leftBottom);
-	            Pen.lineTo(fadeinScaled - heightPoint);
-	            Pen.lineTo(innerRect.leftTop);
-	            Pen.lineTo(innerRect.leftBottom);
-	           
-	            // fade out
-	            Pen.lineTo(innerRect.rightBottom);
-	            Pen.lineTo(fadeoutScaled - heightPoint);
-	            Pen.lineTo(innerRect.rightTop);
-	            Pen.lineTo(innerRect.rightBottom);
+		
+		if( scaledUserView.view.drawBounds.intersects( scaledRect.insetBy(-2,-2) ) ) {
+			
+			innerRect = scaledRect.insetBy(0.5,0.5);
 	
-	            Pen.fill;
+			//selected outline
+			if( selected ) {
+				Pen.width = 2;
+				Pen.color = Color.grey(0.2);
+				this.drawShape(scaledRect);
+				Pen.stroke;
+			};
+	
+	        Pen.use({
+	            var fadeinScaled, fadeoutScaled, fades;
+	            var heightPoint;
+	
+	            this.drawShape(innerRect);
+	            Pen.clip;
 	            
-	            //fade lines
-	            Pen.width = 1;
-	            Pen.color = Color.grey(0.3, 0.5);
-	            Pen.moveTo(fadeoutScaled - heightPoint);
-	            Pen.lineTo(fadeoutScaled);
-	            Pen.moveTo(fadeinScaled - heightPoint);
-	            Pen.lineTo(fadeinScaled);
+	            // fill inside
+	            Pen.addRect( innerRect );
+	            this.getTypeColor.penFill(innerRect, lineAlpha, nil, 10);
 	            
-	            Pen.stroke;	 
-	                       
-	       };   
-        });
+	            //draw fades
+	            fades = event.fadeTimes;
+	            
+	            if( fades.any(_!=0) ) { // draw only if needed
+		            
+		            Pen.color = Color.gray(0.75, 0.75);
+		            
+		            fadeinScaled = innerRect.leftBottom + scaledUserView.doScale(Point(fades[0],0));
+		            fadeoutScaled = innerRect.rightBottom - scaledUserView.doScale(Point(fades[1],0));
+		            
+		            heightPoint = Point(0,innerRect.height);
+		            	            
+		            // fade in
+		            Pen.moveTo(innerRect.leftBottom);
+		            Pen.lineTo(fadeinScaled - heightPoint);
+		            Pen.lineTo(innerRect.leftTop);
+		            Pen.lineTo(innerRect.leftBottom);
+		           
+		            // fade out
+		            Pen.lineTo(innerRect.rightBottom);
+		            Pen.lineTo(fadeoutScaled - heightPoint);
+		            Pen.lineTo(innerRect.rightTop);
+		            Pen.lineTo(innerRect.rightBottom);
+		
+		            Pen.fill;
+		            
+		            //fade lines
+		            Pen.width = 1;
+		            Pen.color = Color.grey(0.3, 0.5);
+		            Pen.moveTo(fadeoutScaled - heightPoint);
+		            Pen.lineTo(fadeoutScaled);
+		            Pen.moveTo(fadeinScaled - heightPoint);
+		            Pen.lineTo(fadeinScaled);
+		            
+		            Pen.stroke;	 
+		                       
+		       };
+		       
+		       //draw name
+		       if( scaledRect.height > 4 ) {
+			       Pen.color = Color.black.alpha_( lineAlpha  );
+			       Pen.stringAtPoint( 
+			       	" " ++ this.getName, 
+			       	scaledRect.leftTop.max( 0 @ -inf ) + (2 @ 1) 
+			       );
+		       };
+	        });
+	    };
 
         //draw name
+		/*
 		Pen.color = Color.black.alpha_( lineAlpha  );
 
 		if( scaledRect.height > 4 ) {
@@ -375,7 +388,7 @@ UChainEventView : UEventView {
 			textrect = scaledRect.sect( scaledUserView.view.drawBounds.moveTo(0,0).insetBy(-3,0) );
 			Pen.use({
 				Pen.addRect( textrect ).clip;
-				Pen.stringLeftJustIn(
+				Pen.stringInRect(
 					" " ++ this.getName,
 					textrect );
 			});
@@ -400,6 +413,7 @@ UChainEventView : UEventView {
 				}
 			} */
 		};
+		*/
 
 		/*
 		// DEBUG resize area

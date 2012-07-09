@@ -70,47 +70,43 @@ UScoreEventView : UEventView {
 	}
 
 	draw { |scaledUserView, maxWidth|
-		var textrect;
-		var disabled = event.disabled;
-		var lineAlpha =  if( disabled ) { 0.5  } { 1.0  };
-		var selectedAlpha = if( selected ) { 0.8 } { 1 };
-		var scaledRect, innerRect, clipRect;
-		var px10Scaled = scaledUserView.doReverseScale(Point(10,0)).x;
-		var px5Scaled =  scaledUserView.doReverseScale(Point(5,0)).x;
+		var lineAlpha =  if( event.disabled ) { 0.5  } { 1.0  };
+		var scaledRect, innerRect;
 
 		this.createRect(maxWidth);
 
 		scaledRect = scaledUserView.translateScale(rect);
-		innerRect = scaledRect.insetBy(0.5,0.5);
-		clipRect = scaledUserView.view.drawBounds.moveTo(0,0).insetBy(2,2);
-
-		//selected outline
-		if( selected ) {
-			Pen.width = 2;
-			Pen.color = Color.grey(0.2);
-			this.drawShape(scaledRect);
-			Pen.stroke;
-		};
-
-		//fill inside
-		Pen.color = this.getTypeColor.alpha_(
-			lineAlpha * 0.4);
-		this.drawShape(innerRect);
-		Pen.fill;
-
-        //draw name
-		Pen.color = Color.black.alpha_( lineAlpha  );
-
-		if( scaledRect.height > 4 ) {
-
-			textrect = scaledRect.sect( scaledUserView.view.drawBounds.moveTo(0,0).insetBy(-3,0) );
-			Pen.use({
-				Pen.addRect( textrect ).clip;
-				Pen.stringLeftJustIn(
-					" " ++ this.getName,
-					textrect );
+		
+		if( scaledUserView.view.drawBounds.intersects( scaledRect.insetBy(-2,-2) ) ) {	
+			innerRect = scaledRect.insetBy(0.5,0.5);
+	
+			//selected outline
+			if( selected ) {
+				Pen.width = 2;
+				Pen.color = Color.grey(0.2);
+				this.drawShape(scaledRect);
+				Pen.stroke;
+			};
+			
+			Pen.use({	
+				this.drawShape(innerRect);
+				Pen.clip;
+				
+				// fill inside
+				Pen.addRect( innerRect );
+				this.getTypeColor.penFill(innerRect, lineAlpha * 0.75, nil, 10);
+				
+				//draw name
+				if( scaledRect.height > 4 ) {
+					Pen.color = Color.black.alpha_( lineAlpha  );
+					Pen.stringAtPoint(
+						" " ++ this.getName,
+						scaledRect.leftTop.max( 0 @ -inf ) + (2 @ 1)
+					);		       
+				};
+	
 			});
-
+			
 		};
 
 	}
