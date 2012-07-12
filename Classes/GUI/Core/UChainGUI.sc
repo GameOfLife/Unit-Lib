@@ -25,7 +25,7 @@ UChainGUI {
 	
 	var <chain;
 	
-	var <parent, <composite, <views, <startButton, <uguis, <controller;
+	var <parent, <composite, <views, <startButton, <uguis;
 	var <>action;
 	var originalBounds;
 	
@@ -99,6 +99,7 @@ UChainGUI {
 		var margin = 0@0, gap = 4@4;
 		var heights, units;
 		var labelWidth, releaseTask;
+		var controller;
 		// var unitInitFunc;
 		
 		labelWidth = 80;
@@ -121,7 +122,10 @@ UChainGUI {
 		
 		composite = CompositeView( parent, bounds ).resize_(5);
 		composite.addFlowLayout( margin, gap );
-		composite.onClose = { controller.remove; if( current == this ) { current = nil } };
+		composite.onClose = { |vw|
+			controller.remove; 
+			if( composite == vw && { current == this } ) { current = nil } 
+		};
 		
 		// startbutton
 		views[ \startButton ] = SmoothButton( composite, 14@14 )
