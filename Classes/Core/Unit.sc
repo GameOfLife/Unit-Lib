@@ -90,6 +90,7 @@ Udef : GenericDef {
 	var <>apxCPU = 1; // indicator for the amount of cpu this unit uses (for load balancing)
 	var <>extraPrefix;
 	var <>numChannels = 1;
+	var <>ioNames;
 	
 	*initClass{
 		defsFolders = [ 
@@ -233,6 +234,39 @@ Udef : GenericDef {
 	controlIns { |unit| ^this.prIOids( \in, \control, unit ); }
 	audioOuts { |unit| ^this.prIOids( \out, \audio, unit ); }
 	controlOuts { |unit| ^this.prIOids( \out, \control, unit ); }
+	
+	prGetIOName { |mode = \in, rate = \audio, index = 0|
+		if( this.ioNames.notNil ) {
+			^this.ioNames[ mode, rate, index.asInteger ];
+		} {
+			^nil
+		};
+	}
+	
+	prSetIOName { |mode = \in, rate = \audio, index = 0, name|
+		if( this.ioNames.isNil ) {
+			this.ioNames = MultiLevelIdentityDictionary();
+		};
+		this.ioNames.put( mode, rate, index.asInteger, name );
+	}
+	
+	audioInName { |index=0| ^this.prGetIOName( \in, \audio, index ); }
+	controlInName { |index=0| ^this.prGetIOName( \in, \control, index ); }
+	audioOutName { |index=0| ^this.prGetIOName( \out, \audio, index ); }
+	controlOutName { |index=0| ^this.prGetIOName( \out, \control, index ); }
+	
+	prSetMultiIOName { |mode, rate, index, name|
+		if( name.isString ) { name = [ name ] };
+		name = name.asCollection.collect(_.asSymbol);
+		index.asCollection.do({ |index, i|
+			this.prSetIOName( mode, rate, index, name[i] );
+		});
+	}
+	
+	setAudioInName { |index, name| this.prSetMultiIOName( \in, \audio, index, name ); }
+	setControlInName { |index, name| this.prSetMultiIOName( \in, \control, index, name ); }
+	setAudioOutName { |index, name| this.prSetMultiIOName( \out, \audio, index, name ); }
+	setControlOutName { |index, name| this.prSetMultiIOName( \out, \control, index, name ); }
 	
 	canFreeSynth { |unit| ^this.keys.includes( \u_doneAction ) } 
 		// assumes the Udef contains a UEnv

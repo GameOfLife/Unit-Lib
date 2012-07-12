@@ -171,23 +171,36 @@ UChainIOGUI : UChainGUI {
 				views[ rate ][ mode ] = [ ];
 				
 				io[2].do({ |item, ii|
-					var nb, pu, mx;
+					var nb, pu, mx, stringColor;
+					
+					
+					if( rate === \control ) {
+						stringColor = Color.gray(0.25);
+					} {
+						stringColor = Color.black;
+					};
 					
 					StaticText( scrollView, labelWidth @ 14 )
 						.applySkin( RoundView.skin )
 						.align_( \right )
-						.string_( "% %".format( 
-							if( ii == 0 ) { "% %".format( rate, mode ) } { "" }, item ) 
+						.stringColor_( stringColor )
+						.string_( "% % %".format( 
+								if( ii == 0 ) { rate } { "" }, 
+								mode,
+								unit.def.prGetIOName( mode, rate, item ) ? item 
+							) 
 						);
 						
 					nb = SmoothNumberBox( scrollView, 20@14 )
 						.clipLo_( 0 )
+						.stringColor_( stringColor )
 						.value_(  io[3][ii] )
 						.action_( { |nb|
 							unit.perform( setter, ii, nb.value ); 					} );
 						
 					pu = PopUpMenu( scrollView, (width - labelWidth - 28)@14 )
 						.applySkin( RoundView.skin )
+						.stringColor_( stringColor )
 						.resize_(2)
 						.action_({ |pu| 
 							unit.perform( setter, ii, pu.value );
@@ -205,13 +218,18 @@ UChainIOGUI : UChainGUI {
 						mixOutSetter = mixOutSetter.asSymbol;
 							
 						mx = EZSmoothSlider(  scrollView, width@14,
-							"% mix %".format( rate, item ),
+							"% mix %".format( 
+								if( ii == 0 ) { rate } { "" }, 
+								unit.def.prGetIOName( mode, rate, item ) ? item 
+							),
 							\amp.asSpec, 
 							{ |vw| 
 								unit.perform( mixOutSetter, ii, vw.value );
 							}, 
 							labelWidth: labelWidth
 						);
+						
+						mx.setColors( stringColor: stringColor );
 						
 						mx.value = io[4][ii];
 						mx.view.resize = 2;
@@ -220,10 +238,10 @@ UChainIOGUI : UChainGUI {
 							mx.value = val;				
 						});
 						
-						this.setMixSlider( mx, io[3][ii], i, rate );
+						this.setMixSlider( mx, io[3][ii], i, rate, stringColor );
 						
 						setPopUps = setPopUps.addFunc({
-							this.setMixSlider( mx, nb.value, i, rate );
+							this.setMixSlider( mx, nb.value, i, rate, stringColor );
 						});
 					};
 					
@@ -255,17 +273,19 @@ UChainIOGUI : UChainGUI {
 		var busConnections;
 		busConnections = this.getBusConnections( i, rate, mode, max );
 		{ 	
-			pu.items = this.prGetPopUpItems( busConnections, mode ); 
+			pu.items = this.prGetPopUpItems( busConnections, mode, rate ); 
 			pu.value = value.clip( 0, busConnections.size-1);
 			pu.background = this.getPopUpColor( busConnections, value );
 		}.defer;
 	}
 	
-	setMixSlider { |mx, bus = 0, i = 0, rate = \audio|
+	setMixSlider { |mx, bus = 0, i = 0, rate = \audio, stringColor|
 		var busConnection;
 		busConnection = analyzers[ rate ].busConnection( \in, bus.asInt, i.asInt );
-		mx.sliderView.string = this.getBusLabel( busConnection, \in, bus );
+		mx.sliderView.string = this.getBusLabel( busConnection, \in, bus, rate );
 		mx.sliderView.hiliteColor = this.getPopUpColor( [busConnection], 0 );
+		mx.sliderView.stringColor = stringColor;
+		mx.numberView.stringColor = stringColor;
 	}
 	
 	getBusConnections { |i = 0, rate = \audio, mode = \in, max = 10|
@@ -283,31 +303,33 @@ UChainIOGUI : UChainGUI {
 		^items[..lastNotNil + 1];
 	}
 	
-	getBusLabel { |busConnection, mode = \in, bus = 0|
-		var prefix;
+	getBusLabel { |busConnection, mode = \in, bus = 0, rate = \audio|
+		var prefix, index, reverseMode;
 		
 		prefix = switch( mode, \in, "from", \out, "to" );
+		reverseMode =  switch( mode, \in, \out, \out, \in );
 		
 		^if( busConnection.notNil ) {
+			index = busConnection[2][ 
+				busConnection[3].indexOfEqual( bus.asInt ) 
+			];
 			"% %:% (%)".format( 
 				prefix,
 				busConnection[1], 
 				busConnection[0].defName,
-				busConnection[2][ 
-					busConnection[3].indexOfEqual( bus.asInt ) 
-				]
+				busConnection[0].def.prGetIOName( reverseMode, rate, index ) ? index
 			);
 		} {
 			"no signal"
 		};
 	}
 	
-	prGetPopUpItems { |busConnections, mode = \in|
-		^busConnections.collect({ |item, bus| this.getBusLabel( item, mode, bus ); });			
+	prGetPopUpItems { |busConnections, mode = \in, rate = \audio|
+		^busConnections.collect({ |item, bus| this.getBusLabel( item, mode, bus, rate ); });			
 	}
 
 	getPopUpItems { |i = 0, rate = \audio, mode = \in, max = 10|
-		^this.prGetPopUpItems( this.getBusConnections( i, rate, mode, max ), mode );	}
+		^this.prGetPopUpItems( this.getBusConnections( i, rate, mode, max ), mode, rate );	}
 	
 	getPopUpColor { |busConnections, bus = 0|
 		var item;
