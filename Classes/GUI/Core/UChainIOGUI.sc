@@ -19,6 +19,8 @@
 
 UChainIOGUI : UChainGUI {
 	
+	classvar <>showControl = true, <>showAudio = true;
+	
 	var <analyzers;
 	var <unitColors;
 	var <>audioMax = 0, <>controlMax = 0;
@@ -48,6 +50,7 @@ UChainIOGUI : UChainGUI {
 	
 	makeUnitHeader { |units, margin, gap|
 		var comp, header,params;
+		var audio, control;
 		
 		comp = CompositeView( composite, (composite.bounds.width - (margin.x * 2))@16 )
 			.resize_(2);
@@ -58,6 +61,28 @@ UChainIOGUI : UChainGUI {
 				.align_( \left )
 				.resize_(2);
 		
+		audio = SmoothButton( comp, Rect( comp.bounds.right - (80+8+60), 1, 40, 12 ) )
+			.label_( ["audio", "audio"] )
+			.border_( 1 )
+			.radius_( 2 )
+			.value_( showAudio.binaryValue )
+			.hiliteColor_( Color.green )
+			.action_({ |bt|
+				 showAudio = bt.value.booleanValue;
+				 chain.changed( \units );
+			}).resize_(3);
+		
+		control = SmoothButton( comp, Rect( comp.bounds.right - (40+4+60), 1, 40, 12 ) )
+			.label_( ["control", "control"] )
+			.border_( 1 )
+			.radius_( 2 )
+			.value_( showControl.binaryValue )
+			.hiliteColor_( Color.green )
+			.action_({ |bt|
+				 showControl = bt.value.booleanValue;
+				 chain.changed( \units );
+			}).resize_(3);
+
 				
 		params = SmoothButton( comp, Rect( comp.bounds.right - 60, 1, 60, 12 ) )
 			.label_( "params" )
@@ -139,6 +164,7 @@ UChainIOGUI : UChainGUI {
 		var setPopUps;
 		var max;
 		var views;
+		var array = [];
 		
 		max = (
 			\audio: this.getMax( \audio ),
@@ -149,12 +175,20 @@ UChainIOGUI : UChainGUI {
 		
 		ctrl = SimpleController( unit );
 		
-		[ 
-			[ \audio, \in ], 
-			[ \audio, \out ], 
-			[ \control, \in ], 
-			[ \control, \out ] 
-		].do({ |item|
+		if( showAudio ) {
+			array = [ 
+				[ \audio, \in ], 
+				[ \audio, \out ], 
+			]
+		};
+		if( showControl ) {
+			array = array ++ [ 
+				[ \control, \in ], 
+				[ \control, \out ],
+			]
+		};
+		
+		array.do({ |item|
 			var rate, mode;
 			var io, etter, setter, getter;
 			var mixOutSetter;
