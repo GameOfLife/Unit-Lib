@@ -363,7 +363,7 @@ UChainGUI {
 				.resize_(2);
 				
 		if( notMassEdit ) {
-            io = SmoothButton( comp, Rect( comp.bounds.right - (36), 1, 36, 12 ) )
+            io = SmoothButton( comp, Rect( comp.bounds.right - 60, 1, 60, 12 ) )
                 .label_( "i/o" )
                 .border_( 1 )
                 .radius_( 2 )
@@ -377,8 +377,7 @@ UChainGUI {
 
                 }).resize_(3);
             code = SmoothButton( comp,
-                    Rect( comp.bounds.right - (36 + 4 + 36),
-                         1, 36, 12 ) )
+                    Rect( comp.bounds.right - (40 + 4 + 60), 1, 40, 12 ) )
                 .label_( "code" )
                 .border_( 1 )
                 .radius_( 2 )
@@ -390,17 +389,15 @@ UChainGUI {
                         UChainCodeGUI( parent, originalBounds, chain );
                     }.defer(0.01);
                 }).resize_(3);
-		};
-
-		defs = SmoothButton( comp, 
-				Rect( comp.bounds.right - (36 + if( notMassEdit ) {4 + 36 + 4 + 36} {0}),
-					 1, 36, 12 ) )
-			.label_( "defs" )
+            defs = SmoothButton( comp, 
+				Rect( comp.bounds.right - (40 + 4 + 40 + 4 + 60), 1, 42, 12 ) )
+			.label_( "udefs" )
 			.border_( 1 )
 			.radius_( 2 )
 			.action_({
 				UdefListView();
 			}).resize_(3);
+		};
 			
 		CompositeView( comp, Rect( 0, 14, (composite.bounds.width - (margin.x * 2)), 2 ) )
 			.background_( Color.black.alpha_(0.25) )

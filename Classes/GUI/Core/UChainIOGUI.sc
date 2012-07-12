@@ -59,7 +59,7 @@ UChainIOGUI : UChainGUI {
 				.resize_(2);
 		
 				
-		params = SmoothButton( comp, Rect( comp.bounds.right - (60+2), 1, 60, 12 ) )
+		params = SmoothButton( comp, Rect( comp.bounds.right - 60, 1, 60, 12 ) )
 			.label_( "params" )
 			.border_( 1 )
 			.radius_( 2 )
