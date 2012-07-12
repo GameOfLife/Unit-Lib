@@ -92,6 +92,7 @@ FilePathView {
 		views[ \basename ] = TextField( view, (bounds.width - (viewHeight + 4)) @ viewHeight )
 			.applySkin( RoundView.skin )
 			.resize_( 2 )
+			.canReceiveDragHandler_({ |vw| View.currentDrag.class == String })
 			.action_({ |tf|
 				if( tf.string.size > 0 ) {
 					value = value.asString.dirname +/+ tf.string;
@@ -115,6 +116,7 @@ FilePathView {
 			
 		views[ \dirname ] = TextField( view, bounds.width @ viewHeight )
 			.applySkin( RoundView.skin )
+			.canReceiveDragHandler_({ |vw| View.currentDrag.class == String })
 			.resize_( 2 )
 			.action_({ |tf|
 				if( value.notNil ) {
