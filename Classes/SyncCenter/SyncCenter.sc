@@ -135,7 +135,7 @@ SyncCenter {
 			recdev = this.recDef;
 			recSynths = recSynths.addAll( 
 				this.servers.collect({ |server, i|  
-					if(verbose) { ("playing receve sync synthdef for server %\n").postf(server) };
+					if(verbose) { ("playing receve sync synthdef for server %, id %\n").postf(server, 100+i) };
 					Synth( "sync_receive", [\id, 100+i,\in,inBus], server ).register
 				}) 
 			); 
@@ -158,7 +158,7 @@ SyncCenter {
 				
 			responder = OSCresponderNode( nil, '/tr', { |time, resp, msg|
 				var server, numOfBlocks, offsetInsideBlock, count;
-				if( verbose ) { ("Received: "++[time, resp, msg] ).postln };
+				
 				case{ msg[ 2 ] == 99 }
 					{ 
 						numOfBlocks = msg[4];
@@ -170,7 +170,7 @@ SyncCenter {
 							.localCountTime_( masterCountTime ); // also local sync
 						this.class.changed( \localSync, current );
 						
-						if( verbose ) { "setting master counts".postln }; 
+						if( verbose ) { "setting master count : %\n".postf( count ) }; 
 					}
 					{ msg[2].exclusivelyBetween( 99, 100 + this.servers.size ) }
 					{ 
@@ -182,11 +182,12 @@ SyncCenter {
 						serverCounts.at(server).value_( count ).changed;
 						
 						if(verbose) { 
-							("Setting remoteCounts for server "++
-								(msg[2] - 100)++" : "++ count 
-							).postln;
+							"Setting remoteCounts for server %, id % : %\n"
+								.postf( server, msg[2], count )
 						};	
-					 }; 
+					 } {
+						 if( verbose ) { ("Received: "++[time, resp, msg] ).postln };
+					 };
 						
 				if( 
 					serverCounts.collect{ |count,server| 
