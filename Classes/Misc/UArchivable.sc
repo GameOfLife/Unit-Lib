@@ -60,7 +60,11 @@ UArchivable {
 	    var writeFunc;
 	    writeFunc = { |overwrite, ask, path|
 		    var text;
+		    
+		    GlobalPathDict.relativePath = path.dirname;
 		    text = this.asTextArchive;
+		    GlobalPathDict.relativePath = nil;
+		    
 		    if( this.textArchiveFileExtension.notNil ) {
 			    path = path.replaceExtension( this.textArchiveFileExtension );
 		    };

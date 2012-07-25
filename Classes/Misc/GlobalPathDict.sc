@@ -20,6 +20,7 @@
 GlobalPathDict {
 	
 	classvar <>dict, <>replaceChar = $@;
+	classvar <>relativePath;
 	
 	*initClass { dict = IdentityDictionary(); }
 	
@@ -53,12 +54,14 @@ GlobalPathDict {
 	*formatPath { |path|
 		var stPath, array = [], key, i = 0;
 		
+		this.put( '_relative', relativePath ?? { thisProcess.nowExecutingPath !? _.dirname } ); 
+		
 		dict.keysValuesDo({ |key, value|
 			array = array.add( [ value.standardizePath.withTrailingSlash, key ] );
 		});
 		
 		array = array.sort({ |a,b|
-			a[0].size <= b[0].size;
+			(a[0].size < b[0].size) or: { a[0].size == b[0].size && { a[1] <= b[1] } }
 		}).reverse;
 		
 		stPath = this.getPath( path );
@@ -66,6 +69,11 @@ GlobalPathDict {
 		while { key.isNil && (i < array.size) } {
 			if( stPath.find( array[i][0] ) == 0 ) {
 				key = array[i][1];
+				if( (key === '_relative') && { relativePath.isNil }) {
+					path = stPath;
+					key = nil;
+					i = i+1;
+				};
 			} {
 				i = i+1;
 			};

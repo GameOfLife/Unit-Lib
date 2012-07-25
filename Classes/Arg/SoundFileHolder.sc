@@ -483,7 +483,7 @@ AbstractSndFile : AbstractRichBuffer {
 
     storeOn { arg stream;
 		stream << this.class.name << ".newBasic(" <<* [ // use newBasic to prevent file reading
-		    path.quote, numFrames, numChannels, sampleRate,
+		    path.formatGPath.quote, numFrames, numChannels, sampleRate,
              startFrame, endFrame, rate, loop
 		]  <<")"
 	}
@@ -562,7 +562,7 @@ BufSndFile : AbstractSndFile {
     
     storeOn { arg stream;
 		stream << this.class.name << ".newBasic(" <<* [ // use newBasic to prevent file reading
-		    path.quote, numFrames, numChannels, sampleRate,
+		    path.formatGPath.quote, numFrames, numChannels, sampleRate,
              startFrame, endFrame, rate, loop
 		]  << ")" << if( useChannels.notNil ) { ".useChannels(%)".format( useChannels ) } { "" };
 	}
