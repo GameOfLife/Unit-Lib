@@ -97,3 +97,36 @@
 		^(inArray - inArray.minItem) + params;
 	}
 }
+
++ BufSndFileSpec {
+	
+	massEditSpec { |inArray|
+		^MultiSndFileSpec(inArray); 
+	}
+	
+	massEditValue { |inArray|
+		^inArray
+	}
+	
+	massEdit { |inArray, params|
+		^params;
+	}
+
+}
+
+
++ DiskSndFileSpec {
+	
+	massEditSpec { |inArray|
+		^MultiSndFileSpec(inArray); 
+	}
+	
+	massEditValue { |inArray|
+		^inArray
+	}
+	
+	massEdit { |inArray, params|
+		^params;
+	}
+
+}

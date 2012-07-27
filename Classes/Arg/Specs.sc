@@ -660,6 +660,30 @@ DiskSndFileSpec : BufSndFileSpec {
 	
 }
 
+MultiSndFileSpec : Spec {
+	
+	// array of points instead of a single point
+	
+	var <>default;
+	
+	*new { |default|
+		^super.new.default_( default );
+	}
+	
+	*testObject { |obj|
+		^obj.isCollection && { obj[0].isKindOf(AbstractSndFile) };
+	}
+	
+	constrain { |value|
+		^value;
+	}
+	
+	*newFromObject { |obj|
+		^this.new;
+	}
+	
+}
+
 PartConvBufferSpec : RichBufferSpec {
 	
 	*new {

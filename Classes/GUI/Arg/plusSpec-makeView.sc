@@ -770,6 +770,99 @@
 	viewClass { ^DiskSndFileView }
 }
 
++ MultiSndFileSpec {
+	
+	makeView { |parent, bounds, label, action, resize|
+		var vws, view, labelWidth;
+		var localStep;
+		var font;
+		var editAction;
+		vws = ();
+		
+		font =  (RoundView.skin ? ()).font ?? { Font( Font.defaultSansFace, 10 ); };
+		
+		bounds.isNil.if{bounds= 320@20};
+		
+		view = EZCompositeView( parent, bounds, gap: 4@4 );
+		bounds = view.asView.bounds;
+		
+		vws[ \view ] = view;
+		
+		vws[ \val ] = this.default ? [];
+		
+		if( label.notNil ) {
+			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
+			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ bounds.height )
+				.string_( label.asString ++ " " )
+				.align_( \right )
+				.resize_( 4 )
+				.applySkin( RoundView.skin );
+		} {
+			labelWidth = 0;
+		};
+
+				
+		editAction = { |vw|
+			vws[ \val ] = vw.object;
+			action.value( vws, vws[ \val ] );
+		};
+		
+		vws[ \list ] = SmoothButton( view, 40 @ (bounds.height) )
+			.label_( "list" )
+			.border_( 1 )
+			.radius_( 2 )
+			.font_( font )
+			.action_({
+				if( vws[ \listdoc ].notNil ) {
+					vws[ \listdoc ].close;
+				};
+				
+				vws[ \listdoc ] = Document().string_(
+					vws[ \val ].collect(_.path).join("\n")
+				).promptToSave_(false);
+			});
+			
+		view.view.onClose_({
+			if( vws[ \listdoc ].notNil ) {
+				vws[ \listdoc ].close;
+			};
+		});
+		
+		vws[ \copy ] = SmoothButton( view, 60 @ (bounds.height) )
+			.label_( "copy all" )
+			.border_( 1 )
+			.radius_( 2 )
+			.font_( font )
+			.action_({
+				var paths;
+				Dialog.savePanel({ |path|
+					path = path.dirname;
+					paths = vws[ \val ].collect({ |item| 
+						item.path.getGPath.asSymbol
+					}).as(Set).as(Array).do({ |pth|
+						pth.asString.copyTo( path );
+					});
+					vws[ \val ].do({ |item|
+						item.path = path +/+ item.path.basename;
+					});
+				});
+			});
+			
+		view.view.onClose_({
+			if( vws[ \listdoc ].notNil ) {
+				vws[ \listdoc ].close;
+			};
+		});
+
+	
+		^vws;
+	}
+	
+	setView { |view, value, active = false|
+		view[ \val ] = value;
+	}
+}
+
 + PartConvBufferSpec {
 	
 	viewNumLines { ^PartConvBufferView.viewNumLines }
