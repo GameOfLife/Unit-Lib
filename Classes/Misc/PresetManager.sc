@@ -68,7 +68,7 @@ PresetManager {
 		preset = getFunc.value( obj );
 		while { i <= size } {
 			if( preset == presets[i+1] ) {
-				^presets[i].postln;
+				^presets[i];
 			};
 			i=i+2;
 		};

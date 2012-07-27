@@ -468,14 +468,15 @@ EQView {
 	var <view;
 	var <plotView, <editView;
 	var <plotCtrl, <editCtrl;
+	var <presetManager, <presetView;
 	var <>action, <>viewHeight = 14;
 	var <resize = 5;
 	
-	*new { |parent, bounds, eqSetting|
-		^this.newCopyArgs.makeView( parent, bounds, eqSetting );
+	*new { |parent, bounds, eqSetting, presets|
+		^this.newCopyArgs.makeView( parent, bounds, eqSetting, presets );
 	}
 	
-	*viewNumLines { ^EQEditView.viewNumLines + EQPlotView.viewNumLines }
+	*viewNumLines { ^EQEditView.viewNumLines + EQPlotView.viewNumLines + PresetManagerGUI.viewNumLines }
 	
 	resize_ { |new|
 		resize = new;
@@ -501,7 +502,7 @@ EQView {
 	
 	close { view.findWindow.close } 
 	
-	makeView { |parent, bounds, eqSetting|
+	makeView { |parent, bounds, eqSetting, presets|
 		if( eqSetting.isNil ) { eqSetting = EQSetting() };
 		
 		if( bounds.isNil ) { bounds = 350 @ (this.class.viewNumLines * (viewHeight + 4)) };
@@ -527,6 +528,21 @@ EQView {
 		
 		editCtrl = SimpleController( editView )
 			.put( \selected, { plotView.selected = editView.selected } );
+			
+		presetManager = PresetManager(
+			eqSetting,
+			presets ?? {
+				[ \default, eqSetting.defaultSetting ]
+			}, 
+			{ |obj| obj.setting.deepCopy }, 
+			{ |obj, setting| obj.setting = setting }
+		);
+		
+		
+		presetView = PresetManagerGUI( view, 
+			bounds.copy.height_( bounds.height * ( 1 / this.class.viewNumLines) ),
+			presetManager 
+		);
 
 		view.asView.onClose_({ plotCtrl.remove; editCtrl.remove });
 		

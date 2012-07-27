@@ -35,6 +35,7 @@ UGlobalEQ {
 	classvar <eqSetting;
 	classvar <>ctrl;
 	classvar <>view;
+	classvar <>presets;
 	
 	*initClass {
 		Class.initClassTree(EQSetting);
@@ -45,6 +46,25 @@ UGlobalEQ {
 			\u_globalEQ_setting -> UGlobalEQSpec,
 			\u_globalEQ_bypass -> BoolSpec(false),	
 		]);
+		
+		presets = [ 	
+			'flat', [ 
+				[ 100.0, 1.0, 0.0 ], [ 250.0, 1.0, 0.0 ], [ 1000.0, 1.0, 0.0 ], 
+				[ 3500.0, 1.0, 0.0 ], [ 6000.0, 1.0, 0.0 ], [ 0.0 ] 
+			], 
+			'low boost', [ 
+				[ 100.0, 1.0, 6.0 ], [ 250.0, 1.0, 0.0 ], [ 1000.0, 1.0, 0.0 ],
+				[ 3500.0, 1.0, 0.0 ], [ 6000.0, 1.0, 0.0 ], [ 0.0 ] 
+			],
+			'loudness', [ 
+				[ 100.0, 1.0, 6.0 ], [ 250.0, 1.0, 0.0 ], [ 1000.0, 1.0, 0.0 ], 
+				[ 3500.0, 1.0, 3.0 ], [ 6000.0, 1.0, 6.0 ], [ 0.0 ] 
+			], 
+			'telephone', [ 
+				[ 200.0, 1.0, -24.0 ], [ 250.0, 1.0, 0.0 ], [ 1500.0, 1.0, 6.0 ], 
+				[ 3500.0, 1.0, 0.0 ], [ 3500.0, 1.0, -24.0 ], [ 0.0 ] 
+			]
+		]
 	}
 	
 	*eqSetting_ { |new|
@@ -62,7 +82,7 @@ UGlobalEQ {
 	
 	*gui { |parent, bounds|
 		if( view.isNil or: { view.view.isClosed } ) {
-			^view = EQView( parent ? "UGlobalEQ", bounds ? Rect(10, 350, 350, 186), eqSetting )
+			^view = EQView( parent ? "UGlobalEQ", bounds ? Rect(10, 350, 350, 186), eqSetting, presets )
 		} {
 			^view.front;
 		};
