@@ -47,6 +47,7 @@ UGlobalGain {
 	
 	*gain_ { |new|
 		gain = (new ? gain);
+		this.changed( \gain, gain );
 		this.update;
 	}
 	
@@ -82,7 +83,7 @@ UGlobalGain {
 	*asOSCArgEmbeddedArray { | array| ^gain.asOSCArgEmbeddedArray(array) }
 	
 	*update { |obj, what ... args|
-		if( view.isNil or: { view.view.isClosed } ) {
+		if( view.notNil and: { view.view.isClosed.not } ) {
 			view.value = gain;
 		};
 		ULib.servers.do({ |item|
