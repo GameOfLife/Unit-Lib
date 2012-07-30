@@ -45,90 +45,172 @@ UMenuWindow {
 		
 		font = font ?? { Font( Font.defaultSansFace, 12 ); };
 		
-		window = Window( "UMenuWindow", Rect(0, Window.screenBounds.height - 30, 400, 30) ).front;
+		window = Window( "UMenuWindow", Rect(0, Window.screenBounds.height - 30, 408, 30) ).front;
 		window.addFlowLayout;
 		
-		sessionMenu = PopUpTreeMenu(window, 100@20 )
+		sessionMenu = PopUpTreeMenu(window, 120@20 )
 			.font_( font )
 			.tree_(
-				(
-					'  Session': (),
-					' New': (),
-					' Open...': (),
-					' Save': (),
-					' Save as...': (),
-					'Add': (
-						'New': ( 
-							'UChain': (),
-							'UChainGroup': (),
-							'UScore': (),
-							'UScoreList': ()
+				OEM(
+					'Session', (),
+					'New', { USession.new.gui },
+					'Open...', { USession.read(nil, USessionGUI(_) ) },
+					'Save', { USession.current !? _.save },
+					'Save as...', { USession.current !? _.saveAs },
+					' ', (),
+					'Add', OEM(
+						'New', OEM( 
+							'UChain', { USession.current !? _.add(UChain()) },
+							'UChainGroup', { USession.current !? _.add(UChainGroup()) },
+							'UScore', { USession.current !? _.add(UScore()) },
+							'UScoreList', { USession.current !? _.add(UScoreList()) }
 						),
-						'Current score': (),
-						'Current score duplicated': (),
-						'Selected events': (
-							'all': (),
-							'flattened': (),
-							'into a UChainGroup': (),
-							'into a UScore': ()
+						'Current score', {
+                       			USession.current !? { |session|
+	                       			UScore.current !? { |score|
+		                       			session.add( score )
+		                       		}
+		                       	}
+			               },
+						'Current score duplicated', {
+                       			USession.current !? { |session|
+	                       			UScore.current !? { |score|
+		                       			session.add( score.deepCopy )
+		                       		}
+		                       	}
+						},
+						'Selected events', OEM(
+							'all', {
+            						USession.current !? { |session|
+						                UScoreEditorGUI.current !? { |editor|
+						                    editor.selectedEvents !? { |events|
+						                        session.add( events.collect(_.deepCopy) )
+						                    }
+						                }
+						            }
+							},
+							'flattened', {
+								USession.current !? { |session|
+									UScoreEditorGUI.current !? { |editor|
+										editor.selectedEvents !? { |events|
+											session.add( events.collect{ |x|
+												     x.deepCopy.getAllUChains
+												}.flat
+											)
+										}
+									}
+								}
+        						},
+							'into a UChainGroup', {
+								USession.current !? { |session|
+									UScoreEditorGUI.current !? { |editor|
+										editor.selectedEvents !? { |events|
+											session.add( 
+												UChainGroup( 
+												    *events.collect{ |x|
+												         x.deepCopy.getAllUChains
+												    }.flat
+												)
+											)
+										}
+									}
+								}
+							},
+							'into a UScore', {
+								USession.current !? { |session|
+									UScoreEditorGUI.current !? { |editor|
+										editor.selectedEvents !? { |events|
+											session.add( 
+												UScore(
+												    *events.collect{ |x|
+											 	        x.deepCopy.getAllUChains 
+											 	    }.flat
+											 	)
+											)
+										}
+									}
+								}
+							}
 						)
 					)
 				)
 			)
-			.value_( [ '  Session' ] )
+			.sortFunc_({true}) // no sorting; OEM is already sorted
+			.value_( [ 'Session' ] )
 			.action_({ |vw, value|
-				vw.value = [ '  Session' ];
-				sessionDict.at( *value ).value;
+				vw.value = [ 'Session' ];
+				vw.tree.atPath( value ).value;
 			});	
 		
-		scoreMenu = PopUpTreeMenu(window, 100@20 )
+		scoreMenu = PopUpTreeMenu(window, 150@20 )
 			.font_( font )
 			.tree_(
-				(
-					'  Scores': (),
-					' New': (),
-					' Open...': (),
-					' Save': (),
-					' Save as...': (),
-					'Add': (
-						'New': ( 
-							'UChain': (),
-							'UChainGroup': (),
-							'UScore': (),
-							'UScoreList': ()
-						),
-						'Current score': (),
-						'Current score duplicated': (),
-						'Selected events': (
-							'all': (),
-							'flattened': (),
-							'into a UChainGroup': (),
-							'into a UScore': ()
-						)
-					)
+				OEM(
+					'Scores', (),
+					'New', { UScore().gui; },
+					'Open...', { UScore.openWFS(nil, UScoreEditorGUI(_) ); },
+					'Save', { UScore.current !? _.save; },
+					'Save as...', { UScore.current !! _.saveAs; },
+					' ', (), 
+					'Export as audio file...', {
+						UScore.current !? { |x| 
+							Dialog.savePanel({ |path|
+								x.writeAudioFile( path );
+							});
+						};
+					},
+					'  ', (),
+					'Add Event', { UScoreEditorGUI.current !? { |x| x.editor.addEvent } },
+					'Edit', { UScoreEditorGUI.current !? { |x| x.scoreView.editSelected } },
+					'Delete', { UScoreEditorGUI.current !? { |x| x.scoreView.deleteSelected } },
+					'   ', (),
+					'Copy', { UScoreEditorGUI.currentSelectedEvents !? UScoreEditor.copy(_) },
+					'Paste', { 
+						UScoreEditorGUI.current !? { |x|
+							x.scoreView.currentEditor.pasteAtCurrentPos 
+						};
+					},
+					'    ', (),
+					'Clean overlaps', { 
+						UScoreEditorGUI.current !? { |x| x.score.cleanOverlaps }
+					},
+					'     ', (),
+					'Disable selected', { 
+						UScoreEditorGUI.current !! { |x| x.scoreView.disableSelected }
+					},
+					'Enable selected', {
+						UScoreEditorGUI.current !! { |x| x.scoreView.soloEnableSelected }
+					},
+					'      ', (),
+					'Add Track', { UScoreEditorGUI.current !! { |x| x.scoreView.addTrack } },
+					'Remove Unused Tracks', { 
+						UScoreEditorGUI.current !! { |x| x.scoreView.removeUnusedTracks }
+					}
 				)
 			)
-			.value_( [ '  Scores' ] )
+			.sortFunc_({true}) 
+			.value_( [ 'Scores' ] )
 			.action_({ |vw, value|
-				vw.value = [ '  Scores' ];
-				scoreDict.at( *value ).value;
+				vw.value = [ 'Scores' ];
+				vw.tree.atPath( value ).value;
 			});	
 		
-		viewMenu = PopUpTreeMenu(window, 100@20 )
+		viewMenu = PopUpTreeMenu(window, 120@20 )
 			.font_( font )
 			.tree_(
-				(
-					' View': (),
-					'EQ': (),
-					'Level': (),
-					'Udefs': (),
-					'Level meters': ()
+				OEM(
+					'View', (),
+					'EQ', { UGlobalEQ.gui; },
+					'Level', { UGlobalGain.gui; },
+					'Udefs', { UdefListView(); },
+					'Level meters', { ULib.servers.first.meter; }
 				)
 			)
-			.value_( [ ' View' ] )
+			.sortFunc_({true}) 
+			.value_( [ 'View' ] )
 			.action_({ |vw, value|
-				vw.value = [ ' View' ];
-				scoreDict.at( *value ).value;
+				vw.value = [ 'View' ];
+				vw.tree.atPath( value ).value;
 			});	
 	}
 	

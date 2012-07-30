@@ -16,8 +16,12 @@ ULib {
 			UChain( \bufSoundFile, \stereoOutput ).useSndFileDur
 		};
 		
-		if( (thisProcess.platform.class.asSymbol == 'OSXPlatform') && (GUI.id == \cocoa) ) {
+		if( (thisProcess.platform.class.asSymbol == 'OSXPlatform') && {
+				thisProcess.platform.ideName.asSymbol === \scapp 
+		}) {
 			UMenuBar();
+		} {
+			UMenuWindow();
 		};
 		
  		defs = Udef.loadAllFromDefaultDirectory.collect(_.synthDef).flat.select(_.notNil);
