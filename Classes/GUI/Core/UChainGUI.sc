@@ -393,15 +393,20 @@ UChainGUI {
                         UChainCodeGUI( parent, originalBounds, chain );
                     }.defer(0.01);
                 }).resize_(3);
-            defs = SmoothButton( comp, 
-				Rect( comp.bounds.right - (40 + 4 + 40 + 4 + 60), 1, 42, 12 ) )
+		};
+		
+		defs = SmoothButton( comp, 
+				Rect( comp.bounds.right - (
+					4 + 38 + (notMassEdit.binaryValue * (4 + 40 + 4 + 60))
+					), 1, 42, 12 
+				) 
+			)
 			.label_( "udefs" )
 			.border_( 1 )
 			.radius_( 2 )
 			.action_({
 				UdefListView();
 			}).resize_(3);
-		};
 			
 		CompositeView( comp, Rect( 0, 14, (composite.bounds.width - (margin.x * 2)), 2 ) )
 			.background_( Color.black.alpha_(0.25) )
