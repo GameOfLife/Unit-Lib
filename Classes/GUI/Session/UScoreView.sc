@@ -28,7 +28,7 @@ UScoreView {
      var <scoreEditorsList;
      var <usessionMouseEventsManager;
      var <>snapActive, <>snapH;
-     var <>numTracks = 16;
+     var <>numTracks = 12;
      var <scoreView, <scoreListView, <mainComposite, font, <parent, <bounds;
      var <>scoreList;
      var <currentScoreEditorController, <scoreController, <eventControllers = #[];
@@ -205,7 +205,7 @@ UScoreView {
 
     removeUnusedTracks {
         numTracks = ((this.currentScore.events.collect( _.track )
-            .maxItem ? 14) + 2).max( 16 );
+            .maxItem ? 10) + 2).max( 12 );
         this.update;
     }
 
@@ -298,7 +298,7 @@ UScoreView {
             scoreView.remove;
         };
 
-        numTracks = ((score.events.collect( _.track ).maxItem ? 14) + 2).max(16);
+        numTracks = ((score.events.collect( _.track ).maxItem ? 10) + 2).max(12);
 
         scoreView = ScaledUserViewContainer(mainComposite,
         			scoreBounds,
