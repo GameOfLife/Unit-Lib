@@ -950,6 +950,117 @@
 
 }
 
++ FreqSpec {
+	
+	makeView { |parent, bounds, label, action, resize|
+		var vws, view, labelWidth;
+		var localStep;
+		var modeFunc;
+		var font;
+		var editAction;
+		var tempVal;
+		vws = ();
+		
+		font =  (RoundView.skin ? ()).font ?? { Font( Font.defaultSansFace, 10 ); };
+		
+		localStep = step.copy;
+		if( step == 0 ) { localStep = 1 };
+		bounds.isNil.if{bounds= 320@20};
+		
+		view = EZCompositeView( parent, bounds, gap: 2@2 );
+		bounds = view.asView.bounds;
+				
+		vws[ \view ] = view;
+		
+		if( label.notNil ) {
+			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
+			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ bounds.height )
+				.string_( label.asString ++ " " )
+				.align_( \right )
+				.resize_( 4 )
+				.applySkin( RoundView.skin );
+		} {
+			labelWidth = 0;
+		};
+		
+		vws[ \comp ] = CompositeView( view, (bounds.width - (labelWidth + 49)) @ (bounds.height) );
+		
+		vws[ \mode ] = PopUpMenu( view, 45 @ (bounds.height) )
+			.font_( font )
+			.applySkin( RoundView.skin ? () )
+			.items_([ 'hz', 'midi', 'note' ])
+			.action_({ |pu|
+				mode = pu.item;
+				this.setMode( vws, mode );
+			});
+		
+		// hz mode
+		vws[ \hz ] = EZSmoothSlider( vws[ \comp ], 
+			vws[ \comp ].bounds.width @ (bounds.height),
+			nil,  this, { |vw| action.value( vw, vw.value ) }
+		).visible_( false );
+		
+		vws[ \hz ].sliderView.centered_( true ).centerPos_( this.unmap( default ) );
+		
+		// midi mode
+		vws[ \midi ] =  EZSmoothSlider( vws[ \comp ], 
+			vws[ \comp ].bounds.width @ (bounds.height),
+			nil, 
+			[ this.minval.cpsmidi, this.maxval.cpsmidi, \lin, 1, this.default.cpsmidi ].asSpec,
+			{ |vw| action.value( vw, vw.value.midicps ) }
+		).visible_( false );
+		
+		vws[ \midi ].sliderView.centered_( true ).centerPos_( 
+			vws[ \midi ].controlSpec.unmap( default.cpsmidi ) 
+		);
+		
+		// note mode
+		vws[ \note ] = SmoothNumberBox( vws[ \comp ], 60 @ (bounds.height) )
+			.action_({ |nb|
+				action.value( vws, nb.value.midicps );
+			})
+			//.step_( localStep.x )
+			.scroll_step_( localStep )
+			.clipLo_( this.minval.cpsmidi )
+			.clipHi_( this.maxval.cpsmidi )
+			.value_( 440.cpsmidi )
+			.formatFunc_({ |val|
+				val.midiname;
+			})
+			.interpretFunc_({ |string|
+				string.namemidi;
+			})
+			.allowedChars_( "abcdefgABCDEFG#-" )
+			.visible_( false );
+			
+		this.setMode( vws, mode );
+	
+		^vws;
+	}
+	
+	setMode { |view, newMode|
+		[ \hz, \midi, \note ].do({ |item|
+			view[ item ].visible = (item == newMode)	
+		});
+	}
+	
+	setView { |view, value, active = false|
+		view[ \hz ].value = value;
+		view[ \midi ].value = value.cpsmidi;
+		view[ \note ].value = value.cpsmidi;
+		{ 
+			this.setMode( view, mode );
+			view[ \mode ].value = view[ \mode ].items.indexOf( mode ) ? 0; 
+		}.defer;
+		if( active ) { view[ \hz ].doAction };
+	}
+	
+	mapSetView { |view, value, active = false|
+		this.setView( view, this.map( value ), active );
+	}
+}
+
+
 
 + EZPopUpMenu {
 	

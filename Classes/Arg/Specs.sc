@@ -833,6 +833,22 @@ PositiveRealSpec : Spec {
 	storeArgs { ^[default] }
 }
 
+FreqSpec : ControlSpec {
+	
+	classvar <>mode = 'hz'; // \hz, \midi, \note - gui only
+	
+	*new { arg minval=20, maxval=20000, warp='exp', step=0.0, default = 440, units = " Hz", grid;
+		^super.newCopyArgs(minval, maxval, warp, step,
+				default ? minval, units ? "", grid
+			).init
+	}
+	
+	*initClass {
+		specs.put( \freq, FreqSpec() ); // replace default freq spec with this
+	}
+
+}
+
 + Spec {
 	*testObject { ^false }
 	
