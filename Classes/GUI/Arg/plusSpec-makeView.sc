@@ -935,7 +935,9 @@
 		        action.value( vw, vw.value );
 		    } ).resize_(5)
 		    .allowedChars_( "" )
-			.step_( 1 )
+			.step_( step )
+			.scroll_step_( step )
+			.alt_scale_( alt_step / step )
 			.clipLo_( this.minval )
 			.clipHi_( this.maxval );
 		    

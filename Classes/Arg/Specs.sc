@@ -781,7 +781,8 @@ MultiSpec : Spec {
 IntegerSpec : Spec {
 
 	var <default = 0;
-	var <step = 1;
+	var <>step = 1;
+	var <>alt_step = 1;
 	var <>minval = -inf;
 	var <>maxval = inf;
 	
