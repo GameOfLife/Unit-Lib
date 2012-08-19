@@ -543,6 +543,8 @@ EQView {
 			bounds.copy.height_( bounds.height * ( 1 / this.class.viewNumLines) ),
 			presetManager 
 		);
+		
+		presetView.resize_(8);
 
 		view.asView.onClose_({ plotCtrl.remove; editCtrl.remove });
 		
