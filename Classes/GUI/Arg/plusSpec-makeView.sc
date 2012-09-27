@@ -1008,20 +1008,19 @@
 		vws[ \midi ] =  EZSmoothSlider( vws[ \comp ], 
 			vws[ \comp ].bounds.width @ (bounds.height),
 			nil, 
-			[ this.minval.cpsmidi, this.maxval.cpsmidi, \lin, 1, this.default.cpsmidi ].asSpec,
+			[ this.minval.cpsmidi, this.maxval.cpsmidi, \lin, 0.01, this.default.cpsmidi ].asSpec,
 			{ |vw| action.value( vw, vw.value.midicps ) }
 		).visible_( false );
 		
 		vws[ \midi ].sliderView.centered_( true ).centerPos_( 
 			vws[ \midi ].controlSpec.unmap( default.cpsmidi ) 
 		);
-		
+				
 		// note mode
-		vws[ \note ] = SmoothNumberBox( vws[ \comp ], 60 @ (bounds.height) )
+		vws[ \note ] = SmoothNumberBox( vws[ \comp ], 40 @ (bounds.height) )
 			.action_({ |nb|
-				action.value( vws, nb.value.midicps );
+				action.value( vws, nb.value.midicps * (vws[ \cents ].value / 100).midiratio );
 			})
-			//.step_( localStep.x )
 			.scroll_step_( localStep )
 			.clipLo_( this.minval.cpsmidi )
 			.clipHi_( this.maxval.cpsmidi )
@@ -1035,6 +1034,16 @@
 			.allowedChars_( "abcdefgABCDEFG#-" )
 			.visible_( false );
 			
+		vws[ \cents ] = EZSmoothSlider( vws[ \comp ], 
+				Rect( 44, 0, (vws[ \comp ].bounds.width - 44), bounds.height ),
+				nil, [-50,50,\lin,0.1,0].asSpec
+			).action_({ |sl|
+				action.value( vws, vws[ \note ].value.midicps * (sl.value / 100).midiratio );
+			})
+			.visible_( false );
+		
+		vws[ \cents ].sliderView.centered_(true);
+			
 		this.setMode( vws, mode );
 	
 		^vws;
@@ -1044,12 +1053,14 @@
 		[ \hz, \midi, \note ].do({ |item|
 			view[ item ].visible = (item == newMode)	
 		});
+		view[ \cents ].visible = (newMode == \note);
 	}
 	
 	setView { |view, value, active = false|
 		view[ \hz ].value = value;
 		view[ \midi ].value = value.cpsmidi;
-		view[ \note ].value = value.cpsmidi;
+		view[ \note ].value = value.cpsmidi.round(1);
+		view[ \cents ].value = (value.cpsmidi - (view[ \note ].value)) * 100;
 		{ 
 			this.setMode( view, mode );
 			view[ \mode ].value = view[ \mode ].items.indexOf( mode ) ? 0; 
