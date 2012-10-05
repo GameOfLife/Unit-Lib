@@ -82,6 +82,10 @@ UScoreEditorGui_TransportBar {
 		scoreController.put(\pos, { |who,what|
             views[\counter].value = this.score.pos;
 		});
+		
+		scoreController.put(\loop, { |who,what|
+            views[\loop].value = this.score.loop.binaryValue; 
+		});
 
 		views[\play].value = this.score.isPlaying.binaryValue;
 		views[\pause].value = this.score.isPaused.binaryValue;
@@ -177,6 +181,7 @@ UScoreEditorGui_TransportBar {
         views[\loop] = SmoothButton( view, 50@size  )
         			.states_( [[\roundArrow, Color.black, Color.clear ],
         			[\roundArrow, Color.black, Color.green.alpha_(0.5) ]])
+        			.value_( this.score.loop.binaryValue )
         			.canFocus_(false)
         			.font_( font )
         			.border_(1)

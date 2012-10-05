@@ -27,7 +27,7 @@ UScore : UEvent {
 
 	//public
 	var <events, <name = "untitled";
-	var pos = 0, <>loop = false;
+	var pos = 0, <loop = false;
 	var <playState = \stopped, <updatePos = true;
 	var <soloed, <softMuted;
 
@@ -86,6 +86,11 @@ UScore : UEvent {
 	events_ { |evs|
 	    events = evs;
 	    this.changed(\events);
+	}
+	
+	loop_ { |bool|
+		loop = bool;
+		this.changed(\loop);
 	}
 
 	isPlaying{ ^playState == \playing }
