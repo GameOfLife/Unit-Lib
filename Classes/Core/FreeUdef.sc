@@ -86,7 +86,7 @@ FreeUdef : Udef {
 	loadSynthDef { |server|
 		this.createSynthDef;
 		if( synthDef.notNil ) {
-			server = server ? Server.default;
+			server = server ? ULib.servers ? Server.default;
 			server.asCollection.do{ |s|
 		   		synthDef.asCollection.do(_.send(s))
 			}
@@ -96,7 +96,7 @@ FreeUdef : Udef {
 	sendSynthDef { |server|
 		this.createSynthDef;
 		if( synthDef.notNil ) {	
-			server = server ? Server.default;
+			server = server ? ULib.servers ? Server.default;
 			server.asCollection.do{ |s|
 				synthDef.asCollection.do(_.send(s));
 			}

@@ -148,14 +148,14 @@ Udef : GenericDef {
 	// this may change 
 	// temp override to send instead of load (remote servers can't load!!)
 	loadSynthDef { |server|
-		server = server ? Server.default;
+		server = server ? ULib.servers ? Server.default;
 		server.asCollection.do{ |s|
 		    this.synthDef.asCollection.do(_.send(s));
 		}
 	}
 	
 	sendSynthDef { |server|
-		server = server ? Server.default;
+		server = server ? ULib.servers ? Server.default;
 		server.asCollection.do{ |s|
 			this.synthDef.asCollection.do(_.send(s));
 		}
