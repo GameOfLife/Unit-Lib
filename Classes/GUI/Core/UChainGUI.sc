@@ -22,10 +22,12 @@ UChainGUI {
 	classvar <>skin;
 	classvar <>current;
 	classvar <>singleWindow = true;
+	classvar <>presetManager;
 	
 	var <chain;
 	
 	var <parent, <composite, <views, <startButton, <uguis;
+	var <>presetView;
 	var <>action;
 	var originalBounds;
 	
@@ -40,7 +42,15 @@ UChainGUI {
 					background:  Gradient( Color.white, Color.gray(0.85), \v ) 
 				)
 			);
+			
+			presetManager = PresetManager( UChain.default, [ \default, { UChain.default } ] )
+				.getFunc_({ |obj| obj.deepCopy })
+				.applyFunc_({ |obj, setting| 
+					obj.units = setting.value.units.deepCopy;
+					obj.duration = obj.duration; // update duration of units
+				});	
 		});
+
 	}
 	
 	*new { |parent, bounds, chain|
@@ -68,7 +78,7 @@ UChainGUI {
 			} {
 				parent = Window(
 					parent, 
-					bounds ?? { Rect(128 rrand: 256, 64 rrand: 128, 342, 400) }, 
+					bounds ?? { Rect(128 rrand: 256, 64 rrand: 128, 342, 420) }, 
 					scroll: false
 				).front;
 				this.makeViews( bounds );
@@ -654,7 +664,13 @@ UChainGUI {
 
 	makeUnitViews { |units, margin, gap|
 		
-		var scrollView;
+		var scrollView, presetManagerHeight = 0, notMassEdit;
+		
+		notMassEdit = chain.class != MassEditUChain;
+		
+		if( notMassEdit ) {
+			presetManagerHeight = PresetManagerGUI.getHeight + 12;
+		};
 		
 		this.makeUnitHeader( units, margin, gap );
 		
@@ -663,6 +679,7 @@ UChainGUI {
 		scrollView = ScrollView( composite, 
 			(composite.bounds.width) 
 				@ (composite.bounds.height - 
+					( presetManagerHeight ) -
 					( composite.decorator.top )
 				)
 		);
@@ -673,6 +690,20 @@ UChainGUI {
 			.autohidesScrollers_( false )
 			.resize_(5)
 			.addFlowLayout( margin, gap );
+			
+		if( notMassEdit ) {
+			
+			CompositeView( composite, (composite.bounds.width - (margin.x * 2)) @ 2 )
+				.background_( Color.black.alpha_(0.25) )
+				.resize_(2);
+			
+			presetView = PresetManagerGUI( 
+				composite, 
+				composite.bounds.width @ PresetManagerGUI.getHeight,
+				presetManager,
+				chain
+			).resize_(7)
+		};
 			
 		^this.makeUnitSubViews( scrollView, units, margin, gap );
 	}
