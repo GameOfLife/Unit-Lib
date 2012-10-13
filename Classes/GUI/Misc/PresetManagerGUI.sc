@@ -1,14 +1,14 @@
 PresetManagerGUI {
 	
-	var <presetManager;
+	var <presetManager, <>object;
 	
 	var <parent, <view, <views, <controller;
 	var <viewHeight = 14, <labelWidth = 50;
 	var <>action;
 	var <font;
 	
-	*new { |parent, bounds, presetManager|
-		^super.newCopyArgs( presetManager ).init( parent, bounds );
+	*new { |parent, bounds, presetManager, object|
+		^super.newCopyArgs( presetManager, object ).init( parent, bounds );
 	}
 	
 	init { |inParent, bounds|
@@ -35,6 +35,7 @@ PresetManagerGUI {
 	
 	*viewNumLines { ^1 }
 	
+	resize { ^view.resize }
 	resize_ { |resize|
 		view.resize = resize ? 5;
 	}
@@ -48,7 +49,7 @@ PresetManagerGUI {
 		{ 
 			views[ \presets ].items = (inPresetManager.presets ? [])[0,2..];
 			if( views[ \presets ].items.size == 1 ) { views[ \presets ].value = 0 };
-			match = presetManager.match;
+			match = presetManager.match( object );
 			if( match.notNil ) {
 				views[ \presets ].value = views[ \presets ].items.indexOf( match );
 			};
@@ -84,14 +85,21 @@ PresetManagerGUI {
 		views[ \label ] = StaticText( view, labelWidth @ viewHeight )
 			.applySkin( RoundView.skin ? () )
 			.string_( " presets" );
-
+			
+		views[ \apply ] = SmoothButton( view, viewHeight @ viewHeight )
+			.radius_( viewHeight/2 )
+			.label_( 'arrow' )
+			.action_({
+				views[ \presets ].doAction;
+			});
+		
 		views[ \presets ] = PopUpMenu( view, 120 @ viewHeight )
 			.applySkin( RoundView.skin ? () )
 			.action_({ |pu|
 				var item;
 				if( pu.items.size > 0 ) {
 					item = pu.item;
-					presetManager.apply( item );
+					presetManager.apply( item, object );
 					action.value( this );
 				};
 			});
@@ -112,20 +120,24 @@ PresetManagerGUI {
 					(views[ \presets ].item ? "default").asString, 
 					"Please enter a name for this preset:",
 					{ |string|
-						presetManager.put( string );
+						presetManager.put( string, object );
+						views[ \presets ].value = views[ \presets ]
+							.items.indexOf( string.asSymbol );
 						action.value( this );
 					}
 				);
 			});
 			
-		views[ \read ] = SmoothButton( view, 40 @ viewHeight )
+		views[ \read ] = SmoothButton( view, 35 @ viewHeight )
 			.states_( [ [ "read", Color.black, Color.green(1,0.25) ] ] )
+			.radius_(2)
 			.action_({
 				presetManager.read( action: { action.value( this ); } );
 			});
 		
-		views[ \write ] = SmoothButton( view, 40 @ viewHeight )
+		views[ \write ] = SmoothButton( view, 35 @ viewHeight )
 			.states_( [ [ "write", Color.black, Color.red(1,0.25) ] ] )
+			.radius_(2)
 			.action_({
 				presetManager.write( successAction: { action.value( this ); } );
 			});
@@ -134,4 +146,10 @@ PresetManagerGUI {
 		this.update;
 	}
 
+}
+
++ PresetManager {
+	gui { |view, bounds|
+		^PresetManagerGUI( view, bounds, this );
+	}
 }

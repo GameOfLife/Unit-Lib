@@ -117,7 +117,7 @@ PresetManager {
 	}
 	
 	applyPreset { |obj, preset|
-		^applyFunc.value( obj ? object, preset );
+		^applyFunc.value( obj ? object, preset.value );
 	}
 	
 	write { |path, overwrite=false, ask=true, successAction, cancelAction|
