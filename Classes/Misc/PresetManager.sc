@@ -5,7 +5,7 @@ PresetManager {
 
 	var <>object;
 	var <presets;
-	var <>getFunc, <>applyFunc;
+	var <>getFunc, <>applyFunc, <>matchFunc;
 	var <>id;
 	
 	
@@ -13,11 +13,11 @@ PresetManager {
 		all = IdentityDictionary();
 	}
 	
-	*new { |object, presets, getFunc, applyFunc|
-		^super.newCopyArgs().init(object, presets, getFunc, applyFunc).addToAll;
+	*new { |object, presets, getFunc, applyFunc, matchFunc|
+		^super.newCopyArgs().init(object, presets, getFunc, applyFunc, matchFunc).addToAll;
 	}
 	
-	init { |inObject, inPresets, inGetFunc, inApplyFunc|
+	init { |inObject, inPresets, inGetFunc, inApplyFunc, inMatchFunc|
 		
 		object = inObject;
 		
@@ -28,6 +28,7 @@ PresetManager {
 		// by default the presets replace the whole object, by returning a copy
 		getFunc = inGetFunc ? { |object| object.deepCopy };
 		applyFunc = inApplyFunc ? { |object, preset| preset.deepCopy };
+		matchFunc = inMatchFunc ? { |object, preset| object == preset };
 	}
 	
 	addToAll {
@@ -48,9 +49,11 @@ PresetManager {
 	clear { this.presets = []; }
 	
 	put { |name = \default, obj|
-		var preset, index;
-		obj = obj ? object;
-		preset = getFunc.value( obj );
+		this.putRaw( name, getFunc.value( obj ? object ) );
+	}
+	
+	putRaw { |name, preset|
+		var index;
 		name = name.asSymbol;
 		index = presets[0,2..].indexOf( name );
 		if( index.notNil ) { 
@@ -67,7 +70,7 @@ PresetManager {
 		size = presets.size-2;
 		preset = getFunc.value( obj );
 		while { i <= size } {
-			if( preset == presets[i+1] ) {
+			if( matchFunc.value( preset, presets[i+1] ) ) {
 				^presets[i];
 			};
 			i=i+2;
