@@ -695,7 +695,7 @@ UChainGUI {
 			
 			CompositeView( composite, (composite.bounds.width - (margin.x * 2)) @ 2 )
 				.background_( Color.black.alpha_(0.25) )
-				.resize_(2);
+				.resize_(8);
 			
 			presetView = PresetManagerGUI( 
 				composite, 
