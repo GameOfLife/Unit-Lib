@@ -42,6 +42,10 @@ UEvent : UArchivable {
 	prepareTime { ^startTime - this.waitTime } // time to start preparing
 	
 	<= { |that| ^this.prepareTime <= that.prepareTime } // sort support
+		
+	== { |that| // use === for identity
+		^this.compareObject(that);
+	}
 
     duration_{ this.subclassResponsibility(thisMethod) }
     isPausable_{ this.subclassResponsibility(thisMethod) }

@@ -41,6 +41,10 @@ AbstractRichBuffer {
     shallowCopy{
         ^this.class.new(numFrames, numChannels, sampleRate)
 	}
+		
+	== { |that| // use === for identity
+		^this.compareObject(that);
+	}
 
     numFrames_ { |new|
 		numFrames = new;
