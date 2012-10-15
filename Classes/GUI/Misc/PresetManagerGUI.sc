@@ -46,10 +46,12 @@ PresetManagerGUI {
 	
 	setViews { |inPresetManager|
 		var match;
+		views[ \undo ].visible = inPresetManager.lastObject.notNil;
 		{ 
 			views[ \presets ].items = (inPresetManager.presets ? [])[0,2..];
 			if( views[ \presets ].items.size == 1 ) { views[ \presets ].value = 0 };
 			match = presetManager.match( object );
+			match = match ?  presetManager.lastChosen;
 			if( match.notNil ) {
 				views[ \presets ].value = views[ \presets ].items.indexOf( match );
 			};
@@ -85,6 +87,13 @@ PresetManagerGUI {
 		views[ \label ] = StaticText( view, labelWidth @ viewHeight )
 			.applySkin( RoundView.skin ? () )
 			.string_( " presets" );
+			
+		views[ \undo ] = SmoothButton( view, viewHeight @ viewHeight )
+			.radius_( viewHeight/2 )
+			.label_( 'arrow_pi' )
+			.action_({
+				presetManager.undo( object );
+			});
 			
 		views[ \apply ] = SmoothButton( view, viewHeight @ viewHeight )
 			.radius_( viewHeight/2 )

@@ -7,7 +7,8 @@ PresetManager {
 	var <presets;
 	var <>getFunc, <>applyFunc, <>matchFunc;
 	var <>id;
-	
+	var <>lastChosen;
+	var <>lastObject;
 	
 	*initClass {
 		all = IdentityDictionary();
@@ -112,6 +113,8 @@ PresetManager {
 		obj = obj ? object;
 		preset = this.at( name );
 		if( preset.notNil ) {
+			this.lastChosen = name;
+			this.lastObject = obj !? { getFunc.value( obj  ) };
 			^this.applyPreset( obj, preset );
 		} {
 			"%:apply - preset '%' not found\n".postf( this.class, name );
@@ -119,8 +122,24 @@ PresetManager {
 		};
 	}
 	
+	undo { |obj|
+		var res;
+		if( lastObject.notNil ) {
+			res = this.applyPreset( obj, lastObject );
+			this.lastObject = nil;
+			this.changed( \undo );
+			^res;
+		} {
+			"%:undo - no undo state available\n".postf( this.class );
+			^obj
+		};
+	}
+	
 	applyPreset { |obj, preset|
-		^applyFunc.value( obj ? object, preset.value );
+		var res;
+		res = applyFunc.value( obj ? object, preset.value );
+		this.changed( \apply );
+		^res;
 	}
 	
 	write { |path, overwrite=false, ask=true, successAction, cancelAction|
