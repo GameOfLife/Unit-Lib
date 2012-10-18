@@ -509,11 +509,12 @@ UChain : UEvent {
 	prepare { |target, startPos = 0, action|
 		var cpu;
 		action = MultiActionFunc( action );
-		if( target.isNil or: { target.size == 0 } ) {
-			target = ULib.servers ? Server.default;
+		target = target.asCollection;
+		if( target.size == 0 ) {
+			target = (ULib.servers ? Server.default).asCollection;
 		};
 		
-		target = target.asCollection.select({ |tg|
+		target = target.select({ |tg|
 			this.shouldPlayOn( tg ) != false;
 		});
 		//cpu = this.apxCPU;
