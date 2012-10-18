@@ -46,7 +46,12 @@ UScoreEditorGUI : UAbstractWindow {
         scoreController = SimpleController(scoreEditor.score);
         scoreController.put(\name,{
             window.name = this.windowTitle
-        })
+        });
+        
+        scoreController.put(\something,{
+            { window.name = this.windowTitle }.defer;
+        });
+        
     }
 
 	score { ^scoreEditor.score }
@@ -56,7 +61,13 @@ UScoreEditorGUI : UAbstractWindow {
 	selectedEvents{ ^scoreView.selectedEvents }
 
     windowTitle {
-        ^("Score Editor : "++this.score.name)
+	    var dur;
+	    dur = this.score.duration;
+	    if( dur == inf ) {
+		  	^("Score Editor : "++ this.score.name ++ " (infinite)" );
+		} {
+			^("Score Editor : "++ this.score.name ++ " (" ++ dur.asSMPTEString(1000) ++ ")" );
+		};
     }
 
     remove {

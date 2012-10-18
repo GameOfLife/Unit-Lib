@@ -87,7 +87,10 @@ UScoreView {
 	    eventControllers = this.currentScore.collect{ |e|
             var s = SimpleController(e);
             [\startTime,\dur,\fadeIn,\fadeOut,\name].do{ |key|
-                s.put(key,{ { this.update }.defer; })
+                s.put(key,{ { 
+	                this.update;
+	                this.currentScore.changed( \something );
+	            }.defer; })
             };
             s
         }
