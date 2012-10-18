@@ -178,25 +178,33 @@ UScore : UEvent {
 	startTimes { ^events.collect( _.startTime ); }
 	durations { ^events.collect( _.dur ); }
 	
-	duration { ^(this.startTimes + this.durations).maxItem ? 0; }
+	duration {
+		var dur = 0;
+		events.do({ |evt|
+			dur = dur.max( evt.endTime );
+			if( dur == inf ) { ^dur };
+		});
+		^dur;
+	}
+	 
 	dur { ^this.duration }
     isFinite{ ^this.duration < inf}
     
-    finiteDuration { 
-		var time = 0;
+    finiteDuration { |addInf = 10|
+	    var time = 0;
 		events.do({ |evt|
 			var dur;
 			dur = evt.dur;
 			if( dur == inf ) {
-				time = time.max( evt.startTime + 10 );
+				time = time.max( evt.startTime + addInf );
 			} {
 				time = time.max( evt.startTime + dur );
 			};
 		});
 		^time; 
 	}
-    displayDuration { // used by UScoreView
-	   ^(this.finiteDuration + 10).max(10);
+    displayDuration { |margin = 10|// used by UScoreView
+	   ^(this.finiteDuration(margin) + margin).max(margin);
     }
 
     //mimic a UChain
