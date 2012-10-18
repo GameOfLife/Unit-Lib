@@ -180,9 +180,21 @@ UScore : UEvent {
 	
 	duration { ^(this.startTimes + this.durations).maxItem ? 0; }
 	dur { ^this.duration }
-	finiteDuration { ^(this.startTimes + this.durations).select( _ < inf ).maxItem ? ((this.startTimes.maxItem ? 0) + 10) }
     isFinite{ ^this.duration < inf}
     
+    finiteDuration { 
+		var time = 0;
+		events.do({ |evt|
+			var dur;
+			dur = evt.dur;
+			if( dur == inf ) {
+				time = time.max( evt.startTime + 10 );
+			} {
+				time = time.max( evt.startTime + dur );
+			};
+		});
+		^time; 
+	}
     displayDuration { // used by UScoreView
 	   ^(this.finiteDuration + 10).max(10);
     }
