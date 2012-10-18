@@ -742,25 +742,26 @@ U : ObjectWithArgs {
 	}
 	
 	prepare { |target, startPos = 0, action|
-		var valuesToPrepare, act;
-		target = target.asCollection.collect{ |t| t.asTarget( this.apxCPU ).server };
+		var valuesToPrepare, act, servers;
+		target = target.asCollection.collect{ |t| t.asTarget( this.apxCPU ) };
 		target = target.select({ |tg|
 			this.shouldPlayOn( tg ) != false;
 		});
+		servers = target.collect(_.server);
 		if( target.size > 0 ) {
-	   	    act = { preparedServers = preparedServers.addAll( target ); action.value };
+	   	    act = { preparedServers = preparedServers.addAll( servers ); action.value };
 		    if( loadDef) {
-		        this.def.loadSynthDef( target );
+		        this.def.loadSynthDef( servers );
 		    };
 		    valuesToPrepare = this.valuesToPrepare;
 		    if( valuesToPrepare.size > 0  ) {
 			    act = MultiActionFunc( act );
 			    valuesToPrepare.do({ |val|
-				     val.prepare(target.asCollection, startPos, action: act.getAction)
+				     val.prepare(servers, startPos, action: act.getAction)
 			    });
-			    this.def.prepare(target.asCollection, act.getAction)
+			    this.def.prepare(servers, act.getAction)
 		    } {
-			    this.def.prepare(target.asCollection, act);
+			    this.def.prepare(servers, act);
 		    };
 		} {
 			action.value;
@@ -772,12 +773,12 @@ U : ObjectWithArgs {
 	    fork{
 	        target = this.prepare(target);
 	        this.prSyncCollection(target);
-	        action.value( this );
+	        action.value( this, target );
 	    }
     }
 
 	prepareAndStart { |target|
-	   this.prepareAnd( target, _.start(target) );
+	   this.prepareAnd( target, _.start(_) );
 	}
 
 	loadDefAndStart { |target|
