@@ -182,6 +182,10 @@ UScore : UEvent {
 	dur { ^this.duration }
 	finiteDuration { ^(this.startTimes + this.durations).select( _ < inf ).maxItem ? ((this.startTimes.maxItem ? 0) + 10) }
     isFinite{ ^this.duration < inf}
+    
+    displayDuration { // used by UScoreView
+	   ^(this.finiteDuration + 10).max(10);
+    }
 
     //mimic a UChain
     eventSustain{ ^inf }

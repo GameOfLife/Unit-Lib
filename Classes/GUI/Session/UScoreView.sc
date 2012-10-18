@@ -302,13 +302,13 @@ UScoreView {
 
         scoreView = ScaledUserViewContainer(mainComposite,
         			scoreBounds,
-        			Rect( 0, 0, score.duration.ceil.max(1), numTracks ),
+        			Rect( 0, 0, score.displayDuration, numTracks ),
         			5);
 
         //CONFIGURE scoreView
         scoreView.background = Color.gray(0.8);
         scoreView.composite.resize = 5;
-	    scoreView.gridLines = [score.finiteDuration.ceil.max(1), numTracks];
+	    scoreView.gridLines = [ score.displayDuration, numTracks];
 		scoreView.gridMode = ['blocks','lines'];
 		scoreView.sliderWidth = 8;
 		scoreView.userView.view
@@ -379,13 +379,20 @@ UScoreView {
 				}
 			})
 			.beforeDrawFunc_( {
-			    var dur = score.finiteDuration.ceil.max(1);
+			    var dur = score.displayDuration;
 				numTracks = ((score.events.collect( _.track ).maxItem ? ( numTracks - 2)) + 2)
 					.max( numTracks );
 				scoreView.fromBounds = Rect( 0, 0, dur, numTracks );
 				scoreView.gridLines = [dur, numTracks];
 				} )
-
+			.drawFunc_({ |v|
+				Pen.color = Color.white.alpha_(0.75);
+				(score.displayDuration / 60).floor.do({ |i|
+					i = (i+1) * 60;
+					Pen.line( i @ 0, i @ numTracks );
+				});
+				Pen.stroke;
+			})
 			.unscaledDrawFunc_( { |v|
 				var scPos, rect;
 				rect = v.view.drawBounds.moveTo(0,0);
