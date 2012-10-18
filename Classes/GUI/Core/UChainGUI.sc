@@ -32,6 +32,16 @@ UChainGUI {
 	var originalBounds;
 	
 	*initClass {
+		
+		Class.initClassTree( PresetManager );
+		
+		presetManager = PresetManager( UChain(), [ \default, { UChain.default } ] )
+			.getFunc_({ |obj| obj.deepCopy })
+			.applyFunc_({ |obj, setting| 
+				obj.units = setting.value.units.deepCopy;
+				obj.duration = obj.duration; // update duration of units
+			});
+	
 		StartUp.defer({
 			skin = ( 
 				labelWidth: 80, 
@@ -42,13 +52,6 @@ UChainGUI {
 					background:  Gradient( Color.white, Color.gray(0.85), \v ) 
 				)
 			);
-			
-			presetManager = PresetManager( UChain.default, [ \default, { UChain.default } ] )
-				.getFunc_({ |obj| obj.deepCopy })
-				.applyFunc_({ |obj, setting| 
-					obj.units = setting.value.units.deepCopy;
-					obj.duration = obj.duration; // update duration of units
-				});	
 		});
 
 	}
