@@ -391,7 +391,7 @@ UScore : UEvent {
 	
 	prStartTasks { |targets, startPos = 0, assumePrepared = false, updatePosition = true, startEventsActiveAtStartPos = true, loop = false|
         var prepareEvents, startEvents, releaseEvents, prepStartRelEvents, preparePos,
-            allEvents, deltaToStart,dur, actions, needsPrepare, firtPrepareTime, updatePosFunc, waitError;
+            allEvents, deltaToStart,dur, actions, needsPrepare, updatePosFunc, waitError;
 
         waitError = "prStartTasks - was going to call .wait on inf";
 
@@ -410,16 +410,20 @@ UScore : UEvent {
                 { |event| event.startAndRelease(targets) }
             ];
         };
-
-
+        
+        dur = this.duration;
+        
         if( loop ) {
-            //if the firt event to be prepared has prepareTime bigger then the duration of the score
+	        // if a score is infinitely long, it cannot loop
+            case { dur == inf } {
+	              this.loop = loop = false;
+               	"can not loop score with infinite events in it".warn;
+            } { (dur + (events.collect(_.prepareTime).sort[0])) < 0 } {
+	       //if the firt event to be prepared has prepareTime bigger then the duration of the score
             //then it is impossible to prepare the event while the score is playing.
-            firtPrepareTime = events.collect(_.prepareTime).sort[0];
-            if( (this.duration + firtPrepareTime) < 0 ) {
-                loop = false;
-                "Score is too small, will not loop score. Would not have enough time to prepare events.".warn
-            }
+                this.loop = loop = false;
+                "Score is too small, will not loop score. Would not have enough time to prepare events.".warn;
+            };
         };
         #allEvents,needsPrepare, preparePos = this.arrayForPlayTask(startPos, assumePrepared, startEventsActiveAtStartPos, loop);
 
@@ -432,7 +436,6 @@ UScore : UEvent {
 
         updatePosFunc = {
             if( updatePosition ) {
-                dur = this.duration;
                 updatePosTask = Task({
                     var waitTime = 0.1;
                     var w = (startPos - preparePos);
@@ -471,7 +474,7 @@ UScore : UEvent {
                     actions[item[1]].value(item[2], (startPos - item[2].startTime).max(0) );
                 });
                 if( this.isFinite ) {
-                    w = this.duration - pos;
+                    w = dur - pos;
                     if(w == inf){ waitError.warn }{w.wait};
                     if(loop) {
                         this.pos = 0;
@@ -490,7 +493,7 @@ UScore : UEvent {
 		    this.changed( \start, startPos );
         } {
 
-            if(this.duration == inf) {
+            if(dur == inf) {
                 //if there is nothing to play but the score is infinite just keep updating the position.
                 this.playState_(\playing);
                 updatePosFunc.value;
@@ -502,7 +505,7 @@ UScore : UEvent {
                     fork{
                         var w;
                         this.playState_(\playing);
-                        w = this.duration - startPos;
+                        w = dur - startPos;
                         if(w == inf){ waitError.warn }{w.wait};
                         this.pos = 0;
                         this.prStartTasks(targets, 0, assumePrepared, updatePosition,
