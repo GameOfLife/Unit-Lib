@@ -352,6 +352,6 @@ MassEditUChain {
 		stream << "a " << this.class.name << "(" <<* units.collect(_.defName)  <<")"
 	}
 	
-	gui { |parent, bounds| ^UChainGUI( parent, bounds, this ) }
+	gui { |parent, bounds, score| ^UChainGUI( parent, bounds, this, score ) }
 	
 }

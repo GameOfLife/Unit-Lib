@@ -698,6 +698,18 @@ UScore : UEvent {
 		stream << "])";
 	}
 	
+	storeModifiersOn { |stream|
+		this.storeName( stream );
+		this.storeTags( stream );
+		this.storeDisplayColor( stream );
+	}
+	
+	storeName { |stream|
+		if( name != "untitled" ) {
+			stream << ".name_(" <<< name << ")";
+		};
+	}
+	
 	textArchiveFileExtension { ^"uscore" }
 
 	onSaveAction { this.name = filePath.basename.removeExtension }

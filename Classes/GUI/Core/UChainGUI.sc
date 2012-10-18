@@ -24,7 +24,7 @@ UChainGUI {
 	classvar <>singleWindow = true;
 	classvar <>presetManager;
 	
-	var <chain;
+	var <chain, <score;
 	
 	var <parent, <composite, <views, <startButton, <uguis;
 	var <>presetView;
@@ -53,8 +53,8 @@ UChainGUI {
 
 	}
 	
-	*new { |parent, bounds, chain|
-		^super.newCopyArgs( chain ).init( parent, bounds );
+	*new { |parent, bounds, chain, score|
+		^super.newCopyArgs( chain, score ).init( parent, bounds );
 	}
 	
 	init { |inParent, bounds|
@@ -184,95 +184,129 @@ UChainGUI {
 			
 		composite.decorator.nextLine;
 		
-		// startTime
-		StaticText( composite, labelWidth@14 )
-			.applySkin( RoundView.skin )
-			.string_( "startTime" )
-			.align_( \right );
+		if( score.notNil ) {
+			// score name
+			StaticText( composite, labelWidth@14 )
+				.applySkin( RoundView.skin )
+				.string_( "name" )
+				.align_( \right );
+				
+			views[ \name ] = TextField( composite, 84@14 )
+				.applySkin( RoundView.skin )
+				.string_( score.name )
+				.action_({ |tf|
+					score.name_( tf.string );
+				});
+				
+			composite.decorator.nextLine;
 			
-		views[ \startTime ] = SMPTEBox( composite, 84@14 )
-			.applySmoothSkin
-			.applySkin( RoundView.skin )
-			.clipLo_(0)
-			.action_({ |nb|
-				chain.startTime_( nb.value );
+			// startTime
+			StaticText( composite, labelWidth@14 )
+				.applySkin( RoundView.skin )
+				.string_( "startTime" )
+				.align_( \right );
+				
+			views[ \startTime ] = SMPTEBox( composite, 84@14 )
+				.applySmoothSkin
+				.applySkin( RoundView.skin )
+				.clipLo_(0)
+				.value_( score.startTime )
+				.action_({ |nb|
+					score.startTime_( nb.value );
+				});
+			
+			composite.decorator.nextLine;
+		} {	
+			// startTime
+			StaticText( composite, labelWidth@14 )
+				.applySkin( RoundView.skin )
+				.string_( "startTime" )
+				.align_( \right );
+				
+			views[ \startTime ] = SMPTEBox( composite, 84@14 )
+				.applySmoothSkin
+				.applySkin( RoundView.skin )
+				.clipLo_(0)
+				.action_({ |nb|
+					chain.startTime_( nb.value );
+				});
+			
+			composite.decorator.nextLine;
+			
+			// duration
+			StaticText( composite, labelWidth@14 )
+				.applySkin( RoundView.skin )
+				.string_( "dur" )
+				.align_( \right );
+				
+			views[ \dur ] = SMPTEBox( composite, 84@14 )
+				.applySmoothSkin
+				.applySkin( RoundView.skin )
+				.clipLo_(0)
+				.action_({ |nb|
+					if( nb.value == 0 ) {
+						chain.dur_( inf );
+					} {
+						chain.dur_( nb.value );
+					};
+				});
+				
+			views[ \infDur ] = SmoothButton( composite, 25@14 )
+				.border_( 1 )
+				.radius_( 3 )
+				.label_( [ "inf", "inf" ] )
+				.hiliteColor_( Color.green )
+				.action_({ |bt|
+					var dur;
+					switch( bt.value, 
+						0, { dur = views[ \dur ].value;
+							if( dur == 0 ) {
+								dur = 1;
+							};
+							chain.dur_( dur ) },
+						1, { chain.dur_( inf ) }
+					);
 			});
-		
-		composite.decorator.nextLine;
-		
-		// duration
-		StaticText( composite, labelWidth@14 )
-			.applySkin( RoundView.skin )
-			.string_( "dur" )
-			.align_( \right );
+	
+			views[ \fromSoundFile ] = SmoothButton( composite, 90@14 )
+				.border_( 1 )
+				.radius_( 3 )
+				.label_( "from soundFile" )
+				.action_({ chain.useSndFileDur });
+				
+			composite.decorator.nextLine;
 			
-		views[ \dur ] = SMPTEBox( composite, 84@14 )
-			.applySmoothSkin
-			.applySkin( RoundView.skin )
-			.clipLo_(0)
-			.action_({ |nb|
-				if( nb.value == 0 ) {
-					chain.dur_( inf );
-				} {
-					chain.dur_( nb.value );
-				};
-			});
+			// fadeTimes
+			StaticText( composite, labelWidth@14 )
+				.applySkin( RoundView.skin )
+				.string_( "fadeTimes" )
+				.align_( \right );
 			
-		views[ \infDur ] = SmoothButton( composite, 25@14 )
-			.border_( 1 )
-			.radius_( 3 )
-			.label_( [ "inf", "inf" ] )
-			.hiliteColor_( Color.green )
-			.action_({ |bt|
-				var dur;
-				switch( bt.value, 
-					0, { dur = views[ \dur ].value;
-						if( dur == 0 ) {
-							dur = 1;
-						};
-						chain.dur_( dur ) },
-					1, { chain.dur_( inf ) }
-				);
-		});
-
-		views[ \fromSoundFile ] = SmoothButton( composite, 90@14 )
-			.border_( 1 )
-			.radius_( 3 )
-			.label_( "from soundFile" )
-			.action_({ chain.useSndFileDur });
-			
-		composite.decorator.nextLine;
-		
-		// fadeTimes
-		StaticText( composite, labelWidth@14 )
-			.applySkin( RoundView.skin )
-			.string_( "fadeTimes" )
-			.align_( \right );
-		
-		views[ \fadeIn ] = SmoothNumberBox( composite, 40@14 )
-			.clipLo_(0)
-			.scroll_step_(0.1)
-			.action_({ |nb|
-				chain.fadeIn_( nb.value );
-			});
-			
-		views[ \fadeOut ] = SmoothNumberBox( composite, 40@14 )
-			.clipLo_(0)
-			.scroll_step_(0.1)
-			.action_({ |nb|
-				chain.fadeOut_( nb.value );
-			});
-			
-		views[ \releaseSelf ] = SmoothButton( composite, 70@14 )
-			.border_( 1 )
-			.radius_( 3 )
-			.label_( [ "releaseSelf", "releaseSelf" ] )
-			.hiliteColor_( Color.green )
-			.action_({ |bt|
-				chain.releaseSelf = bt.value.booleanValue;
-			});
-			
-		composite.decorator.nextLine;
+			views[ \fadeIn ] = SmoothNumberBox( composite, 40@14 )
+				.clipLo_(0)
+				.scroll_step_(0.1)
+				.action_({ |nb|
+					chain.fadeIn_( nb.value );
+				});
+				
+			views[ \fadeOut ] = SmoothNumberBox( composite, 40@14 )
+				.clipLo_(0)
+				.scroll_step_(0.1)
+				.action_({ |nb|
+					chain.fadeOut_( nb.value );
+				});
+				
+			views[ \releaseSelf ] = SmoothButton( composite, 70@14 )
+				.border_( 1 )
+				.radius_( 3 )
+				.label_( [ "releaseSelf", "releaseSelf" ] )
+				.hiliteColor_( Color.green )
+				.action_({ |bt|
+					chain.releaseSelf = bt.value.booleanValue;
+				});
+				
+			composite.decorator.nextLine;
+		};
 		
 		// gain
 		StaticText( composite, labelWidth@14 )
@@ -308,27 +342,6 @@ UChainGUI {
 			} )
 			.put( \gain, { views[ \gain ].value = chain.getGain } )
 			.put( \muted, { views[ \muted ].value = chain.muted.binaryValue } )
-			.put( \startTime, { views[ \startTime ].value = chain.startTime ? 0; })
-			.put( \dur, { var dur;
-				dur = chain.dur;
-				if( dur == inf ) {
-					views[ \dur ].enabled = false; // don't set value
-					views[ \infDur ].value = 1;
-					views[ \releaseSelf ].hiliteColor = Color.green.alpha_(0.25);
-					views[ \releaseSelf ].stringColor = Color.black.alpha_(0.5);
-				} {
-					views[ \dur ].enabled = true;
-					views[ \dur ].value = dur;
-					views[ \infDur ].value = 0;
-					views[ \releaseSelf ].hiliteColor = Color.green.alpha_(1);
-					views[ \releaseSelf ].stringColor = Color.black.alpha_(1);
-				};
-			})
-			.put( \fadeIn, { views[ \fadeIn ].value = chain.fadeIn })
-			.put( \fadeOut, { views[ \fadeOut ].value = chain.fadeOut })
-			.put( \releaseSelf, {  
-				views[ \releaseSelf ].value = chain.releaseSelf.binaryValue;
-			})
 			.put( \units, { 
 				if( composite.isClosed.not ) {
 					{
@@ -349,6 +362,31 @@ UChainGUI {
 					}.defer(0.01);
 				};
 			});
+			
+		if( score.isNil ) {
+			controller
+				.put( \startTime, { views[ \startTime ].value = chain.startTime ? 0; })
+				.put( \dur, { var dur;
+					dur = chain.dur;
+					if( dur == inf ) {
+						views[ \dur ].enabled = false; // don't set value
+						views[ \infDur ].value = 1;
+						views[ \releaseSelf ].hiliteColor = Color.green.alpha_(0.25);
+						views[ \releaseSelf ].stringColor = Color.black.alpha_(0.5);
+					} {
+						views[ \dur ].enabled = true;
+						views[ \dur ].value = dur;
+						views[ \infDur ].value = 0;
+						views[ \releaseSelf ].hiliteColor = Color.green.alpha_(1);
+						views[ \releaseSelf ].stringColor = Color.black.alpha_(1);
+					};
+				})
+				.put( \fadeIn, { views[ \fadeIn ].value = chain.fadeIn })
+				.put( \fadeOut, { views[ \fadeOut ].value = chain.fadeOut })
+				.put( \releaseSelf, {  
+					views[ \releaseSelf ].value = chain.releaseSelf.binaryValue;
+				})
+		};
 		
 		chain.changed( \gain );
 		chain.changed( \mute );
@@ -737,5 +775,5 @@ UChainGUI {
 }
 
 + UChain {
-	gui { |parent, bounds| ^UChainGUI( parent, bounds, this ) }
+	gui { |parent, bounds, score| ^UChainGUI( parent, bounds, this, score ) }
 }

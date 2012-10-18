@@ -86,7 +86,7 @@ UScoreView {
 	    eventControllers.do(_.remove);
 	    eventControllers = this.currentScore.collect{ |e|
             var s = SimpleController(e);
-            [\startTime,\dur,\fadeIn,\fadeOut].do{ |key|
+            [\startTime,\dur,\fadeIn,\fadeOut,\name].do{ |key|
                 s.put(key,{ { this.update }.defer; })
             };
             s
@@ -137,7 +137,7 @@ UScoreView {
             {1}{
                 event = events[0];
                 if(event.isFolder){
-                    gui = MassEditUChain(event.getAllUChains).gui;
+                    gui = MassEditUChain(event.getAllUChains).gui( score: event );
                     currentScore = this.currentScore;
                     gui.windowName = "MassEditUChain : % [ % ]".format( 
                     	currentScore.name, 

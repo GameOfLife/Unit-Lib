@@ -68,7 +68,7 @@ UChainGroup : UEvent {
 
     groups { ^chains.collect(_.groups).flat }
 
-    gui { ^MassEditUChain(chains).gui }
+    gui { |parent, bounds, score| ^MassEditUChain(chains).gui( parent, bounds, score ) }
     
     storeArgs { ^chains }
 }
