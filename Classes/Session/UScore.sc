@@ -203,7 +203,7 @@ UScore : UEvent {
 		});
 		^time; 
 	}
-    displayDuration { |margin = 10|// used by UScoreView
+    displayDuration { |margin = 10| // used by UScoreView
 	   ^(this.finiteDuration(margin) + margin).max(margin);
     }
 
