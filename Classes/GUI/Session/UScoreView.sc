@@ -338,7 +338,7 @@ UScoreView {
                 this.selectedEvents;
             });
 
-		//scoreView.maxZoom = [16,5];
+		scoreView.maxZoom = [64,8];
 
 		usessionMouseEventsManager = UScoreEditorGuiMouseEventsManager(this);
 
