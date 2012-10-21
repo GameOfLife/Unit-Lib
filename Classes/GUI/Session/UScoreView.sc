@@ -200,6 +200,14 @@ UScoreView {
     duplicateSelected {
         this.currentEditor.duplicateEvents(this.selectedEvents)
     }
+    
+    moveSelected { |amt = 0|
+	    this.currentEditor.moveEvents(this.selectedEvents, amt)
+    }
+    
+    changeTrackSelected { |amt = 0|
+	    this.currentEditor.changeEventsTrack(this.selectedEvents, amt)
+    }
 
     addTrack {
         numTracks = numTracks + 1;
@@ -369,17 +377,37 @@ UScoreView {
 
 			} )
 			.keyDownAction_( { |v, a,b,c|
-				if( c == 127 ) {
-					this.deleteSelected
-				};
-				if( c == 32 ) {
-				    if(score.isStopped) {
-				        score.prepareAndStart( ULib.servers, score.pos, true, score.loop);
-				    } {
-				        score.stop;
-				    }
-
-				}
+				switch( c.asInt,
+					127, { this.deleteSelected }, // backspace
+					32, { // space bar
+						if(score.isStopped) {
+							score.prepareAndStart( ULib.servers, score.pos, true, score.loop);
+						} {
+							score.stop;
+						};
+					},
+					100, { // d
+						this.duplicateSelected;
+					},
+					105, { // i
+						this.editSelected;
+					},
+					48, { // 0
+						score.pos = 0;
+					},
+					63232, { // up
+						this.changeTrackSelected( -1 );
+					},
+					63233, { // down
+						this.changeTrackSelected( 1 );
+					},
+					63234, { // left
+						this.moveSelected( snapH.neg );
+					},
+					63235, { // right
+						this.moveSelected( snapH );
+					}
+				);
 			})
 			.beforeDrawFunc_( {
 			    var dur = score.displayDuration;

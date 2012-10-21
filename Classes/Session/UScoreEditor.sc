@@ -222,6 +222,43 @@ UScoreEditor {
 			score.changed(\numEventsChanged);
 		}
 	}
+	
+	moveEvents { |events, amount = 0| // use for small steps
+		if( events.size > 0 ) {	
+			this.changeScore({	
+				var minStartTime;
+				if( amount.isNegative && { amount.abs > (events.collect(_.startTime ).minItem) }) {
+					amount = 0; // don't move if negative amount exceeds first startTime
+				};
+				if( amount != 0 ) {
+					this.changeScore({
+						events.do({ |ev|
+							ev.startTime = ev.startTime + amount;
+						});
+					});
+				};
+			});
+		};
+	}
+
+	changeEventsTrack { |events, amount = 0|
+		if( events.size > 0 ) {	
+			this.changeScore({		
+				var minStartTime;
+				amount = amount.round(1);
+				if( amount.isNegative ) { // don't allow negative tracks
+					amount = amount.abs.min( events.collect(_.track).minItem ).neg;
+				};
+				if( amount != 0 ) {
+					this.changeScore({
+						events.do({ |ev|
+							ev.track = ev.track + amount;
+						});
+					});
+				};
+			});
+		};
+	}
 
 	cutEventsStart { |events,pos,isFolder=false,removeFadeIn = true|
         this.changeScore({
