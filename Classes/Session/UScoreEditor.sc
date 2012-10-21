@@ -131,10 +131,12 @@ UScoreEditor {
 	}
 
 	deleteEvents { |events|
-		this.changeScore({
-		    score.events_(score.events.select(events.includes(_).not))
-		});
-		score.changed(\numEventsChanged);
+		if( events.size > 0 ) {	
+			this.changeScore({
+			    score.events_(score.events.select(events.includes(_).not))
+			});
+			score.changed(\numEventsChanged);
+		};
 	}
 
 	disableEvents { |events|
