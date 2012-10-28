@@ -319,7 +319,7 @@ UScoreView {
         //CONFIGURE scoreView
         scoreView.background = Color.gray(0.8);
         scoreView.composite.resize = 5;
-	    scoreView.gridLines = [ score.displayDuration, numTracks];
+	    scoreView.gridLines = [ 0, numTracks];
 		scoreView.gridMode = ['blocks','lines'];
 		scoreView.sliderWidth = 8;
 		scoreView.userView.view
@@ -363,7 +363,7 @@ UScoreView {
 
 			} )
 			.mouseMoveAction_( { |v, x, y, mod, x2, y2, isInside, buttonNumber|
-				var snap = if(snapActive){snapH * v.gridSpacingH}{0};
+				var snap = if(snapActive){snapH }{0};
 				var shiftDown = ModKey( mod ).shift( \only );
 
 				usessionMouseEventsManager.mouseMoveEvent(Point(x,y),Point(x2,y2),v,snap, shiftDown, v.fromBounds.width);
@@ -414,10 +414,37 @@ UScoreView {
 				numTracks = ((score.events.collect( _.track ).maxItem ? ( numTracks - 2)) + 2)
 					.max( numTracks );
 				scoreView.fromBounds = Rect( 0, 0, dur, numTracks );
-				scoreView.gridLines = [dur, numTracks];
+				scoreView.gridLines = [0, numTracks];
 				} )
 			.drawFunc_({ |v|
+				var viewRect, pixelScale, l, n;
+				pixelScale = v.pixelScale;
+				viewRect = v.viewRect;
+				Pen.width = pixelScale.x / 2;
+				Pen.color = Color.gray.alpha_(0.5);
+				
+				// grid lines
+				if(  score.tempoMap.isNil ) {
+					if( viewRect.width < (v.view.bounds.width/2) ) {
+						l = viewRect.left.ceil;
+						n = viewRect.width.ceil;
+						n.do({ |i|
+							Pen.line( (i + l) @ 0, (i + l) @ numTracks );
+						});
+						Pen.stroke;
+					};
+				} {
+					l = score.tempoMap.beatAtTime( viewRect.left ).ceil;
+					n = score.tempoMap.beatAtTime( viewRect.right ).ceil - l;
+					n.do({ |i|
+						i = score.tempoMap.timeAtBeat( i + l );
+						Pen.line( i @ 0, i @ numTracks );
+					});
+					Pen.stroke;
+				};
+				
 				Pen.color = Color.white.alpha_(0.75);
+				Pen.width = pixelScale.x;
 				(score.displayDuration / 60).floor.do({ |i|
 					i = (i+1) * 60;
 					Pen.line( i @ 0, i @ numTracks );
@@ -444,12 +471,10 @@ UScoreView {
 
 				//draw selection rectangle
 				if(usessionMouseEventsManager.selectionRect.notNil) {
-					Pen.color = Color.white;
+					Pen.strokeColor = Color.white;
+					Pen.fillColor = Color.grey(0.3).alpha_(0.4); 
 					Pen.addRect(v.translateScale(usessionMouseEventsManager.selectionRect));
-					Pen.stroke;
-					Pen.color = Color.grey(0.3).alpha_(0.4);
-					Pen.addRect(v.translateScale(usessionMouseEventsManager.selectionRect));
-					Pen.fill;
+					Pen.fillStroke;
 				};
 
 				//draw Transport line
@@ -460,7 +485,7 @@ UScoreView {
 				Pen.stroke;
 
 				Pen.width = 1;
-				Color.grey(0.5,1).set;
+				Pen.color = Color.grey(0.5,1);
 				Pen.strokeRect( rect.insetBy(0.5,0.5) );
 
 		})
