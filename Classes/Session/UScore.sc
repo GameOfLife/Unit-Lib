@@ -30,6 +30,7 @@ UScore : UEvent {
 	var pos = 0, <loop = false;
 	var <playState = \stopped, <updatePos = true;
 	var <soloed, <softMuted;
+	var <>tempoMap;
 
 
 	/* playState is a finite state machine. The transitions graph:
