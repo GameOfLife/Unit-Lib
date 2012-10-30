@@ -417,7 +417,7 @@ UScoreView {
 				scoreView.gridLines = [0, numTracks];
 				} )
 			.drawFunc_({ |v|
-				var viewRect, pixelScale, l, n, l60, r, lr, bnds;
+				var viewRect, pixelScale, l, n, l60, r, lr, bnds, scaleAmt;
 				pixelScale = v.pixelScale;
 				viewRect = v.viewRect;
 				Pen.width = pixelScale.x / 2;
@@ -445,20 +445,21 @@ UScoreView {
 					lr = l.round(r);
 					bnds = "00:00".bounds( Font( Font.defaultSansFace, 9 ) );
 					bnds.width = bnds.width + 4;
+					scaleAmt = 1/v.scaleAmt.asArray;
 					(n/r).ceil.do({ |i|
 						Pen.use({
 							i = i * r;
-							Pen.translate( (i + lr), 0 );
-							Pen.scale( *1/v.scaleAmt.asArray);
+							Pen.translate( (i + lr), viewRect.bottom );
+							Pen.scale( *scaleAmt );
 							Pen.font = Font( Font.defaultSansFace, 9 );
 							Pen.color = Color.gray.alpha_(0.5);
-							Pen.addRect( bnds ).fill;
+							Pen.addRect( bnds.moveBy( 0, bnds.height.neg - 1 ) ).fill;
 							Pen.color = Color.white.alpha_(0.5);
 							Pen.stringAtPoint(
 								SMPTE.global.initSeconds( i+lr ).asMinSec
 									.collect({ |item| item.asInt.asStringToBase(10,2); })
 									.join($:),
-								2@0
+								2@(bnds.height.neg - 1) 
 							);
 						});
 					});
