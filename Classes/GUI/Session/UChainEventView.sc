@@ -50,12 +50,13 @@ UChainEventView : UEventView {
 	}
 
 	ifIsInResizeFrontArea{ |mousePos, fadeInAreaBiggerThen10Pixels, yesAction,noAction|
-		var resizeFrontDetectArea;
+		var resizeFrontDetectArea, px5squashed;
+		px5squashed = rect.width.linlin( px5Scaled, px5Scaled * 3, 0, px5Scaled, \minmax );
 
         if(fadeInAreaBiggerThen10Pixels) {
-            resizeFrontDetectArea = rect.copy.width_(px5Scaled);
+            resizeFrontDetectArea = rect.copy.width_(px5squashed);
         } {
-            resizeFrontDetectArea = rect.copy.width_(px5Scaled).height_(rect.height-fadeAreaHeight).top_(rect.top+fadeAreaHeight);
+            resizeFrontDetectArea = rect.copy.width_(px5squashed).height_(rect.height-fadeAreaHeight).top_(rect.top+fadeAreaHeight);
         };
         //resize front
         if(resizeFrontDetectArea.containsPoint( mousePos )) {
@@ -66,12 +67,13 @@ UChainEventView : UEventView {
 	}
 
 	ifIsInResizeBackArea{ |mousePos, fadeOutAreaBiggerThen10Pixels, yesAction,noAction|
-		var resizeBackDetectArea =
+		var resizeBackDetectArea, px5squashed;
+		px5squashed = rect.width.linlin( px5Scaled, px5Scaled * 3, px5Scaled/5, px5Scaled, \minmax );
 
         if(fadeOutAreaBiggerThen10Pixels) {
-            resizeBackDetectArea = rect.copy.width_(px5Scaled).left_((rect.left + rect.width - px5Scaled))
+            resizeBackDetectArea = rect.copy.width_(px5squashed).left_((rect.left + rect.width - px5squashed))
         } {
-            resizeBackDetectArea = rect.copy.width_(px5Scaled).left_((rect.left + rect.width - px5Scaled))
+            resizeBackDetectArea = rect.copy.width_(px5squashed).left_((rect.left + rect.width - px5squashed))
             .height_(rect.height-fadeAreaHeight).top_(rect.top+fadeAreaHeight)
         };
 
