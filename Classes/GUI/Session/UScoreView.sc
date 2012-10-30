@@ -433,7 +433,6 @@ UScoreView {
 						Pen.stroke;
 					};
 					Pen.color = Color.white.alpha_(0.75);
-					Pen.width = pixelScale.x;
 					l60 = l.round(60);
 					(n / 60).ceil.do({ |i|
 						i = (i * 60) + l60;
@@ -472,7 +471,6 @@ UScoreView {
 					});
 					Pen.stroke;
 					Pen.color = Color.white.alpha_(0.75);
-					Pen.width = pixelScale.x;
 					(score.displayDuration / 60).floor.do({ |i|
 						i = (i+1) * 60;
 						Pen.line( i @ 0, i @ numTracks );
