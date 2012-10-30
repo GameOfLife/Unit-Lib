@@ -29,6 +29,7 @@ UScoreView {
      var <usessionMouseEventsManager;
      var <>snapActive, <>snapH;
      var <>numTracks = 12;
+     var <>minTracks = 12;
      var <scoreView, <scoreListView, <mainComposite, font, <parent, <bounds;
      var <>scoreList;
      var <currentScoreEditorController, <scoreController, <eventControllers = #[];
@@ -208,15 +209,21 @@ UScoreView {
     changeTrackSelected { |amt = 0|
 	    this.currentEditor.changeEventsTrack(this.selectedEvents, amt)
     }
+    
+    calcNumTracks { 
+	    numTracks = ((this.currentScore.events.collect( _.track ).maxItem ? ( minTracks - 3)) + 3)
+			.max( minTracks );
+    }
 
     addTrack {
         numTracks = numTracks + 1;
+        minTracks = numTracks;
         this.update;
     }
 
     removeUnusedTracks {
-        numTracks = ((this.currentScore.events.collect( _.track )
-            .maxItem ? 10) + 2).max( 12 );
+	    minTracks = 12;
+        this.calcNumTracks;
         this.update;
     }
 
@@ -309,7 +316,7 @@ UScoreView {
             scoreView.remove;
         };
 
-        numTracks = ((score.events.collect( _.track ).maxItem ? 10) + 2).max(12);
+       this.calcNumTracks;
 
         scoreView = ScaledUserViewContainer(mainComposite,
         			scoreBounds,
@@ -411,8 +418,7 @@ UScoreView {
 			})
 			.beforeDrawFunc_( {
 			    var dur = score.displayDuration;
-				numTracks = ((score.events.collect( _.track ).maxItem ? ( numTracks - 2)) + 2)
-					.max( numTracks );
+				this.calcNumTracks;
 				scoreView.fromBounds = Rect( 0, 0, dur, numTracks );
 				scoreView.gridLines = [0, numTracks];
 				} )
