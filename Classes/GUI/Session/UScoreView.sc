@@ -441,7 +441,7 @@ UScoreView {
 					});
 					Pen.stroke;
 					r = (n / 5).max(1);
-					r = r.nearestInList([1,2,5,10,30,60,120,240,360,480,600]);
+					r = r.nearestInList([1,5,10,30,60,300,600]);
 					lr = l.round(r);
 					bnds = "00:00".bounds( Font( Font.defaultSansFace, 9 ) );
 					bnds.width = bnds.width + 4;
