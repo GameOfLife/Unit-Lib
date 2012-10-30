@@ -332,6 +332,14 @@ UChainEventView : UEventView {
 	            Pen.addRect( innerRect );
 	            this.getTypeColor.penFill(innerRect, lineAlpha, nil, 10);
 	            
+	            // resize handles
+	            if( event.duration != inf ) {	
+		            Pen.addRect( scaledRect.copy.width_(5) );
+		            Pen.addRect( scaledRect.copy.left_(scaledRect.right - 5).width_(5) );
+		            Pen.color =  Color.gray(0.2, if( selected ) { 0.25 } { 0.125 });
+		            Pen.fill;
+		        };
+	            
 	            //draw fades
 	            fades = event.fadeTimes;
 	            
