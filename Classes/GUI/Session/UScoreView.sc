@@ -484,15 +484,8 @@ UScoreView {
 				var scPos, rect;
 				rect = v.view.drawBounds.moveTo(0,0);
 
-				//draw border
-				GUI.pen.use({
-					GUI.pen.addRect( rect.insetBy(0.5,0.5) );
-					GUI.pen.fillColor = Color.gray(0.7).alpha_(0.5);
-					GUI.pen.strokeColor = Color.gray(0.1).alpha_(0.5);
-					GUI.pen.fill;
-				});
-
 				Pen.font = Font( Font.defaultSansFace, 10 );
+				
 				//draw events
 				usessionMouseEventsManager.eventViews.do({ |eventView|
 					eventView.draw(v, v.fromBounds.width );
