@@ -50,7 +50,11 @@ UChainGUI {
 				SmoothButton: (
 					border: 0.75,
 					background:  Gradient( Color.white, Color.gray(0.85), \v ) 
-				)
+				),
+				SmoothSimpleButton: (
+					border: 0.75,
+					background:  Gradient( Color.white, Color.gray(0.85), \v ) 
+				),
 			);
 		});
 

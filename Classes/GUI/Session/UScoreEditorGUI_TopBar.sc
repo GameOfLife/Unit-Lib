@@ -93,13 +93,14 @@ UScoreEditorGui_TopBar {
 		
         header = CompositeView( parent, bounds );
         
+        RoundView.pushSkin( UChainGUI.skin );
+        
 		header.addFlowLayout(marginH@marginV);
 		header.resize_(2);
 
 		SmoothButton( header, size@size )
 			.states_( [[ \i, Color.black, Color.blue.alpha_(0.125) ]] )
 			.canFocus_(false)
-			.border_(1).background_(Color.grey(0.8))
 			.action_({ |b|
 				scoreView.editSelected;
 			});
@@ -109,7 +110,6 @@ UScoreEditorGui_TopBar {
 		SmoothButton( header, size@size )
 			.states_( [[ '-' ]] )
 			.canFocus_(false)
-			.border_(1).background_(Color.grey(0.8))
 			.action_({
 				scoreView.deleteSelected;
 			});
@@ -117,7 +117,6 @@ UScoreEditorGui_TopBar {
 		SmoothButton( header, size@size )
 			.states_( [[ '+' ]] )
 			.canFocus_(false)
-			.border_(1).background_(Color.grey(0.8))
 			.action_({
 			    if(scoreView.selectedEvents.notNil) {
 				    scoreView.duplicateSelected;
@@ -132,7 +131,6 @@ UScoreEditorGui_TopBar {
  			.states_( [[ "[", Color.black, Color.clear ]] )
  			.canFocus_(false)
 			.radius_( 0 )
-			.border_(1).background_(Color.grey(0.8))
 			.font_( Font( font.name, 10 ).boldVariant )
 			.radius_([8,0,0,8])
 			.action_({
@@ -143,7 +141,6 @@ UScoreEditorGui_TopBar {
 			.states_( [[ "|", Color.black, Color.clear ]] )
 			.canFocus_(false)
 			.radius_(0)
-			.border_(1).background_(Color.grey(0.8))
 			.font_( Font( font.name, 12 ).boldVariant )
 			.action_({
 				this.selectedEventsOrAll !? { |x| this.scoreEditor.splitEventsAtPos( x ) }
@@ -153,7 +150,6 @@ UScoreEditorGui_TopBar {
 			.states_( [[ "]", Color.black, Color.clear ]] )
 			.canFocus_(false)
 			.radius_([0,8,8,0])
-			.border_(1).background_(Color.grey(0.8))
 			.font_( Font( font.name, 10 ).boldVariant )
 			.action_({
 			    this.selectedEventsOrAll !? { |x| this.scoreEditor.trimEventsEndAtPos( x ) }
@@ -164,7 +160,6 @@ UScoreEditorGui_TopBar {
 		views[\undo] = SmoothButton( header, size@size )
 			.states_( [[ 'arrow_pi' ]] )
 			.canFocus_(false)
-			.border_(1).background_(Color.grey(0.8))
 			.enabled_(false)
 			.action_({
 				this.scoreEditor.undo
@@ -173,7 +168,6 @@ UScoreEditorGui_TopBar {
 		views[\redo] = SmoothButton( header, size@size )
 			.states_( [[ 'arrow' ]] )
 			.canFocus_(false)
-			.border_(1).background_(Color.grey(0.8))
 			.enabled_(false)
 			.action_({
 				this.scoreEditor.redo
@@ -184,7 +178,6 @@ UScoreEditorGui_TopBar {
 		SmoothButton( header, size@size  )
 			.states_( [[ \speaker, Color.black, Color.clear ]] )
 			.canFocus_(false)
-			.border_(1).background_(Color.grey(0.8))
 			.action_({ |b|
 				this.selectedEvents !? { |x|  this.scoreEditor.toggleDisableEvents( x ) }
 			});
@@ -192,7 +185,6 @@ UScoreEditorGui_TopBar {
 		SmoothButton( header, size@size  )
 			.states_( [[ \folder, Color.black, Color.clear ]] )
 			.canFocus_(false)
-			.border_(1).background_(Color.grey(0.8))
 			.action_({
 			    this.selectedEvents !? { |x|
                     if( x.every(_.isFolder) ) {
@@ -209,7 +201,6 @@ UScoreEditorGui_TopBar {
 			.states_( [[ "mixer", Color.black, Color.clear ]] )
 			.canFocus_(false)
 			.font_( font )
-			.border_(1).background_(Color.grey(0.8))
 			.action_({ |b|
 				UMixer(scoreView.currentScore);
 			});
@@ -246,6 +237,8 @@ UScoreEditorGui_TopBar {
 			.action_({ |v|
 				scoreView.usessionMouseEventsManager.mode = v.items[v.value].asSymbol;
 			});
+			
+		RoundView.popSkin;
 
     }
 

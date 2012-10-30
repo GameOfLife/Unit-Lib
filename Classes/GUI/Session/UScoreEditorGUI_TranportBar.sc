@@ -111,6 +111,8 @@ UScoreEditorGui_TransportBar {
 	    marginV = 2;
 		size = bounds.height - (2*marginV);
         view = CompositeView( parent, bounds );
+        
+        RoundView.pushSkin( UChainGUI.skin );
 
 		view.addFlowLayout(marginH@marginV);
 		//view.background_( Color.white );
@@ -129,7 +131,6 @@ UScoreEditorGui_TransportBar {
 			    [ \play, Color.blue, Color.red.alpha_(0.5) ]] )
 			.canFocus_(false)
 			.font_( font )
-			.border_(1).background_(Color.grey(0.8))
 			//.changeStateWhenPressed_(false)
 			.action_({  |v,c,d,e|
 
@@ -152,8 +153,6 @@ UScoreEditorGui_TransportBar {
 			    [ \pause, Color.blue,Color.red.alpha_(0.5) ]] )
 			.canFocus_(false)
 			.font_( font )
-			.border_(1)
-			.background_(Color.grey(0.8))
 			.action_({ |v|
 			    switch( v.value)
 			    {0}{
@@ -173,7 +172,6 @@ UScoreEditorGui_TransportBar {
 			.states_( [[\return, Color.black, Color.clear ]])
 			.canFocus_(false)
 			.font_( font )
-			.border_(1).background_(Color.grey(0.8))
 			.action_({
 			    this.score.pos = 0;
 			});
@@ -184,8 +182,6 @@ UScoreEditorGui_TransportBar {
         			.value_( this.score.loop.binaryValue )
         			.canFocus_(false)
         			.font_( font )
-        			.border_(1)
-        			.background_(Color.grey(0.8))
         			.action_({ |v| this.score.loop = v.value.booleanValue;  });
 
         view.decorator.shift(20,0);
@@ -226,7 +222,9 @@ UScoreEditorGui_TransportBar {
 	            	0, {  this.score.disableOSC }
 	            )
             })
-            .canFocus_(false)
+            .canFocus_(false);
+        
+        RoundView.popSkin;
 
     }
 
