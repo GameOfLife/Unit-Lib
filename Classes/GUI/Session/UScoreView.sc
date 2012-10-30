@@ -417,7 +417,7 @@ UScoreView {
 				scoreView.gridLines = [0, numTracks];
 				} )
 			.drawFunc_({ |v|
-				var viewRect, pixelScale, l, n;
+				var viewRect, pixelScale, l, n, l60, r, lr, bnds;
 				pixelScale = v.pixelScale;
 				viewRect = v.viewRect;
 				Pen.width = pixelScale.x / 2;
@@ -425,14 +425,43 @@ UScoreView {
 				
 				// grid lines
 				if(  score.tempoMap.isNil ) {
-					if( viewRect.width < (v.view.bounds.width/2) ) {
-						l = viewRect.left.ceil;
-						n = viewRect.width.ceil;
-						n.do({ |i|
+					l = viewRect.left.ceil;
+					n = viewRect.width.ceil;
+					if( viewRect.width < (v.view.bounds.width/2) ) {							n.do({ |i|
 							Pen.line( (i + l) @ 0, (i + l) @ numTracks );
 						});
 						Pen.stroke;
 					};
+					Pen.color = Color.white.alpha_(0.75);
+					Pen.width = pixelScale.x;
+					l60 = l.round(60);
+					(n / 60).ceil.do({ |i|
+						i = (i * 60) + l60;
+						Pen.line( i @ 0, i @ numTracks );
+					});
+					Pen.stroke;
+					r = (n / 5).max(1);
+					r = r.nearestInList([1,2,5,10,30,60,120,240,360,480,600]);
+					lr = l.round(r);
+					bnds = "00:00".bounds( Font( Font.defaultSansFace, 9 ) );
+					bnds.width = bnds.width + 4;
+					(n/r).ceil.do({ |i|
+						Pen.use({
+							i = i * r;
+							Pen.translate( (i + lr), 0 );
+							Pen.scale( *1/v.scaleAmt.asArray);
+							Pen.font = Font( Font.defaultSansFace, 9 );
+							Pen.color = Color.gray.alpha_(0.5);
+							Pen.addRect( bnds ).fill;
+							Pen.color = Color.white.alpha_(0.5);
+							Pen.stringAtPoint(
+								SMPTE.global.initSeconds( i+lr ).asMinSec
+									.collect({ |item| item.asInt.asStringToBase(10,2); })
+									.join($:),
+								2@0
+							);
+						});
+					});
 				} {
 					l = score.tempoMap.beatAtTime( viewRect.left ).ceil;
 					n = score.tempoMap.beatAtTime( viewRect.right ).ceil - l;
@@ -441,15 +470,14 @@ UScoreView {
 						Pen.line( i @ 0, i @ numTracks );
 					});
 					Pen.stroke;
+					Pen.color = Color.white.alpha_(0.75);
+					Pen.width = pixelScale.x;
+					(score.displayDuration / 60).floor.do({ |i|
+						i = (i+1) * 60;
+						Pen.line( i @ 0, i @ numTracks );
+					});
+					Pen.stroke;
 				};
-				
-				Pen.color = Color.white.alpha_(0.75);
-				Pen.width = pixelScale.x;
-				(score.displayDuration / 60).floor.do({ |i|
-					i = (i+1) * 60;
-					Pen.line( i @ 0, i @ numTracks );
-				});
-				Pen.stroke;
 			})
 			.unscaledDrawFunc_( { |v|
 				var scPos, rect;

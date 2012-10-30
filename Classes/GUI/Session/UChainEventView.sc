@@ -284,7 +284,7 @@ UChainEventView : UEventView {
 			{\moving}
 			{
 				if( moveVert.not ) {
-					event.startTime = originalStartTime + deltaTime.round(snap)
+					event.startTime = (originalStartTime + deltaTime.round(snap)).max(0);
 				};
 				event.track = originalTrack + deltaTrack;
 			}
