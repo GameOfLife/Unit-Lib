@@ -132,8 +132,6 @@ UChainGUI {
 			bounds.width = bounds.width - 12;
 		};
 		units = chain.units;
-		
-		this.getHeight( units, margin, gap );
 				
 		controller = SimpleController( chain );
 		
