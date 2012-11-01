@@ -302,7 +302,7 @@ UChainEventView : UEventView {
 	}
 
 	draw { |scaledUserView, maxWidth|
-		var lineAlpha =  if( event.disabled ) { 0.5  } { 1.0  };
+		var lineAlpha =  if( event.disabled ) { 0.5  } { 0.875  };
 		var scaledRect, innerRect;
 
 		this.createRect(maxWidth);
