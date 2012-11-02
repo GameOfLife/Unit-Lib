@@ -506,7 +506,11 @@ UScoreView {
 				//draw Transport line
 				Pen.width = 2;
 				Pen.color = Color.black.alpha_(0.5);
-				scPos = v.translateScale( score.pos@0 );
+				if( score.isPlaying ) {
+					scPos = v.translateScale( (score.pos - Server.default.latency)@0 );
+				} {
+					scPos = v.translateScale( score.pos@0 );
+				};
 				Pen.line( (scPos.x)@0, (scPos.x)@v.bounds.height);
 				Pen.stroke;
 
