@@ -233,5 +233,14 @@ UMenuBar {
 			ULib.servers.first.meter;
 		});
 	}
+	
+	*remove {
+		sessionMenu !? _.remove;
+		sessionMenu = nil;
+		scoreMenu !? _.remove;
+		scoreMenu = nil;
+		viewMenu !? _.remove;
+		viewMenu = nil;
+	}
 }
 
