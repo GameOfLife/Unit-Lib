@@ -113,6 +113,11 @@ PresetManagerGUI {
 				};
 			});
 			
+		if( bounds.width < (labelWidth + 260) ) {
+			view.decorator.nextLine;
+			view.decorator.shift( labelWidth + 4, 0 );
+		};
+			
 		views[ \remove ] = SmoothButton( view, viewHeight @ viewHeight )
 			.radius_( viewHeight/2 )
 			.label_( '-' )
