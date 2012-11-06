@@ -104,8 +104,10 @@ SyncCenter {
 	}
 	
 	*writeDefs{
-		this.recDef.writeDefFile;
-		this.masterDefs.do(_.writeDefFile);
+		if( mode === 'sample' ) {
+			this.recDef.writeDefFile;
+			this.masterDefs.do(_.writeDefFile);
+		};
 	}
 	
 	*loadMasterDefs{
