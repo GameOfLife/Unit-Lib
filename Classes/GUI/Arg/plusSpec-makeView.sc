@@ -382,6 +382,122 @@
 	
 }
 
++ CodeSpec {
+	
+	makeView { |parent, bounds, label, action, resize|
+		var vws, view, labelWidth;
+		var localStep;
+		var modeFunc;
+		var font;
+		var editAction;
+		var tempVal;
+		vws = ();
+		
+		font =  (RoundView.skin ? ()).font ?? { Font( Font.defaultSansFace, 10 ); };
+		
+		bounds.isNil.if{bounds= 160@20};
+		
+		view = EZCompositeView( parent, bounds, gap: 2@2 );
+		bounds = view.asView.bounds;
+				
+		vws[ \view ] = view;
+		vws[ \val ] = default;
+		 		
+		if( label.notNil ) {
+			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
+			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ bounds.height )
+				.string_( label.asString ++ " " )
+				.align_( \right )
+				.resize_( 4 )
+				.applySkin( RoundView.skin );
+		} {
+			labelWidth = 0;
+		};
+		
+		vws[ \objectLabel ] = StaticText( view, 55 @ (bounds.height) )
+			.applySkin( RoundView.skin )
+			.background_( Color.gray(0.8) );
+			
+		vws[ \setLabel ] = {
+			{ vws[ \objectLabel ].string = vws[ \val ].asString; }.defer;
+		};
+		
+		vws[ \setLabel ].value;
+			
+		vws[ \edit ] = SmoothButton( view, 40 @ (bounds.height) )
+			.label_( "edit" )
+			.border_( 1 )
+			.radius_( 2 )
+			.font_( font )
+			.action_({
+				var editor;
+				if( vws[ \editor ].isNil or: { vws[ \editor ].isClosed } ) {
+					editor = CodeEditView( bounds: 400 @ 200, object: vws[ \val ] )
+						.action_({ |vw|
+							var obj;
+							obj = vw.object;
+							if( obj.class == Function ) { 
+								if( obj.def.sourceCode
+									.select({ |item| 
+										[ $ , $\n, $\r, $\t ].includes(item).not 
+									})
+									.size > 2
+								) {
+									vws[ \val ] = obj;
+									vws[ \setLabel ].value;
+									action.value( vws,  vws[ \val ] );
+								} {
+									vws[ \val ] = nil;
+									vw.object = {};
+									vw.setCode( vw.object );
+									vws[ \setLabel ].value;
+									action.value( vws,  vws[ \val ] );
+								};
+							} {
+								vws[ \val ] = obj;
+								vws[ \setLabel ].value;
+								action.value( vws,  vws[ \val ] );
+							};
+						})
+						.failAction_({ |vw|
+							vws[ \val ] = nil;
+							vw.textView.string.postln;
+							vw.object = {};
+							vw.setCode( vw.object );
+							vws[ \setLabel ].value;
+							action.value( vws,  vws[ \val ] );
+						});
+					editor.view.onClose_({ 
+						if( vws[ \editor ] == editor ) {
+							vws[ \editor ] = nil;
+						};
+					});
+					vws[ \editor ] = editor;
+				} {
+					vws[ \editor ].view.getParents.last.findWindow.front;
+				};
+			});
+			
+		view.view.onClose_({
+			if( vws[ \editor ].notNil ) {
+				vws[ \editor ].view.getParents.last.findWindow.close
+			};
+		});
+	
+		^vws;
+	}
+	
+	setView { |view, value, active = false|
+		view[ \val ] = value;
+		view[ \setLabel ].value;
+		if( view[ \editor ].notNil ) { 
+			view[ \editor ].object = view[ \val ] ?? {{}};
+			view[ \editor ].setCode( view[ \editor ].object );
+		};
+	}
+
+}
+
 + RealVector3DSpec {
 
     makeView { |parent, bounds, label, action, resize|

@@ -215,6 +215,20 @@ PointSpec : Spec {
 	}
 }
 
+CodeSpec : Spec {
+	
+	var <>default;
+	
+	*new { |default|
+		^super.newCopyArgs( default );
+	}
+	
+	constrain { |value| ^value }
+
+	storeArgs { ^[ default ] }
+	
+}
+
 RealVector3DSpec : Spec {
 
 	classvar <>defaultMode = \point;
