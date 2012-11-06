@@ -41,22 +41,21 @@ UChainGUI {
 				obj.units = setting.value.units.deepCopy;
 				obj.duration = obj.duration; // update duration of units
 			});
+		
+		skin = ( 
+			labelWidth: 80, 
+			hiliteColor: Color.black.alpha_(0.33),
+			SmoothButton: (
+				border: 0.75,
+				background:  Gradient( Color.white, Color.gray(0.85), \v ) 
+			),
+			SmoothSimpleButton: (
+				border: 0.75,
+				background:  Gradient( Color.white, Color.gray(0.85), \v ) 
+			),
+		);
 	
-		StartUp.defer({
-			skin = ( 
-				labelWidth: 80, 
-				font: Font( Font.defaultSansFace, 10 ), 
-				hiliteColor: Color.black.alpha_(0.33),
-				SmoothButton: (
-					border: 0.75,
-					background:  Gradient( Color.white, Color.gray(0.85), \v ) 
-				),
-				SmoothSimpleButton: (
-					border: 0.75,
-					background:  Gradient( Color.white, Color.gray(0.85), \v ) 
-				),
-			);
-		});
+		StartUp.defer({ skin.font = Font( Font.defaultSansFace, 10 ); });
 
 	}
 	
