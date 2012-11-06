@@ -171,7 +171,7 @@ SyncCenter {
 						current = this.new.localCount_( count )
 							.localCountTime_( masterCountTime ); // also local sync
 						this.class.changed( \localSync, current );
-						
+						serverCounts.do(_.changed); // update gui for all servers, in case localcount arrives late
 						if( verbose ) { "setting master count : %\n".postf( count ) }; 
 					}
 					{ msg[2].exclusivelyBetween( 99, 100 + this.servers.size ) }
