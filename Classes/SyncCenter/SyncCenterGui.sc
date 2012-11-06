@@ -54,7 +54,7 @@ SyncCenterGui {
 
 		window.view.decorator.nextLine;
 		
-		SyncCenter.serverCounts.keys.do{ |server,i|
+		SyncCenter.serverCounts.keys.as(Array).sort({ |a,b| a.name <= b.name }).do{ |server,i|
 			var text, uv;
 			text = StaticText(window,100@20).string_(server.name++":" );
 			widgets.add(SyncCenterServerWidget(window,130@17,server));
@@ -105,30 +105,44 @@ SyncCenterServerWidget{
 	var <controller, <view, <difView, <remoteCount;
 	var <>red, <>green;
 	
-	*new{ |parent, bounds, server|
-		if( true ) {
-			^super.new.init(parent,bounds,server)
-		}
+	*new{ |parent, bounds, server, small = false|
+		^super.new.init(parent,bounds,server, small)
 	}
 	
-	init{ |parent,bounds,server| 
+	init{ |parent,bounds,server, small = false| 
+		var width, height;
 		red = Color.red(0.7);
 		green = Color.green(0.7);
 		
 		this.remove;
 		remoteCount = SyncCenter.serverCounts.at(server);
 		
-		view = RoundNumberBox( parent, bounds.asRect.resizeBy( -64, 0 ) );
-		difView = RoundNumberBox( parent, 60 @ (bounds.asRect.height) );
+		width = bounds.asRect.width;
+		height = bounds.asRect.height;
+		
+		if( small ) {
+			green = Color.white.alpha_(0.5);
+		} {
+			view = SmoothNumberBox( parent, (width / 2) @ height );
+			width = width / 2;
+			view.font = Font( Font.defaultSansFace, 10 );
+		};
+	
+		difView = SmoothNumberBox( parent, width @ height );
+		difView.font = Font( Font.defaultSansFace, 10 );
 		this.update;
 			
 		remoteCount.addDependant(this); // becomes a controller
-		view.onClose_( { remoteCount.removeDependant(this); } );
+		difView.onClose_( { remoteCount.removeDependant(this); } );
 	}
 	
 	update { 
-		view.value_(remoteCount.value);
-		view.background_( if( remoteCount.value != -1 ) { green } { red } );
+		if( view.notNil ) {
+			view.value_(remoteCount.value);
+			view.background_( if( remoteCount.value != -1 ) { green } { red } );
+		} {
+			difView.background_( if( remoteCount.value != -1 ) { green } { red } );
+		};
 		if( remoteCount.value != -1 ) { 
 			difView.value = remoteCount.value - 
 				SyncCenter.serverCounts[ SyncCenter.master ].value;
