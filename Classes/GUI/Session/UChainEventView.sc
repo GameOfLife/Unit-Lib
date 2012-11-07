@@ -308,6 +308,7 @@ UChainEventView : UEventView {
 	draw { |scaledUserView, maxWidth|
 		var lineAlpha =  if( event.disabled ) { 0.5  } { 0.875  };
 		var scaledRect, innerRect;
+		var px5sq;
 
 		this.createRect(scaledUserView.pixelScale.x * 10, maxWidth);
 		
@@ -338,8 +339,9 @@ UChainEventView : UEventView {
 	            
 	            // resize handles
 	            if( event.duration != inf ) {	
-		            Pen.addRect( scaledRect.copy.width_(5) );
-		            Pen.addRect( scaledRect.copy.left_(scaledRect.right - 5).width_(5) );
+		            px5sq = scaledRect.width.linlin( 5, 5 * 3, 0, 5, \minmax );
+		            Pen.addRect( scaledRect.copy.width_(px5sq) );
+		            Pen.addRect( scaledRect.copy.left_(scaledRect.right - px5sq).width_(px5sq) );
 		            Pen.color =  Color.gray(0.2, if( selected ) { 0.25 } { 0.125 });
 		            Pen.fill;
 		        };
