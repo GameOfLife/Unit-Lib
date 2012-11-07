@@ -35,9 +35,10 @@ UScoreEventView : UEventView {
 
 	mouseDownEvent{ |mousePos,scaledUserView,shiftDown,mode|
 
-		this.createRect(scaledUserView.viewRect.width);
-        px5Scaled =  scaledUserView.doReverseScale(Point(5,0)).x;
+		px5Scaled =  scaledUserView.doReverseScale(Point(5,0)).x;
 		px10Scaled = scaledUserView.doReverseScale(Point(10,0)).x;
+		this.createRect(px10Scaled, scaledUserView.viewRect.width);
+		
 
         this.ifIsInsideRect( mousePos, {
 
@@ -73,7 +74,7 @@ UScoreEventView : UEventView {
 		var lineAlpha =  if( event.disabled ) { 0.5  } { 1.0  };
 		var scaledRect, innerRect;
 
-		this.createRect(maxWidth);
+		this.createRect(scaledUserView.doReverseScale(Point(10,0)).x, maxWidth);
 
 		scaledRect = scaledUserView.translateScale(rect);
 		

@@ -115,7 +115,7 @@ UScore : UEvent {
 
     duplicate { ^UScore( *events.collect( _.duplicate ) ).name_( name ); }
 
-    makeView{ |i,maxWidth| ^UScoreEventView(this,i,maxWidth) }
+    makeView{ |i,minWidth,maxWidth| ^UScoreEventView(this,i,minWidth, maxWidth) }
     isFolder{ ^true }
 	//ARRAY SUPPORT
 	at { |...path| 

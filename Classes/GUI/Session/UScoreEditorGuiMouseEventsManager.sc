@@ -50,15 +50,16 @@ UScoreEditorGuiMouseEventsManager {
 	}
 
 	init {
+		var minWidth = scoreView.scoreView.pixelScale.x * 10;
 	    var maxWidth = scoreView.scoreView.fromBounds.width;
         scoreEditor = scoreView.currentEditor;
         score = scoreView.currentScore;
-        this.makeEventViews(maxWidth);
+        this.makeEventViews(minWidth, maxWidth);
         scoreController = SimpleController( score );
 
 		scoreController.put(\numEventsChanged, {
 		    //"rebuilding views".postln;
-		    this.makeEventViews(maxWidth)
+		    this.makeEventViews(minWidth, maxWidth)
 		});
 	}
 
@@ -66,9 +67,9 @@ UScoreEditorGuiMouseEventsManager {
 	    scoreController.remove;
 	}
 
-	makeEventViews{ |maxWidth|
+	makeEventViews{ |minWidth, maxWidth|
 	    eventViews = scoreEditor.events.collect{ |event,i|
-			event.makeView(i,maxWidth)
+			event.makeView(i,minWidth, maxWidth)
 	    };
 	}
 	
@@ -320,7 +321,9 @@ UScoreEditorGuiMouseEventsManager {
 	
 				if(state == \selecting) {
 					eventViews.do{ |eventView|
-						eventView.checkSelectionStatus(selectionRect,shiftDown, scaledUserView.viewRect.width);
+						eventView.checkSelectionStatus(selectionRect,shiftDown,
+							scaledUserView.pixelScale.x * 10, 							scaledUserView.viewRect.width
+						);
 					};
 
 				}

@@ -24,8 +24,8 @@ UEventView {
 	var <px5Scaled, <px10Scaled;
 	//state is \nothing, \moving, \resizingFront, \resizingBack, \selecting, \fadeIn, \fadeOut;
 
-	*new{ |event,i,maxWidth|
-		^super.newCopyArgs(event,i).createRect(maxWidth)
+	*new{ |event,i,minWidth, maxWidth|
+		^super.newCopyArgs(event,i).createRect(minWidth, maxWidth)
 	}
 
 	//notice variable i will also be the same...
@@ -45,10 +45,10 @@ UEventView {
 		^(state == \resizingFront) || (state == \resizingBack ) || (state == \fadeIn) || (state == \fadeOut )
 	}
 
-	createRect { |maxWidth|
+	createRect { |minWidth, maxWidth|
 	    var dur = event.dur;
 	    dur = if( dur == inf){maxWidth-event.startTime}{event.dur};
-		rect = Rect( event.startTime, event.track, dur, 1 );
+		rect = Rect( event.startTime, event.track, dur.max(minWidth ? 0), 1 );
 	}
 
 	getTypeColor { }
@@ -69,8 +69,8 @@ UEventView {
 		state = \nothing;
 	}
 
-	checkSelectionStatus { |selectionRect,shiftDown, maxWidth|
-		this.createRect(maxWidth);
+	checkSelectionStatus { |selectionRect,shiftDown, minWidth, maxWidth|
+		this.createRect(minWidth, maxWidth);
 		if(selectionRect.intersects(rect)) {
 			selected = true
 		} {
