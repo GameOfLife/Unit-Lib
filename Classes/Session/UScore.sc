@@ -253,9 +253,13 @@ UScore : UEvent {
 		var evts, tracks;
 
 		evts = events.detect({ |item|
-			(item.startTime <= evt.endTime) and:
-			(item.endTime >= evt.startTime ) and:
-			(item.track == evt.track)
+			(item === evt).not and: {
+				(item.startTime <= evt.endTime) and: {
+					(item.endTime >= evt.startTime ) and: {
+						(item.track == evt.track)
+					}
+				}
+			}
 		});
 
 		^evts.isNil;
