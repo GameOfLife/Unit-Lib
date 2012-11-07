@@ -146,7 +146,7 @@ UMenuWindow {
 			.font_( font )
 			.tree_(
 				OEM(
-					'Scores', (),
+					'Score', (),
 					'New', { UScore().gui; },
 					'Open...', { UScore.openWFS(nil, UScoreEditorGUI(_) ); },
 					'Save', { UScore.current !? _.save; },

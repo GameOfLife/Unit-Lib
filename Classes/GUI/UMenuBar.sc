@@ -123,7 +123,7 @@ UMenuBar {
 		//events
 
 /* EVENTS */
-		scoreMenu = SCMenuGroup.new(nil, "Scores", index + 1);
+		scoreMenu = SCMenuGroup.new(nil, "Score", index + 1);
 
 /* USCORE */
 
