@@ -23,7 +23,7 @@ UEvent : UArchivable {
 	classvar <>renderMaxTime = 60;
 
     var <startTime=0;
-    var <>track=0;  //track number (horizontal segment) on the score editor
+    var <track=0;  //track number (horizontal segment) on the score editor
     var <duration = inf;
     var <>disabled = false;
     var <releaseSelf = true;
@@ -49,6 +49,8 @@ UEvent : UArchivable {
 
     duration_{ this.subclassResponsibility(thisMethod) }
     isPausable_{ this.subclassResponsibility(thisMethod) }
+    
+    track_ { |newTrack = 0| track = newTrack; this.changed( \track ) }
     
     startTime_ { |newTime|
 	   startTime = newTime; 
