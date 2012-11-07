@@ -64,6 +64,28 @@ GenericDef : UArchivable {
 			});
 			path = this.createUserDefFilePath( name );
 			if( this.existsCaseSensitive( path ) ) { ^path };
+			
+			^this.findRelativeFilePath( name );
+		} {
+			^nil;
+		};
+	}
+	
+	*findRelativeFilePath { arg name, levels = 4;
+		var path, dir;
+		if( thisProcess.nowExecutingPath.notNil ) {
+			
+			dir = thisProcess.nowExecutingPath.dirname;
+			path = this.createDefFilePath( dir, name );
+			
+			if( this.existsCaseSensitive( path ) ) { ^path };
+			
+			(1..levels).do({ |i|
+				path = this.createDefFilePath( dir +/+ Array.fill( i, $* ).join( $/ ), name )
+					.pathMatch[0];
+				if( path.notNil && { this.existsCaseSensitive( path ) } ) { ^path };
+			});
+			
 			^nil;
 		} {
 			^nil;
