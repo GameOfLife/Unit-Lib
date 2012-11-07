@@ -82,6 +82,7 @@ Udef : GenericDef {
 	
 	classvar <>all, <>defsFolders, <>userDefsFolder;
 	classvar <>buildUdef; // the Udef currently under construction
+	classvar <>loadOnInit = true;
 		
 	var <>func, <>category;
 	var <>synthDef;
@@ -129,6 +130,7 @@ Udef : GenericDef {
 		argSpecs = ArgSpec.fromSynthDef( this.synthDef, argSpecs );
 		
 		this.initArgs;
+		if( loadOnInit ) { this.loadSynthDef };
 		this.changed( \init );
 	}
 	
@@ -148,16 +150,32 @@ Udef : GenericDef {
 	// this may change 
 	// temp override to send instead of load (remote servers can't load!!)
 	loadSynthDef { |server|
+		var defs;
 		server = server ? ULib.servers ? Server.default;
+		defs = this.synthDef.asCollection;
 		server.asCollection.do{ |s|
-		    this.synthDef.asCollection.do(_.send(s));
+			if( s.class == LoadBalancer ) {
+				s.servers.do({ |s|
+					defs.do(_.send(s));
+				});
+			} {
+				defs.do(_.send(s));
+			};
 		}
 	}
 	
 	sendSynthDef { |server|
+		var defs;
 		server = server ? ULib.servers ? Server.default;
+		defs = this.synthDef.asCollection;
 		server.asCollection.do{ |s|
-			this.synthDef.asCollection.do(_.send(s));
+			if( s.class == LoadBalancer ) {
+				s.servers.do({ |s|
+					defs.do(_.send(s));
+				});
+			} {
+				defs.do(_.send(s));
+			};
 		}
 	}
 

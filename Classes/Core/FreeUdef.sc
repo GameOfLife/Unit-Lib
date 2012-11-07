@@ -42,6 +42,7 @@ FreeUdef : Udef {
 		env = ();
 		if( canFreeSynth ) { this.addUEnv };
 		this.initArgs;
+		if( loadOnInit ) { this.loadSynthDef };
 	}
 	
 	addSynthDefControls { |def|
@@ -88,7 +89,13 @@ FreeUdef : Udef {
 		if( synthDef.notNil ) {
 			server = server ? ULib.servers ? Server.default;
 			server.asCollection.do{ |s|
-		   		synthDef.asCollection.do(_.send(s))
+				if( s.class == LoadBalancer ) {
+					s.servers.do({ |s|
+						synthDef.asCollection.do(_.send(s));
+					});
+				} {
+					synthDef.asCollection.do(_.send(s));
+				};
 			}
 		}
 	}
@@ -98,7 +105,13 @@ FreeUdef : Udef {
 		if( synthDef.notNil ) {	
 			server = server ? ULib.servers ? Server.default;
 			server.asCollection.do{ |s|
-				synthDef.asCollection.do(_.send(s));
+				if( s.class == LoadBalancer ) {
+					s.servers.do({ |s|
+						synthDef.asCollection.do(_.send(s));
+					});
+				} {
+					synthDef.asCollection.do(_.send(s));
+				};
 			}
 		}
 	}
