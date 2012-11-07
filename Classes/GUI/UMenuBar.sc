@@ -195,6 +195,10 @@ UMenuBar {
 			UScoreEditorGUI.current !! { |x| x.score.cleanOverlaps }
 		});
 		
+		SCMenuItem.new(scoreMenu, "Remove empty tracks").action_({
+			UScoreEditorGUI.current !! { |x| x.score.removeEmptyTracks }
+		});
+		
 		//mute, solo
 		SCMenuSeparator.new(scoreMenu);
 		

@@ -300,6 +300,11 @@ UScore : UEvent {
 	cleanOverlaps {
 		events.do{ |x| this.moveEventToEmptyTrack(x) }
     }
+    
+    removeEmptyTracks {
+	    var usedTracks = events.collect(_.track).asInt.as(Set).as(Array).sort;
+	    events.do({ |evt| evt.track = usedTracks.indexOf( evt.track.asInt ) ? evt.track; });
+    }
 
 	//SCORE PLAYING
 

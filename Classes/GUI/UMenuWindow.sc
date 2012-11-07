@@ -174,6 +174,9 @@ UMenuWindow {
 					'Clean overlaps', { 
 						UScoreEditorGUI.current !? { |x| x.score.cleanOverlaps }
 					},
+					'Remove empty tracks', { 
+						UScoreEditorGUI.current !? { |x| x.score.removeEmptyTracks }
+					},
 					'     ', (),
 					'Disable selected', { 
 						UScoreEditorGUI.current !! { |x| x.scoreView.disableSelected }
