@@ -64,6 +64,14 @@
 			^[minval, maxval];
 		};
 	}
+	
+	massEdit { |inArray, params|
+		var linlinArgs;
+		linlinArgs = this.unmap( this.massEditValue( inArray ) ) ++ this.unmap( params );
+		^inArray.collect({ |item|
+			this.map( this.unmap( item ).linlin( *linlinArgs ) );
+		});
+ 	}
 }
 
 + PositiveIntegerSpec {
