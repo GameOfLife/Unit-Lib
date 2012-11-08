@@ -126,7 +126,7 @@ UChainEventView : UEventView {
 		
        	px5Scaled =  scaledUserView.pixelScale.x * 5;
 		px10Scaled = scaledUserView.pixelScale.x * 10;
-		this.createRect(px10Scaled, scaledUserView.viewRect.width);
+		this.createRect(px10Scaled, scaledUserView.fromBounds.width);
 		
 		fadeAreaHeight = (rect.height*0.3);
 
@@ -178,7 +178,7 @@ UChainEventView : UEventView {
 		
 		px5Scaled =  scaledUserView.pixelScale.x * 5;
 		px10Scaled = scaledUserView.pixelScale.x * 10;
-        this.createRect(px10Scaled, scaledUserView.viewRect.width);
+		this.createRect(px10Scaled, scaledUserView.fromBounds.width);
         
 		fadeAreaHeight = (rect.height*0.3);
 
@@ -203,8 +203,8 @@ UChainEventView : UEventView {
 		
         	px5Scaled =  scaledUserView.pixelScale.x * 5;
 		px10Scaled = scaledUserView.pixelScale.x * 10;
+		this.createRect(px10Scaled, scaledUserView.fromBounds.width);
 		
-		this.createRect(px10Scaled, scaledUserView.viewRect.width);
 		fadeAreaHeight = (rect.height*0.3);
 
         this.ifIsInsideRect( mousePos, {
@@ -237,8 +237,8 @@ UChainEventView : UEventView {
 		
         px5Scaled =  scaledUserView.pixelScale.x * 5;
         px10Scaled = scaledUserView.pixelScale.x * 10;
+        this.createRect(px10Scaled, scaledUserView.fromBounds.width);
         
-        this.createRect(px10Scaled, scaledUserView.viewRect.width);
 		fadeAreaHeight = (rect.height*0.3);
 
         this.ifIsInsideRect( mousePos, {
