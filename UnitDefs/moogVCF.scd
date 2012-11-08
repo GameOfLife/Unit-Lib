@@ -1,7 +1,7 @@
-Udef('moogVCF', { |freq #[ 20, 20000 ], modSpeed = 1, modShape = 1, res = 0.5|
+Udef('moogVCF', { |freq #[ 20, 20000 ], modSpeed = 1, modShape = 1, res = 0.5, lag = 0|
 	var in;
 	in = UIn.ar(0,1);
-	in = MoogVCF.ar( in, SinOsc.ar( modSpeed ).pow( modShape ).exprange( *freq ), res );
+	in = MoogVCF.ar( in, SinOsc.ar( modSpeed ).pow( modShape ).exprange( *freq.lag(lag) ), res.lag(lag) );
 	UOut.ar( 0, in );
 }, [ 
 	ArgSpec('freq', [ 20.0, 20000.0 ], 
@@ -10,4 +10,5 @@ Udef('moogVCF', { |freq #[ 20, 20000 ], modSpeed = 1, modShape = 1, res = 0.5|
 	ArgSpec( 'modSpeed', 1, [0.1, 20, 'exp', 0, 1].asSpec ),
 	ArgSpec( 'modShape', 1, [0, 1, 'lin', 0, 1].asSpec ),
 	ArgSpec('res', 0.5, [0, 1, 'linear', 0, 0.1].asSpec ),
+	ArgSpec('lag', 0,  [0,1,\lin].asSpec )
 ], 'filter')

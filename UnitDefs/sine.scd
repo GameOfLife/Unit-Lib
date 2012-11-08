@@ -12,7 +12,8 @@ this is an Udef definition file
 part of the Unit lib default Udefs set
 */
 
-Udef( \sine, { |freq = 440, amp = 0.1|
-	UMixOut.ar( 0, SinOsc.ar( freq, 0, amp ), 0, true ) 
+Udef( \sine, { |freq = 440, amp = 0.1, lag = 0|
+	UMixOut.ar( 0, SinOsc.ar( freq.lag(lag), 0, amp.lag(lag) ), 0, true ) 
 } ).category_( \synthesis )
-	.setSpecMode( \amp, \normal );
+	.setSpecMode( \amp, \normal )
+	.setSpec( \lag, [0,1,\lin].asSpec );

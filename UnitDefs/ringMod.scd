@@ -1,12 +1,12 @@
 
-Udef( \ringMod, { |sine = 1, freq = 440, noise = 0, input = 0, mix = 1.0|
+Udef( \ringMod, { |sine = 1, freq = 440, noise = 0, input = 0, mix = 1.0, lag = 0.1|
 	var sig, modsig;
 	RandSeed.ir(1,12345); // for the noise
 	sig = UIn.ar(0,1);
 	modsig = (
-		SinOsc.ar(freq.lag(0.1), 0, sine ) +
-		PinkNoise.ar( noise ) +
-		( UIn.ar(1,1) * input )
+		SinOsc.ar(freq.lag(lag), 0, sine.lag(lag) ) +
+		PinkNoise.ar( noise.lag(lag) ) +
+		( UIn.ar(1,1) * input.lag(lag) )
 	) * sig;
 	
 	UOut.ar( 0, (sig * (1-mix)) + (modsig * mix) );
@@ -16,4 +16,5 @@ Udef( \ringMod, { |sine = 1, freq = 440, noise = 0, input = 0, mix = 1.0|
 	.setSpec( \sine, \amp.asSpec )
 	.setSpec( \noise, \amp.asSpec )
 	.setSpec( \input, \amp.asSpec )
+	.setSpec( \lag, [0,1,\lin].asSpec )
 	.setSpecMode( \sine, \normal, \noise, \normal, \input, \normal, \mix, \normal );
