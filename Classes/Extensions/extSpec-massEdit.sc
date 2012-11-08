@@ -36,25 +36,15 @@
 + ControlSpec {
 	
 	massEditSpec { |inArray|
-		var minmax;
-		minmax = this.massEditValue( inArray );
-		^RangeSpec( minval, maxval, 1.0e-11, inf, warp, step, minmax, units );
+		^this.asArraySpec.default_( inArray );
 	}
 	
 	massEditValue { |inArray|
-		if( inArray.notNil ) {
-			^[ inArray.minItem, inArray.maxItem ];
-		} {
-			^[minval, maxval];
-		};
+		^inArray
 	}
 	
 	massEdit { |inArray, params|
-		var linlinArgs;
-		linlinArgs = this.unmap( this.massEditValue( inArray ) ++ params );
-		^inArray.collect({ |item|
-			this.map( this.unmap( item ).linlin( *linlinArgs ) );
-		});
+		^params;
 	}
 	
 }
