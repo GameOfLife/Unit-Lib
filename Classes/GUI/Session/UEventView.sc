@@ -29,8 +29,8 @@ UEventView {
 	}
 
 	//notice variable i will also be the same...
-	duplicate{ |maxWidth|
-		^this.class.new(event.duplicate,i, maxWidth)
+	duplicate{ |minWidth, maxWidth|
+		^this.class.new(event.duplicate,i, minWidth, maxWidth)
 		.originalStartTime_(originalStartTime)
 		.originalEndTime_(originalEndTime)
 		.originalFades_(originalFades)

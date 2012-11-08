@@ -242,7 +242,9 @@ UScoreEditorGuiMouseEventsManager {
 				selEvents = this.selectedEventViews;
 				
 				newEventViews = this.selectedEventViews.collect({ |ev,j|
-					ev.duplicate(maxWidth).i_(eventViews.size + j).selected_(true).state_(\moving)
+					ev.duplicate(
+						scoreView.scoreView.pixelScale.x * 10, maxWidth
+					).i_(eventViews.size + j).selected_(true).state_(\moving)
 				});
 				theEventView = newEventViews[0];
 				
