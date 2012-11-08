@@ -149,6 +149,213 @@
 	
 }
 
++ ArraySpec {
+	
+	 makeView { |parent, bounds, label, action, resize|
+		var vws, view, labelWidth, width;
+		var localStep;
+		var modeFunc;
+		var font;
+		var editAction;
+		var tempVal;
+		vws = ();
+		
+		font =  (RoundView.skin ? ()).font ?? { Font( Font.defaultSansFace, 10 ); };
+		
+		bounds.isNil.if{bounds= 350@20};
+		
+		view = EZCompositeView( parent, bounds, gap: 2@2 );
+		bounds = view.asView.bounds;
+		width = bounds.width;
+				
+		vws[ \view ] = view;
+		vws[ \val ] = default.asCollection;
+		vws[ \range ] = [ vws[ \val ] .minItem, vws[ \val ].maxItem ];
+		vws[ \doAction ] = { action.value( vws, vws[ \val ] ) };
+		
+		vws[ \operations ] = OEM(
+			\invert, { |values|
+				values = this.unmap( values );
+				values = values.linlin( 
+					values.minItem, values.maxItem, values.maxItem, values.minItem 
+				);
+				this.map( values );
+			},
+			\reverse, { |values|
+				values.reverse;
+			},
+			\sort, { |values|
+				values.sort;
+			},
+			\scramble, { |values|
+				values.scramble;
+			},
+			\rotate, { |values|
+				values.rotate(1);
+			},
+			\squared, { |values|
+				var min, max;
+				#min, max = this.unmap( [values.minItem, values.maxItem] );
+				this.map( this.unmap( values )
+					.linlin( min, max, 0, 1 ).squared
+					.linlin(0, 1, min, max )
+				);
+			},
+			\sqrt, { |values|
+				var min, max;
+				#min, max = this.unmap( [values.minItem, values.maxItem] );
+				this.map( this.unmap( values )
+					.linlin( min, max, 0, 1 ).sqrt
+					.linlin(0, 1, min, max )
+				);
+			},
+			\scurve, { |values|
+				var min, max;
+				#min, max = this.unmap( [values.minItem, values.maxItem] );
+				this.map( this.unmap( values )
+					.linlin( min, max, 0, 1 ).scurve
+					.linlin(0, 1, min, max )
+				);
+			},
+			\flat, {|values|
+				var mean;
+				mean = values.mean;
+				mean ! (values.size);
+			},
+			\random, { |values|
+				var min, max;
+				#min, max = this.unmap( [values.minItem, values.maxItem] );
+				if( min == max ) { max = vws[ \rangeSlider ].rangeSlider.hi };
+				values = values.collect({ 0.0 rrand: 1 }).normalize(min, max);
+				this.map( values );
+			},
+			\line, { |values|
+				var min, max;
+				#min, max = this.unmap( [values.minItem, values.maxItem] );
+				if( min == max ) { max = vws[ \rangeSlider ].hi; };
+				values = (0..values.size-1).linlin(0,values.size-1, min, max );
+				this.map( values );
+			}
+		);
+		 		
+		if( label.notNil ) {
+			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
+			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ bounds.height )
+				.string_( label.asString ++ " " )
+				.align_( \right )
+				.resize_( 4 )
+				.applySkin( RoundView.skin );
+			width = width - labelWidth - 2;
+		} {
+			labelWidth = 0;
+		};
+		
+		vws[ \rangeSlider ] = EZSmoothRanger( view, (width - 84) @ (bounds.height),
+			nil, this, { |sl| 
+				var values, min, max;
+				values = this.unmap( vws[ \val ] );
+				vws[ \range ] = sl.value;
+				#min, max = this.unmap( vws[ \range ] );
+				if( min == max ) { max = max + 1.0e-11 };
+				values = values.linlin( values.minItem, values.maxItem, min, max );
+				vws[ \val ] = this.map( values );
+				vws[ \setPlotter ].value;
+				action.value( vws, vws[ \val ] ); 
+			}
+		);
+		
+		vws[ \setRangeSlider ] = {
+			var min, max;
+			min = vws[ \val ].minItem;
+			max = vws[ \val ].maxItem;
+			if( min == max ) { max = vws[ \range ].maxItem };
+			vws[ \rangeSlider ].value_( [ min, max ] );
+		};
+		
+		vws[ \setRangeSlider ].value;
+		
+		vws[ \options ] = PopUpMenu( view, 40 @ (bounds.height) )
+			.items_( [ "do", " " ] ++ vws[ \operations ].keys )
+			.font_( font )
+			.applySkin( RoundView.skin )
+			.action_({ |vw|
+				var func;
+				func = vws[ \operations ][ vw.item ];
+				if( func.notNil ) {	
+					vws[ \val ] = func.value( vws[ \val ] );
+					vws[ \update ].value;
+					action.value( vws, vws[ \val ] );
+				};
+				vw.value = 0;
+			});
+			
+		vws[ \edit ] = SmoothButton( view, 40 @ (bounds.height) )
+			.label_( "edit" )
+			.border_( 1 )
+			.radius_( 2 )
+			.font_( font )
+			.action_({
+				var plotter;
+				if( vws[ \plotter ].isNil or: { vws[ \plotter ].parent.isClosed } ) {
+					plotter = vws[ \val ].plot;
+					plotter.editMode_( true )
+						.specs_( this )
+						.findSpecs_( false )
+						.plotMode_( \levels )
+						.editFunc_({ |vw|
+							vws[ \val ] = vw.value;
+							vws[ \range ] = [ vws[ \val ].minItem, vws[ \val ].maxItem ];
+							vws[ \setRangeSlider ].value;
+							action.value( vws, vws[ \val ] );
+						});
+						
+					plotter.parent.onClose = plotter.parent.onClose.addFunc({ 
+						if( vws[ \plotter ] == plotter ) {
+							vws[ \plotter ] = nil;
+						};
+					});
+					vws[ \plotter ] = plotter;
+				} {
+					vws[ \plotter ].parent.front;
+				};
+			});
+			
+		vws[ \setPlotter ] = {
+			if( vws[ \plotter ].notNil ) {
+				{ vws[ \plotter ].value = vws[ \val ]; }.defer;
+			};
+		};
+		
+		vws[ \update ] = {
+			vws[ \setRangeSlider ].value;
+			vws[ \setPlotter ].value;
+		};
+		
+		vws[ \rangeSlider ].view.resize_(2);
+		vws[ \options ].resize_(3);
+		vws[ \edit ].resize_(3);
+			
+		view.view.onClose_({
+			if( vws[ \plotter ].notNil ) {
+				vws[ \plotter ].parent.close
+			};
+		});
+	
+		^vws;
+	 }
+	 
+	 setView { |vws, value, active = false|
+		vws[ \val ] = value.asCollection;
+		vws[ \update ].value; 
+		if( active ) { vws[ \doAction ].value };
+	}
+	
+	mapSetView { |vws, value, active = false|
+		this.setView( vws, this.map(value), active );
+	}
+	 
+}
+
 + StringSpec {
 	
 	makeView { |parent, bounds, label, action, resize| 
