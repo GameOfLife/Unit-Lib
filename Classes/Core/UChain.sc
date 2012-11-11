@@ -729,7 +729,6 @@ UChain : UEvent {
 	    ^UChain(*(units++unit.asCollection))
 	}
 
-	isFolder { ^false }
     getAllUChains{ ^this }
 
 	printOn { arg stream;

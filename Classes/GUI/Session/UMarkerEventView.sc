@@ -1,0 +1,130 @@
+UMarkerEventView : UEventView {
+
+	getTypeColor {
+        ^Color.yellow.alpha_(0.75);
+	}
+	
+	checkSelectionStatus { |selectionRect,shiftDown, minWidth, maxWidth|
+		//this.createRect(minWidth, maxWidth);
+		if(selectionRect.intersects(rect)) {
+			selected = true
+		} {
+			if(shiftDown.not) {
+				selected = false
+			}
+		}
+	}
+
+	ifIsInsideRect{ |mousePos, yesAction, noAction|
+
+	    if(rect.containsPoint(mousePos)) {
+	        yesAction.value;
+	    } {
+	        noAction.value;
+	    }
+
+	}
+
+	mouseDownEvent{ |mousePos,scaledUserView,shiftDown,mode|
+
+		px5Scaled =  scaledUserView.doReverseScale(Point(5,0)).x;
+		px10Scaled = scaledUserView.doReverseScale(Point(10,0)).x;
+		this.createRect(px10Scaled, scaledUserView.viewRect.width, scaledUserView);
+		
+
+        this.ifIsInsideRect( mousePos, {
+
+           //moving
+            state = \moving;
+            originalTrack = event.track;
+            originalStartTime = event.startTime;
+            originalEndTime = event.endTime;
+
+        }, {
+            if(selected) {
+                originalStartTime = event.startTime;
+                originalEndTime = event.endTime;
+                originalTrack = event.track;
+                //event.wfsSynth.checkSoundFile;
+            }
+        })
+
+	}
+
+	mouseMoveEvent{ |deltaTime, deltaTrack, overallState, snap, moveVert|
+
+        if(overallState == \moving) {
+            if( moveVert.not ) {
+                event.startTime = (originalStartTime + deltaTime).round(snap)
+            };
+            event.track = originalTrack + deltaTrack;
+        }
+
+	}
+	
+	createRect { |minWidth, maxWidth, scaledUserView|
+	    var dur = scaledUserView !? { scaledUserView.pixelScale.x * 60; } ? 1;
+	    //dur = if( dur == inf){maxWidth-event.startTime}{event.dur};
+		rect = Rect( event.startTime, event.track, dur.max(minWidth ? 0), 1 );
+	}
+	
+	drawShape { |rectToDraw, height = 1|
+		var radius = 5;
+		
+		Pen.moveTo( (rectToDraw.left - 1) @ 0 );
+		Pen.lineTo( (rectToDraw.left + 1) @ 0 );
+		Pen.lineTo( (rectToDraw.left + 1) @ (rectToDraw.top) );
+		Pen.lineTo( rectToDraw.rightTop );
+		Pen.lineTo( rectToDraw.rightBottom );
+		Pen.lineTo( (rectToDraw.left + 1) @ (rectToDraw.bottom) );
+		Pen.lineTo( (rectToDraw.left + 1) @ height );
+		Pen.lineTo( (rectToDraw.left - 1) @ height );
+		Pen.moveTo( (rectToDraw.left - 1) @ 0 );
+
+	}
+
+	draw { |scaledUserView, maxWidth|
+		var lineAlpha =  if( event.disabled ) { 0.5  } { 1.0  };
+		var scaledRect, innerRect;
+
+		this.createRect(scaledUserView.doReverseScale(Point(10,0)).x, maxWidth, scaledUserView);
+
+		scaledRect = scaledUserView.translateScale(rect);
+		
+		if( scaledUserView.view.drawBounds.intersects( scaledRect.insetBy(-2,-2) ) ) {	
+			innerRect = scaledRect.insetBy(0.5,0.5);
+	
+			//selected outline
+			if( selected ) {
+				Pen.width = 2;
+				Pen.color = Color.grey(0.2);
+				this.drawShape(scaledRect, scaledUserView.view.bounds.height);
+				Pen.stroke;
+			};
+			
+			Pen.use({	
+				this.drawShape(innerRect, scaledUserView.view.bounds.height);
+				Pen.clip;
+				
+				// fill inside
+				Pen.addRect( Rect( innerRect.left - 1, 0, innerRect.width + 1, 
+					scaledUserView.view.bounds.height )
+				);
+				this.getTypeColor.penFill(innerRect, lineAlpha * 0.75, nil, 10);
+				
+				//draw name
+				if( scaledRect.height > 4 ) {
+					Pen.color = Color.black.alpha_( lineAlpha  );
+					Pen.stringAtPoint(
+						" " ++ this.getName,
+						scaledRect.leftTop.max( 0 @ -inf ) + (2 @ 1)
+					);		       
+				};
+	
+			});
+			
+		};
+
+	}
+
+}

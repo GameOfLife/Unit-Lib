@@ -333,6 +333,7 @@ UScore : UEvent {
         fActualStartPos = { |x| if(startEventsActiveAtStartPos) {x.startTime.max(startPos)}{ x.startTime } };
 
         evs = this.eventsThatWillPlay(startPos,startEventsActiveAtStartPos).sort;
+        evs.do(_.score_(this));
 		prepareEvents = if(assumePrepared){evs.select({ |item| item.prepareTime > startPos })}{evs};
 		startEvents = evs.select({ |item| fStartAndRelease.(item).not }).sort({ |a,b| a.startTime <= b.startTime });
 		releaseEvents = events

@@ -46,6 +46,8 @@ UEvent : UArchivable {
 	== { |that| // use === for identity
 		^this.compareObject(that);
 	}
+	
+	dur { ^this.duration }
 
     duration_{ this.subclassResponsibility(thisMethod) }
     isPausable_{ this.subclassResponsibility(thisMethod) }
@@ -56,6 +58,11 @@ UEvent : UArchivable {
 	   startTime = newTime; 
 	   this.changed( \startTime )
     }
+    
+    score { ^nil }
+    score_ { }
+    
+    isFolder { ^false }
 
     endTime { ^startTime + this.duration; } // may be inf
     eventEndTime { ^startTime + this.eventSustain }
@@ -171,6 +178,9 @@ UEvent : UArchivable {
 		this.storeTags( stream );
 		this.storeDisplayColor( stream );
 	}
+	
+	makeView { |i=0, minWidth, maxWidth| ^UEventView( this, i, minWidth, maxWidth ) }
+		
 	
 	//// UOSCsetter support
 	oscSetter_ { |newOSCsetter, removeOld = true|
