@@ -504,15 +504,22 @@ UScoreView {
 				};
 
 				//draw Transport line
-				Pen.width = 2;
-				Pen.color = Color.black.alpha_(0.5);
 				if( score.isPlaying ) {
-					scPos = v.translateScale( (score.pos - Server.default.latency)@0 );
+					Pen.fillColor = Color.black.alpha_(0.2);
+					Pen.strokeColor = Color.black.alpha_(0.5);
+					Pen.width = 2;
+					scPos = v.translateScale( (score.pos - (Server.default.latency))@0 );
+					Pen.addRect( Rect( scPos.x, -2, 
+						v.translateScale( Server.default.latency @ 0 ).x, v.bounds.height + 2) 
+					);
+					Pen.fillStroke;
 				} {
+					Pen.color = Color.black.alpha_(0.5);
+					Pen.width = 2;
 					scPos = v.translateScale( score.pos@0 );
+					Pen.line( (scPos.x)@0, (scPos.x)@v.bounds.height);
+					Pen.stroke;
 				};
-				Pen.line( (scPos.x)@0, (scPos.x)@v.bounds.height);
-				Pen.stroke;
 
 				Pen.width = 1;
 				Pen.color = Color.grey(0.5,1);
