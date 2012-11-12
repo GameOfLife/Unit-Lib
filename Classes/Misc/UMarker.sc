@@ -7,7 +7,21 @@ UMarker : UEvent {
 	var <action; 
 	
 	*initClass {
-		defaultAction = { |marker, score| };
+		defaultAction = 
+{ |marker, score| 
+	
+// examples: (uncomment lines below)
+	
+	// score.pause; // pause the score
+	
+	// "marker passed".postln; // post text in post window
+	
+	/* // jump ahead two seconds
+	score.stop; 
+	score.prepareAndStart( startPos: marker.startTime + 2 );
+	*/
+	
+};
 	}
 	
 	*new { |startTime = 0, track, name, action|
