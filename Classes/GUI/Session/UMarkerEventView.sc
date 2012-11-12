@@ -70,16 +70,34 @@ UMarkerEventView : UEventView {
 	
 	drawShape { |rectToDraw, height = 1|
 		var radius = 5;
+		radius = radius.min( rectToDraw.height/2 );
 		
 		Pen.moveTo( (rectToDraw.left - 1) @ 0 );
 		Pen.lineTo( (rectToDraw.left + 1) @ 0 );
-		Pen.lineTo( (rectToDraw.left + 1) @ (rectToDraw.top) );
-		Pen.lineTo( rectToDraw.rightTop );
-		Pen.lineTo( rectToDraw.rightBottom );
-		Pen.lineTo( (rectToDraw.left + 1) @ (rectToDraw.bottom) );
+		Pen.lineTo( (rectToDraw.left + 1) @ (rectToDraw.top - radius) );
+		Pen.arcTo( 
+			(rectToDraw.left + 1) @ (rectToDraw.top),
+			(rectToDraw.right - radius) @ (rectToDraw.top),
+			radius  
+		);
+		Pen.arcTo( 
+			rectToDraw.rightTop,
+			rectToDraw.right @ (rectToDraw.top + radius),
+			radius  
+		);
+		Pen.arcTo( 
+			rectToDraw.rightBottom,
+			(rectToDraw.left + 1 + radius) @ (rectToDraw.bottom),
+			radius  
+		);
+		Pen.arcTo( 
+			(rectToDraw.left + 1) @ (rectToDraw.bottom),
+			(rectToDraw.left + 1) @ height,
+			radius  
+		);
 		Pen.lineTo( (rectToDraw.left + 1) @ height );
 		Pen.lineTo( (rectToDraw.left - 1) @ height );
-		Pen.moveTo( (rectToDraw.left - 1) @ 0 );
+		Pen.lineTo( (rectToDraw.left - 1) @ 0 );
 
 	}
 
@@ -92,7 +110,7 @@ UMarkerEventView : UEventView {
 		scaledRect = scaledUserView.translateScale(rect);
 		
 		if( scaledUserView.view.drawBounds.intersects( scaledRect.insetBy(-2,-2) ) ) {	
-			innerRect = scaledRect.insetBy(0.5,0.5);
+			innerRect = scaledRect;
 	
 			//selected outline
 			if( selected ) {
