@@ -122,6 +122,13 @@ UScoreEditor {
         });
         score.changed(\numEventsChanged);
     }
+    
+    addMarker{
+        this.changeScore({
+            score.addEventToEmptyTrack( UMarker().startTime_(score.pos) )
+        });
+        score.changed(\numEventsChanged);
+    }
 
 	duplicateEvents{ |events|
 		this.changeScore({

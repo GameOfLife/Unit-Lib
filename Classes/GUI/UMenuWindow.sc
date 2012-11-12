@@ -161,6 +161,7 @@ UMenuWindow {
 					},
 					'  ', (),
 					'Add Event', { UScoreEditorGUI.current !? { |x| x.editor.addEvent } },
+					'Add Marker', { UScoreEditorGUI.current !? { |x| x.editor.addMarker } },
 					'Edit', { UScoreEditorGUI.current !? { |x| x.scoreView.editSelected } },
 					'Delete', { UScoreEditorGUI.current !? { |x| x.scoreView.deleteSelected } },
 					'   ', (),

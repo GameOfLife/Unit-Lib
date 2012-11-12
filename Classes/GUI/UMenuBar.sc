@@ -158,6 +158,10 @@ UMenuBar {
 		SCMenuItem.new(scoreMenu, "Add Event").action_({
 			UScoreEditorGUI.current !! { |x| x.editor.addEvent }
 		}).setShortCut("A",true);
+		
+		SCMenuItem.new(scoreMenu, "Add Marker").action_({
+			UScoreEditorGUI.current !! { |x| x.editor.addMarker }
+		});
 
 		SCMenuItem.new(scoreMenu, "Edit").action_({
 			UScoreEditorGUI.current !! { |x| x.scoreView.editSelected }

@@ -124,6 +124,26 @@ UScoreEditorGui_TopBar {
 				    scoreView.currentEditor.addEvent
 				}
 			});
+			
+		SmoothButton( header, size@size )
+			.states_( [[ { |bt, rect|
+				var square;
+				square = Rect.aboutPoint( rect.center, 
+						rect.width.min( rect.height ) / 5, 
+						rect.width.min( rect.height ) / 4 );
+						
+				Pen.line( square.leftBottom, square.leftTop );
+				Pen.lineTo( square.rightTop );
+				Pen.lineTo( square.right @ (square.top + (square.height / 2) ) );
+				Pen.lineTo( square.left @ (square.top + (square.height / 2) ) );
+				Pen.lineTo( square.leftBottom );
+				Pen.fillStroke;
+				
+			 } ]] )
+			.canFocus_(false)
+			.action_({
+			     scoreView.currentEditor.addMarker
+			});
 
 		header.decorator.shift(10);
 
