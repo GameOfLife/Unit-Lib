@@ -193,9 +193,9 @@ UMenuWindow {
 				)
 			)
 			.sortFunc_({true}) 
-			.value_( [ 'Scores' ] )
+			.value_( [ 'Score' ] )
 			.action_({ |vw, value|
-				vw.value = [ 'Scores' ];
+				vw.value = [ 'Score' ];
 				vw.tree.atPath( value ).value;
 			});	
 		
