@@ -328,6 +328,7 @@ UScoreView {
         scoreView.composite.resize = 5;
 	    scoreView.gridLines = [ 0, numTracks];
 		scoreView.gridMode = ['blocks','lines'];
+		scoreView.gridColor = Color.gray(0.5, 0.125);
 		scoreView.sliderWidth = 8;
 		scoreView.userView.view
 		    .canReceiveDragHandler_({
@@ -427,7 +428,7 @@ UScoreView {
 				pixelScale = v.pixelScale;
 				viewRect = v.viewRect;
 				Pen.width = pixelScale.x / 2;
-				Pen.color = Color.gray.alpha_(0.5);
+				Pen.color = Color.gray.alpha_(0.25);
 				
 				// grid lines
 				if(  score.tempoMap.isNil ) {
@@ -457,7 +458,7 @@ UScoreView {
 							Pen.translate( (i + lr), viewRect.bottom );
 							Pen.scale( *scaleAmt );
 							Pen.font = Font( Font.defaultSansFace, 9 );
-							Pen.color = Color.gray.alpha_(0.5);
+							Pen.color = Color.gray.alpha_(0.25);
 							Pen.addRect( bnds.moveBy( 0, bnds.height.neg - 1 ) ).fill;
 							Pen.color = Color.white.alpha_(0.5);
 							Pen.stringAtPoint(
