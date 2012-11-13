@@ -31,16 +31,12 @@ UMarker : UEvent {
 }) );
 		 presetManager.put( \jump_2s, UMarker( 0,0, "jump_2s", { |marker, score|
 	// jump 2 seconds ahead 
-	score.stop;
-	score.pos = score.pos + 2;
-	score.prepareAndStart( startPos: score.pos );
+	score.jumpTo( score.pos + 2 );
 }) );
 
 		presetManager.put( \jump_to_prev, UMarker( 0,0, "jump_to_prev", { |marker, score| 
 	// jump to the previous marker and play (basic looping)
-	score.stop;
 	score.toPrevMarker;
-	score.prepareAndStart( startPos: score.pos );
 }) );
 
 		defaultAction = { |marker, score| };

@@ -686,22 +686,36 @@ UScore : UEvent {
 		}).collect(_.startTime);
 	}
 	
+	jumpTo { |pos = 0|
+		if( this.isPlaying ) {
+			this.stop;
+			this.pos = pos;
+			this.prepareAndStart( startPos: pos );
+		} {
+			this.pos = pos;
+		};
+	}
+	
 	toNextMarker { |includeEnd = true|
-		var markerPositions, dur;
+		var markerPositions, dur, newPos;
 		markerPositions = this.markerPositions;
 		if( includeEnd && { (dur = this.dur) != inf }) {
 			markerPositions = markerPositions.add( dur ); 
 		};
-		this.pos = markerPositions.detect({ |item| item > this.pos }) ? this.pos; 
+		if( (newPos = markerPositions.detect({ |item| item > this.pos })).notNil ) {
+			this.jumpTo( newPos ); 
+		};
 	}
 	
 	toPrevMarker { |includeStart = true|
-		var markerPositions, dur;
+		var markerPositions, dur, newPos;
 		markerPositions = this.markerPositions;
 		if( includeStart && { markerPositions.includes( 0 ).not } ) {
 			markerPositions = [0] ++ markerPositions;
 		};
-		this.pos = markerPositions.reverse.detect({ |item| item < this.pos }) ? this.pos;
+		if( (newPos = markerPositions.reverse.detect({ |item| item < this.pos })).notNil ) {
+			this.jumpTo( newPos ); 
+		};
 	}
 	
 	// SOLO / MUTE
