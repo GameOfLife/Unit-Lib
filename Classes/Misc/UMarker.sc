@@ -92,17 +92,5 @@ UMarker : UEvent {
 	    ^this.deepCopy;
 	}
 	
-	storeArgs { ^[ startTime, track, name, if( action != defaultAction ) { action } ] }
-	
-	storeNotes { |stream|
-		if( this.notes.notNil ) {
-			stream << ".notes_(" <<< this.notes << ")";
-		};
-	}
-
-	storeModifiersOn { |stream|
-		this.storeNotes( stream );
-		this.storeTags( stream );
-		this.storeDisplayColor( stream );
-	}
+	storeArgs { ^[ startTime, track, name, if( action != defaultAction ) { action }, notes ] }
 }
