@@ -626,7 +626,7 @@
 			.background_( Color.gray(0.8) );
 			
 		vws[ \setLabel ] = {
-			{ vws[ \objectLabel ].string = vws[ \val ].asString; }.defer;
+			{ vws[ \objectLabel ].string = " " ++ vws[ \val ].asString; }.defer;
 		};
 		
 		vws[ \setLabel ].value;
