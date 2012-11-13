@@ -708,12 +708,14 @@ UScore : UEvent {
 	}
 	
 	toPrevMarker { |includeStart = true|
-		var markerPositions, dur, newPos;
+		var markerPositions, dur, nowPos, newPos;
 		markerPositions = this.markerPositions;
 		if( includeStart && { markerPositions.includes( 0 ).not } ) {
 			markerPositions = [0] ++ markerPositions;
 		};
-		if( (newPos = markerPositions.reverse.detect({ |item| item < this.pos })).notNil ) {
+		nowPos = this.pos;
+		if( this.isPlaying && { nowPos >= 0.5 } ) { nowPos = nowPos - 0.5 };
+		if( (newPos = markerPositions.reverse.detect({ |item| item < nowPos })).notNil ) {
 			this.jumpTo( newPos ); 
 		};
 	}
