@@ -23,9 +23,11 @@ GenericDef : UArchivable {
 	classvar <>defsFolders, <>userDefsFolder;
 
 	var <>argSpecs;
+	var filePath;
 
 	*new { |name, args, addToAll = true|
 		var x = super.new.initArgSpecs( args );
+		x.filePath = thisProcess.nowExecutingPath;
 		if(addToAll){
 		    x.addToAll( name );
 		 };
@@ -70,6 +72,11 @@ GenericDef : UArchivable {
 			^nil;
 		};
 	}
+	
+	filePath {
+		^filePath ?? { this.class.findDefFilePath( this.name ) };
+	}
+	filePath_ { |fp| filePath = fp; }
 	
 	*findRelativeFilePath { arg name, levels = 4;
 		var path, dir;
@@ -125,7 +132,7 @@ GenericDef : UArchivable {
 	
 	openDefFile {
 		var path;
-		path = this.class.findDefFilePath( this.name );
+		path = this.filePath;
 		if( path.notNil ) {
 			^Document.open( path );
 		} {
@@ -140,6 +147,7 @@ GenericDef : UArchivable {
 	addToAll { |name|
 		this.class.all ?? { this.class.all = IdentityDictionary() };
 		this.class.all[ name.asSymbol ] = this;
+		this.class.all.changed( \added, this );
 	}
 	
 	name { ^this.class.all !? { this.class.all.findKeyForValue( this ); } }
