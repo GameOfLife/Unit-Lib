@@ -638,7 +638,7 @@
 			.font_( font )
 			.action_({
 				var editor;
-				if( vws[ \editor ].isNil or: { vws[ \editor ].isClosed } ) {
+				if( vws[ \editor ].isNil or: { vws[ \editor ].view.isClosed } ) {
 					editor = CodeEditView( bounds: 400 @ 200, object: vws[ \val ] )
 						.action_({ |vw|
 							var obj;
