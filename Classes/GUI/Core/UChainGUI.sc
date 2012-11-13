@@ -22,7 +22,6 @@ UChainGUI {
 	classvar <>skin;
 	classvar <>current;
 	classvar <>singleWindow = true;
-	classvar <>presetManager;
 	
 	var <chain, <score;
 	
@@ -32,15 +31,6 @@ UChainGUI {
 	var originalBounds;
 	
 	*initClass {
-		
-		Class.initClassTree( PresetManager );
-		
-		presetManager = PresetManager( UChain(), [ \default, { UChain.default } ] )
-			.getFunc_({ |obj| obj.deepCopy })
-			.applyFunc_({ |obj, setting| 
-				obj.units = setting.value.units.deepCopy;
-				obj.duration = obj.duration; // update duration of units
-			});
 		
 		skin = ( 
 			labelWidth: 80, 
@@ -742,7 +732,7 @@ UChainGUI {
 			presetView = PresetManagerGUI( 
 				composite, 
 				composite.bounds.width @ PresetManagerGUI.getHeight,
-				presetManager,
+				UChain.presetManager,
 				chain
 			).resize_(7)
 		};

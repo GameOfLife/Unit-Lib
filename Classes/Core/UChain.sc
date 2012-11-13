@@ -29,6 +29,7 @@ UChain : UEvent {
 	
 	classvar <>verbose = false;
 	classvar <>groupDict;
+	classvar <>presetManager;
 	
 	classvar <>makeDefaultFunc;
 
@@ -38,6 +39,15 @@ UChain : UEvent {
 	var <muted = false;
 	
 	*initClass {
+		
+		Class.initClassTree( PresetManager );
+		
+		presetManager = PresetManager( this, [ \default, { UChain.default } ] )
+			.getFunc_({ |obj| obj.deepCopy })
+			.applyFunc_({ |object, preset|
+			 	object.fromObject( preset );
+		 	});
+		
 		groupDict = IdentityDictionary( );
 		makeDefaultFunc = {
 			UChain( [ \sine, [ \freq, 440 ] ], \output ).duration_(10).fadeIn_(1).fadeOut_(1);
@@ -47,6 +57,21 @@ UChain : UEvent {
 	*new { |...args|
 		^super.new.init( args );
 	}
+	
+	*presets { ^presetManager.presets.as(IdentityDictionary) }
+	
+	fromObject { |obj|
+		this.units = obj.value.units.deepCopy;
+		this.duration = this.duration; // update duration of units
+	}
+	
+	*fromObject { |obj|
+		^obj.value.deepCopy;
+	}
+	
+	*fromPreset { |name| ^presetManager.apply( name ) }
+	
+	fromPreset { |name| ^presetManager.apply( name, this ); }
 
 	/*
 	* Syntaxes for UChain creation:
