@@ -168,12 +168,22 @@ UScoreEditorGui_TransportBar {
 			    }
 			});
 
-		views[\return] = SmoothButton( view, 50@size  )
+		views[\return] = SmoothButton( view, 30@size  )
 			.states_( [[\return, Color.black, Color.clear ]])
 			.canFocus_(false)
+			.radius_( [ size/2, 0, 0, size/2 ] )
 			.font_( font )
 			.action_({
-			    this.score.pos = 0;
+			    this.score.toPrevMarker;
+			});
+			
+		views[\next] = SmoothButton( view, 30@size  )
+			.states_( [[\skip, Color.black, Color.clear ]])
+			.canFocus_(false)
+			.radius_( [ 0, size/2, size/2, 0 ] )
+			.font_( font )
+			.action_({
+			    this.score.toNextMarker;
 			});
 
         views[\loop] = SmoothButton( view, 50@size  )

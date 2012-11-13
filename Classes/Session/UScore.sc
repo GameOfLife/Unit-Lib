@@ -677,6 +677,33 @@ UScore : UEvent {
 	    updatePos = x;
 	    this.changed(\updatePos,x)
 	}
+	
+	// markers
+	
+	markerPositions {
+		^events.select({ |item|
+			item.isKindOf( UMarker );
+		}).collect(_.startTime);
+	}
+	
+	toNextMarker { |includeEnd = true|
+		var markerPositions, dur;
+		markerPositions = this.markerPositions;
+		if( includeEnd && { (dur = this.dur) != inf }) {
+			markerPositions = markerPositions.add( dur ); 
+		};
+		this.pos = markerPositions.detect({ |item| item > this.pos }) ? this.pos; 
+	}
+	
+	toPrevMarker { |includeStart = true|
+		var markerPositions, dur;
+		markerPositions = this.markerPositions;
+		if( includeStart && { markerPositions.includes( 0 ).not } ) {
+			markerPositions = [0] ++ markerPositions;
+		};
+		this.pos = markerPositions.reverse.detect({ |item| item < this.pos }) ? this.pos;
+	}
+	
 	// SOLO / MUTE
 	prSetHardMutes{
 	     events.do{ |ev| ev.muted_( (softMuted.includes(ev) || ( (soloed.size != 0) && soloed.includes(ev).not )).postln ) }
