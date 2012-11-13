@@ -77,6 +77,14 @@ UdefListView {
 		
 		var categories, names, rackCategories, g;
 		var scrollerMargin = 12;
+		var refreshFunc;
+		var controller;
+		
+		refreshFunc = ActionFunc( \delay, { { this.rebuild }.defer( 0.01 ); }, 0.1 );
+		
+		controller = SimpleController( Udef.all );
+		
+		controller.put( \added, { refreshFunc.value });
 		
 		if( GUI.id == \qt ) { scrollerMargin = 20 };
 			
@@ -90,7 +98,10 @@ UdefListView {
 		
 		view = EZCompositeView( parent, bounds ).resize_(5);
 		bounds = view.bounds;
-		view.onClose_({ if( current == this ) { current = nil } });
+		view.onClose_({ 
+			if( current == this ) { current = nil };
+			controller.remove;
+		});
 		views = ();
 		
 		views[ \scrollview ] = ScrollView( view, view.bounds.moveTo(0,0) ).resize_(5);
@@ -143,7 +154,7 @@ UdefListView {
             udefs.do({ |udef|
 	            var hasFile = false, wd = 36;
 	            if( udef.isKindOf( GenericDef ) ) {
-		            hasFile = Udef.findDefFilePath( udef.name ).notNil;
+		           hasFile = udef.filePath.notNil;
 		            if( hasFile ) { wd = 36 + 4 + scrollerMargin + 6 };
 	            };
                 DragSource( views[ cat ], (bounds.width - wd)@18 )
@@ -204,12 +215,13 @@ UdefListView {
 				.radius_(2)
 				.canFocus_(false)
 				.action_({ |bt|
+					Udef.loadOnInit = false;
 					Udef.loadAllFromDefaultDirectory.collect(_.synthDef).flat.select(_.notNil)
 						.do({ |def|
 							ULib.servers.do({ |srv| def.send( srv ) });
 					});
+					Udef.loadOnInit = true;
 					UnitRack.loadAllFromDefaultDirectory;
-					{ this.rebuild }.defer( 0.01 );
 				});
 				
 			StaticText(views[ \scrollview],100@25).string_("Udefs");
