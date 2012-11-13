@@ -17,23 +17,32 @@ UMarker : UEvent {
 			 	object.fromObject( preset );
 		 	});
 		 	
-		 presetManager.put( \pause_score, UMarker( 0,0, "pause", { |marker, score| score.pause; }) );
+		 presetManager.put( \pause, UMarker( 0,0, "pause", { |marker, score| 
+	// pause the score
+	score.pause; 
+}) );
+		 presetManager.put( \post, UMarker( 0,0, "post", { |marker, score| 
+	// post the name of the current marker
+	"passed marker '%' at %\n".postf( 
+		marker.name, 
+		score.pos.asSMPTEString(1000) 
+	); 
+}) );
+		 presetManager.put( \jump_2s, UMarker( 0,0, "jump_2s", { |marker, score|
+	// jump 2 seconds ahead 
+	score.stop;
+	score.pos = score.pos + 2;
+	score.prepareAndStart( startPos: score.pos );
+}) );
 
-		defaultAction = 
-{ |marker, score| 
-	
-// examples: (uncomment lines below)
-	
-	// score.pause; // pause the score
-	
-	// "marker passed".postln; // post text in post window
-	
-	/* // jump ahead two seconds
-	score.stop; 
-	score.prepareAndStart( startPos: marker.startTime + 2 );
-	*/
-	
-};
+		presetManager.put( \jump_to_prev, UMarker( 0,0, "jump_to_prev", { |marker, score| 
+	// jump to the previous marker and play (basic looping)
+	score.stop;
+	score.toPrevMarker;
+	score.prepareAndStart( startPos: score.pos );
+}) );
+
+		defaultAction = { |marker, score| };
 	}
 	
 	*new { |startTime = 0, track, name, action|
