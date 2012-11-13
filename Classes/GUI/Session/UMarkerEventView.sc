@@ -109,7 +109,10 @@ UMarkerEventView : UEventView {
 
 		scaledRect = scaledUserView.translateScale(rect);
 		
-		if( scaledUserView.view.drawBounds.intersects( scaledRect.insetBy(-2,-2) ) ) {	
+		if( (scaledUserView.view.drawBounds.left <= scaledRect.right) and: {
+			(scaledUserView.view.drawBounds.right >= scaledRect.left)
+		}
+		) {	
 			innerRect = scaledRect;
 	
 			//selected outline
