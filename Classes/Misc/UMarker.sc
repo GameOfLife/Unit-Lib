@@ -1,12 +1,24 @@
 UMarker : UEvent {
 	
 	classvar <>defaultAction;
+	classvar <>presetManager;
 	
 	var <name = "marker";
 	var <>score; // set at playback from score
 	var <action; 
 	
 	*initClass {
+		
+		Class.initClassTree( PresetManager );
+		
+		presetManager = PresetManager( this, [ \default, { UMarker() } ] )
+			.getFunc_({ |obj| obj.deepCopy })
+			.applyFunc_({ |object, preset|
+			 	object.fromObject( preset );
+		 	});
+		 	
+		 presetManager.put( \pause_score, UMarker( 0,0, "pause", { |marker, score| score.pause; }) );
+
 		defaultAction = 
 { |marker, score| 
 	
@@ -31,6 +43,19 @@ UMarker : UEvent {
 			.name_( name ? "marker" )
 			.action_( action ? defaultAction );
 	}
+	
+	fromObject { |obj|
+		this.name = obj.name;
+		this.action = obj.action; // only copy the action from presets (perhaps more later)
+	}
+	
+	*fromObject { |obj|
+		^obj.value.deepCopy;
+	}
+	
+	*fromPreset { |name| ^presetManager.apply( name ) }
+	
+	fromPreset { |name| ^presetManager.apply( name, this ); }
 	
 	start { |target, startPos = 0, latency| 
 		if( startPos == 0 ) { action.value( this, this.score ); }

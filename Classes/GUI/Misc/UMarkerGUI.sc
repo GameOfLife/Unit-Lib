@@ -100,6 +100,19 @@ UMarkerGUI : UChainGUI {
 			chain, \action, CodeSpec({ |marker, score| }), controller
 		);
 		
+		composite.decorator.nextLine;
+		composite.decorator.top = composite.bounds.height - (PresetManagerGUI.getHeight + 8 );
+		
+		CompositeView( composite, (composite.bounds.width - (margin.x * 2)) @ 2 )
+				.background_( Color.black.alpha_(0.25) )
+				.resize_(8);
+			
+		presetView = PresetManagerGUI( 
+			composite, 
+			composite.bounds.width @ PresetManagerGUI.getHeight,
+			UMarker.presetManager,
+			chain
+		).resize_(7);
 
 		controller
 			.put( \startTime, { views[ \startTime ].value = chain.startTime ? 0; })
