@@ -6,6 +6,7 @@ UMarker : UEvent {
 	var <name = "marker";
 	var <>score; // set at playback from score
 	var <action; 
+	var <notes;
 	
 	*initClass {
 		
@@ -87,6 +88,7 @@ UMarker : UEvent {
     
     	name_ { |x| name = x; this.changed(\name, name) }
     	action_ { |x| action = x; this.changed(\action, action) }
+    	notes_ { |x| notes = x; this.changed(\notes, notes) }
 
 	makeView{ |i,minWidth,maxWidth| ^UMarkerEventView(this,i,minWidth, maxWidth) }
 	
@@ -95,4 +97,16 @@ UMarker : UEvent {
 	}
 	
 	storeArgs { ^[ startTime, track, name, if( action != defaultAction ) { action } ] }
+	
+	storeNotes { |stream|
+		if( this.notes.notNil ) {
+			stream << ".notes_(" <<< this.notes << ")";
+		};
+	}
+
+	storeModifiersOn { |stream|
+		this.storeNotes( stream );
+		this.storeTags( stream );
+		this.storeDisplayColor( stream );
+	}
 }

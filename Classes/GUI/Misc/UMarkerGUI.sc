@@ -96,12 +96,38 @@ UMarkerGUI : UChainGUI {
 		
 		// action
 		
-		views[ \action ] = ObjectView( composite, (labelWidth + 84 + 80) @ 14, 
-			chain, \action, CodeSpec({ |marker, score| }), controller
-		);
+		RoundView.useWithSkin( RoundView.skin ++ ( labelWidth: 82 ), {
+			views[ \action ] = ObjectView( composite, (labelWidth + 120) @ 14, 
+				chain, \action, CodeSpec({ |marker, score| }), controller
+			);
+		});
 		
 		composite.decorator.nextLine;
-		composite.decorator.top = composite.bounds.height - (PresetManagerGUI.getHeight + 8 );
+		
+		// notes
+		StaticText( composite, labelWidth@14 )
+			.applySkin( RoundView.skin )
+			.string_( "notes" )
+			.align_( \right );
+			
+		views[ \notes ] = TextView( composite, 
+			(composite.bounds.width - (labelWidth+4)) @ 
+			 	(composite.bounds.height - (PresetManagerGUI.getHeight + 12 + composite.decorator.top ))
+			 )
+			.applySkin( RoundView.skin )
+			.string_( chain.notes ? "" )
+			.keyUpAction_({ |tf|
+				if( tf.string.size > 0 ) {
+					chain.notes_( tf.string );
+				} {
+					chain.notes_( nil );
+				};
+			})
+			.background_( Color.gray(0.8) )
+			.resize_(5);
+		
+		composite.decorator.nextLine;
+		//composite.decorator.top = composite.bounds.height - (PresetManagerGUI.getHeight + 8 );
 		
 		CompositeView( composite, (composite.bounds.width - (margin.x * 2)) @ 2 )
 				.background_( Color.black.alpha_(0.25) )
@@ -116,7 +142,9 @@ UMarkerGUI : UChainGUI {
 
 		controller
 			.put( \startTime, { views[ \startTime ].value = chain.startTime ? 0; })
-			.put( \name, { { views[ \name ].value = chain.name; }.defer });		
+			.put( \name, { { views[ \name ].value = chain.name; }.defer })
+			.put( \notes, { { views[ \notes ].string = chain.notes ? ""; }.defer });
+		
 		chain.changed( \startTime );
 		chain.changed( \name );
 	}
