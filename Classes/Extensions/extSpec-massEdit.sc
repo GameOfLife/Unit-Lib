@@ -36,7 +36,7 @@
 + ControlSpec {
 	
 	massEditSpec { |inArray|
-		^this.asArraySpec.default_( inArray );
+		^this.asArrayControlSpec.default_( inArray );
 	}
 	
 	massEditValue { |inArray|

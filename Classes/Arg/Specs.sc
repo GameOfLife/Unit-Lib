@@ -74,14 +74,14 @@ ListSpec : Spec {
 	
 }
 
-ArraySpec : ControlSpec {
+ArrayControlSpec : ControlSpec {
 	// spec for an array of values
 	
 	asRangeSpec {  
 		^RangeSpec.newFrom( this ).default_( this.default.asCollection.wrapAt([0,1]) );  
 	}
 	asControlSpec { ^ControlSpec.newFrom( this ).default_( this.default.asCollection[0] ); }
-	asArraySpec { ^this }
+	asArrayControlSpec { ^this }
 }
 
 StringSpec : Spec {
@@ -583,7 +583,7 @@ RangeSpec : ControlSpec {
 	
 	asRangeSpec { ^this }
 	asControlSpec { ^ControlSpec.newFrom( this ).default_( this.default[0] ); }
-	asArraySpec { ^ArraySpec.newFrom( this ); }
+	asArrayControlSpec { ^ArrayControlSpec.newFrom( this ); }
 
 }
 
@@ -897,7 +897,7 @@ FreqSpec : ControlSpec {
 + ControlSpec { 
 	asRangeSpec { ^RangeSpec.newFrom( this ) }
 	asControlSpec { ^this }
-	asArraySpec { ^ArraySpec.newFrom( this ) }
+	asArrayControlSpec { ^ArrayControlSpec.newFrom( this ) }
 	
 	*testObject { |obj| ^obj.isNumber }
 	
@@ -921,14 +921,17 @@ FreqSpec : ControlSpec {
 + Nil {
 	asRangeSpec { ^RangeSpec.new }
 	asControlSpec { ^this.asSpec; }
+	asArrayControlSpec { ^this.asSpec.asArrayControlSpec }
 }
 
 + Symbol {
 	asRangeSpec { ^this.asSpec.asRangeSpec }
 	asControlSpec { ^this.asSpec; }
+	asArrayControlSpec { ^this.asSpec.asArrayControlSpec }
 }
 
 + Array {
 	asRangeSpec { ^RangeSpec.newFrom( *this ) }
 	asControlSpec { ^this.asSpec; }
+	asArrayControlSpec { ^ArrayControlSpec( this.minItem, this.maxItem, \lin, 0, this ); }
 }

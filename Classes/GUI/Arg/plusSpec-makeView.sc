@@ -149,7 +149,7 @@
 	
 }
 
-+ ArraySpec {
++ ArrayControlSpec {
 	
 	 makeView { |parent, bounds, label, action, resize|
 		var vws, view, labelWidth, width;
