@@ -301,7 +301,7 @@
 					plotter.editMode_( true )
 						.specs_( this )
 						.findSpecs_( false )
-						.plotMode_( \levels )
+						.plotMode_( \points )
 						.editFunc_({ |vw|
 							vws[ \val ] = vw.value;
 							vws[ \range ] = [ vws[ \val ].minItem, vws[ \val ].maxItem ];
