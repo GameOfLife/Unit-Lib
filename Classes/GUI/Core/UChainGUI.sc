@@ -383,7 +383,7 @@ UChainGUI {
 		};
 		
 		chain.changed( \gain );
-		chain.changed( \mute );
+		chain.changed( \muted );
 		chain.changed( \startTime );
 		chain.changed( \dur );
 		chain.changed( \fadeIn );

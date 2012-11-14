@@ -261,6 +261,12 @@ MassEditUChain {
 	duration { ^this.dur }
 	duration_ { |x| this.dur_(x)}
 	
+	muted { ^uchains.collect({ |ch| ch.muted.binaryValue }).mean > 0.5 }
+	muted_ { |bool| 
+		uchains.do({ |ch| ch.muted = bool });
+		this.changed( \muted );
+	} 
+	
 	startTime {
 		^uchains.collect({ |ch| ch.startTime ? 0 }).minItem;
 	}
