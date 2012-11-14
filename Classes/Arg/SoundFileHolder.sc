@@ -361,6 +361,13 @@ AbstractSndFile : AbstractRichBuffer {
 		this.changed( \endFrame, endFrame );
 	}
 	
+	start { ^this.startFrame }
+	start_ { |frame| this.startFrame = frame }
+	
+	end { ^this.endFrame }
+	end_ { |frame| this.endFrame = frame }
+	
+	
 	cutStart { |time = 0|
 		this.startSecond = this.startSecond + time;
 	}
