@@ -48,7 +48,78 @@ UMarkerGUI : UChainGUI {
 			if( composite == vw && { current == this } ) { current = nil } 
 		};
 		
-		composite.decorator.shift( bounds.width - 14 - 80, 0 );
+		composite.decorator.shift( bounds.width - 80 - 32, 0 );
+		
+		views[ \displayColor ] = UserView( composite, 28@14 )
+			.resize_(3)
+			.drawFunc_({ |vw|
+				var wd = 8, smallRect;
+				if( chain.displayColor.notNil ) {	
+					Pen.roundedRect(vw.drawBounds, wd);
+					chain.displayColor.penFill(vw.drawBounds, 1, nil, 10);
+					smallRect = Rect( vw.bounds.width - wd, 0, wd, wd );
+					Pen.color = Color.gray(0.66,0.75);
+					Pen.addOval( smallRect, 2 );
+					Pen.fill;
+					Pen.color = Color.black;
+					DrawIcon( 'x', smallRect );
+				} {
+					Pen.roundedRect(vw.drawBounds, wd);
+					chain.getTypeColor.penFill( vw.drawBounds );
+				};
+			})
+			.mouseDownAction_({ |vw, x,y|
+				var wd = 8, smallRect;
+				smallRect = Rect( vw.bounds.width - wd, 0, wd, wd );
+				if( smallRect.containsPoint( x@y ) ) {
+					 chain.displayColor = nil; 
+					 vw.refresh;
+				} {
+					if( views[ \colorEditor ].isNil ) { 
+						if( chain.displayColor.isNil or: { 
+								chain.displayColor.class == Color 
+							} ) {
+								views[ \colorEditor ] = ColorSpec( chain.getTypeColor )
+									.makeView( 
+										action: { |vws, color| 
+											chain.displayColor = color; 
+										} 
+									);
+								views[ \colorEditor ].view.onClose = { 
+									views[ \colorEditor ] = nil 
+								};
+						} {
+							"no editor available for %\n".postf( chain.displayColor.class );
+						};
+					} {
+						views[ \colorEditor ].view.findWindow.front;
+					};
+				};
+			})
+			.keyDownAction_({ |vw, a,b,cx| 
+				if( cx == 127 ) { chain.displayColor = nil }; 
+			})
+			.beginDragAction_({ chain.displayColor })
+			.canReceiveDragHandler_({ 
+				var obj;
+				obj = View.currentDrag;
+				if( obj.class == String ) {
+					obj = { obj.interpret }.try;
+				};
+				obj.respondsTo( \penFill );
+			})
+			.receiveDragHandler_({ 
+				if( View.currentDrag.class == String ) {
+					chain.displayColor = View.currentDrag.interpret; 
+				} {
+					chain.displayColor = View.currentDrag;
+				};
+			})
+			.onClose_({ if( views[ \colorEditor ].notNil ) {
+					views[ \colorEditor ].view.findWindow.close;
+				};
+			});
+
 		
 		views[ \singleWindow ] = SmoothButton( composite, 74@14 )
 			.label_( [ "single window", "single window" ] )
@@ -141,6 +212,7 @@ UMarkerGUI : UChainGUI {
 		).resize_(7);
 
 		controller
+			.put( \displayColor, { { views[ \displayColor ].refresh; }.defer; } )
 			.put( \startTime, { views[ \startTime ].value = chain.startTime ? 0; })
 			.put( \name, { { views[ \name ].value = chain.name; }.defer })
 			.put( \notes, { { views[ \notes ].string = chain.notes ? ""; }.defer });

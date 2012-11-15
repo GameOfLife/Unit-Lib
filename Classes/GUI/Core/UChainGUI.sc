@@ -106,6 +106,7 @@ UChainGUI {
 		var heights, units;
 		var labelWidth, releaseTask;
 		var controller;
+		var scoreController;
 		// var unitInitFunc;
 		
 		labelWidth = 80;
@@ -128,6 +129,7 @@ UChainGUI {
 		composite.addFlowLayout( margin, gap );
 		composite.onClose = { |vw|
 			controller.remove; 
+			scoreController.remove;
 			if( composite == vw && { current == this } ) { current = nil } 
 		};
 		
@@ -160,8 +162,81 @@ UChainGUI {
 				} ]
 		 	);
 		
-		composite.decorator.shift( bounds.width - 14 - 80, 0 );
+		composite.decorator.shift( bounds.width - 14 - 80 - 32, 0 );
 		
+		views[ \displayColor ] = UserView( composite, 28@14 )
+			.resize_(3)
+			.drawFunc_({ |vw|
+				var wd = 8, smallRect;
+				if( (score ? chain).displayColor.notNil ) {
+					Pen.roundedRect(vw.drawBounds, wd);
+					(score ? chain).displayColor.penFill(vw.drawBounds, 1, nil, 10) ;
+					smallRect = Rect( vw.bounds.width - wd, 0, wd, wd );
+					Pen.color = Color.gray(0.66,0.75);
+					Pen.addOval( smallRect, 2 );
+					Pen.fill;
+					Pen.color = Color.black;
+					DrawIcon( 'x', smallRect );
+				} {
+					Pen.roundedRect(vw.drawBounds, wd);
+					(score ? chain).getTypeColor.penFill( vw.drawBounds );
+				};
+			})
+			.mouseDownAction_({ |vw, x,y|
+				var wd = 8, smallRect;
+				smallRect = Rect( vw.bounds.width - wd, 0, wd, wd );
+				if( smallRect.containsPoint( x@y ) ) {
+					 (score ? chain).displayColor = nil; 
+					 vw.refresh;
+				} {
+					if( views[ \colorEditor ].isNil ) { 
+						if( (score ? chain).displayColor.isNil or: { 
+								(score ? chain).displayColor.class == Color 
+							} ) {
+								views[ \colorEditor ] = ColorSpec( 
+										(score ? chain).getTypeColor 
+									).makeView( 
+										action: { |vws, color| 
+											(score ? chain).displayColor = color; 
+										} 
+									);
+								views[ \colorEditor ].view.onClose = { 
+									views[ \colorEditor ] = nil 
+								};
+						} {
+							"no editor available for %\n".postf( 
+								(score ? chain).displayColor.class 
+							);
+						};
+					} {
+						views[ \colorEditor ].view.findWindow.front;
+					};
+				};
+			})
+			.keyDownAction_({ |vw, a,b,cx| 
+				if( cx == 127 ) { (score ? chain).displayColor = nil }; 
+			})
+			.beginDragAction_({ (score ? chain).displayColor })
+			.canReceiveDragHandler_({ 
+				var obj;
+				obj = View.currentDrag;
+				if( obj.class == String ) {
+					obj = { obj.interpret }.try;
+				};
+				obj.respondsTo( \penFill );
+			})
+			.receiveDragHandler_({ 
+				if( View.currentDrag.class == String ) {
+					(score ? chain).displayColor = View.currentDrag.interpret; 
+				} {
+					(score ? chain).displayColor = View.currentDrag;
+				};
+			})
+			.onClose_({ if( views[ \colorEditor ].notNil ) {
+					views[ \colorEditor ].view.findWindow.close;
+				};
+			});
+
 		views[ \singleWindow ] = SmoothButton( composite, 74@14 )
 			.label_( [ "single window", "single window" ] )
 			.border_( 1 )
@@ -359,6 +434,7 @@ UChainGUI {
 			
 		if( score.isNil ) {
 			controller
+				.put( \displayColor, { { views[ \displayColor ].refresh; }.defer; } )
 				.put( \startTime, { views[ \startTime ].value = chain.startTime ? 0; })
 				.put( \dur, { var dur;
 					dur = chain.dur;
@@ -374,12 +450,19 @@ UChainGUI {
 						views[ \releaseSelf ].hiliteColor = Color.green.alpha_(1);
 						views[ \releaseSelf ].stringColor = Color.black.alpha_(1);
 					};
+					{ views[ \displayColor ].refresh; }.defer;
 				})
 				.put( \fadeIn, { views[ \fadeIn ].value = chain.fadeIn })
 				.put( \fadeOut, { views[ \fadeOut ].value = chain.fadeOut })
 				.put( \releaseSelf, {  
 					views[ \releaseSelf ].value = chain.releaseSelf.binaryValue;
+					{ views[ \displayColor ].refresh; }.defer; 
 				})
+		} {
+			scoreController = SimpleController( score );
+			scoreController
+				.put( \displayColor, { { views[ \displayColor ].refresh; }.defer; } )
+				.put( \startTime, { views[ \startTime ].value = score.startTime ? 0; });
 		};
 		
 		chain.changed( \gain );
