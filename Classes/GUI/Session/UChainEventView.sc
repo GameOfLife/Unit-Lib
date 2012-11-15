@@ -21,24 +21,6 @@ UChainEventView : UEventView {
 
     var <fadeAreaHeight;
 
-	getTypeColor {
-        ^case {
-	        event.displayColor.notNil;
-        } {
-	        event.displayColor;
-        } { 
-	        event.duration == inf 
-	   } {
-	        Color(0.4, 0.4, 0.8)
-        } {
-	        event.releaseSelf == true;
-        } {
-	        Color(0.768, 0.3,0.768);
-        } {
-	        Color(0.4, 0.6, 0.6);
-        };
-	}
-
 	ifIsInsideRect{ |mousePos, yesAction, noAction|
 
 	    if(rect.containsPoint(mousePos)) {

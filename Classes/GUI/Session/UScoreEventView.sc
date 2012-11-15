@@ -19,10 +19,6 @@
 
 UScoreEventView : UEventView {
 
-	getTypeColor {
-        ^if(event.duration == inf){ Color(0.33, 0.33, 0.665) }{Color.white};
-	}
-
 	ifIsInsideRect{ |mousePos, yesAction, noAction|
 
 	    if(rect.containsPoint(mousePos)) {
@@ -95,7 +91,7 @@ UScoreEventView : UEventView {
 				
 				// fill inside
 				Pen.addRect( innerRect );
-				this.getTypeColor.penFill(innerRect, lineAlpha * 0.75, nil, 10);
+				event.getTypeColor.penFill(innerRect, lineAlpha * 0.75, nil, 10);
 				
 				//draw name
 				if( scaledRect.height > 4 ) {
