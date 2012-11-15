@@ -1105,6 +1105,26 @@
 				Pen.color = vws[ \val ];
 				Pen.fillRect( vw.drawBounds );
 			})
+			.canReceiveDragHandler_({
+				var obj;
+				obj = View.currentDrag;
+				if( obj.class == String ) {
+					obj = { obj.interpret }.try;
+				};
+				obj.respondsTo( \asColor );
+			})
+			.receiveDragHandler_({
+				var obj;
+				if( View.currentDrag.class == String ) {
+					obj = View.currentDrag.interpret.asColor; 
+				} {
+					obj = View.currentDrag.asColor;
+				};
+				if( obj.notNil ) { vws[ \val ] = obj };
+				vws[ \updateViews ].value;
+				action.value( vws, vws[ \val ] );
+			})
+			.beginDragAction_({ vws[ \val ] })
 			.resize_(2);
 			
 		vws[ \r ] = EZSmoothSlider(view, viewWidth @ viewHeight, "red" ).value_(0.5);
