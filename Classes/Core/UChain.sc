@@ -275,6 +275,24 @@ UChain : UEvent {
 	dur { ^this.duration }
 	dur_ { |x| this.duration_(x)}
 	
+	getTypeColor {
+		^case {
+	        this.displayColor.notNil;
+        } {
+	        this.displayColor;
+        } { 
+	        this.duration == inf 
+	   } {
+	        Color(0.4, 0.4, 0.8)
+        } {
+	       this.releaseSelf == true;
+        } {
+	        Color(0.768, 0.3,0.768);
+        } {
+	        Color(0.4, 0.6, 0.6);
+        };
+	}
+	
 	gain { ^this.getGain }
 	gain_ { |gain = 0| ^this.setGain(gain) }
 	

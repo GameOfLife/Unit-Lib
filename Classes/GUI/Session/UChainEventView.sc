@@ -335,7 +335,7 @@ UChainEventView : UEventView {
 	            
 	            // fill inside
 	            Pen.addRect( innerRect );
-	            this.getTypeColor.penFill(innerRect, lineAlpha, nil, 10);
+	            event.getTypeColor.penFill(innerRect, lineAlpha, nil, 10);
 	            
 	            // resize handles
 	            if( event.duration != inf ) {	

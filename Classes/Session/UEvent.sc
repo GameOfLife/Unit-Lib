@@ -76,6 +76,16 @@ UEvent : UArchivable {
 		this.changed( \displayColor );
 	}
 
+	getTypeColor {
+		^this.displayColor ?? { 
+			if(this.duration == inf) { 
+				Color(0.33, 0.33, 0.665) 
+			}{
+				Color.white
+			};
+		};
+	}
+	
     /*
     *   server: Server or Array[Server]
     */

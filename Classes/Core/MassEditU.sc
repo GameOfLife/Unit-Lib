@@ -173,6 +173,13 @@ MassEditUChain {
 		uchains.do(_.releaseSelf_(bool));
 	}
 	
+	getTypeColor {
+		^Color( *uchains.collect(_.getTypeColor).collect(_.asArray) );
+	}
+	
+	displayColor { ^nil }
+	displayColor_ { |color| uchains.do({ |item| item.displayColor = color }); }
+	
 	fadeIn_ { |fadeIn = 0|
 		var maxFadeIn, mul;
 		maxFadeIn = this.fadeIn.max(1.0e-11);

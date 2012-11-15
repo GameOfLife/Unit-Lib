@@ -1,8 +1,4 @@
 UMarkerEventView : UEventView {
-
-	getTypeColor {
-        ^Color.yellow.alpha_(0.75);
-	}
 	
 	checkSelectionStatus { |selectionRect,shiftDown, minWidth, maxWidth|
 		//this.createRect(minWidth, maxWidth);
@@ -132,7 +128,7 @@ UMarkerEventView : UEventView {
 				Pen.addRect( Rect( innerRect.left - 1, 0, innerRect.width + 1, 
 					scaledUserView.view.bounds.height )
 				);
-				this.getTypeColor.penFill(innerRect, lineAlpha * 0.75, nil, 10);
+				event.getTypeColor.penFill(innerRect, lineAlpha * 0.75, nil, 10);
 				
 				//draw name
 				if( scaledRect.height > 4 ) {

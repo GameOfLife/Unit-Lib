@@ -81,6 +81,10 @@ UMarker : UEvent {
 	duration { ^0 }
 	duration_{ }
      dur_ { }
+     
+     getTypeColor {
+        ^this.displayColor ? Color.yellow.alpha_(0.75);
+	}
     
     	name_ { |x| name = x; this.changed(\name, name) }
     	action_ { |x| action = x; this.changed(\action, action) }
