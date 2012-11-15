@@ -174,12 +174,14 @@ MassEditUChain {
 	}
 	
 	getTypeColor {
-		^Color( *uchains.collect(_.getTypeColor).collect(_.asArray).mean );
+		^Color( 
+			*uchains.collect(_.getTypeColor).select(_.isKindOf( Color ) ).collect(_.asArray).mean
+		 );
 	}
 	
 	displayColor { 
 		^if( uchains.any({ |item| item.displayColor != nil }) ) {
-			Color( *uchains.collect(_.getTypeColor).collect(_.asArray).mean );
+			this.getTypeColor
 		}; 
 	}
 	
