@@ -72,7 +72,7 @@ UEvent : UArchivable {
 	toggleDisable { this.disabled_(disabled.not) }
 	
 	displayColor_ { |color|
-		displayColor = color;
+		displayColor = color.copy;
 		this.changed( \displayColor );
 	}
 
