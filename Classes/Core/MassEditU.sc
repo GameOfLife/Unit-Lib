@@ -174,11 +174,19 @@ MassEditUChain {
 	}
 	
 	getTypeColor {
-		^Color( *uchains.collect(_.getTypeColor).collect(_.asArray) );
+		^Color( *uchains.collect(_.getTypeColor).collect(_.asArray).mean );
 	}
 	
-	displayColor { ^nil }
-	displayColor_ { |color| uchains.do({ |item| item.displayColor = color }); }
+	displayColor { 
+		^if( uchains.any({ |item| item.displayColor != nil }) ) {
+			Color( *uchains.collect(_.getTypeColor).collect(_.asArray).mean );
+		}; 
+	}
+	
+	displayColor_ { |color| 
+		uchains.do({ |item| item.displayColor = color }); 
+		this.changed( \displayColor, color );
+	}
 	
 	fadeIn_ { |fadeIn = 0|
 		var maxFadeIn, mul;
