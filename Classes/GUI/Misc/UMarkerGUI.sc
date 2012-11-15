@@ -48,7 +48,7 @@ UMarkerGUI : UChainGUI {
 			if( composite == vw && { current == this } ) { current = nil } 
 		};
 		
-		composite.decorator.shift( bounds.width - 80 - 32, 0 );
+		composite.decorator.shift( bounds.width - 80 - 28, 0 );
 		
 		views[ \displayColor ] = UserView( composite, 28@14 )
 			.resize_(3)
