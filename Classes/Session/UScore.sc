@@ -113,7 +113,10 @@ UScore : UEvent {
 	    };
 	}
 
-    duplicate { ^UScore( *events.collect( _.duplicate ) ).name_( name ); }
+    duplicate { ^UScore( *events.collect( _.duplicate ) )
+	    .name_( name )
+	    .displayColor_( displayColor ); 
+	}
 
     makeView{ |i,minWidth,maxWidth| ^UScoreEventView(this,i,minWidth, maxWidth) }
     isFolder{ ^true }
