@@ -587,6 +587,41 @@ RangeSpec : ControlSpec {
 
 }
 
+ColorSpec : Spec {
+
+	var >default;
+
+	*new { |default|
+		^super.newCopyArgs( default ).init;
+	}
+	
+	*testObject { |obj|
+		^obj.class == Color;
+	}
+	
+	*newFromObject { |obj|
+		^this.new( obj.asColor );
+	}
+	
+	init {
+	}
+	
+	default { ^default ?? { Color.gray(0.5) } }
+	
+	clip { |value|
+		^value
+	}
+	
+	constrain { |value|
+		^value.asColor;
+	}
+
+	storeArgs {
+	    ^[ default ]
+	}
+
+}
+
 RichBufferSpec : Spec {
 	
 	var <>numChannels = 1; // fixed number of channels

@@ -1046,6 +1046,128 @@
 
 }
 
++ ColorSpec {
+	
+	viewNumLines { ^5 }
+	
+	makeView { |parent, bounds, label, action, resize|
+		var vws, view, labelWidth;
+		var localStep;
+		var modeFunc;
+		var font;
+		var editAction;
+		var tempVal;
+		var viewHeight, viewWidth;
+		vws = ();
+		
+		font =  (RoundView.skin ? ()).font ?? { Font( Font.defaultSansFace, 10 ); };
+		
+		bounds.isNil.if{bounds= 320@100};
+		
+		view = EZCompositeView( parent, bounds, gap: 2@2 );
+		bounds = view.asView.bounds;
+		view.asView.resize_(5);
+		
+		vws[ \view ] = view;
+		vws[ \val ] = this.default;
+		 		
+		if( label.notNil ) {
+			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
+			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ bounds.height )
+				.string_( label.asString ++ " " )
+				.align_( \right )
+				.resize_( 4 )
+				.applySkin( RoundView.skin );
+		} {
+			labelWidth = 0;
+		};
+		
+		viewHeight = (bounds.height / 5) - 4;
+		viewWidth = bounds.width - (labelWidth + 6);
+		
+		vws[ \colorView ] = UserView( view, viewWidth @ viewHeight )
+			.drawFunc_({ |vw|
+				var rect;
+				rect = vw.drawBounds;
+				Pen.color = Color.black;
+				
+				Pen.line( (rect.right * 2/5) @ (rect.top), rect.rightBottom );
+				Pen.lineTo( rect.rightTop );
+				Pen.lineTo( (rect.right * 2/5) @ (rect.top) );
+				
+				Pen.fill;
+				Pen.color = Color.white;
+				Pen.line( rect.leftTop, (rect.right * 3/5) @ (rect.bottom));
+				Pen.lineTo( rect.leftBottom );
+				Pen.lineTo( rect.leftTop );
+				Pen.fill;
+				
+				Pen.color = vws[ \val ];
+				Pen.fillRect( vw.drawBounds );
+			})
+			.resize_(2);
+			
+		vws[ \r ] = EZSmoothSlider(view, viewWidth @ viewHeight, "red" ).value_(0.5);
+		vws[ \g ] = EZSmoothSlider(view, viewWidth @ viewHeight, "green" ).value_(0.5);
+		vws[ \b ] = EZSmoothSlider(view, viewWidth @ viewHeight, "blue" ).value_(0.5);
+		vws[ \a ] = EZSmoothSlider(view, viewWidth @ viewHeight, "alpha" ).value_(1);
+		
+		[\r,\g,\b,\a].collect(vws[_]).do({ |item| 
+			item.sliderView.hiliteColor = nil;
+			item.view.resize_(2);
+		});
+
+		vws[ \updateViews ] = {
+			vws[ \r ].sliderView.background = Gradient( 
+					vws[ \val ].copy.red_(1).alpha_(1), 
+					vws[ \val ].copy.red_(0).alpha_(1), \v 
+				);
+			vws[ \g ].sliderView.background = Gradient( 
+					vws[ \val ].copy.green_(1).alpha_(1), 
+					vws[ \val ].copy.green_(0).alpha_(1), \v 
+				);
+			vws[ \b ].sliderView.background = Gradient( 
+				vws[ \val ].copy.blue_(1).alpha_(1), 
+				vws[ \val ].copy.blue_(0).alpha_(1), \v 
+				);
+			vws[ \a ].sliderView.background = Gradient( 
+				vws[ \val ].copy.alpha_(1), vws[ \val ].copy.alpha_(0), \v 
+			);
+			vws[ \r ].value = vws[ \val ].red;
+			vws[ \g ].value = vws[ \val ].green;
+			vws[ \b ].value = vws[ \val ].blue;
+			vws[ \a ].value = vws[ \val ].alpha;
+			{ vws[ \colorView ].refresh }.defer;
+		};
+		
+		vws[ \updateViews ].value;
+	
+		editAction = { 
+			vws[ \val ]
+				.red_( vws[ \r ].value )
+				.green_( vws[ \g ].value )
+				.blue_( vws[ \b ].value )
+				.alpha_( vws[ \a ].value );
+			vws[ \updateViews ].value;
+			action.value( vws, vws[ \val ] );
+		};
+		
+		vws[ \r ].action = editAction;
+		vws[ \g ].action = editAction;
+		vws[ \b ].action = editAction;
+		vws[ \a ].action = editAction;
+		
+		^vws;
+	}
+	
+	setView { |view, value, active = false|
+		view[ \val ] = value;
+		view[ \updateViews ].value;
+	}
+
+
+}
+
 + BufSndFileSpec {
 	
 	viewNumLines { ^BufSndFileView.viewNumLines }
