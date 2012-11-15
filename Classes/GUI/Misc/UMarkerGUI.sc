@@ -80,7 +80,7 @@ UMarkerGUI : UChainGUI {
 								chain.displayColor.class == Color 
 							} ) {
 								views[ \colorEditor ] = ColorSpec( chain.getTypeColor )
-									.makeView( 
+									.makeView( "UMarker displayColor",
 										action: { |vws, color| 
 											chain.displayColor = color; 
 										} 

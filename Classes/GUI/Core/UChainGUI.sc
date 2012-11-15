@@ -195,7 +195,7 @@ UChainGUI {
 							} ) {
 								views[ \colorEditor ] = ColorSpec( 
 										(score ? chain).getTypeColor 
-									).makeView( 
+									).makeView( "UChain displayColor", 
 										action: { |vws, color| 
 											(score ? chain).displayColor = color; 
 										} 

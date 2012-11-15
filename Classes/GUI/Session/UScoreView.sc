@@ -150,7 +150,8 @@ UScoreView {
                 } {
                     gui = event.gui;
                     currentScore = this.currentScore;
-                    gui.windowName = "UChain : % [ % ]".format( 
+                    gui.windowName = "% : % [ % ]".format( 
+                    	event.class,
                     	currentScore.name, 
                     	currentScore.events.indexOf( event )
                     );
