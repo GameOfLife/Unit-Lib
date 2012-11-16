@@ -702,8 +702,8 @@ UScore : UEvent {
 	toNextMarker { |includeEnd = true|
 		var markerPositions, dur, newPos;
 		markerPositions = this.markerPositions;
-		if( includeEnd && { (dur = this.dur) != inf }) {
-			markerPositions = markerPositions.add( dur ); 
+		if( includeEnd ) {
+			markerPositions = markerPositions.add( this.finiteDuration(0) ); 
 		};
 		if( (newPos = markerPositions.detect({ |item| item > this.pos })).notNil ) {
 			this.jumpTo( newPos ); 
