@@ -24,6 +24,7 @@ UMarkerGUI : UChainGUI {
 		var heights, units;
 		var labelWidth, releaseTask;
 		var controller;
+		var updateNotes = true;
 		// var unitInitFunc;
 		
 		labelWidth = 80;
@@ -187,12 +188,16 @@ UMarkerGUI : UChainGUI {
 			 )
 			.applySkin( RoundView.skin )
 			.string_( chain.notes ? "" )
+			.hasVerticalScroller_( true )
+			.autohidesScrollers_( true )
 			.keyUpAction_({ |tf|
+				updateNotes = false;
 				if( tf.string.size > 0 ) {
 					chain.notes_( tf.string );
 				} {
 					chain.notes_( nil );
 				};
+				updateNotes = true;
 			})
 			.background_( Color.gray(0.8) )
 			.resize_(5);
@@ -215,7 +220,11 @@ UMarkerGUI : UChainGUI {
 			.put( \displayColor, { { views[ \displayColor ].refresh; }.defer; } )
 			.put( \startTime, { views[ \startTime ].value = chain.startTime ? 0; })
 			.put( \name, { { views[ \name ].value = chain.name; }.defer })
-			.put( \notes, { { views[ \notes ].string = chain.notes ? ""; }.defer });
+			.put( \notes, { 
+				if( updateNotes ) {
+					{ views[ \notes ].string = chain.notes ? ""; }.defer 
+				};
+			});
 		
 		chain.changed( \startTime );
 		chain.changed( \name );
