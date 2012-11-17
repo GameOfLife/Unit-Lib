@@ -686,7 +686,7 @@ UScore : UEvent {
 	markerPositions {
 		^events.select({ |item|
 			item.isKindOf( UMarker );
-		}).collect(_.startTime);
+		}).collect(_.startTime).sort;
 	}
 	
 	jumpTo { |pos = 0|
