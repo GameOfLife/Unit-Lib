@@ -307,6 +307,14 @@ UChainEventView : UEventView {
 				this.drawShape(scaledRect);
 				Pen.stroke;
 			};
+			
+			//event is playing
+			if( event.isPlaying ) {
+				Pen.width = 3;
+				Pen.color = Color.grey(0.9);
+				this.drawShape(scaledRect);
+				Pen.stroke;
+			};
 	
 	        Pen.use({
 	            var fadeinScaled, fadeoutScaled, fades;
