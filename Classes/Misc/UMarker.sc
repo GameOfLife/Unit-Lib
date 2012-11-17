@@ -42,12 +42,13 @@ UMarker : UEvent {
 		defaultAction = { |marker, score| };
 	}
 	
-	*new { |startTime = 0, track, name, action|
+	*new { |startTime = 0, track, name, action, notes|
 		^super.newCopyArgs
 			.startTime_( startTime )
 			.track_( track ? 0 )
 			.name_( name ? "marker" )
-			.action_( action ? defaultAction );
+			.action_( action ? defaultAction )
+			.notes_( notes );
 	}
 	
 	fromObject { |obj|
