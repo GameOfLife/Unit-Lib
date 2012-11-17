@@ -46,6 +46,7 @@ UScoreView {
 		parent = inParent;
 		bounds = inBounds;
 		this.addCurrentScoreControllers;
+		this.makeEventControllers;
 
      }
 
