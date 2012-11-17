@@ -21,22 +21,28 @@ MultiChannelUdef : MultiUdef {
 	
 	classvar <>channelSpec;
 	
+	var <>chSpec;
+	
 	*defNameKey { ^\numChannels }
 	
 	*initClass {
 		channelSpec = ListSpec([1,2,3,4,5,6,7,8,10,12,16,24,32]);
 	}
 	
-	*new { |name, func, args, category, setterIsPrivate = false, addToAll=true| 		^super.basicNew( name, [ 
+	*new { |name, func, args, category, setterIsPrivate = false, channels, addToAll=true| 
+		var chSpec = channelSpec;
+		if( channels.notNil ) { chSpec = ListSpec(channels); };
+		^super.basicNew( name, [ 
 			ArgSpec( this.defNameKey, 
-				channelSpec.default, channelSpec, setterIsPrivate, \nonsynth )
+				chSpec.default, chSpec, setterIsPrivate, \nonsynth )
 		], category, addToAll)
+			.chSpec_( chSpec )
 			.func_( func )
 			.initUdefs( name, args );
 	}
 
 	initUdefs { |name, args|
-		udefs = channelSpec.list.collect({ |numChannels|
+		udefs = chSpec.list.collect({ |numChannels|
 			MultiChannelSubUdef( name, numChannels, func, args );
 		});
 	}
