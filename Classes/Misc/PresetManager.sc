@@ -9,6 +9,7 @@ PresetManager {
 	var <>id;
 	var <>lastChosen;
 	var <>lastObject;
+	var <>filePath;
 	
 	*initClass {
 		all = IdentityDictionary();
@@ -158,6 +159,8 @@ PresetManager {
 				successAction.value(path);
 			}, overwrite, ask);
 	    };
+	    
+	    path = path ? filePath;
 
 	    if( path.isNil ) {
 		    Dialog.savePanel( { |pth|
@@ -171,6 +174,8 @@ PresetManager {
     
     read { |path, action|
 	    var readFunc;
+	    
+	    path = path ? filePath;
 	    
 	    readFunc = { |path|
 		    this.presets = path.load;
