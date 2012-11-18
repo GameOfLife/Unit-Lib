@@ -152,7 +152,9 @@ PresetManager {
 		    
 		    extension = id !? { [ id, fileExtension ].join(".") } ? fileExtension;
 		    
-		    path = path.replaceExtension( extension );
+		    if( path.find( extension ).isNil ) {
+			    path = path.replaceExtension( extension );
+		    };
 		    
 		    File.checkDo( path, { |f|
 				f.write( text );
