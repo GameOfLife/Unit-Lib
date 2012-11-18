@@ -72,7 +72,7 @@ UMarker : UEvent {
 	prepareAndStart{ |target, startPos = 0| this.start( target, startPos ); }
 	waitTime { ^0 }
 	prepareWaitAndStart { |target, startPos = 0| this.start( target, startPos ); }
-	eventSustain{ ^inf }
+	eventSustain{ ^0 }
 	preparedServers {^[] }
 	getAllUChains { ^[] }
 	
