@@ -38,6 +38,26 @@ UMarker : UEvent {
 	// jump to the previous marker and play (basic looping)
 	score.toPrevMarker;
 }) );
+	
+		presetManager.put( \reset_eq_and_level, UMarker(0,0, "reset_eq_and_level", { |marker, score| 
+	// set global level to 0dB:
+	UGlobalGain.gain = 0;
+	
+	// set the eq:
+	UGlobalEQ.setting = [ 
+		[ 100, 1, 0 ], 
+		[ 250, 1, 0 ], 
+		[ 1000, 1, 0 ], 
+		[ 3500, 1, 0 ], 
+		[ 6000, 1, 0 ], 
+		[ 0 ] 
+	];
+	
+	// to get the current eq setting: 
+	/*
+	UGlobalEQ.setting.postln;
+	*/
+}) );
 
 		defaultAction = { |marker, score| };
 	}
