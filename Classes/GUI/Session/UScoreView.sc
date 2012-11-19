@@ -179,13 +179,37 @@ UScoreView {
 	}
 
     selectSimilar {
-        var selectedTypes = this.selectedEvents.collect{ |x| x.units.collect(_.defName) };
-        usessionMouseEventsManager.eventViews.do{ |evView|
-            if( selectedTypes.includesEqual(evView.event.units.collect(_.defName)) ) {
-                evView.selected = true
-            }
-        };
-        this.update
+        var selectedTypes = this.selectedEvents;
+        if( selectedTypes.size > 0 ) {
+	        if( selectedTypes.every(_.isKindOf( UChain )) ) {
+		        selectedTypes = selectedTypes.collect{ |x| x.units.collect(_.defName) };
+		        usessionMouseEventsManager.eventViews.do{ |evView|
+			        if( evView.event.isKindOf( UChain ) ) {
+				        if( selectedTypes.includesEqual(evView.event.units.collect(_.defName)) ) {
+					        evView.selected = true
+					   };
+			        };
+				};
+	        		this.update;
+	    		};
+	    		if( selectedTypes.every(_.isKindOf( UMarker ) ) ) {
+		    		usessionMouseEventsManager.eventViews.do{ |evView|
+			    		if( evView.event.isKindOf( UMarker ) ) {
+				    		evView.selected = true
+				    	};
+	        		};
+	        		this.update;
+			};
+			if( selectedTypes.every(_.isKindOf( UScore ) ) ) {
+		    		usessionMouseEventsManager.eventViews.do{ |evView|
+			    		if( evView.event.isKindOf( UScore ) ) {
+				    		evView.selected = true
+				    	};
+	        		};
+	        		this.update;
+			};
+			
+	    };
     }
 
     disableSelected {
