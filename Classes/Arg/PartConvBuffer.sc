@@ -204,7 +204,7 @@ PartConvBuffer : AbstractRichBuffer {
 
     storeOn { arg stream;
 		stream << this.class.name << ".newBasic(" <<* [ // use newBasic to prevent file reading
-		    path.quote, numFrames
+		    path.formatGPath.quote, numFrames
 		]  <<")"
 	}
 }
