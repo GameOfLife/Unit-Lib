@@ -551,7 +551,7 @@ chain.gui
 x = UOSCsetter( UScore.current );
 
 //just for testing
-ssy = NetAddr( "127.0.0.1", NetAddr.langPort );
+y = NetAddr( "127.0.0.1", NetAddr.langPort );
 
 //send osc messages
 y.sendMsg( '/untitled/0/0/soundFile.rate', 2);
