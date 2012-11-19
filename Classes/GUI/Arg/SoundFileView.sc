@@ -232,12 +232,13 @@ BufSndFileView {
 								"can't move %, try copying instead\n".postf( pth.quote );
 							};
 							Dialog.savePanel({ |path|
-								var res;
-								if( File.exists( pth ).not ) {
-									res = pth.asPathFromServer.moveTo( path.dirname ); 
+								var res, newName;
+								newName = path.dirname +/+ pth.basename;
+								if( File.exists( newName ).not ) {
+									res = pth.getGPath.asPathFromServer.moveTo( path.dirname ); 
 									if( res ) {
 										this.performSndFile( \path_ ,
-											path.dirname +/+ pth.basename 
+											newName
 										);
 									};
 								} {
@@ -253,8 +254,9 @@ BufSndFileView {
 						pth = this.performSndFile( \path );
 						if( pth.notNil ) {
 							Dialog.savePanel({ |path|
-								var res;
-								if( File.exists( pth ).not ) {
+								var res, newName;
+								newName = path.dirname +/+ pth.basename;
+								if( File.exists( newName ).not ) {
 									res = pth.getGPath.asPathFromServer.copyTo( path.dirname ); 
 									if( res ) {
 										this.performSndFile( \path_ ,
@@ -277,7 +279,7 @@ BufSndFileView {
 							Dialog.savePanel({ |path|
 								var res;
 								path =  path.replaceExtension( ext );
-								res = pth.getGPath.asPathFromServer.copyFile(  path ); 
+								res = pth.getGPath.asPathFromServer.copyFile( path ); 
 								if( res ) {
 									this.performSndFile( \path_ , path );
 								};
