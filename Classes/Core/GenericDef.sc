@@ -99,6 +99,13 @@ GenericDef : UArchivable {
 		};
 	}
 	
+	write { |path, overwrite=false, ask=true, successAction, cancelAction|
+		super.write( path, overwrite, ask, 
+			{ |pth| this.filePath = pth; successAction.value( pth ) },
+			cancelAction
+		);
+	}
+	
 	*existsCaseSensitive { |path|
 		^(path.dirname+/+"*").pathMatch.detect{|x|x.compare(path)==0}.notNil
 	}
