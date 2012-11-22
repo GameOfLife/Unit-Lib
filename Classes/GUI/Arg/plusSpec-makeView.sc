@@ -106,12 +106,16 @@
 	makeView { |parent, bounds, label, action, resize|
 		var multipleActions = action.size > 0;
 		var vw;
+		var lbls;
+		lbls = labels.asCollection;
 		vw = EZPopUpMenu( parent, bounds, label !? { label.asString ++ " " }, 
 			if( multipleActions ) {
 				list.collect({ |item, i| 
-					item.asSymbol -> { |vw| action[i].value( vw, list[i] ) };
+					(lbls[i] ? item.asSymbol) -> { |vw| action[i].value( vw, list[i] ) };
 				});
-			} { list.collect({ |item, i| item.asSymbol -> nil })
+			} { list.collect({ |item, i| 
+				(lbls[i] ? item.asSymbol) -> nil 
+			})
 			},
 			initVal: defaultIndex
 		);

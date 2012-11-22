@@ -21,11 +21,12 @@ ListSpec : Spec {
 	var <list;
 	var <>defaultIndex = 0; 
 	var sortedList, indexMap;
+	var <>labels;
 	
 	// handles only Symbols and Numbers, no repetitions
 	
-	*new { |list, defaultIndex = 0|
-		^super.newCopyArgs( list ? [] ).init.defaultIndex_( defaultIndex );
+	*new { |list, defaultIndex = 0, labels|
+		^super.newCopyArgs( list ? [] ).init.defaultIndex_( defaultIndex ).labels_( labels );
 	}
 	
 	init { 
