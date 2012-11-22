@@ -31,8 +31,10 @@ this is an Udef definition file
 part of the Unit lib default Udefs set
 */
 
-Udef( \gendy, { |ampdist = 1, durdist = 1, adparam = 1, ddparam = 1, freq = #[290,590], ampscale = 0.5, durscale = 0.5, initCPs = 12, knum = 12, amp = 0.1, lag = 0|
+Udef( \gendy, { |ampdist = 1, durdist = 1, adparam = 1, ddparam = 1, freq = #[290,590], ampscale = 0.5, durscale = 0.5, initCPs = 12, knum = 12, amp = 0.1, lag = 0, seed = 12345|
 	var sig;
+	URandSeed.ir(seed);
+	
 	#adparam, ddparam, freq, ampscale, durscale, amp = 
 		[ adparam, ddparam, freq, ampscale, durscale, amp ].collect(_.lag(lag));
 		
@@ -52,4 +54,5 @@ Udef( \gendy, { |ampdist = 1, durdist = 1, adparam = 1, ddparam = 1, freq = #[29
 	.setSpec( \durscale, [0,1].asSpec )
 	.setSpec( \initCPs, IntegerSpec( 12, 1, 40 ), \init )
 	.setSpec( \knum, [1,40,\lin,1,12].asSpec )
-	.setSpec( \lag, [0,1,\lin].asSpec );
+	.setSpec( \lag, [0,1,\lin].asSpec )
+	.setSpec( \seed, PositiveIntegerSpec(12345) );
