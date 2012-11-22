@@ -45,8 +45,8 @@ Udef( \gendy, { |ampdist = 1, durdist = 1, adparam = 1, ddparam = 1, freq = #[29
 		
 	UMixOut.ar( 0, sig, 0, true ) 
 } ).category_( \synthesis )
-	.setSpec( \ampdist, IntegerSpec( 1, 0, 6 ) )
-	.setSpec( \durdist, IntegerSpec( 1, 0, 6 ) )
+	.setSpec( \ampdist, ListSpec( (..6), 1, #[ linear, cauchy, logistic, hyperCosine, arcSine, exponential, sinus ] ) )
+	.setSpec( \durdist, ListSpec( (..6), 1, #[ linear, cauchy, logistic, hyperCosine, arcSine, exponential, sinus ] ) )
 	.setSpec( \adparam, [0.0001, 1, \exp].asSpec )
 	.setSpec( \ddparam, [0.0001, 1, \exp].asSpec )
 	.setSpec( \freq, \freq.asSpec.asRangeSpec.default_( [20,1000] ) )
