@@ -70,7 +70,7 @@ ArgSpec : Spec {
 	label { ^label ? name }
 		
 	constrain { |value|
-		^this.doWithSpec( \constrain, value );
+		^this.doWithSpec( \uconstrain, value );
 	}
 	
 	asSynthArg { |value|

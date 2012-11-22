@@ -571,6 +571,8 @@ RangeSpec : ControlSpec {
 		^array.round(step); // step may mess up the min/maxrange
 	}
 	
+	uconstrain { |val| ^this.constrain( val ) }
+	
 	map { arg value;
 		// maps a value from [0..1] to spec range
 		^this.constrain( warp.map(value) );
@@ -926,6 +928,8 @@ FreqSpec : ControlSpec {
 	}
 	
 	*newFromObject { ^this.new }
+	
+	uconstrain { |...args| ^this.constrain( *args ) }
 }
 
 
@@ -935,6 +939,14 @@ FreqSpec : ControlSpec {
 	asArrayControlSpec { ^ArrayControlSpec.newFrom( this ) }
 	
 	*testObject { |obj| ^obj.isNumber }
+	
+	uconstrain { |val|
+		if( val.size == 0 ) { 
+			^this.constrain( val );
+		} {
+			^this.constrain( val.mean );
+		};
+	}
 	
 	*newFromObject { |obj| // float or int
 		var range;
