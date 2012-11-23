@@ -1,7 +1,11 @@
 /*
 \freeverb
 
-a simple reverb
+a simple reverb.
+
+mix: wet/dry mix (0-1)
+room: room size (0-1)
+damp: damp (0-1) (0 means no damping)
 */
 
 Udef( \freeverb, { |mix = 0.33, room = 0.5, damp = 0.5|

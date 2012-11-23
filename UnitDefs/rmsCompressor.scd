@@ -1,7 +1,7 @@
 Udef( \rmsCompressor, { |thresh = (-20), ratio = 1, knee = 6, att = 0, rel= 0.5, makeUp = 0|
 	var in;
 	in = UIn.ar(0,1);
-	in = SoftKneeCompressor.ar( in, in, thresh, ratio, knee, att, rel, makeUp, 1 );
+	in = SoftKneeCompressor.ar( in, in, thresh, ratio, knee, att, rel, makeUp, 40 );
 	UOut.ar( 0, in );
 })
 	.category_( \dynamics )
