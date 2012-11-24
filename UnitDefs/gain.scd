@@ -1,0 +1,25 @@
+/*
+\gain
+
+A simple gain stage. Can set a gain in dB and inverse phase.
+
+gain: added gain (dB)
+inverse: inverse phase (false/true) 
+lag: smoothing time for all parameters
+numChannels: number of channels
+
+--
+this is an Udef definition file
+part of the Unit lib default Udefs set
+*/
+
+MultiChannelUdef( \gain, { |gain = 0, inverse = 0, lag = 0|
+	var in;
+	in = UIn.ar(0, Udef.numChannels );
+	in = in * gain.lag(lag).dbamp * inverse.linlin(0,1,1,-1);
+	UMixOut.ar( 0, in );
+})
+	.category_( \dynamics )
+	.setSpec( \gain, [-96,24,\lin,0,0].asSpec )
+	.setSpec( \inverse, BoolSpec(false) )
+	.setSpec( \lag, [0,1,\lin].asSpec );
