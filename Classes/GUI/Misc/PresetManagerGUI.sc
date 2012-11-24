@@ -53,7 +53,9 @@ PresetManagerGUI {
 			match = presetManager.match( object );
 			match = match ?  presetManager.lastChosen;
 			if( match.notNil ) {
-				views[ \presets ].value = views[ \presets ].items.indexOf( match );
+				views[ \presets ].items.indexOf( match ) !? { |value|
+					views[ \presets ].value = value
+				}; 
 			};
 		}.defer;
 	}

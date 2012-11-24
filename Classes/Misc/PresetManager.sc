@@ -145,30 +145,34 @@ PresetManager {
 	
 	write { |path, overwrite=false, ask=true, successAction, cancelAction|
 	    var writeFunc;
-	    writeFunc = { |overwrite, ask, path|
+	    writeFunc = { |overwrite, ask, path, forceExtension = true|
 		    var text, extension;
 		    
 		    text = this.presets.cs;
 		    
-		    extension = id !? { [ id, fileExtension ].join(".") } ? fileExtension;
-		    
-		    if( path.find( extension ).isNil ) {
-			    path = path.replaceExtension( extension );
-		    };
+		    if( forceExtension ) {	
+			    extension = id !? { [ id, fileExtension ].join(".") } ? fileExtension;
+			    
+			    if( path.find( extension ).isNil ) {
+				    path = path.replaceExtension( extension );
+			    };
+			};
 		    
 		    File.checkDo( path, { |f|
 				f.write( text );
 				successAction.value(path);
 			}, overwrite, ask);
 	    };
-	    
-	    path = path ? filePath;
 
 	    if( path.isNil ) {
-		    Dialog.savePanel( { |pth|
-			    path = pth;
-			    writeFunc.value(true,false,path);
-		    }, cancelAction );
+		    if( filePath.notNil ) {
+			     writeFunc.value(overwrite,ask,filePath,false);
+		    } {
+			    Dialog.savePanel( { |pth|
+				    path = pth;
+				    writeFunc.value(true,false,path);
+			    }, cancelAction );
+		    };
 	    } {
 		    writeFunc.value(overwrite,ask,path);
 	    };
