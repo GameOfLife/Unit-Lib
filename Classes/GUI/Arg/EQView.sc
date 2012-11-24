@@ -528,20 +528,11 @@ EQView {
 		
 		editCtrl = SimpleController( editView )
 			.put( \selected, { plotView.selected = editView.selected } );
-			
-		presetManager = PresetManager(
-			eqSetting,
-			presets ?? {
-				[ \default, eqSetting.defaultSetting ]
-			}, 
-			{ |obj| obj.setting.deepCopy }, 
-			{ |obj, setting| obj.setting = setting }
-		);
-		
 		
 		presetView = PresetManagerGUI( view, 
 			bounds.copy.height_( bounds.height * ( 1 / this.class.viewNumLines) ),
-			presetManager 
+			eqSetting.getEQdef.presetManager,
+			eqSetting
 		);
 		
 		presetView.resize_(8);

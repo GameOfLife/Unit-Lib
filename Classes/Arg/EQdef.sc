@@ -19,18 +19,19 @@
 
 EQdef {
 	
-	classvar <>global;
-	classvar <>dict;
+	classvar <>default;
+	classvar <>all;
 	classvar <>specDict;
 	
 	var <>names, <>classes, <>argNames, <>defaultSetting, <>specs;
 	var <>presets;
+	var <>presetManager;
 	
 	*initClass {
 		
 		Class.initClassTree(ControlSpec);
 		
-		dict = IdentityDictionary[];
+		all = IdentityDictionary[];
 		
 		specDict = (
 			\freq: [ 20, 20000, \exp, 0, 440 ].asSpec,
@@ -48,7 +49,7 @@ EQdef {
 			\order: [0,5,\lin,1,2].asSpec
 		);
 		
-		global = EQdef( 
+		default = EQdef( 
 			'lowShelf', BLowShelf, 
 			'peak1', BPeakEQ,
 			'peak2', BPeakEQ,
@@ -66,7 +67,27 @@ EQdef {
 			]
 		);
 		
-		dict[ \default ] = global;
+		default.presetManager.presets = [ 	
+			'flat', [ 
+				[ 100.0, 1.0, 0.0 ], [ 250.0, 1.0, 0.0 ], [ 1000.0, 1.0, 0.0 ], 
+				[ 3500.0, 1.0, 0.0 ], [ 6000.0, 1.0, 0.0 ], [ 0.0 ] 
+			], 
+			'low boost', [ 
+				[ 100.0, 1.0, 6.0 ], [ 250.0, 1.0, 0.0 ], [ 1000.0, 1.0, 0.0 ],
+				[ 3500.0, 1.0, 0.0 ], [ 6000.0, 1.0, 0.0 ], [ 0.0 ] 
+			],
+			'loudness', [ 
+				[ 100.0, 1.0, 6.0 ], [ 250.0, 1.0, 0.0 ], [ 1000.0, 1.0, 0.0 ], 
+				[ 3500.0, 1.0, 3.0 ], [ 6000.0, 1.0, 6.0 ], [ 0.0 ] 
+			], 
+			'telephone', [ 
+				[ 200.0, 1.0, -24.0 ], [ 250.0, 1.0, 0.0 ], [ 1500.0, 1.0, 6.0 ], 
+				[ 3500.0, 1.0, 0.0 ], [ 3500.0, 1.0, -24.0 ], [ 0.0 ] 
+			]
+		];
+		
+		all[ \default ] = default;
+		
 	}
 	
 	*new { |...bandPairs|
@@ -78,21 +99,21 @@ EQdef {
 	}
 	
 	addToDefs { |key = \new|
-		dict[ key ] = this;
+		all[ key ] = this;
 	}
 	
 	*fromKey { |key|
-		^dict[ key ]	
+		^all[ key ]	
 	}
 	
 	*fromName { |name|
-		^dict[ name.asSymbol ];
+		^all[ name.asSymbol ];
 	}
 	
-	name { ^dict.findKeyForValue( this ); }
+	name { ^all.findKeyForValue( this ); }
 	name_ { |name|
-		dict.removeAt( this.name );
-		dict[ name.asSymbol ] = this;
+		all.removeAt( this.name );
+		all[ name.asSymbol ] = this;
 	}
 	
 	init { |bandPairs|
@@ -131,6 +152,12 @@ EQdef {
 				specDict[ name ];
 			});
 		});
+		
+		presetManager = PresetManager( this, [ \default, { this.defaultSetting } ] )
+			.getFunc_({ |obj| obj.setting.deepCopy })
+			.applyFunc_({ |object, preset|
+			 	object.setting = preset;
+		 	});
 		
 	}
 	
@@ -239,6 +266,10 @@ EQSetting {
 		^this.newCopyArgs( def, setting ).init;
 	}
 	
+	fromPreset { |name|
+		this.getEQdef.presetManager.apply( name, this );
+	}
+	
 	getEQdef {
 		var eqdef;
 		
@@ -247,7 +278,7 @@ EQSetting {
 			def = def.name;
 			if( def.isNil ) { def = eqdef };
 		} {
-			eqdef = EQdef.dict[ def ];
+			eqdef = EQdef.all[ def ];
 			if( eqdef.isNil ) { eqdef = EQdef.fromKey( \default ) };
 		};
 		
