@@ -7,6 +7,7 @@ http://en.wikipedia.org/wiki/Sawtooth_wave
 freq: frequency (Hz)
 width: relative width (0-1) of the pulse. 0.5 means a square wave.
 amp: amplitude (0-1)
+lag: smoothing time for all parameters
 
 --
 this is an Udef definition file

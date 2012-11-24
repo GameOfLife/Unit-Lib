@@ -6,6 +6,7 @@ http://en.wikipedia.org/wiki/Sawtooth_wave
 
 freq: frequency (Hz)
 amp: amplitude (0-1)
+lag: smoothing time for all parameters
 
 --
 this is an Udef definition file

@@ -10,8 +10,7 @@ ampdist: Choice of probability distribution for the next perturbation of the amp
 	3: HYPERBCOS.
 	4: ARCSINE.
 	5: EXPON.
-	6: SINUS.
-Where the sinus (Xenakis' name) is in this implementation taken as sampling from a third party oscillator. See example below.
+The "SINUS" distribution, which needs time-varying input adparam and ddparam, is left out as it would not work in this udef.
 
 durdist: Choice of distribution for the perturbation of the current inter control point duration.
 adparam: A parameter for the shape of the amplitude probability distribution
@@ -49,8 +48,8 @@ Udef( \gendy, { |ampdist = 1, durdist = 1, adparam = 1, ddparam = 1, freq = #[29
 		
 	UMixOut.ar( 0, sig, 0, true ) 
 } ).category_( \synthesis )
-	.setSpec( \ampdist, ListSpec( (..6), 1, #[ linear, cauchy, logistic, hyperCosine, arcSine, exponential, sinus ] ) )
-	.setSpec( \durdist, ListSpec( (..6), 1, #[ linear, cauchy, logistic, hyperCosine, arcSine, exponential, sinus ] ) )
+	.setSpec( \ampdist, ListSpec( (..5), 1, [ \LINEAR, \CAUCHY, \LOGIST, \HYPERBCOS, \ARCSINE, \EXPON ] ) )
+	.setSpec( \durdist, ListSpec( (..5), 1, [ \LINEAR, \CAUCHY, \LOGIST, \HYPERBCOS, \ARCSINE, \EXPON ] ) )
 	.setSpec( \adparam, [0.0001, 1, \exp].asSpec )
 	.setSpec( \ddparam, [0.0001, 1, \exp].asSpec )
 	.setSpec( \freq, \freq.asSpec.asRangeSpec.default_( [20,1000] ) )

@@ -7,6 +7,7 @@ freq: frequency (Hz)
 fromant: frequency of the formant (Hz)
 bw: bandwidth of the formant as multiplier of the freq
 amp: amplitude (0-1)
+lag: smoothing time for all parameters
 
 --
 this is an Udef definition file
