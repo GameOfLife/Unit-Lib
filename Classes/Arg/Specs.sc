@@ -389,45 +389,6 @@ PolarSpec : Spec {
 	}
 }
 
-UnitSphericalSpec : Spec {
-
-	var <step, <>default, <>units;
-
-	*new { |step, default, units|
-		^super.newCopyArgs( step ? UnitSpherical(0,0), default ? UnitSpherical(0,0), units ? "" );
-	}
-
-	*testObject { |obj|
-		^obj.class == UnitSpherical;
-	}
-
-	step_ { |inStep| step = inStep.asUnitSpherical }
-
-	roundToStep { |value|
-		value = value.asUnitSpherical;
-		value.theta = value.theta.round( step.theta );
-		value.phi = value.phi.round( step.phi );
-		^value;
-	}
-
-	constrain { |value|
-		^this.roundToStep( value );
-	}
-
-	map { |value|
-		^this.constrain( value );
-	}
-
-	unmap { |value|
-		^this.constrain( value );
-	}
-
-	storeArgs {
-	    ^[step, default, units]
-	}
-
-}
-
 RectSpec : Spec {
 	
 	var <rect, >default, <>units; // constrains inside rect
