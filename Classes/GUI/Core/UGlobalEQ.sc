@@ -39,6 +39,7 @@ UGlobalEQ {
 	
 	*initClass {
 		Class.initClassTree(EQSetting);
+		Class.initClassTree(Spec);
 		
 		this.eqSetting = EQSetting(); // the default eq setting (may change later)
 		

@@ -29,7 +29,7 @@ EQdef {
 	
 	*initClass {
 		
-		Class.initClassTree(ControlSpec);
+		Class.initClassTree(Spec);
 		
 		all = IdentityDictionary[];
 		

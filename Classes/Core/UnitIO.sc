@@ -59,7 +59,7 @@ UOut -> *ar { |id, channelsArray|
 UIn {
 	
 	*initClass {
-		Class.initClassTree(ControlSpec);
+		Class.initClassTree(Spec);
 		ControlSpec.specs = ControlSpec.specs.addAll([
 			'u_*_*r_*_bus' -> PositiveIntegerSpec(),	
 		]);
@@ -128,7 +128,7 @@ UOut : UIn { // overwrites bus (ReplaceOut)
 UMixOut : UIn {
 	
 	*initClass {
-		Class.initClassTree(ControlSpec);
+		Class.initClassTree(Spec);
 		ControlSpec.specs = ControlSpec.specs.addAll([
 			'u_o_*r_*_lvl' -> \amp.asSpec,	
 		]);

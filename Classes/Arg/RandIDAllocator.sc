@@ -46,6 +46,7 @@ RandIDAllocatorSpec : Spec {
 URandSeed {
 	
 	*initClass {
+		Class.initClassTree(Spec);
 		ControlSpec.specs = ControlSpec.specs.addAll([
 			\u_randID -> RandIDAllocatorSpec
 		]);
