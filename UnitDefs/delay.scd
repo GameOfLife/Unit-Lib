@@ -2,7 +2,7 @@
 \delay
 
 time: the length of the delay.
-maxTime: the maximum length you will use for your delay. This is necessary because the delay will have to allocate a buffer. maxTime is an ‘init’ parameter (recognized by the “(i)” in the UChain editor), which means changed values only become effective when the event is started the next time.
+maxTime: the maximum length you will use for your delay. This is necessary because the delay will have to allocate a buffer. maxTime is an 'init' parameter (recognized by the "(i)" in the UChain editor), which means changed values only become effective when the event is started the next time.
 dry: level of the dry signal.
 amp: level of the delayed signal.
 lag: smoothing time for the changing of parameter settings.
