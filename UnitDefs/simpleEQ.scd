@@ -1,3 +1,16 @@
+/*
+\simpleEQ
+
+This is a filter with a lowshelf filter, 1 parametric filter and a hihgshelf filter.
+
+Clicking the [edit] button in UChainGUI opens the EQ Edit window. You can set the filter by dragging in the window, setting the values in combination with the popup menu or choosing from the presets. 
+
+lowMidHi: an UEQ object, holding all settings for the eq.
+
+--
+this is an Udef definition file
+part of the Unit lib default Udefs set
+*/
 
 EQdef( \low, BLowShelf, \mid, BPeakEQ, \hi, BHiShelf )
 	.defaultSetting_([ 

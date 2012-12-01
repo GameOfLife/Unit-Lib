@@ -1,3 +1,13 @@
+/*
+\tremolo
+
+speed: number of tremolo's per second.amount: sets the minimum and maximum of the tremolo effect.smooth: smoothen the modulator signal; 0 means square wave, 1 means sine wave, and everything in between.
+
+--
+this is an Udef definition file
+part of the Unit lib default Udefs set
+*/
+
 Udef( \tremolo, { |speed = 1, amount = #[0.0,1.0], smooth = 1|
 	UOut.ar( 0, SinOsc.kr( speed ).pow(smooth).range(*amount) * UIn.ar( 0 ) )
 } )

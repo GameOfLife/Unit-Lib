@@ -1,3 +1,15 @@
+/*
+\pitchShift
+
+A time domain granular pitch shifter. Grains have a triangular amplitude envelope and an overlap of 4:1.
+
+semitones: the number of semitones to shift the pitch with.pitchDisp: the maximum random deviation of the pitch.timeDisp: a random offset from 0 to the number of seconds set with timeDisp that is added to the delay of the grain.
+
+--
+this is an Udef definition file
+part of the Unit lib default Udefs set
+*/
+
 Udef( \pitchShift, { |semitones = 0, pitchDisp = 0.0, timeDisp = 0.0|
 	var sig;
 	URandSeed.ir(12345);
