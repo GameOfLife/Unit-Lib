@@ -514,10 +514,13 @@ UChain : UEvent {
 	free { this.groups.do(_.free) }
 	stop { this.stopPrepareTasks; this.free; }
 	
-	release { |time|
+	release { |time, keepFadeOutIfInf = true|
 		var releaseUnits;
 		releaseUnits = units.select({ |unit| unit.def.canFreeSynth });
 		if( releaseUnits.size > 0 ) {
+			if( keepFadeOutIfInf && { this.duration == inf } ) {
+				time = nil;
+			};
 			releaseUnits.do( _.release( time, 14 ) );
 		} {
 			this.stop; // stop if no releaseable synths
