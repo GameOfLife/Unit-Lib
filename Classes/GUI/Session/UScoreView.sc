@@ -90,8 +90,9 @@ UScoreView {
             var s = SimpleController(e);
             [\startTime,\dur,\fadeIn,\fadeOut,\name,\track,\displayColor,\start,\end].do{ |key|
                 s.put(key,{ { 
-	                this.update;
-	                this.currentScore.changed( \something );
+	                if( this.currentScore.updatePos ) {
+		                this.currentScore.changed( \something );
+	                };
 	            }.defer; })
             };
             s
