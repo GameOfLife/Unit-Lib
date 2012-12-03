@@ -544,7 +544,13 @@ U : ObjectWithArgs {
 			[ item[0], switch( item[0], 
 				\u_startPos, { startPos },
 				\u_dur, { item[1] - startPos },
-				\u_fadeIn, { (item[1] - startPos).max(0) },
+				\u_fadeIn, { 
+					if( startPos > 0 ) {
+						(item[1] - startPos).max(0.025) 
+					} { 
+						item[1]
+					};
+				},
 				{ item[1].asControlInputFor( server, startPos ) }
 			) ];
 		}).flatten(1);
