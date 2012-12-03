@@ -561,7 +561,7 @@ UScore : UEvent {
 
     //stop synths
 	stopChains { |releaseTime|
-		events.do(_.release(releaseTime ? 0.1));
+		events.do(_.release(releaseTime ? 0.025));
 	}
 
 	//stop everything
