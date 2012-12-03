@@ -517,15 +517,17 @@ U : ObjectWithArgs {
 	}
 	
 	release { |releaseTime, doneAction| // only works if def.canFreeSynth == true
-		if(releaseTime.isNil, {
-			releaseTime = 0.0;
-		},{
-			releaseTime = -1.0 - releaseTime;
-		});
-		this.prSet( 
+		var args;
+		args = [ 
 			\u_doneAction, doneAction ?? { this.get( \u_doneAction ) }, 
-			\u_gate, releaseTime 
-		);
+			\u_gate, 0 
+		];
+		
+		if( releaseTime.notNil ) {
+			args = [ \u_fadeOut, releaseTime ] ++ args;
+		};
+ 
+		this.prSet( *args );
 	}
 	
 	getArgsFor { |server, startPos = 0|
