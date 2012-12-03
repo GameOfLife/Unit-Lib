@@ -213,7 +213,7 @@ UScore : UEvent {
 
     //mimic a UChain
     eventSustain{ ^inf }
-    release{ ^this.stop }
+    release{ |time| ^this.stop( time ) }
     canFreeSynth{ ^events.collect(_.canFreeSynth).reduce('||') }
 
     cutStart{}
@@ -568,15 +568,13 @@ UScore : UEvent {
 	stop{ |releaseTime, changed = true|
 	    if([\playing,\paused].includes(playState) ) {
             //no nil allowed
-            releaseTime = releaseTime ? 0.1;
             pos = this.pos;
             startedAt = nil;
             this.stopScore;
             this.stopChains(releaseTime);
-            events.select(_.isFolder).do(_.stop);
-            //events.do{ _.disposeIfNotPlaying };
-             events.select({ |evt| evt.isFolder.not && { evt.preparedServers.size > 0 } })
-            	.do(_.dispose);
+            events.select({ |evt| evt.isFolder.not && { (evt.preparedServers.size > 0) &&
+	            	{ evt.isPlaying.not } } })
+	          .do(_.dispose);
             this.playState_(\stopped,changed);
             this.changed(\pos,this.pos);
             CmdPeriod.remove( this );
