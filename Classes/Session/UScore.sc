@@ -333,16 +333,27 @@ UScore : UEvent {
         var evs, prepareEvents, startEvents, releaseEvents, startAndReleaseEvents, allEvents, doPrepare, fStartAndRelease, fActualStartPos;
 
         fStartAndRelease = { |item| item.releaseSelf.not && (item.eventEndTime == item.startTime) };
-        fActualStartPos = { |x| if(startEventsActiveAtStartPos) {x.startTime.max(startPos)}{ x.startTime } };
+        if( startEventsActiveAtStartPos ) {
+	        fActualStartPos = { |x| x.startTime.max(startPos) };
+        } {
+	        fActualStartPos = { |x| x.startTime };
+        };
 
         evs = this.eventsThatWillPlay(startPos,startEventsActiveAtStartPos);
         evs.do(_.score_(this));
 		prepareEvents = if(assumePrepared){evs.select({ |item| item.prepareTime > startPos })}{evs};
-		startEvents = evs.select({ |item| fStartAndRelease.(item).not });
+		startEvents = Array( evs.size );
+		startAndReleaseEvents = Array( evs.size );
+		evs.do({ |item|
+			if( fStartAndRelease.( item ) ) {
+				startAndReleaseEvents.add( item );
+			} {
+				startEvents.add( item );
+			};
+		});
 		releaseEvents = events
 			.select({ |item| (item.releaseSelf != true) && { (item.duration < inf) && { item.eventEndTime >= startPos }
 			&& item.isFolder.not && (item.eventEndTime != item.startTime) } });
-		startAndReleaseEvents = events.select(fStartAndRelease);
 
         // returns collection of [duration, type, event]
         // where type can be:
