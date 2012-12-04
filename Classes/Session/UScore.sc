@@ -333,7 +333,7 @@ UScore : UEvent {
 	}
 
     arrayForPlayTask{ |startPos=0, assumePrepared = false, startEventsActiveAtStartPos = true, loop = false|
-        var evs, prepareEvents, startEvents, releaseEvents, startAndReleaseEvents, allEvents, doPrepare, fStartAndRelease, fActualStartPos;
+        var evs, prepareEvents, startEvents, releaseEvents, allEvents, doPrepare, fStartAndRelease, fActualStartPos;
 
         fStartAndRelease = { |item| item.releaseSelf.not && (item.eventEndTime == item.startTime) };
         if( startEventsActiveAtStartPos ) {
@@ -343,28 +343,28 @@ UScore : UEvent {
         };
 
         evs = this.eventsThatWillPlay(startPos,startEventsActiveAtStartPos);
-        evs.do(_.score_(this));
 		prepareEvents = if(assumePrepared){evs.select({ |item| item.prepareTime > startPos })}{evs};
-		startEvents = Array( evs.size );
-		startAndReleaseEvents = Array( evs.size );
-		evs.do({ |item|
-			if( fStartAndRelease.( item ) ) {
-				startAndReleaseEvents.add( item );
-			} {
-				startEvents.add( item );
+		startEvents = evs.collect({ |item|
+			item.score = this;
+			[ fActualStartPos.(item), if( fStartAndRelease.( item ) ) { 3 } { 1 }, item ];
+		});
+		releaseEvents = Array( events.size );
+		events.do({ |item|
+			var endTime;
+			if( (item.releaseSelf != true) && { item.duration < inf } ) {
+				endTime = item.eventEndTime;
+				if( (endTime >= startPos) && { endTime != item.startTime } ) {
+					releaseEvents.add( [endTime, 2, item] );
+				};
 			};
 		});
-		releaseEvents = events
-			.select({ |item| (item.releaseSelf != true) && { (item.duration < inf) && { item.eventEndTime >= startPos }
-			&& item.isFolder.not && (item.eventEndTime != item.startTime) } });
 
         // returns collection of [duration, type, event]
         // where type can be:
         // 0 - prepare, 1 -start, 2 - release, 3 - start and release
 		allEvents = prepareEvents.collect{ |x| [x.prepareTime, 0, x]}
-         ++ startEvents.collect{ |x| [ fActualStartPos.(x), 1, x]}
-         ++ releaseEvents.collect{ |x| [x.eventEndTime, 2, x]}
-         ++ startAndReleaseEvents.collect{ |x| [ fActualStartPos.(x), 3, x]};
+         ++ startEvents
+         ++ releaseEvents; //.collect{ |x| [x.eventEndTime, 2, x]};
 
         if( loop ) {
             allEvents = allEvents ++
