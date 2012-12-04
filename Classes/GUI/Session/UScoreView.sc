@@ -33,6 +33,8 @@ UScoreView {
      var <scoreView, <scoreListView, <mainComposite, font, <parent, <bounds;
      var <>scoreList;
      var <currentScoreEditorController, <scoreController, <eventControllers = #[];
+     
+     var <updateTask, calledUpdate = false, <>updateInterval = 0.1;
 
      *new{ |parent, bounds, scoreEditor| ^super.new.init(scoreEditor, parent,bounds) }
 
@@ -104,7 +106,20 @@ UScoreView {
     }
 
 	update {
-	    scoreView.refresh;
+		if( updateInterval > 0 ) {
+			calledUpdate = true;
+			if( updateTask.isNil or: { updateTask.isPlaying.not } ) {
+				 updateTask = Task({
+				    while { calledUpdate } {
+					   scoreView.refresh;
+					   calledUpdate = false;
+					   updateInterval.wait;
+				    };
+			    }, AppClock).start;
+			};
+		} {
+			scoreView.refresh;
+		};
 	}
 
     currentEditor{
@@ -556,5 +571,5 @@ UScoreView {
 		})
      }
 
-     refresh{ scoreView.refresh; scoreView.refresh }
+     refresh{ scoreView.refresh; }
 }
