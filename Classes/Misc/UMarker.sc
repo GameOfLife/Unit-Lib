@@ -99,6 +99,9 @@ UMarker : UEvent {
 	stop { }
 	release { }
 	
+	releaseSelf { ^true }
+	releaseSelf_ { "%:releaseSelf - can't use releaseSelf\n".postf( this.class ) }
+	
 	duration { ^0 }
 	duration_{ }
      dur_ { }

@@ -93,6 +93,9 @@ UScore : UEvent {
 		loop = bool;
 		this.changed(\loop);
 	}
+	
+	releaseSelf { ^true }
+	releaseSelf_ { "%:releaseSelf - can't use releaseSelf\n".postf( this.class ) }
 
 	isPlaying{ ^playState == \playing }
 	isPaused{ ^playState == \paused }
