@@ -493,7 +493,7 @@ UScoreView {
 						if( this.selectedEvents.size > 0 ) {
 							this.moveSelected( snapH.neg );
 						} {
-							score.pos = score.pos - snapH;
+							score.pos = (score.pos - snapH).max(0);
 						};
 					},
 					63235, { // right
