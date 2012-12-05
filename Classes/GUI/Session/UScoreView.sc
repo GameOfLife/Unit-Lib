@@ -490,10 +490,18 @@ UScoreView {
 						this.changeTrackSelected( 1 );
 					},
 					63234, { // left
-						this.moveSelected( snapH.neg );
+						if( this.selectedEvents.size > 0 ) {
+							this.moveSelected( snapH.neg );
+						} {
+							score.pos = score.pos - snapH;
+						};
 					},
 					63235, { // right
-						this.moveSelected( snapH );
+						if( this.selectedEvents.size > 0 ) {
+							this.moveSelected( snapH );
+						} {
+							score.pos = score.pos + snapH;
+						};
 					},
 					{ 
 						if( c.asInt.inclusivelyBetween( 49, 57 ) ) {
