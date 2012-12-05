@@ -159,7 +159,7 @@ UScoreEditorGui_TransportBar {
 			        if(this.score.isPlaying) {
 			            this.score.pause;
 			       } {
-			            this.score.prepare;
+			            this.score.prepare( ULib.servers, this.score.pos );
 			       }
 			    }{1} {
 			        this.score.resume(ULib.servers);
