@@ -430,8 +430,12 @@ UScoreView {
 				switch( c.asInt,
 					127, { this.deleteSelected }, // backspace
 					32, { // space bar
-						if(score.isStopped) {
+						case { score.isStopped } {
 							score.prepareAndStart( ULib.servers, score.pos, true, score.loop);
+						} { score.isPaused } {
+							score.resume( ULib.servers );
+						} { score.isPrepared } {
+							score.start( ULib.servers, score.pos, true);
 						} {
 							score.stop;
 						};
@@ -442,8 +446,42 @@ UScoreView {
 					105, { // i
 						this.editSelected;
 					},
+					108, { // l
+						score.loop = score.loop.not;
+					},
+					112, { // p
+						case { score.isPlaying } {
+			            		score.pause;
+			       		} { score.isPaused } {
+				       		score.resume( ULib.servers );
+			       		} { score.isPrepared } {
+			       			score.stop;
+			       		} {
+			            		score.prepare( ULib.servers, score.pos );
+			       		};
+					},
+					45, { // -
+						score.toPrevMarker;
+					},
+					43, { // +
+						score.toNextMarker;
+					},
+					46, { // .
+						// always stop
+						score.stop;
+					},
+					44, { // , 
+						// always play
+						case { score.isPaused } {
+			            		score.resume( ULib.servers );
+			       		} { score.isPrepared } { 
+				       		score.start( ULib.servers, score.pos, true);
+				       	} { score.isStopped } {
+			       			score.prepareAndStart( ULib.servers, score.pos, true, score.loop);
+			       		};
+					},
 					48, { // 0
-						score.pos = 0;
+						score.jumpTo( 0 );
 					},
 					63232, { // up
 						this.changeTrackSelected( -1 );
@@ -456,6 +494,12 @@ UScoreView {
 					},
 					63235, { // right
 						this.moveSelected( snapH );
+					},
+					{ 
+						if( c.asInt.inclusivelyBetween( 49, 57 ) ) {
+							score.jumpTo( score.markerPositions[ a.asString.interpret - 1 ] 
+								? score.finiteDuration );
+						};
 					}
 				);
 			})
