@@ -291,8 +291,11 @@ UChainEventView : UEventView {
 		var lineAlpha =  if( event.disabled ) { 0.5  } { 0.875  };
 		var scaledRect, innerRect;
 		var px5sq;
+		var pixelScale;
+		
+		pixelScale = scaledUserView.pixelScale;
 
-		this.createRect(scaledUserView.pixelScale.x * 10, maxWidth);
+		this.createRect( pixelScale.x * 10, maxWidth);
 		
 		scaledRect = scaledUserView.translateScale(rect);
 		
@@ -343,8 +346,8 @@ UChainEventView : UEventView {
 		            
 		            Pen.color = Color.gray(0.75, 0.75);
 		            
-		            fadeinScaled = innerRect.leftBottom + scaledUserView.doScale(Point(fades[0],0));
-		            fadeoutScaled = innerRect.rightBottom - scaledUserView.doScale(Point(fades[1],0));
+		            fadeinScaled = (innerRect.left + (fades[0] / pixelScale.x ))@0;
+		            fadeoutScaled = (innerRect.right - (fades[1] / pixelScale.x))@0;
 		            
 		            heightPoint = Point(0,innerRect.height);
 		            	            

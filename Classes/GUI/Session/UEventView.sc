@@ -46,8 +46,8 @@ UEventView {
 	}
 
 	createRect { |minWidth, maxWidth|
-	    var dur = event.dur;
-	    dur = if( dur == inf){maxWidth-event.startTime}{event.dur};
+	    var dur = event.duration;
+	    if( dur == inf) { dur = maxWidth-event.startTime };
 		rect = Rect( event.startTime, event.track, dur.max(minWidth ? 0), 1 );
 	}
 
