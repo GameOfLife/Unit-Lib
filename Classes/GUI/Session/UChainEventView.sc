@@ -321,7 +321,6 @@ UChainEventView : UEventView {
 	
 	        Pen.use({
 	            var fadeinScaled, fadeoutScaled, fades;
-	            var heightPoint;
 	
 	            this.drawShape(innerRect);
 	            Pen.clip;
@@ -346,20 +345,18 @@ UChainEventView : UEventView {
 		            
 		            Pen.color = Color.gray(0.75, 0.75);
 		            
-		            fadeinScaled = (innerRect.left + (fades[0] / pixelScale.x ))@0;
-		            fadeoutScaled = (innerRect.right - (fades[1] / pixelScale.x))@0;
+		            fadeinScaled = innerRect.left + (fades[0] / pixelScale.x);
+		            fadeoutScaled = innerRect.right - (fades[1] / pixelScale.x);
 		            
-		            heightPoint = Point(0,innerRect.height);
-		            	            
 		            // fade in
 		            Pen.moveTo(innerRect.leftBottom);
-		            Pen.lineTo(fadeinScaled - heightPoint);
+		            Pen.lineTo(fadeinScaled @ (innerRect.top) );
 		            Pen.lineTo(innerRect.leftTop);
 		            Pen.lineTo(innerRect.leftBottom);
 		           
 		            // fade out
 		            Pen.lineTo(innerRect.rightBottom);
-		            Pen.lineTo(fadeoutScaled - heightPoint);
+		            Pen.lineTo(fadeoutScaled @ (innerRect.top));
 		            Pen.lineTo(innerRect.rightTop);
 		            Pen.lineTo(innerRect.rightBottom);
 		
@@ -368,10 +365,10 @@ UChainEventView : UEventView {
 		            //fade lines
 		            Pen.width = 1;
 		            Pen.color = Color.grey(0.3, 0.5);
-		            Pen.moveTo(fadeoutScaled - heightPoint);
-		            Pen.lineTo(fadeoutScaled);
-		            Pen.moveTo(fadeinScaled - heightPoint);
-		            Pen.lineTo(fadeinScaled);
+		            Pen.moveTo(fadeoutScaled @ (innerRect.top));
+		            Pen.lineTo(fadeoutScaled @ (innerRect.bottom));
+		            Pen.moveTo(fadeinScaled @ (innerRect.top));
+		            Pen.lineTo(fadeinScaled @ (innerRect.bottom));
 		            
 		            Pen.stroke;	 
 		                       
