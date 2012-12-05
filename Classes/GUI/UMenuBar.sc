@@ -195,6 +195,14 @@ UMenuBar {
 		//sort
 		SCMenuSeparator.new(scoreMenu);
 		
+		SCMenuItem.new(scoreMenu, "Sort Events").action_({
+			UScoreEditorGUI.current !! { |x|
+				UScore.current.events.sort; 
+				UScore.current.changed( \numEventsChanged );
+				UScore.current.changed( \something ); 
+			};
+		});
+		
 		SCMenuItem.new(scoreMenu, "Overlapping events to new tracks").action_({
 			UScoreEditorGUI.current !! { |x| x.score.cleanOverlaps }
 		});

@@ -175,6 +175,13 @@ UMenuWindow {
 					'Clean overlaps', { 
 						UScoreEditorGUI.current !? { |x| x.score.cleanOverlaps }
 					},
+					'Sort Events', {
+						UScoreEditorGUI.current !! { |x|
+							UScore.current.events.sort; 
+							UScore.current.changed( \numEventsChanged );
+							UScore.current.changed( \something ); 
+						};
+					},
 					'Remove empty tracks', { 
 						UScoreEditorGUI.current !? { |x| x.score.removeEmptyTracks }
 					},
