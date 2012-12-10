@@ -92,6 +92,9 @@ UEvent : UArchivable {
 		};
 	}
 	
+	connect { }
+	disconnect { }
+	
     /*
     *   server: Server or Array[Server]
     */

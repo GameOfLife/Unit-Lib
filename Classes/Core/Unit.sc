@@ -396,6 +396,7 @@ U : ObjectWithArgs {
 	var <>preparedServers;
 	var >waitTime; // use only to override waittime from args
 	var <>env;
+	var <mod;
 	
 	*initClass {
 	    synthDict = IdentityDictionary( );
@@ -406,13 +407,13 @@ U : ObjectWithArgs {
 	    uneditableCategories = uneditableCategories !? ( _.add(category) ) ? [category]
 	}
 
-	*new { |def, args|
-		^super.new.init( def, args ? [] )
+	*new { |def, args, mod|
+		^super.new.init( def, args ? [], mod )
 	}
 	
 	*defClass { ^Udef }
 	
-	init { |in, inArgs|
+	init { |in, inArgs, inMod|
 	    var realDef;
 		if( in.isKindOf( this.class.defClass ) ) {
 			def = in;
@@ -438,6 +439,8 @@ U : ObjectWithArgs {
 		};
 		preparedServers = [];
 		env = (); // a place to store things in (for FreeUdef)
+		mod = inMod;
+		this.modPerform( \init );
 		this.changed( \init );
 	}
 	allKeys { ^this.keys }
@@ -452,11 +455,11 @@ U : ObjectWithArgs {
     }
 
     def_ { |newDef, keepArgs = true|
-        this.init( newDef, if( keepArgs ) { args } { [] }); // keep args
+        this.init( newDef, if( keepArgs ) { args } { [] }, mod); // keep args
     }
 
     defName_ { |newDefName, keepArgs = true|
-        this.init( newDefName, if( keepArgs ) { args } { [] }); // keep args
+        this.init( newDefName, if( keepArgs ) { args } { [] }, mod); // keep args
     }
     
     name {
@@ -515,6 +518,17 @@ U : ObjectWithArgs {
 		    this.get(key)
 		}
 	}
+	
+	mod_ { |newMod|
+		this.modPerform( \disconnect );
+		mod = newMod;
+		this.modPerform( \init );
+	}
+	
+	modPerform { |what ...args| mod !? _.perform( what, this, *args ); }
+	
+	connect { this.modPerform( \connect ); this.changed( \connect ); }
+	disconnect {  this.modPerform( \disconnect ); this.changed( \disconnect ); }
 	
 	release { |releaseTime, doneAction| // only works if def.canFreeSynth == true
 		var args;
@@ -679,6 +693,7 @@ U : ObjectWithArgs {
 				target.asTarget.server.sendSyncedBundle( latency, nil, *bundles[i] );
 			};
 		});
+		this.modPerform( \start, startPos, latency );
 		if( target.size == 0 ) {
 			^this.synths[0]
 		} { 
@@ -686,7 +701,10 @@ U : ObjectWithArgs {
 		};
 	}
 	
-	free { this.synths.do(_.free) } 
+	free { 
+		this.synths.do(_.free);  
+		this.modPerform( \stop );
+	} 
 	stop { this.free }
 	
 	resetSynths { this.synths = nil; } // after unexpected server quit
@@ -733,10 +751,14 @@ U : ObjectWithArgs {
 		} {
 		    this.def
 		};
-		if( initArgs.size > 0 ) {
-			^[ initDef, initArgs ];
+		if( mod.notNil ) {
+			^[ initDef, initArgs, mod ];
 		} {
-			^[ initDef ];
+			if( (initArgs.size > 0) ) {
+				^[ initDef, initArgs ];
+			} {
+				^[ initDef ];
+			};
 		};
 	}
 	
@@ -792,6 +814,7 @@ U : ObjectWithArgs {
 		} {
 			action.value;
 		};
+		this.modPerform( \prepare, startPos );
 	    ^target; // returns targets actually prepared for
     }
     
@@ -822,6 +845,7 @@ U : ObjectWithArgs {
 	            val.dispose
 	        }
 	    };
+	    this.modPerform( \dispose );
 	    preparedServers = [];
 	}
 	
@@ -835,6 +859,7 @@ U : ObjectWithArgs {
 	            val.disposeFor(server)
 	        }
 	    };
+	    this.modPerform( \dispose );
 	    preparedServers.remove( server );
 	}
 }

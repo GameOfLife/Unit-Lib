@@ -231,6 +231,9 @@ UScore : UEvent {
 	fromTrack { |track = 0| ^this.class.new( events.select({ |event| event.track == track }) ); }
 	
 	sort { events.sort; this.changed( \numEventsChanged ); this.changed( \sort ); }
+	
+	connect { events.do(_.connect) }
+	disconnect { events.do(_.disconnect) }
 
     //TRACK RELATED
 	findEmptyTrack { |startTime = 0, endTime = inf|

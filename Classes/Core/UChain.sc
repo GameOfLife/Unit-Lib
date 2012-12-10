@@ -414,6 +414,9 @@ UChain : UEvent {
 
 	isPlaying { ^units.any(_.isPlaying) }
 	
+	connect { units.do(_.connect) }
+	disconnect { units.do(_.disconnect) }
+	
 	/// creation
 	
 	groups { ^groupDict[ this ] ? [] }
@@ -489,6 +492,7 @@ UChain : UEvent {
                 target.asTarget.server.sendSyncedBundle( latency, nil, *bundles[i] );
             };
         });
+        units.do( _.modPerform(\start, startPos, latency) );
         if( target.size == 0 ) {
             ^this.groups[0]
         } {
