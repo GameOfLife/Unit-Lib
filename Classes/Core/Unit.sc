@@ -686,14 +686,14 @@ U : ObjectWithArgs {
 		var targets, bundles;
 		target = target ? preparedServers ? Server.default;
 		targets = target.asCollection;
-		bundles = this.makeBundle( targets );
 		latency = latency ? 0.2;
+		this.modPerform( \start, startPos, latency );
+		bundles = this.makeBundle( targets );
 		targets.do({ |target, i|
 			if( bundles[i].size > 0 ) {
 				target.asTarget.server.sendSyncedBundle( latency, nil, *bundles[i] );
 			};
 		});
-		this.modPerform( \start, startPos, latency );
 		if( target.size == 0 ) {
 			^this.synths[0]
 		} { 

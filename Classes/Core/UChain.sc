@@ -485,14 +485,14 @@ UChain : UEvent {
         preparedServers = nil;
         targets = target.asCollection;
          if( verbose ) { "% starting on %".format( this, targets ).postln; };
-        bundles = this.makeBundle( targets, startPos , withRelease );
         latency = latency ?? { Server.default.latency; };
+        units.do( _.modPerform(\start, startPos, latency) );
+        bundles = this.makeBundle( targets, startPos , withRelease );
         targets.do({ |target, i|
             if( bundles[i].size > 0 ) {
                 target.asTarget.server.sendSyncedBundle( latency, nil, *bundles[i] );
             };
         });
-        units.do( _.modPerform(\start, startPos, latency) );
         if( target.size == 0 ) {
             ^this.groups[0]
         } {
