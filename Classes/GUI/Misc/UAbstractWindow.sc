@@ -60,6 +60,8 @@ UAbstractWindow {
         view = window.view;
         view.background_( background ? Color.grey(0.6) );
         view.resize_(5);
+
+        window.onClose_({ this.removeFromAll });
     }
 
 
