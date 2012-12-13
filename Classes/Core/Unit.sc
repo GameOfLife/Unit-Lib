@@ -439,8 +439,7 @@ U : ObjectWithArgs {
 		};
 		preparedServers = [];
 		env = (); // a place to store things in (for FreeUdef)
-		mod = inMod.asUMod( this );
-		this.modPerform( \init );
+		mod = inMod.asUModFor( this );
 		this.changed( \init );
 	}
 	allKeys { ^this.keys }
@@ -521,8 +520,7 @@ U : ObjectWithArgs {
 	
 	mod_ { |newMod|
 		this.modPerform( \disconnect );
-		mod = newMod.asUMod( this );
-		this.modPerform( \init );
+		mod = newMod.asUModFor( this );
 	}
 	
 	modPerform { |what ...args| mod !? _.perform( what, this, *args ); }

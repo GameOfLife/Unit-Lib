@@ -7,7 +7,7 @@ UMod : ObjectWithArgs {
 		^super.new.initNew( key, def, args );
 	}
 	
-	asUMod { ^this }
+	asUModFor { |unit| ^this }
 	
 	initNew { |inKey, inDef, inArgs|
 		key = inKey;
@@ -119,7 +119,7 @@ UModDef : GenericDef {
 
 + Object {
 	asUModDef { ^this }
-	asUMod { ^this } // accept any object as umod (for now)
+	asUModFor { |unit| ^this } // accept any object as umod (for now)
 }
 
 + Function {
@@ -127,10 +127,10 @@ UModDef : GenericDef {
 }
 
 + Symbol { 
-	asUMod { |args| ^UMod( this, args ) }
+	asUModFor { |unit, key| ^UMod( key, this ) }
 	asUModDef { ^UModDef.fromName( this ); }
 }
 
 + Array {
-	asUMod { ^UMod( this[0], *this[1..] ) }
+	asUModFor { |unit| ^UMod( this[0], *this[1..] ) }
 }
