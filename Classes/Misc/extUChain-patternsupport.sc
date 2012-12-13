@@ -16,21 +16,38 @@
 		evt = ();
 		evt[ \play ] = {
 			var newChain;
-			newChain = this.deepCopy;
-			newChain.fromEnvironment;
-			newChain.prepareWaitAndStart; // beware of different wait times per event
+			if( ~isRest != true) {	
+				newChain = this.deepCopy;
+				newChain.fromEnvironment;
+				newChain.prepareWaitAndStart; // beware of different wait times per event
+			};
 		};
 		^evt;
 	}
 	
 	fromEnvironment { |env|
+		var itemsNoPoint = ();
 		env = env ? currentEnvironment ?? { () };
-		units.collect(_.keys).flatten(1).do({ |item|
-			if( currentEnvironment[ item ].notNil ) {
-				this.set( item, currentEnvironment[ item ].value );
+		
+		env.keys.do({ |item| 
+			var key = item.asString;
+			if( key.includes( $. ) ) {
+				key = key.split( $. ).first.asSymbol;
+				itemsNoPoint[ key ] = itemsNoPoint[ key ].add( item );
 			};
 		});
 		
+		units.collect(_.keys).flatten(1).as(Set).do({ |item|
+			if( env[ item ].notNil ) {
+				this.set( item, env[ item ].value );
+			};
+			if( itemsNoPoint[ item ].notNil ) {
+				itemsNoPoint[ item ].do({ |key|
+					this.set( item, env[ key ].value );
+				});
+			};
+		});
+				
 		~fadeIn.value !? this.fadeIn_(_);
 		~fadeOut.value !? this.fadeOut_(_);
 		~gain.value !? this.gain_(_);
