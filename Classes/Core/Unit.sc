@@ -414,7 +414,6 @@ U : ObjectWithArgs {
 	*defClass { ^Udef }
 	
 	init { |in, inArgs, inMod|
-	    var realDef;
 		if( in.isKindOf( this.class.defClass ) ) {
 			def = in;
 			defName = in.name;
@@ -435,6 +434,7 @@ U : ObjectWithArgs {
 					};
 				});
 		} {
+			args = inArgs;
 			"def '%' not found".format(in).warn;
 		};
 		preparedServers = [];
