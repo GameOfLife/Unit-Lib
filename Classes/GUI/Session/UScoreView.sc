@@ -519,62 +519,29 @@ UScoreView {
 				} )
 			.drawFunc_({ |v|
 				var viewRect, pixelScale, l, n, l60, r, lr, bnds, scaleAmt;
-				pixelScale = v.pixelScale;
-				viewRect = v.viewRect;
-				Pen.width = pixelScale.x / 2;
-				Pen.color = Color.gray.alpha_(0.25);
+				var top, bottom;
 				
 				// grid lines
 				if(  score.tempoMap.isNil ) {
-					l = viewRect.left.ceil;
-					n = viewRect.width.ceil;
-					if( viewRect.width < (v.view.bounds.width/2) ) {							n.do({ |i|
-							Pen.line( (i + l) @ 0, (i + l) @ numTracks );
-						});
-						Pen.stroke;
-					};
-					Pen.color = Color.white.alpha_(0.75);
-					l60 = l.round(60);
-					(n / 60).ceil.do({ |i|
-						i = (i * 60) + l60;
-						Pen.line( i @ 0, i @ numTracks );
-					});
-					Pen.stroke;
-					r = (n / 5).max(1);
-					r = r.nearestInList([1,5,10,30,60,300,600]);
-					lr = l.round(r);
-					bnds = "00:00".bounds( Font( Font.defaultSansFace, 9 ) );
-					bnds.width = bnds.width + 4;
-					scaleAmt = 1/v.scaleAmt.asArray;
-					(n/r).ceil.do({ |i|
-						Pen.use({
-							i = i * r;
-							Pen.translate( (i + lr), viewRect.bottom );
-							Pen.scale( *scaleAmt );
-							Pen.font = Font( Font.defaultSansFace, 9 );
-							Pen.color = Color.gray.alpha_(0.25);
-							Pen.addRect( bnds.moveBy( 0, bnds.height.neg - 1 ) ).fill;
-							Pen.color = Color.white.alpha_(0.5);
-							Pen.stringAtPoint(
-								SMPTE.global.initSeconds( i+lr ).asMinSec
-									.collect({ |item| item.asInt.asStringToBase(10,2); })
-									.join($:),
-								2@(bnds.height.neg - 1) 
-							);
-						});
-					});
+					v.drawTimeGrid;
 				} {
+					pixelScale = v.pixelScale;
+					viewRect = v.viewRect;
+					Pen.width = pixelScale.x / 2;
+					Pen.color = Color.gray.alpha_(0.25);
+					top = viewRect.top;
+					bottom = viewRect.bottom;
 					l = score.tempoMap.beatAtTime( viewRect.left ).ceil;
 					n = score.tempoMap.beatAtTime( viewRect.right ).ceil - l;
 					n.do({ |i|
 						i = score.tempoMap.timeAtBeat( i + l );
-						Pen.line( i @ 0, i @ numTracks );
+						Pen.line( i @ top, i @ bottom );
 					});
 					Pen.stroke;
 					Pen.color = Color.white.alpha_(0.75);
 					(score.displayDuration / 60).floor.do({ |i|
 						i = (i+1) * 60;
-						Pen.line( i @ 0, i @ numTracks );
+						Pen.line( i @ top, i @ bottom );
 					});
 					Pen.stroke;
 				};
