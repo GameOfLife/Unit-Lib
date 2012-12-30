@@ -38,6 +38,7 @@ UChain : UEvent {
 	var <>preparedServers;
 	var <muted = false;
 	
+	var <>addAction = \addToHead;
 	*initClass {
 		
 		Class.initClassTree( PresetManager );
@@ -445,6 +446,7 @@ UChain : UEvent {
 	    var group;
 	    if( this.shouldPlayOn( target ) != false ) {
 	    		group = Group( target )
+	    		group = Group( target, addAction )
 	                .startAction_({ |synth|
 	                    // only add if started (in case this is a bundle)
 	                    this.changed( \go, group );
