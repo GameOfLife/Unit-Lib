@@ -39,6 +39,8 @@ UChain : UEvent {
 	var <muted = false;
 	
 	var <>addAction = \addToHead;
+	var <>ugroup;
+	
 	*initClass {
 		
 		Class.initClassTree( PresetManager );
@@ -452,6 +454,7 @@ UChain : UEvent {
 	                })
 	                .freeAction_({ |synth|
 	                    this.removeGroup( group );
+	                    UGroup.end( this );
 	                    this.changed( \end, group );
 	                });
 	        
@@ -571,7 +574,10 @@ UChain : UEvent {
 		});
 		//cpu = this.apxCPU;
 		target = target.collect({ |tg|
-			tg.asTarget(this.apxCPU(tg));
+			tg = UGroup.start( ugroup, tg, this );
+			tg = tg.asTarget;
+			tg.server.loadBalancerAddLoad(this.apxCPU(tg));
+			tg;
 		});
 		preparedServers = target;
 	     units.do( _.prepare(target, startPos, action.getAction ) );
@@ -620,6 +626,7 @@ UChain : UEvent {
 	
 	disposeSynths {
 		units.do( _.disposeSynths );
+		this.groups.do({ UGroup.end( this ); });
 		this.groups.copy.do( _.changed( \n_end ) );
 	}
 	
@@ -817,5 +824,16 @@ UChain : UEvent {
 	}
 	
 	storeArgs { ^this.getInitArgs }
+	
+	storeModifiersOn { |stream|
+		this.storeTags( stream );
+		this.storeDisplayColor( stream );
+		if( ugroup.notNil ) {
+			stream << ".ugroup_(" <<< ugroup << ")";
+		};
+		if( addAction != \addToHead ) {
+			stream << ".addAction_(" <<< addAction << ")";
+		};
+	}
 
 }
