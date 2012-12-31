@@ -445,7 +445,6 @@ UChain : UEvent {
 		var maxDurUnit;
 	    var group;
 	    if( this.shouldPlayOn( target ) != false ) {
-	    		group = Group( target )
 	    		group = Group( target, addAction )
 	                .startAction_({ |synth|
 	                    // only add if started (in case this is a bundle)
