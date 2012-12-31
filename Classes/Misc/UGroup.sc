@@ -86,7 +86,11 @@ UGroup {
 		} {
 			grps = targets.collect({ |target|
 				groups.detect({ |item|
-					item.server == target.asTarget.server;
+					if( target.isKindOf( LoadBalancer ) ) {
+						target.servers.includes( item.server );
+					} {
+						item.server == target.asTarget.server;
+					};
 				}) ?? {
 					this.makeGroup( target.asTarget );
 				};
