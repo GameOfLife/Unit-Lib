@@ -125,7 +125,7 @@ GenericDef : UArchivable {
 	}
 	
 	*getNamesFromDefaultDirectory {
-		^this.allDefsFolders.reverse.collect({ |path|
+		^this.allDefsFolders.collect({ |path|
 		    (path ++ "/*.scd").pathMatch.collect({ |path| path.basename.splitext[0].asSymbol })
 	    }).flatten(1);
 	}
