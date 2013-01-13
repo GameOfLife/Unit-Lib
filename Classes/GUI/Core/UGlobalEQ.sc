@@ -65,7 +65,10 @@ UGlobalEQ {
 	
 	*gui { |parent, bounds|
 		if( view.isNil or: { view.view.isClosed } ) {
-			^view = EQView( parent ? "UGlobalEQ", bounds ? Rect(10, 350, 350, 186), eqSetting, presets )
+			RoundView.useWithSkin( UChainGUI.skin, {
+				view = EQView( parent ? "UGlobalEQ", bounds ? Rect(10, 350, 350, 186), eqSetting, presets );
+			});
+			^view;
 		} {
 			^view.front;
 		};
