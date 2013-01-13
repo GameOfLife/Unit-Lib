@@ -123,6 +123,18 @@ GenericDef : UArchivable {
 		    (path ++ "/*.scd").pathMatch.collect({ |path| path.load })
 	    }).flatten(1);
 	}
+	
+	*getNamesFromDefaultDirectory {
+		^this.allDefsFolders.reverse.collect({ |path|
+		    (path ++ "/*.scd").pathMatch.collect({ |path| path.basename.splitext[0].asSymbol })
+	    }).flatten(1);
+	}
+	
+	*loadOnceFromDefaultDirectory {
+		^this.getNamesFromDefaultDirectory.collect({ |item|
+			this.fromName( item );
+		});
+	}
 
 	*cleanDefName{ |name|
 		^name.asString.collect { |char| if (char.isAlphaNum, char, $_) };
