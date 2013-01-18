@@ -500,13 +500,18 @@ U : ObjectWithArgs {
 		^this.getArg( key );
 	}
 
-	mapSet { |key, value|
-		var spec = this.getSpec(key);
-		if( spec.notNil ) {
-		    this.set(key, spec.map(value) )
-		} {
-		    this.set(key,value)
-		}
+	mapSet { |...args|
+        var argsWithSpecs = args.clump(2).collect{ |arr|
+            var key, value, spec;
+            #key, value = arr;
+            spec = this.getSpec(key);
+            if( spec.notNil ) {
+                [key, spec.map(value) ]
+            } {
+                [key, value ]
+            }
+        };
+        this.set( * argsWithSpecs.flatten )
 	}
 
 	mapGet { |key|
