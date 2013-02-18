@@ -101,9 +101,10 @@ SMPTESpec : Spec {
 	
 	var <>minval = 0, <>maxval = inf;
 	var <>fps = 1000;
+	var <>default = 0;
 	
-	*new { |minval = 0, maxval = inf, fps = 1000|
-		^super.newCopyArgs.minval_( minval ).maxval_( maxval ).fps_( fps );
+	*new { |minval = 0, maxval = inf, fps = 1000, default = 0|
+		^super.newCopyArgs.minval_( minval ).maxval_( maxval ).fps_( fps ).default_( default );
 	}
 	
 	constrain { |value| ^value.clip( minval, maxval ); }
