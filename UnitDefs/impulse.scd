@@ -5,7 +5,9 @@ A non-bandlimited impulse generator. Outputs single sample impulses.
 
 freq: frequency (Hz)
 scale: a multiplier for the frequency (if scale is 0, only a single impulse is produced)
+numSamples: width of the impulse in number of samples (1-100)
 amp: amplitude (0-1)
+lag: a lag time (s) for smoothing changes to all parameters
 
 --
 this is an Udef definition file
