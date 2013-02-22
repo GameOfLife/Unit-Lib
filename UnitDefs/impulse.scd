@@ -15,5 +15,6 @@ part of the Unit lib default Udefs set
 Udef( \impulse, { |freq = 440, scale = 1, amp = 0.1, lag = 0|
 	UMixOut.ar( 0, Impulse.ar( freq.lag( lag ) * scale,  amp.lag( lag ) ), 0, true ) 
 } ).category_( \oscillator )
+	.setSpec( \freq, FreqSpec( 2, 20000 ) )
 	.setSpec( \scale, [0,2,\lin,0.125,1].asSpec )
 	.setSpec( \lag, [0,1,\lin].asSpec );

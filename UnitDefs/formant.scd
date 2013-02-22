@@ -19,6 +19,7 @@ Udef( \formant, { |freq = 440, formant = 1760, bw = 2, amp = 0.1, lag = 0|
 	sig = Formant.ar( freq.lag( lag ), formant.lag( lag ), (bw * freq).lag(lag), amp.lag( lag ) );
 	UMixOut.ar( 0, sig, 0, true ) 
 } ).category_( \oscillator )
-	.setSpec( \formant, \freq.asSpec )
+	.setSpec( \freq, FreqSpec( 2, 20000 ) )
+	.setSpec( \formant, FreqSpec( 2, 20000 ) )
 	.setSpec( \bw, [1, 20, \exp ].asSpec )
 	.setSpec( \lag, [0,1,\lin].asSpec );

@@ -16,5 +16,6 @@ part of the Unit lib default Udefs set
 Udef( \sine, { |freq = 440, amp = 0.1, lag = 0|
 	UMixOut.ar( 0, SinOsc.ar( freq.lag(lag), 0, amp.lag(lag) ), 0, true ) 
 } ).category_( \oscillator )
+	.setSpec( \freq, FreqSpec( 2, 20000 ) )
 	.setSpecMode( \amp, \normal )
 	.setSpec( \lag, [0,1,\lin].asSpec );
