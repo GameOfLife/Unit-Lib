@@ -24,6 +24,7 @@ Udef( \ringMod, { |sine = 1, freq = 440, noise = 0, input = 0, mix = 1.0, lag = 
 })
 	.category_( \effect )
 	.setSpec( \sine, \amp.asSpec )
+	.setSpec( \freq, FreqSpec(2,20000) )
 	.setSpec( \noise, \amp.asSpec )
 	.setSpec( \input, \amp.asSpec )
 	.setSpec( \lag, [0,1,\lin].asSpec )
