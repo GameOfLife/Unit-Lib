@@ -12,9 +12,13 @@ this is an Udef definition file
 part of the Unit lib default Udefs set
 */
 
-Udef( \impulse, { |freq = 440, scale = 1, amp = 0.1, lag = 0|
-	UMixOut.ar( 0, Impulse.ar( freq.lag( lag ) * scale,  amp.lag( lag ) ), 0, true ) 
+Udef( \impulse, { |freq = 440, scale = 1, numSamples = 1, amp = 0.1, lag = 0|
+	var sig;
+	sig = Impulse.ar( freq.lag( lag ) * scale );
+	sig = Trig1.ar( sig, numSamples.lag(lag) / SampleRate.ir ) * amp.lag( lag );
+	UMixOut.ar( 0, sig, 0, true ) 
 } ).category_( \oscillator )
 	.setSpec( \freq, FreqSpec( 2, 20000 ) )
 	.setSpec( \scale, [0,2,\lin,0.125,1].asSpec )
+	.setSpec( \numSamples, [1,100,\lin,1,1].asSpec )
 	.setSpec( \lag, [0,1,\lin].asSpec );
