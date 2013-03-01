@@ -23,7 +23,7 @@ EQPlotView {
 	var <active = true;
 	var <selected;
 	var <>font, <>viewHeight = 14, <resize = 5;
-	var <min = 20, <max = 22050, <range = 24;
+	var <min = 20, <max = 22000, <range = 24;
 	var <showLegend = true;
 	var <>action;
 	
