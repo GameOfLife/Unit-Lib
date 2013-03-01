@@ -31,7 +31,7 @@ The library comes with a comprehensive set of GUI's that allow for manipulation 
 ## Installation ##
 
 
-1) Go to https://github.com/GameOfLife/Unit-Lib/tags, download zip for latest version (currently v1.0) and place in extensions folder.
+1) Go to https://github.com/GameOfLife/Unit-Lib/tags, download zip for latest version (currently v.0.1) and place in extensions folder.
 
 or 
 
