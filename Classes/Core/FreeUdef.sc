@@ -45,6 +45,11 @@ FreeUdef : Udef {
 		if( loadOnInit ) { this.loadSynthDef };
 	}
 	
+	synthDef_ { |def|
+		synthDef = def;
+		if( loadOnInit ) { this.loadSynthDef };
+	}
+	
 	addSynthDefControls { |def|
 		def = def ? synthDef;
 		ArgSpec.fromSynthDef( def ).do({ |argSpec| this.addArgSpec( argSpec ); });
