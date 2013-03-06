@@ -86,7 +86,7 @@ EQdef {
 			]
 		];
 		
-		all[ \default ] = default;
+		default.name_( \default );
 		
 	}
 	
@@ -114,6 +114,7 @@ EQdef {
 	name_ { |name|
 		all.removeAt( this.name );
 		all[ name.asSymbol ] = this;
+		presetManager.id_( (this.class.name ++ "_" ++ name).asSymbol );
 	}
 	
 	init { |bandPairs|
