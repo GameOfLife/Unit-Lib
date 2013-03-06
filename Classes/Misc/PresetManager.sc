@@ -164,27 +164,30 @@ PresetManager {
 			}, overwrite, ask);
 	    };
 
-	    if( path.isNil ) {
-		    if( filePath.notNil ) {
-			     writeFunc.value(overwrite,ask,filePath,false);
-		    } {
-			    Dialog.savePanel( { |pth|
-				    path = pth;
-				    writeFunc.value(true,false,path);
-			    }, cancelAction );
-		    };
+	    case { path.isNil && (filePath.notNil) } {
+		   	writeFunc.value(overwrite,ask,filePath,false);
+		} { path.isNil or: (path == \browse) } {
+			Dialog.savePanel( { |pth|
+			    path = pth;
+			    writeFunc.value(true,false,path);
+		    }, cancelAction );
 	    } {
 		    writeFunc.value(overwrite,ask,path);
 	    };
     }
     
-    read { |path, action|
+    read { |path, action, silent = false|
 	    var readFunc;
 	    
-	    path = path ? filePath;
+	    if( path === \browse ) {
+		    path = nil; 
+		} {
+		    path = path ? filePath; 
+		};
 	    
 	    readFunc = { |path|
 		    this.presets = path.load;
+		    if( silent.not ) { "read presets from file: %".postf( path ); };
 		    action.value(this);
 	    };
 	    
@@ -197,7 +200,40 @@ PresetManager {
 		    if( File.exists( path ) ) {
 		   		readFunc.value(path);
 		    } {
-			    "%:read - file not found : %\n".postf( this.class, path );
+			    if( silent.not ) { "%:read - file not found : %\n".postf( this.class, path ); };
+		    };
+	    };
+    }
+    
+    readAdd { |path, action, silent = false|
+	    // read a file and add presets to current (overwriting double names)
+	    var readFunc, addPresets;
+	    
+	    if( path === \browse ) {
+		    path = nil; 
+		} {
+		    path = path ? filePath; 
+		};
+	    
+	    readFunc = { |path|
+		    addPresets = path.load;
+		    addPresets.pairsDo({ |key, value|
+			    this.putRaw( key, value );
+		    });
+		    if( silent.not ) { "added presets from file: %".postf( path ); };
+		    action.value(this);
+	    };
+	    
+	    if( path.isNil ) {
+		    Dialog.getPaths( { |paths|
+			    readFunc.value(paths[0])
+			})
+	    } {
+		    path = path.standardizePath;
+		    if( File.exists( path ) ) {
+		   		readFunc.value(path);
+		    } {
+			    if( silent.not ) { "%:read - file not found : %\n".postf( this.class, path ); };
 		    };
 	    };
     }

@@ -148,14 +148,40 @@ PresetManagerGUI {
 			.states_( [ [ "read", Color.black, Color.green(1,0.25) ] ] )
 			.radius_(2)
 			.action_({
-				presetManager.read( action: { action.value( this ); } );
+				if( presetManager.filePath.notNil ) {
+					SCAlert( 
+						"Do you want to read the default settings\nor import from a file?", 
+						[ "cancel", "import", "default" ],
+						[ { }, { 
+							presetManager.read( \browse, action: { action.value( this ); } );
+						}, {
+							presetManager.read( action: { action.value( this ); } );
+						} ];
+					);
+				} {
+					presetManager.read( action: { action.value( this ); } );
+				};
 			});
 		
 		views[ \write ] = SmoothButton( view, 35 @ viewHeight )
 			.states_( [ [ "write", Color.black, Color.red(1,0.25) ] ] )
 			.radius_(2)
 			.action_({
-				presetManager.write( successAction: { action.value( this ); } );
+				if( presetManager.filePath.notNil ) {
+					SCAlert( 
+						"Do you want to write to default settings\nor export to a file?", 
+						[ "cancel", "export", "default" ],
+						[ { }, { 
+							presetManager.write( \browse, 
+								successAction: { action.value( this ); } );
+						}, {
+							presetManager.write( overwrite: true, 
+								successAction: { action.value( this ); } );
+						} ];
+					);
+				} {
+					presetManager.write( successAction: { action.value( this ); } );
+				};
 			});
 			
 		this.setFont;
