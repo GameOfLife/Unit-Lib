@@ -80,7 +80,7 @@ UGUI {
 			if( argSpec.private.not ) { // show only if not private
 				vw = ObjectView( composite, nil, unit, key, 
 					argSpec.spec, controller,
-					if( argSpec.mode == \init ) { key ++ " (i)" }
+					if( [ \nonsynth, \init ].includes(argSpec.mode) ) { key ++ " (i)" }
 				);
 				
 				vw.action = { action.value( this, key, value ); };
