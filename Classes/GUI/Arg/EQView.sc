@@ -36,7 +36,7 @@ EQPlotView {
 		font = RoundView.skin !? { RoundView.skin.font } ?? { Font( Font.defaultSansFace, 10 ); };
 	}
 	
-	*viewNumLines { ^7 }
+	*viewNumLines { ^6 }
 	
 	removeCtrl {
 		ctrl.remove;
