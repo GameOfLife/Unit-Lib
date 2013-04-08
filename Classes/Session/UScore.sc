@@ -628,6 +628,8 @@ UScore : UEvent {
 		}
 	}
 	
+	dispose { events.do(_.dispose) }
+	
 	collectOSCBundleFuncs { |server, startOffset = 0, infdur = 60|
 		var array, wasCheckFree, out;
 		

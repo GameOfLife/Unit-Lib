@@ -102,6 +102,8 @@ UMarker : UEvent {
 	mute { }
 	unmute { }
 	
+	dispose { }
+	
 	releaseSelf { ^true }
 	releaseSelf_ { "%:releaseSelf - can't use releaseSelf\n".postf( this.class ) }
 	
