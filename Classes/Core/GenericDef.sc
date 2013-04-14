@@ -51,8 +51,8 @@ GenericDef : UArchivable {
 		^if( path.notNil ) {
 			path.load
 		} {
-			"//" + this.class ++ ": - no Udef found for %\n"
-			.postf( this.cleanDefName(name), path );
+			"%:% - no % found for %\n"
+			.postf( this, thisMethod.name, this, this.cleanDefName(name), path );
 			nil
 		}
 	}
