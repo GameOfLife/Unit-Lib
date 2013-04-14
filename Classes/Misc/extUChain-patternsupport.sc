@@ -15,8 +15,9 @@
 		var evt;
 		evt = ();
 		evt[ \play ] = {
-			var newChain;
-			if( ~isRest != true) {	
+			var newChain, freqs;
+			freqs = ~freq = ~detunedFreq.value;
+			if( ~isRest != true && { freqs.isRest.not }) {
 				newChain = this.deepCopy;
 				newChain.fromEnvironment;
 				newChain.prepareWaitAndStart; // beware of different wait times per event
@@ -43,7 +44,7 @@
 			};
 			if( itemsNoPoint[ item ].notNil ) {
 				itemsNoPoint[ item ].do({ |key|
-					this.set( item, env[ key ].value );
+					this.set( key, env[ key ].value );
 				});
 			};
 		});
