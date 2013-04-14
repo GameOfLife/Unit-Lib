@@ -148,6 +148,22 @@ BoolSpec : Spec {
 	storeArgs { ^[default, trueLabel, falseLabel] }
 }
 
+BoolArraySpec : BoolSpec {
+	// spec for an array of boolean values
+	
+	constrain { |value|
+		^value.asArray.collect(_.booleanValue);
+	}
+	
+	map { |value|
+		^value.asArray.collect(_.booleanValue);
+	}
+	
+	unmap { |value|
+		^value.asArray.collect(_.binaryValue);
+	}
+}
+
 PointSpec : Spec {
 	
 	classvar <>defaultMode = \point;

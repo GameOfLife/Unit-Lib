@@ -478,7 +478,7 @@
 		} {	
 			vws[ \buttonView ] = SmoothButton( vws[ \view ], 
 					Rect( labelWidth + 2, 0, bounds.width-(labelWidth+2), bounds.height ) )
-				.label_( [ falseLabel, trueLabel ] );
+				.label_( [ falseLabel ? "off", trueLabel ? "on" ] );
 		};
 		
 		vws[ \buttonView ]
@@ -500,6 +500,149 @@
 		view[ \buttonView ].value = this.map(  value );
 		if( active ) { view[ \buttonView ].doAction };
 	}
+}
+
++ BoolArraySpec {
+
+	 makeView { |parent, bounds, label, action, resize|
+		var vws, view, labelWidth, width;
+		var localStep;
+		var modeFunc;
+		var font;
+		var editAction;
+		var tempVal;
+		vws = ();
+		
+		font =  (RoundView.skin ? ()).font ?? { Font( Font.defaultSansFace, 10 ); };
+		
+		bounds.isNil.if{bounds= 350@20};
+		
+		view = EZCompositeView( parent, bounds, gap: 2@2 );
+		bounds = view.asView.bounds;
+		width = bounds.width;
+				
+		vws[ \view ] = view;
+		vws[ \val ] = default.asCollection;
+		vws[ \doAction ] = { action.value( vws, vws[ \val ] ) };
+				 		
+		if( label.notNil ) {
+			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
+			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ bounds.height )
+				.string_( label.asString ++ " " )
+				.align_( \right )
+				.resize_( 4 )
+				.applySkin( RoundView.skin );
+			width = width - labelWidth - 2;
+		} {
+			labelWidth = 0;
+		};
+		
+		if( trueLabel.isNil && falseLabel.isNil ) {
+			vws[ \state ] = SmoothButton( view, (bounds.height)@(bounds.height) )
+				.states_([
+					[ "", Color.black, Color.clear ],
+					[ 'x', Color.black, Color.gray(0.2,0.5) ],
+					[ '-', Color.black, Color.gray(0.2,0.25) ]
+				])
+		} {
+			vws[ \state ] = SmoothButton( view, 80@(bounds.height) )
+				.states_([
+					[ falseLabel ? "off", Color.black, Color.clear ],
+					[ trueLabel ? "on", Color.black, Color.gray(0.2,0.5) ],
+					[ "mixed" , Color.black, Color.gray(0.2,0.25) ]
+				])
+		};
+			
+		vws[ \state ]
+				.border_( 1 )
+				.radius_( 2 )
+				.font_( font )
+				.action_({ |bt|
+					switch( bt.value.asInt,
+						2, { vws[ \val ] = vws[ \val ].collect( false ); },
+						1, { vws[ \val ] = vws[ \val ].collect( true ); },
+						0, { vws[ \val ] = vws[ \val ].collect( false ); }
+					);
+					vws[ \update ].value;
+					action.value( vws, vws[ \val ] ); 
+				});
+
+		view.decorator.shift(bounds.height,0);
+		
+		vws[ \invert ] = SmoothButton( view, 40@(bounds.height) )
+			.label_( "invert" )
+			.border_( 1 )
+			.radius_( 2 )
+			.font_( font )
+			.action_({ |bt|
+				vws[ \val ] = vws[ \val ].collect( _.not );
+				vws[ \update ].value;
+				action.value( vws, vws[ \val ] ); 
+			});
+			
+		vws[ \edit ] = SmoothButton( view, 40 @ (bounds.height) )
+			.label_( "edit" )
+			.border_( 1 )
+			.radius_( 2 )
+			.font_( font )
+			.action_({
+				var plotter;
+				if( vws[ \plotter ].isNil or: { vws[ \plotter ].parent.isClosed } ) {
+					plotter = vws[ \val ].collect(_.binaryValue).plot;
+					plotter.editMode_( true )
+						.specs_( ControlSpec(0,1,\lin,1,1) )
+						.findSpecs_( false )
+						.plotMode_( \points )
+						.editFunc_({ |vw|
+							vws[ \val ] = vw.value.collect(_.booleanValue);
+							action.value( vws, vws[ \val ] );
+						});
+						
+					plotter.parent.onClose = plotter.parent.onClose.addFunc({ 
+						if( vws[ \plotter ] == plotter ) {
+							vws[ \plotter ] = nil;
+						};
+					});
+					vws[ \plotter ] = plotter;
+				} {
+					vws[ \plotter ].parent.front;
+				};
+			});
+			
+		vws[ \setPlotter ] = {
+			if( vws[ \plotter ].notNil ) {
+				{ vws[ \plotter ].value = vws[ \val ].collect(_.binaryValue); }.defer;
+			};
+		};
+		
+		vws[ \update ] = {
+			case { vws[ \val ].every(_ == true) } {
+				vws[ \state ].value = 1;
+			} { vws[ \val ].every(_ == false) } {
+				vws[ \state ].value = 0;
+			} { vws[ \state ].value = 2; };
+			vws[ \setPlotter ].value;
+		};
+			
+		view.view.onClose_({
+			if( vws[ \plotter ].notNil ) {
+				vws[ \plotter ].parent.close
+			};
+		});
+	
+		^vws;
+	 }
+	 
+	 setView { |vws, value, active = false|
+		vws[ \val ] = value.asCollection.collect(_.booleanValue);
+		vws[ \update ].value; 
+		if( active ) { vws[ \doAction ].value };
+	}
+	
+	mapSetView { |vws, value, active = false|
+		this.setView( vws, this.map(value), active );
+	}
+
 }
 	
 + PointSpec {

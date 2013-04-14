@@ -49,6 +49,22 @@
 	
 }
 
++ BoolSpec {
+	
+	massEditSpec { |inArray|
+		^BoolArraySpec( inArray, trueLabel, falseLabel );
+	}
+	
+	massEditValue { |inArray|
+		^inArray
+	}
+	
+	massEdit { |inArray, params|
+		^params;
+	}
+	
+}
+
 + RangeSpec {
 	
 	massEditSpec { |inArray|
