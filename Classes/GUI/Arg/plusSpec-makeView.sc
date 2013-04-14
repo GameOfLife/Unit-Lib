@@ -1198,11 +1198,21 @@
 			.radius_( 2 )
 			.font_( font )
 			.action_({
+				var missing;
+				
 				if( vws[ \listdoc ].notNil ) {
 					vws[ \listdoc ].close;
 				};
 				
+				missing = vws[ \val ].select({ |x| x.exists.not }).collect(_.path);
+				if( missing.size > 0 ) {
+					missing = "missing files:\n" ++ missing.join("\n") ++ "\n\n";
+				} {
+					missing = "";
+				};
+				
 				vws[ \listdoc ] = Document().string_(
+					missing ++ "all soundfile paths:\n" ++
 					vws[ \val ].collect(_.path).join("\n")
 				).promptToSave_(false);
 			});
