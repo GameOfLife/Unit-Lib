@@ -1111,7 +1111,7 @@
 
 + ColorSpec {
 	
-	viewNumLines { ^5 }
+	viewNumLines { ^7 }
 	
 	makeView { |parent, bounds, label, action, resize|
 		var vws, view, labelWidth;
@@ -1145,7 +1145,7 @@
 			labelWidth = 0;
 		};
 		
-		viewHeight = (bounds.height / 5) - 4;
+		viewHeight = (bounds.height / 6) - 4;
 		viewWidth = bounds.width - (labelWidth + 6);
 		
 		vws[ \colorView ] = UserView( view, viewWidth @ viewHeight )
@@ -1239,6 +1239,14 @@
 		vws[ \g ].action = editAction;
 		vws[ \b ].action = editAction;
 		vws[ \a ].action = editAction;
+		
+		vws[ \presetManager ] = PresetManagerGUI( 
+			view, viewWidth @ viewHeight, presetManager, vws[ \val ] 
+		).action_({ |pm|
+			vws[ \val ] = pm.object;
+			vws[ \updateViews ].value;
+			action.value( vws, vws[ \val ] );
+		});
 		
 		^vws;
 	}

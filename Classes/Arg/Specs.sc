@@ -569,8 +569,27 @@ RangeSpec : ControlSpec {
 }
 
 ColorSpec : Spec {
+	
+	classvar <>presetManager;
 
 	var >default;
+	
+	*initClass {
+		Class.initClassTree( PresetManager );
+		Class.initClassTree( Color );
+		presetManager = PresetManager( Color );
+		presetManager.presets = Color.web16.getPairs( Color.web16.keys.as(Array).sort );
+		presetManager.applyFunc_( { |object, preset|
+			 	if( object === Color ) {
+				 	preset.deepCopy;
+			 	} {	
+				 	object.red = preset.red;
+				 	object.green = preset.green;
+				 	object.blue = preset.blue;
+				 	object.alpha = preset.alpha;
+				 }
+		 	} );
+	}
 
 	*new { |default|
 		^super.newCopyArgs( default ).init;
