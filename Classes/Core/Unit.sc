@@ -528,6 +528,22 @@ U : ObjectWithArgs {
 		mod = newMod.asUModFor( this );
 	}
 	
+	addMod { |newMod|
+		if( mod.isKindOf( UMod ) ) {
+			mod = UModDict( mod );
+		};
+		if( mod.notNil ) {
+			if( mod.isKindOf( UModDict ) ) {
+				this.mod = mod.add( newMod );
+			} {
+				"%:addMod - current mod % is not an UMod or UModDict, can't add %\n"
+					.postf( this.class, mod, newMod );
+			};
+		} {
+			this.mod = UModDict( newMod );
+		};
+	}
+	
 	modPerform { |what ...args| mod !? _.perform( what, this, *args ); }
 	
 	connect { this.modPerform( \connect ); this.changed( \connect ); }
