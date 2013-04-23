@@ -106,6 +106,7 @@ UChainGUI {
 		var heights, units;
 		var labelWidth, releaseTask;
 		var controller;
+		var udefController;
 		var scoreController;
 		// var unitInitFunc;
 		
@@ -124,12 +125,14 @@ UChainGUI {
 		units = chain.units;
 				
 		controller = SimpleController( chain );
+		udefController = SimpleController( Udef.all );
 		
 		composite = CompositeView( parent, bounds ).resize_(5);
 		composite.addFlowLayout( margin, gap );
 		composite.onClose = { |vw|
 			controller.remove; 
 			scoreController.remove;
+			udefController.remove;
 			if( composite == vw && { current == this } ) { current = nil } 
 		};
 		
@@ -431,6 +434,12 @@ UChainGUI {
 					}.defer(0.01);
 				};
 			});
+			
+		udefController.put( \added, { |obj, msg, def| 
+			if( chain.units.any({ |u| u.defName == def.name }) ) {
+				chain.changed( \units );
+			};
+		} );
 			
 		if( score.isNil ) {
 			controller
