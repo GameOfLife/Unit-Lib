@@ -442,7 +442,7 @@ UScore : UEvent {
 	prStart { |targets, startPos = 0, assumePrepared = false, callStopFirst = true, updatePosition = true,
 	    startEventsActiveAtStartPos = true, loop = false|
 	    CmdPeriod.add( this );
-		if( callStopFirst ) { this.stop(nil,false); }; // in case it was still running
+		if( callStopFirst ) { this.stop(nil,false, false); }; // in case it was still running
         this.prStartTasks( targets, startPos, assumePrepared, updatePosition, startEventsActiveAtStartPos, loop );
 	}
 	
@@ -588,7 +588,7 @@ UScore : UEvent {
 	}
 
 	//stop everything
-	stop{ |releaseTime, changed = true|
+	stop{ |releaseTime, changed = true, dispose = true|
 	    if([\playing,\paused].includes(playState) ) {
             //no nil allowed
             pos = this.pos;
@@ -603,6 +603,9 @@ UScore : UEvent {
             CmdPeriod.remove( this );
 	    };
 	    if([\preparing,\prepared].includes(playState)) {
+			if(dispose) {
+				this.dispose
+			};
 	        this.playState_(\stopped,changed);
 	    }
 	}
