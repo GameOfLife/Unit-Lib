@@ -104,6 +104,8 @@ UScore : UEvent {
 	isStopped{ ^playState == \stopped }
 	playState_{ |newState, changed = true|
 
+		//"playstate of % change to %".format(this.hash, newState).postln;
+		//this.dumpBackTrace;
 	    if(changed){
 	        this.changed(\playState,newState,playState);  //send newState oldState
 	    };
@@ -391,17 +393,20 @@ UScore : UEvent {
 
     //prepare resources needed to play score, i.e. load buffers, send synthdefs.
 	prepare { |targets, startPos = 0, action|
+		//var debug1 ="preparing %".format(this.hash).postln;
 	    var eventsToPrepareNow, multiAction;
 	    eventsToPrepareNow = this.eventsToPrepareNow(startPos, loop);
 	    if( eventsToPrepareNow.size > 0 ) {
+			var actions;
 			multiAction = MultiActionFunc( {
 			    this.playState_(\prepared);
 			    action.value;
 			} );
 			// targets = targets.asCollection.collect(_.asTarget); // leave this to UChain:prepare
 			this.playState_(\preparing);
-			eventsToPrepareNow.do({ |item|
-			    item.prepare( targets, (startPos - item.startTime).max(0), action: multiAction.getAction );
+			actions = eventsToPrepareNow.collect{ multiAction.getAction };
+			[eventsToPrepareNow,actions].flopWith({ |item, action|
+			    item.prepare( targets, (startPos - item.startTime).max(0), action:action );
 			});
 	    } {
 	        this.playState_(\preparing);
@@ -412,6 +417,8 @@ UScore : UEvent {
 
     //start immediately, assume prepared by default
     start { |targets, startPos = 0, updatePosition = true|
+		//"UScore % start at %".format(this.hash, startPos).postln;
+		//try{ "prepared state %".format(this.events.collect(_.playState)).postln };
         ^this.prStart(targets, startPos, true, true, updatePosition, true, loop)
     }
 

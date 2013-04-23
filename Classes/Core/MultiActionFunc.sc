@@ -48,7 +48,8 @@ MultiActionFunc {
 	getAction {
 		n = n + 1;
 		^{ |...args|
-			if( i < (n-1) ) { 
+			//"MultiActionFunc count:% target:%".format(i,n).postln;
+			if( i < (n-1) ) {
 				i = i+1; nil;
 			} {
 				action.value( *args );
