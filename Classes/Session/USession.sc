@@ -91,8 +91,8 @@ USession : UArchivable{
         this.changed( \objectsChanged )
     }
 
-    startAll { |targets|
-		objects.do(_.prepareAndStart);
+    prepareAndStart { |targets|
+		objects.do( _.prepareAndStart(targets) );
     }
 
     startChains { |targets|
@@ -107,7 +107,7 @@ USession : UArchivable{
         ^scores
     }
 
-    stopAll {
+    release {
         objects.do(_.release)
     }
 
