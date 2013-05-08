@@ -88,7 +88,7 @@ USessionGUI : UAbstractWindow {
 			.font_( font )
 			.border_(1).background_(Color.grey(0.8))
 			.action_({
-			    session.startAll
+			    session.prepareAndStart
 			});
 
 		SmoothButton( topBarView, 40@size  )
@@ -98,7 +98,7 @@ USessionGUI : UAbstractWindow {
 			.font_( font )
 			.border_(1).background_(Color.grey(0.8))
 			.action_({
-			    session.stopAll
+			    session.release
 			});
 
 		topBarView.decorator.shift(10);

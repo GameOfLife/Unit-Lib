@@ -75,7 +75,7 @@ argument:: item
 
 returns:: (returnvalue)
 
-METHOD:: startAll
+METHOD:: prepareAndStart
 (describe method here)
 
 argument:: targets
@@ -99,7 +99,7 @@ argument:: targets
 
 returns:: (returnvalue)
 
-METHOD:: stopAll
+METHOD:: release
 (describe method here)
 
 returns:: (returnvalue)
