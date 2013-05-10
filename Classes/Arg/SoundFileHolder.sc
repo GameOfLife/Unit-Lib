@@ -632,9 +632,9 @@ DiskSndFile : AbstractSndFile {
 			} {
 				actualStartFrame = startFrame + addStartFrame;
 			};
-			buf = Buffer.alloc(server, diskBufferSize, numChannels, { arg buffer;
-				buffer.readMsg(path.getGPath, actualStartFrame, 
-					diskBufferSize, 0, true, {|buf|
+			buf = Buffer.alloc(server, diskBufferSize.asInt, numChannels, { arg buffer;
+				buffer.readMsg(path.getGPath, actualStartFrame.asInt,
+					diskBufferSize.asInt, 0, true, {|buf|
 						["/b_query", buf.bufnum]
 					}
 				);
