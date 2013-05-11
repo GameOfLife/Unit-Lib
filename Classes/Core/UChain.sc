@@ -242,7 +242,12 @@ UChain : UEvent {
 	* clipFadeIn = false clips fadeOut
 	*/
 	prSetChainsDur { |dur = inf, clipFadeIn = true| //
-		this.prSetCanFreeSynths( \u_doneAction, 14, \u_dur, dur );
+		this.prSetCanFreeSynths( \u_doneAction, 14 );
+		units.do({ |unit|
+			if( unit.keys.includes( \u_dur ) ) {
+				unit.set( \u_dur, dur );
+			};
+		});
 		if( clipFadeIn ) {
 		    this.fadeIn = this.fadeIn.min(dur);
 		    this.fadeOut = this.fadeOut.min(dur - this.fadeIn);
