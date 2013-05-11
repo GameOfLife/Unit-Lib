@@ -27,25 +27,46 @@
 	}
 	
 	fromEnvironment { |env|
-		var itemsNoPoint = ();
+		var unitKeysValues = Order();
 		env = env ? currentEnvironment ?? { () };
 		
 		env.keys.do({ |item| 
 			var key = item.asString;
-			if( key.includes( $. ) ) {
-				key = key.split( $. ).first.asSymbol;
-				itemsNoPoint[ key ] = itemsNoPoint[ key ].add( item );
-			};
+			var index;
+			if( key.includes( $: ) ) {
+				#index, key = key.split( $: );
+				index = index.interpret;
+				key = key.asSymbol;
+				if( (unitKeysValues[ index ] ? []).pairsAt( key ).notNil ) {
+					unitKeysValues[ index ].pairsPut( key, env[ item ].value ); 
+				} {
+					unitKeysValues[ index ] = unitKeysValues[ index ]
+						.addAll( [ key, env[ item ].value ] )
+				};
+			} {
+				if( key.includes( $. ) ) {
+					key = key.split( $. ).first.asSymbol;
+				} {
+					key = key.asSymbol;
+				};
+				units.do({ |unit, index|
+					if( unit.keys.includes( key ) && {
+						 (unitKeysValues[ index ] ? []).pairsAt( key ).isNil
+					} ) {
+						unitKeysValues[ index ] = unitKeysValues[ index ]
+							.addAll( [ item, env[ item ].value ] )
+					}
+				});
+			}
 		});
 		
-		units.collect(_.keys).flatten(1).as(Set).do({ |item|
-			if( env[ item ].notNil ) {
-				this.set( item, env[ item ].value );
-			};
-			if( itemsNoPoint[ item ].notNil ) {
-				itemsNoPoint[ item ].do({ |key|
-					this.set( key, env[ key ].value );
-				});
+		unitKeysValues.do({ |item, index|
+			var unit;
+			unit = units[ index ];
+			if( unit.notNil ) {
+				unit.set( *item );
+			} {
+				"unit #% not available in chain\n".postf( index );
 			};
 		});
 				
