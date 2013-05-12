@@ -54,9 +54,14 @@ UEvent : UArchivable {
 	}
 	
 	dur { ^this.duration }
+	isFinite{ ^this.duration < inf}
 
     duration_{ this.subclassResponsibility(thisMethod) }
     isPausable_{ this.subclassResponsibility(thisMethod) }
+    
+    finiteDuration { |addInf = 10|
+	    if( this.isFinite ) { ^this.duration } { ^addInf };
+    }
     
     track_ { |newTrack = 0| track = newTrack; this.changed( \track ) }
     

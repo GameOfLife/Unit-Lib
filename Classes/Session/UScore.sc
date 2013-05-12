@@ -193,20 +193,11 @@ UScore : UEvent {
 		});
 		^dur;
 	}
-	 
-	dur { ^this.duration }
-    isFinite{ ^this.duration < inf}
     
     finiteDuration { |addInf = 10|
 	    var time = 0;
 		events.do({ |evt|
-			var dur;
-			dur = evt.dur;
-			if( dur == inf ) {
-				time = time.max( evt.startTime + addInf );
-			} {
-				time = time.max( evt.startTime + dur );
-			};
+			time = time.max( evt.startTime + evt.finiteDuration );
 		});
 		^time; 
 	}
