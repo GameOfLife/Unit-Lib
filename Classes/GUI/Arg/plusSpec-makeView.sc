@@ -447,6 +447,83 @@
 
 }
 
++ TriggerSpec {	
+	
+	makeView { |parent, bounds, label, action, resize| 
+		var vws, view, labelWidth;
+		vws = ();
+		
+		// this is basically an EZButton
+		
+		bounds.isNil.if{bounds= 350@20};
+		
+		#view, bounds = EZGui().prMakeMarginGap.prMakeView( parent, bounds );
+		 vws[ \view ] = view;
+		 vws[ \val ] = this.default;
+		 		
+		if( label.notNil ) {
+			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
+			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ bounds.height )
+				.string_( label.asString ++ " " )
+				.align_( \right )
+				.resize_( 4 )
+				.applySkin( RoundView.skin );
+		} {
+			labelWidth = 0;
+		};
+		
+		vws[ \buttonView ] = SmoothButton( vws[ \view ], 
+				Rect( labelWidth + 2, 0, 60, bounds.height ) )
+			.label_( this.label ? "set" );
+		
+		if( spec.notNil ) {
+			vws[ \valueView ] = spec.asSpec.makeView( view, 
+				Rect( labelWidth + 64, 0, bounds.width-(labelWidth+64), bounds.height ),
+				nil, { |vw, val| vws[ \val ] = val }
+			);
+			spec.setView( vws[ \valueView ], vws[ \val ] );
+		};
+		
+		vws[ \buttonView ]
+				.radius_( bounds.height / 8 )
+				.mouseDownAction_({
+					action.value( vws, vws[ \val ] );
+				})
+				.resize_( 1 );
+				
+		vws[ \normalBackground ] = vws[ \buttonView ].background;
+				
+		vws[ \task ] = Task({ 
+			0.1.wait; 
+			vws[ \buttonView ].background = vws[ \normalBackground ]; 
+		}).start;
+
+		if( resize.notNil ) { vws[ \view ].resize = resize };
+		^vws;
+	}
+	
+	setView { |view, value, active = false|
+		if( view[ \task ].isPlaying ) {
+			view[ \task ].stop;
+		} {
+			view[ \buttonView ].background = Color.red(0.75);
+		};
+		view[ \task ] = Task({ 
+			0.1.wait; 
+			view[ \buttonView ].background = view[ \normalBackground ]; 
+		}).start;
+		view[ \val ] = value;
+		if( view[ \valueView ].notNil ) {
+			spec.setView( view[ \valueView ], view[ \val ] );
+		};
+		if( active ) { view[ \buttonView ].doAction };
+	}
+	
+	mapSetView { |view, value, active = false|
+		this.setView( view, value, active );
+	}
+}
+
 + BoolSpec {	
 	
 	makeView { |parent, bounds, label, action, resize| 

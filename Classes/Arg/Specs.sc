@@ -112,6 +112,28 @@ SMPTESpec : Spec {
 	storeArgs { ^[minval, maxval, fps] }
 }
 
+TriggerSpec : Spec {
+	var <>label, <>spec;
+	
+	*new { |label, spec|
+		^super.newCopyArgs( label, spec );
+	}
+	
+	default { ^(spec !? _.default) ? 1 } 
+	
+	map { |value|
+		^value;
+	}
+	
+	unmap { |value|
+		^value;
+	}
+	
+	constrain { |value|
+		^value;
+	}
+}
+
 BoolSpec : Spec {
 	
 	var <default = true;
