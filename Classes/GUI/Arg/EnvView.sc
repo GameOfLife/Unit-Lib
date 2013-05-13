@@ -28,6 +28,7 @@ EnvPlotView {
 	var <showLegend = true;
 	var <>action;
 	var <>editMode = \move;
+	var <>fixedDuration = true;
 	var hitPoint;
 	
 	*new { |parent, bounds, env|
@@ -153,13 +154,13 @@ EnvPlotView {
 				pts = this.getPoints( bounds );
 				this.selectedLine = nil;
 				this.selected = pts.detectIndex({ |ptx|
-					ptx.dist( hitPoint ) <= 6;
+					ptx.dist( hitPoint ) <= 0.06;
 				});
 				if( selected.isNil && { 
 						(
 							env.at( x.linlin(0,bounds.width,0,env.times.sum) )
 								.linlin(min,max,bounds.height,0) - y 
-						).abs < 6
+						).abs < 0.06
 					} ) {
 					this.selectedLine = pts.lastIndexForWhich({ |ptx| ptx.x < hitPoint.x });
 				};
@@ -180,7 +181,9 @@ EnvPlotView {
 						\move, {
 							pt = pts[ selected ];
 							pt.y = pt.y - (hitPoint.y - y);
-							if( selected != 0 and: { selected != (pts.size - 1)} ) {
+							if( selected != 0  and: { 
+								if( fixedDuration ) { selected != (pts.size - 1) } { true }
+								} ) {
 								pt.x = pt.x - (hitPoint.x - x);
 							};
 							
@@ -195,7 +198,9 @@ EnvPlotView {
 							pt = pts[ selected ];
 							oldX = pt.x;
 							pt.y = pt.y - (hitPoint.y - y);
-							if( selected != 0 and: { selected != (pts.size - 1)} ) {
+							if( selected != 0 and: { 
+								if( fixedDuration ) { selected != (pts.size - 1) } { true }
+								} ) {
 								pt.x = pt.x - (hitPoint.x - x);
 							};
 							pts[..selected-1].do({ |item, i|
@@ -214,7 +219,7 @@ EnvPlotView {
 							pt = pts[ selected ];
 							oldX = pt.x;
 							pt.y = pt.y - (hitPoint.y - y);
-							if( selected != 0 and: { selected != (pts.size - 1)} ) {
+							if( selected != 0 and: { selected != (pts.size - 1)}) {
 								pt.x = pt.x - (hitPoint.x - x);
 							};
 							pts[selected+1..].do({ |item, i|
@@ -250,69 +255,76 @@ EnvPlotView {
 			
 		};
 		
-			
+		plotView.beforeDrawFunc = { |vw|
+			var dur;
+			dur = env.times.sum;
+			plotView.fromBounds = Rect( 0, 0, dur, 
+				(dur * vw.bounds.height / vw.bounds.width) / vw.scaleH
+			);
+		};
+		
 		plotView.drawFunc = { |vw|
 			var freqs, svals, bounds, sline, slineX;
 			var pts, strOffset = 11;
+			var pscale;
 			
 			if( GUI.id === 'swing' ) { strOffset = 14 };
 			
 			bounds = vw.fromBounds.moveTo(0,0);
 			
+			vw.drawTimeGrid;
+			
 			////// PREPARATION ///////
 			
-			svals = env.discretize( bounds.width ).linlin(min,max, bounds.height, 0, \none);
+			pscale = vw.pixelScale.x;
+			
+			Pen.width = pscale / 2;
+			Pen.color = Color.gray.alpha_(0.25);
+			[0.25,0.5,0.75].do({ |item|
+				Pen.line( 0@(bounds.height * item), (bounds.width)@(bounds.height * item) );
+			});
+			Pen.stroke;
+			
+			Pen.width = pscale;
+			
+			svals = env.discretize( bounds.width * 100 ).linlin(min,max, bounds.height, 0, \none);
 			
 			// get draggable points
 			pts = this.getPoints( bounds );
 			
-			////// DRAWING ///////
-			
-			// draw background
-			Pen.color_( Color.white.alpha_(0.25) );
-			Pen.roundedRect( bounds, 2 ).fill;
-			
-			// make cliprect
-			Pen.roundedRect( bounds.insetBy(0,0), 2 ).clip;
-			
-			pts.do({ |pt, i|
-				if( selected == i ) { 
-					Pen.color = Color.yellow;
-					Pen.addArc( pt, 5, 0, 2pi );
-					Pen.fill;
-				};
-				Pen.color = Color.hsv( i.linlin( 0, pts.size, 0, 1 ), 0.75, 0.5 );
-				Pen.addArc( pt, 5, 0, 2pi );
-				Pen.stroke;
-			});
-			
 			if( selectedLine.notNil ) {
-				slineX = (pts.clipAt(selectedLine).x.asInt);
+				slineX = (pts.clipAt(selectedLine).x * 100).asInt;
 				sline = svals
-					[slineX..pts.clipAt(selectedLine+1).x.ceil.asInt-1];
+					[slineX..(pts.clipAt(selectedLine+1).x * 100).ceil.asInt-1];
 				Pen.color = Color.yellow;
-				Pen.width = 3;
-				Pen.moveTo( slineX@(sline[0]) );
+				Pen.width = pscale * 3;
+				Pen.moveTo( slineX.linlin(0,svals.size, 0,bounds.width)@(sline[0]) );
 				sline[1..].do({ |val, i|
-					Pen.lineTo( (i+1+slineX)@val );
+					Pen.lineTo(( (i+1+slineX).linlin(0,svals.size, 0,bounds.width))@val );
 				});
 				Pen.stroke;
 			};
-				
-			// draw summed magResponse
+
 			Pen.color = Color.blue(0.5);
-			Pen.width = 1;
+			Pen.width = pscale;
 			Pen.moveTo( 0@(svals[0]) );
 			svals[1..].do({ |val, i|
-				Pen.lineTo( (i+1)@val );
+				Pen.lineTo( (i+1).linlin(0,svals.size, 0,bounds.width)@val );
 			});
 			Pen.stroke;
 			
-			// draw outer border
-			Pen.extrudedRect( bounds, 2, 1, inverse: true );
+			pts.do({ |pt, i|
+				Pen.color = Color.hsv( i.linlin( 0, pts.size, 0, 1 ), 0.22, 0.66, 1 );
+				Pen.addArc( pt, 5 * pscale, 0, 2pi );
+				Pen.fill;
+				if( selected == i ) { 
+					Pen.color = Color.yellow;
+					Pen.addArc( pt, 4 * pscale, 0, 2pi );
+					Pen.fill;
+				};
+			});
+			
 		};
-		
-
 	}
 }
 
