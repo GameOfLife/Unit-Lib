@@ -28,24 +28,28 @@ UEnvGen {
 
 UXLine {
 
-	*kr{ |start, end, time|
-		^UEnvGen.kr([start,end],[time],\exp)
+	*kr{ |start, end, time, argName = \uxline|
+		#start, end = argName.kr([start,end]);
+		^UEnvGen.kr([0,1],[time],\lin).linexp(0.0,1.0,start,end)
 	}
 
-	*ar{ |start, end, time|
-		^UEnvGen.ar([start,end],[time],\exp)
+	*ar{ |start, end, time, argName = \uxline|
+		#start, end = argName.kr([start,end]);
+		^UEnvGen.ar([0,1],[time],\lin).linexp(0.0,1.0,start,end)
 	}
 
 }
 
 ULine {
 
-	*kr{ |start, end, time|
-		^UEnvGen.kr([start,end],[time],\lin)
+	*kr{ |start=0.0, end=1.0, time, argName = \uline|
+		#start, end = argName.kr([start,end]);
+		^UEnvGen.kr([0,1],[time],\lin).linlin(0.0,1.0,start,end)
 	}
 
-	*ar{ |start, end, time|
-		^UEnvGen.ar([start,end],[time],\lin)
+	*ar{ |start, end, time, argName = \uline|
+		#start, end = argName.kr([start,end]);
+		^UEnvGen.ar([0,1],[time],\lin).linlin(0.0,1.0,start,end)
 	}
 
 }
@@ -78,11 +82,13 @@ UEnvGenRel {
 
 UXLineRel {
 
-	*kr{ |start, end|
+	*kr{ |start, end, argName = \uxlineRel|
+		#start, end = argName.kr([start,end]);
 		^UEnvGenRel.kr([0,1],[1],\lin).linexp(0.0,1.0,start,end)
 	}
 
-	*ar{ |start, end|
+	*ar{ |start, end, argName = \uxlineRel|
+		#start, end = argName.kr([start,end]);
 		^UEnvGenRel.ar([0,1],[1],\lin).linexp(0.0,1.0,start,end)
 	}
 
@@ -90,11 +96,13 @@ UXLineRel {
 
 ULineRel {
 
-	*kr{ |start, end|
+	*kr{ |start, end, argName = \ulineRel|
+		#start, end = argName.kr([start,end]);
 		^UEnvGenRel.kr([0,1],[1],\lin).linlin(0.0,1.0,start,end)
 	}
 
-	*ar{ |start, end|
+	*ar{ |start, end, argName = \ulineRel|
+		#start, end = argName.kr([start,end]);
 		^UEnvGenRel.ar([0,1],[1],\lin).linlin(0.0,1.0,start,end)
 	}
 
