@@ -55,7 +55,7 @@ EnvPlotView {
 	}
 	
 	refresh {
-		if( plotView.isClosed.not ) {
+		if( plotView.userView.view.isClosed.not ) {
 			{ plotView.refresh }.defer;
 		};
 	}
@@ -87,7 +87,7 @@ EnvPlotView {
 	env_ { |new|
 		if( new.notNil ) {
 			env = new;
-			if( plotView.isClosed.not ) {
+			if( plotView.userView.view.isClosed.not ) {
 				this.addCtrl;
 			};
 			this.changed( \env, env );
@@ -103,7 +103,7 @@ EnvPlotView {
 	getPoints { |bounds|
 		var dur;
 		dur = env.times.sum;
-		bounds = bounds ? plotView.drawBounds;
+		bounds = bounds ? plotView.fromBounds;
 		^env.levels.collect({ |level, i|
 			Point(
 				(env.times[..i-1].sum / dur) * bounds.width, 
@@ -137,8 +137,10 @@ EnvPlotView {
 		
 		this.addCtrl;
 			
-		plotView = UserView( view, bounds.moveTo(0,0) )
+		plotView = ScaledUserView.withSliders( view, bounds.moveTo(0,0),  bounds.moveTo(0,0))
 			.resize_( 5 )
+			.scaleVEnabled_( false )
+			.moveVEnabled_( false )
 			.onClose_({ this.removeCtrl; });
 			
 		
@@ -146,7 +148,7 @@ EnvPlotView {
 			var bounds, pts;
 			
 			if( active ) {
-				bounds = vw.bounds.moveTo(0,0);
+				bounds = vw.fromBounds.moveTo(0,0);
 				hitPoint = (x@y);
 				pts = this.getPoints( bounds );
 				this.selectedLine = nil;
@@ -169,7 +171,7 @@ EnvPlotView {
 			var pt, pts, oldX, curves;
 			
 			if( active ) {
-				bounds = vw.bounds.moveTo(0,0);
+				bounds = vw.fromBounds.moveTo(0,0);
 				
 				pts = this.getPoints( bounds );
 				
@@ -255,7 +257,7 @@ EnvPlotView {
 			
 			if( GUI.id === 'swing' ) { strOffset = 14 };
 			
-			bounds = vw.bounds.moveTo(0,0);
+			bounds = vw.fromBounds.moveTo(0,0);
 			
 			////// PREPARATION ///////
 			
