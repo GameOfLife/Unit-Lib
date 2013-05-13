@@ -56,12 +56,6 @@ UEnvGenRel {
 		var timesRel2 = timesRel / timesRel.sum;
 		var start = \u_startPos.kr(0.0);
 		var duration = \u_dur.kr(1.0)+start;
-		var x1 = \u_doneAction.kr(0);
-		var x2 = \u_fadeIn.kr(0);
-		var x3 = \u_fadeOut.kr(0);
-		var x4 = \u_gain.kr(0);
-		var x5 = \u_gate.kr(0);
-		var x6 = \u_mute.kr(0);
 		var env = Env(vals, timesRel2*duration, int);
 		^[start, duration, env]
 	}
@@ -85,11 +79,11 @@ UEnvGenRel {
 UXLineRel {
 
 	*kr{ |start, end|
-		^UEnvGenRel.kr([start,end],[1],\exp)
+		^UEnvGenRel.kr([0,1],[1],\lin).linexp(0.0,1.0,start,end)
 	}
 
 	*ar{ |start, end|
-		^UEnvGenRel.ar([start,end],[1],\exp)
+		^UEnvGenRel.ar([0,1],[1],\lin).linexp(0.0,1.0,start,end)
 	}
 
 }
@@ -97,11 +91,11 @@ UXLineRel {
 ULineRel {
 
 	*kr{ |start, end|
-		^UEnvGenRel.kr([start,end],[1],\lin)
+		^UEnvGenRel.kr([0,1],[1],\lin).linlin(0.0,1.0,start,end)
 	}
 
 	*ar{ |start, end|
-		^UEnvGenRel.ar([start,end],[1],\lin)
+		^UEnvGenRel.ar([0,1],[1],\lin).linlin(0.0,1.0,start,end)
 	}
 
 }
