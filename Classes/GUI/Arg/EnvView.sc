@@ -154,13 +154,13 @@ EnvPlotView {
 				pts = this.getPoints( bounds );
 				this.selectedLine = nil;
 				this.selected = pts.detectIndex({ |ptx|
-					ptx.dist( hitPoint ) <= 0.06;
+					ptx.dist( hitPoint ) <= (vw.pixelScale.x * 6);
 				});
 				if( selected.isNil && { 
 						(
 							env.at( x.linlin(0,bounds.width,0,env.times.sum) )
 								.linlin(min,max,bounds.height,0) - y 
-						).abs < 0.06
+						).abs <  (vw.pixelScale.x * 6)
 					} ) {
 					this.selectedLine = pts.lastIndexForWhich({ |ptx| ptx.x < hitPoint.x });
 				};
@@ -266,11 +266,14 @@ EnvPlotView {
 		plotView.drawFunc = { |vw|
 			var freqs, svals, bounds, sline, slineX;
 			var pts, strOffset = 11;
+			var res;
 			var pscale;
 			
 			if( GUI.id === 'swing' ) { strOffset = 14 };
 			
 			bounds = vw.fromBounds.moveTo(0,0);
+			
+			res = ((vw.bounds.width / bounds.width) * vw.scaleH).round(1);
 			
 			vw.drawTimeGrid;
 			
@@ -287,15 +290,15 @@ EnvPlotView {
 			
 			Pen.width = pscale;
 			
-			svals = env.discretize( bounds.width * 100 ).linlin(min,max, bounds.height, 0, \none);
+			svals = env.discretize( bounds.width * res ).linlin(min,max, bounds.height, 0, \none);
 			
 			// get draggable points
 			pts = this.getPoints( bounds );
 			
 			if( selectedLine.notNil ) {
-				slineX = (pts.clipAt(selectedLine).x * 100).asInt;
+				slineX = (pts.clipAt(selectedLine).x * res).asInt;
 				sline = svals
-					[slineX..(pts.clipAt(selectedLine+1).x * 100).ceil.asInt-1];
+					[slineX..(pts.clipAt(selectedLine+1).x * res).ceil.asInt-1];
 				Pen.color = Color.yellow;
 				Pen.width = pscale * 3;
 				Pen.moveTo( slineX.linlin(0,svals.size, 0,bounds.width)@(sline[0]) );
