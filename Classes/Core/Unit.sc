@@ -82,6 +82,7 @@ Udef : GenericDef {
 	
 	classvar <>all, <>defsFolders, <>userDefsFolder;
 	classvar <>buildUdef; // the Udef currently under construction
+	classvar <>buildArgSpecs; //The specs under construction
 	classvar <>loadOnInit = true;
 		
 	var <>func, <>category;
@@ -114,6 +115,12 @@ Udef : GenericDef {
 	
 	*numChannels { ^buildUdef !? { buildUdef.numChannels } ? 1 }
 
+	*addBuildSpec { |argSpec|
+		this.buildArgSpecs !? {
+			this.buildArgSpecs = this.buildArgSpecs ++ [argSpec];
+		}
+	}
+
     prGenerateSynthDefName {
        ^this.class.prefix ++ (extraPrefix ? "") ++ this.name.asString
     }
@@ -124,11 +131,14 @@ Udef : GenericDef {
 		func = inFunc;
 		
 		this.class.buildUdef = this;
+		this.class.buildArgSpecs = [];
 		this.synthDef = SynthDef( this.prGenerateSynthDefName, func );
 		this.class.buildUdef = nil;
 		
-		argSpecs = ArgSpec.fromSynthDef( this.synthDef, argSpecs );
+		argSpecs = ArgSpec.fromSynthDef( this.synthDef, argSpecs ++ this.class.buildArgSpecs );
 		
+		this.class.buildArgSpecs = nil;
+
 		this.initArgs;
 		if( loadOnInit ) { this.loadSynthDef };
 		this.changed( \init );
