@@ -464,6 +464,8 @@ EnvEditView {
 				.applySkin( RoundView.skin );
 		
 		views[ \duration ] = SMPTEBox( view, 70 @ viewHeight  )
+			.applySmoothSkin
+			.applySkin( RoundView.skin )
 			.value_( env.times.sum )
 			.clipLo_( 0.001 )
 			.font_( font )
@@ -537,6 +539,8 @@ EnvEditView {
 					.applySkin( RoundView.skin );
 				
 				vws[ \time ] = SMPTEBox( vws[ \comp ], 70 @ viewHeight  )
+					.applySmoothSkin
+					.applySkin( RoundView.skin )
 					.value_( env.times[i] )
 					.clipLo_( 0 )
 					.font_( font )
