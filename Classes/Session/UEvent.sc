@@ -19,7 +19,7 @@
 
 UEvent : UArchivable {
 	
-	classvar <>renderNumChannels = 2;
+	classvar >renderNumChannels = 2;
 	classvar <>renderMaxTime = 60;
 
     var <startTime=0;
@@ -62,6 +62,8 @@ UEvent : UArchivable {
     finiteDuration { |addInf = 10|
 	    if( this.isFinite ) { ^this.duration } { ^addInf };
     }
+    
+    renderNumChannels { ^renderNumChannels.value }
     
     track_ { |newTrack = 0| track = newTrack; this.changed( \track ) }
     
@@ -153,7 +155,7 @@ UEvent : UArchivable {
 		};
 		
 		o = ServerOptions.new
-			.numOutputBusChannels_(renderNumChannels ? 2)
+			.numOutputBusChannels_(this.renderNumChannels ? 2)
 			.memSize_( 2**19 );
 		path = path.replaceExtension( headerFormat.toLower );
 		this.render( 
