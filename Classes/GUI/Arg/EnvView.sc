@@ -236,6 +236,9 @@ EnvPlotView {
 				
 				if( selectedLine.notNil ) {
 					curves = env.curves.asCollection.wrapExtend(env.times.size);
+					if( Env.shapeNumber( curves[selectedLine] ) == 1 ) {
+						 curves[selectedLine] = 0;
+					};
 					if( curves[selectedLine].isNumber ) {
 						if( pts[selectedLine].y > (pts[selectedLine+1].y) ) {
 							curves[selectedLine] = curves[selectedLine] - 
@@ -333,7 +336,7 @@ EnvPlotView {
 
 EnvEditView {
 	
-	var <env, <view, <listView, <argViews, <ctrl;
+	var <env, <view, <listView, <argViews, <ctrl, <views;
 	var <>viewHeight = 14;
 	var <resize = 8;
 	var <>font;
@@ -356,33 +359,32 @@ EnvEditView {
 	
 	addCtrl {
 		ctrl.remove;
-		ctrl = SimpleController( env )
-			.put( \setting, { |obj, what, name, argName, value|
-				var nameIndex, vw;
-				if( listView.isClosed.not ) {
-					if( name.isNil ) {
-						this.update;
-					} {
-						nameIndex = env.names.indexOf( name );
-						if( nameIndex.notNil ) {
-							vw = argViews[ nameIndex ][ argName ];
-							if( vw.notNil ) {
-								vw.value = value;
-							};
-						};
-					};
-				};
-			});
+		ctrl = SimpleController( env );
+		ctrl.put( \times, { this.update })
+			.put( \levels, { this.update })
+			.put( \curves, { this.update });
 	}
 	
 	update {
-		var argNames;
+		var curves;
 		if( listView.isClosed.not ) {
-			argNames = env.argNames;
-			argNames.do({ |names, i|
-				names.do({ |argName|
-					argViews[ i ][ argName ].value = env.get( i, argName );
-				});
+			curves = env.curves.asCollection.wrapExtend( env.levels.size - 1 );
+			views[ \duration ].value = env.times.sum;
+			argViews.do({ |item, i|
+				var last;
+				last = (i == (env.levels.size-1));
+				item.level.value = env.levels[i];
+				if( last.not ) {
+					item.time.value = env.times[i];
+					if( curves[i].isNumber ) {
+						item.curveNumber.stringColor = Color.black;
+						item.curveNumber.value = curves[i];
+						{ item.curveType.value = 5 }.defer;
+					} {
+						item.curveNumber.stringColor = Color.black.alpha_(0.5);
+						{ item.curveType.value = Env.shapeNumber( curves[i] ) }.defer;
+					};
+				};
 			});
 		};
 	}
@@ -398,7 +400,7 @@ EnvEditView {
 				});
 				{ 	listView.value = selected; 
 					view.view.background = Color.hsv( 
-						(selected ? 0).linlin( 0, env.names.size, 0, 1 ), 
+						(selected ? 0).linlin( 0, env.levels.size, 0, 1 ), 
 						0.75, 0.5 
 					).alpha_( 0.25 );
 				}.defer;
@@ -415,7 +417,6 @@ EnvEditView {
 			};
 			this.changed( \env, env );
 			this.update;
-			//this.refresh;
 		};
 	}
 	
@@ -426,7 +427,7 @@ EnvEditView {
 	
 	
 	makeView { |parent, bounds|
-		var comp, argNames, specs;
+		var comp;
 		
 		if( bounds.isNil ) { bounds = 350 @ (this.class.viewNumLines * (viewHeight + 4)) };
 			
@@ -435,8 +436,11 @@ EnvEditView {
 		view.resize_( resize ? 5 );
 		argViews = [];
 		
+		views = ();
+		
 		this.addCtrl;
 		
+		// selection
 		listView = PopUpMenu( view, 80 @ viewHeight )
 			.font_( font )
 			.value_( selected ? 0 )
@@ -452,55 +456,157 @@ EnvEditView {
 			
 		listView.onClose_({ this.removeCtrl });
 		
+		// duration
+		StaticText( view, 45 @ viewHeight )
+				.string_( "duration " )
+				.align_( \right )
+				.font_( font )
+				.applySkin( RoundView.skin );
+		
+		views[ \duration ] = SMPTEBox( view, 70 @ viewHeight  )
+			.value_( env.times.sum )
+			.clipLo_( 0.001 )
+			.font_( font )
+			.action_({ |nb|
+				var times;
+				times = env.times;
+				if( times.mutable.not ) {
+					times = times.copy;
+				};
+				times = times.normalizeSum * nb.value;
+				env.times = times;
+				env.changed( \times );
+				action.value( this, env );
+			});
+
 		view.decorator.nextLine;
 		
 		comp = CompositeView( view, bounds.width @ (viewHeight + 4))
 			.resize_(2)
 			.background_( Color.white.alpha_(0.25) );
 		
-		argNames = [ \level, \time, \curve ];
-		specs = [ [0,1].asSpec, SMPTESpec(), [-32,32].asSpec ];
-		
 		view.view.background = Color.hsv( 
-			(selected ? 0).linlin( 0, env.names.size, 0, 1 ), 
+			(selected ? 0).linlin( 0, env.levels.size, 0, 1 ), 
 			0.75, 0.5 
 		).alpha_( 0.25 );
 			
-		env.levels.do({ |name, i|
-			var vws;
+		env.levels.do({ |level, i|
+			var vws, last;
 			vws = ();
+			
+			last = (i == (env.levels.size-1));
 			
 			vws[ \comp ] = CompositeView( comp, bounds.width @ (viewHeight + 4) )
 				.resize_(2);
 				
 			vws[ \comp ].addFlowLayout( 2@2, 2@2 );
 			
-			argNames[i].do({ |argName, ii|
-				var spec, step;
+			// level
+			StaticText(  vws[ \comp ], 25 @ viewHeight )
+				.string_( "level " )
+				.align_( \right )
+				.font_( font )
+				.applySkin( RoundView.skin );
+			
+			vws[ \level ] = SmoothNumberBox( vws[ \comp ], 40 @ viewHeight  )
+				.value_( level )
+				.font_( font )
+				.clipLo_( 0.0 )
+				.clipHi_( 1.0 )
+				.step_( 0.01 )
+				.scroll_step_( 0.01 )
+				.action_({ |nb|
+					var levels;
+					levels = env.levels;
+					if( levels.mutable.not ) {
+						levels = levels.copy;
+					};
+					levels.put( i, nb.value );
+					env.levels = levels;
+					env.changed( \levels );
+					action.value( this, env );
+				});
 				
+			if( last.not ) {
+				
+				// time
 				StaticText(  vws[ \comp ], 25 @ viewHeight )
-					.string_( argName.asString ++ " " )
+					.string_( "time " )
 					.align_( \right )
 					.font_( font )
 					.applySkin( RoundView.skin );
-					
-				spec = specs[i][ii];
-				step =  spec !? { spec.step } ? 1;
-				if( step == 0 ) { step = 1 };
 				
-				vws[ argName ] = SmoothNumberBox( vws[ \comp ], 40 @ viewHeight  )
-					.value_( env.get( name, argName ) )
+				vws[ \time ] = SMPTEBox( vws[ \comp ], 70 @ viewHeight  )
+					.value_( env.times[i] )
+					.clipLo_( 0 )
 					.font_( font )
-					.clipLo_( spec !? { spec.minval } ? -inf )
-					.clipHi_( spec !? { spec.maxval } ? inf  )
-					.step_( step )
-					.scroll_step_( step )
 					.action_({ |nb|
-						env.set( name, argName, nb.value );
+						var times;
+						times = env.times;
+						if( times.mutable.not ) {
+							times = times.copy;
+						};
+						times.put( i, nb.value );
+						env.times = times;
+						env.changed( \times );
 						action.value( this, env );
 					});
 				
-			});
+				// curve
+				StaticText(  vws[ \comp ], 35 @ viewHeight )
+					.string_( "curve " )
+					.align_( \right )
+					.font_( font )
+					.applySkin( RoundView.skin );
+				
+				vws[ \curveType ] = PopUpMenu( vws[ \comp ], 60 @ viewHeight  )
+					.items_([ \step, \lin, \exp, \sine, \welch, \curve, \squared, \cubed ])
+					.value_( 
+						Env.shapeNumber(env.curves.asCollection.wrapAt(i)) 
+					)
+					.font_( font )
+					.action_({ |pu|
+						if( pu.value != 5 ) {
+							env.curves = env.curves.asCollection
+								.wrapExtend( env.levels.size - 1 ).put( i, pu.item );
+							vws[ \curveNumber ].stringColor = Color.black.alpha_(0.5);
+						} {
+							env.curves = env.curves.asCollection
+								.wrapExtend( env.levels.size - 1 )
+								.put( i, vws[ \curveNumber ].value );
+							vws[ \curveNumber ].stringColor = Color.black;
+						};
+						env.changed( \curves );
+						action.value( this, env );
+					});
+				
+				vws[ \curveNumber ] = SmoothNumberBox( vws[ \comp ], 40 @ viewHeight  )
+					.value_( 
+						if( env.curves.asCollection.wrapAt(i).isNumber ) {
+							env.curves.asCollection.wrapAt(i)
+						} {
+							0
+						}
+					)
+					.clipLo_( -16 )
+					.clipHi_( 16 )
+					.step_( 0.1 )
+					.scroll_step_( 0.1 )
+					.font_( font )
+					.action_({ |nb|
+						env.curves = env.curves.asCollection
+							.wrapExtend( env.levels.size - 1 )
+							.put( i, nb.value );
+						vws[ \curveType ].value = 5;
+						nb.stringColor = Color.black;
+						env.changed( \curves );
+						action.value( this, env );
+					});
+				
+				if( env.curves.asCollection.wrapAt(i).isNumber.not ) {
+					vws[ \curveNumber ].stringColor = Color.black.alpha_(0.5);
+				};
+			};
 			
 			vws[ \comp ].visible = ((selected ? 0) == i);
 			
@@ -516,7 +622,6 @@ EnvView {
 	var <view;
 	var <plotView, <editView;
 	var <plotCtrl, <editCtrl;
-	var <presetManager, <presetView;
 	var <>action, <>viewHeight = 14;
 	var <resize = 5;
 	
@@ -524,7 +629,7 @@ EnvView {
 		^this.newCopyArgs.makeView( parent, bounds, env, presets );
 	}
 	
-	*viewNumLines { ^EQEditView.viewNumLines + EQPlotView.viewNumLines + PresetManagerGUI.viewNumLines }
+	*viewNumLines { ^EnvEditView.viewNumLines + EnvPlotView.viewNumLines }
 	
 	resize_ { |new|
 		resize = new;
@@ -551,7 +656,7 @@ EnvView {
 	close { view.findWindow.close } 
 	
 	makeView { |parent, bounds, env, presets|
-		if( env.isNil ) { env = EQSetting() };
+		if( env.isNil ) { env = Env() };
 		
 		if( bounds.isNil ) { bounds = 350 @ (this.class.viewNumLines * (viewHeight + 4)) };
 			
@@ -559,31 +664,33 @@ EnvView {
 		bounds = view.asView.bounds;
 		view.resize_( resize ? 5 );
 		
-		plotView = EQPlotView( view, 
+		plotView = EnvPlotView( view, 
 			bounds.copy.height_( bounds.height *
-				( EQPlotView.viewNumLines / this.class.viewNumLines) ),
+				( EnvPlotView.viewNumLines / this.class.viewNumLines) ),
 			env
 		).resize_(5);
 		
-		editView = EQEditView( view, 
+		env = plotView.env;
+		
+		editView = EnvEditView( view, 
 			bounds.copy.height_( bounds.height *
-				( EQEditView.viewNumLines / this.class.viewNumLines) ),
+				( EnvEditView.viewNumLines / this.class.viewNumLines) ),
 			env
 		).resize_(8);
 		
 		plotCtrl = SimpleController( plotView )
-			.put( \selected, { editView.selected = plotView.selected } );
+			.put( \selected, { editView.selected = plotView.selected; } )
+			.put( \selectedLine, { editView.selected = plotView.selectedLine; } );
 		
 		editCtrl = SimpleController( editView )
-			.put( \selected, { plotView.selected = editView.selected } );
-		
-		presetView = PresetManagerGUI( view, 
-			bounds.copy.height_( bounds.height * ( 1 / this.class.viewNumLines) ),
-			env.getEQdef.presetManager,
-			env
-		);
-		
-		presetView.resize_(8);
+			.put( \selected, { 
+				if( (plotView.selected != editView.selected)  && {
+					plotView.selectedLine != editView.selected
+				}) {
+					plotView.selected = editView.selected; 
+					plotView.selectedLine = nil 
+				};
+			} );
 
 		view.asView.onClose_({ plotCtrl.remove; editCtrl.remove });
 		
