@@ -153,7 +153,7 @@ GenericDef : UArchivable {
 		var path;
 		path = this.filePath;
 		if( path.notNil ) {
-			^Document.open( path );
+			^path.openDocument
 		} {
 			^nil;
 		};
