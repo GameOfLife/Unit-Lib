@@ -336,7 +336,7 @@ EnvPlotView {
 
 EnvEditView {
 	
-	var <env, <view, <listView, <argViews, <ctrl, <views;
+	var <env, <view, <listView, <argViews, <rangeViews, <ctrl, <views;
 	var <>viewHeight = 14;
 	var <resize = 8;
 	var <>font;
@@ -370,6 +370,7 @@ EnvEditView {
 		if( listView.isClosed.not ) {
 			curves = env.curves.asCollection.wrapExtend( env.levels.size - 1 );
 			views[ \duration ].value = env.times.sum;
+			rangeViews[ \range ].value = [ env.levels.minItem, env.levels.maxItem ];
 			argViews.do({ |item, i|
 				var last;
 				last = (i == (env.levels.size-1));
@@ -398,11 +399,18 @@ EnvEditView {
 				argViews.do({ |item, i|
 					item[ \comp ].visible = (i == selected);
 				});
+				rangeViews[ \comp ].visible = false;
 				{ 	listView.value = selected; 
 					view.view.background = Color.hsv( 
 						(selected ? 0).linlin( 0, env.levels.size, 0, 1 ), 
 						0.75, 0.5 
 					).alpha_( 0.25 );
+				}.defer;
+			} {
+				argViews.do({ |item, i| item[ \comp ].visible = false; });
+				rangeViews[ \comp ].visible = true;
+				{ 	listView.value = listView.items.size - 1; 
+					view.view.background = Color.gray(0.7).alpha_( 0.5 );
 				}.defer;
 			};
 			this.changed( \selected, selected );
@@ -448,10 +456,14 @@ EnvEditView {
 			.items_( 
 				env.levels.collect({ |item, i|
 					"node" + i;
-				}) 
+				}) ++ [ "all" ] 
 			)
 			.action_({ |pu|
-				this.selected = pu.value;
+				if( pu.value == (pu.items.size-1) ) {
+					this.selected = nil;
+				} {
+					this.selected = pu.value;
+				};
 			});
 			
 		listView.onClose_({ this.removeCtrl });
@@ -616,7 +628,30 @@ EnvEditView {
 			
 			argViews = argViews.add( vws );
 		});
+		
+		rangeViews = ();
+
+		rangeViews[ \comp ] = CompositeView( comp, bounds.width @ (viewHeight + 4) )
+				.resize_(2);
+				
+		rangeViews[ \comp ].addFlowLayout( 2@2, 2@2 );
 			
+		// range
+		rangeViews[ \range ] = EZSmoothRanger( rangeViews[ \comp ],
+			(bounds.width - 60) @ viewHeight, "range"
+		)
+			.font_( font )
+			.value_( [ env.levels.minItem, env.levels.maxItem] )
+			.action_({ |sl|
+				env.levels = env.levels.normalize( 
+					sl.value[0], 
+					sl.value[1].max(sl.value[0]+1.0e-12)  
+				);
+				env.changed( \levels );
+			});
+		rangeViews[ \range ].view.resize_(2);
+		
+		rangeViews[ \comp ].visible = selected.isNil;
 	}
 	
 }
@@ -684,16 +719,21 @@ EnvView {
 		
 		plotCtrl = SimpleController( plotView )
 			.put( \selected, { editView.selected = plotView.selected; } )
-			.put( \selectedLine, { editView.selected = plotView.selectedLine; } );
+			.put( \selectedLine, { editView.selected = plotView.selectedLine ? plotView.selected; } );
 		
 		editCtrl = SimpleController( editView )
 			.put( \selected, { 
-				if( (plotView.selected != editView.selected)  && {
-					plotView.selectedLine != editView.selected
-				}) {
-					plotView.selected = editView.selected; 
-					plotView.selectedLine = nil 
-				};
+				if( editView.selected.isNil ) {
+					plotView.selected = nil;
+					plotView.selectedLine = nil;
+				} {	
+					if( (plotView.selected != editView.selected)  && {
+						plotView.selectedLine != editView.selected
+					}) {
+						plotView.selected = editView.selected; 
+						plotView.selectedLine = nil 
+					};
+				}
 			} );
 
 		view.asView.onClose_({ plotCtrl.remove; editCtrl.remove });
