@@ -2,7 +2,7 @@
 z = UScore(
 	*12.collect({ |i|
 		var evt;
-		evt = BufSndFile("sounds/a11wlk01-44_1.aiff", 
+		evt = BufSndFile("@resources/sounds/a11wlk01-44_1.aiff",
 				rate: (i-6).midiratio, loop: [true,false].wrapAt(i) ).makeUChain
 				.releaseSelf_(true).startTime_(i/2).track_(i).fadeOut_(1).fadeIn_(1);
 		
