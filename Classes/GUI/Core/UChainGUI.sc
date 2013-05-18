@@ -570,10 +570,10 @@ UChainGUI {
 		};
 		
 		if( units.size == 0 ) {
-			comp = CompositeView( scrollView, width@14 )
+			comp = CompositeView( scrollView, width@100 )
 				.resize_(2);
 			
-			header = StaticText( comp, comp.bounds.moveTo(0,0) )
+			header = StaticText( comp, comp.bounds.width @ 14 )
 				.applySkin( RoundView.skin )
 				.string_( " empty: drag unit or Udef here" )
 				.background_( Color.yellow.alpha_(0.25) )
@@ -583,7 +583,7 @@ UChainGUI {
 						{ Font( Font.defaultSansFace, 12) }).boldVariant 
 				);
 				
-			uview = UserView( comp, comp.bounds.moveTo(0,0) );
+			uview = UserView( comp, comp.bounds.width @ 100 );
 				
 			uview.canReceiveDragHandler_({ |sink|
 				var drg;
@@ -745,8 +745,9 @@ UChainGUI {
 		});
 		
 		if( notMassEdit && { units.size > 0 } ) {
-			addLast = UserView( scrollView, width@6 )
-				.resize_(2);
+			addLast = UserView( scrollView, width@100 )
+				.resize_(2)
+				.canFocus_(false);
 					
 			addLast.canReceiveDragHandler_({ |sink|
 					var drg;
