@@ -153,6 +153,7 @@ UdefListView {
 
             udefs.do({ |udef|
 	            var hasFile = false, wd = 36;
+	            if( GUI.id == \qt ) { wd = 44 };
 	            if( udef.isKindOf( GenericDef ) ) {
 		           hasFile = udef.filePath.notNil;
 		            if( hasFile ) { wd = 36 + 4 + scrollerMargin + 6 };
