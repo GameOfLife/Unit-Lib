@@ -845,9 +845,9 @@
 			labelWidth = 0;
 		};
 		
-		vws[ \objectLabel ] = StaticText( view, 55 @ (bounds.height) )
-			.applySkin( RoundView.skin )
-			.background_( Color.gray(0.8) );
+		vws[ \objectLabel ] = StaticText( view,Ê
+			(bounds.width-(labelWidth + 2) - 42) @ (bounds.height) 
+		).applySkin( RoundView.skin ).background_( Color.gray(0.8) );
 			
 		vws[ \setLabel ] = {
 			{ vws[ \objectLabel ].string = " " ++ vws[ \val ].asString; }.defer;
