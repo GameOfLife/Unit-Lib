@@ -649,6 +649,25 @@ U : ObjectWithArgs {
 	audioOuts { ^this.def.audioOuts( this ); }
 	controlOuts { |unit| ^this.def.controlOuts( this ); }
 	
+	increaseIOs { |amt = 1|
+		var audioIns = this.audioIns;
+		var controlIns = this.controlIns;
+		var audioOuts = this.audioOuts;
+		var controlOuts = this.controlOuts;
+		audioIns.do({ |item|
+			this.setAudioIn(item, this.getAudioIn(item) + (audioIns.size * amt));
+		});
+		controlIns.do({ |item|
+			this.setControlIn(item, this.getControlIn(item) + (controlIns.size * amt));
+		});
+		audioOuts.do({ |item|
+			this.setAudioOut(item, this.getAudioOut(item) + (audioOuts.size * amt));
+		});
+		controlOuts.do({ |item|
+			this.setControlOut(item, this.getControlOut(item) + (controlOuts.size * amt));
+		});
+	}
+		
 	canFreeSynth { ^this.def.canFreeSynth( this ) }
 	
 	shouldPlayOn { |target| // this may prevent a unit or chain to play on a specific server 

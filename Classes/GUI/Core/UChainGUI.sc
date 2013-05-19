@@ -761,7 +761,7 @@ UChainGUI {
 					.label_( '+' )
 					.border_( 1 )
 					.action_({
-						chain.units = chain.units.insert( i, unit.deepCopy );
+						chain.units = chain.units.insert( i+1, unit.deepCopy.increaseIOs );
 					}).resize_(3);
 			};	
 					
