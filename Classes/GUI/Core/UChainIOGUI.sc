@@ -48,6 +48,8 @@ UChainIOGUI : UChainGUI {
 		}).sum + (4 * (14 + gap.y));
 	}
 	
+	getUnits { ^chain.units }
+	
 	makeUnitHeader { |units, margin, gap|
 		var comp, header,params;
 		var audio, control;

@@ -26,6 +26,8 @@ UChainCodeGUI : UChainGUI {
 		});
 
 	}
+	
+	getUnits { ^chain.units }
 
     makeUnitHeader { |units, margin, gap|
         var comp, header,params;

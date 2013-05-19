@@ -29,6 +29,7 @@ UChainGUI {
 	var <>presetView;
 	var <>action;
 	var originalBounds;
+	var <packUnits = false;
 	
 	*initClass {
 		
@@ -101,6 +102,34 @@ UChainGUI {
 		}).sum + (4 * (14 + gap.y));
 	}
 	
+	getUnits {
+		var units;
+		if( this.packUnits ) {
+			units = Array( chain.units.size );
+			chain.units.do({ |item, i|
+				case { i == 0 or: { item.isKindOf( MassEditU ) or: 
+						{ item.def.isKindOf( LocalUdef ) } } 
+				} {
+					units.add( item );
+				} { item.def == units.last.def } {
+					if( units.last.isKindOf( MassEditU ) ) {
+						units.last.units = units.last.units.add(item);
+					} {
+						units[ units.size - 1 ] = MassEditU([ units.last, item ]);  
+					};
+				} { units.add( item ); }
+			});
+			^units;
+		} {
+			^chain.units
+		};
+	}
+	
+	packUnits_ { |bool = true|
+		packUnits = bool;
+		chain.changed( \units )
+	}
+	
 	prMakeViews { |bounds|
 		var margin = 0@0, gap = 4@4;
 		var heights, units;
@@ -122,7 +151,8 @@ UChainGUI {
 		if( parent.asView.class.name == 'SCScrollTopView' ) {
 			bounds.width = bounds.width - 12;
 		};
-		units = chain.units;
+		
+		units = this.getUnits;
 				
 		controller = SimpleController( chain );
 		udefController = SimpleController( Udef.all );
