@@ -40,7 +40,7 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 				});
 				massEditSpec = argSpec.spec.massEditSpec( values );
 				if( massEditSpec.notNil ) {
-					ArgSpec( argSpec.name, massEditSpec.default, massEditSpec, argSpec.private ); 
+					ArgSpec( argSpec.name, massEditSpec.default, massEditSpec, argSpec.private, argSpec.mode ); 
 				} {
 					nil;
 				};
