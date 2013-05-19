@@ -22,6 +22,7 @@ UChainGUI {
 	classvar <>skin;
 	classvar <>current;
 	classvar <>singleWindow = true;
+	classvar <>packUnitsDefault = true;
 	
 	var <chain, <score;
 	
@@ -29,7 +30,7 @@ UChainGUI {
 	var <>presetView;
 	var <>action;
 	var originalBounds;
-	var <packUnits = false;
+	var <packUnits = true;
 	
 	*initClass {
 		
@@ -56,6 +57,8 @@ UChainGUI {
 	
 	init { |inParent, bounds|
 		parent = inParent;
+		
+		packUnits = packUnitsDefault;
 		
 		if( skin.font.class != Font.implClass ) { // quick hack to make sure font is correct
 			skin.font = Font( Font.defaultSansFace, 10 );
@@ -125,8 +128,23 @@ UChainGUI {
 		};
 	}
 	
+	setUnits { |units|
+		var actualUnits = [];
+		units.do({ |item|
+			case { item.isKindOf( MassEditU ) } {
+				item.units.do({ |item|
+					actualUnits = actualUnits.add( item );
+				});
+			} {
+				actualUnits = actualUnits.add( item );
+			};
+		});
+		chain.units = actualUnits;
+	}
+	
 	packUnits_ { |bool = true|
 		packUnits = bool;
+		packUnitsDefault = packUnits;
 		chain.changed( \units )
 	}
 	
@@ -585,6 +603,7 @@ UChainGUI {
 		var width;
 		var notMassEdit;
 		var scrollerMargin = 12;
+		var realIndex = 0;
 		var massEditWindow;
 		
 		if( GUI.id == \qt ) { scrollerMargin = 20 };
@@ -644,9 +663,17 @@ UChainGUI {
 		
 		ug = units.collect({ |unit, i|
 			var header, comp, uview, plus, min, defs, io;
-			var addBefore;
+			var addBefore, indexLabel;
 				
-					
+			indexLabel = realIndex.asString;
+			
+			if( notMassEdit && { unit.isKindOf( MassEditU ) } ) {
+				realIndex = realIndex + unit.units.size;
+				indexLabel = indexLabel ++ ".." ++ (realIndex -1);
+			} {
+				realIndex = realIndex + 1;
+			};
+			
 			addBefore = UserView( scrollView, width@6 )
 				.resize_(2);
 			
@@ -667,22 +694,25 @@ UChainGUI {
 					.receiveDragHandler_({ |sink, x, y|
 							var ii;
 							case { View.currentDrag.isKindOf( U ) } {
-								ii = chain.units.indexOf( View.currentDrag );
+								ii = units.indexOf( View.currentDrag );
 								if( ii.notNil ) {
-									chain.units[ii] = nil;
-									chain.units.insert( i, View.currentDrag );
-									chain.units = chain.units.select(_.notNil);
+									units[ii] = nil;
+									units.insert( i, View.currentDrag );
+									this.setUnits( units.select(_.notNil) );
 								} {
-									chain.units = chain.units.insert( i, 
-										View.currentDrag.deepCopy );
+									this.setUnits( 
+										units.insert( i, View.currentDrag.deepCopy ) 
+									);
 								};
 							} { View.currentDrag.isKindOf( Udef ) } {
-								chain.units = chain.units.insert( i,  U( View.currentDrag ) );
+								this.setUnits( units.insert( i, U( View.currentDrag ) ) );
 							}{ View.currentDrag.isKindOf( UnitRack ) } {
-	                           		chain.insertCollection( i, View.currentDrag.units ++ [ unit ]);                        
+								this.setUnits( 
+									units[..i-1] ++ View.currentDrag.units ++ units[i..] 
+								);                       
 	                           }{   [ Symbol, String ].includes( View.currentDrag.class )  } {
-								chain.units = chain.units.insert( i, 
-									U( View.currentDrag.asSymbol )
+								this.setUnits( 
+									units.insert( i, U( View.currentDrag.asSymbol ) )
 								);
 							};
 					});
@@ -693,7 +723,7 @@ UChainGUI {
 			
 			header = StaticText( comp, comp.bounds.moveTo(0,0) )
 				.applySkin( RoundView.skin )
-				.string_( " " ++ i ++ ": " ++ if(unit.def.class == LocalUdef){"[Local] "}{""}++unit.defName )
+				.string_( " " ++ indexLabel ++ ": " ++ if(unit.def.class == LocalUdef){"[Local] "}{""}++unit.defName )
 				.background_( Color.white.alpha_(0.5) )
 				.resize_(2)
 				.font_( 
@@ -723,17 +753,17 @@ UChainGUI {
 				var u, ii;
 				case { View.currentDrag.isKindOf( U ) } {
 					u = View.currentDrag;
-					ii = chain.units.indexOf( u );
+					ii = units.indexOf( u );
 					if( ii.notNil ) { 
-						chain.units[ii] = unit; 
-						chain.units[i] = u;
+						units[ii] = unit; 
+						units[i] = u;
 					} {
-						chain.units[ i ] = u.deepCopy;
+						units[ i ] = u.deepCopy;
 					};
-					chain.units = chain.units; // force refresch
+					this.setUnits( units );
 					
 				} { View.currentDrag.isKindOf( UnitRack ) } {
-                        chain.insertCollection( i, View.currentDrag.units );
+                        this.setUnits( units[..i-1] ++ View.currentDrag.units ++ units[i+1..] );
                     } { View.currentDrag.isKindOf( Udef ) } {
 					unit.def = View.currentDrag;
 				} {   [ Symbol, String ].includes( View.currentDrag.class )  } {
@@ -768,6 +798,7 @@ UChainGUI {
 							};	
 						});
 						unit.units.do({ |item, i|
+							if( notMassEdit ) { i = i + (realIndex - unit.units.size) };
 							StaticText( massEditWindow, 
 									(massEditWindow.bounds.width - 8) @ 14 )
 								.applySkin( RoundView.skin )
@@ -790,7 +821,11 @@ UChainGUI {
 						.label_( '-' )
 						.border_( 1 )
 						.action_({
-							chain.units = chain.units.select(_ != unit);
+							var u = unit;
+							if( u.isKindOf( MassEditU ) ) {
+								u = u.units.last;
+							};
+							chain.units = chain.units.select(_ != u);
 						}).resize_(3);
 				
 				if( units.size == 1 ) {
@@ -802,7 +837,15 @@ UChainGUI {
 					.label_( '+' )
 					.border_( 1 )
 					.action_({
-						chain.units = chain.units.insert( i+1, unit.deepCopy.increaseIOs );
+						var index, copy;
+						if( unit.isKindOf( MassEditU ) ) {
+							index = chain.units.indexOf( unit.units.last );
+							copy = unit.units.last.deepCopy.increaseIOs;
+						} {
+							copy = unit.deepCopy.increaseIOs;
+							index = i;
+						};
+						chain.units = chain.units.insert( index+1, copy );
 					}).resize_(3);
 			};	
 					
@@ -836,13 +879,13 @@ UChainGUI {
 				.receiveDragHandler_({ |sink, x, y|
 						var ii;
 						case { View.currentDrag.isKindOf( U ) } {
-							ii = chain.units.indexOf( View.currentDrag );
+							ii = units.indexOf( View.currentDrag );
 							if( ii.notNil ) {
-								chain.units[ii] = nil;
-								chain.units = chain.units.select(_.notNil) ++
-									[ View.currentDrag ];
+								units[ii] = nil;
+								this.setUnits( units.select(_.notNil) ++
+									[ View.currentDrag ] );
 							} {
-								chain.units = chain.units ++ [ View.currentDrag.deepCopy ];
+								this.setUnits( units ++ [ View.currentDrag.deepCopy ] );
 							};
 							
 						} { View.currentDrag.isKindOf( Udef ) } {
