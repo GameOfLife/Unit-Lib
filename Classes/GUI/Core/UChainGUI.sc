@@ -585,6 +585,7 @@ UChainGUI {
 		var width;
 		var notMassEdit;
 		var scrollerMargin = 12;
+		var massEditWindow;
 		
 		if( GUI.id == \qt ) { scrollerMargin = 20 };
 		
@@ -742,6 +743,46 @@ UChainGUI {
 			.beginDragAction_({ 
 				unit;
 			});
+			
+			if( unit.isKindOf( MassEditU ) ) {
+				SmoothButton( comp, 
+					Rect( comp.bounds.right - 
+						((18 + 2) + if( notMassEdit){12 + 4 + 12}{0}), 
+						1, 18, 12 ) 
+					)
+					.label_( 'up' )
+					.border_( 1 )
+					.radius_( 2 )
+					.action_({
+						if( massEditWindow.notNil && { massEditWindow.isClosed.not }) {
+							massEditWindow.close;
+						};
+						RoundView.pushSkin( skin );
+						massEditWindow = Window( unit.defName, 
+							this.window.bounds.moveBy( this.window.bounds.width + 10, 0 ),
+							scroll: true ).front;
+						massEditWindow.addFlowLayout;
+						comp.onClose_({ 
+							if( massEditWindow.notNil && { massEditWindow.isClosed.not }) {
+								massEditWindow.close;
+							};	
+						});
+						unit.units.do({ |item, i|
+							StaticText( massEditWindow, 
+									(massEditWindow.bounds.width - 8) @ 14 )
+								.applySkin( RoundView.skin )
+								.string_( " " ++ i ++ ": " ++ item.defName )
+								.background_( Color.white.alpha_(0.5) )
+								.resize_(2)
+								.font_( 
+									(RoundView.skin.tryPerform( \at, \font ) ?? 
+										{ Font( Font.defaultSansFace, 12) }).boldVariant 
+								);
+							item.gui( massEditWindow );
+						});
+						RoundView.popSkin( skin );
+					}).resize_(3);
+			};
 			
 			if( notMassEdit ) {	
 				min = SmoothButton( comp, 
