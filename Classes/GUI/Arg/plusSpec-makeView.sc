@@ -262,6 +262,9 @@
 				#min, max = this.unmap( vws[ \range ] );
 				if( min == max ) { max = max + 1.0e-11 };
 				values = values.linlin( values.minItem, values.maxItem, min, max );
+				if( values.every(_==min) ) {
+					values = Array.series( values.size, min, ((max - min)/(values.size-1)) );
+				};
 				vws[ \val ] = this.map( values );
 				vws[ \setPlotter ].value;
 				action.value( vws, vws[ \val ] ); 
@@ -272,7 +275,6 @@
 			var min, max;
 			min = vws[ \val ].minItem;
 			max = vws[ \val ].maxItem;
-			if( min == max ) { max = vws[ \range ].maxItem };
 			vws[ \rangeSlider ].value_( [ min, max ] );
 		};
 		
