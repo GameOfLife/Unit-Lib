@@ -861,7 +861,7 @@ UChainGUI {
 		});
 		
 		if( notMassEdit && { units.size > 0 } ) {
-			addLast = UserView( scrollView, width@20 )
+			addLast = UserView( scrollView, width@6 )
 				.resize_(2)
 				.background_( Color.white.alpha_(0.25) )
 				.canFocus_(false);
