@@ -802,7 +802,7 @@ UChainGUI {
 						unit.units.do({ |item, i|
 							if( notMassEdit ) { i = i + (realIndex - unit.units.size) };
 							StaticText( massEditWindow, 
-									(massEditWindow.bounds.width - 8) @ 14 )
+									(massEditWindow.bounds.width - 8 - scrollerMargin) @ 14 )
 								.applySkin( RoundView.skin )
 								.string_( " " ++ i ++ ": " ++ item.defName )
 								.background_( Color.white.alpha_(0.5) )
@@ -811,6 +811,7 @@ UChainGUI {
 									(RoundView.skin.tryPerform( \at, \font ) ?? 
 										{ Font( Font.defaultSansFace, 12) }).boldVariant 
 								);
+							massEditWindow.view.decorator.nextLine;
 							item.gui( massEditWindow );
 						});
 						RoundView.popSkin( skin );
