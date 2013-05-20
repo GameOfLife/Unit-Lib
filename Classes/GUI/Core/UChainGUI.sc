@@ -78,7 +78,7 @@ UChainGUI {
 			} {
 				parent = Window(
 					parent, 
-					bounds ?? { Rect(128 rrand: 256, 64 rrand: 128, 342, 420) }, 
+					bounds ?? { Rect(425 rrand: 525, 300 rrand: 350, 342, 420) }, 
 					scroll: false
 				).front;
 				this.makeViews( bounds );
