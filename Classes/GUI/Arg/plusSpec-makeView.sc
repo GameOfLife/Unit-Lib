@@ -242,6 +242,14 @@
 			}
 		);
 		 		
+		[ 0.1, 1, 10, 100, 1000 ].do({ |item|
+			if( (step < item) && { (maxval - minval) >= item } ) { 
+				vws[ \operations ][ "round(%)".format(item).asSymbol ] = { |values|
+					this.constrain( values.round(item) );
+				};
+			};
+		});
+		
 		if( label.notNil ) {
 			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
 			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ bounds.height )
