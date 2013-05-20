@@ -646,7 +646,7 @@
 					action.value( vws, vws[ \val ] ); 
 				});
 
-		view.decorator.shift(bounds.height,0);
+		view.decorator.left_( bounds.width - (40+2+40) );
 		
 		vws[ \invert ] = SmoothButton( view, 40@(bounds.height) )
 			.label_( "invert" )
@@ -1387,27 +1387,36 @@
 
 + MultiSndFileSpec {
 	
+	viewNumLines { ^3 }
+	
 	makeView { |parent, bounds, label, action, resize|
 		var vws, view, labelWidth;
 		var localStep;
 		var font;
 		var editAction;
+		var loopSpec, rateSpec;
+		var viewHeight;
 		vws = ();
 		
 		font =  (RoundView.skin ? ()).font ?? { Font( Font.defaultSansFace, 10 ); };
 		
-		bounds.isNil.if{bounds= 320@20};
+		bounds.isNil.if{bounds= 350 @ (this.viewNumLines * 18) };
 		
-		view = EZCompositeView( parent, bounds, gap: 4@4 );
+		viewHeight = (bounds.height / this.viewNumLines).floor - 2;
+		
+		view = EZCompositeView( parent, bounds, gap: 2@2 );
 		bounds = view.asView.bounds;
 		
 		vws[ \view ] = view;
 		
 		vws[ \val ] = this.default ? [];
 		
+		loopSpec = BoolSpec(true).massEditSpec( vws[ \val ].collect(_.loop) );
+		rateSpec = [-24,24].asSpec.massEditSpec( vws[ \val ].collect({|x| x.rate.ratiomidi }) );
+		
 		if( label.notNil ) {
 			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
-			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ bounds.height )
+			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ viewHeight )
 				.string_( label.asString ++ " " )
 				.align_( \right )
 				.resize_( 4 )
@@ -1422,7 +1431,7 @@
 			action.value( vws, vws[ \val ] );
 		};
 		
-		vws[ \list ] = SmoothButton( view, 40 @ (bounds.height) )
+		vws[ \list ] = SmoothButton( view, 40 @ viewHeight )
 			.label_( "list" )
 			.border_( 1 )
 			.radius_( 2 )
@@ -1453,7 +1462,7 @@
 			};
 		});
 		
-		vws[ \copy ] = SmoothButton( view, 60 @ (bounds.height) )
+		vws[ \copy ] = SmoothButton( view, 60 @ viewHeight )
 			.label_( "copy all" )
 			.border_( 1 )
 			.radius_( 2 )
@@ -1473,7 +1482,7 @@
 				});
 			});
 			
-		vws[ \browse ] = SmoothButton( view, 20 @ (bounds.height) )
+		vws[ \browse ] = SmoothButton( view, 20 @ viewHeight )
 			.label_( 'folder' )
 			.border_( 1 )
 			.radius_( 2 )
@@ -1511,18 +1520,61 @@
 				}, {}, true);
 			});
 			
-		view.view.onClose_({
-			if( vws[ \listdoc ].notNil ) {
-				vws[ \listdoc ].close;
+		view.view.decorator.nextLine;
+		view.view.decorator.shift( labelWidth, 0 );
+		
+		RoundView.pushSkin( (RoundView.skin.deepCopy ? ()).labelWidth_(35) );
+		
+		vws[ \loop ] = loopSpec.makeView( view, (view.bounds.width - labelWidth) @ viewHeight,
+			" loop", { |vw, val| 
+				var size;
+				vws[ \updateLoop ] = false;
+				size = val.size - 1;
+				val.do({ |item, i|
+					if( i == size ) { vws[ \updateLoop ] = true };
+					vws[ \val ][ i ].loop = item;
+				});
+			}, 2 );
+			
+		vws[ \loop ].labelView.align_( \left );
+			
+		vws[ \setLoop ] = { |evt, value|
+			if( evt.updateLoop != false ) {
+				loopSpec.setView( evt[ \loop ], value.collect(_.loop) );
 			};
-		});
+		};
+			
+		view.view.decorator.nextLine;
+		view.view.decorator.shift( labelWidth, 0 );
+		
+		vws[ \rate ] = rateSpec.makeView( view, (view.bounds.width - labelWidth) @ viewHeight,
+			" rate", { |vw, val| 
+				var size;
+				vws[ \updateRate ] = false;
+				size = val.size - 1;
+				val.do({ |item, i|
+					if( i == size ) { vws[ \updateRate ] = true };
+					vws[ \val ][ i ].rate = item.midiratio;
+				})  
+			}, 2 );
+		
+		vws[ \rate ].labelView.align_( \left );
+			
+		vws[ \setRate ] = { |evt, value|
+			if( evt.updateRate != false ) {
+				rateSpec.setView( evt[ \rate ], value.collect({|x| x.rate.ratiomidi }) );
+			};
+		};
+		
+		RoundView.popSkin;
 
-	
 		^vws;
 	}
 	
 	setView { |view, value, active = false|
 		view[ \val ] = value;
+		view.setLoop( value );
+		view.setRate( value );
 	}
 }
 
