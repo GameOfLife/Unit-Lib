@@ -53,7 +53,16 @@ UGUI {
 	makeViews { |bounds|
 		var margin = 0@0, gap = 4@4;
 		
-		bounds = bounds ?? { parent.asView.bounds.insetBy(4,4) };
+		if( bounds.isNil ) { 
+			bounds = parent.asView.bounds.insetBy(4,4);
+			if( parent.asView.class.name == \SCScrollTopView ) {
+				bounds.width = bounds.width - 12;
+			};
+			if( parent.asView.class.name == \QScrollTopView ) {
+				bounds.width = bounds.width - 20;
+			};
+		};
+		bounds = bounds.asRect;
 		bounds.height = this.class.getHeight( unit, viewHeight, margin, gap );
 		controller = SimpleController( unit );
 		
