@@ -9,8 +9,6 @@ ULib {
 	
 	*startup {
 		var defs;	
-				
-		GlobalPathDict.put( \resources, String.scDir );
 		
 		UChain.makeDefaultFunc = {
 			UChain( \bufSoundFile, \stereoOutput ).useSndFileDur

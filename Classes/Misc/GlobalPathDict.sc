@@ -22,7 +22,10 @@ GlobalPathDict {
 	classvar <>dict, <>replaceChar = $@;
 	classvar <>relativePath;
 	
-	*initClass { dict = IdentityDictionary(); }
+	*initClass { 
+		dict = IdentityDictionary(); 
+		GlobalPathDict.put( \resources, String.scDir );
+	}
 	
 	*put { |key, path|
 		dict.put( key, path );
