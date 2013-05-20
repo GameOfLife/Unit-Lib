@@ -1473,6 +1473,44 @@
 				});
 			});
 			
+		vws[ \browse ] = SmoothButton( view, 20 @ (bounds.height) )
+			.label_( 'folder' )
+			.border_( 1 )
+			.radius_( 2 )
+			.font_( font )
+			.action_({
+				var paths;
+				Dialog.openPanel({ |paths|
+					case { paths.size >= vws[ \val ].size } {
+						vws[ \val ].do({ |item, i|
+							item.path = paths[i];
+							item.fromFile;
+						});
+					} { paths.size == 1 } {
+						SCAlert( "You selected one soundfile for % units.\nUse only on the first unit,\nor the same for all?".format( vws[ \val ].size ), [ "cancel", "first", "all" ], [ {}, {
+							vws[ \val ][0].path = paths[0];
+							vws[ \val ][0].fromFile;
+						}, {
+							vws[ \val ].do({ |item, i|
+								item.path = paths[0];
+								item.fromFile;
+							});
+						} ] );
+					} { SCAlert( "You selected % soundfiles for % units.\nUse them only for the first % units,\nor wrap around for all?".format( paths.size, vws[ \val ].size, paths.size ), [ "cancel", "first %".format( paths.size ), "all" ], [ {}, {
+							paths.do({ |item, i|
+								vws[ \val ][i].path = item;
+								vws[ \val ][i].fromFile;
+							});
+						}, {
+							vws[ \val ].do({ |item, i|
+								item.path = paths.wrapAt(i);
+								item.fromFile;
+							});
+						} ] );					
+					};
+				}, {}, true);
+			});
+			
 		view.view.onClose_({
 			if( vws[ \listdoc ].notNil ) {
 				vws[ \listdoc ].close;
