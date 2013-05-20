@@ -634,6 +634,7 @@ UChainGUI {
 				);
 				
 			uview = UserView( comp, comp.bounds.width @ 100 );
+			uview.background_( Color.white.alpha_(0.25) );
 				
 			uview.canReceiveDragHandler_({ |sink|
 				var drg;
@@ -678,6 +679,7 @@ UChainGUI {
 				.resize_(2);
 			
 			if( notMassEdit ) {
+				addBefore.background_( Color.white.alpha_(0.25) );
 				addBefore.canReceiveDragHandler_({ |sink|
 						var drg;
 						drg = View.currentDrag;
@@ -859,8 +861,9 @@ UChainGUI {
 		});
 		
 		if( notMassEdit && { units.size > 0 } ) {
-			addLast = UserView( scrollView, width@100 )
+			addLast = UserView( scrollView, width@20 )
 				.resize_(2)
+				.background_( Color.white.alpha_(0.25) )
 				.canFocus_(false);
 					
 			addLast.canReceiveDragHandler_({ |sink|
