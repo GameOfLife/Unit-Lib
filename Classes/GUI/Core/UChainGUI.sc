@@ -840,15 +840,13 @@ UChainGUI {
 					.label_( '+' )
 					.border_( 1 )
 					.action_({
-						var index, copy;
+						var copy;
 						if( unit.isKindOf( MassEditU ) ) {
-							index = chain.units.indexOf( unit.units.last );
-							copy = unit.units.last.deepCopy.increaseIOs;
+							unit.units = unit.units.add( unit.units.last.deepCopy.increaseIOs )
 						} {
-							copy = unit.deepCopy.increaseIOs;
-							index = i;
+							units = units.insert( i+1, unit.deepCopy.increaseIOs );
 						};
-						chain.units = chain.units.insert( index+1, copy );
+						this.setUnits( units );
 					}).resize_(3);
 			};	
 					
