@@ -19,7 +19,7 @@ MultiChannelUdef( \gain, { |gain = 0, inverse = 0, lag = 0|
 	in = in * gain.lag(lag).dbamp * inverse.linlin(0,1,1,-1);
 	UMixOut.ar( 0, in );
 })
-	.category_( \dynamics )
+	.category_( \utility )
 	.setSpec( \gain, [-96,24,\lin,0,0].asSpec )
 	.setSpec( \inverse, BoolSpec(false) )
 	.setSpec( \lag, [0,1,\lin].asSpec );
