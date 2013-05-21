@@ -24,12 +24,15 @@ GenericDef : UArchivable {
 
 	var <>argSpecs;
 	var filePath;
+	var <>prName;
 
 	*new { |name, args, addToAll = true|
 		var x = super.new.initArgSpecs( args );
 		x.filePath = thisProcess.nowExecutingPath;
 		if(addToAll){
 		    x.addToAll( name );
+		 } {
+			x.prName = name
 		 };
 		 ^x
 	}
@@ -169,7 +172,7 @@ GenericDef : UArchivable {
 		this.class.all.changed( \added, this );
 	}
 	
-	name { ^this.class.all !? { this.class.all.findKeyForValue( this ); } }
+	name { ^this.class.all !? { this.class.all.findKeyForValue( this ); } ? prName }
 	
 	name_ { |name|
 		this.class.all ?? { this.class.all = IdentityDictionary() };
