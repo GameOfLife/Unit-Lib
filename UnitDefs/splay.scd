@@ -14,6 +14,18 @@ numOutputs: number of output channels (1-8) (**).
 
 (**) in the UChainGUI these numbers are displayed as normal numbers, but in the source code the actual value is a Symbol formatted as follows: 'splay_1', 'splay_2' .. 'splay_8'
 
+example:
+
+numChannels = 4, numOutputs = 8
+
+inputs   0 1 2 3
+         | | | |
+         | | | +++++++
+         | | +++++   |
+         | +++   |   |
+         |   |   |   |
+outputs  0 1 2 3 4 5 6 7
+
 --
 this is an Udef definition file
 part of the Unit lib default Udefs set
