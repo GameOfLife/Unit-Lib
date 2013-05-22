@@ -6,7 +6,22 @@ ULib {
     *initClass {
         servers = [Server.default]
     }
-	
+
+	*allServers {
+        ^servers.collect{ |s|
+            if( s.isKindOf( LoadBalancer ) ) {
+                s.servers
+            } {
+                s
+            }
+        }.flat
+    }
+
+	*waitForServersToBoot {
+        while({ this.allServers.collect( _.serverRunning ).every( _ == true ).not; },
+            { 0.2.wait; });
+    }
+
 	*startup {
 		var defs;	
 		
