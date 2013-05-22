@@ -939,6 +939,77 @@
 
 }
 
++ UEnvSpec {
+	
+	makeView { |parent, bounds, label, action, resize|
+		var vws, view, labelWidth;
+		var localStep;
+		var modeFunc;
+		var font;
+		var editAction;
+		var tempVal;
+		vws = ();
+		
+		font =  (RoundView.skin ? ()).font ?? { Font( Font.defaultSansFace, 10 ); };
+		
+		bounds.isNil.if{bounds= 160@20};
+		
+		view = EZCompositeView( parent, bounds, gap: 2@2 );
+		bounds = view.asView.bounds;
+				
+		vws[ \view ] = view;
+		vws[ \val ] = Env();
+		 		
+		if( label.notNil ) {
+			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
+			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ bounds.height )
+				.string_( label.asString ++ " " )
+				.align_( \right )
+				.resize_( 4 )
+				.applySkin( RoundView.skin );
+		} {
+			labelWidth = 0;
+		};
+			
+		vws[ \edit ] = SmoothButton( view, 40 @ (bounds.height) )
+			.label_( "edit" )
+			.border_( 1 )
+			.radius_( 2 )
+			.font_( font )
+			.action_({
+				var editor;
+				if( vws[ \editor ].isNil or: { vws[ \editor ].isClosed } ) {
+					editor = EnvView( env: vws[ \val ] )
+						.onClose_({ 
+							if( vws[ \editor ] == editor ) {
+								vws[ \editor ] = nil;
+							};
+						});
+					vws[ \editor ] = editor;
+				} {
+					vws[ \editor ].front;
+				};
+				
+			});
+			
+		view.view.onClose_({
+			if( vws[ \editor ].notNil ) {
+				vws[ \editor ].close;
+			};
+		});
+	
+		^vws;
+	}
+	
+	setView { |view, value, active = false|
+		view[ \val ] = value;
+		if( view[ \editor ].notNil ) { 
+			view[ \editor ].env = view[ \val ];
+		};
+	}
+
+}
+
 + RealVector3DSpec {
 
     makeView { |parent, bounds, label, action, resize|

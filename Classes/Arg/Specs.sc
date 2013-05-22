@@ -279,6 +279,37 @@ CodeSpec : Spec {
 	
 }
 
+UEnvSpec : Spec {
+	var <>default;
+	var <>spec;
+	
+	*new { |default, spec|
+		^super.newCopyArgs( default ? Env(), spec.asSpec );
+	}
+	
+	*testObject { |obj|
+		^obj.isKindOf( Env );
+	}
+	
+	*newFromObject { |obj|
+		^this.new( obj );
+	}
+	
+	map { |value|
+		^value;
+	}
+	
+	unmap { |value|
+		^value;
+	}
+	
+	constrain { |value|
+		^value
+	}
+
+	storeArgs { ^[ default, spec] }
+}
+
 RealVector3DSpec : Spec {
 
 	classvar <>defaultMode = \point;

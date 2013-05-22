@@ -64,28 +64,52 @@ UScore(
 
 UEnvGen {
 
-	*checkEnv { |args|
-		^if(args[0].isKindOf(Env)){
-			args[0]
-		} {
-			Env(*args)
-		}
+	*prepareEnv { |env, spec|
+		env = env ?? { Env() };
+		case { env.isKindOf(Env) or: env.isArray } {
+			env = env.asArray;
+		} { env.isKindOf(Symbol) } {
+			// uncomment when EnvSpec is added
+			Udef.addBuildSpec(
+				ArgSpec(env, Env(), UEnvSpec( Env(), spec ), mode: \init)
+			);
+			env = env.ir( Env(0!32,0!31).asArray );
+		};
+		^[ 0, env[0], env[1], env[5,9..(env.size-1)*4].sum ] ++
+			env[4..].clump(4).collect({ |item|
+				[ item[1], item[2], item[3], item[0] ]
+			}).flatten(1);
+	}
+	
+	*getLineArgs { |env, timeScale = 1|
+		var start, dur;
+		start = \u_startPos.kr(0.0);
+		dur = env[3];
+		^[ start / timeScale, dur, ((dur * timeScale)-start).max(0) ]
 	}
 
-	*ar { |...args|
-		var env = this.checkEnv(args);
-		var start = \u_startPos.kr(0.0);
-		var dur = env.times.sum;
-		var phasor = Line.ar(start, dur, (dur-start).max(0.0) );
-		^IEnvGen.ar(env, phasor)
+	*ar { |env, spec, timeScale = 1|
+		var phasor;
+		if( env.isKindOf( Env ) && { spec.isNil } ) {
+			spec = ControlSpec( env.levels.minItem, env.levels.maxItem );
+			env.levels = env.levels.normalize;
+		};
+		spec = spec.asSpec;
+		env = this.prepareEnv(env, spec);
+		phasor = Line.ar( *this.getLineArgs(env, timeScale));
+		^spec.map( IEnvGen.ar(env, phasor) )
 	}
 
-	*kr { |...args|
-		var env = this.checkArgs(args);
-		var start = \u_startPos.kr(0.0);
-		var dur = env.times.sum;
-		var phasor = Line.kr(start, dur, (dur-start).max(0.0) );
-		^IEnvGen.kr(env, phasor)
+	*kr { |env, spec, timeScale = 1|
+		var phasor;
+		if( env.isKindOf( Env ) && { spec.isNil } ) {
+			spec = ControlSpec( env.levels.minItem, env.levels.maxItem );
+			env.levels = env.levels.normalize;
+		};
+		spec = spec.asSpec;
+		env = this.prepareEnv(env, spec);
+		phasor = Line.ar( *this.getLineArgs(env, timeScale));
+		^spec.map( IEnvGen.kr(env, phasor) )
 	}
 
 }
@@ -99,82 +123,68 @@ UXLine {
 		} ?? { [start, end] }
 	}
 
-	*kr{ |start, end, time, argName|
+	*kr{ |start=1.0, end=2.0, time, argName|
 		#start, end = this.makeControl(start, end, argName);
-		^UEnvGen.kr([0,1],[time],\lin).linexp(0.0,1.0,start,end)
+		^UEnvGen.kr( Env([0,1],[time],\lin), [start, end, \exp] );
 	}
 
-	*ar{ |start, end, time, argName|
+	*ar{ |start=1.0, end=2.0, time, argName|
 		#start, end = this.makeControl(start, end, argName);
-		^UEnvGen.ar([0,1],[time],\lin).linexp(0.0,1.0,start,end)
+		^UEnvGen.kr( Env([0,1],[time],\lin), [start, end, \exp] );
 	}
 
 }
 
 ULine {
 
-	*kr{ |start=0.0, end=1.0, time, argName = \uline|
+	*kr{ |start=0.0, end=1.0, time, argName|
 		#start, end = UXLine.makeControl(start, end, argName);
-		^UEnvGen.kr([0,1],[time],\lin).linlin(0.0,1.0,start,end)
+		^UEnvGen.kr( Env([0,1],[time],\lin), [start, end, \lin] );
 	}
 
-	*ar{ |start, end, time, argName = \uline|
+	*ar{ |start=0.0, end=1.0, time, argName|
 		#start, end = UXLine.makeControl(start, end, argName);
-		^UEnvGen.ar([0,1],[time],\lin).linlin(0.0,1.0,start,end)
+		^UEnvGen.ar( Env([0,1],[time],\lin), [start, end, \lin] );
 	}
 
 }
 
-UEnvGenRel {
-
-	*startDurationEnv{ |vals, timesRel, int, scalingFactor = 1.0|
-		var timesRel2 = timesRel / timesRel.sum;
-		var start = \u_startPos.kr(0.0);
-		var duration = \u_dur.kr(1.0)+start;
-		var env = Env(vals, timesRel2*duration*scalingFactor, int);
-		^[start, duration, env]
+UEnvGenRel : UEnvGen {
+	
+	*getLineArgs { |env, timeScale = 1|
+		var start, dur, envdur;
+		start = \u_startPos.kr(0.0);
+		dur = \u_dur.kr(1.0)+start;
+		envdur = env[3] / timeScale;
+		^[ envdur * (start/dur), envdur, (dur-start).max(0) ]
 	}
-
-	*ar{ |vals, timesRel, int = \lin, scalingFactor = 1.0|
-		var start, duration, env, phasor;
-		#start, duration, env = this.startDurationEnv(vals, timesRel, int, scalingFactor);
-		phasor = Line.ar(start, duration, (duration-start).max(0.0) );
-		^IEnvGen.ar(env, phasor)
-	}
-
-	*kr{ |vals, timesRel, int = \lin, scalingFactor = 1.0|
-		var start, duration, env, phasor;
-		#start, duration, env = this.startDurationEnv(vals, timesRel, int, scalingFactor);
-		phasor = Line.kr(start, duration, (duration-start).max(0.0) );
-		^IEnvGen.kr(env, phasor)
-	}
-
+	
 }
 
 UXLineRel {
 
-	*kr{ |start, end, argName, scalingFactor = 1.0|
+	*kr{ |start=1.0, end=2.0, argName, timeScale = 1.0|
 		#start, end = UXLine.makeControl(start, end, argName);
-		^UEnvGenRel.kr([0,1],[1],\lin, scalingFactor).linexp(0.0,1.0,start,end)
+		^UEnvGenRel.kr( Env([0,1],[1],\lin), [start, end, \exp], timeScale );
 	}
 
-	*ar{ |start, end, argName, scalingFactor = 1.0|
+	*ar{ |start=1.0, end=2.0, argName, timeScale = 1.0|
 		#start, end = UXLine.makeControl(start, end, argName);
-		^UEnvGenRel.ar([0,1],[1],\lin, scalingFactor).linexp(0.0,1.0,start,end)
+		^UEnvGenRel.ar( Env([0,1],[1],\lin), [start, end, \exp], timeScale );
 	}
 
 }
 
 ULineRel {
 
-	*kr{ |start, end, argName, scalingFactor = 1.0|
+	*kr{ |start=0.0, end=1.0, argName, timeScale = 1.0|
 		#start, end = UXLine.makeControl(start, end, argName);
-		^UEnvGenRel.kr([0,1],[1],\lin, scalingFactor).linlin(0.0,1.0,start,end)
+		^UEnvGenRel.ar( Env([0,1],[1],\lin), [start, end, \lin], timeScale );
 	}
 
-	*ar{ |start, end, argName, scalingFactor = 1.0|
+	*ar{ |start=0.0, end=1.0, argName, timeScale = 1.0|
 		#start, end = UXLine.makeControl(start, end, argName);
-		^UEnvGenRel.ar([0,1],[1],\lin, scalingFactor).linlin(0.0,1.0,start,end)
+		^UEnvGenRel.ar( Env([0,1],[1],\lin), [start, end, \lin], timeScale );
 	}
 
 }
