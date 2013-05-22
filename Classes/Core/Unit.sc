@@ -538,6 +538,34 @@ U : ObjectWithArgs {
 		mod = newMod.asUModFor( this );
 	}
 	
+	mapAr { |...args|
+		args.clump(3).do{ |xs|
+			var key, index, numChannels;
+			#key, index, numChannels = xs;
+			this.synths.do{ |synth|
+				var s = synth.server;
+				synth.map(
+					key,
+					Bus.new( \audio,  s.options.firstPrivateBus + index, numChannels ? 1, s)
+				)
+			}
+		}
+	}
+
+	mapKr { |...args|
+		args.clump(3).do{ |xs|
+			var key, index, numChannels;
+			#key, index, numChannels = xs;
+			this.synths.do{ |synth|
+				var s = synth.server;
+				synth.map(
+					key,
+					Bus.new( \control, UIn.firstControlBus + index, numChannels ? 1, s)
+				)
+			}
+		}
+	}
+
 	addMod { |newMod|
 		if( mod.isKindOf( UMod ) ) {
 			mod = UModDict( mod );
