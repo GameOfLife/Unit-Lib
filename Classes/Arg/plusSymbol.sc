@@ -9,8 +9,8 @@ UChain(\test, \stereoOutput).gui
 */
 + Symbol {
 
-	krSpec{ |minval=0.0, maxval=1.0, warp='lin', step=0.0, default, lag, fixedLag = false|
-		Udef.addBuildSpec(ArgSpec(this,default, ControlSpec(minval, maxval, warp, step, default) ) )
+	krSpec{ |default, minval=0.0, maxval=1.0, warp='lin', step=0.0, lag, fixedLag = false|
+		Udef.addBuildSpec(ArgSpec(this, default, ControlSpec(minval, maxval, warp, step, default) ) )
 		^this.kr(default, lag, fixedLag)
 	}
 
