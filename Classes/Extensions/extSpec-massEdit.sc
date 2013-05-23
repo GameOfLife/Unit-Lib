@@ -49,6 +49,39 @@
 	
 }
 
++ ListSpec {
+	
+	massEditSpec { |inArray|
+		var default, newList;
+		default = this.massEditValue(inArray);
+		newList = list ++ [ "mixed" ];
+		default = newList.indexOf( default );
+		^ListSpec( list ++ [ "mixed" ], default, labels !? { labels ++ [ "mixed" ] })
+	}
+	
+	massEditValue { |inArray|
+		var first;
+		first = inArray.first;
+		if( inArray.every(_ == first) ) {
+			^first;
+		} {
+			^"mixed";
+		};	
+	}
+
+	massEdit { |inArray, params|
+		if( list.includes( params ) ) {
+			^params.dup(inArray.size);
+		} {
+			if( this.massEditValue( inArray ) != "mixed" ) {
+				^{ list.choose }.dup(inArray.size); // randomize
+			} {
+				^inArray
+			};
+		};
+	}
+}
+
 + BoolSpec {
 	
 	massEditSpec { |inArray|
