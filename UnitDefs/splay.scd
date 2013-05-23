@@ -8,7 +8,7 @@ width: the width sets how many outputs are used for each input. A cosine window 
 center: rotates the outputs; 0 means the first input goes to the first output, 1 or -1 means the first input goes to the middle output.
 numChannels: number of input channels (*).
 numOutputs: number of output channels (1-8) (**).
-	
+
 (*) only the following numbers of channels are allowed:
 1,2,3,4,5,6,7,8,10,12,16,24,32
 
@@ -37,7 +37,17 @@ defs = (1..8).collect({ |n|
 	MultiChannelUdef( "splay_%".format(n).asSymbol, { |spread = 1, width = 2, center = 0|
 		var sig;
 		sig = UIn.ar( 0, Udef.numChannels );
-		UOut.ar( 0, SplayAz.ar( n, sig, spread, 1, width, center, 0 ) );
+		switch( n,
+			1, { UOut.ar( 0, sig.asCollection.sum * sig.asCollection.size.reciprocal.sqrt ) },
+			2, { UOut.ar( 0, Splay.ar( sig.asCollection, spread, 1, center ) ) },
+			{
+				if( Udef.numChannels == 1 ) {
+					UOut.ar( 0, SplayAz.ar( n, sig.dup, spread, 1, width, center, 0 ) );
+				} {
+					UOut.ar( 0, SplayAz.ar( n, sig, spread, 1, width, center, 0 ) );
+				};
+			}
+		);
 	}, addToAll: false)
 		.setSpec( \spread, [0,1,\lin,0,1].asSpec )
 		.setSpec( \width, [1,n.max(2),\exp,0,2].asSpec )
