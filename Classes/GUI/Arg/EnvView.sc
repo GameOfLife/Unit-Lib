@@ -93,6 +93,7 @@ EnvPlotView {
 			};
 			this.changed( \env, env );
 			this.refresh;
+			action.value( this, env );
 		};
 	}
 	
@@ -258,6 +259,26 @@ EnvPlotView {
 			
 		};
 		
+		plotView.view
+			.beginDragAction_({ env })
+			.canReceiveDragHandler_({ |vw|
+				var drg = View.currentDrag;
+				drg.isKindOf( Env ) or: { 
+					drg.isString && { 
+						{ drg.interpret }.try !? { |obj| obj.isKindOf( Env ) } ? false;
+					};
+				};
+			})
+			.receiveDragHandler_({ |vw|
+				var obj;
+				var drg = View.currentDrag;
+				if( drg.isString ) {
+					this.env = drg.interpret;
+				} {
+					this.env = View.currentDrag.deepCopy;
+				};
+			});
+		
 		plotView.beforeDrawFunc = { |vw|
 			var dur;
 			dur = env.times.sum;
@@ -336,12 +357,14 @@ EnvPlotView {
 
 EnvEditView {
 	
-	var <env, <view, <listView, <argViews, <rangeViews, <ctrl, <views;
+	var <env, <view, <comp, <listView, <argViews, <rangeViews, <ctrl, <views;
+	var <>maxSize = 32;
 	var <>viewHeight = 14;
 	var <resize = 8;
 	var <>font;
 	var <selected = 0;
 	var <>action;
+	var <>size;
 	
 	*new { |parent, bounds, env|
 		^super.newCopyArgs( env ).init.makeView( parent, bounds );
@@ -368,25 +391,29 @@ EnvEditView {
 	update {
 		var curves;
 		if( listView.isClosed.not ) {
-			curves = env.curves.asCollection.wrapExtend( env.levels.size - 1 );
-			views[ \duration ].value = env.times.sum;
-			rangeViews[ \range ].value = [ env.levels.minItem, env.levels.maxItem ];
-			argViews.do({ |item, i|
-				var last;
-				last = (i == (env.levels.size-1));
-				item.level.value = env.levels[i];
-				if( last.not ) {
-					item.time.value = env.times[i];
-					if( curves[i].isNumber ) {
-						item.curveNumber.stringColor = Color.black;
-						item.curveNumber.value = curves[i];
-						{ item.curveType.value = 5 }.defer;
-					} {
-						item.curveNumber.stringColor = Color.black.alpha_(0.5);
-						{ item.curveType.value = Env.shapeNumber( curves[i] ) }.defer;
+			if( size != env.levels.size ) {
+				{ this.rebuildViews }.defer;
+			} {	
+				curves = env.curves.asCollection.wrapExtend( env.levels.size - 1 );
+				views[ \duration ].value = env.times.sum;
+				rangeViews[ \range ].value = [ env.levels.minItem, env.levels.maxItem ];
+				argViews.do({ |item, i|
+					var last;
+					last = (i == (env.levels.size-1));
+					item.level.value = env.levels[i];
+					if( last.not ) {
+						item.time.value = env.times[i];
+						if( curves[i].isNumber ) {
+							item.curveNumber.stringColor = Color.black;
+							item.curveNumber.value = curves[i];
+							{ item.curveType.value = 5 }.defer;
+						} {
+							item.curveNumber.stringColor = Color.black.alpha_(0.5);
+							{ item.curveType.value = Env.shapeNumber( curves[i] ) }.defer;
+						};
 					};
-				};
-			});
+				});
+			}
 		};
 	}
 	
@@ -433,20 +460,24 @@ EnvEditView {
 		view.resize_( resize );
 	}
 	
+	rebuildViews {
+		listView.items = env.levels.collect({ |item, i|
+			"node" + i;
+		}) ++ [ "all" ];
+		selected = selected !? { selected.clip( 0, env.levels.size -1 ) };
+		argViews.do({ |item| item.comp.remove });
+		this.makeSubViews;
+	}
 	
 	makeView { |parent, bounds|
-		var comp;
-		
 		if( bounds.isNil ) { bounds = 350 @ (this.class.viewNumLines * (viewHeight + 4)) };
 			
 		view = EZCompositeView( parent, bounds, margin: 0@2, gap: 2@2 );
-		bounds = view.asView.bounds;
 		view.resize_( resize ? 5 );
-		argViews = [];
-		
-		views = ();
 		
 		this.addCtrl;
+		
+		views = ();
 		
 		// selection
 		listView = PopUpMenu( view, 80 @ viewHeight )
@@ -469,7 +500,7 @@ EnvEditView {
 		listView.onClose_({ this.removeCtrl });
 		
 		// duration
-		StaticText( view, 45 @ viewHeight )
+		views[ \durationLabel ] = StaticText( view, 45 @ viewHeight )
 				.string_( "duration " )
 				.align_( \right )
 				.font_( font )
@@ -492,18 +523,66 @@ EnvEditView {
 				env.changed( \times );
 				action.value( this, env );
 			});
-
+			
+		views[ \minus ] = SmoothButton( view, viewHeight @ viewHeight )
+			.label_( '-' )
+			.mouseUpAction_({
+				if( selected.notNil && { env.levels.size > 2 } ) {
+					env.levels = env.levels.copy.select({ |item, i| i != selected });
+					if( selected == env.times.size ) {
+						if( env.times.mutable.not ) { env.times = env.times.copy };
+						env.times.pop;
+						if( env.curves.size > 0 ) {
+							env.curves.pop;
+						}
+					} {
+						env.times = env.times.select({ |item, i| i != selected });
+						if( env.curves.size > 0 ) {
+							env.curves = env.curves.select({ |item, i| i != selected });
+						}
+					};
+					{ env.changed( \levels ); }.defer(0.1);
+				};
+			});
+			
+		views[ \plus ] = SmoothButton( view, viewHeight @ viewHeight )
+			.label_( '+' )
+			.action_({
+				if( selected.notNil && { env.levels.size < maxSize }) {
+					env.levels = env.levels.collect(_.value)
+						.insert( selected, env.levels[selected] );
+					env.times = env.times.copy.collect(_.value)
+						.insert( selected, env.times.clipAt( selected ) );
+					if( env.curves.size > 0 ) {
+						env.curves = env.curves.insert( selected, env.curves.clipAt( selected ) );
+					};
+					{ env.changed( \levels ); }.defer(0.1);
+				};
+			});
+		
+		view.view.background = Color.hsv( 
+			(selected ? 0).linlin( 0, env.levels.size, 0, 1 ), 
+			0.75, 0.5 
+		).alpha_( 0.25 );
+		
 		view.decorator.nextLine;
 		
 		comp = CompositeView( view, bounds.width @ (viewHeight + 4))
 			.resize_(2)
 			.background_( Color.white.alpha_(0.25) );
 		
-		view.view.background = Color.hsv( 
-			(selected ? 0).linlin( 0, env.levels.size, 0, 1 ), 
-			0.75, 0.5 
-		).alpha_( 0.25 );
-			
+		this.makeSubViews;
+	}
+	
+	makeSubViews { 
+		var bounds;
+		
+		bounds = view.asView.bounds;
+		 
+		argViews = [];
+		
+		size = env.levels.size;
+					
 		env.levels.do({ |level, i|
 			var vws, last;
 			vws = ();
@@ -685,6 +764,9 @@ EnvView {
 		editView.env = new;
 	}
 	
+	maxSize { ^editView.maxSize }
+	maxSize_ { |new = 32| editView.maxSize = new }
+	
 	value { ^this.env }
 	value_ { |val| this.env = val }
 	
@@ -719,7 +801,13 @@ EnvView {
 		
 		plotCtrl = SimpleController( plotView )
 			.put( \selected, { editView.selected = plotView.selected; } )
-			.put( \selectedLine, { editView.selected = plotView.selectedLine ? plotView.selected; } );
+			.put( \selectedLine, { editView.selected = plotView.selectedLine ? plotView.selected; } )
+			.put( \env, {
+				env = plotView.env;
+				if( editView.env !== env ) {
+					editView.env = env;
+				};
+			});
 		
 		editCtrl = SimpleController( editView )
 			.put( \selected, { 
@@ -734,7 +822,13 @@ EnvView {
 						plotView.selectedLine = nil 
 					};
 				}
-			} );
+			} )
+			.put( \env, {
+				env = editView.env;
+				if( plotView.env !== env ) {
+					plotView.env = env;
+				};
+			});
 
 		view.asView.onClose_({ plotCtrl.remove; editCtrl.remove });
 		
