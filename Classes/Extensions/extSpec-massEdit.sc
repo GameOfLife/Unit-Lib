@@ -95,8 +95,7 @@
 	massEditSpec { |inArray|
 		var minmax;
 		minmax = this.massEditValue( inArray );
-		//^RangeSpec( 0, (minmax[1] * 10).round(1), 0, inf, \lin, 1, minmax.round(1) );
-		^PositiveIntegerSpec()
+		^PositiveIntegerSpec( minmax )
 	}
 	
 	massEditValue { |inArray|
