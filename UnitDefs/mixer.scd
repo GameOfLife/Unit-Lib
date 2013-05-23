@@ -18,7 +18,7 @@ MultiChannelUdef( \mixer, {
 	var sig, amps;
 	sig = UIn.ar( 0, Udef.numChannels );
 	amps = Udef.numChannels.collect({ |i| 
-		("amp" ++ i).asSymbol.krSpec( default: 1/Udef.numChannels.sqrt, warp: 'amp' ) 
+		("amp" ++ i).asSymbol.ukr( 1/Udef.numChannels.sqrt, warp: 'amp' )
 	});
 	UOut.ar( 0, (sig * amps).sum );
 })

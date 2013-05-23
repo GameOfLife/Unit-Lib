@@ -1,7 +1,7 @@
 /*
 
 Udef(\test,{
-   UOut.ar( WhiteNoise.ar * SinOsc.ar( \lfo.krSpec(1.0,15.0,\lin,0.0,10,lag:2) ) )
+   UOut.ar( WhiteNoise.ar * SinOsc.ar( \lfo.ukr(10.0, 1.0, 15.0,\lin,0.0,lag:2) ) )
 })
 
 UChain(\test, \stereoOutput).gui
