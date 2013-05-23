@@ -55,7 +55,7 @@
 		var default, newList;
 		default = this.massEditValue(inArray);
 		newList = list ++ [ "mixed" ];
-		default = newList.indexOf( default ) ? (list.size);
+		default = newList.indexOfEqual( default ) ? (list.size);
 		^ListSpec( list ++ [ "mixed" ], default, labels !? { labels ++ [ "mixed" ] })
 	}
 	
