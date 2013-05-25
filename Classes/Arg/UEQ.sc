@@ -108,9 +108,11 @@ UEQSpec : Spec {
 		var font;
 		var editAction;
 		var tempVal;
+		var skin;
 		vws = ();
 		
 		font =  (RoundView.skin ? ()).font ?? { Font( Font.defaultSansFace, 10 ); };
+		skin = RoundView.skin;
 		
 		bounds.isNil.if{bounds= 160@20};
 		
@@ -143,12 +145,14 @@ UEQSpec : Spec {
 			.action_({
 				var editor;
 				if( vws[ \editor ].isNil or: { vws[ \editor ].isClosed } ) {
-					editor = EQView( eqSetting: vws[ \val ] )
+					RoundView.pushSkin( skin );
+					editor = EQView( "UEQ % editor".format( def ), eqSetting: vws[ \val ] )
 						.onClose_({ 
 							if( vws[ \editor ] == editor ) {
 								vws[ \editor ] = nil;
 							};
 						});
+					RoundView.popSkin;
 					vws[ \editor ] = editor;
 				} {
 					vws[ \editor ].front;

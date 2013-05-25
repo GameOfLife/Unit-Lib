@@ -948,9 +948,11 @@
 		var font;
 		var editAction;
 		var tempVal;
+		var skin;
 		vws = ();
 		
 		font =  (RoundView.skin ? ()).font ?? { Font( Font.defaultSansFace, 10 ); };
+		skin = RoundView.skin;
 		
 		bounds.isNil.if{bounds= 160@20};
 		
@@ -979,12 +981,14 @@
 			.action_({
 				var editor;
 				if( vws[ \editor ].isNil or: { vws[ \editor ].isClosed } ) {
-					editor = EnvView( env: vws[ \val ], spec: spec )
+					RoundView.pushSkin( skin );
+					editor = EnvView( "Envelope editor", env: vws[ \val ], spec: spec )
 						.onClose_({ 
 							if( vws[ \editor ] == editor ) {
 								vws[ \editor ] = nil;
 							};
 						});
+					RoundView.popSkin;
 					vws[ \editor ] = editor;
 				} {
 					vws[ \editor ].front;

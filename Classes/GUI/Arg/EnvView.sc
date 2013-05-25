@@ -365,6 +365,7 @@ EnvEditView {
 	var <selected = 0;
 	var <>action;
 	var <>size;
+	var <>skin;
 	
 	*new { |parent, bounds, env, spec|
 		^super.newCopyArgs( env, spec ).init.makeView( parent, bounds );
@@ -470,7 +471,7 @@ EnvEditView {
 		}) ++ [ "all" ];
 		selected = selected !? { selected.clip( 0, env.levels.size -1 ) };
 		argViews.do({ |item| item.comp.remove });
-		this.makeSubViews;
+		RoundView.useWithSkin( skin ? (), { this.makeSubViews });
 	}
 	
 	makeView { |parent, bounds|
@@ -574,6 +575,8 @@ EnvEditView {
 		comp = CompositeView( view, bounds.width @ ((viewHeight + 4) * 2))
 			.resize_(2)
 			.background_( Color.white.alpha_(0.25) );
+			
+		skin = RoundView.skin;
 		
 		this.makeSubViews;
 	}
