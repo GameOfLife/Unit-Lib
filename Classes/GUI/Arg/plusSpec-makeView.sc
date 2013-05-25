@@ -979,7 +979,7 @@
 			.action_({
 				var editor;
 				if( vws[ \editor ].isNil or: { vws[ \editor ].isClosed } ) {
-					editor = EnvView( env: vws[ \val ] )
+					editor = EnvView( env: vws[ \val ], spec: spec )
 						.onClose_({ 
 							if( vws[ \editor ] == editor ) {
 								vws[ \editor ] = nil;

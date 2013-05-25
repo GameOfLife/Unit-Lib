@@ -357,7 +357,7 @@ EnvPlotView {
 
 EnvEditView {
 	
-	var <env, <view, <comp, <listView, <argViews, <rangeViews, <ctrl, <views;
+	var <env, <spec, <view, <comp, <listView, <argViews, <rangeViews, <ctrl, <views;
 	var <>maxSize = 32;
 	var <>viewHeight = 14;
 	var <resize = 8;
@@ -366,8 +366,8 @@ EnvEditView {
 	var <>action;
 	var <>size;
 	
-	*new { |parent, bounds, env|
-		^super.newCopyArgs( env ).init.makeView( parent, bounds );
+	*new { |parent, bounds, env, spec|
+		^super.newCopyArgs( env, spec.asSpec ).init.makeView( parent, bounds );
 	}
 	
 	init {
@@ -396,11 +396,13 @@ EnvEditView {
 			} {	
 				curves = env.curves.asCollection.wrapExtend( env.levels.size - 1 );
 				views[ \duration ].value = env.times.sum;
-				rangeViews[ \range ].value = [ env.levels.minItem, env.levels.maxItem ];
+				rangeViews[ \range ].value = spec.asSpec.map([ 
+					env.levels.minItem, env.levels.maxItem 
+				]);
 				argViews.do({ |item, i|
 					var last;
 					last = (i == (env.levels.size-1));
-					item.level.value = env.levels[i];
+					item.level.value = spec.asSpec.map( env.levels[i] );
 					if( last.not ) {
 						item.time.value = env.times[i];
 						if( curves[i].isNumber ) {
@@ -417,7 +419,7 @@ EnvEditView {
 		};
 	}
 	
-	*viewNumLines { ^2 }
+	*viewNumLines { ^3 }
 	
 	selected_ { |new|
 		if( selected != new ) {	
@@ -454,6 +456,8 @@ EnvEditView {
 			this.update;
 		};
 	}
+	
+	spec_ { |new| spec = new.asSpec }
 	
 	resize_ { |new|
 		resize = new;
@@ -567,7 +571,7 @@ EnvEditView {
 		
 		view.decorator.nextLine;
 		
-		comp = CompositeView( view, bounds.width @ (viewHeight + 4))
+		comp = CompositeView( view, bounds.width @ ((viewHeight + 4) * 2))
 			.resize_(2)
 			.background_( Color.white.alpha_(0.25) );
 		
@@ -589,17 +593,36 @@ EnvEditView {
 			
 			last = (i == (env.levels.size-1));
 			
-			vws[ \comp ] = CompositeView( comp, bounds.width @ (viewHeight + 4) )
+			vws[ \comp ] = CompositeView( comp, comp.bounds.moveTo(0,0) )
 				.resize_(2);
 				
 			vws[ \comp ].addFlowLayout( 2@2, 2@2 );
 			
 			// level
-			StaticText(  vws[ \comp ], 25 @ viewHeight )
+			StaticText(  vws[ \comp ], 35 @ viewHeight )
 				.string_( "level " )
 				.align_( \right )
 				.font_( font )
 				.applySkin( RoundView.skin );
+			
+			vws[ \level ] = EZSmoothSlider( vws[ \comp ],
+				(bounds.width - 43) @ viewHeight, nil, spec.asSpec
+			)
+				.font_( font )
+				.value_( spec.asSpec.map( level ) )
+				.action_({ |sl|
+					var levels;
+					levels = env.levels;
+					if( levels.mutable.not ) {
+						levels = levels.copy;
+					};
+					levels.put( i, spec.asSpec.unmap(sl.value) );
+					env.levels = levels;
+					env.changed( \levels );
+					action.value( this, env );
+				});
+			
+			/*
 			
 			vws[ \level ] = SmoothNumberBox( vws[ \comp ], 40 @ viewHeight  )
 				.value_( level )
@@ -620,10 +643,14 @@ EnvEditView {
 					action.value( this, env );
 				});
 				
+			*/
+				
 			if( last.not ) {
 				
+				vws[ \comp ].decorator.nextLine;
+				
 				// time
-				StaticText(  vws[ \comp ], 25 @ viewHeight )
+				StaticText(  vws[ \comp ], 35 @ viewHeight )
 					.string_( "time " )
 					.align_( \right )
 					.font_( font )
@@ -714,17 +741,24 @@ EnvEditView {
 				.resize_(2);
 				
 		rangeViews[ \comp ].addFlowLayout( 2@2, 2@2 );
+		
+		// level
+		StaticText( rangeViews[ \comp ], 35 @ viewHeight )
+			.string_( "range" )
+			.align_( \right )
+			.font_( font )
+			.applySkin( RoundView.skin );
 			
 		// range
 		rangeViews[ \range ] = EZSmoothRanger( rangeViews[ \comp ],
-			(bounds.width - 60) @ viewHeight, "range"
+			(bounds.width - 43) @ viewHeight, nil, spec.asSpec
 		)
 			.font_( font )
-			.value_( [ env.levels.minItem, env.levels.maxItem] )
+			.value_( spec.asSpec.map([ env.levels.minItem, env.levels.maxItem]) )
 			.action_({ |sl|
 				env.levels = env.levels.normalize( 
-					sl.value[0], 
-					sl.value[1].max(sl.value[0]+1.0e-12)  
+					spec.asSpec.unmap( sl.value[0] ), 
+					spec.asSpec.unmap( sl.value[1].max(sl.value[0]+1.0e-12) ) 
 				);
 				env.changed( \levels );
 			});
@@ -743,8 +777,8 @@ EnvView {
 	var <>action, <>viewHeight = 14;
 	var <resize = 5;
 	
-	*new { |parent, bounds, env, presets|
-		^this.newCopyArgs.makeView( parent, bounds, env, presets );
+	*new { |parent, bounds, env, spec|
+		^this.newCopyArgs.makeView( parent, bounds, env, spec );
 	}
 	
 	*viewNumLines { ^EnvEditView.viewNumLines + EnvPlotView.viewNumLines }
@@ -764,6 +798,9 @@ EnvView {
 		editView.env = new;
 	}
 	
+	spec { ^editView.spec }
+	spec_ { |spec| editView.spec = spec;}
+	
 	maxSize { ^editView.maxSize }
 	maxSize_ { |new = 32| editView.maxSize = new }
 	
@@ -776,7 +813,7 @@ EnvView {
 	
 	close { view.findWindow.close } 
 	
-	makeView { |parent, bounds, env, presets|
+	makeView { |parent, bounds, env, spec|
 		if( env.isNil ) { env = Env() };
 		
 		if( bounds.isNil ) { bounds = 350 @ (this.class.viewNumLines * (viewHeight + 4)) };
@@ -796,7 +833,7 @@ EnvView {
 		editView = EnvEditView( view, 
 			bounds.copy.height_( bounds.height *
 				( EnvEditView.viewNumLines / this.class.viewNumLines) ),
-			env
+			env, spec
 		).resize_(8);
 		
 		plotCtrl = SimpleController( plotView )
