@@ -737,7 +737,7 @@ EnvEditView {
 		
 		rangeViews = ();
 
-		rangeViews[ \comp ] = CompositeView( comp, bounds.width @ (viewHeight + 4) )
+		rangeViews[ \comp ] = CompositeView( comp, comp.bounds.moveTo(0,0) )
 				.resize_(2);
 				
 		rangeViews[ \comp ].addFlowLayout( 2@2, 2@2 );
@@ -761,8 +761,66 @@ EnvEditView {
 					spec.asSpec.unmap( sl.value[1].max(sl.value[0]+1.0e-12) ) 
 				);
 				env.changed( \levels );
+				action.value( this, env );
 			});
 		rangeViews[ \range ].view.resize_(2);
+		
+		SmoothButton( rangeViews[ \comp ], 50 @ viewHeight )
+			.label_( "invert" )
+			.font_( font )
+			.radius_(2)
+			.action_({ 
+				var min, max;
+				min = env.levels.minItem;
+				max = env.levels.maxItem;
+				env.levels = env.levels.linlin(min,max,max,min);
+				env.changed( \levels );
+				action.value( this, env );
+			});
+			
+		SmoothButton( rangeViews[ \comp ], 50 @ viewHeight )
+			.label_( "reverse" )
+			.font_( font )
+			.radius_(2)
+			.action_({ 
+				env.levels = env.levels.reverse;
+				env.times = env.times.reverse;
+				if( env.curves.size > 0 ) {
+					env.curves = env.curves.reverse;
+				};
+				env.changed( \levels );
+				action.value( this, env );
+			});
+			
+		SmoothButton( rangeViews[ \comp ], 50 @ viewHeight )
+			.label_( "random" )
+			.font_( font )
+			.radius_(2)
+			.action_({ 
+				var min, max, dur;
+				min = env.levels.minItem;
+				max = env.levels.maxItem;
+				dur = env.times.sum;
+				env.levels = ({0.0 rrand: 1.0}!env.levels.size).normalize(min, max);
+				env.times = ({0.1 exprand: 1.0}!env.times.size).normalizeSum * dur;
+				env.changed( \levels );
+				action.value( this, env );
+			});
+			
+		SmoothButton( rangeViews[ \comp ], 50 @ viewHeight )
+			.label_( "line" )
+			.font_( font )
+			.radius_(2)
+			.action_({ 
+				var min, max, dur;
+				min = env.levels.minItem;
+				max = env.levels.maxItem;
+				dur = env.times.sum;
+				env.levels = (..env.levels.size-1).normalize(min, max);
+				env.times = (1!env.times.size).normalizeSum * dur;
+				env.changed( \levels );
+				action.value( this, env );
+			});
 		
 		rangeViews[ \comp ].visible = selected.isNil;
 	}
