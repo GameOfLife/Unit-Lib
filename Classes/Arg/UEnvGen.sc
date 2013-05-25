@@ -94,8 +94,8 @@ UEnvGen {
 			spec = ControlSpec( env.levels.minItem, env.levels.maxItem );
 			env.levels = env.levels.normalize;
 		};
-		spec = spec.asSpec;
 		env = this.prepareEnv(env, spec);
+		spec = spec.asSpec;
 		phasor = Line.ar( *this.getLineArgs(env, timeScale));
 		^spec.map( IEnvGen.ar(env, phasor) )
 	}
@@ -106,8 +106,8 @@ UEnvGen {
 			spec = ControlSpec( env.levels.minItem, env.levels.maxItem );
 			env.levels = env.levels.normalize;
 		};
-		spec = spec.asSpec;
 		env = this.prepareEnv(env, spec);
+		spec = spec.asSpec;
 		phasor = Line.ar( *this.getLineArgs(env, timeScale));
 		^spec.map( IEnvGen.kr(env, phasor) )
 	}

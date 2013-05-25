@@ -367,7 +367,7 @@ EnvEditView {
 	var <>size;
 	
 	*new { |parent, bounds, env, spec|
-		^super.newCopyArgs( env, spec.asSpec ).init.makeView( parent, bounds );
+		^super.newCopyArgs( env, spec ).init.makeView( parent, bounds );
 	}
 	
 	init {
@@ -600,7 +600,7 @@ EnvEditView {
 			
 			// level
 			StaticText(  vws[ \comp ], 35 @ viewHeight )
-				.string_( "level " )
+				.string_( if( spec.isKindOf( Symbol ) ) { spec ++ " " } { "level " } )
 				.align_( \right )
 				.font_( font )
 				.applySkin( RoundView.skin );

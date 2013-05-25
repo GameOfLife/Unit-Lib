@@ -284,7 +284,7 @@ UEnvSpec : Spec {
 	var <>spec;
 	
 	*new { |default, spec|
-		^super.newCopyArgs( default ? Env(), spec.asSpec );
+		^super.newCopyArgs( default ? Env(), spec );
 	}
 	
 	*testObject { |obj|
