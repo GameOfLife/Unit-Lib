@@ -405,7 +405,6 @@ U : ObjectWithArgs {
 	var <>disposeOnFree = true;
 	var <>preparedServers;
 	var >waitTime; // use only to override waittime from args
-	var <>env;
 	var <mod;
 	
 	*initClass {
@@ -448,7 +447,6 @@ U : ObjectWithArgs {
 			"def '%' not found".format(in).warn;
 		};
 		preparedServers = [];
-		env = (); // a place to store things in (for FreeUdef)
 		mod = inMod.asUModFor( this );
 		this.changed( \init );
 	}
