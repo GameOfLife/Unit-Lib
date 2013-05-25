@@ -624,30 +624,9 @@ EnvEditView {
 					env.changed( \levels );
 					action.value( this, env );
 				});
-			
-			/*
-			
-			vws[ \level ] = SmoothNumberBox( vws[ \comp ], 40 @ viewHeight  )
-				.value_( level )
-				.font_( font )
-				.clipLo_( 0.0 )
-				.clipHi_( 1.0 )
-				.step_( 0.01 )
-				.scroll_step_( 0.01 )
-				.action_({ |nb|
-					var levels;
-					levels = env.levels;
-					if( levels.mutable.not ) {
-						levels = levels.copy;
-					};
-					levels.put( i, nb.value );
-					env.levels = levels;
-					env.changed( \levels );
-					action.value( this, env );
-				});
 				
-			*/
-				
+			vws[ \level ].view.resize_(2);
+			
 			if( last.not ) {
 				
 				vws[ \comp ].decorator.nextLine;
