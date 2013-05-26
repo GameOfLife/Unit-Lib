@@ -648,18 +648,18 @@ UScore : UEvent {
 		
 		if( disabled.not ) {
 			server = server ? Server.default;
-			wasCheckFree = AbstractRichBuffer.useCheckFree;
-			AbstractRichBuffer.useCheckFree = false;
 			
-			array = events.collect({ |item|
-				item.collectOSCBundleFuncs( server, item.startTime + startOffset, infdur );
-			}).flatten(1);
-			
-			out = array.sort({ |a,b| a[0] <= b[0] }).collect({ |item|
-				[ item[0] ] ++ server.makeBundle( false, item[1] )
-			}).select({ |item| item.size > 1 });
-			
-			AbstractRichBuffer.useCheckFree = wasCheckFree;
+			this.useNRT({
+							
+				array = events.collect({ |item|
+					item.collectOSCBundleFuncs( server, item.startTime + startOffset, infdur );
+				}).flatten(1);
+				
+				out = array.sort({ |a,b| a[0] <= b[0] }).collect({ |item|
+					[ item[0] ] ++ server.makeBundle( false, item[1] )
+				}).select({ |item| item.size > 1 });
+				
+			});
 			^out;
 		} {
 			^[];

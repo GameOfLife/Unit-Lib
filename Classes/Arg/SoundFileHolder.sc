@@ -97,7 +97,7 @@ AbstractRichBuffer {
 	
 	freeBuffer { |buf, action|
 		if( buf.notNil ) {
-			if( useCheckFree ) {
+			if( UEvent.nrtMode != true ) {
 				buf.checkFree( action );
 			} {
 				buf.free;
@@ -647,7 +647,7 @@ DiskSndFile : AbstractSndFile {
 	}
 	
 	 freeBuffer { |buf, action|
-		 if( useCheckFree ) {
+		 if( UEvent.nrtMode != true ) {
 			buf.checkCloseFree( action );
 		 } {
 			 buf.close;

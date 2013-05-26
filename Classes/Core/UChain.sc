@@ -678,40 +678,39 @@ UChain : UEvent {
 		if( disabled.not ) {	
 			server = server ? Server.default;
 			
-			wasCheckFree = AbstractRichBuffer.useCheckFree;
-			AbstractRichBuffer.useCheckFree = false;
-			
-			array = [ 
-				[ startOffset ] ++ server.makeBundle( false, { 
-					this.prepare(server);
-					this.start(server); 
-				})
-			];
-			
-			if( this.releaseSelf.not ) {
-				if( this.duration != inf ) {
-					array = array.add( 
-						[ startOffset + this.eventSustain ] ++ 
-							server.makeBundle( false, { this.release })
-					);
+			this.useNRT({	
+				
+				array = [ 
+					[ startOffset ] ++ server.makeBundle( false, { 
+						this.prepare(server);
+						this.start(server); 
+					})
+				];
+				
+				if( this.releaseSelf.not ) {
+					if( this.duration != inf ) {
+						array = array.add( 
+							[ startOffset + this.eventSustain ] ++ 
+								server.makeBundle( false, { this.release })
+						);
+					} {
+						array = array.add( 
+							[ infdur - this.fadeOut ] ++ 
+								server.makeBundle( false, { this.release }) 
+						);
+					};
+				};
+				
+				if( this.duration == inf )  {
+					array = array.add( [ infdur ] ++ server.makeBundle( false, { this.disposeSynths }) );
 				} {
 					array = array.add( 
-						[ infdur - this.fadeOut ] ++ 
-							server.makeBundle( false, { this.release }) 
+						[ startOffset + this.duration ] ++ 
+							server.makeBundle( false, { this.disposeSynths })
 					);
 				};
-			};
-			
-			if( this.duration == inf )  {
-				array = array.add( [ infdur ] ++ server.makeBundle( false, { this.disposeSynths }) );
-			} {
-				array = array.add( 
-					[ startOffset + this.duration ] ++ 
-						server.makeBundle( false, { this.disposeSynths })
-				);
-			};
-			
-			AbstractRichBuffer.useCheckFree = wasCheckFree;
+				
+			});
 			
 			^array.sort({ |a,b| a[0] <= b[0] });
 		} {

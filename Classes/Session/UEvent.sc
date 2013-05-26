@@ -21,6 +21,7 @@ UEvent : UArchivable {
 	
 	classvar >renderNumChannels = 2;
 	classvar <>renderMaxTime = 60;
+	classvar <>nrtMode = false;
 
     var <startTime=0;
     var <track=0;  //track number (horizontal segment) on the score editor
@@ -74,6 +75,16 @@ UEvent : UArchivable {
     
     score { ^nil }
     score_ { }
+    
+    useNRT { |func|
+	    if( nrtMode == true ) {
+		    func.value
+	    } {
+		    nrtMode = true;
+		    func.value;
+		    nrtMode = false;
+	    };
+    }
     
     isFolder { ^false }
 
@@ -130,6 +141,9 @@ UEvent : UArchivable {
 	    			++ [ [ duration, [ \c_set, 0,0 ] ] ]
 	    	);
     }
+    
+    collectOSCBundles { ^[] }
+    collectOSCBundleFuncs { ^[] }
     
     render { // standalone app friendly version
 		arg path, maxTime=60, sampleRate = 44100,
