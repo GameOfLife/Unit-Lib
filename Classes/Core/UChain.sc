@@ -417,6 +417,40 @@ UChain : UEvent {
 
         }
 	}
+	
+	bounce { |index = 0, path, action|
+		var tempChain, analyzer, playbackUnit, dur;
+		path = path.getGPath.replaceExtension( "aiff" );
+		dur = this.duration;
+		
+		tempChain = this.deepCopy;
+		tempChain.units = tempChain.units[..index];
+		
+		analyzer = UChainAudioAnalyzer( tempChain );
+		
+		playbackUnit = U( \diskSoundFile, [ \soundFile, DiskSndFile.newBasic(
+				path, 
+				(dur * 44100).floor, 
+				analyzer.usedBuses.size
+			) ] 
+		);
+		
+		analyzer.usedBuses.do({ |bus, i|
+			tempChain.add( U( \output, [ \bus, i ] ).setAudioIn( 0, bus ) );
+			playbackUnit.setAudioOut( i, bus );
+		});
+		
+		this.units = [ playbackUnit ] ++ (this.units[index + 1..]);
+		this.duration = dur;
+		
+		tempChain.writeAudioFile( path, sampleFormat: "float", 
+			numChannels: analyzer.usedBuses.size.postln, 
+			action: { 
+				playbackUnit.soundFile.path = playbackUnit.soundFile.path;
+				action.value( this );
+			}
+		);
+	}
 
 	 makeView{ |i=0,minWidth, maxWidth| ^UChainEventView(this, i, minWidth, maxWidth) }
 

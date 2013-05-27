@@ -848,6 +848,20 @@ UChainGUI {
 						};
 						this.setUnits( units );
 					}).resize_(3);
+					
+				if(  unit.isKindOf( MassEditU ).not && { unit.audioOuts.size > 0 } ) {					SmoothButton( comp, 
+						Rect( comp.bounds.right - (45 + 2 + 12 + 4 + 12), 
+							1, 45, 12 ) 
+						)
+						.label_( "bounce" )
+						.border_( 1 )
+						.radius_( 2 )
+						.action_({
+							Dialog.savePanel( { |path|
+								chain.bounce( chain.units.indexOf( unit ), path );
+							});
+						}).resize_(3);
+				};
 			};	
 					
 			unit.addDependant( unitInitFunc );
