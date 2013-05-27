@@ -672,7 +672,7 @@ UChain : UEvent {
 	}
 	
 	collectOSCBundles { |server, startOffset = 0, infdur = 60|
-		var array, wasCheckFree;
+		var array, prepareArray;
 		// returns a set of OSC bundles to be used by Score for NRT purposes
 		
 		if( disabled.not ) {	
@@ -680,11 +680,14 @@ UChain : UEvent {
 			
 			this.useNRT({	
 				
-				array = [ 
-					[ startOffset ] ++ server.makeBundle( false, { 
-						this.prepare(server);
-						this.start(server); 
-					})
+				prepareArray = server.makeBundle( false, { this.prepare(server); } );
+				
+				prepareArray.do({ |item|
+					array = array ++ [ [ startOffset, item ] ];
+				});
+				
+				array = array ++ [ 
+					[ startOffset ] ++ server.makeBundle( false, { this.start(server); }) 
 				];
 				
 				if( this.releaseSelf.not ) {

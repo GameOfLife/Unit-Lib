@@ -656,8 +656,10 @@ UScore : UEvent {
 				}).flatten(1);
 				
 				out = array.sort({ |a,b| a[0] <= b[0] }).collect({ |item|
-					[ item[0] ] ++ server.makeBundle( false, item[1] )
-				}).select({ |item| item.size > 1 });
+					server.makeBundle( false, item[1] ).collect({ |bundle|
+						[ item[0], bundle ] 
+					});
+				}).flatten(1).select({ |item| item.size > 1 });
 				
 			});
 			^out;
