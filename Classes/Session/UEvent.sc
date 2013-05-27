@@ -161,7 +161,7 @@ UEvent : UArchivable {
 		Score.program = oldpgm;
     }
     
-    writeAudioFile { |path, maxTime, action, headerFormat = "AIFF", sampleFormat = "int24"|
+    writeAudioFile { |path, maxTime, action, headerFormat = "AIFF", sampleFormat = "int24", numChannels|
 		var o;
 		
 		if( this.isFinite.not && { maxTime == nil } ) {
@@ -169,7 +169,7 @@ UEvent : UArchivable {
 		};
 		
 		o = ServerOptions.new
-			.numOutputBusChannels_(this.renderNumChannels ? 2)
+			.numOutputBusChannels_( numChannels ? this.renderNumChannels ? 2)
 			.memSize_( 2**19 );
 		path = path.replaceExtension( headerFormat.toLower );
 		this.render( 
