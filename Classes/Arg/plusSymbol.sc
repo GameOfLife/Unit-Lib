@@ -6,6 +6,33 @@ Udef(\test,{
 
 UChain(\test, \stereoOutput).gui
 
+Udef( \testTrig, { 
+	var in;
+	in = UIn.ar(0);
+	in = in * Sweep.kr( \trigger.utr ).wrap(0,1);
+	UOut.ar( 0, in );
+});
+
+UChain( \sine, \testTrig, \stereoOutput ).gui;
+
+(
+Udef( \testTrig, {  // now watch the gui
+	var in;
+	in = UIn.ar(0);
+	in = in * Sweep.kr( \trigger.utr( label: "start" ) ).wrap(0,1);
+	UOut.ar( 0, in );
+});
+)
+
+(
+Udef( \testTrig, {  // now watch the gui
+	var in;
+	in = UIn.ar(0);
+	in = in * Sweep.kr( \trigger.utr( 0, nil, 0, 2 ) ).wrap(0,1);
+	UOut.ar( 0, in );
+});
+)
+
 TODO:
 intelligently sense the size of the default, and switch to ControlSpec, RangeSpec or ArrayControlSpec
 */
