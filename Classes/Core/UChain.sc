@@ -418,37 +418,55 @@ UChain : UEvent {
         }
 	}
 	
-	bounce { |index = 0, path, action|
-		var tempChain, analyzer, playbackUnit, dur;
+	bounce { |index = 0, path, action, replace = true, single = true|
+		var tempChain, playbackUnit, dur, newAction;
+		var usedBuses;
 		path = path.getGPath.replaceExtension( "aiff" );
 		dur = this.duration;
 		
 		tempChain = this.deepCopy;
 		tempChain.units = tempChain.units[..index];
 		
-		analyzer = UChainAudioAnalyzer( tempChain );
+		if( single == true ) {
+			usedBuses = tempChain.units.last.audioOuts.collect({ |item|
+				tempChain.units.last.getAudioOut( item );
+			});
+		} {
+			usedBuses = UChainAudioAnalyzer( tempChain ).usedBuses.sort;
+		};
 		
-		playbackUnit = U( \diskSoundFile, [ \soundFile, DiskSndFile.newBasic(
-				path, 
-				(dur * 44100).floor, 
-				analyzer.usedBuses.size
-			) ] 
-		);
-		
-		analyzer.usedBuses.do({ |bus, i|
+		usedBuses.do({ |bus, i|
 			tempChain.add( U( \output, [ \bus, i ] ).setAudioIn( 0, bus ) );
-			playbackUnit.setAudioOut( i, bus );
 		});
 		
-		this.units = [ playbackUnit ] ++ (this.units[index + 1..]);
-		this.duration = dur;
+		if( replace == true ) {	
+			playbackUnit = U( \diskSoundFile, [ \soundFile, DiskSndFile.newBasic(
+					path, 
+					(dur * 44100).floor, 
+					usedBuses.size
+				) ] 
+			);
+			
+			usedBuses.do({ |bus, i|
+				playbackUnit.setAudioOut( i, bus );
+			});
+			
+			if( single == true ) {
+				this.units = this.units.put( index, playbackUnit );
+			} {
+				this.units = [ playbackUnit ] ++ (this.units[index + 1..]);
+			};
+			
+			this.duration = dur;
+			newAction = {
+				playbackUnit.soundFile.path = playbackUnit.soundFile.path;
+				action.value;
+			};
+		};
 		
 		tempChain.writeAudioFile( path, sampleFormat: "float", 
-			numChannels: analyzer.usedBuses.size.postln, 
-			action: { 
-				playbackUnit.soundFile.path = playbackUnit.soundFile.path;
-				action.value( this );
-			}
+			numChannels: usedBuses.size, 
+			action: newAction ? action
 		);
 	}
 
