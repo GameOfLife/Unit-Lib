@@ -14,6 +14,6 @@ Udef( \envelope, {
 	var in;
 	in = UIn.ar(0);
 	in = in * UEnvGen.ar( \env, \amp );
-	UMixOut.ar( 0, in );
+	UOut.ar( 0, in );
 })
 	.category_( \dynamics )
