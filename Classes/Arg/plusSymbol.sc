@@ -22,8 +22,8 @@ intelligently sense the size of the default, and switch to ControlSpec, RangeSpe
 		^this.kr(default, lag, fixedLag)
 	}
 
-	utr { |default, minval=0.0, maxval=1.0, warp='lin', step=0.0|
-		Udef.addBuildSpec(ArgSpec(this, default, TrigSpec(minval, maxval, warp, step, default) ) );
+	utr { |default|
+		Udef.addBuildSpec(ArgSpec(this, default, TriggerSpec(this)) );
 		^this.tr(default)
 	}
 
