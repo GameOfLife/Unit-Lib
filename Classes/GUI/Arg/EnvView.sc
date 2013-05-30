@@ -401,18 +401,21 @@ EnvEditView {
 					env.levels.minItem, env.levels.maxItem 
 				]);
 				argViews.do({ |item, i|
-					var last;
-					last = (i == (env.levels.size-1));
+					var first;
+					first = (i == 0);
 					item.level.value = spec.asSpec.map( env.levels[i] );
-					if( last.not ) {
-						item.time.value = env.times[i];
-						if( curves[i].isNumber ) {
+					if( first.not ) {
+						item.time
+							.value_( env.times[..i-1].sum )
+							.clipLo_( env.times[..i-2].sum )
+							.clipHi_( if( env.times.size == i ) { inf } { env.times[..i].sum } );
+						if( curves[i-1].isNumber ) {
 							item.curveNumber.stringColor = Color.black;
-							item.curveNumber.value = curves[i];
+							item.curveNumber.value = curves[i-1];
 							{ item.curveType.value = 5 }.defer;
 						} {
 							item.curveNumber.stringColor = Color.black.alpha_(0.5);
-							{ item.curveType.value = Env.shapeNumber( curves[i] ) }.defer;
+							{ item.curveType.value = Env.shapeNumber( curves[i-1] ) }.defer;
 						};
 					};
 				});
@@ -470,7 +473,9 @@ EnvEditView {
 			"node" + i;
 		}) ++ [ "all" ];
 		selected = selected !? { selected.clip( 0, env.levels.size -1 ) };
+		if( selected.isNil ) { listView.value = env.levels.size };
 		argViews.do({ |item| item.comp.remove });
+		rangeViews !? { rangeViews[ \comp ].remove };
 		RoundView.useWithSkin( skin ? (), { this.makeSubViews });
 	}
 	
@@ -532,36 +537,42 @@ EnvEditView {
 		views[ \minus ] = SmoothButton( view, viewHeight @ viewHeight )
 			.label_( '-' )
 			.mouseUpAction_({
-				if( selected.notNil && { env.levels.size > 2 } ) {
-					env.levels = env.levels.copy.select({ |item, i| i != selected });
-					if( selected == env.times.size ) {
+				var which;
+				which = selected ? (env.levels.size - 1);
+				if( which.notNil && { env.levels.size > 2 }) {
+					env.levels = env.levels.copy.select({ |item, i| i != which });
+					if( which == env.times.size ) {
 						if( env.times.mutable.not ) { env.times = env.times.copy };
 						env.times.pop;
 						if( env.curves.size > 0 ) {
 							env.curves.pop;
 						}
 					} {
-						env.times = env.times.select({ |item, i| i != selected });
+						env.times = env.times.select({ |item, i| i != which });
 						if( env.curves.size > 0 ) {
-							env.curves = env.curves.select({ |item, i| i != selected });
+							env.curves = env.curves.select({ |item, i| i != which });
 						}
 					};
 					{ env.changed( \levels ); }.defer(0.1);
+					action.value( this, env );
 				};
 			});
 			
 		views[ \plus ] = SmoothButton( view, viewHeight @ viewHeight )
 			.label_( '+' )
 			.action_({
-				if( selected.notNil && { env.levels.size < maxSize }) {
+				var which;
+				which = selected ? (env.levels.size - 1);
+				if( which.notNil && { env.levels.size < maxSize }) {
 					env.levels = env.levels.collect(_.value)
-						.insert( selected, env.levels[selected] );
+						.insert( which, env.levels[which] );
 					env.times = env.times.copy.collect(_.value)
-						.insert( selected, env.times.clipAt( selected ) );
+						.insert( which, env.times.clipAt( which ) );
 					if( env.curves.size > 0 ) {
-						env.curves = env.curves.insert( selected, env.curves.clipAt( selected ) );
+						env.curves = env.curves.insert( which, env.curves.clipAt( which ) );
 					};
 					{ env.changed( \levels ); }.defer(0.1);
+					action.value( this, env );
 				};
 			});
 		
@@ -591,10 +602,10 @@ EnvEditView {
 		size = env.levels.size;
 					
 		env.levels.do({ |level, i|
-			var vws, last;
+			var vws, first;
 			vws = ();
 			
-			last = (i == (env.levels.size-1));
+			first = (i == 0);
 			
 			vws[ \comp ] = CompositeView( comp, comp.bounds.moveTo(0,0) )
 				.resize_(2);
@@ -627,9 +638,9 @@ EnvEditView {
 				
 			vws[ \level ].view.resize_(2);
 			
-			if( last.not ) {
-				
-				vws[ \comp ].decorator.nextLine;
+			vws[ \comp ].decorator.nextLine;
+			
+			if( first.not ) {
 				
 				// time
 				StaticText(  vws[ \comp ], 35 @ viewHeight )
@@ -641,16 +652,21 @@ EnvEditView {
 				vws[ \time ] = SMPTEBox( vws[ \comp ], 70 @ viewHeight  )
 					.applySmoothSkin
 					.applySkin( RoundView.skin )
-					.value_( env.times[i] )
-					.clipLo_( 0 )
+					.value_( env.times[..i-1].sum )
+					.clipLo_( env.times[..i-2].sum )
+					.clipHi_( if( env.times.size == i ) { inf } { env.times[..i].sum } )
 					.font_( font )
 					.action_({ |nb|
-						var times;
+						var times, max;
 						times = env.times;
 						if( times.mutable.not ) {
 							times = times.copy;
 						};
-						times.put( i, nb.value );
+						max = times[..i].sum;
+						times.put( i-1, nb.value - (times[..i-2].sum) );
+						if(  i < env.times.size ) {
+							times.put( i, max - nb.value);
+						};
 						env.times = times;
 						env.changed( \times );
 						action.value( this, env );
@@ -666,18 +682,18 @@ EnvEditView {
 				vws[ \curveType ] = PopUpMenu( vws[ \comp ], 60 @ viewHeight  )
 					.items_([ \step, \lin, \exp, \sine, \welch, \curve, \squared, \cubed ])
 					.value_( 
-						Env.shapeNumber(env.curves.asCollection.wrapAt(i)) 
+						Env.shapeNumber(env.curves.asCollection.wrapAt(i-1)) 
 					)
 					.font_( font )
 					.action_({ |pu|
 						if( pu.value != 5 ) {
 							env.curves = env.curves.asCollection
-								.wrapExtend( env.levels.size - 1 ).put( i, pu.item );
+								.wrapExtend( env.levels.size - 1 ).put( i-1, pu.item );
 							vws[ \curveNumber ].stringColor = Color.black.alpha_(0.5);
 						} {
 							env.curves = env.curves.asCollection
 								.wrapExtend( env.levels.size - 1 )
-								.put( i, vws[ \curveNumber ].value );
+								.put( i-1, vws[ \curveNumber ].value );
 							vws[ \curveNumber ].stringColor = Color.black;
 						};
 						env.changed( \curves );
@@ -700,19 +716,57 @@ EnvEditView {
 					.action_({ |nb|
 						env.curves = env.curves.asCollection
 							.wrapExtend( env.levels.size - 1 )
-							.put( i, nb.value );
+							.put( i-1, nb.value );
 						vws[ \curveType ].value = 5;
 						nb.stringColor = Color.black;
 						env.changed( \curves );
 						action.value( this, env );
 					});
 				
-				if( env.curves.asCollection.wrapAt(i).isNumber.not ) {
+				if( env.curves.asCollection.wrapAt(i-1).isNumber.not ) {
 					vws[ \curveNumber ].stringColor = Color.black.alpha_(0.5);
 				};
+				
+				vws[ \comp ].decorator.left_( vws[ \comp ].bounds.width - (2 * viewHeight) - 6 );
+				
+				vws[ \back ] = SmoothButton( vws[ \comp ], viewHeight @ viewHeight )
+					.label_( 'back' )
+					.action_({
+						var levels;
+						levels = env.levels;
+						if( levels.mutable.not ) {
+							levels = levels.copy;
+						};
+						levels = levels[..i-2] ++ levels[[i,i-1]] ++ levels[i+1..];
+						env.levels = levels;
+						env.changed( \levels );
+						this.selected = this.selected - 1;
+						action.value( this, env );
+					})
+					.resize_(3);
+			} {
+				vws[ \comp ].decorator.left_( vws[ \comp ].bounds.width - (1 * viewHeight) - 4 );
 			};
 			
-			vws[ \comp ].visible = ((selected ? 0) == i);
+			if( i < (env.levels.size - 1) ) {
+				vws[ \forward ] = SmoothButton( vws[ \comp ], viewHeight @ viewHeight )
+					.label_( 'play' )
+					.action_({
+						var levels;
+						levels = env.levels;
+						if( levels.mutable.not ) {
+							levels = levels.copy;
+						};
+						levels = levels[..i-1] ++ levels[[i+1,i]] ++ levels[i+2..];
+						env.levels = levels;
+						env.changed( \levels );
+						this.selected = this.selected + 1;
+						action.value( this, env );
+					})
+					.resize_(3);
+			};
+			
+			vws[ \comp ].visible = (selected == i);
 			
 			argViews = argViews.add( vws );
 		});
@@ -878,7 +932,7 @@ EnvView {
 		
 		plotCtrl = SimpleController( plotView )
 			.put( \selected, { editView.selected = plotView.selected; } )
-			.put( \selectedLine, { editView.selected = plotView.selectedLine ? plotView.selected; } )
+			.put( \selectedLine, { editView.selected = plotView.selectedLine !? (_ + 1) ? plotView.selected; } )
 			.put( \env, {
 				env = plotView.env;
 				if( editView.env !== env ) {
@@ -893,7 +947,7 @@ EnvView {
 					plotView.selectedLine = nil;
 				} {	
 					if( (plotView.selected != editView.selected)  && {
-						plotView.selectedLine != editView.selected
+						plotView.selectedLine !? (_ + 1) != editView.selected
 					}) {
 						plotView.selected = editView.selected; 
 						plotView.selectedLine = nil 
