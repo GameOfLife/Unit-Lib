@@ -157,6 +157,17 @@ Udef : GenericDef {
 		});
 	}
 	
+	asArgsArray { |argPairs, constrain = true|
+		argPairs = argPairs ? #[];
+		^argSpecs.collect({ |item| 
+			var val;
+			val = argPairs.pairsAt(item.name) ?? { item.default.copy };
+			if( constrain && { val.isKindOf( UMap ).not } ) { val = item.constrain( val ) };
+			[ item.name,  val ] 
+		}).flatten(1);
+	}
+	
+	
 	// this may change 
 	// temp override to send instead of load (remote servers can't load!!)
 	loadSynthDef { |server|
@@ -434,14 +445,10 @@ U : ObjectWithArgs {
 			def = nil;
 		};
 		if( this.def.notNil ) {
-			args = this.def.asArgsArray( inArgs ? [] )
-				.collect({ |item, i|
-					if( i.odd ) {
-						item.deepCopy.asUnitArg( this );
-					} {
-						item;
-					};
-				});
+			
+			this.def.asArgsArray( inArgs ? [] ).pairsDo({ |key, value|
+				args = args ++ [ key, value.deepCopy.asUnitArg( this, key ) ];
+			});
 		} {
 			args = inArgs;
 			"def '%' not found".format(in).warn;
@@ -492,7 +499,7 @@ U : ObjectWithArgs {
 					value = this.get( key ).perform( ext.asSymbol.asSetter, value );
 				};
 			} {
-				value = value.asUnitArg( this );
+				value = value.asUnitArg( this, key );
 			};
 			this.setArg( key, value );
 			synthArgs = synthArgs.addAll( [ key, value ] ); 
@@ -553,6 +560,12 @@ U : ObjectWithArgs {
 	}
 	
 	modPerform { |what ...args| mod !? _.perform( what, this, *args ); }
+	
+	umapPerform { |what ...args| 
+		this.values.detect( _.isKindOf( UMap ) ).do({ |item|
+			item.perform( what, *args );
+		});
+	}
 	
 	connect { this.modPerform( \connect ); this.changed( \connect ); }
 	disconnect {  this.modPerform( \disconnect ); this.changed( \disconnect ); }
@@ -740,6 +753,7 @@ U : ObjectWithArgs {
 				target.asTarget.server.sendSyncedBundle( latency, nil, *bundles[i] );
 			};
 		});
+		this.umodPerform( \start, target, startPos, latency );
 		if( target.size == 0 ) {
 			^this.synths[0]
 		} { 
