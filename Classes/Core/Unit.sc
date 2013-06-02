@@ -445,7 +445,7 @@ U : ObjectWithArgs {
 			def = nil;
 		};
 		if( this.def.notNil ) {
-			
+			args = [];
 			this.def.asArgsArray( inArgs ? [] ).pairsDo({ |key, value|
 				args = args ++ [ key, value.deepCopy.asUnitArg( this, key ) ];
 			});
