@@ -85,7 +85,10 @@ UMap {
 		bundles = this.unit.synths.collect({ |synth|
 			synth.server.makeBundle( false, {
 				Synth.before( synth, "umap_line", [
-					\min, min, \max, max, \time, time, \bus, bus + this.class.busOffset 
+					\min, min.blend(max,startPos/time), 
+					\max, max, 
+					\time, time - startPos, 
+					\bus, bus + this.class.busOffset 
 				] );
 			});
 		});
