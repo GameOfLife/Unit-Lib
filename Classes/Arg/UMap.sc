@@ -73,6 +73,8 @@ UMap : U {
 	
 	hasBus { ^this.def.hasBus }
 	
+	setUMapBuses { } // this is done by the U for all (nested) UMaps
+	
 	u_waitTime { ^this.waitTime }
 	
 	dontStoreArgNames { ^[ 'u_dur', 'u_doneAction', 'u_mapbus', 'u_spec' ] }
