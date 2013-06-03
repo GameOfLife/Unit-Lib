@@ -554,9 +554,6 @@ UChain : UEvent {
                 target.asTarget.server.sendSyncedBundle( latency, nil, *bundles[i] );
             };
         });
-        units.do({ |unit|
-	        unit.umapPerform( \start, unit.synths, startPos, latency );
-        });
         if( target.size == 0 ) {
             ^this.groups[0]
         } {

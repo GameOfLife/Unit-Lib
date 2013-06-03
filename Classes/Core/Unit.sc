@@ -241,6 +241,7 @@ Udef : GenericDef {
 			synthAction.value( synth );
 			unit.addSynth(synth);
 		};
+		^synth;
 	}
 	
 	shouldPlayOn { |unit, server| // returns nil if no func
@@ -736,7 +737,11 @@ U : ObjectWithArgs {
 	}
 
 	makeSynth { |target, startPos = 0, synthAction|
-		this.def.makeSynth( this, target, startPos, synthAction );
+		var synth;
+		synth = this.def.makeSynth( this, target, startPos, synthAction );
+		if( synth.notNil ) {
+			this.umapPerform( \makeSynth, synth, startPos );
+		};
 	}
 	
 	makeBundle { |targets, startPos = 0, synthAction|
@@ -759,7 +764,6 @@ U : ObjectWithArgs {
 				target.asTarget.server.sendSyncedBundle( latency, nil, *bundles[i] );
 			};
 		});
-		this.umodPerform( \start, this.synths, startPos, latency );
 		if( target.size == 0 ) {
 			^this.synths[0]
 		} { 
