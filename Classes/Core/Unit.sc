@@ -747,7 +747,7 @@ U : ObjectWithArgs {
 		targets = target.asCollection;
 		latency = latency ? 0.2;
 		this.modPerform( \start, startPos, latency );
-		bundles = this.makeBundle( targets );
+		bundles = this.makeBundle( targets, startPos );
 		targets.do({ |target, i|
 			if( bundles[i].size > 0 ) {
 				target.asTarget.server.sendSyncedBundle( latency, nil, *bundles[i] );
