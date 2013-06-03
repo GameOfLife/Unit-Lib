@@ -14,6 +14,20 @@ UMapDef : Udef {
 	
 	asUMapDef { ^this }
 	
+	getControlInput { |unit|
+		^("c" ++ (this.getBus(unit) + unit.class.busOffset)).asSymbol;
+	}
+	
+	getBus { |unit|
+		^unit.get(\u_mapbus) ? 0
+	}
+	
+	setBus { |bus = 0, unit|
+		unit.set(\u_mapbus, bus );
+	}
+	
+	hasBus { ^this.argNames.includes( \u_mapbus ); }
+	
 	createSynth { |umap, target, startPos = 0| // create A single synth based on server
 		target = target ? Server.default;
 		^Synth( this.synthDefName, umap.getArgsFor( target, startPos ), target, \addBefore );
@@ -36,7 +50,6 @@ UMap : U {
 	classvar <>allUnits;
 	
 	var <>spec;
-	var <>bus = 0;
 	
 	*busOffset { ^1500 }
 	
@@ -47,8 +60,18 @@ UMap : U {
 	*defClass { ^UMapDef }
 	
 	asControlInput {
-		^("c" ++ (bus + this.class.busOffset)).asSymbol;
+		^this.def.getControlInput(this);
 	}
+	
+	getBus { 
+		^this.def.getBus( this );
+	}
+	
+	setBus { |bus = 0|
+		this.def.setBus( bus, this );
+	}
+	
+	hasBus { ^this.def.hasBus }
 	
 	u_waitTime { ^this.waitTime }
 	

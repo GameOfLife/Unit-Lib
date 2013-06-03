@@ -569,8 +569,27 @@ U : ObjectWithArgs {
 	modPerform { |what ...args| mod !? _.perform( what, this, *args ); }
 	
 	umapPerform { |what ...args| 
-		this.values.detect( _.isKindOf( UMap ) ).do({ |item|
+		this.getUMaps.do({ |item|
 			item.perform( what, *args );
+		});
+	}
+	
+	getUMaps { ^this.values.select( _.isKindOf( UMap ) ) }
+	
+	getAllUMaps { 
+		var umaps;
+		this.getUMaps.do({ |item|
+			umaps = umaps.add( item );
+			umaps = umaps.addAll( item.getAllUMaps );
+		});
+		^umaps;
+	}
+	
+	setUMapBuses {
+		var umaps;
+		umaps = this.getAllUMaps.select(_.hasBus);
+		umaps.do({ |item, i|
+			item.setBus(i);
 		});
 	}
 	
@@ -886,6 +905,7 @@ U : ObjectWithArgs {
 			action.value;
 		};
 		this.modPerform( \prepare, startPos );
+		this.setUMapBuses;
 	    ^target; // returns targets actually prepared for
     }
     
