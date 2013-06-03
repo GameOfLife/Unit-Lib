@@ -1,4 +1,27 @@
-UMap {
+UMapDef : Udef {
+	classvar <>all, <>defsFolders, <>userDefsFolder;
+	
+	*initClass{
+		defsFolders = [ 
+			this.filenameSymbol.asString.dirname.dirname.dirname +/+ "UMapDefs"
+		];
+		userDefsFolder = Platform.userAppSupportDir ++ "/UMapDefs/";
+	}
+	
+	*prefix { ^"umap_" } // synthdefs get another prefix to avoid overwriting
+	
+	*from { |item| ^item.asUDef( this ) }
+	
+	asUMapDef { ^this }
+	
+	createSynth { |umap, target, startPos = 0| // create A single synth based on server
+		target = target ? Server.default;
+		target.postln;
+		^Synth( this.synthDefName, umap.getArgsFor( target, startPos ), target, \addBefore );
+	}
+}
+
+UMap : U {
 	
 	// This class is under development. For now it plays a line between min and max.
 	// it can only be used for args that have a single value ControlSpec
@@ -6,16 +29,14 @@ UMap {
 	
 	/* 
 	example:
-	x = UChain([ 'sine', [ 'freq', UMap(0.5,0.75,5) ] ], 'output');
+	x = UChain([ 'sine', [ 'freq', UMap() ] ], 'output');
 	x.prepareAndStart;
 	x.stop;
 	*/
 	
 	classvar <>allUnits;
 	
-	var <min = 0.5, <max = 1, <time = 5;
 	var <>spec;
-	var <>synths;
 	var <>bus = 0;
 	
 	*busOffset { ^1000 }
@@ -24,9 +45,7 @@ UMap {
 	    allUnits = IdentityDictionary();
 	}
 	
-	*new { |min = 0.5, max = 1, time = 5|
-		^super.newCopyArgs( min, max, time );
-	}
+	*defClass { ^UMapDef }
 	
 	asControlInput {
 		"called %.asControlInput\n".postf( this.cs );
@@ -34,83 +53,17 @@ UMap {
 		^("c" ++ (bus + this.class.busOffset)).asSymbol;
 	}
 	
-	u_waitTime { ^1 }
+	u_waitTime { ^this.waitTime }
 	
-	synthDef {
-		^SynthDef( "umap_line", {
-			ReplaceOut.kr( \bus.kr(bus + this.class.busOffset), spec.asSpec.map( 
-				Line.kr( \min.kr(min),\max.kr(max), \time.kr(time) )
-				)
-			);
-		});
-	}
+	dontStoreArgNames { ^[ 'u_dur', 'u_doneAction', 'u_mapbus', 'u_spec' ] }
 	
-	prepare { |servers, startPos = 0, action|
-		action = MultiActionFunc( action );
-		servers.do({ |server|
-			var innerAction = action.getAction;
-			this.synthDef.send(server);
-			OSCresponderNode( server.addr, '/done', { |time, resp, msg, addr|
-				if( msg == [ '/done', '/d_recv' ]  ) {
-					resp.remove;
-					innerAction.value;
-				};
-			}).add;
-	     });
-		"called %.prepare( % )\n".postf( this.cs, [servers, startPos, action ]
-			.join( ", " ) 
-		);
-	}
-	
-	min_ { |new = 0|
-		min = new;
-		this.changed( \min, min );
-		this.unitSet;
-	}
-	
-	max_ { |new = 0|
-		max = new;
-		this.changed( \max, max );
-		this.unitSet;
-	}
-	
-	time_ { |new = 0|
-		time = new;
-		this.changed( \time, time );
-		this.unitSet;
-	}
-	
-	start { |targets, startPos, latency|
-		var bundles;
-		bundles = this.unit.synths.collect({ |synth|
-			synth.server.makeBundle( false, {
-				Synth.before( synth, "umap_line", [
-					\min, min.blend(max,startPos/time), 
-					\max, max, 
-					\time, time - startPos, 
-					\bus, bus + this.class.busOffset 
-				] );
-			});
-		});
-		this.unit.synths.do({ |synth, i|
-			synth.server.sendSyncedBundle( latency, nil, *bundles[i] );
-		});
-		"called %.start( %, %, % )\n".postf( this.cs, targets, startPos, latency);
-	}
-	
-	dispose {
-		"called %.dispose\n".postf( this.cs );
-	}
-	
-	disposeFor { |server|
-		"called %.disposeFor(%)\n".postf( this.cs, server );
-	}
-	
+	// UMap is intended to use as arg for a Unit (or another UMap)
 	asUnitArg { |unit, key|
 		this.unit = unit; 
 		this.unitArgName = key;
 		if( key.notNil ) {
 			spec = unit.getSpec( key ).copy;
+			this.set( \u_spec, spec );
 		};
 		^this;
 	}
@@ -163,9 +116,5 @@ UMap {
 				this.unit.set( unitArgName, this );
 			};
 		};
-	}
-	
-	storeArgs {
-		^[ min, max, time ]
 	}
 }

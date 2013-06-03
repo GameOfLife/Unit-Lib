@@ -963,6 +963,26 @@ FreqSpec : ControlSpec {
 
 }
 
+ControlSpecSpec : Spec {
+	
+	*new {
+		^super.newCopyArgs();
+	}
+	
+	*testObject { |obj|
+		^obj.isKindOf( ControlSpec );
+	}
+	
+	constrain { |value|
+		^value.asControlSpec;
+	}
+	
+	default { 
+		^nil.asControlSpec;
+	}
+
+}
+
 + Spec {
 	*testObject { ^false }
 	

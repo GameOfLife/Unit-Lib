@@ -437,7 +437,7 @@ U : ObjectWithArgs {
 		if( in.isKindOf( this.class.defClass ) ) {
 			def = in;
 			defName = in.name;
-			if( defName.notNil && { defName.asUdef == def } ) {
+			if( defName.notNil && { defName.asUdef( this.class.defClass ) == def } ) {
 				def = nil;
 			};
 		} {
@@ -461,7 +461,7 @@ U : ObjectWithArgs {
 	allValues { ^this.values }
 
     def {
-        ^def ?? { defName.asUdef }
+        ^def ?? { defName.asUdef( this.class.defClass ) }
     }
 
     defName {
@@ -753,7 +753,7 @@ U : ObjectWithArgs {
 				target.asTarget.server.sendSyncedBundle( latency, nil, *bundles[i] );
 			};
 		});
-		this.umodPerform( \start, target, startPos, latency );
+		this.umodPerform( \start, this.synths, startPos, latency );
 		if( target.size == 0 ) {
 			^this.synths[0]
 		} { 
@@ -764,6 +764,7 @@ U : ObjectWithArgs {
 	free { 
 		this.synths.do(_.free);  
 		this.modPerform( \stop );
+		this.umodPerform( \free );
 	} 
 	stop { this.free }
 	
