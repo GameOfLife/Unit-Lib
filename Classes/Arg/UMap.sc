@@ -15,7 +15,16 @@ UMapDef : Udef {
 	asUMapDef { ^this }
 	
 	getControlInput { |unit|
-		^("c" ++ (this.getBus(unit) + unit.class.busOffset)).asSymbol;
+		if( this.hasBus ) {
+			^("c" ++ (this.getBus(unit) + unit.class.busOffset)).asSymbol;
+		} {
+			^this.value( unit );
+		};
+	}
+	
+	value { |unit|  
+		// subclass may put something different here
+		^unit !? {|x| x.spec.default } ? 0;
 	}
 	
 	getBus { |unit|
