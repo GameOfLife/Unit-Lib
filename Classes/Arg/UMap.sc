@@ -39,7 +39,7 @@ UMap : U {
 	var <>spec;
 	var <>bus = 0;
 	
-	*busOffset { ^1000 }
+	*busOffset { ^1500 }
 	
 	*initClass { 
 	    allUnits = IdentityDictionary();
