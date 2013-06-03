@@ -16,7 +16,6 @@ UMapDef : Udef {
 	
 	createSynth { |umap, target, startPos = 0| // create A single synth based on server
 		target = target ? Server.default;
-		target.postln;
 		^Synth( this.synthDefName, umap.getArgsFor( target, startPos ), target, \addBefore );
 	}
 }
@@ -48,8 +47,6 @@ UMap : U {
 	*defClass { ^UMapDef }
 	
 	asControlInput {
-		"called %.asControlInput\n".postf( this.cs );
-		//^spec.asSpec.map( value.value );
 		^("c" ++ (bus + this.class.busOffset)).asSymbol;
 	}
 	
