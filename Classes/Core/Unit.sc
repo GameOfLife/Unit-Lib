@@ -176,11 +176,17 @@ Udef : GenericDef {
 		defs = this.synthDef.asCollection;
 		server.asCollection.do{ |s|
 			if( s.class == LoadBalancer ) {
-				s.servers.do({ |s|
-					defs.do(_.send(s));
-				});
+				if( s.isLocal ) { 
+					defs.do(_.load(s)); 
+				} {
+					defs.do(_.send(s)); 
+				};
 			} {
-				defs.do(_.send(s));
+				if( s.isLocal ) { 
+					defs.do(_.load(s)); 
+				} {
+					defs.do(_.send(s)); 
+				};
 			};
 		}
 	}
