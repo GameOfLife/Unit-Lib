@@ -945,8 +945,13 @@ UChainGUI {
 		};
 		
 		if( scrollViewOrigin.notNil ) {
-			scrollView.visibleOrigin = scrollViewOrigin;
-			scrollViewOrigin = nil;
+			if( GUI.id == \qt ) {
+				{ 
+					scrollView.visibleOrigin = scrollViewOrigin; 					scrollViewOrigin = nil;
+				}.defer(0.1);
+			} {
+				scrollView.visibleOrigin = scrollViewOrigin; 				scrollViewOrigin = nil;
+			};
 		};
 		
 		^ug;
