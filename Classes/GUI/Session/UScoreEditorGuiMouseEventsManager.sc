@@ -315,6 +315,7 @@ UScoreEditorGuiMouseEventsManager {
 				if(mouseMoved.not){
 				    //"mouse didn't move".postln;
 				    state = \nothing;
+					/*
 					eventViews.do({ |eventView|
 						if(shiftDown.not) {
 							if(eventView != theEventView) {
@@ -322,6 +323,7 @@ UScoreEditorGuiMouseEventsManager {
 							}
 						}
 					});
+					*/
 				};
 				
 			} {
