@@ -150,6 +150,15 @@ UChainGUI {
 		chain.changed( \units )
 	}
 	
+	canPackUnits {
+		var wasPackUnits, res;
+		wasPackUnits = packUnits;
+		packUnits = true;
+		res = this.getUnits.any( _.isKindOf( MassEditU ) );
+		packUnits = wasPackUnits;
+		^res;
+	}
+	
 	prMakeViews { |bounds|
 		var margin = 0@0, gap = 4@4;
 		var heights, units;
@@ -539,14 +548,26 @@ UChainGUI {
 	
 	makeUnitHeader { |units, margin, gap|
 		var comp, header, min, io, defs, code;
-		var notMassEdit;
+		var notMassEdit, headerInset = 0;
 		
 		notMassEdit = chain.class != MassEditUChain;
 		
 		comp = CompositeView( composite, (composite.bounds.width - (margin.x * 2))@16 )
 			.resize_(2);
+			
+		if( notMassEdit && { this.canPackUnits }) {
+			RoundButton( comp, 13 @ 13 )
+				.border_(0)
+				.label_([ 'down', 'play' ])
+				.hiliteColor_(nil)
+				.value_( packUnits.binaryValue )
+				.action_({ |bt|
+					this.packUnits = bt.value.booleanValue;
+				});
+			headerInset = 14;
+		};
 		
-		header = StaticText( comp, comp.bounds.moveTo(0,0) )
+		header = StaticText( comp, comp.bounds.moveTo(0,0).insetAll( headerInset, 0,0,0 ) )
 				.applySkin( RoundView.skin )
 				.string_( if( notMassEdit ) { " units" } { " units (accross multiple events)" } )
 				.align_( \left )
