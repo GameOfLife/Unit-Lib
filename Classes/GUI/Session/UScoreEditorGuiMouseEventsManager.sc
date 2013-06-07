@@ -283,6 +283,11 @@ UScoreEditorGuiMouseEventsManager {
 				"selecting now";
 				//selecting
 				selectionRect = Rect.fromPoints(mouseDownPos,mousePos);
+				eventViews.do{ |eventView|
+						eventView.checkSelectionStatus(selectionRect,shiftDown,
+							scaledUserView.pixelScale.x * 10, 							scaledUserView.viewRect.width
+						);
+					};
 			}
 		}
 
