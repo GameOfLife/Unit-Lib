@@ -23,6 +23,7 @@ UChainGUI {
 	classvar <>current;
 	classvar <>singleWindow = true;
 	classvar <>packUnitsDefault = true;
+	classvar <>scrollViewOrigin;
 	
 	var <chain, <score;
 	
@@ -31,6 +32,7 @@ UChainGUI {
 	var <>action;
 	var originalBounds;
 	var <packUnits = true;
+	var <>scrollView;
 	
 	*initClass {
 		
@@ -465,6 +467,7 @@ UChainGUI {
 			.put( \units, { 
 				if( composite.isClosed.not ) {
 					{
+						scrollViewOrigin = this.scrollView.visibleOrigin;
 						composite.children[0].focus; // this seems to prevent a crash..
 						composite.remove;
 						this.makeViews( originalBounds );
@@ -475,6 +478,7 @@ UChainGUI {
 			.put( \init, { 
 				if( composite.isClosed.not ) {
 					{
+						scrollViewOrigin = this.scrollView.visibleOrigin;
 						composite.children[0].focus; // this seems to prevent a crash..
 						composite.remove;
 						this.makeViews( originalBounds );
@@ -918,6 +922,12 @@ UChainGUI {
 						};
 				});
 		};
+		
+		if( scrollViewOrigin.notNil ) {
+			scrollView.visibleOrigin = scrollViewOrigin;
+			scrollViewOrigin = nil;
+		};
+		
 		^ug;
 		
 	}
@@ -950,6 +960,8 @@ UChainGUI {
 			.autohidesScrollers_( false )
 			.resize_(5)
 			.addFlowLayout( margin, gap );
+			
+		this.scrollView = scrollView;
 			
 		if( notMassEdit ) {
 			
