@@ -544,7 +544,7 @@ UChainGUI {
 		
 		header = StaticText( comp, comp.bounds.moveTo(0,0) )
 				.applySkin( RoundView.skin )
-				.string_( " units" )
+				.string_( if( notMassEdit ) { " units" } { " units (accross multiple events)" } )
 				.align_( \left )
 				.resize_(2);
 				
@@ -718,6 +718,8 @@ UChainGUI {
 								);
 							};
 					});
+			} {
+				addBefore.canFocus = false;
 			};
 		
 			comp = CompositeView( scrollView, width@14 )
@@ -726,7 +728,10 @@ UChainGUI {
 			header = StaticText( comp, comp.bounds.moveTo(0,0) )
 				.applySkin( RoundView.skin )
 				.string_( " " ++ indexLabel ++ ": " ++ if(unit.def.class == LocalUdef){"[Local] "}{""}++unit.defName )
-				.background_( Color.white.alpha_(0.5) )
+				.background_( if( notMassEdit ) 
+					{ Color.white.alpha_(0.5) }
+					{ Color.white.blend( Color.yellow, 0.33 ).alpha_(0.5) }
+				)
 				.resize_(2)
 				.font_( 
 					(RoundView.skin.tryPerform( \at, \font ) ?? 
