@@ -39,15 +39,21 @@ UGUI {
 		viewHeight = viewHeight ? 14;
 		margin = margin ?? {0@0};
 		gap = gap ??  {4@4};
-		^(margin.y * 2) + ( 
-			unit.argSpecs
-				.select({|x|
-					x.private.not
-				})
-				.collect({|x|
+		^(margin.y * 2) + ( this.viewNumLines( unit ) * (viewHeight + gap.y) ) - gap.y;
+	}
+	
+	*viewNumLines { |unit|
+		^unit.argSpecs
+			.select({|x|
+				x.private.not
+			})
+			.collect({|x|
+				if( unit[ x.name ].isKindOf( UMap ) ) {
+					UMapGUI.viewNumLines( unit[ x.name ] );
+				} {
 					x.spec.viewNumLines
-				}).sum * (viewHeight + gap.y) 
-		) - gap.y;
+				};
+			}).sum;
 	}
 	
 	makeViews { |bounds|
@@ -78,8 +84,14 @@ UGUI {
 			}; 
 			controller.remove
 		 };
-		
+		 
+		 this.makeSubViews( bounds );
+	}
+	
+	makeSubViews { |bounds|
 		views = ();
+		
+		this.makeHeader(bounds);
 		
 		unit.args.pairsDo({ |key, value, i|
 			var vw, argSpec;
@@ -87,13 +99,16 @@ UGUI {
 			argSpec = unit.argSpecs[i/2];
 			
 			if( argSpec.private.not ) { // show only if not private
-				vw = ObjectView( composite, nil, unit, key, 
-					argSpec.spec, controller,
-					if( [ \nonsynth, \init ].includes(argSpec.mode) ) { key ++ " (i)" }
-				);
-				
-				vw.action = { action.value( this, key, value ); };
-				
+				if( value.isKindOf( UMap ) ) {
+					vw = UMapGUI( composite, nil, value );
+				} {
+					vw = ObjectView( composite, nil, unit, key, 
+						argSpec.spec, controller,
+						if( [ \nonsynth, \init ].includes(argSpec.mode) ) { key ++ " (i)" }
+					);
+					
+					vw.action = { action.value( this, key, value ); };
+				};
 				views[ key ] = vw;
 			}
 		
@@ -103,6 +118,8 @@ UGUI {
 			controller.remove;
 		};
 	}
+	
+	makeHeader { }
 	
 	resize_ { |resize| composite.resize_(resize) }
 	reset { unit.reset }
