@@ -22,7 +22,7 @@ ObjectView {
 	classvar <viewHeight = 14;
 	
 	var <object, <key, <spec, <parent, <composite, <views; 
-	var <>action;
+	var <>action, <>testValue;
 		// views can be anything; i.e. the output of the makeFunc in the def
 	
 	*new { |parent, bounds, object, key, spec, controller, label|
@@ -75,7 +75,11 @@ ObjectView {
 			
 		this.update;
 		
-		controller.put( key, { |obj, key, value| spec.setView( views, value, false ) });
+		controller.put( key, { |obj, key, value| 
+			if( testValue.isNil or: { testValue.(value) } ) {
+				spec.setView( views, value, false );
+			};
+		});
 	}
 	
 	update {

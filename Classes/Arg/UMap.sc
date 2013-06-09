@@ -14,6 +14,8 @@ UMapDef : Udef {
 	
 	asUMapDef { ^this }
 	
+	isUdef { ^false }
+	
 	getControlInput { |unit|
 		if( this.hasBus ) {
 			^("c" ++ (this.getBus(unit) + unit.class.busOffset)).asSymbol;

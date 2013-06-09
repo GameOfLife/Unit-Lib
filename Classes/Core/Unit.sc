@@ -212,6 +212,8 @@ Udef : GenericDef {
 	
 	synthDefName { ^this.synthDef.name }
 	
+	isUdef { ^true }
+	
 	load { |server| this.loadSynthDef( server ) }
 	send { |server| this.sendSynthDef( server ) }
 	
@@ -959,6 +961,7 @@ U : ObjectWithArgs {
 	asControlInputFor { |server, startPos| ^this.asControlInput } // may split between servers
 	u_waitTime { ^0 }
 	asUnitArg { |unit| ^this }
+	isUdef { ^false }
 }
 
 + Function {

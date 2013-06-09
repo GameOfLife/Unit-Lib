@@ -24,6 +24,7 @@ UGUI {
 	var <parent, <composite, <views, <controller;
 	var <viewHeight = 14, <labelWidth = 80;
 	var <>action;
+	var <>mapSetAction, <>mapChecker;
 	
 	*new { |parent, bounds, unit|
 		^super.newCopyArgs( unit ).init( parent, bounds );
@@ -70,6 +71,7 @@ UGUI {
 		};
 		bounds = bounds.asRect;
 		bounds.height = this.class.getHeight( unit, viewHeight, margin, gap );
+		mapChecker = UMapSetChecker( unit, { mapSetAction.value( this ) } );
 		controller = SimpleController( unit );
 		
 		if( unit.class == MassEditU ) {
@@ -82,7 +84,8 @@ UGUI {
 			if( unit.class == MassEditU ) {
 				unit.disconnect;
 			}; 
-			controller.remove
+			controller.remove;
+			mapChecker.remove;
 		 };
 		 
 		 this.makeSubViews( bounds );
@@ -95,18 +98,34 @@ UGUI {
 		
 		unit.args.pairsDo({ |key, value, i|
 			var vw, argSpec;
+			var decLastPos;
+			var umapdragbin;
 			
 			argSpec = unit.argSpecs[i/2];
 			
 			if( argSpec.private.not ) { // show only if not private
 				if( value.isKindOf( UMap ) ) {
-					vw = UMapGUI( composite, nil, value );
+					vw = UMapGUI( composite, composite.bounds.insetBy(0,-24), value );
+					vw.mapSetAction = { mapSetAction.value( this ) };
 				} {
+					umapdragbin = UserView( composite, composite.bounds.width @ viewHeight )
+						.canFocus_( false )
+						.canReceiveDragHandler_({ 
+							View.currentDrag.isKindOf( UMapDef ) && {
+								[ ControlSpec, FreqSpec ].includes( argSpec.spec.class ); 							};
+						})
+						.receiveDragHandler_({
+							unit.set( key, UMap( View.currentDrag ) );
+						});
+					
+					composite.decorator.nextLine;
+					composite.decorator.shift( 0, (viewHeight + composite.decorator.gap.y).neg );
+					
 					vw = ObjectView( composite, nil, unit, key, 
 						argSpec.spec, controller,
 						if( [ \nonsynth, \init ].includes(argSpec.mode) ) { key ++ " (i)" }
 					);
-					
+					vw.testValue = { |value| value.isKindOf( UMap ).not };
 					vw.action = { action.value( this, key, value ); };
 				};
 				views[ key ] = vw;
@@ -116,6 +135,7 @@ UGUI {
 		
 		if( views.size == 0 ) {
 			controller.remove;
+			mapChecker.remove;
 		};
 	}
 	
@@ -135,6 +155,41 @@ UGUI {
 	}
 	
 	view { ^composite }
+}
+
+UMapSetChecker {
+	
+	var unit, <>action, argDict;
+	
+	*new { |unit, action|
+		^super.newCopyArgs( unit, action ).init;
+	}
+	
+	init {
+		argDict = ();
+		unit.args.pairsDo({ |key, value|
+			if( value.isKindOf( UMap ) ) {
+				argDict[ key ] = value;
+			};
+		});
+		unit.addDependant( this );
+	}
+	
+	remove { unit.removeDependant( this ) }
+	
+	update { |obj, key, value|
+		if( value.isKindOf( UMap ) ) {
+			if( argDict[ key ] !== value ) {
+				argDict[ key ] = value;
+				action.value( this, key, value );
+			};
+		} {
+			if( argDict[ key ].notNil ) {
+				argDict[ key ] = nil;
+				action.value( this, key, value );
+			};
+		}	
+	}
 }
 
 + U {

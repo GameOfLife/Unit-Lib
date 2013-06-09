@@ -547,7 +547,7 @@ UChainGUI {
 	}
 	
 	makeUnitHeader { |units, margin, gap|
-		var comp, header, min, io, defs, code;
+		var comp, header, min, io, defs, mapdefs, code;
 		var notMassEdit, headerInset = 0;
 		
 		notMassEdit = chain.class != MassEditUChain;
@@ -600,11 +600,20 @@ UChainGUI {
                         UChainCodeGUI( parent, originalBounds, chain );
                     }.defer(0.01);
                 }).resize_(3);
+                
+            mapdefs = SmoothButton( comp,
+                    Rect( comp.bounds.right - (40 + 4 + 60 + 4 + 40), 1, 40, 12 ) )
+                .label_( "umaps" )
+                .border_( 1 )
+                .radius_( 2 )
+                .action_({
+	                UMapDefListView();
+	            }).resize_(3);
 		};
 		
 		defs = SmoothButton( comp, 
 				Rect( comp.bounds.right - (
-					4 + 38 + (notMassEdit.binaryValue * (4 + 40 + 4 + 60))
+					4 + 38 + (notMassEdit.binaryValue * (4 + 40 + 4 + 60 + 4 + 40))
 					), 1, 42, 12 
 				) 
 			)
@@ -664,7 +673,7 @@ UChainGUI {
 			uview.canReceiveDragHandler_({ |sink|
 				var drg;
 				drg = View.currentDrag;
-				case { drg.isKindOf( Udef ) } 
+				case { drg.isUdef } 
 					{ true }
 					{ drg.isKindOf( UnitRack ) }
                     { true }
@@ -677,7 +686,7 @@ UChainGUI {
 			.receiveDragHandler_({ |sink, x, y|
 					case { View.currentDrag.isKindOf( U ) } {
 						chain.units = [ View.currentDrag.deepCopy ];
-					}{ View.currentDrag.isKindOf( Udef ) }{
+					}{ View.currentDrag.isUdef }{
 						chain.units = [ U( View.currentDrag ) ];
 					}{ View.currentDrag.isKindOf( UnitRack ) } {
                         chain.units = View.currentDrag.units;
@@ -689,7 +698,7 @@ UChainGUI {
 		
 		ug = units.collect({ |unit, i|
 			var header, comp, uview, plus, min, defs, io;
-			var addBefore, indexLabel;
+			var addBefore, indexLabel, ugui;
 				
 			indexLabel = realIndex.asString;
 			
@@ -708,7 +717,7 @@ UChainGUI {
 				addBefore.canReceiveDragHandler_({ |sink|
 						var drg;
 						drg = View.currentDrag;
-						case { drg.isKindOf( Udef ) } 
+						case { drg.isUdef } 
 							{ true }
 							{ drg.isKindOf( UnitRack ) }
 	                        { true }
@@ -731,7 +740,7 @@ UChainGUI {
 										units.insert( i, View.currentDrag.deepCopy ) 
 									);
 								};
-							} { View.currentDrag.isKindOf( Udef ) } {
+							} { View.currentDrag.isUdef } {
 								this.setUnits( units.insert( i, U( View.currentDrag ) ) );
 							}{ View.currentDrag.isKindOf( UnitRack ) } {
 								this.setUnits( 
@@ -771,7 +780,7 @@ UChainGUI {
 			uview.canReceiveDragHandler_({ |sink|
 				var drg;
 				drg = View.currentDrag;
-				case { drg.isKindOf( Udef ) } 
+				case { drg.isUdef } 
 					{ true }
 					{ drg.isKindOf( UnitRack ) }
                         { true }
@@ -796,7 +805,7 @@ UChainGUI {
 					
 				} { View.currentDrag.isKindOf( UnitRack ) } {
                         this.setUnits( units[..i-1] ++ View.currentDrag.units ++ units[i+1..] );
-                    } { View.currentDrag.isKindOf( Udef ) } {
+                    } { View.currentDrag.isUdef } {
 					unit.def = View.currentDrag;
 				} {   [ Symbol, String ].includes( View.currentDrag.class )  } {
 					unit.def = View.currentDrag.asSymbol.asUdef;
@@ -896,11 +905,13 @@ UChainGUI {
 					
 			unit.addDependant( unitInitFunc );
 			header.onClose_({ unit.removeDependant( unitInitFunc ) });
-			unit.gui( scrollView, 
+			ugui = unit.gui( scrollView, 
 				scrollView.bounds.copy.width_( 
 					scrollView.bounds.width - scrollerMargin - (margin.x * 2) 
 				)  
 			);
+			ugui.mapSetAction = { chain.changed( \units ) };
+			ugui;
 		});
 		
 		if( notMassEdit && { units.size > 0 } ) {
@@ -912,7 +923,7 @@ UChainGUI {
 			addLast.canReceiveDragHandler_({ |sink|
 					var drg;
 					drg = View.currentDrag;
-					case { drg.isKindOf( Udef ) } 
+					case { drg.isUdef } 
 						{ true }
 						{ drg.isKindOf( UnitRack ) }
                         { true }
@@ -934,7 +945,7 @@ UChainGUI {
 								this.setUnits( units ++ [ View.currentDrag.deepCopy ] );
 							};
 							
-						} { View.currentDrag.isKindOf( Udef ) } {
+						} { View.currentDrag.isUdef } {
 							chain.units = chain.units ++ [ U( View.currentDrag ) ];
 						}{ View.currentDrag.isKindOf( UnitRack ) } {
                             chain.units = chain.units ++ View.currentDrag.units;
