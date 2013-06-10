@@ -151,3 +151,11 @@ UMap : U {
 		};
 	}
 }
+
+MassEditUMap : MassEditU {
+	
+	unitArgName { ^units[0].unitArgName }
+	
+	asUnitArg { }
+	
+}
