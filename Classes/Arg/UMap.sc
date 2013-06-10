@@ -2,10 +2,10 @@ UMapDef : Udef {
 	classvar <>all, <>defsFolders, <>userDefsFolder;
 	
 	*initClass{
-		defsFolders = [ 
+		this.defsFolders = [ 
 			this.filenameSymbol.asString.dirname.dirname.dirname +/+ "UMapDefs"
 		];
-		userDefsFolder = Platform.userAppSupportDir ++ "/UMapDefs/";
+		this.userDefsFolder = Platform.userAppSupportDir ++ "/UMapDefs/";
 	}
 	
 	*prefix { ^"umap_" } // synthdefs get another prefix to avoid overwriting

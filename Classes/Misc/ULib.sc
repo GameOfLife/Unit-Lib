@@ -105,6 +105,7 @@ ULib {
 		
 		Udef.loadOnInit = false;
  		defs = Udef.loadAllFromDefaultDirectory.collect(_.synthDef).flat.select(_.notNil);
+ 		defs = defs ++ UMapDef.loadAllFromDefaultDirectory.collect(_.synthDef).flat.select(_.notNil);
  		Udef.loadOnInit = true;
  		
  		UnitRack.defsFolders = UnitRack.defsFolders.add( 
