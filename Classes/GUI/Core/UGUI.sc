@@ -105,7 +105,7 @@ UGUI {
 			argSpec = unit.argSpecs[i/2];
 			
 			if( argSpec.private.not ) { // show only if not private
-				if( value.isKindOf( UMap ) ) {
+				if( value.isUMap ) {
 					vw = UMapGUI( composite, composite.bounds.insetBy(0,-24), value );
 					vw.mapSetAction = { mapSetAction.value( this ) };
 				} {

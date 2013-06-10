@@ -576,7 +576,7 @@ U : ObjectWithArgs {
 		});
 	}
 	
-	getUMaps { ^this.values.select( _.isKindOf( UMap ) ) }
+	getUMaps { ^this.values.select( _.isUMap ) }
 	
 	getAllUMaps { 
 		var umaps;

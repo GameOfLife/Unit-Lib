@@ -82,6 +82,8 @@ UMap : U {
 		this.def.setBus( bus, this );
 	}
 	
+	isUMap { ^true }
+	
 	hasBus { ^this.def.hasBus }
 	
 	setUMapBuses { } // this is done by the U for all (nested) UMaps
@@ -158,4 +160,10 @@ MassEditUMap : MassEditU {
 	
 	asUnitArg { }
 	
+	isUMap { ^true }
+	
+}
+
++ Object {
+	isUMap { ^false }
 }
