@@ -426,9 +426,11 @@ UScoreView {
 				usessionMouseEventsManager.mouseUpEvent(Point(x,y),Point(x2,y2),shiftDown,v,isInside);
 
 			} )
-			.keyDownAction_( { |v, a,b,c|
+			.keyDownAction_( { |v, a,b,c,keycode,key|
+				var arrowKey = c.getArrowKey ? key.getArrowKey;
 				switch( c.asInt,
-					127, { this.deleteSelected }, // backspace
+					8, { this.deleteSelected }, // backspace QT
+					127, { this.deleteSelected }, // backspace Cocoa
 					32, { // space bar
 						case { score.isStopped } {
 							score.prepareAndStart( ULib.servers, score.pos, true, score.loop);
@@ -483,30 +485,32 @@ UScoreView {
 					48, { // 0
 						score.jumpTo( 0 );
 					},
-					63232, { // up
+					{ 
+						if( c.asInt.inclusivelyBetween( 49, 57 ) ) {
+							score.jumpTo( score.markerPositions[ a.asString.interpret - 1 ] 
+								? score.finiteDuration );
+						};
+					}
+				);
+				switch( arrowKey,
+					\up, { // up
 						this.changeTrackSelected( -1 );
 					},
-					63233, { // down
+					\down, { // down
 						this.changeTrackSelected( 1 );
 					},
-					63234, { // left
+					\left, { // left
 						if( this.selectedEvents.size > 0 ) {
 							this.moveSelected( snapH.neg );
 						} {
 							score.pos = (score.pos - snapH).max(0);
 						};
 					},
-					63235, { // right
+					\right, { // right
 						if( this.selectedEvents.size > 0 ) {
 							this.moveSelected( snapH );
 						} {
 							score.pos = score.pos + snapH;
-						};
-					},
-					{ 
-						if( c.asInt.inclusivelyBetween( 49, 57 ) ) {
-							score.jumpTo( score.markerPositions[ a.asString.interpret - 1 ] 
-								? score.finiteDuration );
 						};
 					}
 				);
