@@ -547,6 +547,13 @@ U : ObjectWithArgs {
 		}
 	}
 	
+	setDur { |dur = inf|
+		if( this.keys.includes( \u_dur ) ) {
+			this.set( \u_dur, dur );
+		};
+		this.getUMaps.do(_.setDur(dur));
+	}
+	
 	mod_ { |newMod|
 		this.modPerform( \disconnect );
 		mod = newMod.asUModFor( this );
