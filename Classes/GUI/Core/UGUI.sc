@@ -100,6 +100,7 @@ UGUI {
 			var vw, argSpec;
 			var decLastPos;
 			var umapdragbin;
+			var viewNumLines;
 			
 			argSpec = unit.argSpecs[i/2];
 			
@@ -108,25 +109,34 @@ UGUI {
 					vw = UMapGUI( composite, composite.bounds.insetBy(0,-24), value );
 					vw.mapSetAction = { mapSetAction.value( this ) };
 				} {
-					umapdragbin = UserView( composite, composite.bounds.width @ viewHeight )
-						.canFocus_( false )
-						.canReceiveDragHandler_({ 
-							View.currentDrag.isKindOf( UMapDef ) && {
-								[ ControlSpec, FreqSpec ].includes( argSpec.spec.class ); 							};
-						})
-						.receiveDragHandler_({
-							unit.set( key, UMap( View.currentDrag ) );
-						});
-					
-					composite.decorator.nextLine;
-					composite.decorator.shift( 0, (viewHeight + composite.decorator.gap.y).neg );
-					
 					vw = ObjectView( composite, nil, unit, key, 
 						argSpec.spec, controller,
 						if( [ \nonsynth, \init ].includes(argSpec.mode) ) { key ++ " (i)" }
 					);
 					vw.testValue = { |value| value.isKindOf( UMap ).not };
 					vw.action = { action.value( this, key, value ); };
+					
+					if( [ \nonsynth ].includes(argSpec.mode).not ) {						viewNumLines = argSpec.spec.viewNumLines;
+						composite.decorator.nextLine;
+						composite.decorator.shift( 0, 
+							((viewHeight + composite.decorator.gap.y) * viewNumLines).neg 
+						);
+						
+						umapdragbin = UserView( composite, labelWidth @ viewHeight )
+							.canFocus_( false )
+							.canReceiveDragHandler_({ 
+									(View.currentDrag.isKindOf( UMapDef ) && {
+										[ ControlSpec, FreqSpec ].includes( argSpec.spec.class ); 								});
+							})
+							.receiveDragHandler_({
+								unit.set( key, UMap( View.currentDrag ) );
+							});
+							
+						composite.decorator.nextLine;
+						composite.decorator.shift( 0, 
+							((viewHeight + composite.decorator.gap.y) * (viewNumLines - 1))
+						);
+					};
 				};
 				views[ key ] = vw;
 			}
