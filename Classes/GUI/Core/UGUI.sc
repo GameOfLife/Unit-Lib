@@ -112,7 +112,7 @@ UGUI {
 					vw.mapSetAction = { mapSetAction.value( this ) };
 					vw.removeAction = { |umap|
 						umap.stop;
-						unit.set( key, unit.def.getDefault( key ) );
+						unit.set( key, unit.getDefault( key ) );
 					};
 				} {
 					vw = ObjectView( composite, nil, unit, key, 

@@ -131,12 +131,26 @@ MultiUdef : Udef {
 		};
 	}
 	
+	getArgSpec { |key, unit|
+		if( key === this.defNameKey ) {
+			^argSpecs[0].spec;
+		} {
+			^this.findUdefFor( unit ).getArgSpec( key, unit );
+		};
+	}
+	
 	getSpec { |key, unit|
 		if( key === this.defNameKey ) {
 			^argSpecs[0].spec;
 		} {
 			^this.findUdefFor( unit ).getSpec( key, unit );
 		};
+	}
+	
+	getDefault { |name, unit|
+		var asp;
+		asp = this.getArgSpec(name, unit);
+		if( asp.notNil ) { ^asp.default } { ^nil };
 	}
 	
 	findUdefsWithArgName { |key|

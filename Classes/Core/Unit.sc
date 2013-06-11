@@ -814,6 +814,7 @@ U : ObjectWithArgs {
 	
 	argSpecs { ^this.def.argSpecs( this ) }
 	getSpec { |key| ^this.def.getSpec( key, this ); }
+	getDefault { |key| ^this.def.getDefault( key, this ); }
 
 	isPlaying { ^(this.synths.size != 0) }
 		
