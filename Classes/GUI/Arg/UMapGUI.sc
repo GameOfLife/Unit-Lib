@@ -31,6 +31,8 @@ UMapGUI : UGUI {
 			unit.connect;
 		};
 		
+		unit.valuesAsUnitArg;
+		
 		mainComposite = CompositeView( parent, bounds ).resize_(2);
 		
 		userView = UserView( mainComposite, bounds.moveTo(0,0) ).resize_(2);

@@ -871,6 +871,9 @@ U : ObjectWithArgs {
 	
 	waitTime { ^waitTime ?? { this.values.collect( _.u_waitTime ).sum } }
 	
+	valuesAsUnitArg {
+		this.args.pairsDo({ |key, value| value.asUnitArg( this, key ); });
+	}
 	
 	valuesToPrepare {
 		^this.values.select( _.respondsTo(\prepare) );
@@ -900,6 +903,7 @@ U : ObjectWithArgs {
 		    if( loadDef) {
 		        this.def.loadSynthDef( servers );
 		    };
+		    this.valuesAsUnitArg;
 		    valuesToPrepare = this.valuesToPrepare;
 		    if( valuesToPrepare.size > 0  ) {
 			    act = MultiActionFunc( act );

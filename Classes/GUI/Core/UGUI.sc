@@ -78,6 +78,8 @@ UGUI {
 			unit.connect;
 		};
 		
+		unit.valuesAsUnitArg;
+		
 		composite = CompositeView( parent, bounds ).resize_(2);
 		composite.addFlowLayout( margin, gap );
 		composite.onClose = {
