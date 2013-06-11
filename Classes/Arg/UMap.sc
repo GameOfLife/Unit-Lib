@@ -1,6 +1,8 @@
 UMapDef : Udef {
 	classvar <>all, <>defsFolders, <>userDefsFolder;
 	
+	var <>mappedArgs;
+	
 	*initClass{
 		this.defsFolders = [ 
 			this.filenameSymbol.asString.dirname.dirname.dirname +/+ "UMapDefs"
@@ -11,6 +13,69 @@ UMapDef : Udef {
 	*prefix { ^"umap_" } // synthdefs get another prefix to avoid overwriting
 	
 	*from { |item| ^item.asUDef( this ) }
+	
+	asArgsArray { |argPairs, constrain = true|
+		argPairs = argPairs ? #[];
+		^argSpecs.collect({ |item| 
+			var val;
+			val = argPairs.pairsAt(item.name) ?? { item.default.copy };
+			if( constrain && this.isMappedArg( item.name ).not && { val.isKindOf( UMap ).not } ) { 
+				val = item.constrain( val ) 
+			};
+			[ item.name,  val ] 
+		}).flatten(1);
+	}
+	
+	isMappedArg { |name|
+		^mappedArgs.notNil && { mappedArgs.includes( name ) };
+	}
+	
+	argSpecs { |unit|
+		^argSpecs.collect({ |asp|
+			if( this.isMappedArg( asp.name ) ) {
+				asp.adaptToSpec( unit !? _.spec );
+			} {
+				asp
+			};
+		});
+	}
+		
+	getArgSpec { |name, unit|
+		var asp;
+		asp = argSpecs.detect({ |item| item.name == name });
+		if( this.isMappedArg( name ) ) {
+			^asp !? _.adaptToSpec( unit !? _.spec )
+		} {
+			^asp
+		};
+	}
+	
+	getSpec { |name, unit|
+		var asp;
+		asp = argSpecs.detect({ |item| item.name == name });
+		if( this.isMappedArg( name ) ) {
+			^asp.spec.adaptToSpec( unit.spec );
+		} {
+			^asp.spec
+		};
+	}
+	
+	getDefault { |name, unit|
+		var asp;
+		asp = this.getArgSpec(name, unit);
+		if( asp.notNil ) { ^asp.default; } { ^nil };
+	}
+	
+	setSynth { |unit ...keyValuePairs|
+		keyValuePairs = keyValuePairs.clump(2).collect({ |item|
+			if( this.isMappedArg( item[0] ) ) {
+				[ item[0], this.getSpec( item[0], unit ) !? _.unmap( item[1] ) ? item[1] ];
+			} {
+				item
+			};
+		}).flatten(1);
+		this.prSetSynth( unit.synths, *keyValuePairs );
+	}
 	
 	asUMapDef { ^this }
 	
@@ -60,10 +125,24 @@ UMap : U {
 	
 	classvar <>allUnits;
 	
-	var <>spec;
+	var <spec;
 	var <>unitArgName;
+	var <>unmappedKeys;
 	
 	*busOffset { ^1500 }
+	
+	*new { |def, args, mod|
+		^super.new( def, args, mod ).setunmappedKeys( args );
+	}
+	
+	setunmappedKeys { |args|
+		args = (args ? []).clump(2).flop[0];
+		this.def.mappedArgs.do({ |item|
+			if( args.includes( item ).not ) {
+				unmappedKeys = unmappedKeys.add( item );
+			};
+		});
+	}
 	
 	*initClass { 
 	    allUnits = IdentityDictionary();
@@ -83,6 +162,19 @@ UMap : U {
 		this.def.setBus( bus, this );
 	}
 	
+	set { |...args|
+		var keys;
+		if( unmappedKeys.size > 0 ) {	
+			keys = (args ? []).clump(2).flop[0];
+			keys.do({ |item|
+				if( unmappedKeys.includes( item ) ) {
+					unmappedKeys.remove(item);
+				};
+			});
+		};
+		^super.set( *args );
+	}
+	
 	isUMap { ^true }
 	
 	hasBus { ^this.def.hasBus }
@@ -93,11 +185,35 @@ UMap : U {
 	
 	dontStoreArgNames { ^[ 'u_dur', 'u_doneAction', 'u_mapbus', 'u_spec' ] }
 	
+	spec_ { |newSpec|
+		if( spec.isNil ) {
+			if( newSpec.notNil ) {
+				spec = newSpec;
+				unmappedKeys.do({ |item|
+					this.set( item, this.getSpec( item ).map( this.get( item ) ) );
+				});
+				unmappedKeys = nil;
+			};
+		} {
+			this.def.mappedArgs.do({ |item|
+				this.set( item, this.getSpec( item ).unmap( this.get( item ) ) );
+			});
+			spec = newSpec;
+			if( spec.notNil ) {
+				this.def.mappedArgs.do({ |item|
+					this.set( item, this.getSpec( item ).map( this.get( item ) ) );
+				});
+			} {
+				unmappedKeys = this.def.mappedArgs.copy;
+			};
+		} 
+	}
+	
 	// UMap is intended to use as arg for a Unit (or another UMap)
 	asUnitArg { |unit, key|
 		this.unitArgName = key;
 		if( key.notNil ) {
-			spec = unit.getSpec( key ).copy;
+			this.spec = unit.getSpec( key ).copy;
 			this.set( \u_spec, spec );
 		};
 		^this;
@@ -129,6 +245,20 @@ UMap : U {
 				this.unit.set( this.unitArgName, this );
 			};
 		};
+	}
+	
+	getSynthArgs {
+		var nonsynthKeys;
+		nonsynthKeys = this.argSpecs.select({ |item| item.mode == \nonsynth }).collect(_.name);
+		^this.args.clump(2).select({ |item| nonsynthKeys.includes( item[0] ).not })
+			.collect({ |item|
+				if( this.def.isMappedArg( item[0] ) ) {
+					[ item[0], this.getSpec( item[0] ) !? _.unmap( item[1] ) ? item[1] ];
+				} {
+					item
+				};
+			})
+			.flatten(1);
 	}
 	
 	disposeFor {

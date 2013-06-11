@@ -106,6 +106,18 @@ ArgSpec : Spec {
 		spec.asSpec.mapSetView( view, value, active );
 	}
 	
+	adaptToSpec { |spec|
+		var asp;
+		if( spec.notNil ) {
+			asp = this.copy;
+			asp.spec = this.spec.adaptToSpec( spec );
+			asp.default = asp.spec.map( this.default );
+			^asp;
+		} {
+			^this;
+		};
+	}
+	
 	asArgSpec { ^this }
 	
 	printOn { arg stream;
