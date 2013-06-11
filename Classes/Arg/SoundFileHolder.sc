@@ -25,6 +25,7 @@ AbstractRichBuffer {
 	classvar <>useCheckFree = true; // safer in high-traffic situations, but not for NRT
 	
     var <numFrames, <numChannels, <sampleRate;
+    var <>unitArgName;
 
 	// var <>buffers; // holder for all buffers
     // var <unit, <unitArgName;
@@ -138,19 +139,23 @@ AbstractRichBuffer {
 	}
 
 	dispose {
-       this.freeAllBuffers
+       this.freeAllBuffers;
+       this.unit = nil;
 	}
 
 	disposeFor { |server|
-        this.freeBufferFor(server)
+        this.freeBufferFor(server);
+        if( this.buffers.size == 0 ) {
+	        this.unit = nil;
+        };
 	}
 
 	asControlInputFor { |server| ^this.currentBuffer(server) }
 	
 	u_waitTime { ^1 }
 	
-	asUnitArg { |unit|
-		this.unit = unit; ^this;
+	asUnitArg { |unit, key|
+		this.unitArgName = key;
 	}
 
 	unit_ { |aUnit|
@@ -189,32 +194,10 @@ AbstractRichBuffer {
 	
 	unit { ^allUnits[ this ] !? { allUnits[ this ][0] }; }
 	
-	unitArgName {  
-		var array;
-		^allUnits[ this ] !? { 
-			allUnits[ this ][1] ?? {
-				array = allUnits[ this ];
-				array[1] = array[0].findKeyForValue( this );
-				array[1];
-			};
-		}; 
-	}
-	
-	unitArgName_ { |unitArgName|
-		if( allUnits[ this ].notNil ) {
-			allUnits[ this ][1] = unitArgName;
-		} {
-			"Warning: unitArgName_ - no unit specified for\n%\n"
-				.postf( this.asCompileString )
-		};
-	}
-	
 	unitSet { // sets this object in the unit to enforce setting of the synths
-		var unitArgName;
 		if( this.unit.notNil ) {	
-			unitArgName = this.unitArgName;
-			if( unitArgName.notNil ) {
-				this.unit.set( unitArgName, this );
+			if( this.unitArgName.notNil ) {
+				this.unit.set( this.unitArgName, this );
 			};
 		};
 	}

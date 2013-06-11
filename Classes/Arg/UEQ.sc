@@ -2,6 +2,8 @@ UEQ : EQSetting {
 	
 	classvar <>allUnits;
 	
+	var <>unitArgName;
+	
 	 *initClass { 
 	    allUnits = IdentityDictionary();
 	}
@@ -21,8 +23,8 @@ UEQ : EQSetting {
 		this.unitSet;
 	}
 	
-	asUnitArg { |unit|
-		this.unit = unit; ^this;
+	asUnitArg { |unit, key|
+		this.unitArgName = key; ^this;
 	}
 	
 	unit_ { |aUnit|
@@ -45,34 +47,22 @@ UEQ : EQSetting {
 	
 	unit { ^allUnits[ this ] !? { allUnits[ this ][0] }; }
 	
-	unitArgName {  
-		var array;
-		^allUnits[ this ] !? { 
-			allUnits[ this ][1] ?? {
-				array = allUnits[ this ];
-				array[1] = array[0].findKeyForValue( this );
-				array[1];
-			};
-		}; 
-	}
-	
-	unitArgName_ { |unitArgName|
-		if( allUnits[ this ].notNil ) {
-			allUnits[ this ][1] = unitArgName;
-		} {
-			"Warning: unitArgName_ - no unit specified for\n%\n"
-				.postf( this.asCompileString )
-		};
-	}
-	
 	unitSet { // sets this object in the unit to enforce setting of the synths
-		var unitArgName;
 		if( this.unit.notNil ) {	
-			unitArgName = this.unitArgName;
-			if( unitArgName.notNil ) {
-				this.unit.set( unitArgName, this );
+				if( this.unitArgName.notNil ) {
+				this.unit.set( this.unitArgName, this );
 			};
 		};
+	}
+	
+	disposeFor {
+		if( this.unit.notNil && { this.unit.synths.size == 0 }) {
+			this.unit = nil;
+		};
+	}
+	
+	dispose {
+		this.unit = nil;
 	}
 
 	asUEQ { ^this }

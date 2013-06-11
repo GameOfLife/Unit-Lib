@@ -61,6 +61,7 @@ UMap : U {
 	classvar <>allUnits;
 	
 	var <>spec;
+	var <>unitArgName;
 	
 	*busOffset { ^1500 }
 	
@@ -94,7 +95,6 @@ UMap : U {
 	
 	// UMap is intended to use as arg for a Unit (or another UMap)
 	asUnitArg { |unit, key|
-		this.unit = unit; 
 		this.unitArgName = key;
 		if( key.notNil ) {
 			spec = unit.getSpec( key ).copy;
@@ -123,39 +123,32 @@ UMap : U {
 	
 	unit { ^allUnits[ this ] !? { allUnits[ this ][0] }; }
 	
-	unitArgName {  
-		var array;
-		^allUnits[ this ] !? { 
-			allUnits[ this ][1] ?? {
-				array = allUnits[ this ];
-				array[1] = array[0].findKeyForValue( this );
-				array[1];
-			};
-		}; 
-	}
-	
-	unitArgName_ { |unitArgName|
-		if( allUnits[ this ].notNil ) {
-			allUnits[ this ][1] = unitArgName;
-		} {
-			"Warning: unitArgName_ - no unit specified for\n%\n"
-				.postf( this.asCompileString )
-		};
-	}
-	
 	unitSet { // sets this object in the unit to enforce setting of the synths
-		var unitArgName;
 		if( this.unit.notNil ) {	
-			unitArgName = this.unitArgName;
-			if( unitArgName.notNil ) {
-				this.unit.set( unitArgName, this );
+			if( this.unitArgName.notNil ) {
+				this.unit.set( this.unitArgName, this );
 			};
 		};
 	}
 	
+	disposeFor {
+		if( this.unit.notNil && { this.unit.synths.size == 0 }) {
 			this.unit = nil;
 		};
 	}
+	
+	dispose {
+	    this.free;
+	    this.values.do{ |val|
+	        if(val.respondsTo(\dispose)) {
+	            val.dispose
+	        }
+	    };
+	    this.modPerform( \dispose );
+	    preparedServers = [];
+	    this.unit = nil;
+	}
+
 }
 
 MassEditUMap : MassEditU {

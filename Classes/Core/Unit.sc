@@ -875,6 +875,14 @@ U : ObjectWithArgs {
 		this.args.pairsDo({ |key, value| value.asUnitArg( this, key ); });
 	}
 	
+	valuesSetUnit {
+		this.args.pairsDo({ |key, value| 
+			if( value.respondsTo( \unit_ ) ) { 
+				value.unit = this;
+			}
+		});
+	}
+	
 	valuesToPrepare {
 		^this.values.select( _.respondsTo(\prepare) );
 	}
@@ -903,7 +911,7 @@ U : ObjectWithArgs {
 		    if( loadDef) {
 		        this.def.loadSynthDef( servers );
 		    };
-		    this.valuesAsUnitArg;
+		    this.valuesSetUnit;
 		    valuesToPrepare = this.valuesToPrepare;
 		    if( valuesToPrepare.size > 0  ) {
 			    act = MultiActionFunc( act );
