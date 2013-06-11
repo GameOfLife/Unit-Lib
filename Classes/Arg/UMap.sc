@@ -183,7 +183,11 @@ MassEditUMap : MassEditU {
 					values = units.collect({ |unit|
 						unit.get( argSpec.name );
 					});
-					massEditSpec = argSpec.spec.massEditSpec( values );
+					if( values.any(_.isUMap) ) {
+						massEditSpec = MassEditUMapSpec( MassEditUMap( values ) );
+					} {	
+						massEditSpec = argSpec.spec.massEditSpec( values );
+					};
 					if( massEditSpec.notNil ) {
 						ArgSpec( argSpec.name, massEditSpec.default, massEditSpec, argSpec.private, argSpec.mode ); 
 					} {
