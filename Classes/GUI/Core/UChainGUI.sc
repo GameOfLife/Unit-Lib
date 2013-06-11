@@ -479,6 +479,9 @@ UChainGUI {
 						scrollViewOrigin = this.scrollView.visibleOrigin;
 						composite.children[0].focus; // this seems to prevent a crash..
 						composite.remove;
+						if( chain.class == MassEditUChain ) {
+							chain.init;
+						};
 						this.makeViews( originalBounds );
 						this.makeCurrent;
 					}.defer(0.01);

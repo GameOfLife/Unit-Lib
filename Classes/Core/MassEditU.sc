@@ -71,10 +71,13 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 	}
 	
 	resetArg { |key| // doesn't change the units
+		var spec, values;
 		if( key.notNil ) {
-			this.setArg( key, this.def.getSpec( key ).massEditValue( 
-				units.collect({ |unit| unit.get( key ) }) ) 
-			);
+			spec = this.def.getSpec( key );
+			values = units.collect({ |unit| unit.get( key ) });
+			if( spec.class != MassEditUMapSpec and: { values.any(_.isUMap).not }) {
+				this.setArg( key, spec.massEditValue( values ) );
+			};
 		} {
 			this.keys.do({ |key| this.resetArg( key ) });
 		};
