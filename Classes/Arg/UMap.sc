@@ -153,14 +153,6 @@ UMap : U {
 		};
 	}
 	
-	remove {
-		var unitArgName;
-		this.stop;
-		if( this.unit.notNil ) {	
-			unitArgName = this.unitArgName;
-			if( unitArgName.notNil ) {
-				this.unit.set( unitArgName, this.unit.def.getDefault( unitArgName ) );
-			};
 			this.unit = nil;
 		};
 	}

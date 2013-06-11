@@ -218,11 +218,6 @@ AbstractRichBuffer {
 			};
 		};
 	}
-	
-	remove {
-		this.unit = nil;
-	}
-
 }
 
 RichBuffer : AbstractRichBuffer {

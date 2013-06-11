@@ -110,6 +110,10 @@ UGUI {
 				if( value.isUMap ) {
 					vw = UMapGUI( composite, composite.bounds.insetBy(0,-24), value );
 					vw.mapSetAction = { mapSetAction.value( this ) };
+					vw.removeAction = { |umap|
+						umap.stop;
+						unit.set( key, unit.def.getDefault( key ) );
+					};
 				} {
 					vw = ObjectView( composite, nil, unit, key, 
 						argSpec.spec, controller,

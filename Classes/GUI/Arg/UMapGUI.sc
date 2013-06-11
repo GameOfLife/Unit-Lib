@@ -3,6 +3,7 @@ UMapGUI : UGUI {
 	classvar >color;
 	
 	var <>header, <>userView, <>mainComposite;
+	var <>removeAction;
 	
 	*viewNumLines { |unit|
 		^super.viewNumLines( unit ) + 1.1;
@@ -88,7 +89,7 @@ UMapGUI : UGUI {
 				.radius_( 3 )
 				.canFocus_( false )
 				.action_({
-					unit.remove;
+					removeAction.value( unit );
 				});
 		};
 	}
