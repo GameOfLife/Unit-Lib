@@ -178,7 +178,7 @@ UMapSetChecker {
 	init {
 		argDict = ();
 		unit.args.pairsDo({ |key, value|
-			if( value.isKindOf( UMap ) ) {
+			if( value.isUMap ) {
 				argDict[ key ] = value;
 			};
 		});
@@ -188,7 +188,7 @@ UMapSetChecker {
 	remove { unit.removeDependant( this ) }
 	
 	update { |obj, key, value|
-		if( value.isKindOf( UMap ) ) {
+		if( value.isUMap ) {
 			if( argDict[ key ] !== value ) {
 				argDict[ key ] = value;
 				action.value( this, key, value );
