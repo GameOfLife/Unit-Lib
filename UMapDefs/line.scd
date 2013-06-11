@@ -6,4 +6,5 @@ UMapDef( \line, { |range = #[0.0,1.0], up = 1, duration = 10|
 	UMapOut.kr(sig);
 })
 	.setSpec( \up, BoolSpec(true) )
-	.setSpec( \duration, SMPTESpec() );
+	.setSpec( \duration, SMPTESpec() )
+	.mappedArgs_( [ \range ] );

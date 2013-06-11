@@ -6,4 +6,5 @@ UMapDef( \sine, { |freq = 2, phase = 0, range = #[0.0,1.0]|
 })
 	.setSpec( \phase, [-pi,pi,\lin,0,0] )
 	.setSpec( \freq, FreqSpec(0.01,100, default: 2) )
+	.mappedArgs_( [ \range ] )
 	.category_( 'lfo' )
