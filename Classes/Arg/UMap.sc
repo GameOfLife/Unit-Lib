@@ -152,15 +152,111 @@ UMap : U {
 			};
 		};
 	}
+	
+	remove {
+		var unitArgName;
+		this.stop;
+		if( this.unit.notNil ) {	
+			unitArgName = this.unitArgName;
+			if( unitArgName.notNil ) {
+				this.unit.set( unitArgName, this.unit.def.getDefault( unitArgName ) );
+			};
+			this.unit = nil;
+		};
+	}
 }
 
 MassEditUMap : MassEditU {
 	
-	unitArgName { ^units[0].unitArgName }
+	var <>mixed = false;
+	
+	init { |inUnits|
+		var firstDef, defs;
+		units = inUnits.asCollection;
+		if( units.every(_.isUMap) ) {	
+			defs = inUnits.collect(_.def);
+			firstDef = defs[0];
+			if( defs.every({ |item| item == firstDef }) ) {
+				def = firstDef;
+				argSpecs = def.argSpecs.collect({ |argSpec|
+					var values, massEditSpec;
+					values = units.collect({ |unit|
+						unit.get( argSpec.name );
+					});
+					massEditSpec = argSpec.spec.massEditSpec( values );
+					if( massEditSpec.notNil ) {
+						ArgSpec( argSpec.name, massEditSpec.default, massEditSpec, argSpec.private, argSpec.mode ); 
+					} {
+						nil;
+					};
+				}).select(_.notNil);
+				args = argSpecs.collect({ |item| [ item.name, item.default ] }).flatten(1);
+				this.changed( \init );
+			} {
+				mixed = true;
+			};
+		} {
+			mixed = true;
+		};
+	}
+	
+	unitArgName { ^units.detect(_.isUMap).unitArgName }
 	
 	asUnitArg { }
 	
 	isUMap { ^true }
+	
+	defName { 
+		var numUMaps, numValues;
+		if( mixed ) {
+			numUMaps = units.count(_.isUMap);
+			numValues = units.size - numUMaps;
+			^("mixed" + "(% umaps%)".format( numUMaps, if( numValues > 0 ) { 
+				", % values".format( numValues ) 
+			} { "" }
+			)).asSymbol
+		} {
+			^((this.def !? { this.def.name }).asString + 
+				"(% umaps)".format( units.size )).asSymbol
+		};
+	}
+	
+	def_ { |def| 
+		units.do({ |item|
+			if( item.isUMap ) { item.def = def };
+		});
+		this.init( units ); 
+	}	
+	
+	remove {
+		units.do({ |item|
+			if( item.isUMap ) { item.remove };
+		});
+		this.init( units ); 
+	}
+}
+
+MassEditUMapSpec : Spec {
+	
+	var <>default;
+	// placeholder for mass edit MassEditUMap
+	
+	*new { |default|
+		^super.newCopyArgs( default );
+	}
+	
+	viewNumLines { 
+		if( default.mixed ) { 
+			^1.1 
+		} {
+			^UMapGUI.viewNumLines( default );
+		};
+	}
+	
+	constrain { |value| ^value }
+	
+	map { |value| ^value }
+	unmap { |value| ^value }
 	
 }
 

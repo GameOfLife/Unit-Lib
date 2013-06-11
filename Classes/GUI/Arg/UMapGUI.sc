@@ -27,7 +27,7 @@ UMapGUI : UGUI {
 		mapChecker = UMapSetChecker( unit, { mapSetAction.value( this ) } );
 		controller = SimpleController( unit );
 		
-		if( unit.class == MassEditU ) {
+		if( unit.class == MassEditUMap ) {
 			unit.connect;
 		};
 		
@@ -50,7 +50,7 @@ UMapGUI : UGUI {
 		composite = CompositeView( mainComposite, bounds.moveTo(0,0) ).resize_(2);
 		composite.addFlowLayout( margin, gap );
 		composite.onClose = {
-			if( unit.class == MassEditU ) {
+			if( unit.class == MassEditUMap ) {
 				unit.disconnect;
 			}; 
 			controller.remove;
@@ -82,13 +82,14 @@ UMapGUI : UGUI {
 			.font_( boldFont )
 			.string_( unit.defName );
 			
-		SmoothButton( header, Rect( bounds.width - 14, 2, 12, 12 ) )
-			.label_( 'x' )
-			.radius_( 3 )
-			.canFocus_( false )
-			.action_({
-				var key = unit.unitArgName;
-				unit.unit.set( key, unit.unit.def.getDefault( key ) );
-			});
+		if( unit.class != MassEditUMap ) { // no close button until massedit updating is fixed
+			SmoothButton( header, Rect( bounds.width - 14, 2, 12, 12 ) )
+				.label_( 'x' )
+				.radius_( 3 )
+				.canFocus_( false )
+				.action_({
+					unit.remove;
+				});
+		};
 	}
 }

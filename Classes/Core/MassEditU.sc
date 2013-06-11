@@ -34,11 +34,16 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 		if( defs.every({ |item| item == firstDef }) ) {
 			def = firstDef;
 			argSpecs = def.argSpecs.collect({ |argSpec|
-				var values, massEditSpec;
+				var values, massEditSpec, value;
 				values = units.collect({ |unit|
 					unit.get( argSpec.name );
 				});
-				massEditSpec = argSpec.spec.massEditSpec( values );
+				
+				if( values.any(_.isUMap) ) {
+					massEditSpec = MassEditUMapSpec( MassEditUMap( values ) );
+				} {	
+					massEditSpec = argSpec.spec.massEditSpec( values );
+				};
 				if( massEditSpec.notNil ) {
 					ArgSpec( argSpec.name, massEditSpec.default, massEditSpec, argSpec.private, argSpec.mode ); 
 				} {
