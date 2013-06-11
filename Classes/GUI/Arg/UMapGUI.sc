@@ -25,11 +25,17 @@ UMapGUI : UGUI {
 		};
 		bounds = bounds.asRect;
 		bounds.height = this.class.getHeight( unit, viewHeight, margin, gap );
-		mapChecker = UMapSetChecker( unit, { mapSetAction.value( this ) } );
 		controller = SimpleController( unit );
 		
-		if( unit.class == MassEditUMap ) {
+		if( unit.isKindOf( MassEditU ) ) {
+			mapCheckers = unit.units.collect({ |unit|
+				if( unit.isKindOf( U ) ) {
+					UMapSetChecker( unit, { mapSetAction.value( this ) } ); 
+				};
+			}).select(_.notNil);
 			unit.connect;
+		} {
+			mapCheckers = [ UMapSetChecker( unit, { mapSetAction.value( this ) } ) ];
 		};
 		
 		unit.valuesAsUnitArg;
@@ -55,7 +61,7 @@ UMapGUI : UGUI {
 				unit.disconnect;
 			}; 
 			controller.remove;
-			mapChecker.remove;
+			mapCheckers.do(_.remove);
 		 };
 		 
 		 this.makeSubViews( bounds );

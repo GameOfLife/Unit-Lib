@@ -24,7 +24,7 @@ UGUI {
 	var <parent, <composite, <views, <controller;
 	var <viewHeight = 14, <labelWidth = 80;
 	var <>action;
-	var <>mapSetAction, <>mapChecker;
+	var <>mapSetAction, <>mapCheckers;
 	
 	*new { |parent, bounds, unit|
 		^super.newCopyArgs( unit ).init( parent, bounds );
@@ -71,11 +71,17 @@ UGUI {
 		};
 		bounds = bounds.asRect;
 		bounds.height = this.class.getHeight( unit, viewHeight, margin, gap );
-		mapChecker = UMapSetChecker( unit, { mapSetAction.value( this ) } );
 		controller = SimpleController( unit );
 		
-		if( unit.class == MassEditU ) {
+		if( unit.isKindOf( MassEditU ) ) {
+			mapCheckers = unit.units.collect({ |unit|
+				if( unit.isKindOf( U ) ) {
+					UMapSetChecker( unit, { mapSetAction.value( this ) } ); 
+				} { nil };
+			}).select(_.notNil);
 			unit.connect;
+		} {
+			mapCheckers = [ UMapSetChecker( unit, { mapSetAction.value( this ) } ) ];
 		};
 		
 		unit.valuesAsUnitArg;
@@ -87,7 +93,7 @@ UGUI {
 				unit.disconnect;
 			}; 
 			controller.remove;
-			mapChecker.remove;
+			mapCheckers.do(_.remove);
 		 };
 		 
 		 this.makeSubViews( bounds );
@@ -151,7 +157,7 @@ UGUI {
 		
 		if( views.size == 0 ) {
 			controller.remove;
-			mapChecker.remove;
+			mapCheckers.do(_.remove);
 		};
 	}
 	
