@@ -963,6 +963,11 @@ U : ObjectWithArgs {
 	
 	disposeSynths {
 		this.synths.copy.do(_.changed( \n_end ));
+		  this.values.do{ |val|
+	        if(val.respondsTo(\disposeSynths)) {
+	            val.disposeSynths;
+	        }
+	    };
 	}
 
 	disposeArgsFor { |server|
