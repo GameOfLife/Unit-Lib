@@ -219,6 +219,9 @@ AbstractRichBuffer {
 		};
 	}
 	
+	remove {
+		this.unit = nil;
+	}
 
 }
 
