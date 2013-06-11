@@ -73,7 +73,7 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 	resetArg { |key| // doesn't change the units
 		var spec, values;
 		if( key.notNil ) {
-			spec = this.def.getSpec( key );
+			spec = this.getSpec( key );
 			values = units.collect({ |unit| unit.get( key ) });
 			if( spec.class != MassEditUMapSpec and: { values.any(_.isUMap).not }) {
 				this.setArg( key, spec.massEditValue( values ) );
@@ -101,7 +101,7 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 		args.pairsDo({ |key, value|
 			var values;
 			this.setArg( key, value );
-			values = this.def.getSpec( key ).massEdit( units.collect(_.get(key) ), value );
+			values = this.getSpec( key ).massEdit( units.collect(_.get(key) ), value );
 			units.do({ |unit, i|
 				unit.set( key, values[i] );
 			});
@@ -109,6 +109,10 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 		
 		// re-enable auto updating
 		autoUpdate = autoUpdateWas;
+	}
+	
+	getSpec { |name|
+		^units[0].getSpec( name );
 	}
 	
 	defName { ^((this.def !? { this.def.name }).asString + "(% units)".format( units.size )).asSymbol }

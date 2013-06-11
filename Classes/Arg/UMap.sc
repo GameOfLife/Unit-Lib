@@ -293,7 +293,7 @@ MassEditUMap : MassEditU {
 			firstDef = defs[0];
 			if( defs.every({ |item| item == firstDef }) ) {
 				def = firstDef;
-				argSpecs = def.argSpecs.collect({ |argSpec|
+				argSpecs = units[0].argSpecs.collect({ |argSpec|
 					var values, massEditSpec;
 					values = units.collect({ |unit|
 						unit.get( argSpec.name );
