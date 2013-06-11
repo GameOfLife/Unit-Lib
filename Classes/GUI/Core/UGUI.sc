@@ -44,7 +44,7 @@ UGUI {
 	}
 	
 	*viewNumLines { |unit|
-		^unit.argSpecs
+		^(unit.argSpecs ? [])
 			.select({|x|
 				x.private.not
 			})
