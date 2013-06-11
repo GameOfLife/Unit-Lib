@@ -114,7 +114,7 @@ ArgSpec : Spec {
 
 	storeOn { arg stream;
 		var spc;
-		spc = ( spec.findKey ? spec );
+		spc = ( spec !? _.findKey) ? spec;
 		if( spc.class == Symbol ) {
 			spc = spc.asCompileString ++ ".asSpec";
 		} {
