@@ -1,8 +1,8 @@
 
-UMapDef( \line, { |range = #[0.0,1.0], up = 1, curve = 0, duration = 10|
+UMapDef( \line_rel, { |range = #[0.0,1.0], up = 1, curve = 0, timeScale = 1.0|
 	var sig, lineRange = [0,1];
 	lineRange = if( up, lineRange, lineRange.reverse );
-	sig = ULine.kr( lineRange[0], lineRange[1], duration );
+	sig = ULineRel.kr( lineRange[0], lineRange[1], nil, timeScale );
 	sig = Select.kr( curve.inRange(-0.001,0.001), [
 		sig.lincurve(0,1, range[0], range[1], curve ),
 		sig.linlin(0,1, range[0], range[1] )
@@ -11,6 +11,6 @@ UMapDef( \line, { |range = #[0.0,1.0], up = 1, curve = 0, duration = 10|
 })
 	.setSpec( \up, BoolSpec(true) )
 	.setSpec( \curve, [-16,16,\lin,0,0].asSpec )
-	.setSpec( \duration, SMPTESpec() )
+	.setSpec( \timeScale, [0.25,4,\exp,0,1].asSpec, \init )
 	.category_( 'automation' )
 	.mappedArgs_( [ \range ] );
