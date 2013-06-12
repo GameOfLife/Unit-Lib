@@ -736,6 +736,8 @@ U : ObjectWithArgs {
 	loop_ { |new| this.set( \loop, new ) }
 	numChannels { ^this.get( \numChannels ) }
 	numChannels_ { |new| this.set( \numChannels, new ) }
+	value { ^this.get( \value ) }
+	value_ { |new| this.set( \value, new ) }
 
 	cutStart { |amount = 0|
 		this.values.do({ |value|
