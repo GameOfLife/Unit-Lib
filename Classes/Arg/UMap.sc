@@ -197,7 +197,7 @@ UMap : U {
 		if( spec.isNil ) {
 			if( newSpec.notNil ) {
 				spec = newSpec;
-				unmappedKeys.do({ |item|
+				unmappedKeys.copy.do({ |item|
 					this.set( item, this.getSpec( item ).map( this.get( item ) ) );
 				});
 				unmappedKeys = nil;
