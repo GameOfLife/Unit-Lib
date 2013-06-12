@@ -1,5 +1,5 @@
 /*
-\envelope
+\envelope_amp
 
 An amplitude envelope.
 
@@ -10,10 +10,10 @@ this is an Udef definition file
 part of the Unit lib default Udefs set
 */
 
-Udef( \envelope, { 
+Udef( \envelope_amp, { 
 	var in;
 	in = UIn.ar(0);
 	in = in * UEnvGen.ar( \env, \amp );
 	UOut.ar( 0, in );
 })
-	.category_( \dynamics )
+	.category_( \utility )
