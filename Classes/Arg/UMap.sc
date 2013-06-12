@@ -68,7 +68,7 @@ UMapDef : Udef {
 	
 	setSynth { |unit ...keyValuePairs|
 		keyValuePairs = keyValuePairs.clump(2).collect({ |item|
-			if( this.isMappedArg( item[0] ) ) {
+			if( this.isMappedArg( item[0] ) && { item[1].isUMap.not } ) {
 				[ item[0], this.getSpec( item[0], unit ) !? _.unmap( item[1] ) ? item[1] ];
 			} {
 				item
@@ -216,7 +216,11 @@ UMap : U {
 		this.unitArgName = key;
 		if( key.notNil ) {
 			this.spec = unit.getSpec( key ).copy;
-			this.set( \u_spec, spec );
+			if( unit.isUMap && { unit.def.isMappedArg( key ) } ) {
+				 this.set( \u_spec, [0,1,\lin].asSpec );
+			} {
+				 this.set( \u_spec, spec );
+			};
 		};
 		^this;
 	}
@@ -254,7 +258,7 @@ UMap : U {
 		nonsynthKeys = this.argSpecs.select({ |item| item.mode == \nonsynth }).collect(_.name);
 		^this.args.clump(2).select({ |item| nonsynthKeys.includes( item[0] ).not })
 			.collect({ |item|
-				if( this.def.isMappedArg( item[0] ) ) {
+				if( this.def.isMappedArg( item[0] ) && { item[1].isUMap.not }) {
 					[ item[0], this.getSpec( item[0] ) !? _.unmap( item[1] ) ? item[1] ];
 				} {
 					item
