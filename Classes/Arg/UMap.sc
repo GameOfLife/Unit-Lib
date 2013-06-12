@@ -195,17 +195,19 @@ UMap : U {
 				unmappedKeys = nil;
 			};
 		} {
-			this.def.mappedArgs.do({ |item|
-				this.set( item, this.getSpec( item ).unmap( this.get( item ) ) );
-			});
-			spec = newSpec;
-			if( spec.notNil ) {
+			if( newSpec != spec ) {	
 				this.def.mappedArgs.do({ |item|
-					this.set( item, this.getSpec( item ).map( this.get( item ) ) );
+					this.set( item, this.getSpec( item ).unmap( this.get( item ) ) );
 				});
-			} {
-				unmappedKeys = this.def.mappedArgs.copy;
-			};
+				spec = newSpec;
+				if( spec.notNil ) {
+					this.def.mappedArgs.do({ |item|
+						this.set( item, this.getSpec( item ).map( this.get( item ) ) );
+					});
+				} {
+					unmappedKeys = this.def.mappedArgs.copy;
+				};
+			}
 		} 
 	}
 	
