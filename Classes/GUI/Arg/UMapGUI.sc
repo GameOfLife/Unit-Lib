@@ -38,8 +38,6 @@ UMapGUI : UGUI {
 			mapCheckers = [ UMapSetChecker( unit, { mapSetAction.value( this ) } ) ];
 		};
 		
-		unit.valuesAsUnitArg;
-		
 		mainComposite = CompositeView( parent, bounds ).resize_(2);
 		
 		userView = UserView( mainComposite, bounds.moveTo(0,0) ).resize_(2);
