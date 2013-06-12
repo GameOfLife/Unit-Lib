@@ -166,6 +166,8 @@ BoolSpec : Spec {
 	default_ { |value| 
 		default = this.constrain( value );
 	}
+	
+	asControlSpec { ^ControlSpec(0,1,\lin,1,default.binaryValue) }
 
 	storeArgs { ^[default, trueLabel, falseLabel] }
 }
@@ -898,6 +900,7 @@ IntegerSpec : Spec {
 	var <>alt_step = 1;
 	var <>minval = -inf;
 	var <>maxval = inf;
+	var <>units;
 	
 	*new{ |default = 0, minval = -inf, maxval = inf|
         ^super.new.minval_( minval ).maxval_( maxval ).default_(default);
@@ -910,10 +913,39 @@ IntegerSpec : Spec {
 	constrain { |value|
 		^value.clip(minval, maxval).asInteger;
 	}
+	
+	range { ^maxval - minval }
+	ratio { ^maxval / minval }
 
 	default_ { |value|
 		default = this.constrain( value );
 	}
+	
+	warp { ^LinearWarp( this ) }
+	
+	floatMinMax {
+		^minval.max( (2**24).neg )
+	}
+	
+	map { |value|
+		^value.linlin( 0, 1, 
+			this.minval.max( (2**24).neg ), 
+			maxval.min( 2**24 ), \minmax 
+		).round( step ).asInteger;
+	}
+	
+	unmap { |value|
+		^value.round(step).linlin( 
+			this.minval.max( (2**24).neg ), 
+			maxval.min( 2**24 ), 
+			0,1, \minmax 
+		);
+	}
+		
+	asControlSpec {
+		^ControlSpec( this.minval.max( (2**24).neg ), maxval.min( 2**24 ), \lin, 1, default )
+	}
+	
 
     storeArgs { ^[default, minval, maxval] }
 }
@@ -961,6 +993,9 @@ FreqSpec : ControlSpec {
 		specs.put( \freq, FreqSpec() ); // replace default freq spec with this
 	}
 
+}
+
+DisplayControlSpec : ControlSpec {
 }
 
 ControlSpecSpec : Spec {

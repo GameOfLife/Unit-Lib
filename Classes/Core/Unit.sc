@@ -206,7 +206,7 @@ Udef : GenericDef {
 		}
 	}
 
-	prepare { |servers, action|
+	prepare { |servers, unit, action|
 	    action.value;
 	}
 	
@@ -921,9 +921,9 @@ U : ObjectWithArgs {
 			    valuesToPrepare.do({ |val|
 				     val.prepare(servers, startPos, action: act.getAction)
 			    });
-			    this.def.prepare(servers, act.getAction)
+			    this.def.prepare(servers, this, act.getAction)
 		    } {
-			    this.def.prepare(servers, act);
+			    this.def.prepare(servers, this, act);
 		    };
 		} {
 			action.value;
