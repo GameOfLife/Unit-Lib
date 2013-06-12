@@ -595,10 +595,11 @@ U : ObjectWithArgs {
 	}
 	
 	setUMapBuses {
-		var umaps;
+		var umaps, i = 0;
 		umaps = this.getAllUMaps.select(_.hasBus);
-		umaps.do({ |item, i|
+		umaps.do({ |item|
 			item.setBus(i);
+			i = i + item.def.numChannels;
 		});
 	}
 	

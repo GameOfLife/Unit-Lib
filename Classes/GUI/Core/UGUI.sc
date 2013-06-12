@@ -121,7 +121,10 @@ UGUI {
 				} {
 					vw = ObjectView( composite, nil, unit, key, 
 						argSpec.spec, controller,
-						if( [ \nonsynth, \init ].includes(argSpec.mode) ) { key ++ " (i)" }
+						switch( argSpec.mode,
+						 	\nonsynth, { key ++ " (l)" },
+						 	\init, { key ++ " (i)" }
+						 ) 
 					);
 					vw.testValue = { |value| value.isKindOf( UMap ).not };
 					vw.action = { action.value( this, key, value ); };
@@ -136,7 +139,11 @@ UGUI {
 							.canFocus_( false )
 							.canReceiveDragHandler_({ 
 									(View.currentDrag.isKindOf( UMapDef ) && {
-										[ ControlSpec, FreqSpec ].includes( argSpec.spec.class ); 								});
+										argSpec.spec.respondsTo( \asControlSpec ) && {
+											value.asControlInput.asCollection.size == 
+												View.currentDrag.numChannels
+										};
+								});
 							})
 							.receiveDragHandler_({
 								unit.set( key, UMap( View.currentDrag ) );

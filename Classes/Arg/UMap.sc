@@ -83,7 +83,13 @@ UMapDef : Udef {
 	
 	getControlInput { |unit|
 		if( this.hasBus ) {
-			^("c" ++ (this.getBus(unit) + unit.class.busOffset)).asSymbol;
+			if( this.numChannels > 1 ) {
+				^this.numChannels.collect({ |i|
+					("c" ++ (this.getBus(unit) + i + unit.class.busOffset)).asSymbol;
+				});
+			} {
+				^("c" ++ (this.getBus(unit) + unit.class.busOffset)).asSymbol;
+			};
 		} {
 			^this.value( unit );
 		};
@@ -153,6 +159,8 @@ UMap : U {
 	asControlInput {
 		^this.def.getControlInput(this);
 	}
+	
+	asOSCArgEmbeddedArray { | array| ^this.asControlInput.asCollection.asOSCArgEmbeddedArray(array) }
 	
 	getBus { 
 		^this.def.getBus( this );

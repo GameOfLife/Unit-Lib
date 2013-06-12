@@ -38,6 +38,15 @@ x = Synth( "test_map", [ \freq, [220,440,\exp].asSpec ] );
 	asOSCArgEmbeddedArray { | array| ^this.asControlInput.asOSCArgEmbeddedArray(array) }
 }
 
++ Spec {
+
+	asControlInput {
+		^this.asControlSpec.asControlInput;
+	}
+	
+	asOSCArgEmbeddedArray { | array| ^this.asControlInput.asOSCArgEmbeddedArray(array) }
+}
+
 + Array {
 	
 	asSpecMapKr { |value = 0|
