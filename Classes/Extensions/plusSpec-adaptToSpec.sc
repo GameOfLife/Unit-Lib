@@ -11,7 +11,7 @@
 			if( spec.isMemberOf( FreqSpec ) && { class == ControlSpec } ) {
 				class = FreqSpec;
 			};
-			res = this.class.newFrom( spec );
+			res = class.newFrom( spec );
 			res.default_( res.map( this.default ) );
 		};
 		^res;
