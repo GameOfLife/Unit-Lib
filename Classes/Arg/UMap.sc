@@ -223,12 +223,16 @@ UMap : U {
 	asUnitArg { |unit, key|
 		this.unitArgName = key;
 		if( key.notNil ) {
-			this.spec = unit.getSpec( key ).copy;
 			if( unit.isUMap && { unit.def.isMappedArg( key ) } ) {
-				 this.set( \u_spec, [0,1,\lin].asSpec );
+				if( unit.spec.notNil ) {
+					this.spec = unit.getSpec( key ).copy;
+					this.set( \u_spec, [0,1,\lin].asSpec );
+				};
 			} {
-				 this.set( \u_spec, spec );
+				this.spec = unit.getSpec( key ).copy;
+				this.set( \u_spec, spec );
 			};
+			this.valuesAsUnitArg
 		};
 		^this;
 	}
