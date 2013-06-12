@@ -3,3 +3,4 @@ UMapDef( \envelope, {
 	sig = UEnvGen.kr( \env );
 	UMapOut.kr(sig);
 }).mappedArgs_([ \env ])
+.category_( 'automation' )

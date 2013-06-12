@@ -7,4 +7,5 @@ UMapDef( \line, { |range = #[0.0,1.0], up = 1, duration = 10|
 })
 	.setSpec( \up, BoolSpec(true) )
 	.setSpec( \duration, SMPTESpec() )
+	.category_( 'automation' )
 	.mappedArgs_( [ \range ] );
