@@ -115,6 +115,10 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 		^units[0].getSpec( name );
 	}
 	
+	canUseUMap { |key, umapdef|
+		^units.first.canUseUMap( key, umapdef );
+	}
+	
 	defName { ^((this.def !? { this.def.name }).asString + "(% units)".format( units.size )).asSymbol }
 	
 	def_ { |def|  units.do(_.def_( def ) ); this.init( units ); }

@@ -87,7 +87,6 @@ UMapGUI : UGUI {
 			.font_( boldFont )
 			.string_( unit.defName );
 			
-		if( unit.class != MassEditUMap ) { // no close button until massedit updating is fixed
 			SmoothButton( header, Rect( bounds.width - 14, 2, 12, 12 ) )
 				.label_( 'x' )
 				.radius_( 3 )
@@ -95,6 +94,5 @@ UMapGUI : UGUI {
 				.action_({
 					removeAction.value( unit );
 				});
-		};
 	}
 }

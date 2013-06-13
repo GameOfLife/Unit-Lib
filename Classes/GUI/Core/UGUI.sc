@@ -115,8 +115,21 @@ UGUI {
 					vw = UMapGUI( composite, composite.bounds.insetBy(0,-24), value );
 					vw.mapSetAction = { mapSetAction.value( this ) };
 					vw.removeAction = { |umap|
-						umap.stop;
-						unit.set( key, unit.getDefault( key ) );
+						if( unit.isKindOf( MassEditU ) ) {
+							var value;
+							value = unit.units.first.getDefault( key );
+							umap.units.do({ |item|
+								if( item.isUMap ) { item.stop };
+							});
+							unit.units.do({ |item|
+								if( item.get( key ).isUMap ) {
+									item.set( key, value );
+								};
+							});
+						} {
+							umap.stop;
+							unit.set( key, unit.getDefault( key ) );
+						};
 					};
 				} {
 					vw = ObjectView( composite, nil, unit, key, 
@@ -137,18 +150,23 @@ UGUI {
 						
 						umapdragbin = UserView( composite, labelWidth @ viewHeight )
 							.canFocus_( false )
-							.canReceiveDragHandler_({ 
-									(View.currentDrag.isKindOf( UMapDef ) && {
-										argSpec.spec.respondsTo( \asControlSpec ) && {
-											value.asControlInput.asCollection.size == 
-												View.currentDrag.numChannels
-										};
+							.canReceiveDragHandler_({
+								View.currentDrag.isKindOf( UMapDef ) && {
+									unit.canUseUMap( key, View.currentDrag ); 
+								};
+							});
+						
+						if( unit.isKindOf( MassEditU ) ) {
+							umapdragbin.receiveDragHandler_({
+								unit.units.do({ |unit|
+									unit.set( key, UMap( View.currentDrag ) );
 								});
-							})
-							.receiveDragHandler_({
+							});
+						} {
+							umapdragbin.receiveDragHandler_({
 								unit.set( key, UMap( View.currentDrag ) );
 							});
-							
+						};
 						composite.decorator.nextLine;
 						composite.decorator.shift( 0, 
 							((viewHeight + composite.decorator.gap.y) * (viewNumLines - 1))

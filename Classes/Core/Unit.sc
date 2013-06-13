@@ -603,6 +603,14 @@ U : ObjectWithArgs {
 		});
 	}
 	
+	canUseUMap { |key, umapdef|
+		^this.getMode( key ) != \nonsynth && {
+			this.getSpec( key ).respondsTo( \asControlSpec ) && {
+				this.get( key ).asControlInput.asCollection.size == umapdef.numChannels
+			};
+		};
+	}
+	
 	connect { this.modPerform( \connect ); this.changed( \connect ); }
 	disconnect {  this.modPerform( \disconnect ); this.changed( \disconnect ); }
 	
