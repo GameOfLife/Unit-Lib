@@ -214,6 +214,7 @@ UMenuWindow {
 					'EQ', { UGlobalEQ.gui; },
 					'Level', { UGlobalGain.gui; },
 					'Udefs', { UdefListView(); },
+					'UMapDefs', { UMapDefListView(); },
 					'Level meters', { ULib.servers.first.meter; }
 				)
 			)
