@@ -7,6 +7,8 @@ FuncUMapDef : UMapDef {
 	} 
 	*/
 	
+	var <>valueIsMapped = true;
+	
 	*new { |name, func, args, valueIsPrivate = false, category, addToAll=true|
 		^this.basicNew( name, args ? [], addToAll )
 			.initFunc( func, valueIsPrivate ).category_( category ? \default ); 
@@ -23,13 +25,12 @@ FuncUMapDef : UMapDef {
 		mappedArgs = [ \value ];
 		this.changed( \init );
 	}
-	
-	mappedArgs_ { |args|
-		args = args ? [];
-		if( args.includes( \value ).not ) {
-			mappedArgs = args.add( \value );
+		
+	isMappedArg { |name|
+		if( name == \value ) {
+			^valueIsMapped;
 		} {
-			mappedArgs = args;
+			^mappedArgs.notNil && { mappedArgs.includes( name ) };
 		};
 	}
 	
@@ -46,11 +47,15 @@ FuncUMapDef : UMapDef {
 	}
 	
 	doFunc { |unit|
-		unit.setArg( \value, unit.getSpec( \value ).map(	 		func.value( unit, 
-					*this.asUnmappedArgsArray( unit, unit.args ).clump(2).flop[1]
-				)
-			) 
+		var res;
+		res = func.value( unit, 
+			*this.asUnmappedArgsArray( unit, unit.args ).clump(2).flop[1]
 		);
+		if( valueIsMapped ) {
+			unit.setArg( \value, unit.getSpec( \value ).map( res ) );
+		} {
+			unit.setArg( \value, res );
+		};
 	}
 	
 	prepare { |servers, unit, action|
@@ -63,9 +68,13 @@ FuncUMapDef : UMapDef {
 	hasBus { ^false }
 	
 	value { |unit|
-		^(unit.get( \u_spec ) ?? { [0,1].asSpec }).map( 
-			unit.getSpec( \value ).unmap( unit.value )
-		);
+		if( valueIsMapped ) {
+			^(unit.get( \u_spec ) ?? { [0,1].asSpec }).map( 
+				unit.getSpec( \value ).unmap( unit.value )
+			);
+		} {
+			^unit.value
+		};
 	}
 	
 	setSynth { |unit ...keyValuePairs|

@@ -97,6 +97,22 @@ StringSpec : Spec {
 	
 }
 
+MapSpec : Spec {
+	
+	var <>default = 'c0';
+	
+	constrain { |value| ^(value ? default).asSymbol }
+	
+	*testObject { |obj|
+		^obj.class == Symbol
+	}
+	
+	map { |value| ^value }
+	unmap { |value| ^value }
+	
+	
+}
+
 SMPTESpec : Spec {
 	
 	var <>minval = 0, <>maxval = inf;
