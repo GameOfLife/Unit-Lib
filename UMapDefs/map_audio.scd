@@ -1,29 +1,34 @@
 (
 UMapDef( \map_audio, { |bus = 0, rangeIn = #[-1.0, 1.0], rangeOut = #[0.0,1.0], invert = 0,
 	curve = 0, lag = 0.0, clipMode = 0|
-	var sig, unranged;
+	var sig;
 	sig = In.ar(bus + UIn.firstPrivateBus);
 	sig = A2K.kr( sig );
-	sig = sig.linlin(*rangeIn ++ [0,1,\none]);
-	sig = if( invert, 1-sig, sig );
+	sig = sig.linlin(*rangeIn ++ [-1,1,\none]);
+	sig = if( invert, sig.neg, sig );
 	sig = Select.kr( curve.inRange(-0.001,0.001), [
-		sig.lincurve(0,1,0,1, curve ),
+		sig.lincurve(-1,1,-1,1, curve, \none ),
+		sig
+	]);
+	sig = Select.kr( clipMode, [
+		sig.clip2(1),
+		sig.fold2(1),
+		sig.wrap2(1),
+		sig.tanh,
+		sig.softclip,
+		sig.distort,
+		(sig.wrap2(1) * pi).sin,
 		sig
 	]);
 	sig = sig.lag( lag );
-	unranged = sig;
-	sig = sig.linlin(0,1,*rangeOut ++ [ \none ]);
-	sig = Select.kr( clipMode, [
-		sig.clip(*rangeOut),
-		sig.fold(*rangeOut),
-		sig.wrap(*rangeOut),
-		unranged.softclip.linlin( 0,1,*rangeOut),
-		sig
-	]);
+	sig = sig.linlin(-1,1,*rangeOut ++ [ \none ]);
 	UMapOut.kr(sig);
 })
 	.setSpec( \rangeIn, [-1,1].asSpec.asRangeSpec )
-	.setSpec( \clipMode, ListSpec( (..4), 0, [ \clip, \fold, \wrap, \softclip, \none ] ) )
+	.setSpec( \clipMode, ListSpec( (..7), 0, [ 
+		\clip, \fold, \wrap, \tanh, \softclip, \distort, \wrap_sine, \none 
+		] ) 
+	)
 	.setSpec( \invert, BoolSpec(false) )
 	.setSpec( \curve, [-16,16,\lin,0,0].asSpec )
 	.setSpec( \bus, PositiveIntegerSpec(0,0,32) )
