@@ -93,6 +93,7 @@ Udef : GenericDef {
 	var <>extraPrefix;
 	var <>numChannels = 1;
 	var <>ioNames;
+	var <>canUseUMap = true;
 	
 	*initClass{
 		defsFolders = [ 
@@ -604,11 +605,13 @@ U : ObjectWithArgs {
 	}
 	
 	canUseUMap { |key, umapdef|
-		^this.getMode( key ) != \nonsynth && {
-			this.getSpec( key ).respondsTo( \asControlSpec ) && {
-				this.get( key ).asControlInput.asCollection.size == umapdef.numChannels
+		^this.def.canUseUMap == true && 
+		{ this.getMode( key ) != \nonsynth && {
+				this.getSpec( key ).respondsTo( \asControlSpec ) && {
+					this.get( key ).asControlInput.asCollection.size == umapdef.numChannels
+				};
 			};
-		};
+		}
 	}
 	
 	connect { this.modPerform( \connect ); this.changed( \connect ); }
