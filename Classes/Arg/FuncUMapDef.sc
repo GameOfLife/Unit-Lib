@@ -23,6 +23,7 @@ FuncUMapDef : UMapDef {
 		].collect(_.asArgSpec);
 		argSpecs.do(_.mode_( \nonsynth ));
 		mappedArgs = [ \value ];
+		this.canUseUMap = false;
 		this.changed( \init );
 	}
 		
