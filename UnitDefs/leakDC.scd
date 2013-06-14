@@ -13,6 +13,7 @@ part of the Unit lib default Udefs set
 Udef( \leakDC, { |cutFreq = 20|
 	var in;
 	in = UIn.ar(0,1);
+	cutFreq = cutFreq.clip(1,200);
 	in = LeakDC.ar( in, (-2pi * (cutFreq/SampleRate.ir)).exp );
 	UOut.ar( 0, in );
 })

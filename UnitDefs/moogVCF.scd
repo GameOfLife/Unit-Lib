@@ -11,6 +11,7 @@ part of the Unit lib default Udefs set
 Udef('moogVCF', { |freq #[ 20, 20000 ], modSpeed = 1, modShape = 1, res = 0.5, lag = 0|
 	var in;
 	in = UIn.ar(0,1);
+	freq = freq.clip(20,20000);
 	in = MoogVCF.ar( in, SinOsc.ar( modSpeed ).pow( modShape ).exprange( *freq.lag(lag) ), res.lag(lag) );
 	UOut.ar( 0, in );
 }, [ 
