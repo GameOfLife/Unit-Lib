@@ -211,6 +211,10 @@ Udef : GenericDef {
 	    action.value;
 	}
 	
+	stop { |unit|
+		unit.synths.do(_.free);  
+	}
+	
 	synthDefName { ^this.synthDef.name }
 	
 	isUdef { ^true }
@@ -814,9 +818,9 @@ U : ObjectWithArgs {
 	}
 	
 	free { 
-		this.synths.do(_.free);  
+		this.def.stop( this );
 		this.modPerform( \stop );
-		this.umodPerform( \free );
+		this.umapPerform( \free );
 	} 
 	stop { this.free }
 	
