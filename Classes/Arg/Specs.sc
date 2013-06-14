@@ -113,6 +113,19 @@ MapSpec : Spec {
 	
 }
 
+AnythingSpec : Spec {
+	var <>default;
+	
+	constrain { |value| ^value }
+	
+	*testObject { |obj|
+		^true
+	}
+	
+	map { |value| ^value }
+	unmap { |value| ^value }
+}
+
 SMPTESpec : Spec {
 	
 	var <>minval = 0, <>maxval = inf;

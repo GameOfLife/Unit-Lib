@@ -200,7 +200,7 @@ UMap : U {
 	
 	u_waitTime { ^this.waitTime }
 	
-	dontStoreArgNames { ^[ 'u_dur', 'u_doneAction', 'u_mapbus', 'u_spec' ] }
+	dontStoreArgNames { ^[ 'u_dur', 'u_doneAction', 'u_mapbus', 'u_spec', 'u_store' ] }
 	
 	spec_ { |newSpec|
 		if( spec.isNil ) {
