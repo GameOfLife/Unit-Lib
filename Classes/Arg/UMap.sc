@@ -77,6 +77,15 @@ UMapDef : Udef {
 		this.prSetSynth( unit.synths, *keyValuePairs );
 	}
 	
+	activateUnit { |unit, parentUnit| // called at UMap:asUnitArg
+		if( unit.synths.size == 0 && {
+			parentUnit.notNil && { parentUnit.synths.size > 0 } 
+		}) {
+				unit.unit_(parentUnit);
+				unit.prepareAndStart( unit.unit.synths );
+			};
+	}
+	
 	asUMapDef { ^this }
 	
 	isUdef { ^false }
@@ -232,6 +241,7 @@ UMap : U {
 				this.spec = unit.getSpec( key ).copy;
 				this.set( \u_spec, spec );
 			};
+			this.def.activateUnit( this, unit );
 			this.valuesAsUnitArg
 		};
 		^this;

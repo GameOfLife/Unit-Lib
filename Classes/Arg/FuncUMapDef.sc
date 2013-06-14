@@ -64,6 +64,12 @@ FuncUMapDef : UMapDef {
 		action.value;
 	}
 	
+	activateUnit { |unit| // called at UMap:asUnitArg
+		if( unit.unit.notNil && { unit.unit.synths.size > 0 } ) {
+			unit.prepare;
+		};
+	}
+	
 	makeSynth { ^nil }
 	
 	hasBus { ^false }
