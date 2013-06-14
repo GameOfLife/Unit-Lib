@@ -5,11 +5,14 @@ ValueUMapDef( \midi_cc, { |unit, midifunc|
 		var fromRange, toRange, curve;
 		if( unit.get( \learn ).booleanValue == true ) {
 			unit.set( \cc, num );
+			unit.set( \channel, chan );
 		};
 		fromRange = unit.get( \fromRange );
 		toRange = unit.mapGet( \toRange );
 		curve = unit.get( \curve );
-		if( num.asInt == unit.get( \cc ).asInt ) {
+		if( num.asInt == unit.get( \cc ).asInt && {
+			unit.get( \channel ) !? (_ == chan) ? true
+		}) {
 			if (abs(curve) < 0.001) {
 				value = value.linlin( *fromRange ++ [ -1, 1, \none ] );
 			} {
@@ -36,6 +39,7 @@ ValueUMapDef( \midi_cc, { |unit, midifunc|
 	nil;
 }, [ 
 	[ \cc, 0, PositiveIntegerSpec(maxval:127) ],
+	[ \channel, nil, ListSpec( [ nil ] ++ (..15), 0, [ "any" ] ++ (..15).collect(_.asString) ) ],
 	[ \learn, false, BoolSpec( false ) ],
 	[ \fromRange, [0,127], RangeSpec(0,127,step:1) ],
 	[ \toRange, [0,1], RangeSpec(0,1) ], 
