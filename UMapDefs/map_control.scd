@@ -1,14 +1,13 @@
 (
-UMapDef( \map_control, { |bus = 0, rangeIn = #[0.0, 1.0], rangeOut = #[0.0,1.0], invert = 0, curve = 0,
-	lag = 0.0, clipMode = 0|
+UMapDef( \map_control, { |bus = 0, rangeIn = #[0.0, 1.0], rangeOut = #[0.0,1.0], curve = 0, invert = 0, 	lag = 0.0, clipMode = 0|
 	var sig;
 	sig = In.kr(bus + UIn.firstControlBus);
 	sig = sig.linlin(*rangeIn ++ [-1,1,\none]);
-	sig = if( invert, sig.neg, sig );
 	sig = Select.kr( curve.inRange(-0.001,0.001), [
 		sig.lincurve(-1,1,-1,1, curve, \none ),
 		sig
 	]);
+	sig = if( invert, sig.neg, sig );
 	sig = Select.kr( clipMode, [
 		sig.clip2(1),
 		sig.fold2(1),

@@ -1,4 +1,4 @@
-UMapDef( \value_clip, { |value = 0.0, range = #[0.0, 1.0], curve = 0.0, clipMode = 0|
+UMapDef( \value_clip, { |value = 0.0, range = #[0.0, 1.0], curve = 0.0, invert = 0, clipMode = 0|
 	var sig;
 	sig = value;
 	sig = sig.linlin(*range ++ [-1,1,\none]);
@@ -6,6 +6,7 @@ UMapDef( \value_clip, { |value = 0.0, range = #[0.0, 1.0], curve = 0.0, clipMode
 		sig.lincurve(-1,1,-1,1, curve, \none ),
 		sig
 	]);
+	sig = if( invert, sig.neg, sig );
 	sig = Select.kr( clipMode, [
 		sig.clip2(1),
 		sig.fold2(1),
@@ -25,4 +26,5 @@ UMapDef( \value_clip, { |value = 0.0, range = #[0.0, 1.0], curve = 0.0, clipMode
 		] ) 
 	)
 	.setSpec( \curve, [-16,16,\lin,0,0].asSpec )
+	.setSpec( \invert, BoolSpec(false) )
 	.category_( 'filter' )
