@@ -260,16 +260,14 @@ PointSpec : Spec {
 	minval_ { |value|
 		var x,y;
 		#x, y = value.asPoint.asArray;
-		rect.left = x;
-		rect.top = y;
+		rect = Rect.fromPoints( x@y, rect.rightBottom );
 		this.init;
 	}
 	
 	maxval_ { |value|
 		var x,y;
 		#x, y = value.asPoint.asArray;
-		rect.right = x;
-		rect.top = y;
+		rect = Rect.fromPoints( rect.leftTop, x@y );
 		this.init;
 	}
 	
@@ -280,7 +278,7 @@ PointSpec : Spec {
 			this.minval.asArray.mean.max( (2**24).neg ), 
 			this.maxval.asArray.mean.min( 2**24 ), 
 			\lin, 
-			step.asArray.mean, 
+			0,
 			default.asArray.mean, 
 			units 
 		);
