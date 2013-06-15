@@ -400,6 +400,20 @@ Udef : GenericDef {
 		);
 	}
 	
+	synthsForUMap { |unit|
+		// return only one synth per server
+		var servers, synths;
+		servers = Set();
+		synths = [];
+		unit.synths.reverseDo({ |item|
+			if( servers.includes( item.server ).not ) {
+				synths = synths.add( item );
+				servers.add( item.server );
+			};
+		});
+		^synths;
+	}
+	
 	printOn { arg stream;
 		stream << "a " << this.class.name << "(" <<* [this.name]  <<")"
 	}
@@ -764,6 +778,10 @@ U : ObjectWithArgs {
 	}
 	
 	synths { ^synthDict[ this ] ? [] }
+	
+	synthsForUMap {
+		^this.def.synthsForUMap( this );
+	}
 	
 	synths_ { |synths| synthDict.put( this, synths ); }
 	

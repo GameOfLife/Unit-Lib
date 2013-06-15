@@ -82,7 +82,7 @@ UMapDef : Udef {
 			parentUnit.notNil && { parentUnit.synths.size > 0 } 
 		}) {
 				unit.unit_(parentUnit);
-				unit.prepareAndStart( unit.unit.synths );
+				unit.prepareAndStart( unit.unit.synthsForUMap );
 			};
 	}
 	
