@@ -2,6 +2,7 @@ UMapDef : Udef {
 	classvar <>all, <>defsFolders, <>userDefsFolder;
 	
 	var <>mappedArgs;
+	var <>allowedModes = #[ sync, normal ];
 	
 	*initClass{
 		this.defsFolders = [ 

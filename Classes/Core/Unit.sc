@@ -624,7 +624,7 @@ U : ObjectWithArgs {
 	
 	canUseUMap { |key, umapdef|
 		^this.def.canUseUMap == true && 
-		{ this.getMode( key ) != \nonsynth && {
+		{ umapdef.allowedModes.includes( this.getSpecMode( key ) ) && {
 				this.getSpec( key ).respondsTo( \asControlSpec ) && {
 					this.get( key ).asControlInput.asCollection.size == umapdef.numChannels
 				};
@@ -850,6 +850,7 @@ U : ObjectWithArgs {
 	
 	argSpecs { ^this.def.argSpecs( this ) }
 	getSpec { |key| ^this.def.getSpec( key, this ); }
+	getSpecMode { |key| ^this.def.getArgSpec( key, this ) !? _.mode }
 	getDefault { |key| ^this.def.getDefault( key, this ); }
 
 	isPlaying { ^(this.synths.size != 0) }

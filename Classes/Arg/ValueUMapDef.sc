@@ -30,6 +30,7 @@ ValueUMapDef : UMapDef {
 		] ++ argSpecs).collect(_.asArgSpec);
 		argSpecs.do(_.mode_( \nonsynth ));
 		mappedArgs = [ \value ];
+		allowedModes = [ \init, \sync, \normal ];
 		this.canUseUMap = false;
 		this.changed( \init );
 	}
