@@ -1033,6 +1033,17 @@ FreqSpec : ControlSpec {
 
 }
 
+AngleSpec : ControlSpec {
+	
+	classvar <>mode = 'rad'; // \rad, \deg	
+	
+	*new { arg minval= -pi, maxval= pi, warp='lin', step=0.0, default = 0, units, grid;
+		^super.newCopyArgs(minval, maxval, warp, step,
+				default ? minval, units ? "", grid
+			).init
+	}
+}
+
 DisplayControlSpec : ControlSpec {
 }
 

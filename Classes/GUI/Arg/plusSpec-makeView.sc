@@ -1871,6 +1871,106 @@
 	}
 }
 
++ AngleSpec {
+	
+	makeView {  |parent, bounds, label, action, resize|
+		var vws, view, labelWidth;
+		var localStep;
+		var modeFunc;
+		var font;
+		var editAction;
+		var tempVal;
+		var degMul = 180 / pi;
+		vws = ();
+		
+		font =  (RoundView.skin ? ()).font ?? { Font( Font.defaultSansFace, 10 ); };
+		
+		localStep = step.copy;
+		if( step == 0 ) { localStep = 1 };
+		bounds.isNil.if{bounds= 320@20};
+		
+		view = EZCompositeView( parent, bounds, gap: 2@2 );
+		bounds = view.asView.bounds;
+				
+		vws[ \view ] = view;
+		
+		if( label.notNil ) {
+			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
+			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ bounds.height )
+				.string_( label.asString ++ " " )
+				.align_( \right )
+				.resize_( 4 )
+				.applySkin( RoundView.skin );
+		} {
+			labelWidth = 0;
+		};
+		
+		vws[ \comp ] = CompositeView( view, (bounds.width - (labelWidth + 49)) @ (bounds.height) );
+		
+		vws[ \mode ] = PopUpMenu( view, 45 @ (bounds.height) )
+			.font_( font )
+			.applySkin( RoundView.skin ? () )
+			.items_([ 'rad', 'deg' ])
+			.action_({ |pu|
+				mode = pu.item;
+				this.setMode( vws, mode );
+			});
+		
+		// rad mode
+		vws[ \rad ] = EZSmoothSlider( vws[ \comp ], 
+			vws[ \comp ].bounds.width @ (bounds.height),
+			nil,  
+			[ this.minval / pi, this.maxval / pi, \lin, step / pi, this.default / pi, "pi" ].asSpec, 
+			{ |vw| action.value( vw, vw.value * pi ) },
+			unitWidth: 45
+		).visible_( false );
+		
+		vws[ \rad ].sliderView
+			.centered_( true )
+			.centerPos_( this.unmap( default ) )
+			.clipMode_( \wrap );
+		
+		// deg mode
+		vws[ \deg ] = EZSmoothSlider( vws[ \comp ], 
+			vws[ \comp ].bounds.width @ (bounds.height),
+			nil, 
+			[ this.minval * degMul, this.maxval * degMul, \lin, step * degMul, 
+				this.default * degMul ].asSpec,
+			{ |vw| action.value( vw, vw.value / degMul ) }
+		).visible_( false );
+		
+		vws[ \deg ].sliderView
+			.centered_( true )
+			.centerPos_( this.unmap( default ) )
+			.clipMode_( \wrap );
+			
+		this.setMode( vws, mode );
+	
+		^vws;
+	}
+	
+	setMode { |view, newMode|
+		[ \rad, \deg ].do({ |item|
+			view[ item ].visible = (item == newMode)	
+		});
+	}
+	
+	setView { |view, value, active = false|
+		view[ \rad ].value = value / pi;
+		view[ \deg ].value = value * 180 / pi;
+		{ 
+			this.setMode( view, mode );
+			view[ \mode ].value = view[ \mode ].items.indexOf( mode ) ? 0; 
+		}.defer;
+		if( active ) { view[ \rad ].doAction };
+	}
+	
+	mapSetView { |view, value, active = false|
+		this.setView( view, this.map( value ), active );
+	}
+
+}
+
 + DisplayControlSpec {
 	
 	makeView {
