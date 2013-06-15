@@ -33,6 +33,7 @@ FreeUdef : Udef {
 	var <>env; // environment for variables
 	
 	var <>createSynthDefFunc; // optional, called at load or send
+	var <>synthsForUMapFunc;
 	
 	*new { |name, args, canFreeSynth = false, category|
 		^super.basicNew( name, args ? [], category ).initFree( canFreeSynth ); 
@@ -148,6 +149,14 @@ FreeUdef : Udef {
 			setSynthFunc.value( unit, *keyValuePairs );
 		} { 
 			super.setSynth( unit, *keyValuePairs );
+		};
+	}
+	
+	synthsForUMap { |unit|
+		if( synthsForUMapFunc.notNil ) {
+			^synthsForUMapFunc.value( unit );
+		} {
+			^super.synthsForUMap( unit );
 		};
 	}
 	
