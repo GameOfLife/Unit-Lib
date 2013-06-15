@@ -44,7 +44,6 @@ FreeUdef : Udef {
 		if( canFreeSynth ) { this.addUEnv };
 		this.initArgs;
 		if( loadOnInit ) { this.loadSynthDef };
-		this.canUseUMap = false;
 	}
 	
 	synthDef_ { |def|
