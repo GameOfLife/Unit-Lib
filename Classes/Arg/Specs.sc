@@ -275,6 +275,17 @@ PointSpec : Spec {
 	
 	rect_ { |newRect| rect = newRect; this.init }
 	
+	asControlSpec {
+		^ControlSpec( 
+			this.minval.asArray.mean.max( (2**24).neg ), 
+			this.maxval.asArray.mean.min( 2**24 ), 
+			\lin, 
+			step.asArray.mean, 
+			default.asArray.mean, 
+			units 
+		);
+	}
+	
 	clip { |value|
 		^value.clip( clipRect.leftTop, clipRect.rightBottom );
 	}
