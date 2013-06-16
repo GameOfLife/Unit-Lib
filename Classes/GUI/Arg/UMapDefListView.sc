@@ -147,6 +147,12 @@ UMapDefListView {
 	            };
                 DragSource( views[ cat ], (bounds.width - wd)@18 )
                     .object_( udef )
+                    .beginDragAction_({ |vw|
+	                    this.setEndFrontAction( true );
+	                    UGUI.currentUMapSink = nil;
+	                    { UChainGUI.current !? { |x| x.view.refresh }; }.defer(0.1);
+	                    vw.object;
+                    })
                     .string_( " " ++ udef.name.asString )
                     .applySkin( RoundView.skin ? () );
                   
@@ -157,7 +163,10 @@ UMapDefListView {
 	                	.border_(1)
 	                	.resize_(3)
 	                	.canFocus_( false )
-	                	.action_({ udef.openDefFile });
+	                	.action_({ 
+		                	this.setEndFrontAction( false );
+		                	udef.openDefFile;
+		                });
                 };
             });
             
@@ -215,6 +224,23 @@ UMapDefListView {
 			views[ \scrollview].decorator.nextLine;
 			categories.pairsDo(g);
 		});
+		
+		 this.setEndFrontAction( true );
+	}
+	
+	setEndFrontAction { |bool = true|
+		 if( GUI.id == \cocoa ) {
+			if( bool ) {
+				view.findWindow.endFrontAction = {
+					if( View.currentDrag.isKindOf( UMapDef ) ) {
+						View.currentDrag = nil;
+					};
+				};
+			} {
+				view.findWindow.endFrontAction = nil;
+				View.currentDrag = nil;
+			};
+		 };
 	}
 	
 }

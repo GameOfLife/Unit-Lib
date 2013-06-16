@@ -19,6 +19,8 @@
 
 UGUI {
 	
+	classvar <>currentUMapSink;
+	
 	var <unit;
 	
 	var <parent, <composite, <views, <controller;
@@ -112,10 +114,13 @@ UGUI {
 		
 		this.makeHeader(bounds);
 		
+		if( GUI.id == \cocoa ) { View.currentDrag = nil; };
+		
 		unit.args.pairsDo({ |key, value, i|
 			var vw, argSpec;
 			var decLastPos;
 			var umapdragbin;
+			var umapdragbinTask;
 			var viewNumLines;
 			
 			argSpec = unit.argSpecs[i/2];
@@ -161,11 +166,44 @@ UGUI {
 						
 						umapdragbin = UserView( composite, labelWidth @ viewHeight )
 							.canFocus_( false )
-							.canReceiveDragHandler_({
+							.canReceiveDragHandler_({ |vw, x,y|
+								var last;
+								if( x.notNil ) {
+									last = currentUMapSink;
+									currentUMapSink = vw;
+									last !? _.refresh;
+									vw.refresh;
+								};
 								View.currentDrag.isKindOf( UMapDef ) && {
 									unit.canUseUMap( key, View.currentDrag ); 
 								};
 							});
+																		umapdragbin.drawFunc = { |vw|
+							if( View.currentDrag.notNil && {
+								vw.canReceiveDragHandler.value == true;
+							}) {
+								Pen.width = 2;
+								if( currentUMapSink === vw ) {
+									Pen.color = Color.blue.alpha_(1);
+								} {
+									Pen.color = Color.blue.alpha_(0.25);
+								};
+								Pen.addRect( vw.bounds.moveTo(0,0).insetBy(1,1) );
+								Pen.stroke;
+								if( umapdragbinTask.isPlaying.not ) {
+									umapdragbinTask = Task({
+										while { vw.isClosed.not && {												vw.canReceiveDragHandler.value == true
+											} 
+										} {
+											0.25.wait;
+										};
+										if( vw.isClosed.not ) {
+											vw.refresh;
+										};
+									}, AppClock).start;
+								};
+							};
+						};
 						
 						if( unit.isKindOf( MassEditU ) ) {
 							umapdragbin.receiveDragHandler_({
