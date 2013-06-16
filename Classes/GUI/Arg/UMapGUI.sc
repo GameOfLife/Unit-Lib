@@ -80,8 +80,7 @@ UMapGUI : UGUI {
 		
 		StaticText( header, labelWidth @ viewHeight )
 			.applySkin( RoundView.skin )
-			.string_( unit.unitArgName.asString ++ ": " )
-			.font_( boldFont )
+			.string_( unit.unitArgName.asString ++ " " )
 			.align_( \right );
 
 		StaticText( header, 
@@ -101,7 +100,6 @@ UMapGUI : UGUI {
 				
 			SmoothButton( header, Rect( 2, 2, 12, 12 ) )
 				.label_( ['down', 'play'] )
-				.radius_( 0 )
 				.border_( 0 )
 				.background_( nil )
 				.hiliteColor_( nil )
