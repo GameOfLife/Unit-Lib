@@ -4,6 +4,7 @@ UMapGUI : UGUI {
 	
 	var <>header, <>userView, <>mainComposite;
 	var <>removeAction;
+	var <>parentUnit;
 	
 	*viewNumLines { |unit|
 		^super.viewNumLines( unit ) + 1.1;
@@ -107,6 +108,17 @@ UMapGUI : UGUI {
 				.value_( unit.guiCollapsed.binaryValue )
 				.action_({ |bt|
 					unit.guiCollapsed = bt.value.booleanValue;
+				});
+			
+			UserView( header, Rect( 16, 2,  bounds.width - 16 - 16, 12 ) )
+				.canReceiveDragHandler_({
+					View.currentDrag.isKindOf( UMapDef ) && {
+						parentUnit !? (_.canUseUMap( unit.unitArgName, View.currentDrag )) 
+							? false; 
+					};
+				})
+				.receiveDragHandler_({
+					unit.def = View.currentDrag;
 				});
 	}
 }

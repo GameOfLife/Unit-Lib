@@ -123,6 +123,7 @@ UGUI {
 			if( argSpec.private.not ) { // show only if not private
 				if( value.isUMap ) {
 					vw = UMapGUI( composite, composite.bounds.insetBy(0,-24), value );
+					vw.parentUnit = unit;
 					vw.mapSetAction = { mapSetAction.value( this ) };
 					vw.removeAction = { |umap|
 						if( unit.isKindOf( MassEditU ) ) {
