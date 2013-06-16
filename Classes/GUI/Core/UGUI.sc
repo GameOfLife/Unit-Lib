@@ -44,20 +44,30 @@ UGUI {
 	}
 	
 	*viewNumLines { |unit|
-		^(unit.argSpecs ? [])
-			.select({|x|
-				x.private.not
-			})
-			.collect({|x|
-				if( unit[ x.name ].isKindOf( UMap ) ) {
-					UMapGUI.viewNumLines( unit[ x.name ] );
-				} {
-					x.spec.viewNumLines
-				};
-			}).sum;
+		if( unit.guiCollapsed ) {
+			^0;
+		} {
+			^(unit.argSpecs ? [])
+				.select({|x|
+					x.private.not
+				})
+				.collect({|x|
+					if( unit[ x.name ].isKindOf( UMap ) ) {
+						UMapGUI.viewNumLines( unit[ x.name ] );
+					} {
+						x.spec.viewNumLines
+					};
+				}).sum;
+		};
 	}
 	
 	makeViews { |bounds|
+		if( unit.guiCollapsed.not ) {
+			this.prMakeViews( bounds );
+		};
+	}
+	
+	prMakeViews { |bounds|
 		var margin = 0@0, gap = 4@4;
 		
 		if( bounds.isNil ) { 

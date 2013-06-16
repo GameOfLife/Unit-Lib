@@ -445,6 +445,7 @@ U : ObjectWithArgs {
 	var <>preparedServers;
 	var >waitTime; // use only to override waittime from args
 	var <mod;
+	var <guiCollapsed = false;
 	
 	*initClass {
 	    synthDict = IdentityDictionary( );
@@ -487,6 +488,13 @@ U : ObjectWithArgs {
 	}
 	allKeys { ^this.keys }
 	allValues { ^this.values }
+	
+	guiCollapsed_ { |bool = false|
+		if( guiCollapsed != bool ) {
+			guiCollapsed = bool;
+			this.changed( \init );
+		};
+	}
 
     def {
         ^def ?? { defName.asUdef( this.class.defClass ) }

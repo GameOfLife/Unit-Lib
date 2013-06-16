@@ -25,7 +25,6 @@ UMapGUI : UGUI {
 		};
 		bounds = bounds.asRect;
 		bounds.height = this.class.getHeight( unit, viewHeight, margin, gap );
-		controller = SimpleController( unit );
 		
 		if( unit.isKindOf( MassEditU ) ) {
 			mapCheckers = unit.units.collect({ |unit|
@@ -52,6 +51,7 @@ UMapGUI : UGUI {
 		
 		userView.canFocus_( false );
 		
+		controller = SimpleController( unit );		
 		composite = CompositeView( mainComposite, bounds.moveTo(0,0) ).resize_(2);
 		composite.addFlowLayout( margin, gap );
 		composite.onClose = {
@@ -62,7 +62,11 @@ UMapGUI : UGUI {
 			mapCheckers.do(_.remove);
 		 };
 		 
-		 this.makeSubViews( bounds );
+		 if( unit.guiCollapsed ) {
+			 this.makeHeader(bounds);
+		 } {
+			 this.makeSubViews( bounds );
+		 };
 	}
 	
 	makeHeader { |bounds|
@@ -93,6 +97,18 @@ UMapGUI : UGUI {
 				.canFocus_( false )
 				.action_({
 					removeAction.value( unit );
+				});
+				
+			SmoothButton( header, Rect( 2, 2, 12, 12 ) )
+				.label_( ['down', 'play'] )
+				.radius_( 0 )
+				.border_( 0 )
+				.background_( nil )
+				.hiliteColor_( nil )
+				.canFocus_( false )
+				.value_( unit.guiCollapsed.binaryValue )
+				.action_({ |bt|
+					unit.guiCollapsed = bt.value.booleanValue;
 				});
 	}
 }

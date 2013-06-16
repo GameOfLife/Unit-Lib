@@ -702,6 +702,7 @@ UChainGUI {
 		ug = units.collect({ |unit, i|
 			var header, comp, uview, plus, min, defs, io;
 			var addBefore, indexLabel, ugui;
+			var currentUMaps;
 				
 			indexLabel = realIndex.asString;
 			
@@ -907,7 +908,12 @@ UChainGUI {
 			};	
 					
 			unit.addDependant( unitInitFunc );
-			header.onClose_({ unit.removeDependant( unitInitFunc ) });
+			currentUMaps = unit.getAllUMaps;
+			currentUMaps.do(_.addDependant( unitInitFunc ));
+			header.onClose_({ 
+				unit.removeDependant( unitInitFunc );
+				currentUMaps.do(_.removeDependant( unitInitFunc ));
+			});
 			ugui = unit.gui( scrollView, 
 				scrollView.bounds.copy.width_( 
 					scrollView.bounds.width - scrollerMargin - (margin.x * 2) 
