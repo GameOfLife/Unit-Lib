@@ -1,7 +1,7 @@
 
 UMapDef( \lfo_pulse, { |freq = 2, phase = 0, width = 0.5, range = #[0.0,1.0]|
 	var sig;
-	sig = LFPulse.kr(freq, phase, width).range(*range);
+	sig = LFPulse.kr(freq, phase + (\u_startPos.kr(0) * freq), width).range(*range);
 	UMapOut.kr(sig);
 })
 	.setSpec( \phase, [0,1,\lin,0,0], \init )
