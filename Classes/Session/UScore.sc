@@ -740,7 +740,7 @@ UScore : UEvent {
 	
 	// SOLO / MUTE
 	prSetHardMutes{
-	     events.do{ |ev| ev.muted_( (softMuted.includes(ev) || ( (soloed.size != 0) && soloed.includes(ev).not )) ) }
+		this.getAllUChains.do{ |ev| ev.muted_( (softMuted.includes(ev) || ( (soloed.size != 0) && soloed.includes(ev).not )) ) }
 	}
 
 	prSMSet { |event, array, bool, setArray|
@@ -758,16 +758,29 @@ UScore : UEvent {
 	}
 
 	solo { |event, bool|
-	    this.prSMSet(event, soloed, bool, { |x| soloed = x})
+		(if(event.isUScoreLike) {
+			event.getAllUChains
+		}{
+			[event]
+		}).do{ |ev|
+			this.prSMSet(ev, soloed, bool, { |x| soloed = x})
+		};
 	}
 
 	softMute { |event, bool|
-	    this.prSMSet(event, softMuted, bool, { |x| softMuted = x})
+		(if(event.isUScoreLike) {
+			event.getAllUChains
+		}{
+			[event]
+		}).do{ |ev|
+			this.prSMSet(ev, softMuted, bool, { |x| softMuted = x})
+		};
 	}
 
 	prRecheckSoloMutes {
-		soloed = soloed.select{ |x| events.includes(x) };
-		softMuted = softMuted.select{ |x| events.includes(x) };
+		var all = this.getAllUChains;
+		soloed = soloed.select{ |x| all.includes(x) };
+		softMuted = softMuted.select{ |x| all.includes(x) };
 		this.prSetHardMutes;
 	}
 

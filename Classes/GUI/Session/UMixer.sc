@@ -184,7 +184,7 @@ UMixer {
 
 				}{
 					eventsFromFolder = event.allEvents.collect{ |event| (\event: event,\oldLevel: event.getGain) };
-					cview = CompositeView(mixerView,40@300);
+					cview = CompositeView(mixerView,40@330);
 					cview.decorator = FlowLayout(cview.bounds);
 					cview.background_(Color(0.28208955223881, 0.50149253731343, 0.23582089552239, 1.0););
 					SmoothButton(cview,32@20).states_([["open"]])
