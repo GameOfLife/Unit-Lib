@@ -92,8 +92,7 @@ UMapGUI : UGUI {
 			.string_( unit.defName );
 			
 			SmoothButton( header, Rect( bounds.width - 14, 2, 12, 12 ) )
-				.label_( 'x' )
-				.radius_( 3 )
+				.label_( '-' )
 				.canFocus_( false )
 				.action_({
 					removeAction.value( unit );
