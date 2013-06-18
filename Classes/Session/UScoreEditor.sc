@@ -140,7 +140,8 @@ UScoreEditor {
 	deleteEvents { |events|
 		if( events.size > 0 ) {	
 			this.changeScore({
-			    score.events_(score.events.select(events.includes(_).not))
+			    score.events_(score.events.select(events.includes(_).not));
+				score.prRecheckSoloMutes;
 			});
 			score.changed(\numEventsChanged);
 		};

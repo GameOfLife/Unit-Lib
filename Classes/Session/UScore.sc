@@ -739,12 +739,12 @@ UScore : UEvent {
 	
 	// SOLO / MUTE
 	prSetHardMutes{
-	     events.do{ |ev| ev.muted_( (softMuted.includes(ev) || ( (soloed.size != 0) && soloed.includes(ev).not )).postln ) }
+	     events.do{ |ev| ev.muted_( (softMuted.includes(ev) || ( (soloed.size != 0) && soloed.includes(ev).not )) ) }
 	}
 
 	prSMSet { |event, array, bool, setArray|
 	    if(bool) {
-            if( array.includes(event).not.postln ){
+            if( array.includes(event).not ){
                 setArray.(array.add(event));
                 this.prSetHardMutes;
             }
@@ -762,6 +762,12 @@ UScore : UEvent {
 
 	softMute { |event, bool|
 	    this.prSMSet(event, softMuted, bool, { |x| softMuted = x})
+	}
+
+	prRecheckSoloMutes {
+		soloed = soloed.select{ |x| events.includes(x) };
+		softMuted = softMuted.select{ |x| events.includes(x) };
+		this.prSetHardMutes;
 	}
 
 	printOn { arg stream;
