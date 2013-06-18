@@ -86,6 +86,7 @@ UScore : UEvent {
 
 	events_ { |evs|
 	    events = evs;
+		this.prRecheckSoloMutes;
 	    this.changed(\events);
 	}
 	

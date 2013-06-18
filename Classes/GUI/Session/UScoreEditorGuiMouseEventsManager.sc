@@ -251,6 +251,7 @@ UScoreEditorGuiMouseEventsManager {
 				eventViews.do{ |ev| ev.selected_(false).clearState };
 
                 score.events = score.events ++ newEventViews.collect( _.event );
+				score.changed(\numEventsChanged);
                 eventViews = eventViews ++ newEventViews;
 
 				//("scoreEvents "++score.events.size).postln;
