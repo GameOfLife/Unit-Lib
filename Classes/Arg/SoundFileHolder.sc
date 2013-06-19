@@ -672,8 +672,14 @@ DiskSndFile : AbstractSndFile {
 }
 
 + String {
-	asUnitArg { |unit|
-		^this.asBufSndFile.asUnitArg( unit );
+	asUnitArg { |unit, key|
+		case { unit.getSpec( key ).isKindOf( BufSndFile ) } {
+			^this.asBufSndFile.asUnitArg(unit, key)
+		} { unit.getSpec( key ).isKindOf( DiskSndFile ) } {
+			^this.asDiskSndFile.asUnitArg(unit, key)
+		} {
+			^this;
+		};
 	}
 	
 	asUnit {
