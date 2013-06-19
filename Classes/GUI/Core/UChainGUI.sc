@@ -546,6 +546,10 @@ UChainGUI {
 		chain.changed( \fadeOut );
 		chain.changed( \releaseSelf );
 		
+		composite.getParents.last.findWindow !? _.toFrontAction_({ 
+			this.makeCurrent;
+		});
+		
 		uguis = this.makeUnitViews(units, margin, gap );
 	}
 	
