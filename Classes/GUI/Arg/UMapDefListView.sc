@@ -222,6 +222,7 @@ UMapDefListView {
 				
 			StaticText(views[ \scrollview],100@25).string_("UMapDefs");
 			views[ \scrollview].decorator.nextLine;
+			categories = categories.clump(2).sort({ |a,b| a[0] <= b[0] }).flatten(1);
 			categories.pairsDo(g);
 		});
 		
