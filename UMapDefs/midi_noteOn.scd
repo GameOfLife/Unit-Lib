@@ -1,7 +1,7 @@
-ValueUMapDef( \midi_cc, { |unit, midifunc|
+ValueUMapDef( \midi_noteOn, { |unit, midifunc|
 	var func;
 	if(MIDIClient.initialized.not,{ MIDIIn.connectAll });
-	midifunc.free;
+	midifunc.remove;
 	func = { |value, fromRange|
 		var toRange, curve;
 		toRange = unit.mapGet( \toRange );
@@ -26,16 +26,13 @@ ValueUMapDef( \midi_cc, { |unit, midifunc|
 		value = value.linlin(-1,1,*toRange ++ [ \none ]);
 		unit.mapSet( \value, value );
 	};
-	MIDIFunc.cc({ |value, num, chan, src|
+	MIDIFunc.noteOn({ |velo, value, chan, src|
 		var fromRange;
 		if( unit.get( \learn ).booleanValue == true ) {
-			unit.set( \cc, num );
 			unit.set( \channel, chan );
 		};
 		fromRange = unit.get( \fromRange );
-		if( num.asInt == unit.get( \cc ).asInt && {
-			unit.get( \channel ) !? (_ == chan) ? true
-		}) {
+		if( unit.get( \channel ) !? (_ == chan) ? true ) {
 			if( unit.get( \clipMode ) === \ignore ) {
 				if( value.inclusivelyBetween( *fromRange ) ) {
 					func.value( value, fromRange );
@@ -49,14 +46,13 @@ ValueUMapDef( \midi_cc, { |unit, midifunc|
 	midifunc.free;
 	nil;
 }, [ 
-	[ \cc, 0, PositiveIntegerSpec(maxval:127) ],
 	[ \channel, nil, ListSpec( [ nil ] ++ (..15), 0, [ "any" ] ++ (..15).collect(_.asString) ) ],
 	[ \learn, false, BoolSpec( false ) ],
 	[ \fromRange, [0,127], RangeSpec(0,127,step:1) ],
 	[ \toRange, [0,1], RangeSpec(0,1) ], 
 	[ \invert, false, BoolSpec(false) ],
 	[ \curve, 0, [-16,16,\lin,0,0].asSpec ],
-	[ \clipMode, \clip, ListSpec( [ 
+	[ \clipMode, \ignore, ListSpec( [ 
 			\ignore, \clip, \fold, \wrap, \tanh, \softclip, \distort, \wrap_sine, \none 
 		] ) 
 	]

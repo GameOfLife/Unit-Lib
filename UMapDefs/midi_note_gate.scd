@@ -1,7 +1,7 @@
-ValueUMapDef( \midi_cc, { |unit, midifunc|
+ValueUMapDef( \midi_note_gate, { |unit, midifuncs|
 	var func;
 	if(MIDIClient.initialized.not,{ MIDIIn.connectAll });
-	midifunc.free;
+	midifuncs.do(_.free);
 	func = { |value, fromRange|
 		var toRange, curve;
 		toRange = unit.mapGet( \toRange );
@@ -26,15 +26,16 @@ ValueUMapDef( \midi_cc, { |unit, midifunc|
 		value = value.linlin(-1,1,*toRange ++ [ \none ]);
 		unit.mapSet( \value, value );
 	};
-	MIDIFunc.cc({ |value, num, chan, src|
+	[
+	MIDIFunc.noteOn({ |value, nn, chan, src|
 		var fromRange;
 		if( unit.get( \learn ).booleanValue == true ) {
-			unit.set( \cc, num );
+			unit.set( \nn, nn );
 			unit.set( \channel, chan );
 		};
 		fromRange = unit.get( \fromRange );
-		if( num.asInt == unit.get( \cc ).asInt && {
-			unit.get( \channel ) !? (_ == chan) ? true
+		if( unit.get( \channel ) !? (_ == chan) ? true && {
+			 unit.get( \nn ) == nn;
 		}) {
 			if( unit.get( \clipMode ) === \ignore ) {
 				if( value.inclusivelyBetween( *fromRange ) ) {
@@ -44,12 +45,32 @@ ValueUMapDef( \midi_cc, { |unit, midifunc|
 				func.value( value, fromRange );
 			};
 		};
-	});
-}, { |unit, midifunc|
-	midifunc.free;
+	}),
+	MIDIFunc.noteOff({ |velo, nn, chan, src|
+		var fromRange, value = 0;
+		if( unit.get( \learn ).booleanValue == true ) {
+			unit.set( \nn, nn );
+			unit.set( \channel, chan );
+		};
+		fromRange = unit.get( \fromRange );
+		if( unit.get( \channel ) !? (_ == chan) ? true && {
+			 unit.get( \nn ) == nn;
+		}) {
+			if( unit.get( \clipMode ) === \ignore ) {
+				if( value.inclusivelyBetween( *fromRange ) ) {
+					func.value( value, fromRange );
+				};
+			} {
+				func.value( value, fromRange );
+			};
+		};
+	})
+	];
+}, { |unit, midifuncs|
+	midifuncs.do(_.free);
 	nil;
 }, [ 
-	[ \cc, 0, PositiveIntegerSpec(maxval:127) ],
+	[ \nn, [0,127], [0,127,\lin].asSpec ],
 	[ \channel, nil, ListSpec( [ nil ] ++ (..15), 0, [ "any" ] ++ (..15).collect(_.asString) ) ],
 	[ \learn, false, BoolSpec( false ) ],
 	[ \fromRange, [0,127], RangeSpec(0,127,step:1) ],
