@@ -117,6 +117,7 @@ UMapGUI : UGUI {
 					};
 				})
 				.receiveDragHandler_({
+					unit.stop;
 					unit.def = View.currentDrag;
 				});
 	}
