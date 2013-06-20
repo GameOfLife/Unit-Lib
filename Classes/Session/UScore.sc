@@ -81,6 +81,7 @@ UScore : UEvent {
 	    events = if(args.size >0){args}{Array.new};
 	    soloed = [];
 	    softMuted = [];
+	    tempoMap = TempoMap.default.deepCopy;
 	    this.changed( \init );
 	}
 
@@ -818,6 +819,9 @@ UScore : UEvent {
 	}
 	
 	storeModifiersOn { |stream|
+		if( tempoMap != TempoMap.default ) {
+			stream << ".tempoMap_(" <<< tempoMap << ")";
+		};
 		this.storeName( stream );
 		this.storeTags( stream );
 		this.storeDisplayColor( stream );
