@@ -380,6 +380,10 @@ MassEditUMap : MassEditU {
 		this.init( units ); 
 	}	
 	
+	getInitArgs {
+		if( mixed ) { ^nil } { ^super.getInitArgs };
+	}
+	
 	remove {
 		units.do({ |item|
 			if( item.isUMap ) { item.remove };
