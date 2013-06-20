@@ -880,7 +880,7 @@ U : ObjectWithArgs {
 	argsForPrint {
         var initArgs, initDef;
         initArgs = this.getInitArgs;
-        initDef = this.def.name;
+        initDef = this.defName;
         if( initArgs.size > 0 ) {
             ^[ initDef, initArgs ];
         } {

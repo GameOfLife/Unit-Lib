@@ -369,6 +369,10 @@ MassEditUMap : MassEditU {
 		};
 	}
 	
+	def {
+        ^if( mixed ) { ^nil } { def ?? { defName.asUdef( this.class.defClass ) } };
+    }
+	
 	def_ { |def| 
 		units.do({ |item|
 			if( item.isUMap ) { item.def = def };

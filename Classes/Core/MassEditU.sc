@@ -129,6 +129,8 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 	
 	def_ { |def|  units.do(_.def_( def ) ); this.init( units ); }
 	
+	storeArgs { ^[ units ] }
+	
 }
 
 
