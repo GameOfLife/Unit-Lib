@@ -26,8 +26,12 @@
 		
 		if( viewRect.width < (this.view.bounds.width/100) ) {
 			Pen.use({	
-				Pen.width = pixelScale.x / 2;
-				Pen.lineDash_( FloatArray[ 0.5, 0.5 ] );
+				if( GUI.id == \cocoa ) {
+					Pen.width = pixelScale.x / 2;
+					Pen.lineDash_( FloatArray[ 0.5, 0.5 ] );
+				} {
+					Pen.width = pixelScale.x / 4;
+				};
 				tempoMap.divisionLines( viewRect.left, viewRect.right, 0.25 ).do({ |i|
 					Pen.line( i @ top, i @ bottom );
 				});
