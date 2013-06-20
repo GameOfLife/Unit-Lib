@@ -81,7 +81,8 @@ UMapGUI : UGUI {
 		
 		StaticText( header, labelWidth @ viewHeight )
 			.applySkin( RoundView.skin )
-			.string_( unit.unitArgName.asString ++ " " )
+			.font_( boldFont )
+			.string_( unit.unitArgName.asString )
 			.align_( \right );
 
 		StaticText( header, 
@@ -89,7 +90,7 @@ UMapGUI : UGUI {
 		)
 			.applySkin( RoundView.skin )
 			.font_( boldFont )
-			.string_( unit.defName );
+			.string_( ":" + unit.defName );
 			
 			SmoothButton( header, Rect( bounds.width - 14, 2, 12, 12 ) )
 				.label_( '-' )
