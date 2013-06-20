@@ -35,6 +35,7 @@ UScoreView {
      var <currentScoreEditorController, <scoreController, <eventControllers = #[];
      
      var <updateTask, calledUpdate = false, <>updateInterval = 0.1;
+     var <showTempoMap = false;
 
      *new{ |parent, bounds, scoreEditor| ^super.new.init(scoreEditor, parent,bounds) }
 
@@ -50,6 +51,9 @@ UScoreView {
 		this.addCurrentScoreControllers;
 		this.makeEventControllers;
 
+		if( scoreEditor.score.tempoMap != TempoMap.default ) {
+			showTempoMap = true;
+		};
      }
 
      addCurrentScoreControllers {
@@ -250,6 +254,11 @@ UScoreView {
     
     changeTrackSelected { |amt = 0|
 	    this.currentEditor.changeEventsTrack(this.selectedEvents, amt)
+    }
+    
+    showTempoMap_ { |bool|
+	    showTempoMap = bool.booleanValue;
+	    scoreView.refresh;
     }
     
     calcNumTracks { 
@@ -526,28 +535,10 @@ UScoreView {
 				var top, bottom;
 				
 				// grid lines
-				if(  score.tempoMap.isNil ) {
-					v.drawTimeGrid;
+				if( showTempoMap ) {
+					v.drawTempoGrid( score.tempoMap );
 				} {
-					pixelScale = v.pixelScale;
-					viewRect = v.viewRect;
-					Pen.width = pixelScale.x / 2;
-					Pen.color = Color.gray.alpha_(0.25);
-					top = viewRect.top;
-					bottom = viewRect.bottom;
-					l = score.tempoMap.beatAtTime( viewRect.left ).ceil;
-					n = score.tempoMap.beatAtTime( viewRect.right ).ceil - l;
-					n.do({ |i|
-						i = score.tempoMap.timeAtBeat( i + l );
-						Pen.line( i @ top, i @ bottom );
-					});
-					Pen.stroke;
-					Pen.color = Color.white.alpha_(0.75);
-					(score.displayDuration / 60).floor.do({ |i|
-						i = (i+1) * 60;
-						Pen.line( i @ top, i @ bottom );
-					});
-					Pen.stroke;
+					v.drawTimeGrid;
 				};
 			})
 			.unscaledDrawFunc_( { |v|

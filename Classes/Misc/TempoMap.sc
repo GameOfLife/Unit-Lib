@@ -6,15 +6,30 @@ TempoMap {
 	// events: a sorted array with elements [ tempo, beat, time ]
 	// the 'time' slot is updated automatically for all events when adding one
 	
-	var <events, <size;
+	classvar <>defaultBarMap;
+	classvar <>default;
 	
-	*new { |tempo = 1|
-		^super.newCopyArgs.init( tempo )
+	var <events, <size;
+	var <>barMap;
+	
+	*initClass {
+		StartUp.defer({
+			defaultBarMap = BarMap();
+			default = TempoMap();
+		});
 	}
 	
-	init { |tempo = 1| // initial tempo
-		events = [ [ tempo, 0, 0 ] ]; // first event always needs to be at 0 position
-		size = 1;
+	*new { |tempo = 1, beat = 0 ...argPairs|
+		^super.newCopyArgs.init( tempo ? 1, beat ? 0, *argPairs )
+	}
+	
+	init { |...args|
+		events = [];
+		args.pairsDo({ |tempo, beat|
+			events = events.add([ tempo, beat, 0 ]);
+		});
+		this.barMap = defaultBarMap.deepCopy;
+		this.prUpdateTimes;
 		this.changed( \init );
 	}
 	
@@ -75,7 +90,9 @@ TempoMap {
 	put { |...args| // beat, tempo pairs
 		args.pairsDo({ |beat, tempo|
 			events.removeAllSuchThat({ |item| item[1] == beat });
-			events.add([ tempo, beat, 0 ]);
+			if( tempo.notNil ) {
+				events = events.add([ tempo, beat, 0 ]);
+			};
 		});
 		this.prUpdateTimes;
 		this.changed( \events );
@@ -105,7 +122,7 @@ TempoMap {
 		^events[ this.prIndexAtTime( time ) ][0];
 	}
 	
-	tempoAtBeat_ { |tempo = 1, beat = 0, add = false|
+	setTempoAtBeat { |tempo = 1, beat = 0, add = false|
 		if( add ) {
 			this.put( beat, tempo );
 		} {
@@ -115,7 +132,7 @@ TempoMap {
 		};
 	}
 	
-	tempoAtTime_ { |tempo = 1, time = 0, add = false| 
+	setTempoAtTime { |tempo = 1, time = 0, add = false| 
 		// !! changes the beats of events after !!
 		if( add ) {
 			this.put( this.beatAtTime( time ), tempo );
@@ -137,12 +154,66 @@ TempoMap {
 		evt = events[ this.prIndexAtTime( time ) ];
 		^evt[1] + ((time - evt[2]) * evt[0]);
 	}
+	
+	barAtTime { |time = 0|
+		^barMap.barAtBeat( this.beatAtTime( time ) );
+	}
+	
+	timeAtBar { |bar = 1, division = 0|
+		^this.timeAtBeat( barMap.beatAtBar( bar, division ) );
+	}
+	
+	signatureAtTime { |time = 0|
+		^barMap.signatureAtBeat( this.beatAtTime( time ) );
+	}
+	
+	setSignatureAtTime { |signature, time = 0, addNew = false|
+		barMap.setSignatureAtBeat( signature, this.beatAtTime( time ), addNew );
+	}
+	
+	barLines { |startTime = 0, endTime|
+		^barMap.barLines( this.beatAtTime( startTime ), this.beatAtTime( endTime ) )
+			.collect({ |item| this.timeAtBeat( item ) });
+	}
+	
+	divisionLines { |startTime = 0, endTime, div = 1|
+		^barMap.divisionLines( this.beatAtTime( startTime ), this.beatAtTime( endTime ), div )
+			.collect({ |item| this.timeAtBeat( item ) });
+	}
+	
+	== { |that| ^that.class == this.class && { 
+			this.events == that.events && {
+				this.barMap == that.barMap
+			} 
+		} 
+	}
+	
+	storeArgs {
+		^events.collect({ |item|
+			[ item[0], item[1] ];
+		}).flatten(1);
+	}
+	
+	storeModifiersOn { |stream|
+		if( barMap != defaultBarMap ) {
+			stream << ".barmap_(" <<< barMap << ")";
+		};
+	}
+	
+	doesNotUnderstand { |selector ...args|
+		// refer to barMap
+		var res;
+		res = barMap.perform( selector, *args );
+		if( res != barMap ) {
+			^res;
+		};
+	}
 }
 
 BPMTempoMap : TempoMap {
 	
-	*new { |tempo = 60|
-		^super.newCopyArgs.init( tempo )
+	*new { |tempo = 60, beat = 0 ...argPairs|
+		^super.newCopyArgs.init( tempo ? 60, beat ? 0, *argPairs )
 	}
 
 	*secondsToBeats { |time = 0, tempo = 1|
