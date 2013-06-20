@@ -838,6 +838,7 @@ UChainGUI {
 					.border_( 1 )
 					.radius_( 2 )
 					.action_({
+						var allUnits;
 						if( massEditWindow.notNil && { massEditWindow.isClosed.not }) {
 							massEditWindow.close;
 						};
@@ -851,7 +852,8 @@ UChainGUI {
 								massEditWindow.close;
 							};	
 						});
-						unit.units.do({ |item, i|
+						allUnits = unit.units.collect({ |item, i|
+							var ugui;
 							if( notMassEdit ) { i = i + (realIndex - unit.units.size) };
 							StaticText( massEditWindow, 
 									(massEditWindow.bounds.width - 8 - scrollerMargin) @ 14 )
@@ -864,7 +866,15 @@ UChainGUI {
 										{ Font( Font.defaultSansFace, 12) }).boldVariant 
 								);
 							massEditWindow.view.decorator.nextLine;
-							item.gui( massEditWindow );
+							ugui = item.gui( massEditWindow );
+							ugui.mapSetAction = { chain.changed( \units ) };
+							[ item ] ++ item.getAllUMaps;
+						}).flatten(1);
+						allUnits.do({ |item|
+							item.addDependant( unitInitFunc )
+						});
+						massEditWindow.onClose_({
+							allUnits.do(_.removeDependant(unitInitFunc));
 						});
 						RoundView.popSkin( skin );
 					}).resize_(3);
