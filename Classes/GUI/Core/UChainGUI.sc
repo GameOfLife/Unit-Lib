@@ -33,6 +33,7 @@ UChainGUI {
 	var originalBounds;
 	var <packUnits = true;
 	var <>scrollView;
+	var <>massEditWindowIndex;
 	
 	*initClass {
 		
@@ -712,6 +713,7 @@ UChainGUI {
 			var header, comp, uview, plus, min, defs, io;
 			var addBefore, indexLabel, ugui;
 			var currentUMaps;
+			var massEditWindowButton;
 				
 			indexLabel = realIndex.asString;
 			
@@ -829,7 +831,7 @@ UChainGUI {
 			});
 			
 			if( unit.isKindOf( MassEditU ) ) {
-				SmoothButton( comp, 
+				massEditWindowButton = SmoothButton( comp, 
 					Rect( comp.bounds.right - 
 						((18 + 2) + if( notMassEdit){12 + 4 + 12}{0}), 
 						1, 18, 12 ) 
@@ -838,7 +840,7 @@ UChainGUI {
 					.border_( 1 )
 					.radius_( 2 )
 					.action_({
-						var allUnits;
+						var allUnits, userClosed = true;
 						if( massEditWindow.notNil && { massEditWindow.isClosed.not }) {
 							massEditWindow.close;
 						};
@@ -849,16 +851,17 @@ UChainGUI {
 						massEditWindow.addFlowLayout;
 						comp.onClose_({ 
 							if( massEditWindow.notNil && { massEditWindow.isClosed.not }) {
+								userClosed = false;
 								massEditWindow.close;
 							};	
 						});
-						allUnits = unit.units.collect({ |item, i|
+						allUnits = unit.units.collect({ |item, ii|
 							var ugui;
-							if( notMassEdit ) { i = i + (realIndex - unit.units.size) };
+							if( notMassEdit ) { ii = ii + (realIndex - unit.units.size) };
 							StaticText( massEditWindow, 
 									(massEditWindow.bounds.width - 8 - scrollerMargin) @ 14 )
 								.applySkin( RoundView.skin )
-								.string_( " " ++ i ++ ": " ++ item.defName )
+								.string_( " " ++ ii ++ ": " ++ item.defName )
 								.background_( Color.white.alpha_(0.5) )
 								.resize_(2)
 								.font_( 
@@ -867,17 +870,31 @@ UChainGUI {
 								);
 							massEditWindow.view.decorator.nextLine;
 							ugui = item.gui( massEditWindow );
-							ugui.mapSetAction = { chain.changed( \units ) };
+							ugui.mapSetAction = { 
+								chain.changed( \units );
+							};
 							[ item ] ++ item.getAllUMaps;
 						}).flatten(1);
 						allUnits.do({ |item|
 							item.addDependant( unitInitFunc )
 						});
+						massEditWindowIndex = i;
 						massEditWindow.onClose_({
 							allUnits.do(_.removeDependant(unitInitFunc));
+							if( userClosed ) {
+								massEditWindowIndex = nil;
+							};
 						});
 						RoundView.popSkin( skin );
 					}).resize_(3);
+					
+				if( massEditWindowIndex == i ) {
+					massEditWindowButton.doAction;
+				};
+			} {
+				if( massEditWindowIndex == i ) {
+					massEditWindowIndex = nil;
+				};
 			};
 			
 			if( notMassEdit ) {	
