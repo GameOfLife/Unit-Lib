@@ -37,7 +37,7 @@ UGlobalGain {
 	classvar <>view;
 	
 	*initClass {
-		Class.initClassTree(ControlSpec);
+		Class.initClassTree(Spec);
 
 		
 		ControlSpec.specs = ControlSpec.specs.addAll([
