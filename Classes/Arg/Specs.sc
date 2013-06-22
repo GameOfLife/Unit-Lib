@@ -786,6 +786,26 @@ BufSndFileSpec : RichBufferSpec {
 	
 }
 
+MonoBufSndFileSpec : BufSndFileSpec {
+	
+	*testObject { |obj|
+		^obj.isKindOf( MonoBufSndFile );
+	}
+	
+	constrain { |value|
+		^value.asMonoBufSndFile;
+	}
+	
+	default { 
+		^nil.asMonoBufSndFile;
+	}
+	
+	*newFromObject { |obj|
+		^this.new();
+	}
+	
+}
+
 DiskSndFileSpec : BufSndFileSpec {
 	
 	*testObject { |obj|

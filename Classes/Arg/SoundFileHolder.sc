@@ -498,6 +498,11 @@ BufSndFile : AbstractSndFile {
 	}
 	
 	asBufSndFile { ^this }
+	
+	asMonoBufSndFile { 
+		^MonoBufSndFile.newCopyVars( this ); 
+	}
+	
 	asDiskSndFile { 
 		var unit; // pass unit on to new object
 		unit = this.unit;
@@ -511,7 +516,7 @@ BufSndFile : AbstractSndFile {
     }
     
     numChannelsForPlayBuf {
-	    ^if( useChannels.isNil ) { ^numChannels } { ^useChannels.size };
+	    ^if( useChannels.isNil ) { ^numChannels } { ^this.useChannels.size };
     }
     
     asControlInputFor { |server, startPos = 0| 
@@ -537,9 +542,9 @@ BufSndFile : AbstractSndFile {
 			};
 		};
 		
-		if( useChannels.notNil ) {
+		if( this.useChannels.notNil ) {
 			buf = Buffer.readChannel( server, path.getGPath,
-					startFrame + addStartFrame, localUsedFrames, useChannels, action, bufnum );
+					startFrame + addStartFrame, localUsedFrames, this.useChannels, action, bufnum );
 		} {
 			buf = Buffer.read( server, path.getGPath,
 					startFrame + addStartFrame, localUsedFrames, action, bufnum );
@@ -556,7 +561,7 @@ BufSndFile : AbstractSndFile {
 		stream << this.class.name << ".newBasic(" <<* [ // use newBasic to prevent file reading
 		    path.formatGPath.quote, numFrames, numChannels, sampleRate,
              startFrame, endFrame, rate, loop
-		]  << ")" << if( useChannels.notNil ) { ".useChannels(%)".format( useChannels ) } { "" };
+		]  << ")" << if( this.useChannels.notNil ) { ".useChannels_(%)".format( useChannels ) } { "" };
 	}
 	
 	cutStart { |time=0|
@@ -567,6 +572,40 @@ BufSndFile : AbstractSndFile {
 		};
 	}
 
+}
+
+MonoBufSndFile : BufSndFile {
+	
+	var <channel = 0;
+	
+	useChannels { ^[ channel ] }
+	useChannels_ { |new| 
+		this.channel = new.asCollection.first ? 0;
+		this.changed( \useChannels, useChannels );
+	}
+	
+	channel_ { |new = 0|
+		channel = new.min( numChannels );
+		this.changed( \useChannels, useChannels );
+	}
+	
+	asMonoBufSndFile { 
+		^this 
+	}
+	
+	asBufSndFile {
+		^BufSndFile.newCopyVars( this );
+	}
+	
+	numChannels { ^1 }
+	
+	storeOn { arg stream;
+		stream << this.class.name << ".newBasic(" <<* [ // use newBasic to prevent file reading
+		    path.formatGPath.quote, numFrames, numChannels, sampleRate,
+             startFrame, endFrame, rate, loop
+		]  << ")" << if( this.channel != 0 ) { ".channel_(%)".format( this.channel ) } { "" };
+	}
+	
 }
 
 DiskSndFile : AbstractSndFile {
@@ -589,6 +628,11 @@ DiskSndFile : AbstractSndFile {
 		this.unit = nil;
 		^BufSndFile.newCopyVars( this ).unit_( unit ); 
 	}
+	
+	asMonoBufSndFile {
+		^MonoBufSndFile.newCopyVars( this );
+	}
+	
 	asDiskSndFile { ^this }
 	
 	asControlInputFor { |server, startPos = 0| 
@@ -664,6 +708,10 @@ DiskSndFile : AbstractSndFile {
 	
 	asBufSndFile { 
 		^BufSndFile.newBasic(String.scDir +/+ "sounds/a11wlk01-44_1.aiff", 107520, 1, 44100, 0, nil, 1, false)
+	}
+	
+	asMonoBufSndFile { 
+		^MonoBufSndFile.newBasic(String.scDir +/+ "sounds/a11wlk01-44_1.aiff", 107520, 1, 44100, 0, nil, 1, false)
 	}
 	
 	asDiskSndFile {
