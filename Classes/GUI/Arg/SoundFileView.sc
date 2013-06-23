@@ -52,10 +52,6 @@ BufSndFileView {
 		all.do( _.setRateMode( rateMode ) );
 	}
 	
-	initClass {
-		all = [];
-	}
-	
 	doAction { action.value( this ) }
 	
 	value { ^sndFile }
