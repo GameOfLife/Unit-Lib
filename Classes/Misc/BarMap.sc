@@ -33,8 +33,13 @@ BarMap {
 		^[ signature[0], signature.wrapAt(1).nextPowerOfTwo ];
 	}
 	
-	*formatEvent { |signature = #[4,4], bar = 1|
-		^this.formatSignature(signature) ++ [ bar.asInt, 0, inf ];
+	*formatEvent { |signature = #[4,4], bar = 1, event|
+		event = event ? [4,4,1,0,inf];
+		signature = this.formatSignature(signature);
+		event.put(0, signature[0] );
+		event.put(1, signature[1] );
+		event.put(2, bar.asInt );
+		^event;
 	}
 	
 	firstBar { ^events[0][2]; }
@@ -92,19 +97,22 @@ BarMap {
 		^events.lastForWhich({ |item| item[2] <= bar }) ? events[0];
 	}
 	
-	barAtBeat { |beat = 0|
+	barAtBeat { |beat = 0, clip = true|
 		var raw, mul;
 		var num, denom, bar, sigStartBeat;
+		if( clip ) { beat = beat.max(0) };
 		#num, denom, bar, sigStartBeat = this.eventAtBeat(beat);
 		mul = (num/denom) * beatDenom;
 		raw = bar + ((beat - sigStartBeat) / mul);
 		^[ raw.asInt, raw.frac * num ]; // bar, division
 	}
 	
-	beatAtBar { |bar = 1, division = 0|
+	beatAtBar { |bar = 1, division = 0, clip = true|
 		var num, denom, sigStartBar, beat;
 		#num, denom, sigStartBar, beat = this.eventAtBar(bar);		bar = bar + (division / num) - sigStartBar;
-		^beat + (bar * (num/denom) * beatDenom);
+		beat = beat + (bar * (num/denom) * beatDenom);
+		if( clip ) { beat = beat.max(0) };
+		^beat;
 	}
 	
 	barAtBar { |bar = 1, division = 0, clip = true|
@@ -153,10 +161,11 @@ BarMap {
 	
 	put { |...args| // beat, tempo pairs
 		args.pairsDo({ |bar, signature|
+			var oldEvent;
 			bar = bar.asInt;
-			events.removeAllSuchThat({ |item| item[2] == bar });
+			oldEvent = (events.removeAllSuchThat({ |item| item[2] == bar }) ? [])[0];
 			if( signature.notNil ) {
-				events = events.add( this.class.formatEvent( signature, bar ) );
+				events = events.add( this.class.formatEvent( signature, bar, oldEvent ) );
 			};
 		});
 		this.prDeleteDuplicates;
