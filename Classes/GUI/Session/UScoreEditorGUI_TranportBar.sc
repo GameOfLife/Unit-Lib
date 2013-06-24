@@ -245,7 +245,7 @@ UScoreEditorGui_TransportBar {
 			.align_( \center )
 			.value_( this.score.tempoMap.signatureAtTime( this.score.pos ) )
 			.action_({ |vw|
-				if(this.score.isStopped) {
+				if( true ) {
 					this.score.tempoMap.setSignatureAtTime( vw.value, this.score.pos );
 					this.score.changed( \pos );
 				} {
@@ -261,7 +261,7 @@ UScoreEditorGui_TransportBar {
 				(240 / this.score.tempoMap.barMap.beatDenom)
 			)
 			.action_({ |vw|
-				if(this.score.isStopped) {
+				if( true ) {
 					this.score.tempoMap.setTempoAtTime( 
 						vw.value / (240 / this.score.tempoMap.barMap.beatDenom),
 						this.score.pos );
