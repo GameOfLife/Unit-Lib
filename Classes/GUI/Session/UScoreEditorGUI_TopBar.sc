@@ -226,14 +226,16 @@ UScoreEditorGui_TopBar {
 			});
 
 
-		header.decorator.shift(100);
+		header.decorator.shift( header.decorator.indentedRemaining.width - 200, 0 );
 
-		StaticText( header, 30@size ).string_( "snap" ).font_( font ).align_( \right );
+		StaticText( header, 30@size ).string_( "snap:" ).font_( font ).align_( \right )
+			.resize_(3);
 
 		PopUpMenu( header, 50@size )
 			.items_( [ "off", "0.001", "0.01", "0.1", "0.25", "0.333", "1" ] )
 			.canFocus_(false)
 			.font_( font )
+			.resize_(3)
 			.value_(4)
 			.action_({ |v|
 				if (v.value == 0)
@@ -243,16 +245,18 @@ UScoreEditorGui_TopBar {
 				scoreView.snapH = [0, 0.001, 0.01, 0.1, 0.25, 1/3, 1][ v.value ];
 				});
 
-		StaticText( header, 10@size ).string_( "s" ).font_( font );
+		StaticText( header, 15@size ).string_( "s" ).font_( font )
+			.resize_(3);
 
-		header.decorator.shift(4);
-
-		StaticText( header, 30@size ).string_( "Mode:" ).font_( font );
+		StaticText( header, 30@size ).string_( "mode:" ).font_( font )
+			.resize_(3)
+			.align_('right');
 
 		PopUpMenu( header, 50@size )
 			.items_( [ "all","move","resize","fades"] )
 			.canFocus_(false)
 			.font_( font )
+			.resize_(3)
 			.value_(0)
 			.action_({ |v|
 				scoreView.usessionMouseEventsManager.mode = v.items[v.value].asSymbol;

@@ -81,6 +81,8 @@ UScoreEditorGui_TransportBar {
 
 		scoreController.put(\pos, { |who,what|
             views[\counter].value = this.score.pos;
+            views[\barMap ].value = this.score.tempoMap.beatAtTime( this.score.pos );
+            views[\signature ].value = this.score.tempoMap.signatureAtTime( this.score.pos ) 
 		});
 		
 		scoreController.put(\loop, { |who,what|
@@ -196,35 +198,94 @@ UScoreEditorGui_TransportBar {
 
         view.decorator.shift(20,0);
 
-	    views[\counter] = SMPTEBox( view, 150@size )
+	    views[\counter] = SMPTEBox( view, 110@size )
 			.value_( this.score.pos )
 			.radius_( 12 )
 			.align_( \center )
 			.clipLo_(0)
-			.background_( Color.clear )
+			.applySmoothSkin
 			.charSelectColor_( Color.white.alpha_(0.5) )
 			.autoScale_( true )
+			.visible_( scoreView.showTempoMap.not )
             .action_({ |v|
                 if(this.score.isStopped) {
                     this.score.pos = v.value
                 }
             });
-        StaticText(view, 60@size )
-            .string_("Update:")
-            .align_('right');
-        views[\update] = SmoothButton( view, size@size )
-            .label_( [ "", 'x' ] )
+            
+        view.decorator.shift( -114, 0 );
+        
+        views[\barMap] = BarMapView( view, 110@size, this.score.tempoMap.barMap )
+			.value_( this.score.tempoMap.beatAtTime( this.score.pos ) )
+			.visible_( scoreView.showTempoMap )
+			.autoScale_( true )
+			.action_({ |v|
+				if(this.score.isStopped) {
+					this.score.pos = this.score.tempoMap.timeAtBeat( v.value )
+				};
+			});
+            
+	   views[\timeMode ] = PopUpMenu( view, 50@size )
+			.items_( [ "time", "bar" ] )
+			.canFocus_(false)
+			.font_( font )
+			.value_( scoreView.showTempoMap.binaryValue )
+			.action_({ |v|
+				scoreView.showTempoMap = v.value.booleanValue;
+				views[\signature].visible = scoreView.showTempoMap;
+				views[\tempo].visible = scoreView.showTempoMap;
+				views[\barMap].visible = scoreView.showTempoMap;
+				views[\counter].visible = scoreView.showTempoMap.not;
+			});
+			
+		views[\signature] = SignatureBox( view,35@size )
+			.applySmoothSkin
+			.visible_( scoreView.showTempoMap )
+			.autoScale_(true)
+			.align_( \center )
+			.value_( this.score.tempoMap.signatureAtTime( this.score.pos ) )
+			.action_({ |vw|
+				if(this.score.isStopped) {
+					this.score.tempoMap.setSignatureAtTime( vw.value, this.score.pos );
+					this.score.changed( \pos );
+				} {
+					vw.value = this.score.tempoMap.signatureAtTime( this.score.pos );
+				};
+			});
+			
+		views[\tempo] = SmoothNumberBox( view,35@size )
+			.visible_( scoreView.showTempoMap )
+			.autoScale_(true)
+			.align_( \center )
+			.value_( this.score.tempoMap.tempoAtTime( this.score.pos ) * 
+				(240 / this.score.tempoMap.barMap.beatDenom)
+			)
+			.action_({ |vw|
+				if(this.score.isStopped) {
+					this.score.tempoMap.setTempoAtTime( 
+						vw.value / (240 / this.score.tempoMap.barMap.beatDenom),
+						this.score.pos );
+					this.score.changed( \pos );
+				} {
+					vw.value =  this.score.tempoMap.tempoAtTime( this.score.pos ) * 
+						(240 / this.score.tempoMap.barMap.beatDenom)
+				};
+			});
+	    
+        view.decorator.shift( view.decorator.indentedRemaining.width - 78, 0 );
+        
+        views[\update] = SmoothButton( view, 39@size )
+            .label_( [ "update", "update" ] )
+            .hiliteColor_( Color.green.alpha_(0.5) )
             .value_(1)
             .radius_( bounds.height / 8 )
             .action_({ |bt| this.score.updatePos = bt.value.booleanValue; })
+            .resize_(3)
             .canFocus_(false);
-            
-        // this should become MVC
-        StaticText(view, 60@size )
-            .string_("OSC:")
-            .align_('right');
-        views[\osc] = SmoothButton( view, size@size )
-            .label_( [ "", 'x' ] )
+        
+        views[\osc] = SmoothButton( view, 28@size )
+            .label_( [ "osc", "osc" ] )
+            .hiliteColor_( Color.green.alpha_(0.5) )
             .value_(this.score.oscSetter.notNil.binaryValue )
             .radius_( bounds.height / 8 )
             .action_({ |bt| switch( bt.value.asInt,
@@ -232,6 +293,7 @@ UScoreEditorGui_TransportBar {
 	            	0, {  this.score.disableOSC }
 	            )
             })
+            .resize_(3)
             .canFocus_(false);
         
         RoundView.popSkin;

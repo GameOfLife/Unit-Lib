@@ -35,10 +35,11 @@ BarMapView {
 		barMap.addDependant( this );
 		action = inAction;
 		case { bounds.isKindOf( Point ) } {
-			viewHeight = bounds.y - 4;
+			viewHeight = bounds.y;
 		} {  bounds.isKindOf( Rect ) } {
-			viewHeight = bounds.height - 4;
+			viewHeight = bounds.height;
 		};
+		viewHeight.postln;
 		this.makeView( parent, bounds );
 	}
 	
@@ -92,6 +93,12 @@ BarMapView {
 		views[ \sub ].font = font;
 	}
 	
+	autoScale_ { |bool|
+		views[ \bar ].autoScale = bool;
+		views[ \division ].autoScale = bool;
+		views[ \sub ].autoScale = bool;
+	}
+	
 	*viewNumLines { ^1 }
 	
 	makeView { |parent, bounds, resize|
@@ -111,8 +118,8 @@ BarMapView {
 			);
 		};
 		
-		centerWidth = viewHeight * 1.25;
-		sideWidth = ( bounds.width - (centerWidth + 8) ) / 2;
+		centerWidth = (viewHeight * 1.25).floor;
+		sideWidth = ( ( bounds.width - (centerWidth + 8) ) / 2 ).floor;
 		
 		views[ \bar ] = SmoothNumberBox( view, sideWidth @ viewHeight )
 			.step_(1).scroll_step_(1)
