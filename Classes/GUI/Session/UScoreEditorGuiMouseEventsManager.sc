@@ -224,7 +224,7 @@ UScoreEditorGuiMouseEventsManager {
 	}
 	
 	mouseMoveEvent{ |mousePos,unscaledMousePos,scaledUserView,snap,shiftDown,maxWidth|
-		var deltaX, deltaY, scoreEvents, selEvents, newEvents, newEventViews;
+		var deltaX, deltaY, newEvents, selectedEvent;
 		
 		//check if movement exceeds threshold
 		if((unscaledMousePos - mouseDownPos).x.abs > minimumMov) {
@@ -239,20 +239,22 @@ UScoreEditorGuiMouseEventsManager {
 			if( isCopying && copyed.not ) {
 				//"copying Events".postln;
 				
-				selEvents = this.selectedEventViews;
-				
-				newEventViews = this.selectedEventViews.collect({ |ev,j|
-					ev.duplicate(
-						scoreView.scoreView.pixelScale.x * 10, maxWidth
-					).i_(eventViews.size + j).selected_(true).state_(\moving)
+				newEvents = this.selectedEventViews.collect({ |ev,j|
+					ev.event.duplicate;
 				});
-				theEventView = newEventViews[0];
-				
+				selectedEvent = newEvents[0];
 				eventViews.do{ |ev| ev.selected_(false).clearState };
-
-                score.events = score.events ++ newEventViews.collect( _.event );
+				score.events = score.events ++ newEvents;
 				score.changed(\numEventsChanged);
-                eventViews = eventViews ++ newEventViews;
+				eventViews.do({ |item|
+	                	if( newEvents.includes( item.event ) ) { item
+		                	.selected_(true)
+		                	.state_(\moving)
+		                	.originalStartTime_( item.event.startTime )
+		                	.originalTrack_( item.event.track )
+	                	};
+                	});
+                	theEventView = eventViews.detect({ |item| item.event === selectedEvent });
 
 				//("scoreEvents "++score.events.size).postln;
 				//("selected events"++this.selectedEventViews).postln;
