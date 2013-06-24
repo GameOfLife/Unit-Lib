@@ -7,7 +7,7 @@ BarMap {
 	// the last two items of the array (beat, numBars) are updated internally
 	
 	var <events;
-	var <beatDenom = 2; // a beat is 1/2; 1s at default tempo and bar
+	var <beatDenom = 4; // a beat is 1/4; 1s at default tempo and bar
 	var <deleteDuplicates = true;
 	
 	*new { |signature = #[4,4], bar = 1...argPairs|
