@@ -24,6 +24,7 @@ BarMapView {
 	var <parent, <view, <views;
 	var <>action;
 	var <viewHeight = 14;
+	var <visible;
 	
 	*new { |parent, bounds, barMap, action|
 		^super.new.init( parent, bounds, barMap, action );
@@ -48,8 +49,16 @@ BarMapView {
 		this.update;
 	}
 	
+	visible_ { |bool = true|
+		if( bool != visible ) {
+			visible = bool;
+			this.update;
+		};
+		{ view.visible = visible }.defer;
+	}
+	
 	update {
-		this.setViews( value );
+		if( visible ) { this.setViews( value ); };
 	}
 	
 	resize_ { |resize|
@@ -86,7 +95,7 @@ BarMapView {
 	*viewNumLines { ^1 }
 	
 	makeView { |parent, bounds, resize|
-		var getValue;
+		var getValue, centerWidth, sideWidth;
 		if( bounds.isNil ) { bounds= 350 @ (this.class.viewNumLines * (viewHeight + 4)) };
 		
 		view = EZCompositeView( parent, bounds, gap: 4@4 );
@@ -102,7 +111,10 @@ BarMapView {
 			);
 		};
 		
-		views[ \bar ] = SmoothNumberBox( view, (viewHeight * 2.25) @ viewHeight )
+		centerWidth = viewHeight * 1.25;
+		sideWidth = ( bounds.width - (centerWidth + 8) ) / 2;
+		
+		views[ \bar ] = SmoothNumberBox( view, sideWidth @ viewHeight )
 			.step_(1).scroll_step_(1)
 			.radius_( [ viewHeight, 0, 0, viewHeight ] / 2 )
 			.align_( \right )
@@ -119,7 +131,7 @@ BarMapView {
 				);
 			});
 			
-		views[ \division ] = SmoothNumberBox( view, (viewHeight * 1.25) @ viewHeight )
+		views[ \division ] = SmoothNumberBox( view, centerWidth @ viewHeight )
 			.step_(1).scroll_step_(1)
 			.radius_( 0 )
 			.align_( \center )
@@ -136,7 +148,7 @@ BarMapView {
 				);
 			});
 			
-		views[ \sub ] = SmoothNumberBox( view, (viewHeight * 2.25) @ viewHeight )
+		views[ \sub ] = SmoothNumberBox( view, sideWidth @ viewHeight )
 			.step_(1).scroll_step_(1)
 			.radius_( [ 0, viewHeight, viewHeight, 0 ] / 2 )
 			.formatFunc_({ |value| value.asString.padLeft(3,"0"); })
