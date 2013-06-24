@@ -11,7 +11,7 @@ EnvM : Env {
 	}
 	
 	unmappedLevels { ^levels }
-	unmappedLevels_ { |newLevels| levels = newLevels; array = nil; }
+	unmappedLevels_ { |newLevels| levels = newLevels; mapped = false; array = nil; }
 	
 	levels { ^if( spec.notNil ) { spec.map( levels ) } { levels } }
 	levels_ { |newLevels|
@@ -35,15 +35,16 @@ EnvM : Env {
 				if( mapped ) { 
 					levels = spec.unmap( levels );
 					mapped = false;
+					this.changed( \levels );
 				};
 			};
 		} {
 			if( spec.notNil ) {
 				levels = spec.map( levels );
+				this.changed( \levels );
 			};
 			spec = nil;
 		};
-		this.changed( \levels );
 	}
 	
 	asUnitArg { |unit, key|
