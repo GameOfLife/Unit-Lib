@@ -126,21 +126,15 @@
 + PositiveIntegerSpec {
 	
 	massEditSpec { |inArray|
-		var minmax;
-		minmax = this.massEditValue( inArray );
-		^PositiveIntegerSpec( minmax )
+		^ArrayControlSpec( ).adaptToSpec( this ).default_( inArray );
 	}
 	
 	massEditValue { |inArray|
-		if( inArray.notNil ) {
-			^inArray.minItem;
-		} {
-			^0;
-		};
+		^inArray
 	}
-
+	
 	massEdit { |inArray, params|
-		^(inArray - inArray.minItem) + params;
+		^params;
 	}
 }
 
