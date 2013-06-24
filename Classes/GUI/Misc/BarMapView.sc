@@ -24,7 +24,7 @@ BarMapView {
 	var <parent, <view, <views;
 	var <>action;
 	var <viewHeight = 14;
-	var <visible;
+	var <visible = true;
 	
 	*new { |parent, bounds, barMap, action|
 		^super.new.init( parent, bounds, barMap, action );
