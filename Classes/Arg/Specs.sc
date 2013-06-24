@@ -348,6 +348,8 @@ UEnvSpec : Spec {
 	}
 
 	storeArgs { ^[ default, spec] }
+	
+	asControlSpec { ^spec.asControlSpec }
 }
 
 RealVector3DSpec : Spec {

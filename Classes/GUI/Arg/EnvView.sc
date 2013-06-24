@@ -106,7 +106,7 @@ EnvPlotView {
 		var dur;
 		dur = env.times.sum;
 		bounds = bounds ? plotView.fromBounds;
-		^env.levels.collect({ |level, i|
+		^env.unmappedLevels.collect({ |level, i|
 			Point(
 				(env.times[..i-1].sum / dur) * bounds.width, 
 				level.linlin( min, max, bounds.height, 0 )
@@ -124,7 +124,7 @@ EnvPlotView {
 				pt.y.linlin( 0, bounds.height, max, min )
 			]
 		}).flop;
-		env.levels = levels;
+		env.unmappedLevels = levels;
 		env.times = times.differentiate[1..];
 		env.changed( \levels );
 	}
@@ -398,12 +398,12 @@ EnvEditView {
 				curves = env.curves.asCollection.wrapExtend( env.levels.size - 1 );
 				views[ \duration ].value = env.times.sum;
 				rangeViews[ \range ].value = spec.asSpec.map([ 
-					env.levels.minItem, env.levels.maxItem 
+					env.unmappedLevels.minItem, env.unmappedLevels.maxItem 
 				]);
 				argViews.do({ |item, i|
 					var first;
 					first = (i == 0);
-					item.level.value = spec.asSpec.map( env.levels[i] );
+					item.level.value = spec.asSpec.map( env.unmappedLevels[i] );
 					if( first.not ) {
 						item.time
 							.value_( env.times[..i-1].sum )
@@ -540,7 +540,7 @@ EnvEditView {
 				var which;
 				which = selected ? (env.levels.size - 1);
 				if( which.notNil && { env.levels.size > 2 }) {
-					env.levels = env.levels.copy.select({ |item, i| i != which });
+					env.unmappedLevels = env.unmappedLevels.copy.select({ |item, i| i != which });
 					if( which == env.times.size ) {
 						if( env.times.mutable.not ) { env.times = env.times.copy };
 						env.times.pop;
@@ -564,8 +564,8 @@ EnvEditView {
 				var which;
 				which = selected ? (env.levels.size - 1);
 				if( which.notNil && { env.levels.size < maxSize }) {
-					env.levels = env.levels.collect(_.value)
-						.insert( which, env.levels[which] );
+					env.unmappedLevels = env.unmappedLevels.collect(_.value)
+						.insert( which, env.unmappedLevels[which] );
 					env.times = env.times.copy.collect(_.value)
 						.insert( which, env.times.clipAt( which ) );
 					if( env.curves.size > 0 ) {
@@ -601,7 +601,7 @@ EnvEditView {
 		
 		size = env.levels.size;
 					
-		env.levels.do({ |level, i|
+		env.unmappedLevels.do({ |level, i|
 			var vws, first;
 			vws = ();
 			
@@ -626,12 +626,12 @@ EnvEditView {
 				.value_( spec.asSpec.map( level ) )
 				.action_({ |sl|
 					var levels;
-					levels = env.levels;
+					levels = env.unmappedLevels;
 					if( levels.mutable.not ) {
 						levels = levels.copy;
 					};
 					levels.put( i, spec.asSpec.unmap(sl.value) );
-					env.levels = levels;
+					env.unmappedLevels = levels;
 					env.changed( \levels );
 					action.value( this, env );
 				});
@@ -733,12 +733,12 @@ EnvEditView {
 					.label_( 'back' )
 					.action_({
 						var levels;
-						levels = env.levels;
+						levels = env.unmappedLevels;
 						if( levels.mutable.not ) {
 							levels = levels.copy;
 						};
 						levels = levels[..i-2] ++ levels[[i,i-1]] ++ levels[i+1..];
-						env.levels = levels;
+						env.unmappedLevels = levels;
 						env.changed( \levels );
 						this.selected = this.selected - 1;
 						action.value( this, env );
@@ -753,12 +753,12 @@ EnvEditView {
 					.label_( 'play' )
 					.action_({
 						var levels;
-						levels = env.levels;
+						levels = env.unmappedLevels;
 						if( levels.mutable.not ) {
 							levels = levels.copy;
 						};
 						levels = levels[..i-1] ++ levels[[i+1,i]] ++ levels[i+2..];
-						env.levels = levels;
+						env.unmappedLevels = levels;
 						env.changed( \levels );
 						this.selected = this.selected + 1;
 						action.value( this, env );
@@ -790,9 +790,9 @@ EnvEditView {
 			(bounds.width - 43) @ viewHeight, nil, spec.asSpec
 		)
 			.font_( font )
-			.value_( spec.asSpec.map([ env.levels.minItem, env.levels.maxItem]) )
+			.value_( spec.asSpec.map([ env.unmappedLevels.minItem, env.unmappedLevels.maxItem]) )
 			.action_({ |sl|
-				env.levels = env.levels.normalize( 
+				env.unmappedLevels = env.unmappedLevels.normalize( 
 					spec.asSpec.unmap( sl.value[0] ), 
 					spec.asSpec.unmap( sl.value[1].max(sl.value[0]+1.0e-12) ) 
 				);
@@ -807,9 +807,9 @@ EnvEditView {
 			.radius_(2)
 			.action_({ 
 				var min, max;
-				min = env.levels.minItem;
-				max = env.levels.maxItem;
-				env.levels = env.levels.linlin(min,max,max,min);
+				min = env.unmappedLevels.minItem;
+				max = env.unmappedLevels.maxItem;
+				env.unmappedLevels = env.unmappedLevels.linlin(min,max,max,min);
 				env.changed( \levels );
 				action.value( this, env );
 			});
@@ -819,7 +819,7 @@ EnvEditView {
 			.font_( font )
 			.radius_(2)
 			.action_({ 
-				env.levels = env.levels.reverse;
+				env.unmappedLevels = env.unmappedLevels.reverse;
 				env.times = env.times.reverse;
 				if( env.curves.size > 0 ) {
 					env.curves = env.curves.reverse;
@@ -834,10 +834,10 @@ EnvEditView {
 			.radius_(2)
 			.action_({ 
 				var min, max, dur;
-				min = env.levels.minItem;
-				max = env.levels.maxItem;
+				min = env.unmappedLevels.minItem;
+				max = env.unmappedLevels.maxItem;
 				dur = env.times.sum;
-				env.levels = ({0.0 rrand: 1.0}!env.levels.size).normalize(min, max);
+				env.unmappedLevels = ({0.0 rrand: 1.0}!env.unmappedLevels.size).normalize(min, max);
 				env.times = ({0.1 exprand: 1.0}!env.times.size).normalizeSum * dur;
 				env.changed( \levels );
 				action.value( this, env );
@@ -849,10 +849,10 @@ EnvEditView {
 			.radius_(2)
 			.action_({ 
 				var min, max, dur;
-				min = env.levels.minItem;
-				max = env.levels.maxItem;
+				min = env.unmappedLevels.minItem;
+				max = env.unmappedLevels.maxItem;
 				dur = env.times.sum;
-				env.levels = (..env.levels.size-1).normalize(min, max);
+				env.unmappedLevels = (..env.unmappedLevels.size-1).normalize(min, max);
 				env.times = (1!env.times.size).normalizeSum * dur;
 				env.changed( \levels );
 				action.value( this, env );
