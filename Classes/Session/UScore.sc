@@ -120,6 +120,8 @@ UScore : UEvent {
 
     duplicate { ^UScore( *events.collect( _.duplicate ) )
 	    .name_( name )
+	    .startTime_( startTime )
+	    .track_( track )
 	    .displayColor_( displayColor ); 
 	}
 
