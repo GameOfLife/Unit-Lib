@@ -1,5 +1,7 @@
 EnvM : Env {
 	// a mapped Env. level values are entered raw, but stored internally unmapped
+	// note: when entering a literal array (i.e. #[0,1,0]) it will not be unmapped
+	
 	var <spec;
 	
 	unmappedLevels { ^levels }
@@ -7,7 +9,7 @@ EnvM : Env {
 	
 	levels { ^if( spec.notNil ) { spec.map( levels ) } { levels } }
 	levels_ { |newLevels|
-		if( spec.notNil ) { 
+		if( spec.notNil && newLevels.mutable ) { 
 			levels = spec.unmap( newLevels ) 
 		} { 
 			levels = newLevels;
@@ -23,7 +25,9 @@ EnvM : Env {
 				spec = newSpec.asSpec;
 			} {
 				spec = newSpec.asSpec;
-				levels = spec.unmap( levels );
+				if( levels.mutable ) { // specify a  
+					levels = spec.unmap( levels );
+				};
 			};
 		} {
 			if( spec.notNil ) {
