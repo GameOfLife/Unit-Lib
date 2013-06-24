@@ -3,6 +3,12 @@ EnvM : Env {
 	// note: when entering a literal array (i.e. #[0,1,0]) it will not be unmapped
 	
 	var <spec;
+	var <>mapped = true;
+	
+	*new { arg levels = #[0,1,0], times = #[1,1], curve = 'lin', releaseNode, loopNode;
+		^super.newCopyArgs(levels, times, curve)
+			.releaseNode_(releaseNode).loopNode_(loopNode).mapped_(levels.mutable);
+	}
 	
 	unmappedLevels { ^levels }
 	unmappedLevels_ { |newLevels| levels = newLevels; array = nil; }
@@ -13,6 +19,7 @@ EnvM : Env {
 			levels = spec.unmap( newLevels ) 
 		} { 
 			levels = newLevels;
+			mapped = newLevels.mutable;
 		};
 		array = nil; 
 	}
@@ -25,8 +32,9 @@ EnvM : Env {
 				spec = newSpec.asSpec;
 			} {
 				spec = newSpec.asSpec;
-				if( levels.mutable ) { // specify a  
+				if( mapped ) { 
 					levels = spec.unmap( levels );
+					mapped = false;
 				};
 			};
 		} {
