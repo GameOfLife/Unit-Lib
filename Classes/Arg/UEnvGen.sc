@@ -71,7 +71,7 @@ UEnvGen {
 		} { env.isKindOf(Symbol) } {
 			// uncomment when EnvSpec is added
 			Udef.addBuildSpec(
-				ArgSpec(env, Env(), UEnvSpec( Env(), spec ), mode: \init)
+				ArgSpec(env, EnvM(), UEnvSpec( EnvM(), spec ), mode: \init)
 			);
 			env = env.ir( Env(0!32,0!31).asArray );
 		};
