@@ -49,12 +49,16 @@ EnvM : Env {
 	
 	asUnitArg { |unit, key|
 		if( key.notNil ) {
-			if( unit.isUMap && { unit.def.isMappedArg( key ) } ) {
-				if( unit.spec.notNil ) {
+			if( unit.getSpec( key ).isKindOf( UEnvSpec ) ) {
+				if( unit.isUMap && { unit.def.isMappedArg( key ) } ) {
+					if( unit.spec.notNil ) {
+						this.spec = unit.getSpec( key ).asControlSpec.copy;
+					};
+				} {
 					this.spec = unit.getSpec( key ).asControlSpec.copy;
 				};
 			} {
-				this.spec = unit.getSpec( key ).asControlSpec.copy;
+				^UMap( 'envelope', [ \env, this ] ).asUnitArg( unit, key );
 			};
 		};
 		^this;
