@@ -82,6 +82,7 @@ UScoreEditorGui_TransportBar {
 		scoreController.put(\pos, { |who,what|
             views[\counter].value = this.score.pos;
             views[\barMap ].value = this.score.tempoMap.beatAtTime( this.score.pos );
+            views[\tempo ].value = this.score.tempoMap.bpmAtTime( this.score.pos );
             views[\signature ].value = this.score.tempoMap.signatureAtTime( this.score.pos ) 
 		});
 		
@@ -257,19 +258,13 @@ UScoreEditorGui_TransportBar {
 			.visible_( scoreView.showTempoMap )
 			.autoScale_(true)
 			.align_( \center )
-			.value_( this.score.tempoMap.tempoAtTime( this.score.pos ) * 
-				(240 / this.score.tempoMap.barMap.beatDenom)
-			)
+			.value_( this.score.tempoMap.bpmAtTime( this.score.pos );			)
 			.action_({ |vw|
 				if( true ) {
-					this.score.tempoMap.setTempoAtTime( 
-						vw.value / (240 / this.score.tempoMap.barMap.beatDenom),
-						this.score.pos );
+					this.score.tempoMap.setBPMAtTime( vw.value, this.score.pos );
 					this.score.changed( \pos );
 				} {
-					vw.value =  this.score.tempoMap.tempoAtTime( this.score.pos ) * 
-						(240 / this.score.tempoMap.barMap.beatDenom)
-				};
+					vw.value = this.score.tempoMap.bpmAtTime( this.score.pos );				};
 			});
 	    
         view.decorator.shift( view.decorator.indentedRemaining.width - 78, 0 );

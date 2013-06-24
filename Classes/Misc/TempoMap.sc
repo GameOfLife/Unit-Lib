@@ -47,6 +47,14 @@ TempoMap {
 		^beat / tempo;
 	}
 	
+	tempoToBPM { |tempo = 1|
+		^tempo * (240 / barMap.beatDenom);
+	}
+	
+	bpmToTempo { |bpm = 60|
+		^bpm / (240 / barMap.beatDenom);
+	}
+	
 	prUpdateTimes {
 		var time = 0, lastBeat = 0, lastTempo = 1;
 		size = events.size; // update size
@@ -122,6 +130,14 @@ TempoMap {
 		^events[ this.prIndexAtTime( time ) ][0];
 	}
 	
+	bpmAtTime { |time = 0|
+		^this.tempoToBPM( this.tempoAtTime( time ) );
+	}
+	
+	bpmAtBeat { |beat = 0|
+		^this.tempoToBPM( this.tempoAtBeat( beat ) );
+	}
+	
 	setTempoAtBeat { |tempo = 1, beat = 0, add = false|
 		if( add ) {
 			this.put( beat, tempo );
@@ -141,6 +157,22 @@ TempoMap {
 			this.prUpdateBeats;
 			this.changed( \events );
 		};
+	}
+	
+	setTempoAtBar { |tempo = 1, bar = 1, division = 0, add = false| 
+		this.setTempoAtBeat( tempo, this.beatAtBar( bar, division ), add );
+	}
+	
+	setBPMAtBeat { |bpm = 60, beat = 0, add = false|
+		this.setTempoAtBeat( this.bpmToTempo( bpm ), beat, add );
+	}
+	
+	setBPMAtTime { |bpm = 60, time = 0, add = false|
+		this.setTempoAtTime( this.bpmToTempo( bpm ), time, add );
+	}
+	
+	setBPMAtBar { |bpm = 60, bar = 1, division = 0, add = false| 
+		this.setTempoAtBeat( this.bpmToTempo( bpm ), this.beatAtBar( bar, division ), add );
 	}
 
 	timeAtBeat { |beat = 0|
@@ -208,20 +240,4 @@ TempoMap {
 			^res;
 		};
 	}
-}
-
-BPMTempoMap : TempoMap {
-	
-	*new { |tempo = 60, beat = 0 ...argPairs|
-		^super.newCopyArgs.init( tempo ? 60, beat ? 0, *argPairs )
-	}
-
-	*secondsToBeats { |time = 0, tempo = 1|
-		^time * (tempo / 60);
-	}
-	
-	*beatsToSeconds { |beat = 0, tempo = 1|
-		^beat / (tempo / 60);
-	}
-	
 }
