@@ -20,10 +20,11 @@ EnvM : Env {
 	spec_ { |newSpec|
 		if( newSpec.notNil ) {
 			if( spec.notNil ) {
-				levels = spec.map( levels );
+				spec = newSpec.asSpec;
+			} {
+				spec = newSpec.asSpec;
+				levels = spec.unmap( levels );
 			};
-			spec = newSpec.asSpec;
-			levels = spec.unmap( levels );
 		} {
 			if( spec.notNil ) {
 				levels = spec.map( levels );
