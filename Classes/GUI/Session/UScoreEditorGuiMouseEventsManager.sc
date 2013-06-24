@@ -68,7 +68,7 @@ UScoreEditorGuiMouseEventsManager {
 	}
 
 	makeEventViews{ |minWidth, maxWidth|
-	    eventViews = scoreEditor.events.collect{ |event,i|
+		eventViews = scoreEditor.events.select{ |x| x.hideInGUI.not }.collect{ |event,i|
 			event.makeView(i,minWidth, maxWidth)
 	    };
 	}

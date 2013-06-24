@@ -30,6 +30,7 @@ UEvent : UArchivable {
     var <releaseSelf = true;
     var <oscSetter;
     var <displayColor;
+	var <>hideInGUI = false;
 
     /*
     If 'releaseSelf' is set to false, then uchains will not free themselves automatically when the events stop playing.
