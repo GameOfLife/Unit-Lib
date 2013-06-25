@@ -8,7 +8,6 @@ BarMap {
 	
 	var <events;
 	var <beatDenom = 4; // a beat is 1/4; 1s at default tempo and bar
-	var <deleteDuplicates = true;
 	
 	*new { |signature = #[4,4], bar = 1...argPairs|
 		^super.newCopyArgs.init( (signature ? [4,4]).asCollection, bar ? 1, *argPairs )
@@ -20,7 +19,6 @@ BarMap {
 			events = events.add( this.class.formatEvent( signature, bar ) );
 		});
 		this.prUpdateBeats;
-		this.prDeleteDuplicates;
 		this.changed( \init );
 	}
 	
@@ -44,14 +42,6 @@ BarMap {
 	
 	firstBar { ^events[0][2]; }
 	
-	deleteDuplicates_ { |bool|
-		deleteDuplicates = bool.booleanValue;
-		if( deleteDuplicates ) {
-			this.prDeleteDuplicates;
-			this.changed( \events );
-		};
-	}
-	
 	beatDenom_ { |new = 4|
 		if( beatDenom != new ) {
 			beatDenom = new;
@@ -59,19 +49,17 @@ BarMap {
 		};
 	}
 	
-	prDeleteDuplicates { |force = false|
+	deleteDuplicates { |force = false|
 		// remove events that have the same tempo as the event before
 		var signature;
-		if( deleteDuplicates or: force ) {
-			events = events.sort({ |a,b| a[2] <= b[2]; }).collect({ |item|
-				if( signature == item[[0,1]] ) {
-					nil;
-				} {
-					signature = item[[0,1]];
-					item
-				};
-			}).select(_.notNil);
-		};
+		this.events = events.sort({ |a,b| a[2] <= b[2]; }).collect({ |item|
+			if( signature == item[[0,1]] ) {
+				nil;
+			} {
+				signature = item[[0,1]];
+				item
+			};
+		}).select(_.notNil);
 	}
 	
 	prUpdateBeats {
@@ -154,7 +142,6 @@ BarMap {
 		if( events.size == 0 ) {
 			events = [ [ 4,4,1,0,inf ] ];
 		};
-		this.prDeleteDuplicates;
 		this.prUpdateBeats;
 		this.changed( \events );
 	}
@@ -168,7 +155,6 @@ BarMap {
 				events = events.add( this.class.formatEvent( signature, bar, oldEvent ) );
 			};
 		});
-		this.prDeleteDuplicates;
 		this.prUpdateBeats;
 		this.changed( \events );
 	}
