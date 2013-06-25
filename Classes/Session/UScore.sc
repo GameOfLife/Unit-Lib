@@ -187,6 +187,27 @@ UScore : UEvent {
 	    ^events.collect(_.getAllUChains).flat
 	}
 	startTimes { ^events.collect( _.startTime ); }
+	startTimes_ { |times| 
+		times = times.asCollection;
+		events.do({ |evt, i| 
+			if( times[i].notNil ) {
+				evt.startTime = times[i]; 
+			};
+		}); 
+		this.changed( \events );
+	}
+	
+	startBeats { ^events.collect({ |evt| tempoMap.beatAtTime( evt.startTime ) }); }
+	startBeats_ { |beats|
+		beats = beats.asCollection;
+		events.do({ |evt, i| 
+			if( beats[i].notNil ) {
+				evt.startTime = tempoMap.timeAtBeat( beats[i] ) 
+			};
+		}); 
+		this.changed( \events );
+	}
+	
 	durations { ^events.collect( _.dur ); }
 	
 	duration {

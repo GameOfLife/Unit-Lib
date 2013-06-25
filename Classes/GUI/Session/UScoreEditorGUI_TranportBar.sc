@@ -20,6 +20,57 @@
 UScoreEditorGui_TransportBar {
     var <scoreView;
     var <>views, <>scoreController, <scoreViewController;
+    
+    *initClass {
+	    StartUp.defer({			
+			DrawIcon.drawFuncs.put( \lock, { |rect|
+				var size = rect.width.min( rect.height ) * 0.8;
+				var radius = size/6;
+				var corners = [ -1 @ 0, -1 @ -2, 1 @ -2, 1 @ 0 ] * radius;
+				
+				Pen.use({
+					
+					Pen.translate( *rect.center.asArray );
+					
+					Pen.fillRect( Rect( size.neg * 0.25,0, size / 2, size / 3 ) );
+					
+					2.do({
+						Pen.moveTo( corners[0] )
+							.arcTo( corners[1], corners[2], radius )
+							.arcTo( corners[2], corners[3], radius )
+							.lineTo( corners[3] );
+						corners = corners.reverse * [0.5@0.75];
+						radius = radius / 2;
+					});
+					Pen.fill;
+			
+					});
+				}
+			).put( \unlock, { |rect|
+				var size = rect.width.min( rect.height ) * 0.8;
+				var radius = size/6;
+				var corners = [ 0 @ 0, 0 @ -2, 2 @ -2, 2 @ 0 ] * radius;
+				
+				Pen.use({
+					Pen.translate( *rect.center.asArray );
+					
+					Pen.fillRect( Rect( (size.neg * 0.25) - (radius/2),0, size / 2, size / 3 ) );
+					
+					2.do({
+						Pen.moveTo( corners[0] )
+							.arcTo( corners[1], corners[2], radius )
+							.arcTo( corners[2], corners[3], radius )
+							.lineTo( corners[3] );
+						corners = (corners.reverse + [ radius@0 ]) * [0.5@0.75];
+						radius = radius / 2;
+					});
+					Pen.fill;
+					
+					});
+				}
+			);
+		});
+    }
 
     *new{ |parent, bounds, scoreView|
         ^super.newCopyArgs(scoreView).init(parent, bounds)
@@ -236,6 +287,7 @@ UScoreEditorGui_TransportBar {
 				scoreView.showTempoMap = v.value.booleanValue;
 				views[\signature].visible = scoreView.showTempoMap;
 				views[\tempo].visible = scoreView.showTempoMap;
+				views[\lockToTempo].visible = scoreView.showTempoMap;
 				views[\barMap].visible = scoreView.showTempoMap;
 				views[\counter].visible = scoreView.showTempoMap.not;
 			});
@@ -248,26 +300,37 @@ UScoreEditorGui_TransportBar {
 			.align_( \center )
 			.value_( this.score.tempoMap.signatureAtTime( this.score.pos ) )
 			.action_({ |vw|
-				if( true ) {
-					this.score.tempoMap.setSignatureAtTime( vw.value, this.score.pos );
-					this.score.changed( \pos );
+				this.score.tempoMap.setSignatureAtTime( vw.value, this.score.pos );
+				this.score.changed( \pos );
+			});
+			
+		views[\tempo] = SmoothNumberBox( view,40@size )
+			.visible_( scoreView.showTempoMap )
+			.autoScale_(true)
+			.value_( this.score.tempoMap.bpmAtTime( this.score.pos ) )
+			.action_({ |vw|
+				var beats;
+				if(this.score.isStopped && (views[ \lockToTempo ].value == 1) ) {
+					beats = this.score.startBeats;
+					this.score.tempoMap.setBPMAtTime( vw.value, this.score.pos );
+					this.score.startBeats = beats;
 				} {
-					vw.value = this.score.tempoMap.signatureAtTime( this.score.pos );
+					this.score.tempoMap.setBPMAtTime( vw.value, this.score.pos );
+					this.score.changed( \pos );
 				};
 			});
 			
-		views[\tempo] = SmoothNumberBox( view,35@size )
-			.visible_( scoreView.showTempoMap )
-			.autoScale_(true)
-			.align_( \center )
-			.value_( this.score.tempoMap.bpmAtTime( this.score.pos );			)
-			.action_({ |vw|
-				if( true ) {
-					this.score.tempoMap.setBPMAtTime( vw.value, this.score.pos );
-					this.score.changed( \pos );
-				} {
-					vw.value = this.score.tempoMap.bpmAtTime( this.score.pos );				};
-			});
+		view.decorator.shift( -16, 0 );
+			
+		views[\lockToTempo ] = SmoothButton( view,12@12 )
+			.label_( [ 'unlock', 'lock' ] )
+			.states_( [ [ 'unlock' ], [ 'lock', Color.red ] ] )
+			.radius_( 4 )
+			.hiliteColor_(nil)
+			.canFocus_( false )
+			.background_( nil )
+			.border_( 0.00001 )
+			.visible_( scoreView.showTempoMap );
 	    
         view.decorator.shift( view.decorator.indentedRemaining.width - 78, 0 );
         
