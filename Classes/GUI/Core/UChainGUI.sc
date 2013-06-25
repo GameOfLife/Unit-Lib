@@ -40,6 +40,7 @@ UChainGUI {
 		skin = ( 
 			labelWidth: 80, 
 			hiliteColor: Color.black.alpha_(0.33),
+			border: 0.0000001, // force invisible border in Qt
 			SmoothButton: (
 				border: 0.75,
 				background:  Gradient( Color.white, Color.gray(0.85), \v ) 

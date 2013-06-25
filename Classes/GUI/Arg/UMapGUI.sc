@@ -101,7 +101,7 @@ UMapGUI : UGUI {
 				
 			SmoothButton( header, Rect( 2, 2, 12, 12 ) )
 				.label_( ['down', 'play'] )
-				.border_( 0 )
+				.border_( 0.0000001 )
 				.background_( nil )
 				.hiliteColor_( nil )
 				.canFocus_( false )

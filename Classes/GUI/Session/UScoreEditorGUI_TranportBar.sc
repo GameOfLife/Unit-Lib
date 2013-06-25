@@ -205,6 +205,7 @@ UScoreEditorGui_TransportBar {
 			.align_( \center )
 			.clipLo_(0)
 			.applySmoothSkin
+			.border_(0.000001)
 			.charSelectColor_( Color.white.alpha_(0.5) )
 			.autoScale_( true )
 			.visible_( scoreView.showTempoMap.not )
@@ -241,6 +242,7 @@ UScoreEditorGui_TransportBar {
 			
 		views[\signature] = SignatureBox( view,35@size )
 			.applySmoothSkin
+			.border_(0.00001)
 			.visible_( scoreView.showTempoMap )
 			.autoScale_(true)
 			.align_( \center )
