@@ -41,6 +41,10 @@ UChainGUI {
 			labelWidth: 80, 
 			hiliteColor: Color.black.alpha_(0.33),
 			border: 0.0000001, // force invisible border in Qt
+			RoundButton: (
+				border: 0.75,
+				background:  Gradient( Color.white, Color.gray(0.85), \v ) 
+			),
 			SmoothButton: (
 				border: 0.75,
 				background:  Gradient( Color.white, Color.gray(0.85), \v ) 
@@ -567,6 +571,7 @@ UChainGUI {
 		if( notMassEdit && { this.canPackUnits }) {
 			RoundButton( comp, 13 @ 13 )
 				.border_(0)
+				.background_( nil )
 				.label_([ 'down', 'play' ])
 				.hiliteColor_(nil)
 				.value_( packUnits.binaryValue )
