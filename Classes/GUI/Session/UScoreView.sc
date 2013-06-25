@@ -38,6 +38,10 @@ UScoreView {
      var <showTempoMap = false;
 
      *new{ |parent, bounds, scoreEditor| ^super.new.init(scoreEditor, parent,bounds) }
+     
+     *current {
+	     ^UScoreEditorGUI.current !? _.scoreView
+     }
 
      init { |scoreEditor, inParent, inBounds|
 
