@@ -45,7 +45,7 @@ UMenuWindow {
 		
 		font = font ?? { Font( Font.defaultSansFace, 12 ); };
 		
-		window = Window( "UMenuWindow", Rect(0, Window.screenBounds.height - 30, 408, 30) ).front;
+		window = Window( "UMenuWindow", Rect(0, Window.screenBounds.height - 30, 428, 30) ).front;
 		window.addFlowLayout;
 		
 		sessionMenu = PopUpTreeMenu(window, 120@20 )
@@ -206,7 +206,7 @@ UMenuWindow {
 				vw.tree.atPath( value ).value;
 			});	
 		
-		viewMenu = PopUpTreeMenu(window, 120@20 )
+		viewMenu = PopUpTreeMenu(window, 140@20 )
 			.font_( font )
 			.tree_(
 				OEM(
