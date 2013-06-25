@@ -99,13 +99,19 @@ BarMapView {
 		views[ \sub ].autoScale = bool;
 	}
 	
+	radius_ { |radius|
+		radius = radius.asCollection.wrapExtend(4);
+		views[ \bar ].radius = [ radius[0], 0, 0, radius[3] ];
+		views[ \sub ].radius = [ 0, radius[1], radius[2], 0 ];
+	}
+	
 	*viewNumLines { ^1 }
 	
 	makeView { |parent, bounds, resize|
 		var getValue, centerWidth, sideWidth;
 		if( bounds.isNil ) { bounds= 350 @ (this.class.viewNumLines * (viewHeight + 4)) };
 		
-		view = EZCompositeView( parent, bounds, gap: 4@4 );
+		view = EZCompositeView( parent, bounds, gap: 2@2 );
 		bounds = view.asView.bounds;
 		view.onClose_({ this.remove; });
 		view.resize_( resize ? 5 );
@@ -119,7 +125,7 @@ BarMapView {
 		};
 		
 		centerWidth = (viewHeight * 1.25).floor;
-		sideWidth = ( ( bounds.width - (centerWidth + 8) ) / 2 ).floor;
+		sideWidth = ( ( bounds.width - (centerWidth + 4) ) / 2 ).floor;
 		
 		views[ \bar ] = SmoothNumberBox( view, sideWidth @ viewHeight )
 			.step_(1).scroll_step_(1)
