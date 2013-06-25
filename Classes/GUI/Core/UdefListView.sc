@@ -144,6 +144,8 @@ UdefListView {
                 (bounds.width - (scrollerMargin+6))@18,
                 collapsed[ cat ] ? true
             );
+            
+            views[ cat ].button.background = nil;
 
             views[ cat ].addFlowLayout( 0@0, 4@4 );
 
