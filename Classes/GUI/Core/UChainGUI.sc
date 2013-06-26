@@ -363,12 +363,13 @@ UChainGUI {
 			
 			composite.decorator.shift( -88, 0 );
 			
-			views[ \startBar ] = BarMapView( composite, 84@14, tempoMap.barMap  )
+			views[ \startBar ] = TempoBarMapView( composite, 84@14, tempoMap  )
 				.applySkin( RoundView.skin )
+				.radius_(2)
 				.clipLo_(0)
 				.visible_( startTimeMode === \bar )
 				.action_({ |nb|
-					score.startTime_( tempoMap.timeAtBeat( nb.value ) );
+					score.startTime_( nb.value );
 				});
 
 			
@@ -397,12 +398,13 @@ UChainGUI {
 			
 			composite.decorator.shift( -88, 0 );
 			
-			views[ \startBar ] = BarMapView( composite, 84@14, tempoMap.barMap  )
+			views[ \startBar ] = TempoBarMapView( composite, 84@14, tempoMap  )
 				.applySkin( RoundView.skin )
+				.radius_(2)
 				.clipLo_(0)
 				.visible_( startTimeMode === \bar )
 				.action_({ |nb|
-					chain.startTime_( tempoMap.timeAtBeat( nb.value ) );
+					chain.startTime_( nb.value );
 				});
 			
 			composite.decorator.nextLine;
@@ -553,7 +555,7 @@ UChainGUI {
 				.put( \displayColor, { { views[ \displayColor ].refresh; }.defer; } )
 				.put( \startTime, { 
 					views[ \startTime ].value = chain.startTime ? 0; 
-					views[ \startBar ].value = tempoMap.beatAtTime( chain.startTime ? 0 );
+					views[ \startBar ].value = chain.startTime ? 0;
 				})
 				.put( \dur, { var dur;
 					dur = chain.dur;
@@ -583,7 +585,7 @@ UChainGUI {
 				.put( \displayColor, { { views[ \displayColor ].refresh; }.defer; } )
 				.put( \startTime, { 
 					views[ \startTime ].value = score.startTime ? 0; 
-					views[ \startBar ].value = tempoMap.beatAtTime( score.startTime ? 0 );
+					views[ \startBar ].value = score.startTime ? 0;
 				});
 		};
 		
