@@ -344,6 +344,7 @@ UChainGUI {
 			// startTime
 			PopUpMenu( composite, labelWidth@14 )
 				.applySkin( RoundView.skin )
+				.canFocus_( false )
 				.items_( [ "startTime", "startBar" ] )
 				.action_({ |pu|
 					startTimeMode = [ \time, \bar ][ pu.value ];
@@ -379,6 +380,7 @@ UChainGUI {
 				
 			PopUpMenu( composite, labelWidth@14 )
 				.applySkin( RoundView.skin )
+				.canFocus_( false )
 				.items_( [ "startTime", "startBar" ] )
 				.action_({ |pu|
 					startTimeMode = [ \time, \bar ][ pu.value ];
