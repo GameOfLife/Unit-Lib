@@ -3,6 +3,7 @@
 	drawTempoGrid { |tempoMap|
 		var viewRect, pixelScale;
 		var barLines, firstBar;
+		var tempos, signatures, temposSignatures;
 		var top, bottom, left60, leftRounded;
 		var round, width, scaleAmt;
 		if( tempoMap.isNil ) {
@@ -21,6 +22,8 @@
 		scaleAmt = 1/this.scaleAmt.asArray;
 		barLines = tempoMap.barLines( viewRect.left, viewRect.right );
 		firstBar = tempoMap.barAtTime(barLines.first ? 0)[0];
+		signatures = tempoMap.signaturesBetween( viewRect.left, viewRect.right );
+		tempos = tempoMap.bpmsBetween( viewRect.left, viewRect.right );
 		
 		Pen.color = Color.gray.alpha_(0.25);
 		
@@ -76,8 +79,44 @@
 				Pen.addRect( bnds.moveBy( 0, bnds.height.neg - 1 ) ).fill;
 				Pen.color = Color.white.alpha_(0.5);
 				Pen.stringAtPoint(
-					(firstBar + (i * round)).asString,
+					string,
 					2@(bnds.height.neg - 1) 
+				);
+			});
+		});
+		
+		temposSignatures = signatures.collect({ |item, i|
+			var tempo;
+			tempo = tempos.detect({ |t|
+				item[1].equalWithPrecision( t[1], 1.0e-6 )
+			});
+			tempos.remove( tempo );
+			if( tempo.notNil ) {
+				[ [ item[0].join("/"), tempo[0] ], item[1] ];
+			} {
+				[ [ item[0].join("/") ], item[1] ]
+			};
+		});
+		
+		temposSignatures = temposSignatures.addAll( 
+			tempos.collect({ |item| [ [ item[0] ], item[1] ] })
+		);
+		
+		temposSignatures.do({ |item, i|
+			Pen.use({
+				var string, bnds;
+				string = item[0].join(", ");
+				bnds = string.bounds( Font( Font.defaultSansFace, 9 ) );
+				bnds.width = bnds.width + 4;
+				Pen.translate( item[1], bottom );
+				Pen.scale( *scaleAmt );
+				Pen.font = Font( Font.defaultSansFace, 9 );
+				Pen.color = Color.gray.alpha_(0.25);
+				Pen.addRect( bnds.moveBy( 0, (bnds.height.neg*2) -1 ) ).fill;
+				Pen.color = Color.white.alpha_(0.5);
+				Pen.stringAtPoint(
+					string,
+					2@((bnds.height.neg*2) -1) 
 				);
 			});
 		});

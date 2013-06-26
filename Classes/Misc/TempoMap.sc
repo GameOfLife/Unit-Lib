@@ -228,6 +228,26 @@ TempoMap {
 			.collect({ |item| this.timeAtBeat( item ) });
 	}
 	
+	bpmsBetween { |startTime = 0, endTime = inf|
+		^events.select({ |item|
+			item[2].inclusivelyBetween( startTime, endTime );
+		}).collect({ |item|
+			[ this.tempoToBPM( item[0] ).round(0.001), item[2] ]
+		});
+	}
+	
+	signaturesBetween { |startTime = 0, endTime = inf|
+		var startBeat, endBeat, barMapEvents;
+		startBeat = this.beatAtTime( startTime );
+		endBeat = this.beatAtTime( endTime );
+		barMapEvents = barMap.events.select({ |item|
+			item[3].inclusivelyBetween( startBeat, endBeat );
+		});
+		^barMapEvents.collect({ |item|
+			[ item[[0,1]], this.timeAtBeat( item[3] ) ];
+		});
+	}
+	
 	== { |that| ^that.class == this.class && { 
 			this.events == that.events && {
 				this.barMap == that.barMap
