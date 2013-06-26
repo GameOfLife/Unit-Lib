@@ -233,6 +233,9 @@ UScoreEditor {
 	moveEvents { |events, amount = 0| // use for small steps
 		if( events.size > 0 ) {	
 			this.changeScore({	
+				if( amount.isNegative ) {
+					amount = amount.max( events.collect(_.startTime ).minItem.neg );
+				};
 				if( amount != 0 ) {
 					this.changeScore({
 						events.do({ |ev|
@@ -247,12 +250,16 @@ UScoreEditor {
 	moveEventsBeats { |events, amount = 0|
 		if( events.size > 0 ) {	
 			this.changeScore({	
+				if( amount.isNegative ) {
+					amount = amount.max( 
+						score.tempoMap.beatAtTime( events.collect(_.startTime ).minItem ) 
+					);
+				};
 				if( amount != 0 ) {
 					this.changeScore({
 						events.do({ |ev|
-							ev.startTime = score.tempoMap.useBeat( 
-								ev.startTime, _ + amount 
-							).max(0);
+							ev.startTime = score.tempoMap.useBeat( ev.startTime, _ + amount )
+								.max(0);
 						});
 					});
 				};
