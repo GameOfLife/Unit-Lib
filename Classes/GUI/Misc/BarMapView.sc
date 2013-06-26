@@ -22,9 +22,12 @@ BarMapView {
 	var <value = 0;
 	var <barMap;
 	var <parent, <view, <views;
+	var <>clipLo = -inf;
+	var <>clipHi = inf;
 	var <>action;
 	var <viewHeight = 14;
 	var <visible = true;
+	var <enabled;
 	
 	*new { |parent, bounds, barMap, action|
 		^super.new.init( parent, bounds, barMap, action );
@@ -55,6 +58,11 @@ BarMapView {
 			this.update;
 		};
 		{ view.visible = visible }.defer;
+	}
+	
+	enabled_ { |bool = true|
+		enabled = bool;
+		views.do(_.enabled_(enabled));
 	}
 	
 	update {
@@ -121,6 +129,7 @@ BarMapView {
 			value = barMap.beatAtBar( views[ \bar ].value, 
 				views[ \division ].value + (views[ \sub ].value / 1000) 
 			);
+			value = value.clip( clipLo, clipHi );
 		};
 		
 		centerWidth = (viewHeight * 1.25).floor;

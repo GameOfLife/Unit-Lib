@@ -287,6 +287,7 @@ UScoreEditorGui_TransportBar {
 				scoreView.showTempoMap = v.value.booleanValue;
 				views[\signature].visible = scoreView.showTempoMap;
 				views[\tempo].visible = scoreView.showTempoMap;
+				views[\editTempo].visible = scoreView.showTempoMap;
 				views[\lockToTempo].visible = scoreView.showTempoMap;
 				views[\barMap].visible = scoreView.showTempoMap;
 				views[\counter].visible = scoreView.showTempoMap.not;
@@ -335,6 +336,15 @@ UScoreEditorGui_TransportBar {
 			.background_( nil )
 			.border_( 0.00001 )
 			.visible_( scoreView.showTempoMap );
+			
+		views[\editTempo ] = SmoothButton( view, 28@size )
+            	.radius_( bounds.height / 8 )
+			.label_( "edit" )
+			.canFocus_(false)
+			.visible_( scoreView.showTempoMap )
+			.action_({ |b|
+				views[\tempoEditor ] = UScoreTempoMapGUI( score: scoreView.currentScore );
+			});
 	    
         view.decorator.shift( view.decorator.indentedRemaining.width - 78, 0 );
         
@@ -361,6 +371,8 @@ UScoreEditorGui_TransportBar {
             .canFocus_(false);
         
         RoundView.popSkin;
+        
+        view.onClose_({ views[\tempoEditor ] !? _.close })
 
     }
 
