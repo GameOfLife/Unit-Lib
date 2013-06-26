@@ -107,7 +107,7 @@ TempoMap {
 	}
 	
 	prIndexAtBeat { |beat = 0|
-		var i = 0;
+		var i = 1;
 		while { (i < size) && { events[i][1] <= beat } } {
 			i = i+1;
 		};
@@ -115,7 +115,7 @@ TempoMap {
 	}
 	
 	prIndexAtTime { |time = 0|
-		var i = 0;
+		var i = 1;
 		while { (i < size) && { events[i][2] <= time } } {
 			i = i+1;
 		};
@@ -193,6 +193,13 @@ TempoMap {
 	
 	timeAtBar { |bar = 1, division = 0|
 		^this.timeAtBeat( barMap.beatAtBar( bar, division ) );
+	}
+	
+	timeMoveWithSnap { |time = 0, delta = 1, snap = 0.25|
+		var beat, newBeat;
+		beat = this.beatAtTime( time );
+		newBeat = this.beatAtTime( time + delta );
+		^this.timeAtBeat( beat + (newBeat - beat).round(snap) );
 	}
 	
 	signatureAtTime { |time = 0|

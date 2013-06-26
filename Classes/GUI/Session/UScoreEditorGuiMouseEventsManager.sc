@@ -225,6 +225,7 @@ UScoreEditorGuiMouseEventsManager {
 	
 	mouseMoveEvent{ |mousePos,unscaledMousePos,scaledUserView,snap,shiftDown,maxWidth|
 		var deltaX, deltaY, newEvents, selectedEvent;
+		var tempoMap;
 		
 		//check if movement exceeds threshold
 		if((unscaledMousePos - mouseDownPos).x.abs > minimumMov) {
@@ -271,14 +272,15 @@ UScoreEditorGuiMouseEventsManager {
 				};
 				
 				//if event is selected apply action all selected, otherwise apply action only to the event
+				if( scoreView.showTempoMap ) { tempoMap = score.tempoMap };
 				if(theEventView.selected) {
 					
 					this.selectedEventViews.do{ |eventView|
 						("resizing "++eventView);
-						eventView.mouseMoveEvent(deltaX,deltaY,state,snap,shiftDown)
+						eventView.mouseMoveEvent(deltaX,deltaY,state,snap,shiftDown,tempoMap)
 					}
 				} {
-					theEventView.mouseMoveEvent(deltaX,deltaY,state,snap,shiftDown)
+					theEventView.mouseMoveEvent(deltaX,deltaY,state,snap,shiftDown,tempoMap)
 				}				
 
 			} {

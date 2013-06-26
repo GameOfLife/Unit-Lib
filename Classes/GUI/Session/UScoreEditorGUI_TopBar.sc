@@ -226,27 +226,39 @@ UScoreEditorGui_TopBar {
 			});
 
 
-		header.decorator.shift( header.decorator.indentedRemaining.width - 200, 0 );
+		header.decorator.shift( header.decorator.indentedRemaining.width - (184 + size), 0 );
 
 		StaticText( header, 30@size ).string_( "snap:" ).font_( font ).align_( \right )
 			.resize_(3);
 
 		PopUpMenu( header, 50@size )
-			.items_( [ "off", "0.001", "0.01", "0.1", "0.25", "0.333", "1" ] )
+			.items_( [ 
+				"off", 
+				"0.001", "0.01", "0.1", 
+				"1/32", "1/16", "1/12", "1/8", "1/6", "1/5", "1/4", "1/3", "1/2", "1" 
+			] )
 			.canFocus_(false)
 			.font_( font )
 			.resize_(3)
-			.value_(4)
+			.value_(10)
 			.action_({ |v|
 				if (v.value == 0)
 					{ scoreView.snapActive = false; }
 					{ scoreView.snapActive = true; };
 
-				scoreView.snapH = [0, 0.001, 0.01, 0.1, 0.25, 1/3, 1][ v.value ];
+				scoreView.snapH = (1/[inf,1000,100,10,32,16,12,8,6,5,4,3,2,1])[ v.value ];
 				});
 
-		StaticText( header, 15@size ).string_( "s" ).font_( font )
-			.resize_(3);
+		SmoothButton( header, size@size )
+			.label_( "Q" )
+			.resize_(3)
+			.action_({
+				this.selectedEvents !? { |x| 
+					this.scoreEditor.quantizeEvents(
+						x, scoreView.snapH, scoreView.showTempoMap 
+					)
+				} ?? { "quantize: no selected events".postln };
+			});
 
 		StaticText( header, 30@size ).string_( "mode:" ).font_( font )
 			.resize_(3)

@@ -316,5 +316,26 @@ UScoreEditor {
 	splitEventsAtPos { |events|
 	    this.splitEvents(events, score.pos)
 	}
+	
+	quantizeEvents { |events, amount = 0, useTempoMap = false|
+		amount = amount ? 0;
+		if( amount > 0 ) {
+			this.changeScore({	
+				if( useTempoMap ) {
+					events.do({ |event|
+						event.startTime = score.tempoMap.timeAtBeat(
+							score.tempoMap.beatAtTime(
+								event.startTime
+							).round(amount)
+						);
+					});
+				} {
+					events.do({ |event|
+						event.startTime = event.startTime.round(amount);
+					});
+				};
+			})
+		}
+	}
 
 }

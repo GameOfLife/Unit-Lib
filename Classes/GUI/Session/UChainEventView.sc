@@ -257,7 +257,7 @@ UChainEventView : UEventView {
 
 	}
 
-	mouseMoveEvent{ |deltaTime, deltaTrack, overallState, snap, moveVert|
+	mouseMoveEvent{ |deltaTime, deltaTrack, overallState, snap, moveVert, tempoMap|
 
 			switch(overallState)
 			{\resizingFront}
@@ -272,7 +272,13 @@ UChainEventView : UEventView {
 			{\moving}
 			{
 				if( moveVert.not ) {
-					event.startTime = (originalStartTime + deltaTime.round(snap)).max(0);
+					if( tempoMap.notNil ) {
+						event.startTime = tempoMap.timeMoveWithSnap( 
+							originalStartTime, deltaTime, snap
+						).max(0);
+					} {
+						event.startTime = (originalStartTime + deltaTime.round(snap)).max(0);
+					};
 				};
 				event.track = originalTrack + deltaTrack;
 			}

@@ -47,13 +47,19 @@ UMarkerEventView : UEventView {
 
 	}
 
-	mouseMoveEvent{ |deltaTime, deltaTrack, overallState, snap, moveVert|
+	mouseMoveEvent{ |deltaTime, deltaTrack, overallState, snap, moveVert, tempoMap|
 
         if(overallState == \moving) {
-            if( moveVert.not ) {
-                event.startTime = (originalStartTime + deltaTime).round(snap)
-            };
-            event.track = originalTrack + deltaTrack;
+	        if( moveVert.not ) {
+				if( tempoMap.notNil ) {
+					event.startTime = tempoMap.timeMoveWithSnap( 
+						originalStartTime, deltaTime, snap
+					).max(0);
+				} {
+					event.startTime = (originalStartTime + deltaTime.round(snap)).max(0);
+				};
+			};
+			event.track = originalTrack + deltaTrack;
         }
 
 	}
