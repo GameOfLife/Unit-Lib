@@ -243,7 +243,7 @@ TempoMap {
 	
 	storeModifiersOn { |stream|
 		if( barMap != defaultBarMap ) {
-			stream << ".barmap_(" <<< barMap << ")";
+			stream << ".barMap_(" <<< barMap << ")";
 		};
 	}
 	
