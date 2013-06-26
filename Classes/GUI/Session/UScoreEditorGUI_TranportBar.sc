@@ -312,10 +312,14 @@ UScoreEditorGui_TransportBar {
 				var beats;
 				if(this.score.isStopped && (views[ \lockToTempo ].value == 1) ) {
 					beats = this.score.startBeats;
-					this.score.tempoMap.setBPMAtTime( vw.value, this.score.pos );
+					this.score.tempoMap.setBPMAtBeat( vw.value, 
+						this.score.tempoMap.beatAtTime( this.score.pos )
+					);
 					this.score.startBeats = beats;
 				} {
-					this.score.tempoMap.setBPMAtTime( vw.value, this.score.pos );
+					this.score.tempoMap.setBPMAtBeat( vw.value, 
+						this.score.tempoMap.beatAtTime( this.score.pos )
+					);
 					this.score.changed( \pos );
 				};
 			});
