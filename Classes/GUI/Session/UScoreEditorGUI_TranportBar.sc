@@ -133,7 +133,7 @@ UScoreEditorGui_TransportBar {
 		scoreController.put(\pos, { |who,what|
             views[\counter].value = this.score.pos;
             views[\barMap ].value = this.score.tempoMap.beatAtTime( this.score.pos );
-            views[\tempo ].value = this.score.tempoMap.bpmAtTime( this.score.pos );
+            views[\tempo ].value = this.score.tempoMap.bpmAtTime( this.score.pos ).round(0.001);
             views[\signature ].value = this.score.tempoMap.signatureAtTime( this.score.pos ) 
 		});
 		
@@ -307,7 +307,7 @@ UScoreEditorGui_TransportBar {
 		views[\tempo] = SmoothNumberBox( view,40@size )
 			.visible_( scoreView.showTempoMap )
 			.autoScale_(true)
-			.value_( this.score.tempoMap.bpmAtTime( this.score.pos ) )
+			.value_( this.score.tempoMap.bpmAtTime( this.score.pos ).round(0.001) )
 			.action_({ |vw|
 				var beats;
 				if(this.score.isStopped && (views[ \lockToTempo ].value == 1) ) {
