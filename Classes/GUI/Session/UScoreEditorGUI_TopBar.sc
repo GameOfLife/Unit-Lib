@@ -233,20 +233,22 @@ UScoreEditorGui_TopBar {
 
 		PopUpMenu( header, 50@size )
 			.items_( [ 
-				"off", 
+				"off", "cf",
 				"0.001", "0.01", "0.1", 
 				"1/32", "1/16", "1/12", "1/8", "1/6", "1/5", "1/4", "1/3", "1/2", "1" 
 			] )
 			.canFocus_(false)
 			.font_( font )
 			.resize_(3)
-			.value_(10)
+			.value_(11)
 			.action_({ |v|
 				if (v.value == 0)
 					{ scoreView.snapActive = false; }
 					{ scoreView.snapActive = true; };
 
-				scoreView.snapH = (1/[inf,1000,100,10,32,16,12,8,6,5,4,3,2,1])[ v.value ];
+				scoreView.snapH = (1/[inf, 
+					ULib.servers[0].options.sampleRate / ULib.servers[0].options.blockSize,
+				1000,100,10,32,16,12,8,6,5,4,3,2,1])[ v.value ];
 				});
 
 		SmoothButton( header, size@size )
