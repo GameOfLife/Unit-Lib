@@ -358,4 +358,11 @@ UScoreEditor {
 		}
 	}
 
+	quantizePos { |amount = 0, useTempoMap = false|
+		if( useTempoMap ) {
+			score.pos = score.tempoMap.useBeat( score.pos, _.round(amount) );
+		} {
+			score.pos = score.pos.round(amount);
+		};
+	}
 }

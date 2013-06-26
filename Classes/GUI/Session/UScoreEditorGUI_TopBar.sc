@@ -252,12 +252,15 @@ UScoreEditorGui_TopBar {
 		SmoothButton( header, size@size )
 			.label_( "Q" )
 			.resize_(3)
+			.canFocus_(false)
 			.action_({
 				this.selectedEvents !? { |x| 
 					this.scoreEditor.quantizeEvents(
 						x, scoreView.snapH, scoreView.showTempoMap 
 					)
-				} ?? { "quantize: no selected events".postln };
+				} ?? {
+					this.scoreEditor.quantizePos( scoreView.snapH, scoreView.showTempoMap );
+				};
 			});
 
 		StaticText( header, 30@size ).string_( "mode:" ).font_( font )
