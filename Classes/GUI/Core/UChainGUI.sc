@@ -24,6 +24,7 @@ UChainGUI {
 	classvar <>singleWindow = true;
 	classvar <>packUnitsDefault = true;
 	classvar <>scrollViewOrigin;
+	classvar <>startTimeMode = \time; // \time, \bar
 	
 	var <chain, <score;
 	
@@ -34,6 +35,7 @@ UChainGUI {
 	var <packUnits = true;
 	var <>scrollView;
 	var <>massEditWindowIndex;
+	var <>tempoMap;
 	
 	*initClass {
 		
@@ -67,6 +69,8 @@ UChainGUI {
 		parent = inParent;
 		
 		packUnits = packUnitsDefault;
+		
+		tempoMap = UScore.current !? _.tempoMap ?? { TempoMap() };
 		
 		if( skin.font.class != Font.implClass ) { // quick hack to make sure font is correct
 			skin.font = Font( Font.defaultSansFace, 10 );
@@ -338,34 +342,67 @@ UChainGUI {
 			composite.decorator.nextLine;
 			
 			// startTime
-			StaticText( composite, labelWidth@14 )
+			PopUpMenu( composite, labelWidth@14 )
 				.applySkin( RoundView.skin )
-				.string_( "startTime" )
-				.align_( \right );
+				.items_( [ "startTime", "startBar" ] )
+				.action_({ |pu|
+					startTimeMode = [ \time, \bar ][ pu.value ];
+					views[ \startTime ].visible = (startTimeMode === \time );
+					views[ \startBar ].visible = (startTimeMode === \bar );
+				})
+				.value_( [ \time, \bar ].indexOf( startTimeMode ) ? 0 );
 				
 			views[ \startTime ] = SMPTEBox( composite, 84@14 )
 				.applySmoothSkin
 				.applySkin( RoundView.skin )
 				.clipLo_(0)
-				.value_( score.startTime )
+				.visible_( startTimeMode === \time )
 				.action_({ |nb|
 					score.startTime_( nb.value );
 				});
 			
+			composite.decorator.shift( -88, 0 );
+			
+			views[ \startBar ] = BarMapView( composite, 84@14, tempoMap.barMap  )
+				.applySkin( RoundView.skin )
+				.clipLo_(0)
+				.visible_( startTimeMode === \bar )
+				.action_({ |nb|
+					score.startTime_( tempoMap.timeAtBeat( nb.value ) );
+				});
+
+			
 			composite.decorator.nextLine;
 		} {	
 			// startTime
-			StaticText( composite, labelWidth@14 )
+				
+			PopUpMenu( composite, labelWidth@14 )
 				.applySkin( RoundView.skin )
-				.string_( "startTime" )
-				.align_( \right );
+				.items_( [ "startTime", "startBar" ] )
+				.action_({ |pu|
+					startTimeMode = [ \time, \bar ][ pu.value ];
+					views[ \startTime ].visible = (startTimeMode === \time );
+					views[ \startBar ].visible = (startTimeMode === \bar );
+				})
+				.value_( [ \time, \bar ].indexOf( startTimeMode ) ? 0 );
 				
 			views[ \startTime ] = SMPTEBox( composite, 84@14 )
 				.applySmoothSkin
 				.applySkin( RoundView.skin )
 				.clipLo_(0)
+				.visible_( startTimeMode === \time )
 				.action_({ |nb|
 					chain.startTime_( nb.value );
+				});
+			
+			composite.decorator.shift( -88, 0 );
+			
+			views[ \startBar ] = BarMapView( composite, 84@14, tempoMap.barMap  )
+				.applySkin( RoundView.skin )
+				.clipLo_(0)
+				.visible_( startTimeMode === \bar )
+				.action_({ |nb|
+					chain.startTime_( tempoMap.timeAtBeat( nb.value ) );
 				});
 			
 			composite.decorator.nextLine;
@@ -514,7 +551,10 @@ UChainGUI {
 		if( score.isNil ) {
 			controller
 				.put( \displayColor, { { views[ \displayColor ].refresh; }.defer; } )
-				.put( \startTime, { views[ \startTime ].value = chain.startTime ? 0; })
+				.put( \startTime, { 
+					views[ \startTime ].value = chain.startTime ? 0; 
+					views[ \startBar ].value = tempoMap.beatAtTime( chain.startTime ? 0 );
+				})
 				.put( \dur, { var dur;
 					dur = chain.dur;
 					if( dur == inf ) {
@@ -541,7 +581,10 @@ UChainGUI {
 			scoreController = SimpleController( score );
 			scoreController
 				.put( \displayColor, { { views[ \displayColor ].refresh; }.defer; } )
-				.put( \startTime, { views[ \startTime ].value = score.startTime ? 0; });
+				.put( \startTime, { 
+					views[ \startTime ].value = score.startTime ? 0; 
+					views[ \startBar ].value = tempoMap.beatAtTime( score.startTime ? 0 );
+				});
 		};
 		
 		chain.changed( \gain );
