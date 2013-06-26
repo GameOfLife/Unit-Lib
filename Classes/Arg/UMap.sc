@@ -231,21 +231,25 @@ UMap : U {
 	
 	// UMap is intended to use as arg for a Unit (or another UMap)
 	asUnitArg { |unit, key|
-		this.unitArgName = key;
-		if( key.notNil ) {
-			if( unit.isUMap && { unit.def.isMappedArg( key ) } ) {
-				if( unit.spec.notNil ) {
+		if( unit.canUseUMap( key, this.def ) ) {
+			this.unitArgName = key;
+			if( key.notNil ) {
+				if( unit.isUMap && { unit.def.isMappedArg( key ) } ) {
+					if( unit.spec.notNil ) {
+						this.spec = unit.getSpec( key ).copy;
+						this.set( \u_spec, [0,1,\lin].asSpec );
+					};
+				} {
 					this.spec = unit.getSpec( key ).copy;
-					this.set( \u_spec, [0,1,\lin].asSpec );
+					this.set( \u_spec, spec );
 				};
-			} {
-				this.spec = unit.getSpec( key ).copy;
-				this.set( \u_spec, spec );
+				this.def.activateUnit( this, unit );
+				this.valuesAsUnitArg
 			};
-			this.def.activateUnit( this, unit );
-			this.valuesAsUnitArg
+			^this;
+		} {
+			^unit.getDefault( key );
 		};
-		^this;
 	}
 	
 	unit_ { |aUnit|
