@@ -25,6 +25,7 @@ UChainGUI {
 	classvar <>packUnitsDefault = true;
 	classvar <>scrollViewOrigin;
 	classvar <>startTimeMode = \time; // \time, \bar
+	classvar <>durationMode = \duration; // \duration, \endTime, \endBar
 	
 	var <chain, <score;
 	
@@ -412,20 +413,58 @@ UChainGUI {
 			composite.decorator.nextLine;
 			
 			// duration
-			StaticText( composite, labelWidth@14 )
+			PopUpMenu( composite, labelWidth@14 )
 				.applySkin( RoundView.skin )
-				.string_( "dur" )
-				.align_( \right );
+				.items_( [ "duration", "endTime", "endBar" ] )
+				.canFocus_( false )
+				.action_({ |pu|
+					durationMode = [ \duration, \endTime, \endBar ][ pu.value ];
+					views[ \dur ].visible = (durationMode === \duration );
+					views[ \endTime ].visible = (durationMode === \endTime );
+					views[ \endBar ].visible = (durationMode === \endBar );
+				})
+				.value_( [ \duration, \endTime, \endBar ].indexOf( durationMode ) ? 0 );
 				
 			views[ \dur ] = SMPTEBox( composite, 84@14 )
 				.applySmoothSkin
 				.applySkin( RoundView.skin )
 				.clipLo_(0)
+				.visible_( durationMode === \duration )
 				.action_({ |nb|
 					if( nb.value == 0 ) {
 						chain.dur_( inf );
 					} {
 						chain.dur_( nb.value );
+					};
+				});
+				
+			composite.decorator.shift( -88, 0 );
+			
+			views[ \endTime ] = SMPTEBox( composite, 84@14 )
+				.applySmoothSkin
+				.applySkin( RoundView.skin )
+				.clipLo_(0)
+				.visible_( durationMode === \endTime )
+				.action_({ |nb|
+					if( nb.value <= chain.startTime ) {
+						chain.dur_( inf );
+					} {
+						chain.dur_( nb.value - chain.startTime );
+					};
+				});
+				
+			composite.decorator.shift( -88, 0 );
+			
+			views[ \endBar ] = TempoBarMapView( composite, 84@14, tempoMap  )
+				.applySkin( RoundView.skin )
+				.radius_(2)
+				.clipLo_(0)
+				.visible_( durationMode === \endBar )
+				.action_({ |nb|
+					if( nb.value <= chain.startTime ) {
+						chain.dur_( inf );
+					} {
+						chain.dur_( nb.value - chain.startTime );
 					};
 				});
 				
@@ -558,17 +597,30 @@ UChainGUI {
 				.put( \startTime, { 
 					views[ \startTime ].value = chain.startTime ? 0; 
 					views[ \startBar ].value = chain.startTime ? 0;
+					if( chain.dur == inf ) {
+						views[ \endTime ].value = chain.startTime ? 0;
+						views[ \endBar ].value = chain.startTime ? 0; 
+					} {
+						views[ \endTime ].value = (chain.startTime + chain.dur) ? 0; 
+						views[ \endBar ].value = (chain.startTime + chain.dur) ? 0; 
+					};
 				})
 				.put( \dur, { var dur;
 					dur = chain.dur;
 					if( dur == inf ) {
 						views[ \dur ].enabled = false; // don't set value
+						views[ \endTime ].enabled = false; // don't set value
+						views[ \endBar ].enabled = false; // don't set value
 						views[ \infDur ].value = 1;
 						views[ \releaseSelf ].hiliteColor = Color.green.alpha_(0.25);
 						views[ \releaseSelf ].stringColor = Color.black.alpha_(0.5);
 					} {
 						views[ \dur ].enabled = true;
+						views[ \endTime ].enabled = true;
+						views[ \endBar ].enabled = true;
 						views[ \dur ].value = dur;
+						views[ \endTime ].value = chain.startTime + dur;
+						views[ \endBar ].value = chain.startTime + dur;
 						views[ \infDur ].value = 0;
 						views[ \releaseSelf ].hiliteColor = Color.green.alpha_(1);
 						views[ \releaseSelf ].stringColor = Color.black.alpha_(1);
