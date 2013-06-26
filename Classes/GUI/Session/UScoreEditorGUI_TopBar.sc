@@ -247,7 +247,8 @@ UScoreEditorGui_TopBar {
 					{ scoreView.snapActive = true; };
 
 				scoreView.snapH = (1/[inf, 
-					ULib.servers[0].options.sampleRate / ULib.servers[0].options.blockSize,
+					ULib.servers[0].options.sampleRate ? 44100 / 
+					ULib.servers[0].options.blockSize,
 				1000,100,10,32,16,12,8,6,5,4,3,2,1])[ v.value ];
 				});
 
