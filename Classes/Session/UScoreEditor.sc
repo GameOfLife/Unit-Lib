@@ -252,7 +252,7 @@ UScoreEditor {
 			this.changeScore({	
 				if( amount.isNegative ) {
 					amount = amount.max( 
-						score.tempoMap.beatAtTime( events.collect(_.startTime ).minItem ) 
+						score.tempoMap.beatAtTime( events.collect(_.startTime ).minItem ).neg 
 					);
 				};
 				if( amount != 0 ) {
