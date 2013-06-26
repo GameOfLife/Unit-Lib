@@ -195,6 +195,14 @@ TempoMap {
 		^this.timeAtBeat( barMap.beatAtBar( bar, division ) );
 	}
 	
+	useBeat { |time = 0, func|
+		^this.timeAtBeat( func.value( this.beatAtTime( time ), this ) );
+	}
+	
+	useBar { |time = 0, func|
+		^this.timeAtBar( *func.value( *this.barAtTime( time ) ++ this ) );
+	}
+	
 	timeMoveWithSnap { |time = 0, delta = 1, snap = 0.25|
 		var beat, newBeat;
 		beat = this.beatAtTime( time );

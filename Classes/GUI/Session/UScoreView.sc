@@ -256,6 +256,10 @@ UScoreView {
 	    this.currentEditor.moveEvents(this.selectedEvents, amt)
     }
     
+    moveSelectedBeats { |amt = 0|
+	    this.currentEditor.moveEventsBeats(this.selectedEvents, amt)
+    }
+    
     changeTrackSelected { |amt = 0|
 	    this.currentEditor.changeEventsTrack(this.selectedEvents, amt)
     }
@@ -513,18 +517,38 @@ UScoreView {
 						this.changeTrackSelected( 1 );
 					},
 					\left, { // left
-						if( this.selectedEvents.size > 0 ) {
-							this.moveSelected( snapH.neg );
+						if( showTempoMap ) {
+							if( this.selectedEvents.size > 0 ) {
+								this.moveSelectedBeats( snapH.neg )
+							} {
+								score.pos = score.tempoMap.useBeat( 
+									score.pos, _ - snapH
+								).max(0);
+							}; 
 						} {
-							score.pos = (score.pos - snapH).max(0);
-						};
+							if( this.selectedEvents.size > 0 ) {
+								this.moveSelected( snapH.neg );
+							} {
+								score.pos = (score.pos - snapH).max(0);
+							};	
+						}
 					},
 					\right, { // right
-						if( this.selectedEvents.size > 0 ) {
-							this.moveSelected( snapH );
+						if( showTempoMap ) {
+							if( this.selectedEvents.size > 0 ) {
+								this.moveSelectedBeats( snapH )
+							} {
+								score.pos = score.tempoMap.useBeat( 
+									score.pos, _ + snapH
+								);
+							}; 
 						} {
-							score.pos = score.pos + snapH;
-						};
+							if( this.selectedEvents.size > 0 ) {
+								this.moveSelected( snapH );
+							} {
+								score.pos = score.pos + snapH;
+							};	
+						}
 					}
 				);
 			})

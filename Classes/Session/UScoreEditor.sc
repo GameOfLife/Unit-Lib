@@ -247,6 +247,26 @@ UScoreEditor {
 			});
 		};
 	}
+	
+	moveEventsBeats { |events, amount = 0|
+		if( events.size > 0 ) {	
+			this.changeScore({	
+				var minStartTime;
+				if( amount.isNegative && { amount.abs > (
+					score.tempoMap.beatAtTime( events.collect(_.startTime ).minItem ) 
+				) }) {
+					amount = 0; // don't move if negative amount exceeds first startTime
+				};
+				if( amount != 0 ) {
+					this.changeScore({
+						events.do({ |ev|
+							ev.startTime = score.tempoMap.useBeat( ev.startTime, _ + amount );
+						});
+					});
+				};
+			});
+		};
+	}
 
 	changeEventsTrack { |events, amount = 0|
 		if( events.size > 0 ) {	
