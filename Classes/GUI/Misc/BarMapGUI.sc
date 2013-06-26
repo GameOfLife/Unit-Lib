@@ -4,6 +4,7 @@ BarMapGUI {
 	var <parent, <scrollView, <composite, <allViews, <localEvents;
 	var <>action;
 	var <viewHeight = 14;
+	var skin;
 	
 	*new { |parent, barMap, action|
 		^super.new.init( parent, barMap, action );
@@ -26,7 +27,7 @@ BarMapGUI {
 	rebuild {
 		{	
 			composite.remove;
-			this.makeViews;
+			RoundView.useWithSkin( skin, { this.makeViews; });
 		}.defer(0.1);
 	}
 	
@@ -43,6 +44,8 @@ BarMapGUI {
 			122 + (viewHeight * 2), 
 			(viewHeight + 4) * (barMap.events.size + 2)
 		);	
+		
+		skin = RoundView.skin;
 			
 		font = RoundView.skin.tryPerform( \at, \font ) ?? { 
 			Font( Font.defaultSansFace, viewHeight - 4) 

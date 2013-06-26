@@ -5,6 +5,7 @@ TempoMapGUI {
 	var <>action;
 	var <viewHeight = 14;
 	var <mode = \bar;
+	var skin;
 	
 	*new { |parent, tempoMap, action|
 		^super.new.init( parent, tempoMap, action );
@@ -27,7 +28,7 @@ TempoMapGUI {
 	rebuild {
 		{	
 			composite.remove;
-			this.makeViews;
+			RoundView.useWithSkin( skin, { this.makeViews; });
 		}.defer(0.1);
 	}
 	
@@ -51,6 +52,8 @@ TempoMapGUI {
 			(160 + (viewHeight * 2)), 
 			(viewHeight + 4) * (tempoMap.events.size + 2)
 		);	
+		
+		skin = RoundView.skin;
 			
 		font = RoundView.skin.tryPerform( \at, \font ) ?? { 
 			Font( Font.defaultSansFace, viewHeight - 4) 
