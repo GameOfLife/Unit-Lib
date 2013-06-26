@@ -39,7 +39,6 @@ BarMapView {
 		} {  bounds.isKindOf( Rect ) } {
 			viewHeight = bounds.height;
 		};
-		viewHeight.postln;
 		this.makeView( parent, bounds );
 	}
 	
