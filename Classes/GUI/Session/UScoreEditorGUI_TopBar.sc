@@ -226,12 +226,12 @@ UScoreEditorGui_TopBar {
 			});
 
 
-		header.decorator.shift( header.decorator.indentedRemaining.width - (184 + size), 0 );
+		header.decorator.shift( header.decorator.indentedRemaining.width - (189 + size), 0 );
 
 		StaticText( header, 30@size ).string_( "snap:" ).font_( font ).align_( \right )
 			.resize_(3);
 
-		PopUpMenu( header, 50@size )
+		PopUpMenu( header, 55@size )
 			.items_( [ 
 				"off", "cf",
 				"0.001", "0.01", "0.1", 
