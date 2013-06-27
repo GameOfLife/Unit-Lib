@@ -331,6 +331,7 @@ UScoreEditorGui_TransportBar {
 			.hiliteColor_(nil)
 			.canFocus_( false )
 			.background_( nil )
+			.border_( 0 )
 			.visible_( scoreView.showTempoMap );
 			
 		views[\editTempo ] = SmoothButton( view, 28@size )
