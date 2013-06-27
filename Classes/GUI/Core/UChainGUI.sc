@@ -37,6 +37,7 @@ UChainGUI {
 	var <>scrollView;
 	var <>massEditWindowIndex;
 	var <>tempoMap;
+	var <>undoManager;
 	
 	*initClass {
 		
@@ -110,6 +111,10 @@ UChainGUI {
 		RoundView.useWithSkin( skin ++ (RoundView.skin ? ()), {
 			this.prMakeViews( bounds );
 		});
+	}
+	
+	undo { |amt = 1|
+		undoManager !? { chain.handleUndo( undoManager.undo( amt ) ) };
 	}
 	
 	getHeight { |units, margin, gap|
@@ -236,6 +241,21 @@ UChainGUI {
 		 	);
 		
 		composite.decorator.shift( bounds.width - 14 - 80 - 32, 0 );
+
+		if( chain.isKindOf( MassEditUChain ).not ) {
+			
+			composite.decorator.shift( -34, 0 );
+			
+			undoManager = undoManager ?? { UndoManager() };
+			
+			if( chain.handlingUndo ) {
+				chain.handlingUndo = false;
+			} {
+				undoManager.add( chain );
+			};
+			
+			UndoView( composite, 30@14, chain, undoManager ).view.resize_(3);
+		};
 		
 		views[ \displayColor ] = UserView( composite, 28@14 )
 			.resize_(3)
@@ -675,6 +695,7 @@ UChainGUI {
 				.hiliteColor_(nil)
 				.value_( packUnits.binaryValue )
 				.action_({ |bt|
+					chain.handlingUndo = true; // don't add a state
 					this.packUnits = bt.value.booleanValue;
 				});
 			headerInset = 14;

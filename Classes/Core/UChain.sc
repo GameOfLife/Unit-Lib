@@ -40,6 +40,7 @@ UChain : UEvent {
 	
 	var <>addAction = \addToHead;
 	var <>ugroup;
+	var <>handlingUndo = false;
 	
 	*initClass {
 		
@@ -75,6 +76,13 @@ UChain : UEvent {
 	*fromPreset { |name| ^presetManager.apply( name ) }
 	
 	fromPreset { |name| ^presetManager.apply( name, this ); }
+	
+	handleUndo { |obj|
+		if( obj.notNil ) {
+			handlingUndo = true;
+			this.fromObject( obj );
+		};
+	}
 
 	/*
 	* Syntaxes for UChain creation:

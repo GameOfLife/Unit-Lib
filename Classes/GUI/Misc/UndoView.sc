@@ -22,9 +22,6 @@ UndoView {
 	var <object, <undoManager;
 	var <view, <views, <ctrlFunc;
 	
-	var <object;
-	var <view, <views;
-	
 	*new { |parent, bounds, object, undoManager|
 		^super.newCopyArgs( object )
 			.addUndoManagerFromObject
@@ -77,6 +74,7 @@ UndoView {
 	
 		view = CompositeView( parent, bounds );
 		view.addFlowLayout( 0@0, 2@2 );
+		view.onClose_({ undoManager.removeDependant( ctrlFunc ); });
 		
 		bounds = view.drawBounds;
 		
@@ -99,6 +97,8 @@ UndoView {
 					};
 				});
 		});
+		
+		this.undoManager.changed( \update );
 	}
 	
 }
