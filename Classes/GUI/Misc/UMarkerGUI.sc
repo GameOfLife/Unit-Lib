@@ -63,7 +63,7 @@ UMarkerGUI : UChainGUI {
 					Pen.addOval( smallRect, 2 );
 					Pen.fill;
 					Pen.color = Color.black;
-					DrawIcon( 'x', smallRect );
+					DrawIcon( '-', smallRect );
 				} {
 					Pen.roundedRect(vw.drawBounds, wd);
 					chain.getTypeColor.penFill( vw.drawBounds );
@@ -80,6 +80,7 @@ UMarkerGUI : UChainGUI {
 						if( chain.displayColor.isNil or: { 
 								chain.displayColor.class == Color 
 							} ) {
+								RoundView.pushSkin( skin );
 								views[ \colorEditor ] = ColorSpec( chain.getTypeColor )
 									.makeView( "UMarker displayColor",
 										action: { |vws, color| 
@@ -89,6 +90,7 @@ UMarkerGUI : UChainGUI {
 								views[ \colorEditor ].view.onClose = { 
 									views[ \colorEditor ] = nil 
 								};
+								RoundView.popSkin;
 						} {
 							"no editor available for %\n".postf( chain.displayColor.class );
 						};

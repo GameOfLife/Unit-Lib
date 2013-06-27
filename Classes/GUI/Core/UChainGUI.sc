@@ -268,7 +268,7 @@ UChainGUI {
 					Pen.addOval( smallRect, 2 );
 					Pen.fill;
 					Pen.color = Color.black;
-					DrawIcon( 'x', smallRect );
+					DrawIcon( '-', smallRect );
 				} {
 					Pen.roundedRect(vw.drawBounds, wd);
 					(score ? chain).getTypeColor.penFill( vw.drawBounds );
@@ -285,6 +285,7 @@ UChainGUI {
 						if( (score ? chain).displayColor.isNil or: { 
 								(score ? chain).displayColor.class == Color 
 							} ) {
+								RoundView.pushSkin( skin );
 								views[ \colorEditor ] = ColorSpec( 
 										(score ? chain).getTypeColor 
 									).makeView( "UChain displayColor", 
@@ -295,6 +296,7 @@ UChainGUI {
 								views[ \colorEditor ].view.onClose = { 
 									views[ \colorEditor ] = nil 
 								};
+								RoundView.popSkin;
 						} {
 							"no editor available for %\n".postf( 
 								(score ? chain).displayColor.class 
