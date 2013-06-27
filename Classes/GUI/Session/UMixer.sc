@@ -38,7 +38,7 @@ UMixer {
         this.addCurrentScoreControllers;
         unitControllers = List.new;
         mainComposite = ScrollView(parent,bounds).resize_(5)
-            .background_( Color.grey(0.5) );
+            .background_( Color.grey(0.8) );
         this.makeMixerView
 
      }
@@ -123,7 +123,7 @@ UMixer {
     }
 
      makeMixerView{
-        var spec, maxTrack,count, color, cview,w,level,bounds, width,top,main,scroll, evs;
+        var spec, maxTrack,count, cview,w,level,bounds, width,top,main,scroll, evs;
 		var score = this.currentScore;
 		var events = score.events;
         var viewBounds;
@@ -146,11 +146,14 @@ UMixer {
 			evs.do{ |event,i|
 				var cview,faders, eventsFromFolder, ctl, sl, bt;
 				if(event.track == j){
-				color = Color.rand;
 				if(event.isFolder.not){
 					cview = CompositeView(mixerView,40@330);
 					cview.decorator = FlowLayout(cview.bounds);
-					cview.background_(Color(0.58208955223881, 0.70149253731343, 0.83582089552239, 1.0););
+					if( [ Color ].includes( event.getTypeColor.class ) ) {
+						cview.background_( event.getTypeColor.copy.alpha_(0.5) );
+					} {
+						cview.background_(Color(0.58208955223881, 0.70149253731343, 0.83582089552239, 1.0));
+					}; 
 					cview.decorator.shift(0,24);
 					sl = EZSmoothSlider.new(cview, Rect(0,0,32,240), events.indexOf(event), spec, layout:\vert)
 						.value_(event.getGain)
@@ -186,7 +189,11 @@ UMixer {
 					eventsFromFolder = event.allEvents.collect{ |event| (\event: event,\oldLevel: event.getGain) };
 					cview = CompositeView(mixerView,40@330);
 					cview.decorator = FlowLayout(cview.bounds);
-					cview.background_(Color(0.28208955223881, 0.50149253731343, 0.23582089552239, 1.0););
+					if( [ Color ].includes( event.getTypeColor.class ) ) {
+						cview.background_( event.getTypeColor.copy.alpha_(0.5) );
+					} {
+						cview.background_(Color(0.28208955223881, 0.50149253731343, 0.23582089552239, 1.0));
+					}; 
 					SmoothButton(cview,32@20).states_([["open"]])
 						.radius_(3)
 						.action_({
