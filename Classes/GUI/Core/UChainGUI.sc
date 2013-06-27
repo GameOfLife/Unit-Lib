@@ -81,7 +81,7 @@ UChainGUI {
 			parent = chain.class.asString;
 		};
 		if( parent.class == String ) {
-			if( singleWindow && current.notNil ) {
+			if( singleWindow && current.notNil && { current.window.class == Window.implClass } ) {
 				parent = current.parent.asView.findWindow;
 				current.views.singleWindow.focus;
 				current.remove;
