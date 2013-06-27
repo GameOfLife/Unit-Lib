@@ -295,7 +295,6 @@ UScoreEditorGui_TransportBar {
 			
 		views[\signature] = SignatureBox( view,35@size )
 			.applySmoothSkin
-			.border_(0.00001)
 			.visible_( scoreView.showTempoMap )
 			.autoScale_(true)
 			.align_( \center )
@@ -332,7 +331,6 @@ UScoreEditorGui_TransportBar {
 			.hiliteColor_(nil)
 			.canFocus_( false )
 			.background_( nil )
-			.border_( 0.00001 )
 			.visible_( scoreView.showTempoMap );
 			
 		views[\editTempo ] = SmoothButton( view, 28@size )

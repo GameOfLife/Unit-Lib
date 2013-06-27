@@ -99,7 +99,6 @@ BarMapGUI {
 				
 			views[ \signature ] = SignatureBox( composite, 50@viewHeight )
 				.applySmoothSkin
-				.border_( 0.000001 )
 				.font_( font )
 				.value_( item[[0,1]] )
 				.action_( localAction ); 
