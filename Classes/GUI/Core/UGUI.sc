@@ -148,7 +148,7 @@ UGUI {
 						};
 					};
 				} {
-					vw = ObjectView( composite, nil, unit, key, 
+					vw = ObjectView( composite, bounds.width, unit, key, 
 						argSpec.spec, controller,
 						switch( argSpec.mode,
 						 	\nonsynth, { key ++ " (l)" },

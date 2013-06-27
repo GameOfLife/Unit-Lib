@@ -63,6 +63,8 @@ UMapGUI : UGUI {
 			mapCheckers.do(_.remove);
 		 };
 		 
+		 bounds = bounds.insetAll(0,0,2,0);
+		 
 		 if( unit.guiCollapsed ) {
 			 this.makeHeader(bounds);
 		 } {
@@ -92,7 +94,7 @@ UMapGUI : UGUI {
 			.font_( boldFont )
 			.string_( ":" + unit.defName );
 			
-			SmoothButton( header, Rect( bounds.width - 14, 2, 12, 12 ) )
+			SmoothButton( header, Rect( bounds.width - 12, 2, 12, 12 ) )
 				.label_( '-' )
 				.canFocus_( false )
 				.action_({
