@@ -51,7 +51,7 @@ UScoreTempoMapGUI {
 		};
 		view = CompositeView( parent, parent.asView.bounds.insetAll(0,0,0,30) );
 		view.resize_(5);
-		view.addFlowLayout;
+		view.addFlowLayout(0@0, 4@4);
 		RoundView.useWithSkin( UChainGUI.skin, {
 			barMapGUI = BarMapGUI( view, score.tempoMap.barMap );
 			tempoMapGUI = TempoMapGUI( view, score.tempoMap );
