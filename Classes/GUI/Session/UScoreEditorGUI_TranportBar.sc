@@ -132,7 +132,7 @@ UScoreEditorGui_TransportBar {
 
 		scoreController.put(\pos, { |who,what|
             views[\counter].value = this.score.pos;
-            views[\barMap ].value = this.score.tempoMap.beatAtTime( this.score.pos );
+            views[\barMap ].value = this.score.pos;
             views[\tempo ].value = this.score.tempoMap.bpmAtTime( this.score.pos ).round(0.001);
             views[\signature ].value = this.score.tempoMap.signatureAtTime( this.score.pos ) 
 		});
@@ -268,13 +268,13 @@ UScoreEditorGui_TransportBar {
             
         view.decorator.shift( -114, 0 );
         
-        views[\barMap] = BarMapView( view, 110@size, this.score.tempoMap.barMap )
-			.value_( this.score.tempoMap.beatAtTime( this.score.pos ) )
+        views[\barMap] = TempoBarMapView( view, 110@size, this.score.tempoMap )
+			.value_( this.score.pos )
 			.visible_( scoreView.showTempoMap )
 			.autoScale_( true )
 			.action_({ |v|
 				if(this.score.isStopped) {
-					this.score.pos = this.score.tempoMap.timeAtBeat( v.value )
+					this.score.pos = v.value;
 				};
 			});
             
@@ -302,7 +302,6 @@ UScoreEditorGui_TransportBar {
 			.value_( this.score.tempoMap.signatureAtTime( this.score.pos ) )
 			.action_({ |vw|
 				this.score.tempoMap.setSignatureAtTime( vw.value, this.score.pos );
-				this.score.changed( \pos );
 			});
 			
 		views[\tempo] = SmoothNumberBox( view,40@size )
@@ -321,7 +320,6 @@ UScoreEditorGui_TransportBar {
 					this.score.tempoMap.setBPMAtBeat( vw.value, 
 						this.score.tempoMap.beatAtTime( this.score.pos )
 					);
-					this.score.changed( \pos );
 				};
 			});
 			

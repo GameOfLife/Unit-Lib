@@ -33,6 +33,7 @@ UScoreView {
      var <scoreView, <scoreListView, <mainComposite, font, <parent, <bounds;
      var <>scoreList;
      var <currentScoreEditorController, <scoreController, <eventControllers = #[];
+     var <tempoMapControllers;
      
      var <updateTask, calledUpdate = false, <>updateInterval = 0.1;
      var <showTempoMap = false;
@@ -92,6 +93,14 @@ UScoreView {
 		        this.baseEditor.changed(\score);
 		    }
 		});
+		
+		tempoMapControllers.do(_.remove);
+		tempoMapControllers = [
+			SimpleController( this.currentScore.tempoMap )
+				.put( \events, { this.currentScore.changed( \pos ) }),
+			SimpleController( this.currentScore.tempoMap.barMap )
+				.put( \events, { this.currentScore.changed( \pos ) } )
+		];
 	}
 
 	makeEventControllers {
@@ -110,7 +119,7 @@ UScoreView {
 	}
 
 	remove {
-        ([currentScoreEditorController, scoreController, usessionMouseEventsManager]++eventControllers).do(_.remove)
+        ([currentScoreEditorController, scoreController, usessionMouseEventsManager]++eventControllers++tempoMapControllers).do(_.remove)
     }
 
 	update {

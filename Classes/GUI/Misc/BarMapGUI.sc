@@ -63,10 +63,7 @@ BarMapGUI {
 					allViews[ i ][ \signature ].value = item[[0,1]];
 				});
 				if( barMap.events != localEvents ) {
-					{	
-						composite.remove;
-						this.makeViews.value( );
-					}.defer(0.1);
+					this.rebuild;
 				};
 			});
 			

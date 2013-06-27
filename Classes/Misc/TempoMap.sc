@@ -8,6 +8,7 @@ TempoMap {
 	
 	classvar <>defaultBarMap;
 	classvar <>default;
+	classvar <>presetManager;
 	
 	var <events, <size;
 	var <>barMap;
@@ -16,12 +17,33 @@ TempoMap {
 		StartUp.defer({
 			defaultBarMap = BarMap();
 			default = TempoMap();
+			presetManager = PresetManager( this, [ \default, default ] )
+				.getFunc_({ |obj| obj.deepCopy })
+				.applyFunc_({ |object, preset|
+			 		object.fromObject( preset );
+		 		});
 		});
 	}
 	
 	*new { |tempo = 1, beat = 0 ...argPairs|
 		^super.newCopyArgs.init( tempo ? 1, beat ? 0, *argPairs )
 	}
+	
+	*presets { ^presetManager.presets.as(IdentityDictionary) }
+	
+	fromObject { |obj|
+		this.events = obj.value.events.deepCopy;
+		this.barMap.events = obj.value.barMap.events.deepCopy; // update duration of units
+		this.barMap.beatDenom = obj.value.barMap.beatDenom;
+	}
+	
+	*fromObject { |obj|
+		^obj.value.deepCopy;
+	}
+	
+	*fromPreset { |name| ^presetManager.apply( name ) }
+	
+	fromPreset { |name| ^presetManager.apply( name, this ); }
 	
 	init { |...args|
 		events = [];

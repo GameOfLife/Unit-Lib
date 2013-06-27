@@ -58,7 +58,6 @@ TempoMapGUI {
 		font = RoundView.skin.tryPerform( \at, \font ) ?? { 
 			Font( Font.defaultSansFace, viewHeight - 4) 
 		};
-		font = Font( Font.defaultSansFace, viewHeight - 4 );
 		
 		localEvents = tempoMap.events.copy;
 		composite = CompositeView( scrollView, bounds);

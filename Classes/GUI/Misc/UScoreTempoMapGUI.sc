@@ -2,7 +2,7 @@ UScoreTempoMapGUI {
 	
 	classvar <>current;
 	
-	var <parent, <barMapGUI, <tempoMapGUI;
+	var <parent, <view, <barMapGUI, <tempoMapGUI, <presetView;
 	
 	*new { |parent, score, openNew = false|
 		if( openNew.not && { current.notNil }) {
@@ -36,9 +36,8 @@ UScoreTempoMapGUI {
 	
 	score_ { |score|
 		barMapGUI.barMap = score.tempoMap.barMap;
-		barMapGUI.action = { score.changed( \pos ) };
 		tempoMapGUI.tempoMap = score.tempoMap;
-		tempoMapGUI.action = { score.changed( \pos ) };
+		presetView.object = score.tempoMap;
 	}
 	
 	makeViews { |score|
@@ -50,9 +49,20 @@ UScoreTempoMapGUI {
 				current = nil;
 			};
 		};
+		view = CompositeView( parent, parent.asView.bounds.insetAll(0,0,0,30) );
+		view.resize_(5);
+		view.addFlowLayout;
 		RoundView.useWithSkin( UChainGUI.skin, {
-			barMapGUI = BarMapGUI( parent, score.tempoMap.barMap, { score.changed( \pos ) } );
-			tempoMapGUI = TempoMapGUI( parent, score.tempoMap, { score.changed( \pos ) } );
+			barMapGUI = BarMapGUI( view, score.tempoMap.barMap );
+			tempoMapGUI = TempoMapGUI( view, score.tempoMap );
+			tempoMapGUI.scrollView.resize_(5);
+			
+			presetView = PresetManagerGUI( 
+				parent, 
+				parent.asView.bounds.width @ PresetManagerGUI.getHeight,
+				TempoMap.presetManager,
+				score.tempoMap
+			).resize_(7)
 		});
 	}
 	
