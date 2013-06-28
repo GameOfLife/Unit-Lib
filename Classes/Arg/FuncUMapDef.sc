@@ -20,6 +20,7 @@ FuncUMapDef : UMapDef {
 		argSpecs = argSpecs ++ [
 			[ \value, 0, DisplayControlSpec(0,1), valueIsPrivate ], 
 			[ \u_spec, [0,1].asSpec, ControlSpecSpec(), true ],
+			[ \u_prepared, false, BoolSpec(false), true ]
 		].collect(_.asArgSpec);
 		argSpecs.do(_.mode_( \nonsynth ));
 		mappedArgs = [ \value ];
@@ -60,8 +61,17 @@ FuncUMapDef : UMapDef {
 		};
 	}
 	
+	uPrepareValue { |unit| // can prepare value earlier if needed
+		this.prepare( nil, unit );
+		unit.setArg( \u_prepared, true );
+		^unit.value;
+	}
+	
 	prepare { |servers, unit, action|
-		this.doFunc( unit );
+		if( unit.get( \u_prepared ) == false ) {
+			this.doFunc( unit );
+			unit.setArg( \u_prepared, true );
+		};
 		action.value;
 	}
 	
@@ -71,7 +81,9 @@ FuncUMapDef : UMapDef {
 		};
 	}
 	
-	makeSynth { ^nil }
+	makeSynth { |unit, target, startPos = 0, synthAction|
+		unit.set( \u_prepared, false );
+	}
 	
 	hasBus { ^false }
 	
@@ -87,11 +99,19 @@ FuncUMapDef : UMapDef {
 	
 	setSynth { |unit ...keyValuePairs|
 		keyValuePairs.clump(2).do({ |item|
-			if( [ \u_spec ].includes( item[0] ).not ) {
+			if( [ \u_spec, \u_prepared ].includes( item[0] ).not ) {
 				this.doFunc( unit );
 				unit.unitSet;
 			};
 		});
 	}
 
+}
+
++ Object {
+	uPrepareValue { }
+}
+
++ U {
+	uPrepareValue { ^this.def.uPrepareValue( this ); }
 }
