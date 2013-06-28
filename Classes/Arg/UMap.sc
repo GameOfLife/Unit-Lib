@@ -101,7 +101,7 @@ UMapDef : Udef {
 				^("c" ++ (this.getBus(unit) + unit.class.busOffset)).asSymbol;
 			};
 		} {
-			^this.value( unit );
+			^this.value( unit ).asControlInput;
 		};
 	}
 	
