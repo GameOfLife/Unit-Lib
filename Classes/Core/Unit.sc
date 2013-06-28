@@ -207,6 +207,10 @@ Udef : GenericDef {
 		}
 	}
 
+	writeDefFile {
+		this.synthDef.asCollection( _.writeDefFile )
+	}
+
 	prepare { |servers, unit, action|
 	    action.value;
 	}
