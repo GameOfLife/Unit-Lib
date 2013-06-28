@@ -113,5 +113,5 @@ FuncUMapDef : UMapDef {
 }
 
 + U {
-	uPrepareValue { ^this.def.uPrepareValue( this ); }
+	uPrepareValue { this.def.uPrepareValue( this ); ^this.value; }
 }
