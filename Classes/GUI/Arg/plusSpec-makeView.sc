@@ -823,6 +823,50 @@
 	
 }
 
++ DisplayPointSpec {
+	
+	
+	makeView {
+		 |parent, bounds, label, action, resize|
+		var vws, view, labelWidth, font;
+		vws = ();
+		
+		font =  (RoundView.skin ? ()).font ?? { Font( Font.defaultSansFace, 10 ); };
+		bounds.isNil.if{bounds= 320@20};
+		
+		view = EZCompositeView( parent, bounds, gap: 2@2 );
+		bounds = view.asView.bounds;
+				
+		vws[ \view ] = view;
+		
+		if( label.notNil ) {
+			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
+			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ bounds.height )
+				.string_( label.asString ++ " " )
+				.align_( \right )
+				.resize_( 4 )
+				.applySkin( RoundView.skin );
+		} {
+			labelWidth = 0;
+		};
+		
+		vws[ \display ] = StaticText( view, (bounds.width - (labelWidth + 4)) @ (bounds.height) )
+			.font_( font );
+	
+		^vws;
+	}
+	
+	setView { |view, value, active = false|
+		{ 
+			view[ \display ].string = value.asPoint.asArray.asString 
+		}.defer;
+	}
+	
+	mapSetView { |view, value, active = false|
+		this.setView( view, this.map( value ), active );
+	}
+}
+
 + CodeSpec {
 	
 	makeView { |parent, bounds, label, action, resize|

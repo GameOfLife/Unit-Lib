@@ -305,6 +305,9 @@ PointSpec : Spec {
 	}
 }
 
+DisplayPointSpec : PointSpec {
+}
+
 CodeSpec : Spec {
 	
 	var <>default;
