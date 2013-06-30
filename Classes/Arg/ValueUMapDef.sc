@@ -28,7 +28,8 @@ ValueUMapDef : UMapDef {
 			[ \u_store, nil, AnythingSpec(), true ], // func can store things here
 			[ \u_spec, [0,1].asSpec, ControlSpecSpec(), true ],
 		] ++ argSpecs).collect(_.asArgSpec);
-		argSpecs.do(_.mode_( \nonsynth ));
+		argSpecs.do(_.mode_( \init ));
+		this.setSpecMode( \value, \nonsynth );
 		mappedArgs = [ \value ];
 		allowedModes = [ \init, \sync, \normal ];
 		this.canUseUMap = false;
