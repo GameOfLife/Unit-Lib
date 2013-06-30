@@ -22,10 +22,10 @@ FuncUMapDef : UMapDef {
 			[ \u_spec, [0,1].asSpec, ControlSpecSpec(), true ],
 			[ \u_prepared, false, BoolSpec(false), true ]
 		].collect(_.asArgSpec);
-		argSpecs.do(_.mode_( \nonsynth ));
+		argSpecs.do(_.mode_( \init ));
+		this.setSpecMode( \value, \nonsynth );
 		mappedArgs = [ \value ];
 		allowedModes = [ \init, \sync, \normal ];
-		this.canUseUMap = false;
 		this.changed( \init );
 	}
 		
@@ -42,8 +42,10 @@ FuncUMapDef : UMapDef {
 		^unit.argSpecs.collect({ |item| 
 			var val;
 			val = argPairs.pairsAt(item.name) ?? { item.default.copy };
-			if( this.isMappedArg( item.name ) && { val.isKindOf( UMap ).not } ) { 
-				val = item.spec.unmap( val ); 
+			if( this.isMappedArg( item.name ) ) { 
+				val = item.spec.unmap( val.value ); 
+			} {
+				val = val.value;
 			};
 			[ item.name,  val ] 
 		}).flatten(1);
@@ -113,5 +115,8 @@ FuncUMapDef : UMapDef {
 }
 
 + U {
-	uPrepareValue { this.def.uPrepareValue( this ); ^this.value; }
+	uPrepareValue { |target, startPos = 0, action| 
+			this.prepare( target, startPos, action ); 
+			^this.value;
+	}
 }
