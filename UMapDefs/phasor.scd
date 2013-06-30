@@ -1,5 +1,5 @@
 
-UMapDef( \lfo_phasor, { |speed = 0.1, up = 1, startPos = 0, range = #[0.0,1.0]|
+UMapDef( \phasor, { |speed = 0.1, up = 1, startPos = 0, range = #[0.0,1.0]|
 	var sig;
 	var trigger;
 	trigger = \trigger.utr + Impulse.kr(0);
