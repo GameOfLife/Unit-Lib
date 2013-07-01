@@ -9,7 +9,9 @@ FuncUMapDef( \point_random_value, { |
 })	
 	.category_( 'point' )
 	.numChannels_( 2 )
-	.setSpec( \value, DisplayPointSpec(Rect(0,0,1,1)) )
+	.setSpec( \value, DisplaySpec( PointSpec(Rect(0,0,1,1)), { |point|
+		"% @ %".format(point.x, point.y ) 
+	}) )
 	.setDefault( \value, 0.5@0.5 )
 	.setSpec( \center, PointSpec(Rect(0,0,1,1)) )
 	.setSpec( \radius, PointSpec(Rect(0,0,1,1)) )

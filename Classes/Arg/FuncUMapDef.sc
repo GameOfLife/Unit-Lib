@@ -18,7 +18,7 @@ FuncUMapDef : UMapDef {
 		func = inFunc;
 		argSpecs = ArgSpec.fromFunc( func, argSpecs )[1..];
 		argSpecs = argSpecs ++ [
-			[ \value, 0, DisplayControlSpec(0,1), valueIsPrivate ], 
+			[ \value, 0, DisplaySpec(), valueIsPrivate ], 
 			[ \u_spec, [0,1].asSpec, ControlSpecSpec(), true ],
 			[ \u_prepared, false, BoolSpec(false), true ]
 		].collect(_.asArgSpec);

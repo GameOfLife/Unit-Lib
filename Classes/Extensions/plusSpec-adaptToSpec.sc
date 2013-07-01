@@ -49,3 +49,9 @@
 	}
 	
 }
+
++ DisplaySpec {
+	adaptToSpec { |inSpec|
+		^this.class.new( spec.adaptToSpec( inSpec ), formatFunc );
+	}
+}

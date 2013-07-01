@@ -305,9 +305,6 @@ PointSpec : Spec {
 	}
 }
 
-DisplayPointSpec : PointSpec {
-}
-
 CodeSpec : Spec {
 	
 	var <>default;
@@ -1069,7 +1066,21 @@ AngleSpec : ControlSpec {
 	}
 }
 
-DisplayControlSpec : ControlSpec {
+DisplaySpec : Spec { // a spec for displaying a value that should not be user-edited
+	var <>spec;
+	var <>formatFunc;
+	
+	*new { |spec, formatFunc|
+		^this.newCopyArgs( (spec ? [0,1]).asSpec, formatFunc ? _.asString );
+	}
+	
+	doesNotUnderstand { |selector ...args|
+		var res;
+		res = spec.perform( selector, *args );
+		if( res != this ) {
+			^res;
+		};
+	}
 }
 
 ControlSpecSpec : Spec {
