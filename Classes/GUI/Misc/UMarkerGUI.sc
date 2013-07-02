@@ -152,20 +152,37 @@ UMarkerGUI : UChainGUI {
 		composite.decorator.nextLine;
 			
 		// startTime
-		StaticText( composite, labelWidth@14 )
+		PopUpMenu( composite, labelWidth@14 )
 			.applySkin( RoundView.skin )
-			.string_( "startTime" )
-			.align_( \right );
+			.canFocus_( false )
+			.items_( [ "startTime", "startBar" ] )
+			.action_({ |pu|
+				startTimeMode = [ \time, \bar ][ pu.value ];
+				views[ \startTime ].visible = (startTimeMode === \time );
+				views[ \startBar ].visible = (startTimeMode === \bar );
+			})
+			.value_( [ \time, \bar ].indexOf( startTimeMode ) ? 0 );
 			
 		views[ \startTime ] = SMPTEBox( composite, 84@14 )
 			.applySmoothSkin
 			.applySkin( RoundView.skin )
 			.clipLo_(0)
-			.value_( chain.startTime )
+			.visible_( startTimeMode === \time )
 			.action_({ |nb|
-				chain.startTime_( nb.value );
+				score.startTime_( nb.value );
 			});
 		
+		composite.decorator.shift( -88, 0 );
+		
+		views[ \startBar ] = TempoBarMapView( composite, 84@14, tempoMap  )
+			.applySkin( RoundView.skin )
+			.radius_(2)
+			.clipLo_(0)
+			.visible_( startTimeMode === \bar )
+			.action_({ |nb|
+				score.startTime_( nb.value );
+			});
+						
 		composite.decorator.nextLine;
 		
 		// action
@@ -220,7 +237,10 @@ UMarkerGUI : UChainGUI {
 
 		controller
 			.put( \displayColor, { { views[ \displayColor ].refresh; }.defer; } )
-			.put( \startTime, { views[ \startTime ].value = chain.startTime ? 0; })
+			.put( \startTime, { 
+				views[ \startTime ].value = chain.startTime ? 0; 
+				views[ \startBar ].value = chain.startTime ? 0;
+			})
 			.put( \name, { { views[ \name ].value = chain.name; }.defer })
 			.put( \notes, { 
 				if( updateNotes ) {
