@@ -3,6 +3,7 @@ UMapDef : Udef {
 	
 	var <>mappedArgs;
 	var <>allowedModes = #[ sync, normal ];
+	var <>apxCPU = 0;
 	
 	*initClass{
 		this.defsFolders = [ 
