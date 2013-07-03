@@ -38,10 +38,12 @@ BufSndFilePlayer {
 	}
 	
 	*ar { |numChannels = 1, key, trigger = 1, startPos, doneAction = 0|
+		Udef.addBuildSpec(ArgSpec(key ? 'soundFile', nil, BufSndFileSpec(nil) ) );
 		^PlayBuf.ar( *this.getArgs( numChannels, key, trigger, startPos ) ++ [ doneAction ] );
 	}
 	
 	*kr { |numChannels = 1, key, trigger = 1, startPos, doneAction = 0|
+		Udef.addBuildSpec(ArgSpec(key ? 'soundFile', nil, BufSndFileSpec(nil) ) );
 		^PlayBuf.kr( *this.getArgs( numChannels, key, trigger, startPos, \control ) ++ [ doneAction ]  );
 	}
 	
@@ -58,6 +60,7 @@ DiskSndFilePlayer {
 		var bufnum, rate, loop;
 		key = key ? 'soundFile';
 		#bufnum, rate, loop = key.asSymbol.kr( [ 0, 1, 0 ] );
+		Udef.addBuildSpec(ArgSpec(key ? 'soundFile', nil, DiskSndFileSpec(nil) ) );
 		^VDiskIn.ar( numChannels, bufnum, BufRateScale.kr( bufnum ) * rate, loop );
 	}
 	

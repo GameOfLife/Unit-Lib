@@ -572,6 +572,15 @@ BufSndFile : AbstractSndFile {
 		};
 	}
 
+	//a pseudo-ugen for UGens for allocating a buffer and reading a file into it.
+	*kr{ |numChannels = 1, key|
+		var bufnum, rate, loop;
+		key = key ? 'buffer';
+		#bufnum, rate, loop = key.asSymbol.kr( [ 0, 1, 0 ] );
+		Udef.addBuildSpec( ArgSpec(key, nil, BufSndFileSpec(numChannels) ) );
+		^bufnum
+	}
+
 }
 
 MonoBufSndFile : BufSndFile {

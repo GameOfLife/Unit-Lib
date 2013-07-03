@@ -39,12 +39,22 @@ intelligently sense the size of the default, and switch to ControlSpec, RangeSpe
 + Symbol {
 
 	ukr{ |default, minval=0.0, maxval=1.0, warp='lin', step=0.0, lag, fixedLag = false|
-		Udef.addBuildSpec(ArgSpec(this, default, ControlSpec(minval, maxval, warp, step, default) ) );
+		var spec = if( minval.isKindOf( Symbol ) ) {
+			minval.asSpec
+		} {
+			ControlSpec(minval, maxval, warp, step, default)
+		};
+		Udef.addBuildSpec( ArgSpec(this, default, spec ) );
 		^this.kr(default, lag, fixedLag)
 	}
 
 	uir { |default, minval=0.0, maxval=1.0, warp='lin', step=0.0, lag, fixedLag = false|
-		Udef.addBuildSpec(ArgSpec(this, default, ControlSpec(minval, maxval, warp, step, default) )
+		var spec = if( minval.isKindOf( Symbol ) ) {
+			minval.asSpec
+		} {
+			ControlSpec(minval, maxval, warp, step, default)
+		};
+		Udef.addBuildSpec(ArgSpec(this, default, spec )
 			.mode_(\init) );
 		^this.kr(default, lag, fixedLag)
 	}
@@ -58,6 +68,23 @@ intelligently sense the size of the default, and switch to ControlSpec, RangeSpe
 			) ) );
 		};
 		^this.tr(default)
+	}
+
+	ukrRange { |minval=0.0, maxval=1.0, minRange=0, maxRange = inf, warp='lin',
+		step=0.0, lag, fixedLag = false|
+		Udef.addBuildSpec( ArgSpec(this, [minval, maxval],
+			RangeSpec(minval, maxval, minRange, maxRange, warp, step) ) )
+		^this.kr( [minval, maxval], lag, fixedLag)
+	}
+
+	ukrInt { |default=0, minval = -inf, maxval = inf, lag, fixedLag = false|
+		Udef.addBuildSpec( ArgSpec(this, default, IntegerSpec( default, minval, maxval ) ) );
+		^this.kr(default, lag, fixedLag)
+	}
+
+	ukrArgSpec{ |default, spec, lag, fixedLag = false|
+		Udef.addBuildSpec( ArgSpec(this, default, spec ) );
+		^this.kr(default, lag, fixedLag)
 	}
 
 }
