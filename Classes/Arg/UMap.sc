@@ -148,8 +148,10 @@ UMap : U {
 	
 	*busOffset { ^1500 }
 	
-	*new { |def, args, mod|
-		^super.new( def, args, mod ).setunmappedKeys( args );
+	init { |in, inArgs, inMod|
+		super.init( in, inArgs ? [], inMod );
+		this.setunmappedKeys( inArgs );
+		this.mapUnmappedArgs;
 	}
 	
 	setunmappedKeys { |args|
@@ -208,10 +210,7 @@ UMap : U {
 		if( spec.isNil ) {
 			if( newSpec.notNil ) {
 				spec = newSpec;
-				unmappedKeys.copy.do({ |item|
-					this.set( item, this.getSpec( item ).map( this.get( item ) ) );
-				});
-				unmappedKeys = nil;
+				this.mapUnmappedArgs;
 			};
 		} {
 			if( newSpec != spec ) {	
@@ -219,15 +218,18 @@ UMap : U {
 					this.set( item, this.getSpec( item ).unmap( this.get( item ) ) );
 				});
 				spec = newSpec;
-				if( spec.notNil ) {
-					this.def.mappedArgs.do({ |item|
-						this.set( item, this.getSpec( item ).map( this.get( item ) ) );
-					});
-				} {
-					unmappedKeys = this.def.mappedArgs.copy;
-				};
+				unmappedKeys = this.def.mappedArgs.copy;
+				this.mapUnmappedArgs;
 			}
 		} 
+	}
+	
+	mapUnmappedArgs {
+		if( spec.notNil ) {
+			unmappedKeys.copy.do({ |item|
+				this.set( item, this.getSpec( item ).map( this.get( item ) ) );
+			});
+		};
 	}
 	
 	// UMap is intended to use as arg for a Unit (or another UMap)
