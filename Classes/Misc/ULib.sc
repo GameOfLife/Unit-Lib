@@ -1,5 +1,22 @@
-	
-	
+/*
+    Unit Library
+    The Game Of Life Foundation. http://gameoflife.nl
+    Copyright 2006-2013 Miguel Negrao, Wouter Snoei.
+
+    GameOfLife Unit Library: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    GameOfLife Unit Library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GameOfLife Unit Library.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 ULib {
     classvar <>servers;
 
@@ -88,43 +105,62 @@ ULib {
         ^w
     }
 
-	*startup {
-		var defs;	
-		
+	*startup { |sendDefsOnInit = true|
+
 		UChain.makeDefaultFunc = {
 			UChain( \bufSoundFile, \stereoOutput ).useSndFileDur
 		};
-		
+
 		if( (thisProcess.platform.class.asSymbol == 'OSXPlatform') && {
-				thisProcess.platform.ideName.asSymbol === \scapp 
+				thisProcess.platform.ideName.asSymbol === \scapp
 		}) {
 			UMenuBar();
 		} {
 			UMenuWindow();
 		};
-		
-		Udef.loadOnInit = false;
- 		defs = Udef.loadAllFromDefaultDirectory.collect(_.synthDef).flat.select(_.notNil);
- 		defs = defs ++ UMapDef.loadAllFromDefaultDirectory.collect(_.synthDef).flat.select(_.notNil);
- 		Udef.loadOnInit = true;
- 		
- 		UnitRack.defsFolders = UnitRack.defsFolders.add( 
+
+		UnitRack.defsFolders = UnitRack.defsFolders.add(
 			Platform.userAppSupportDir ++ "/UnitRacks/";
 		);
 
-        ULib.servers.do{ |sv| sv.waitForBoot({
+		//if not sending the defs they should have been written to disk once before
+		// with writeDefaultSynthDefs
+		if( sendDefsOnInit ) {
+			var defs = this.getDefaultSynthDefs;
+			ULib.servers.do{ |sv| sv.waitForBoot({
 
-            defs.do( _.load( sv ) );
-            
-        });
-	   "\n\tUnit Lib started".postln
+				defs.do( _.load( sv ) );
+
+			})
+			}
+		} {
+			ULib.servers.do(_.boot)
         };
-        
+
         UGlobalGain.gui;
         UGlobalEQ.gui;
+
+		"\n\tUnit Lib started".postln
+	}
+
+	*getDefaultSynthDefs{
+		var defs;
+		Udef.loadOnInit = false;
+		defs = (Udef.loadAllFromDefaultDirectory ++
+			UMapDef.loadAllFromDefaultDirectory).collect(_.synthDef).flat.select(_.notNil);
+		Udef.loadOnInit = true;
+		^defs
+
+	}
+
+	*writeDefaultSynthDefs {
+		this.getDefaultSynthDefs.do{ |def|
+			def.writeDefFile;
+			"writting % SynthDef file".format(def.name).postln;
+		}
 	}
 
 }
 
-	
+
 	
