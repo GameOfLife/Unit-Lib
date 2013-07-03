@@ -77,6 +77,11 @@ UChainCodeGUI : UChainGUI {
 			};
 		};
 
+		DragSource(scrollView, width@16 )
+		.align_(\center)
+		.object_( chain.asCompileString )
+		.string_( "drag me for the chain's code" );
+
 		^units.collect({ |unit, i|
 			var header, comp, views, params;
 
