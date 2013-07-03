@@ -317,8 +317,8 @@ BufSndFileView {
 					.background_( nil )
 					.hiliteColor_( Color.blue(0.2).alpha_(0.2) );
 				b.action = { |sl|
-					x.startFrame = (sl.lo * x.numFrames).round(1);
-					x.endFrame = (sl.hi * x.numFrames).round(1);
+					x.startFrame = (sl.lo * x.numFrames).round(1).asInteger;
+					x.endFrame = (sl.hi * x.numFrames).round(1).asInteger;
 				};
 				b.lo = x.startFrame / x.numFrames;
 				b.hi = x.endFrame / x.numFrames;
