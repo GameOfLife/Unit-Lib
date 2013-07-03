@@ -11,7 +11,7 @@ UMapDef( \point_circle, { |
 	center = center.linlin(0,1,-1,1);
 	circle =ÊSinOsc.kr(  
 		speed * clockwise.linlin(0,1,-1,1), 
-		[ 0, 0.5pi ] + ((LPFLag.kr( startAngle, lag )) + (u_startPos * speed * 2pi)),
+		[ 0, 0.5pi ] + ((LPFLag.kr( startAngle, lag )) + (u_startPos * speed * 2pi).wrap(0,2pi)),
 		LPFLag.kr( radius, lag ),
 		LPFLag.kr( center, lag )
 	);
