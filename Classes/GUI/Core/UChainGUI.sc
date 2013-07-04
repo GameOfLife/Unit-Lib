@@ -662,6 +662,7 @@ UChainGUI {
 					views[ \startTime ].value = score.startTime ? 0; 
 					views[ \startBar ].value = score.startTime ? 0;
 				});
+			score.changed( \startTime );
 		};
 		
 		chain.changed( \gain );
