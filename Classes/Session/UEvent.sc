@@ -30,6 +30,7 @@ UEvent : UArchivable {
     var <releaseSelf = true;
     var <oscSetter;
     var <displayColor;
+    var <>lockStartTime = false;
 	var <>hideInGUI = false;
 
     /*
@@ -70,7 +71,7 @@ UEvent : UArchivable {
     track_ { |newTrack = 0| track = newTrack; this.changed( \track ) }
     
     startTime_ { |newTime|
-	   startTime = newTime; 
+	   if( lockStartTime.not ) { startTime = newTime; };
 	   this.changed( \startTime )
     }
     
