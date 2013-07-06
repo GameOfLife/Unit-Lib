@@ -228,7 +228,7 @@ UScoreEditorGuiMouseEventsManager {
 		var tempoMap;
 		
 		//check if movement exceeds threshold
-		if((unscaledMousePos - mouseDownPos).x.abs > minimumMov) {
+		if((unscaledMousePos - unscaledMouseDownPos).x.abs > minimumMov) {
 			//score will change store undo state
 			if((mouseMoved == false) && [\nothing, \selecting].includes(state).not){
 
