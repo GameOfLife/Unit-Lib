@@ -27,6 +27,7 @@ UScoreEditorGuiMouseEventsManager {
 	var <isCopying = false, copyed = false;
 	var <>mode = \all;
 	var scoreController;
+	var moveVert = false;
 
 	//state is \nothing, \moving, \resizingFront, \resizingBack, \selecting, \fadeIn, \fadeOut;
 	//mode is \all, \move, \resize, \fades
@@ -111,6 +112,7 @@ UScoreEditorGuiMouseEventsManager {
 		mouseDownPos = mousePos;
 		unscaledMouseDownPos = unscaledMousePos;
 		clickCount = inClickCount;
+		moveVert = true;
 
 		eventViews.do{ |eventView|
 			eventView.mouseDownEvent(mousePos,scaledUserView,shiftDown,mode)
@@ -230,8 +232,11 @@ UScoreEditorGuiMouseEventsManager {
 		var deltaX, deltaY, newEvents, selectedEvent;
 		var tempoMap;
 		
-		//check if movement exceeds threshold
-		if((unscaledMousePos - unscaledMouseDownPos).x.abs > minimumMov) {
+		// only start changing startTime if mouse has moved > 3px horizontally
+		if( moveVert == true ) { 
+			moveVert = (unscaledMousePos - unscaledMouseDownPos).x.abs <= minimumMov;
+		};
+		
 			//score will change store undo state
 			if((mouseMoved == false) && [\nothing, \selecting].includes(state).not){
 
@@ -280,10 +285,10 @@ UScoreEditorGuiMouseEventsManager {
 					
 					this.selectedEventViews.do{ |eventView|
 						("resizing "++eventView);
-						eventView.mouseMoveEvent(deltaX,deltaY,state,snap,shiftDown,tempoMap)
+						eventView.mouseMoveEvent(deltaX,deltaY,state,snap,shiftDown or: moveVert,tempoMap)
 					}
 				} {
-					theEventView.mouseMoveEvent(deltaX,deltaY,state,snap,shiftDown,tempoMap)
+					theEventView.mouseMoveEvent(deltaX,deltaY,state,snap,shiftDown or: moveVert,tempoMap)
 				}				
 
 			} {
@@ -297,7 +302,6 @@ UScoreEditorGuiMouseEventsManager {
 						);
 					};
 			}
-		}
 
 		
 	}
