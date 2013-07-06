@@ -395,6 +395,13 @@ UChainGUI {
 					score.startTime_( nb.value );
 				});
 
+			views[ \lockStartTime ] = SmoothButton( composite, 14@14 )
+				.label_([ 'unlock', 'lock' ])
+				.radius_(2)
+				.value_( score.lockStartTime.binaryValue )
+				.action_({ |bt|
+					score.lockStartTime = bt.value.booleanValue;
+				});
 			
 			composite.decorator.nextLine;
 		} {	
@@ -429,6 +436,14 @@ UChainGUI {
 				.visible_( startTimeMode === \bar )
 				.action_({ |nb|
 					chain.startTime_( nb.value );
+				});
+			
+			views[ \lockStartTime ] = SmoothButton( composite, 14@14 )
+				.label_([ 'unlock', 'lock' ])
+				.radius_(2)
+				.value_( chain.lockStartTime.binaryValue )
+				.action_({ |bt|
+					chain.lockStartTime = bt.value.booleanValue;
 				});
 			
 			composite.decorator.nextLine;

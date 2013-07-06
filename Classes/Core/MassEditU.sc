@@ -144,6 +144,9 @@ MassEditUChain {
 		^super.newCopyArgs( uchains ).init;
 	}
 	
+	lockStartTime { ^uchains.any(_.lockStartTime) }
+	lockStartTime_ { |bool| ^uchains.do(_.lockStartTime_(bool)) }
+	
 	init {
 		var allDefNames = [], allUnits = Order();
 		
