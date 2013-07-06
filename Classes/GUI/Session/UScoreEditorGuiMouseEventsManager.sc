@@ -164,6 +164,9 @@ UScoreEditorGuiMouseEventsManager {
 								} 
 							} {
 								theEventView.selected = theEventView.selected.not;
+								if( theEventView.selected.not ) {
+									state = \nothing;
+								};
 							};				
 							if(altDown){
 								isCopying = true;
