@@ -17,12 +17,12 @@
     along with GameOfLife Unit Library.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-USampleOffset {
+USampleOffset : Spec {
 	
 	*ar { |in, use = 1|
 		var delay;
 		Udef.addBuildSpec( 
-			ArgSpec( \u_sampleOffset, USampleOffset, USampleOffsetSpec, true, \init ) 
+			ArgSpec( \u_sampleOffset, this, this, true, \init ) 
 		);
 		delay = (\u_sampleOffset.ir( 0 ) * use) / SampleRate.ir;
 		^DelayN.ar( in, delay, delay );	
@@ -42,20 +42,16 @@ USampleOffset {
 	*asUGenInput { ^this.getCurrent }
 	*asControlInput { ^this.getCurrent }
 	*asOSCArgEmbeddedArray { | array| ^this.getCurrent.asOSCArgEmbeddedArray(array) }
-	
-}
 
-
-USampleOffsetSpec : Spec {
 	
 	// fixed output: 
 	*new { ^this } // only use as class
 	
 	*asSpec { ^this }
 	
-	*constrain { ^USampleOffset } // whatever comes in; UGlobalEQ comes out
+	*constrain { ^this } // whatever comes in; UGlobalEQ comes out
 	
-	*default {  ^USampleOffset }
+	*default {  ^this }
 	
 	*massEditSpec { ^nil }
 	
