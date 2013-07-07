@@ -168,6 +168,8 @@ Udef : GenericDef {
 		}).flatten(1);
 	}
 	
+	argNamesFor { |unit| ^this.argNames }
+	
 	
 	// this may change 
 	// temp override to send instead of load (remote servers can't load!!)
@@ -517,7 +519,7 @@ U : ObjectWithArgs {
     }
     
     checkDef {
-	    if( this.def.notNil && { this.def.argNames != this.argNames } ) {
+	    if( this.def.notNil && { this.def.argNamesFor( this ) != this.argNames } ) {
 		    this.init( this.def, args, mod );
 	    };
     }

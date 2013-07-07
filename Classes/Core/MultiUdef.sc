@@ -98,6 +98,10 @@ MultiUdef : Udef {
 			argSpecs.collect({ |item| [ item.name, item.default ] }).flatten(1) 
 	}
 	
+	argNamesFor { |unit|
+		^(this.findUdefFor( unit ).argNamesFor( unit ) ? []) ++ this.argNames;
+	}
+	
 	synthDef { ^udefs.collect(_.synthDef).flat }
 	
 	createSynth { |unit, target, startPos|
