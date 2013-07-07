@@ -197,6 +197,8 @@ UChainGUI {
 		};
 		
 		units = this.getUnits;
+		
+		units.do(_.checkDef);
 				
 		controller = SimpleController( chain );
 		udefController = SimpleController( Udef.all );

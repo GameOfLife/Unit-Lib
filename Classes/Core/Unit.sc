@@ -516,6 +516,12 @@ U : ObjectWithArgs {
         this.init( newDefName, if( keepArgs ) { args } { [] }, mod); // keep args
     }
     
+    checkDef {
+	    if( this.def.notNil && { this.def.argNames != this.argNames } ) {
+		    this.init( this.def, args, mod );
+	    };
+    }
+    
     name {
 	    if( this.def.respondsTo( \nameFunc ) && { this.def.nameFunc.notNil } ) {
 		    ^this.def.nameFunc.value( this );
