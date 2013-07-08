@@ -94,21 +94,21 @@ BarMap {
 		^events.lastForWhich({ |item| item[2] <= bar }) ? events[0];
 	}
 	
-	barAtBeat { |beat = 0, clip = true|
+	barAtBeat { |beat = 0, clip = false|
 		var raw, mul;
 		var num, denom, bar, sigStartBeat;
+		if( clip ) { beat = beat.max( 0 ) };
 		#num, denom, bar, sigStartBeat = this.eventAtBeat(beat);
-		if( clip ) { beat = beat.max( this.startBeat ) };
 		mul = (num/denom) * beatDenom;
 		raw = bar + ((beat - sigStartBeat) / mul);
-		^[ raw.asInt, raw.frac * num ]; // bar, division
+		^[ raw.floor.asInt, raw.frac * num ]; // bar, division
 	}
 	
-	beatAtBar { |bar = 1, division = 0, clip = true|
+	beatAtBar { |bar = 1, division = 0, clip = false|
 		var num, denom, sigStartBar, beat;
 		#num, denom, sigStartBar, beat = this.eventAtBar(bar);		bar = bar + (division / num) - sigStartBar;
 		beat = beat + (bar * (num/denom) * beatDenom);
-		if( clip ) { beat = beat.max( this.startBeat ) };
+		if( clip ) { beat = beat.max( 0 ) };
 		^beat;
 	}
 	
@@ -118,7 +118,7 @@ BarMap {
 		num = this.eventAtBar(bar)[0];
 		raw = bar + (division / num);
 		raw = raw.max( events[0][2] );
-		^[ raw.asInt, raw.frac * num ]; // bar, division
+		^[ raw.floor.asInt, raw.frac * num ]; // bar, division
 	}
 	
 	signatureAtBeat { |beat = 0|
