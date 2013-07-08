@@ -83,6 +83,8 @@ ArrayControlSpec : ControlSpec {
 	}
 	asControlSpec { ^ControlSpec.newFrom( this ).default_( this.default.asCollection[0] ); }
 	asArrayControlSpec { ^this }
+	
+	*testObject { |obj| ^obj.isArray && { obj.every(_.isNumber) } }
 }
 
 StringSpec : Spec {
