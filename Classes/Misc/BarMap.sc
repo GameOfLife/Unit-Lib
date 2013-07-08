@@ -49,6 +49,14 @@ BarMap {
 		};
 	}
 	
+	startBeat_ { |new = 0|
+		events[0][3] = new;
+		this.prUpdateBeats;
+		this.changed(\events);
+	}
+	
+	startBeat { ^events[0][3] }
+	
 	deleteDuplicates { |force = false|
 		// remove events that have the same tempo as the event before
 		var signature;
@@ -63,12 +71,13 @@ BarMap {
 	}
 	
 	prUpdateBeats {
-		var beat = 0, lastBar, num, denom;
+		var beat, lastBar, num, denom;
 		events = events.sort({ |a,b| a[2] <= b[2]; });
 		events.last[4] = inf;
 		num = events[0][0];
 		denom = events[0][1];
 		lastBar = events[0][2];
+		beat = events[0][3];
 		events[1..].do({ |item, i|
 			item[3] = beat = (beat + ( (item[2] - lastBar) * (num/denom) * beatDenom ));
 			#num, denom = item[..1];
@@ -85,25 +94,23 @@ BarMap {
 		^events.lastForWhich({ |item| item[2] <= bar }) ? events[0];
 	}
 	
-	barAtBeat { |beat = 0, clip = true|
+	barAtBeat { |beat = 0|
 		var raw, mul;
 		var num, denom, bar, sigStartBeat;
-		if( clip ) { beat = beat.max(0) };
 		#num, denom, bar, sigStartBeat = this.eventAtBeat(beat);
 		mul = (num/denom) * beatDenom;
 		raw = bar + ((beat - sigStartBeat) / mul);
 		^[ raw.asInt, raw.frac * num ]; // bar, division
 	}
 	
-	beatAtBar { |bar = 1, division = 0, clip = true|
+	beatAtBar { |bar = 1, division = 0|
 		var num, denom, sigStartBar, beat;
 		#num, denom, sigStartBar, beat = this.eventAtBar(bar);		bar = bar + (division / num) - sigStartBar;
 		beat = beat + (bar * (num/denom) * beatDenom);
-		if( clip ) { beat = beat.max(0) };
 		^beat;
 	}
 	
-	barAtBar { |bar = 1, division = 0, clip = true|
+	barAtBar { |bar = 1, division = 0|
 		var raw;
 		var num;
 		num = this.eventAtBar(bar)[0];
@@ -202,6 +209,9 @@ BarMap {
 	storeModifiersOn { |stream|
 		if( beatDenom != 4 ) {
 			stream << ".beatDenom_(" <<< beatDenom << ")";
+		};
+		if( this.startBeat != 0 ) {
+			stream << ".startBeat_(" <<< this.startBeat << ")";
 		};
 	}
 	

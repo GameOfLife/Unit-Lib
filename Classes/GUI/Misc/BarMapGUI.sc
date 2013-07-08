@@ -1,7 +1,7 @@
 BarMapGUI {
 	
 	var <barMap;
-	var <parent, <scrollView, <composite, <allViews, <localEvents;
+	var <parent, <scrollView, <composite, <startBeatView, <allViews, <localEvents;
 	var <>action;
 	var <viewHeight = 14;
 	var skin;
@@ -42,7 +42,7 @@ BarMapGUI {
 		var ctrl, font;
 		var bounds = Point( 
 			122 + (viewHeight * 2), 
-			(viewHeight + 4) * (barMap.events.size + 2)
+			(viewHeight + 4) * (barMap.events.size + 3)
 		);	
 		
 		skin = RoundView.skin;
@@ -68,6 +68,16 @@ BarMapGUI {
 			});
 			
 		composite.onClose_({ ctrl.remove });
+		
+		StaticText( composite, 50@viewHeight ).string_( "startBeat:" ).font_( font );
+		startBeatView = SmoothNumberBox( composite, 50@viewHeight )
+			.value_( barMap.startBeat )
+			.font_( font )
+			.action_({ |nb|
+				barMap.startBeat = nb.value;
+			});
+			
+		composite.decorator.nextLine;
 		
 		StaticText( composite, 50@viewHeight ).string_( "bar" ).font_( font );
 		StaticText( composite, 80@viewHeight ).string_( "signature" ).font_( font );
