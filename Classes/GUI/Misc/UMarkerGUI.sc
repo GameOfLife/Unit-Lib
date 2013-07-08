@@ -169,7 +169,7 @@ UMarkerGUI : UChainGUI {
 			.clipLo_(0)
 			.visible_( startTimeMode === \time )
 			.action_({ |nb|
-				score.startTime_( nb.value );
+				chain.startTime_( nb.value );
 			});
 		
 		composite.decorator.shift( -88, 0 );
@@ -180,7 +180,7 @@ UMarkerGUI : UChainGUI {
 			.clipLo_(0)
 			.visible_( startTimeMode === \bar )
 			.action_({ |nb|
-				score.startTime_( nb.value );
+				chain.startTime_( nb.value );
 			});
 						
 		composite.decorator.nextLine;
