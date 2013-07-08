@@ -830,7 +830,11 @@ UScore : UEvent {
 	
 	storeParamsOn { arg stream;
 		var args = this.storeArgs;
-		stream << "(*[";
+		var useArray = args.size > 254;
+		stream << "(";
+		if( useArray ) {
+			stream << "*[";
+		};
 		stream <<* args.collect({ |item|
 			if( item.isKindOf( UEvent ) ) {
 				"\n\t" ++ item.asCompileString
@@ -838,7 +842,10 @@ UScore : UEvent {
 				item.asCompileString;
 			};
 		});
-		stream << "])";
+		if( useArray ) {
+			stream << "]";
+		};
+		stream << ")";
 	}
 	
 	storeModifiersOn { |stream|
