@@ -127,6 +127,8 @@ UMarkerEventView : UEventView {
 			};
 			
 			Pen.use({	
+				var textLeft = 2;
+				
 				this.drawShape(innerRect, scaledUserView.view.bounds.height);
 				Pen.clip;
 				
@@ -139,9 +141,13 @@ UMarkerEventView : UEventView {
 				//draw name
 				if( scaledRect.height > 4 ) {
 					Pen.color = Color.black.alpha_( lineAlpha  );
+					if( event.lockStartTime ) {
+						DrawIcon( \lock, Rect( scaledRect.left + 2, scaledRect.top, 14, 14 ) );
+						textLeft = textLeft + 12;
+				     };
 					Pen.stringAtPoint(
 						" " ++ this.getName,
-						scaledRect.leftTop.max( 0 @ -inf ) + (2 @ 1)
+						scaledRect.leftTop.max( 0 @ -inf ) + (textLeft @ 1)
 					);		       
 				};
 	
