@@ -78,7 +78,7 @@ LocalUdef : Udef {
         this.rebuild;
     }
 
-    prepare { |servers, action|
+    prepare { |servers, unit, action|
         action = MultiActionFunc( action );
         servers.do({ |server|
             var innerAction = action.getAction;
