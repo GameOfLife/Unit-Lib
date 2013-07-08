@@ -270,6 +270,7 @@ UScoreEditorGui_TransportBar {
         
         views[\barMap] = TempoBarMapView( view, 110@size, this.score.tempoMap )
 			.value_( this.score.pos )
+			.clipLo_(0)
 			.visible_( scoreView.showTempoMap )
 			.autoScale_( true )
 			.action_({ |v|
