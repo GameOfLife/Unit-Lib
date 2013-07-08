@@ -95,6 +95,8 @@ LocalUdef : Udef {
             };
         })
     }
+    
+    needsPrepare { ^true }
 
     asUdef { }
 

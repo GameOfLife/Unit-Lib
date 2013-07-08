@@ -77,6 +77,8 @@ FuncUMapDef : UMapDef {
 		action.value;
 	}
 	
+	needsPrepare { ^true }
+	
 	activateUnit { |unit| // called at UMap:asUnitArg
 		if( unit.unit.notNil && { unit.unit.synths.size > 0 } ) {
 			unit.prepare;

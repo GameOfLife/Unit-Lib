@@ -43,6 +43,8 @@ ValueUMapDef : UMapDef {
 		action.value;
 	}
 	
+	needsPrepare { ^true }
+	
 	stop { |unit|
 		unit.set( \active, false );
 	}

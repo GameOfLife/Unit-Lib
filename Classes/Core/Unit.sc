@@ -217,6 +217,8 @@ Udef : GenericDef {
 	    action.value;
 	}
 	
+	needsPrepare { ^false }
+	
 	stop { |unit|
 		unit.synths.do(_.free);  
 	}
@@ -946,7 +948,9 @@ U : ObjectWithArgs {
 	}
 	
 	needsPrepare {
-		^this.valuesToPrepare.size > 0;
+		^this.valuesToPrepare.size > 0 or: { 
+			this.def.needsPrepare; 
+		};
 	}
 	
 	apxCPU { |target|
