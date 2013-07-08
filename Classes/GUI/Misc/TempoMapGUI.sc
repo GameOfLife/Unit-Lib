@@ -171,6 +171,7 @@ TempoMapGUI {
 				
 			views[ \tempo ] = SmoothNumberBox( composite, 50@viewHeight )
 				.font_( font )
+				.clipLo_(1)
 				.value_( tempoMap.tempoToBPM( item[0] ) )
 				.action_( localAction ); 
 				

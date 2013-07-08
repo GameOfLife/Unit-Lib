@@ -305,6 +305,7 @@ UScoreEditorGui_TransportBar {
 			
 		views[\tempo] = SmoothNumberBox( view,40@size )
 			.visible_( scoreView.showTempoMap )
+			.clipLo_(1)
 			.autoScale_(true)
 			.value_( this.score.tempoMap.bpmAtTime( this.score.pos ).round(0.001) )
 			.action_({ |vw|
