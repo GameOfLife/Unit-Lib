@@ -39,6 +39,8 @@ UChainGUI {
 	var <>tempoMap;
 	var <>undoManager;
 	
+	var <>autoRestart = false;
+
 	*initClass {
 		
 		skin = ( 
@@ -610,6 +612,16 @@ UChainGUI {
 						};
 						this.makeViews( originalBounds );
 						this.makeCurrent;
+					if( autoRestart and: { chain.isPlaying } ) {
+						chain.release(0.5);
+						fork{
+							while( { chain.isPlaying } ) {
+								0.01.wait;
+							};
+							//currently there's no way to know the startpos so it will start from 0
+							chain.prepareAndStart()
+						}
+					}
 					}.defer(0.01);
 				};
 			})
