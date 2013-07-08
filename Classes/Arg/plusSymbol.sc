@@ -39,17 +39,22 @@ intelligently sense the size of the default, and switch to ControlSpec, RangeSpe
 + Symbol {
 
 	ukr{ |default, minval=0.0, maxval=1.0, warp='lin', step=0.0, lag, fixedLag = false|
-		var spec = if( minval.isKindOf( Symbol ) ) {
+		var spec = if( minval.respondsTo( \asSpec ) ) {
 			minval.asSpec
 		} {
 			ControlSpec(minval, maxval, warp, step, default)
+		};
+		case { default.size == 2 } {
+			spec = spec.asRangeSpec;
+		} { default.size > 2 } {
+			spec = spec.asArrayControlSpec;
 		};
 		Udef.addBuildSpec( ArgSpec(this, default, spec ) );
 		^this.kr(default, lag, fixedLag)
 	}
 
 	uir { |default, minval=0.0, maxval=1.0, warp='lin', step=0.0, lag, fixedLag = false|
-		var spec = if( minval.isKindOf( Symbol ) ) {
+		var spec = if( minval.respondsTo( \asSpec ) ) {
 			minval.asSpec
 		} {
 			ControlSpec(minval, maxval, warp, step, default)
