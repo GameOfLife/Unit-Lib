@@ -30,7 +30,7 @@ UEvent : UArchivable {
     var <releaseSelf = true;
     var <oscSetter;
     var <displayColor;
-    var <>lockStartTime = false;
+    var <lockStartTime = false;
 	var <>hideInGUI = false;
 
     /*
@@ -75,6 +75,11 @@ UEvent : UArchivable {
 	   this.changed( \startTime )
     }
     
+    lockStartTime_ { |bool = false|
+	    lockStartTime = bool;
+	    this.changed( \lockStartTime );
+    }
+    
     score { ^nil }
     score_ { }
     
@@ -96,6 +101,7 @@ UEvent : UArchivable {
 	disable { this.disabled_(true) }
 	enable { this.disabled_(false) }
 	toggleDisable { this.disabled_(disabled.not) }
+	toggleLockStartTime { this.lockStartTime_( lockStartTime.not ) }
 	
 	displayColor_ { |color|
 		displayColor = color.copy;

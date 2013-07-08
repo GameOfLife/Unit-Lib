@@ -443,7 +443,6 @@ UChainGUI {
 			views[ \lockStartTime ] = SmoothButton( composite, 14@14 )
 				.label_([ 'unlock', 'lock' ])
 				.radius_(2)
-				.value_( chain.lockStartTime.binaryValue )
 				.action_({ |bt|
 					chain.lockStartTime = bt.value.booleanValue;
 				});
@@ -643,6 +642,9 @@ UChainGUI {
 						views[ \endBar ].value = (chain.startTime + chain.dur) ? 0; 
 					};
 				})
+				.put( \lockStartTime, {
+					views[ \lockStartTime ].value = chain.lockStartTime.binaryValue;
+				})
 				.put( \dur, { var dur;
 					dur = chain.dur;
 					if( dur == inf ) {
@@ -678,13 +680,18 @@ UChainGUI {
 				.put( \startTime, { 
 					views[ \startTime ].value = score.startTime ? 0; 
 					views[ \startBar ].value = score.startTime ? 0;
+				})
+				.put( \lockStartTime, {
+					views[ \lockStartTime ].value = score.lockStartTime.binaryValue;
 				});
 			score.changed( \startTime );
+			score.changed( \lockStartTime );
 		};
 		
 		chain.changed( \gain );
 		chain.changed( \muted );
 		chain.changed( \startTime );
+		chain.changed( \lockStartTime );
 		chain.changed( \dur );
 		chain.changed( \fadeIn );
 		chain.changed( \fadeOut );

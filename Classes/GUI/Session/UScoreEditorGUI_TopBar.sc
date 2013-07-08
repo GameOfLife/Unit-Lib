@@ -201,6 +201,13 @@ UScoreEditorGui_TopBar {
 			.action_({ |b|
 				this.selectedEvents !? { |x|  this.scoreEditor.toggleDisableEvents( x ) }
 			});
+			
+		SmoothButton( header, size@size  )
+			.states_( [[ \lock, Color.black, Color.clear ]] )
+			.canFocus_(false)
+			.action_({ |b|
+				this.selectedEvents !? { |x|  this.scoreEditor.toggleLockEvents( x ) }
+			});
 
 		SmoothButton( header, size@size  )
 			.states_( [[ \folder, Color.black, Color.clear ]] )

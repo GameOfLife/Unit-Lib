@@ -107,7 +107,7 @@ UScoreView {
 	    eventControllers.do(_.remove);
 	    eventControllers = this.currentScore.collect{ |e|
             var s = SimpleController(e);
-            [\startTime,\dur,\fadeIn,\fadeOut,\name,\track,\displayColor,\start,\end].do{ |key|
+            [\startTime,\lockStartTime,\dur,\fadeIn,\fadeOut,\name,\track,\displayColor,\start,\end].do{ |key|
                 s.put(key,{ { 
 	                if( this.currentScore.updatePos ) {
 		                this.currentScore.changed( \something );

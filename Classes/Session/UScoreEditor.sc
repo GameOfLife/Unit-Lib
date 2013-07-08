@@ -163,6 +163,12 @@ UScoreEditor {
 	        events.do( _.toggleDisable );
 	    })
 	}
+	
+	toggleLockEvents { |events|
+	    this.changeScore({
+	        events.do( _.toggleLockStartTime );
+	    })
+	}
 
 	enableAll {
 	    this.changeScore({
