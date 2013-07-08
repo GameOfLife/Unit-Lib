@@ -216,29 +216,19 @@ MassEditUChain {
 	}
 	
 	fadeIn_ { |fadeIn = 0|
-		var maxFadeIn, add;
-		maxFadeIn = this.fadeIn;
-		
-		add = fadeIn - maxFadeIn;
+		var add = fadeIn - this.fadeIn;
 		
 		uchains.do({ |item|
-			item.fadeIn_( (item.fadeIn + add).max(0) );
-		});
-		
-		this.changed( \fadeIn );	
+			item.fadeIn_( item.fadeIn + add );
+		});	
 	}
 	
 	fadeOut_ { |fadeOut = 0|
-		var maxFadeOut, add;
-		maxFadeOut = this.fadeOut;
-		
-		add = fadeOut - maxFadeOut;
+		var add = fadeOut - this.fadeOut;
 		
 		uchains.do({ |item|
-			item.fadeOut_( (item.fadeOut + add).max(0) );
-		});
-		
-		this.changed( \fadeOut );	
+			item.fadeOut_( item.fadeOut + add );
+		});	
 	}
 	
 	fadeOut {
