@@ -42,6 +42,8 @@ UChain : UEvent {
 	var <>ugroup;
 	var <>handlingUndo = false;
 	
+	var <lastTarget;
+
 	*initClass {
 		
 		Class.initClassTree( PresetManager );
@@ -643,6 +645,7 @@ UChain : UEvent {
 
 	prepare { |target, startPos = 0, action|
 		var cpu;
+		lastTarget = target;
 		action = MultiActionFunc( action );
 		target = target.asCollection;
 		if( target.size == 0 ) {

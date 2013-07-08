@@ -619,7 +619,7 @@ UChainGUI {
 								0.01.wait;
 							};
 							//currently there's no way to know the startpos so it will start from 0
-							chain.prepareAndStart()
+							chain.prepareAndStart(chain.lastTarget)
 						}
 					}
 					}.defer(0.01);
