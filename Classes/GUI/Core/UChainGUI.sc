@@ -209,6 +209,7 @@ UChainGUI {
 			controller.remove; 
 			scoreController.remove;
 			udefController.remove;
+			if( chain.isKindOf( MassEditUChain ) ) { chain.disconnect };
 			if( composite == vw && { current == this } ) { current = nil } 
 		};
 		
@@ -243,7 +244,9 @@ UChainGUI {
 		
 		composite.decorator.shift( bounds.width - 14 - 80 - 32, 0 );
 
-		if( chain.isKindOf( MassEditUChain ).not ) {
+		if( chain.isKindOf( MassEditUChain ) ) {
+			chain.connect;
+		} {
 			
 			composite.decorator.shift( -34, 0 );
 			

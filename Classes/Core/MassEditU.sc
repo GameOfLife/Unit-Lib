@@ -180,19 +180,15 @@ MassEditUChain {
 	}
 	
 	connect {
-		units.do({ |unit| 
-			if( unit.class == MassEditU ) {
-				unit.connect;
-			};
-		})
+		uchains.do(_.addDependant(this));
 	}
 	
 	disconnect {
-		units.do({ |unit| 
-			if( unit.class == MassEditU ) {
-				unit.disconnect;
-			};
-		})
+		uchains.do(_.removeDependant(this));
+	}
+	
+	update { |obj, what ...args|
+		this.changed( what, *args );
 	}
 	
 	groups { ^uchains.collect(_.groups).flatten(1); } // don't know any groups
