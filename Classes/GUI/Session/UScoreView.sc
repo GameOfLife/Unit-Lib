@@ -143,9 +143,10 @@ UScoreView {
 	}
 	
 	prUpdate {
-		var zoom, score;
+		var zoom, score, dur;
 		score = this.currentScore;
-		zoom = score.displayDuration / 4;
+		dur = score.displayDuration;
+		zoom = dur / 4;
 		if( scoreView.maxZoom != zoom ) {
 			scoreView.maxZoom = zoom;
 			if( scoreView.scaleH != 1 ) {
@@ -153,7 +154,7 @@ UScoreView {
 			};
 		};
 		if( followPos ) {
-			scoreView.moveH = (score.pos / score.displayDuration).clip(0,1);
+			scoreView.moveH = (score.pos / dur).clip(0,1);
 		} {
 			scoreView.refresh;
 		};
