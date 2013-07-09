@@ -26,6 +26,7 @@ MultiChannelUdef( \grainSoundFile, {
 	var pos, density, timeVar, rateVar, overlap, pan, sig;
 	#numChannels, bufnum, rate, trigger, startFrame, loop = 
 		BufSndFilePlayer.getArgs( 1, startPos: 0 );
+	rate = rate / BufRateScale.kr( bufnum );
 	pos = \pos.kr( [0.5,0.5] );
 	density = \density.kr( 100 );
 	timeVar = (\timeVar.kr( 0 ) * 6).midiratio;
