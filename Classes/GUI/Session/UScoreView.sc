@@ -123,20 +123,34 @@ UScoreView {
     }
 
 	update {
+		var zoom;
 		if( updateInterval > 0 ) {
 			calledUpdate = true;
 			if( updateTask.isNil or: { updateTask.isPlaying.not } ) {
 				 updateTask = Task({
 				    while { calledUpdate } {
-					   scoreView.refresh;
+					   this.prUpdate;
 					   calledUpdate = false;
 					   updateInterval.wait;
 				    };
 			    }, AppClock).start;
 			};
 		} {
-			scoreView.refresh;
+			this.prUpdate;
 		};
+	}
+	
+	prUpdate {
+		var zoom, score;
+		score = this.currentScore;
+		zoom = score.displayDuration / 4;
+		if( scoreView.maxZoom != zoom ) {
+			scoreView.maxZoom = zoom;
+			if( scoreView.scaleH != 1 ) {
+				scoreView.updateSliders;
+			};
+		};
+		scoreView.refresh;
 	}
 
     currentEditor{
