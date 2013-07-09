@@ -399,20 +399,22 @@ UChain : UEvent {
     //events can become bigger
 	trimStart{ |newStart,removeFade = false|
 		var delta1,delta2;
-		delta1 = newStart - startTime;
-		if(newStart < this.endTime) {
-            startTime = newStart;
-			this.dur = this.dur - delta1;
-			if(removeFade){
-		        this.fadeIn = 0
-			};
-			if(delta1 > 0) {
-				//do something when making event shorter
-			} {	//making event bigger
-				//do something when making event bigger
+		if( lockStartTime.not ) {	
+			delta1 = newStart - startTime;
+			if(newStart < this.endTime) {
+	            startTime = newStart;
+				this.dur = this.dur - delta1;
+				if(removeFade){
+			        this.fadeIn = 0
+				};
+				if(delta1 > 0) {
+					//do something when making event shorter
+				} {	//making event bigger
+					//do something when making event bigger
+				}
+	
 			}
-
-		}
+		};
 	}
 
 	//events can only become smaller
