@@ -154,8 +154,9 @@ UScoreView {
 		};
 		if( followPos ) {
 			scoreView.moveH = (score.pos / score.displayDuration).clip(0,1);
+		} {
+			scoreView.refresh;
 		};
-		scoreView.refresh;
 	}
 
     currentEditor{
