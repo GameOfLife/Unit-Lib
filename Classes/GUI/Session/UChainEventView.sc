@@ -256,41 +256,43 @@ UChainEventView : UEventView {
 		{\fades}{ this.mouseDownFades(mousePos,scaledUserView,shiftDown) }
 
 	}
+	
+	getTimeWithSnap { |originalTime, deltaTime, snap, tempoMap|
+		^if( tempoMap.notNil ) {
+			tempoMap.timeMoveWithSnap( 
+				originalTime, deltaTime, snap
+			).max(0);
+		} {
+			(originalTime + deltaTime.round(snap)).max(0);
+		};
+	}
 
 	mouseMoveEvent{ |deltaTime, deltaTrack, overallState, snap, moveVert, tempoMap|
-
-			switch(overallState)
-			{\resizingFront}
-			{
-				event.trimStart( originalStartTime + deltaTime )
-			}
-			{\resizingBack}
-			{
-				//"resizing back";
-				event.trimEnd( originalEndTime + deltaTime )
-			}
-			{\moving}
-			{
-				if( moveVert.not ) {
-					if( tempoMap.notNil ) {
-						event.startTime = tempoMap.timeMoveWithSnap( 
-							originalStartTime, deltaTime, snap
-						).max(0);
-					} {
-						event.startTime = (originalStartTime + deltaTime.round(snap)).max(0);
-					};
-				};
-				event.track = originalTrack + deltaTrack;
-			}
-			{\fadeIn}
-			{
-				event.fadeIn = originalFades[0] + deltaTime;
-			}
-			{\fadeOut}
-			{
-				event.fadeOut = originalFades[1] - deltaTime;
-			}
-
+		if( moveVert.not ) {
+			switch(overallState,
+				\resizingFront, { 
+					event.trimStart( 
+						this.getTimeWithSnap( originalStartTime, deltaTime, snap, tempoMap )
+					);
+				},
+				\resizingBack, { 
+					event.trimEnd( 
+						this.getTimeWithSnap( originalEndTime, deltaTime, snap, tempoMap )
+					);
+				},
+				\moving, {
+					event.startTime = this.getTimeWithSnap( originalStartTime, deltaTime, snap, tempoMap );
+				},
+				\fadeIn, { 
+					event.fadeIn = originalFades[0] + deltaTime; 
+				},
+				\fadeOut, {
+					event.fadeOut = originalFades[1] - deltaTime;
+				});
+		};
+		if( overallState === \moving ) {
+			event.track = originalTrack + deltaTrack;
+		};
 	}
 
 	draw { |scaledUserView, maxWidth|
