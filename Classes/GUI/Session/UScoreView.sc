@@ -37,6 +37,8 @@ UScoreView {
      
      var <updateTask, calledUpdate = false, <>updateInterval = 0.1;
      var <showTempoMap = false;
+     
+     var <followPos = false;
 
      *new{ |parent, bounds, scoreEditor| ^super.new.init(scoreEditor, parent,bounds) }
      
@@ -150,6 +152,9 @@ UScoreView {
 				scoreView.updateSliders;
 			};
 		};
+		if( followPos ) {
+			scoreView.moveH = (score.pos / score.displayDuration).clip(0,1);
+		};
 		scoreView.refresh;
 	}
 
@@ -167,6 +172,13 @@ UScoreView {
 
     isInnerScore{
         ^(scoreEditorsList.size > 1)
+    }
+    
+    followPos_ { |bool = false|
+	    if( followPos != bool ) {
+	   		followPos = bool;
+	   		this.update;
+	    };
     }
 
     selectedEvents{ ^usessionMouseEventsManager.selectedEvents }
