@@ -29,6 +29,8 @@ UAbstractWindow {
     *current { ^currentDict[this] }
 
     *current_ { |x| currentDict[this] = x }
+    
+    *all { ^allDict[this] }
 
     toFront {
         if( window.isClosed.not ) {
@@ -49,12 +51,7 @@ UAbstractWindow {
 
         window = Window(title, bounds).front;
         window.onClose_(onClose);
-        //for 3.5 this has to be changed.
-        if(window.respondsTo(\drawFunc_)) {
-            window.drawFunc_({ currentDict[this.class] = this });
-        } {
-            window.drawHook_({ currentDict[this.class] = this });
-        };
+        window.toFrontAction_({ currentDict[this.class] = this });
         margin = margin ? 4;
         gap = gap ? 2;
         view = window.view;
