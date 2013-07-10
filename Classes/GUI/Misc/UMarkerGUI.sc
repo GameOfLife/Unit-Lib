@@ -46,6 +46,7 @@ UMarkerGUI : UChainGUI {
 		composite.addFlowLayout( margin, gap );
 		composite.onClose = { |vw|
 			controller.remove; 
+			this.removeFromAll;
 			if( composite == vw && { current == this } ) { current = nil } 
 		};
 		

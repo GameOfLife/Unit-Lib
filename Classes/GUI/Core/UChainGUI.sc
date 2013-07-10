@@ -21,6 +21,7 @@ UChainGUI {
 	
 	classvar <>skin;
 	classvar <>current;
+	classvar <>all;
 	classvar <>singleWindow = true;
 	classvar <>packUnitsDefault = true;
 	classvar <>scrollViewOrigin;
@@ -61,6 +62,8 @@ UChainGUI {
 		);
 	
 		StartUp.defer({ skin.font = Font( Font.defaultSansFace, 10 ); });
+		
+		all = [];
 
 	}
 	
@@ -89,6 +92,7 @@ UChainGUI {
 				current.remove;
 				this.makeViews( bounds );
 				this.makeCurrent;
+				this.addToAll;
 				parent.front;
 			} {
 				parent = Window(
@@ -98,15 +102,20 @@ UChainGUI {
 				).front;
 				this.makeViews( bounds );
 				this.makeCurrent;
+				this.addToAll;
 			};
 		} {
 			this.makeViews( bounds );
 			this.makeCurrent;
+			this.addToAll;
 		};
 		
 	}
 	
 	makeCurrent { current = this }
+	
+	addToAll { all = all.add( this ) }
+	removeFromAll { all.remove( this ) }
 	
 	makeViews { |bounds|
 		RoundView.useWithSkin( skin ++ (RoundView.skin ? ()), {
@@ -212,6 +221,7 @@ UChainGUI {
 			scoreController.remove;
 			udefController.remove;
 			if( chain.isKindOf( MassEditUChain ) ) { chain.disconnect };
+			this.removeFromAll;
 			if( composite == vw && { current == this } ) { current = nil } 
 		};
 		
@@ -612,6 +622,7 @@ UChainGUI {
 						};
 						this.makeViews( originalBounds );
 						this.makeCurrent;
+						this.addToAll;
 					if( autoRestart and: { chain.isPlaying } ) {
 						chain.release(0.5);
 						fork{
@@ -633,6 +644,7 @@ UChainGUI {
 						composite.remove;
 						this.makeViews( originalBounds );
 						this.makeCurrent;
+						this.addToAll;
 					}.defer(0.01);
 				};
 			});
