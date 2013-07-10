@@ -85,6 +85,18 @@ UChain : UEvent {
 			this.fromObject( obj );
 		};
 	}
+	
+	*clear {
+		groupDict.do({ |groups| 
+			groups.do({ |group| if( group.isPlaying ) { 
+					group.free 
+				} {
+					group.changed( \n_end );
+				}; 
+			});
+		});
+		groupDict = IdentityDictionary();
+	}
 
 	/*
 	* Syntaxes for UChain creation:

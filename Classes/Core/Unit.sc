@@ -470,6 +470,18 @@ U : ObjectWithArgs {
 	
 	*defClass { ^Udef }
 	
+	*clear {
+		synthDict.do({ |synths| 
+			synths.do({	 |synth| if( synth.isPlaying ) { 
+					synth.free 
+				} {
+					synth.changed( \n_end );
+				};
+			});
+		});
+		synthDict = IdentityDictionary();
+	}
+	
 	init { |in, inArgs, inMod|
 		if( in.isKindOf( this.class.defClass ) ) {
 			def = in;
