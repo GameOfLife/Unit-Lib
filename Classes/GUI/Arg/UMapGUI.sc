@@ -74,6 +74,8 @@ UMapGUI : UGUI {
 	
 	makeHeader { |bounds|
 		var boldFont;
+		var umapdragbin;
+		var umapdragbinTask;
 		
 		header = CompositeView( composite, bounds.width @ viewHeight )
 			.resize_(2);
@@ -113,7 +115,14 @@ UMapGUI : UGUI {
 				});
 			
 			UserView( header, Rect( 16, 2,  bounds.width - 16 - 16, 12 ) )
-				.canReceiveDragHandler_({
+				.canReceiveDragHandler_({ |vw, x,y|
+					var last;
+					if( x.notNil ) {
+						last = currentUMapSink;
+						currentUMapSink = vw;
+						last !? _.refresh;
+						vw.refresh;
+					};
 					View.currentDrag.isKindOf( UMapDef ) && {
 						parentUnit !? (_.canUseUMap( unit.unitArgName, View.currentDrag )) 
 							? false; 
@@ -122,6 +131,32 @@ UMapGUI : UGUI {
 				.receiveDragHandler_({
 					unit.stop;
 					unit.def = View.currentDrag;
+				})
+				.drawFunc_({ |vw|
+					if( View.currentDrag.notNil && {
+						vw.canReceiveDragHandler.value == true;
+					}) {
+						Pen.width = 2;
+						if( currentUMapSink === vw ) {
+							Pen.color = Color.blue.alpha_(1);
+						} {
+							Pen.color = Color.blue.alpha_(0.25);
+						};
+						Pen.addRect( vw.bounds.moveTo(0,0).insetBy(1,1) );
+						Pen.stroke;
+						if( umapdragbinTask.isPlaying.not ) {
+							umapdragbinTask = Task({
+								while { vw.isClosed.not && {												vw.canReceiveDragHandler.value == true
+									} 
+								} {
+									0.25.wait;
+								};
+								if( vw.isClosed.not ) {
+									vw.refresh;
+								};
+							}, AppClock).start;
+						};
+					};
 				});
 	}
 }
