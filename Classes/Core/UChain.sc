@@ -283,8 +283,12 @@ UChain : UEvent {
 	* clipFadeIn = false clips fadeOut
 	*/
 	prSetChainsDur { |dur = inf, clipFadeIn = true| //
-		this.prSetCanFreeSynths( \u_doneAction, 14 );
 		units.do(_.setDur(dur));
+		if( releaseSelf ) {
+			this.prSetCanFreeSynths( \u_doneAction, 14 );
+		} {
+			this.prSetCanFreeSynths( \u_doneAction, 14, \u_dur, inf );
+		};
 		if( clipFadeIn ) {
 		    this.fadeIn = this.fadeIn.min(dur);
 		    this.fadeOut = this.fadeOut.min(dur - this.fadeIn);
@@ -297,9 +301,7 @@ UChain : UEvent {
 	duration_{ |dur|
         duration = dur;
         this.changed( \dur );
-        if(releaseSelf){
-            this.prSetChainsDur(dur);
-        };
+        this.prSetChainsDur(dur);
         this.fadeOut_(this.fadeOut.min(dur));
         this.fadeIn_(this.fadeIn.min(dur));
     }
@@ -309,11 +311,7 @@ UChain : UEvent {
         if(releaseSelf != bool) {
 	        releaseSelf = bool;
 	        this.changed( \releaseSelf );
-            if(bool){
-                this.prSetChainsDur(duration);
-            } {
-                this.prSetChainsDur(inf);
-            }
+             this.prSetChainsDur(duration);
         }
     }
 	
