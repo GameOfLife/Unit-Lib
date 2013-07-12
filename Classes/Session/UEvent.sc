@@ -182,19 +182,27 @@ UEvent : UArchivable {
 			maxTime = this.finiteDuration + 60;
 		};
 		
-		o = ServerOptions.new
-			.numOutputBusChannels_( numChannels ? this.renderNumChannels ? 2)
-			.memSize_( 2**19 );
-		path = path.replaceExtension( headerFormat.toLower );
-		this.render( 
-			path,
-			maxTime, // explicit nil forces UScore to use score duration
-			sampleRate: ULib.servers.first.sampleRate,
-			headerFormat: headerFormat, 
-			sampleFormat: sampleFormat,
-			options: o,
-			action: action
-		);		
+		numChannels = numChannels ? this.renderNumChannels ? 2;
+		
+		if( numChannels > 0 ) {
+			o = ServerOptions.new
+				.numOutputBusChannels_( numChannels ? this.renderNumChannels ? 2)
+				.memSize_( 2**19 );
+			path = path.replaceExtension( headerFormat.toLower );
+			this.render( 
+				path,
+				maxTime, // explicit nil forces UScore to use score duration
+				sampleRate: ULib.servers.first.sampleRate,
+				headerFormat: headerFormat, 
+				sampleFormat: sampleFormat,
+				options: o,
+				action: action
+			);		
+		} {
+			"%:writeAudioFile - no audio file written; numChannels needs to be > 0\n"
+				.postf( this.class );
+			action.value;
+		};
     }
     
     // tag system: for UScores and UChains
