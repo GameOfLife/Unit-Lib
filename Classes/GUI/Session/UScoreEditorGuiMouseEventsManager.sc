@@ -20,7 +20,7 @@
 UScoreEditorGuiMouseEventsManager {
 	classvar minimumMov = 3;
 	var <scoreView;
-	var <score, <scoreEditor, <eventViews, <scoreEditorGUI, <>state = \nothing;
+	var <score, <scoreEditor, <eventViews, <>state = \nothing;
 	var <mouseMoved = false, <mouseDownPos, <unscaledMouseDownPos, <clickCount;
 	var <selectionRect, theEventView;
 	var <xLimit, <yLimit;
@@ -28,6 +28,7 @@ UScoreEditorGuiMouseEventsManager {
 	var <>mode = \all;
 	var scoreController;
 	var moveVert = false;
+	var lastSelectedEvents;
 
 	//state is \nothing, \moving, \resizingFront, \resizingBack, \selecting, \fadeIn, \fadeOut;
 	//mode is \all, \move, \resize, \fades
@@ -307,7 +308,7 @@ UScoreEditorGuiMouseEventsManager {
 	}
 	
 	mouseUpEvent{ |mousePos,unscaledMousePos,shiftDown,scaledUserView|
-		var oldSelectedEvents;
+		var newSelectedEvents;
 
 		if(this.isResizingOrFades) {
 		    //"resizing or fades".postln;
@@ -369,6 +370,13 @@ UScoreEditorGuiMouseEventsManager {
 		state = \nothing;
 		isCopying = false;
 		copyed = false;
+
+		newSelectedEvents = this.selectedEvents;
+		if(newSelectedEvents != lastSelectedEvents) {
+			//notify of change of selection
+			scoreView.changed(\selection, newSelectedEvents)
+		};
+		lastSelectedEvents = newSelectedEvents
 
 	}
 	
