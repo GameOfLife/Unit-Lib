@@ -51,15 +51,15 @@ FreeUdef : Udef {
 		if( loadOnInit ) { this.loadSynthDef };
 	}
 	
-	addSynthDefControls { |def|
+	addSynthDefControls { |def, inArgSpecs|
 		def = def ? synthDef;
-		ArgSpec.fromSynthDef( def ).do({ |argSpec| this.addArgSpec( argSpec ); });
+		ArgSpec.fromSynthDef( def, inArgSpecs ).do({ |argSpec| this.addArgSpec( argSpec ); });
 		this.initArgs; // make private if needed
 	}
 	
-	removeSynthDefControls { |def|
+	removeSynthDefControls { |def, inArgSpecs|
 		def = def ? synthDef;
-		ArgSpec.fromSynthDef( def ).do({ |argSpec| this.removeArgSpec( argSpec ); });
+		ArgSpec.fromSynthDef( def, inArgSpecs ).do({ |argSpec| this.removeArgSpec( argSpec ); });
 	}
 	
 	addUIO { |class, selector ...args| 
@@ -67,11 +67,21 @@ FreeUdef : Udef {
 		// this assumes you have a UEnv in at least one of 
 		// the synths you are running, or you use the UEnv controls in 
 		// some other way to release the synths, set its duration etc
-		this.addSynthDefControls( SynthDef( "tmp", { class.perform( selector, *args) } ) ); 
+		var def;
+		this.class.buildUdef = this;
+		this.class.buildArgSpecs = [];
+		def = SynthDef( "tmp", { class.perform( selector, *args) } );
+		this.class.buildUdef = nil;
+		this.addSynthDefControls( def, this.class.buildArgSpecs ); 
 	}
 	
 	removeUIO { |class, selector ...args|
-		this.removeSynthDefControls( SynthDef( "tmp", { class.perform( selector, *args) } ) ); 	}
+		var def;
+		this.class.buildUdef = this;
+		this.class.buildArgSpecs = [];
+		def = SynthDef( "tmp", { class.perform( selector, *args) } );
+		this.class.buildUdef = nil;
+		this.removeSynthDefControls( def, this.class.buildArgSpecs ); 	}
 	
 	addUEnv { this.addUIO( UEnv, \kr ); }
 	removeUEnv {  this.removeUIO( UEnv, \kr ); }
