@@ -30,7 +30,7 @@ USampleOffset : Spec {
 	
 	*getCurrent {
 		var round, count;
-		if( SyncCenter.current.notNil && UEvent.nrtMode.not ) {
+		if( SyncCenter.current.notNil && { SyncCenter.mode === \sample } ) {
 			round = SyncCenter.round;
 			count = SyncCenter.current.masterSampleCount( Server.default.latency );
 			^round - (count.roundUp( round ) - count);
