@@ -87,9 +87,15 @@ UEvent : UArchivable {
 	    if( nrtMode == true ) {
 		    func.value
 	    } {
+		    if( SyncCenter.mode === \sample ) {
+			    SyncCenter.mode = \nrt;
+		    };
 		    nrtMode = true;
 		    func.value;
 		    nrtMode = false;
+		    if( SyncCenter.mode === \nrt ) {
+			    SyncCenter.mode = \sample;
+		    };
 	    };
     }
     
