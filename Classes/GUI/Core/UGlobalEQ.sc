@@ -39,15 +39,7 @@ UGlobalEQ {
 	
 	*initClass {
 		Class.initClassTree(EQSetting);
-		Class.initClassTree(Spec);
-		
 		this.eqSetting = EQSetting(); // the default eq setting (may change later)
-		
-		ControlSpec.specs = ControlSpec.specs.addAll([
-			\u_globalEQ_setting -> UGlobalEQSpec,
-			\u_globalEQ_bypass -> BoolSpec(false),	
-		]);
-		
 	}
 	
 	*eqSetting_ { |new|
@@ -58,8 +50,13 @@ UGlobalEQ {
 	
 	*ar { |in|
 		var setting, bypass;
+		
+		Udef.addBuildSpec( ArgSpec( \u_globalEQ_setting, UGlobalEQ, UGlobalEQ, true ) );
 		setting = \u_globalEQ_setting.kr( eqSetting.asControlInput );
+		
+		Udef.addBuildSpec( ArgSpec( \u_globalEQ_bypas, false, BoolSpec(false), true ) );
 		bypass = \u_globalEQ_bypass.kr( 0 );
+		
 		^if( bypass, in, eqSetting.ar( in, setting ) );
 	}
 	
@@ -102,19 +99,14 @@ UGlobalEQ {
 		if( res != eqSetting ) { ^res }
 	}
 	
-}
-
-
-UGlobalEQSpec : Spec {
-	
-	// fixed output: 
+	// double as Spec
 	*new { ^this } // only use as class
 	
 	*asSpec { ^this }
 	
-	*constrain { ^UGlobalEQ } // whatever comes in; UGlobalEQ comes out
+	*constrain { ^this } // whatever comes in; UGlobalEQ comes out
 	
-	*default {  ^UGlobalEQ }
+	*default { ^this }
 	
 	*massEditSpec { ^nil }
 	

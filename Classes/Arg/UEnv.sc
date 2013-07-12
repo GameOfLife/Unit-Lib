@@ -41,16 +41,13 @@ duration etc.).
 UEnv : UIn {
 	
 	*initClass {
-		Class.initClassTree(ControlSpec);
-		ControlSpec.specs = ControlSpec.specs.addAll([
-
-			\u_dur -> ControlSpec(0, inf),
-			\u_doneAction -> ControlSpec(0, 14, \lin, 1),
-			\u_gain -> ControlSpec( -inf, 24, \db ),
-			\u_mute -> BoolSpec( false ),
-			\u_fadeIn -> ControlSpec( 0, inf ),
-			\u_fadeOut -> ControlSpec( 0, inf )
-			
+		specs.addAll([
+			\dur -> ControlSpec(0, inf),
+			\doneAction -> ControlSpec(0, 14, \lin, 1),
+			\gain -> ControlSpec( -inf, 24, \db ),
+			\mute -> BoolSpec( false ),
+			\fadeIn -> ControlSpec( 0, inf ),
+			\fadeOut -> ControlSpec( 0, inf )
 		]);
 	}
 	

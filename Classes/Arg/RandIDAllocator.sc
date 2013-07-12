@@ -22,18 +22,15 @@ RandIDAllocator {
 			dict.clear; // remove all
 		};
 	}
-}
-
-RandIDAllocatorSpec : Spec {
 	
-	// fixed output: 
+	// double as Spec
 	*new { ^this } // only use as class
 	
 	*asSpec { ^this }
 	
-	*constrain { ^RandIDAllocator } // whatever comes in; UGlobalEQ comes out
+	*constrain { ^this } // whatever comes in; UGlobalEQ comes out
 	
-	*default {  ^RandIDAllocator }
+	*default { ^this }
 	
 	*massEditSpec { ^nil }
 	
@@ -45,22 +42,19 @@ RandIDAllocatorSpec : Spec {
 
 URandSeed {
 	
-	*initClass {
-		Class.initClassTree(Spec);
-		ControlSpec.specs = ControlSpec.specs.addAll([
-			\u_randID -> RandIDAllocatorSpec
-		]);
+	*getRandID {
+		var id = \u_randID.ir( 0 );
+		Udef.addBuildSpec( ArgSpec( \u_randID, RandIDAllocator, RandIDAllocator, true, \init ) );
+		RandID.ir( id );
 	}
 	
 	*ir { |seed = 12345|
-		var id = \u_randID.ir( 0 );
-		RandID.ir( id );
+		this.getRandID;
 		RandSeed.ir( 1, seed );
 	}
 	
 	*kr { |trig = 1, seed = 12345|
-		var id = \u_randID.kr( 0 );
-		RandID.kr( id );
+		this.getRandID;
 		RandSeed.kr( trig, seed );
 	}
 }

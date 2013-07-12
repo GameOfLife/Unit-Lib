@@ -36,15 +36,6 @@ UGlobalGain {
 	classvar <gain = 0;
 	classvar <>view;
 	
-	*initClass {
-		Class.initClassTree(Spec);
-
-		
-		ControlSpec.specs = ControlSpec.specs.addAll([
-			\u_globalGain -> UGlobalGainSpec
-		]);
-	}
-	
 	*gain_ { |new|
 		gain = (new ? gain);
 		this.changed( \gain, gain );
@@ -52,6 +43,7 @@ UGlobalGain {
 	}
 	
 	*kr { |use = 1|
+		Udef.addBuildSpec( ArgSpec( \u_globalGain, UGlobalGain, UGlobalGain, true ) );
 		^(\u_globalGain.kr( gain ) * use).dbamp;	
 	}
 	
@@ -104,19 +96,14 @@ UGlobalGain {
 		RootNode( server ).set( \u_globalGain, this );
 	}
 	
-}
-
-
-UGlobalGainSpec : Spec {
-	
-	// fixed output: 
+	// double as Spec
 	*new { ^this } // only use as class
 	
 	*asSpec { ^this }
 	
-	*constrain { ^UGlobalGain } // whatever comes in; UGlobalEQ comes out
+	*constrain { ^this }
 	
-	*default {  ^UGlobalGain }
+	*default {  ^this }
 	
 	*massEditSpec { ^nil }
 	

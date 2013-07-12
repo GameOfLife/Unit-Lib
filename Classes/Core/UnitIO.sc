@@ -58,11 +58,12 @@ UOut -> *ar { |id, channelsArray|
 
 UIn {
 	
+	classvar <>specs;
+	
 	*initClass {
 		Class.initClassTree(Spec);
-		ControlSpec.specs = ControlSpec.specs.addAll([
-			'u_*_*r_*_bus' -> PositiveIntegerSpec(),	
-		]);
+		specs = IdentityDictionary();
+		specs.put( \bus, PositiveIntegerSpec() );
 	}
 
 	
@@ -83,7 +84,13 @@ UIn {
 	}
 	
 	*getControl { |mode = \kr, name, what, value, lag|
-		^(name ++ "_" ++ what).asSymbol.perform( mode, value, lag );
+		var spec;
+		name = (name ++ "_" ++ what).asSymbol;
+		spec = specs[ what.asSymbol ];
+		if( spec.notNil ) {
+			Udef.addBuildSpec( ArgSpec( name, value, specs[ what.asSymbol ], true ) );
+		};
+		^name.perform( mode, value, lag );
 	}
 	
 	*ar { |id = 0, numChannels = 1|
@@ -128,10 +135,7 @@ UOut : UIn { // overwrites bus (ReplaceOut)
 UMixOut : UIn {
 	
 	*initClass {
-		Class.initClassTree(Spec);
-		ControlSpec.specs = ControlSpec.specs.addAll([
-			'u_o_*r_*_lvl' -> \amp.asSpec,	
-		]);
+		specs.put( 'lvl', \amp.asSpec );
 	}
 	
 	*ar { |id = 0, channelsArray, inLevel = 0, offset = false |
