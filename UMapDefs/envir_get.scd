@@ -41,7 +41,7 @@ ValueUMapDef( \envir_get, { |unit, routine|
 		};
 		lastVal = val;
 	};
-	//update.value; // this seems to make it crash sometimes..
+	update.value; // this seems to make it crash sometimes..
 	{
 		loop {
 			(1/unit.get( \speed )).max(0.01).wait;

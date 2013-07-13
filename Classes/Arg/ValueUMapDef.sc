@@ -83,8 +83,8 @@ ValueUMapDef : UMapDef {
 				 \value, { unit.unitSet; },
 				 \active, { 
 					 if( item[1].booleanValue ) {
-						 unit.set( \u_store, startFunc.value( unit, unit.get( \u_store ) ) );
 						 activeUnits.add( unit );
+						 unit.set( \u_store, startFunc.value( unit, unit.get( \u_store ) ) ); 
 					 } {
 						 unit.set( \u_store, endFunc.value( unit, unit.get( \u_store ) ) );
 						 activeUnits.remove( unit );
