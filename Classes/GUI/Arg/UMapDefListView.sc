@@ -104,8 +104,6 @@ UMapDefListView {
 		});
 		views = ();
 		
-		view.view.background = UMapGUI.color;
-		
 		views[ \scrollview ] = ScrollView( view, view.bounds.moveTo(0,0) ).resize_(5);
 		views[ \scrollview ].addFlowLayout;
 		views[ \scrollview ].hasBorder = false;
@@ -131,6 +129,8 @@ UMapDefListView {
                 (bounds.width - (scrollerMargin+6))@18,
                 collapsed[ cat ] ? true
             );
+            
+            views[ cat ].background = UMapGUI.color;
             
             views[ cat ].button.background = nil;
 
