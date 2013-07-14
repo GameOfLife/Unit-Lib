@@ -20,6 +20,7 @@
 UGUI {
 	
 	classvar <>currentUMapSink;
+	classvar <>nowBuildingUnit;
 	
 	var <unit;
 	
@@ -72,6 +73,8 @@ UGUI {
 	prMakeViews { |bounds|
 		var margin = 0@0, gap = 4@4;
 		
+		nowBuildingUnit = unit;
+		
 		if( bounds.isNil ) { 
 			bounds = parent.asView.bounds.insetBy(4,4);
 			if( parent.asView.class.name == \SCScrollTopView ) {
@@ -107,6 +110,8 @@ UGUI {
 		 };
 		 
 		 this.makeSubViews( bounds );
+		 
+		 nowBuildingUnit = nil;
 	}
 	
 	makeSubViews { |bounds|

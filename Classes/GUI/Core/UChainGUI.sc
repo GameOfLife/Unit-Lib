@@ -27,6 +27,7 @@ UChainGUI {
 	classvar <>scrollViewOrigin;
 	classvar <>startTimeMode = \time; // \time, \bar
 	classvar <>durationMode = \duration; // \duration, \endTime, \endBar
+	classvar <>nowBuildingChain;
 	
 	var <chain, <score;
 	
@@ -193,6 +194,8 @@ UChainGUI {
 		var udefController;
 		var scoreController;
 		// var unitInitFunc;
+		
+		nowBuildingChain = chain;
 		
 		labelWidth = 80;
 		
@@ -729,6 +732,8 @@ UChainGUI {
 		});
 		
 		uguis = this.makeUnitViews(units, margin, gap );
+		
+		nowBuildingChain = nil;
 	}
 	
 	makeUnitHeader { |units, margin, gap|
