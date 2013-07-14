@@ -172,7 +172,10 @@ UdefListView {
 	                	.border_(1)
 	                	.resize_(3)
 	                	.canFocus_( false )
-	                	.action_({ udef.openDefFile });
+	                	.action_({
+		                	this.setEndFrontAction;
+		                	udef.openDefFile 
+		                });
                 };
             });
             
@@ -236,4 +239,9 @@ UdefListView {
 		});
 	}
 	
+	setEndFrontAction {
+		 if( GUI.id == \cocoa ) {
+			 view.findWindow.endFrontAction = nil;
+		 };
+	}	
 }
