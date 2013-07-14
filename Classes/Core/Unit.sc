@@ -464,6 +464,7 @@ U : ObjectWithArgs {
 	var >waitTime; // use only to override waittime from args
 	var <mod;
 	var <guiCollapsed = false;
+	var <>parentChain;
 	
 	*initClass {
 	    synthDict = IdentityDictionary( );
@@ -985,6 +986,9 @@ U : ObjectWithArgs {
 	
 	prepare { |target, startPos = 0, action|
 		var valuesToPrepare, act, servers;
+		
+		parentChain = UChain.nowPreparingChain;
+		
 		target = target.asCollection.collect{ |t| t.asTarget( this.apxCPU ) };
 		target = target.select({ |tg|
 			this.shouldPlayOn( tg ) != false;
@@ -1062,6 +1066,9 @@ U : ObjectWithArgs {
 	    };
 	    this.modPerform( \dispose );
 	    preparedServers.remove( server );
+	    if( preparedServers.size == 0 ) {
+		    parentChain = nil; // forget chain after disposing last server
+	    };
 	}
 }
 

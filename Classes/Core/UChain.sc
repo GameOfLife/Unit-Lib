@@ -32,6 +32,7 @@ UChain : UEvent {
 	classvar <>presetManager;
 	
 	classvar <>makeDefaultFunc;
+	classvar <>nowPreparingChain;
 
 	var <units; //, <>groups;
 	var <prepareTasks;
@@ -657,6 +658,9 @@ UChain : UEvent {
 
 	prepare { |target, startPos = 0, action|
 		var cpu;
+		
+		nowPreparingChain = this;
+		
 		lastTarget = target;
 		action = MultiActionFunc( action );
 		target = target.asCollection;
@@ -679,6 +683,8 @@ UChain : UEvent {
 	     action.getAction.value; // fire action at least once
 	     
 	     if( verbose ) { "% preparing for %".format( this, preparedServers ).postln; };
+	     
+	     nowPreparingChain = nil
 	     
 	     ^target; // return array of actually prepared servers
 	}
