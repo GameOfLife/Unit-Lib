@@ -796,30 +796,16 @@ UChainGUI {
 		
 		defs = SmoothButton( comp, 
 				Rect( comp.bounds.right - (
-					2 + 40 + 4 + 40 + (notMassEdit.binaryValue * (4 + 60 + 4 + 40))
+					2 + 40 + (notMassEdit.binaryValue * (4 + 60 + 4 + 40))
 					), 1, 42, 12 
 				) 
 			)
 			.label_( "udefs" )
 			.border_( 1 )
-			.radius_( [ 6, 2, 2, 6 ] )
+			.radius_( 2 )
 			.action_({
-				UdefListView();
+				UdefsGUI();
 			}).resize_(3);
-			
-		mapdefs = SmoothButton( comp, 
-				Rect( comp.bounds.right - (
-					4 + 40 + (notMassEdit.binaryValue * (4 + 60 + 4 + 40))
-					), 1, 42, 12 
-				) 
-			)
-              .label_( "umaps" )
-              .border_( 1 )
-              
-			.radius_( [ 2, 6, 6, 2 ] )
-              .action_({
-	              UMapDefListView();
-               }).resize_(3);
 			
 		CompositeView( comp, Rect( 0, 14, (composite.bounds.width - (margin.x * 2)), 2 ) )
 			.background_( Color.black.alpha_(0.25) )

@@ -213,8 +213,7 @@ UMenuWindow {
 					'View', (),
 					'EQ', { UGlobalEQ.gui; },
 					'Level', { UGlobalGain.gui; },
-					'Udefs', { UdefListView(); },
-					'UMapDefs', { UMapDefListView(); },
+					'Udefs', { UdefsGUI(); },
 					'Level meters', { ULib.servers.first.meter; }
 				)
 			)
