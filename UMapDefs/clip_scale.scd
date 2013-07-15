@@ -1,14 +1,13 @@
 /*
-\map_audio
+\clip_scale
 
-Creates an UMap that listens to an audio bus from a previous unit in the chain and converts it to a control signal.
+Creates an UMap for scaling a value to another range, with clipping and wrapping functionality.
 
-bus: the number of the bus (usually 0)
-fromRange: the input range to listen to (-1 to 1)
-toRange: the range to which the output is scaled
-curve: a curvature value for toRange. If curve == 0, the range is linear.
-invert: if true, the fromRange is inverted (i.e. low values become high and v.v.)
-lag: lagging filter time for value changes
+value: the value upon which the scaling is applied (this can be another UMap as well)
+fromRange: the used range of the input value
+toRange: the range to map it to
+invert: if true, the input range is inverted (i.e. low values become high and v.v.)
+curve: a curvature value for the mapped range. If curve == 0, the range is linear.
 clipMode: can be one of the following modes (Symbol):
 	'clip' (default): clip values outside fromRange
 	'fold': fold values outside fromRange
@@ -19,17 +18,17 @@ clipMode: can be one of the following modes (Symbol):
 	'wrap_sine': wrap values around fromRange, and then map them to a sine curve. This means that values at the borders of fromRange will return at the center of toRange.
 	'none': no clipping applied (values can go outside toRange)
 
-The 'toRange' arg range is mapped to that of the parameter to which the UMap is connected
+The value arg range is mapped to that of the parameter to which the UMap is connected.
 
 --
 this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UMapDef( \map_audio, { |bus = 0, fromRange = #[-1.0, 1.0], toRange = #[0.0,1.0], 	curve = 0, invert = 0, lag = 0.0, clipMode = 0|
+
+UMapDef( \clip_scale, { |value = 0.0, fromRange = #[0.0, 1.0], toRange = #[0.0, 1.0], curve = 0.0, invert = 0, clipMode = 0|
 	var sig;
-	sig = In.ar(bus + UIn.firstPrivateBus);
-	sig = A2K.kr( sig );
+	sig = value;
 	sig = sig.linlin(*fromRange ++ [-1,1,\none]);
 	sig = Select.kr( curve.inRange(-0.001,0.001), [
 		sig.lincurve(-1,1,-1,1, curve, \none ),
@@ -46,17 +45,14 @@ UMapDef( \map_audio, { |bus = 0, fromRange = #[-1.0, 1.0], toRange = #[0.0,1.0],
 		(sig.wrap2(1) * pi).sin,
 		sig
 	]);
-	sig = sig.lag( lag );
 	sig = sig.linlin(-1,1,*toRange ++ [ \none ]);
 	UMapOut.kr(sig);
 })
-	.setSpec( \fromRange, [-1,1].asSpec.asRangeSpec )
+	.mappedArgs_([ \value, \fromRange, \toRange ])
 	.setSpec( \clipMode, ListSpec( (..7), 0, [ 
 		\clip, \fold, \wrap, \tanh, \softclip, \distort, \wrap_sine, \none 
 		] ) 
 	)
-	.setSpec( \invert, BoolSpec(false) )
 	.setSpec( \curve, [-16,16,\lin,0,0].asSpec )
-	.setSpec( \bus, PositiveIntegerSpec(0,0,32) )
-	.mappedArgs_([ \toRange ])
-	.category_(\input)
+	.setSpec( \invert, BoolSpec(false) )
+	.category_( 'filter' )

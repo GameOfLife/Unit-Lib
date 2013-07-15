@@ -1,3 +1,19 @@
+/*
+\global_control
+
+Creates an UMap that listens to a control in UGlobalControl
+
+value: the actual output value (this will change when the variable changes, but can also be changed manually)
+active: if true, the UMap will listen to the specified global control and update it whenever it changes. If a non-existing key is used, it will be added to UGlobalControl automatically when 'active' == true.
+controlKey: the name of the globalControl (a Symbol)
+
+The 'value' arg range is mapped to that of the parameter to which the UMap is connected.
+
+--
+this is an UMapDef definition file
+part of the Unit lib default UMapDefs set
+*/
+
 ValueUMapDef( \global_control, { |unit, ctrl|
 	var key, spec;
 	UGlobalControl.removeDependant( ctrl );

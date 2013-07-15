@@ -1,3 +1,34 @@
+/*
+\midi_noteOn
+
+Creates an UMap that listens to MIDI note on messages. Works similar to all 'midi_xxx' UMapDefs.
+
+value: the actual output value (this will change when a midi message is received, but can also be changed manually)
+active: if true, the UMap will listen to the specified MIDI message. Hitting cmd-. will make the UMap stop listening, but whenever the Unit is started, it will re-activate. The MIDI client will be inited when the first midi_xxx UMap is made 'active'.
+channel: the MIDI channel to listen to. 0-15 or nil (any channel).
+learn: if learn is true, the 'channel' value will be changed according to any incoming MIDI note on message, as long as 'learn' is true.
+fromRange: the used range of the midi message
+toRange: the output range of the UMap
+invert: if true, the input range is inverted (i.e. low values become high and v.v.)
+curve: a curvature value for the mapped range. If curve == 0, the range is linear.
+clipMode: can be one of the following modes (Symbol):
+	'ignore': ignore values outside fromRange
+	'clip' (default): clip values outside fromRange
+	'fold': fold values outside fromRange
+	'wrap': wrap around values outside fromRange
+	'tanh': distort values to range with a tanh function
+	'softclip': softclip values outside fromRange
+	'distort': use a non-linear distortion curve to keep all values within range
+	'wrap_sine': wrap values around fromRange, and then map them to a sine curve. This means that values at the borders of fromRange will return at the center of toRange.
+	'none': no clipping applied (values can go outside toRange)
+
+The 'value' arg range is mapped to that of the parameter to which the UMap is connected.
+
+--
+this is an UMapDef definition file
+part of the Unit lib default UMapDefs set
+*/
+
 ValueUMapDef( \midi_noteOn, { |unit, midifunc|
 	var func;
 	if(MIDIClient.initialized.not,{ MIDIIn.connectAll });

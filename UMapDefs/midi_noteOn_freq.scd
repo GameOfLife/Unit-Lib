@@ -1,3 +1,25 @@
+/*
+\midi_noteOn_freq
+
+Creates an UMap that listens to MIDI note on messages. It implements diatonic scaling meant for use with \freq parameters. Works similar to all 'midi_xxx' UMapDefs.
+
+value: the actual output value (this will change when a midi message is received, but can also be changed manually)
+active: if true, the UMap will listen to the specified MIDI message. Hitting cmd-. will make the UMap stop listening, but whenever the Unit is started, it will re-activate. The MIDI client will be inited when the first midi_xxx UMap is made 'active'.
+channel: the MIDI channel to listen to. 0-15 or nil (any channel).
+learn: if learn is true, the 'channel' value will be changed according to any incoming MIDI note on message, as long as 'learn' is true.
+range: the used range of input note numbers. Notes outside this range will be ignored.
+a: the frequency of "A3" (note number 69)
+transpose: amount of transposition in semitones
+scale: scaling of semitones around (transposed) note number 69
+invert: if true, the range is inverted around note number 69
+
+The 'value' arg range is mapped to that of the parameter to which the UMap is connected.
+
+--
+this is an UMapDef definition file
+part of the Unit lib default UMapDefs set
+*/
+
 ValueUMapDef( \midi_noteOn_freq, { |unit, midifunc|
 	var func;
 	if(MIDIClient.initialized.not,{ MIDIIn.connectAll });
