@@ -27,9 +27,11 @@ ValueUMapDef( \global_control, { |unit, ctrl|
 	"listening to UGlobalControl '%'\n".postf( key );
 	ctrl = { |obj, key|
 		var val;
-		val = UGlobalControl.current.get( key );
-		if( val.notNil ) {
-			unit.mapSet( \value, val );
+		if( key === unit.get( \controlKey ).asSymbol ) {
+			val = UGlobalControl.current.get( key );
+			if( val.notNil ) {
+				unit.mapSet( \value, val );
+			};
 		};
 	};
 	UGlobalControl.addDependant( ctrl );
