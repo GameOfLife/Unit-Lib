@@ -44,9 +44,21 @@ UGlobalControl : OEM {
 		};
 	}
 	
+	getUMaps { ^this.values.select( _.isUMap ) }
+	
+	getAllUMaps { 
+		var umaps;
+		this.getUMaps.do({ |item|
+			umaps = umaps.add( item );
+			umaps = umaps.addAll( item.getAllUMaps );
+		});
+		^umaps;
+	}
+	
 	argSpecs { ^this.keys.collect({ |key| ArgSpec( key, 0.5, [0,1].asSpec, false, \init ) }) }
 	defName { ^"UGlobalControl" }
 	guiCollapsed { ^false }
+	getDefault { ^0.5 }
 	
 	args { ^this.getPairs }
 	
