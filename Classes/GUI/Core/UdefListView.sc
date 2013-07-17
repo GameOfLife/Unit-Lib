@@ -232,9 +232,11 @@ UdefListView {
 				
 			StaticText(views[ \scrollview],100@25).string_("Udefs");
 			views[ \scrollview].decorator.nextLine;
+			categories = categories.clump(2).sort({ |a,b| a[0] <= b[0] }).flatten(1);
 			categories.pairsDo(g);
 			StaticText(views[ \scrollview],100@25).string_("UnitRacks");
             views[ \scrollview].decorator.nextLine;
+            rackCategories = rackCategories.clump(2).sort({ |a,b| a[0] <= b[0] }).flatten(1);
             rackCategories.pairsDo(g);
 		});
 	}
