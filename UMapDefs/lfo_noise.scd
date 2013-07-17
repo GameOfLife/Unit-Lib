@@ -18,7 +18,7 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UMapDef( \lfo_noise, { |freq = 2, type = 0, seed = 12345, range = #[0.0,1.0]|
+UMapDef( \lfo_noise, { |freq = 2, type = 2, seed = 12345, range = #[0.0,1.0]|
 	var sig;
 	URandSeed.ir(seed);
 	sig = [
