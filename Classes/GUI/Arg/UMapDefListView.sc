@@ -152,7 +152,10 @@ UMapDefListView {
                     .beginDragAction_({ |vw|
 	                    this.setEndFrontAction( true );
 	                    UGUI.currentUMapSink = nil;
-	                    { UChainGUI.all.do({ |x| x.view.refresh }); }.defer(0.1);
+	                    { 
+		                    UChainGUI.all.do({ |x| x.view.refresh });
+		                    UGlobalControlGUI.current !? {|x| x.view.view.refresh };
+		               }.defer(0.1);
 	                    vw.object;
                     })
                     .string_( " " ++ udef.name.asString )
