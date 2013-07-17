@@ -162,6 +162,7 @@
 		var font;
 		var editAction;
 		var tempVal;
+		var optionsWidth = 40, operationsOffset = 1;
 		vws = ();
 		
 		font =  (RoundView.skin ? ()).font ?? { Font( Font.defaultSansFace, 10 ); };
@@ -178,6 +179,32 @@
 		vws[ \doAction ] = { action.value( vws, vws[ \val ] ) };
 		
 		vws[ \operations ] = OEM(
+			\edit, { |values|
+				var plotter;
+				if( vws[ \plotter ].isNil or: { vws[ \plotter ].parent.isClosed } ) {
+					plotter = vws[ \val ].plot;
+					plotter.editMode_( true )
+						.specs_( this )
+						.findSpecs_( false )
+						.plotMode_( \points )
+						.editFunc_({ |vw|
+							vws[ \val ] = vw.value;
+							vws[ \range ] = [ vws[ \val ].minItem, vws[ \val ].maxItem ];
+							vws[ \setRangeSlider ].value;
+							action.value( vws, vws[ \val ] );
+						});
+						
+					plotter.parent.onClose = plotter.parent.onClose.addFunc({ 
+						if( vws[ \plotter ] == plotter ) {
+							vws[ \plotter ] = nil;
+						};
+					});
+					vws[ \plotter ] = plotter;
+				} {
+					vws[ \plotter ].parent.front;
+				};
+				values;
+			},
 			\invert, { |values|
 				values = this.unmap( values );
 				values = values.linlin( 
@@ -288,8 +315,10 @@
 		
 		vws[ \setRangeSlider ].value;
 		
-		vws[ \options ] = PopUpMenu( view, 40 @ (bounds.height) )
-			.items_( [ "do", " " ] ++ vws[ \operations ].keys )
+		if( GUI.id === \qt ) { optionsWidth = 80; operationsOffset = 0; };
+		
+		vws[ \options ] = PopUpMenu( view, optionsWidth @ (bounds.height) )
+			.items_( [ "do", " " ] ++ vws[ \operations ].keys[operationsOffset..] )
 			.font_( font )
 			.applySkin( RoundView.skin )
 			.action_({ |vw|
@@ -303,36 +332,17 @@
 				vw.value = 0;
 			});
 			
-		vws[ \edit ] = SmoothButton( view, 40 @ (bounds.height) )
-			.label_( "edit" )
-			.border_( 1 )
-			.radius_( 2 )
-			.font_( font )
-			.action_({
-				var plotter;
-				if( vws[ \plotter ].isNil or: { vws[ \plotter ].parent.isClosed } ) {
-					plotter = vws[ \val ].plot;
-					plotter.editMode_( true )
-						.specs_( this )
-						.findSpecs_( false )
-						.plotMode_( \points )
-						.editFunc_({ |vw|
-							vws[ \val ] = vw.value;
-							vws[ \range ] = [ vws[ \val ].minItem, vws[ \val ].maxItem ];
-							vws[ \setRangeSlider ].value;
-							action.value( vws, vws[ \val ] );
-						});
-						
-					plotter.parent.onClose = plotter.parent.onClose.addFunc({ 
-						if( vws[ \plotter ] == plotter ) {
-							vws[ \plotter ] = nil;
-						};
-					});
-					vws[ \plotter ] = plotter;
-				} {
-					vws[ \plotter ].parent.front;
-				};
-			});
+		if( GUI.id != \qt ) {	
+			vws[ \edit ] = SmoothButton( view, 40 @ (bounds.height) )
+				.label_( "edit" )
+				.border_( 1 )
+				.radius_( 2 )
+				.font_( font )
+				.action_({
+					vws[ \operations ][ \edit ].value;
+				});
+			vws[ \edit ].resize_(3);
+		};
 			
 		vws[ \setPlotter ] = {
 			if( vws[ \plotter ].notNil ) {
@@ -347,7 +357,6 @@
 		
 		vws[ \rangeSlider ].view.resize_(2);
 		vws[ \options ].resize_(3);
-		vws[ \edit ].resize_(3);
 			
 		view.view.onClose_({
 			if( vws[ \plotter ].notNil ) {
