@@ -44,6 +44,14 @@ UGlobalControl : OEM {
 		};
 	}
 	
+	argSpecs { ^this.keys.collect({ |key| ArgSpec( key, 0.5, [0,1].asSpec, false, \init ) }) }
+	defName { ^"UGlobalControl" }
+	guiCollapsed { ^false }
+	
+	args { ^this.getPairs }
+	
+	init { this.changed( \init ) }
+	
 	prepare { |key, action|
 		var act, val;
 		if( key.isNil ) {
