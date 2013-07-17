@@ -1,12 +1,64 @@
 UGlobalControl : OEM {
 	
 	classvar <>current;
+	classvar <>presetManager;
+	classvar <>autoAdd = true;
+	classvar <>autoRemove = false;
 	
 	*initClass {
-		this.new( 
-			*(..7).collect({ |x| [ ("global_" ++ x).asSymbol, 0.5 ] }).flatten(1) 
-		).makeCurrent;
+		Class.initClassTree( PresetManager );
+		
+		presetManager = PresetManager( this, [ 
+			\default, this.new( 
+				*(..7).collect({ |x| [ ("global_" ++ x).asSymbol, 0.5 ] }).flatten(1) 
+			),
+			\nano_sliders, {
+				var ccs;
+				ccs = [ 2, 3, 4, 5, 6, 8, 9, 12, 13 ];
+				this.new(
+					*ccs.collect({ |cc, i|
+						[ 
+							("global_" ++ i).asSymbol, 
+							UMap( 'midi_cc', [
+								\cc, cc,
+								\channel, 0
+							] )
+						]
+					}).flatten(1)
+				)
+			}
+		] )
+			.getFunc_({ |obj| obj.deepCopy })
+			.applyFunc_({ |object, preset|
+			 	object.fromObject( preset );
+		 	});
+		 	
+		 this.fromPreset( \default ).makeCurrent;
 	}
+		
+	*presets { ^presetManager.presets.as(IdentityDictionary) }
+	
+	fromObject { |obj|
+		var keys;
+		obj = obj.value; // in case it is a function
+		if( autoRemove ) {
+			keys = obj.keys;
+			this.keys.copy.do({ |key|
+				if( keys.includes( key ).not ) {
+					this.put( key, nil );
+				};
+			});
+		};
+		this.set( *obj.getPairs.deepCopy );
+	}
+	
+	*fromObject { |obj|
+		^obj.deepCopy;
+	}
+	
+	*fromPreset { |name| ^presetManager.apply( name ) }
+	
+	fromPreset { |name| ^presetManager.apply( name, this ); }
 	
 	makeCurrent {
 		current.removeDependant( this.class );
@@ -21,8 +73,29 @@ UGlobalControl : OEM {
 		this.class.changed( \current );
 	}
 	
+	stopUMap { |key|
+		if( this[ key ].isUMap ) {
+			this[ key ].stop;
+			this[ key ].dispose;
+		};
+	}
+	
 	put { |key, value|
-		super.put( key, value.asUnitArg(this,key) );
+		if( autoRemove or: { value.notNil } ) {
+			if( autoAdd ) {
+				if( this[ key ] !== value ) {
+					this.stopUMap( key );
+				};
+				super.put( key, value.asUnitArg(this,key) );
+			} {
+				if( this.keys.includes( key ) ) {
+					if( this[ key ] !== value ) {
+						this.stopUMap( key );
+					};
+					super.put( key, value.asUnitArg(this,key) );
+				};
+			};
+		};
 	}
 	
 	get { |key| 

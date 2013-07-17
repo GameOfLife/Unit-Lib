@@ -2,8 +2,8 @@ UGlobalControlGUI {
 	
 	classvar <>current;
 	
-	var <view, <views, <header, <scrollView, <composite, <ugui;
-	var <>performUpdate = false;
+	var <view, <views, <scrollView, <composite, <presetView, <ugui;
+	var <>performUpdate = nil;
 	var <>storedKeys, <>umaps, <>unitInitFunc;
 	
 	*new { |parent, bounds, makeCurrent = true|
@@ -23,8 +23,8 @@ UGlobalControlGUI {
 	}
 	
 	update { |key, value|
-		if( performUpdate or: { UGlobalControl.current.keys != storedKeys } ) {
-			performUpdate = false;
+		if( performUpdate !? { performUpdate } ?? { UGlobalControl.current.keys != storedKeys } ) {
+			performUpdate = nil;
 			this.rebuild;
 		};
 	}
@@ -33,14 +33,16 @@ UGlobalControlGUI {
 		if( parent.notNil ) {
 			bounds = bounds ?? { parent.bounds.moveTo(0,0).insetBy(4,4) };
 		} {
-			bounds = bounds ? Rect(405, 230, 331, 217)
+			bounds = bounds ? Rect(
+				Window.screenBounds.width - 445, 
+				Window.screenBounds.height - 845, 
+				340, 240
+			);
+
 		};
 		
 		view = EZCompositeView( parent ? "UGlobalControl", bounds, true ).resize_(5);
 		bounds = view.bounds;
-		view.onClose_({ 
-			if( current == this ) { current = nil };
-		});
 		
 		views = ();
 		
@@ -54,6 +56,11 @@ UGlobalControlGUI {
 			.border_(1)
 			.hiliteColor_( Color.green )
 			.action_( [ {
+					umaps.do({ |item|
+						if( item.argNames.includes( \active ) ) {
+							item.set( \active, true );
+						};
+					});
 					UGlobalControl.current.prepare;
 				}, { 
 					UGlobalControl.current.dispose;
@@ -72,7 +79,9 @@ UGlobalControlGUI {
 		 	
 		view.decorator.nextLine;
 		
-		scrollView = ScrollView( view, view.decorator.indentedRemaining ).resize_(5);
+		scrollView = ScrollView( view, view.decorator.indentedRemaining
+			.insetAll( 0,0,0, 20) 
+		).resize_(5);
 		scrollView.addFlowLayout;
 		
 		unitInitFunc = { |unit, what ...args|
@@ -85,16 +94,24 @@ UGlobalControlGUI {
 		
 		view.onClose_( { 
 			UGlobalControl.removeDependant( this ); 
-			//umaps.do( _.removeDependant( unitInitFunc ) )
+			umaps.do( _.removeDependant( unitInitFunc ) );
+			if( current == this ) { current = nil };
 		} );
 		
-		RoundView.popSkin;
-		
 		this.makeView;
+		
+		presetView = PresetManagerGUI( 
+				view, 
+				view.bounds.width @ PresetManagerGUI.getHeight,
+				UGlobalControl.presetManager,
+				UGlobalControl.current
+			).resize_(7);
+		
+		RoundView.popSkin;
 	}
 	
 	rebuild {
-		//umaps.do( _.removeDependant( unitInitFunc ) );
+		umaps.do( _.removeDependant( unitInitFunc ) );
 		{
 			views[ \startButton ].focus( true );
 			ugui.composite.remove;
@@ -115,10 +132,10 @@ UGlobalControlGUI {
 		storedKeys = UGlobalControl.current.keys.copy;
 		
 		umaps = UGlobalControl.current.getAllUMaps;
-		//umaps.do( _.addDependant( unitInitFunc ) );
+		umaps.do( _.addDependant( unitInitFunc ) );
 		ugui = UGUI( scrollView, width @ 0, UGlobalControl.current );
 		
-		ugui.mapSetAction = { performUpdate = true; };
+		ugui.mapSetAction = { performUpdate = true; this.update; };
 		
 		RoundView.popSkin;
 	}
