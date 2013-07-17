@@ -27,7 +27,10 @@ ValueUMapDef( \global_control, { |unit, ctrl|
 	"listening to UGlobalControl '%'\n".postf( key );
 	ctrl = { |obj, key|
 		var val;
-		if( key === unit.get( \controlKey ).asSymbol ) {
+		if( unit.get( \learn ) ) {
+			unit.set( \controlKey, key );
+		};
+		if( key === unit.get( \controlKey ) ) {
 			val = UGlobalControl.current.get( key );
 			if( val.notNil ) {
 				unit.mapSet( \value, val );
@@ -41,5 +44,6 @@ ValueUMapDef( \global_control, { |unit, ctrl|
 	UGlobalControl.removeDependant( ctrl );
 	nil;
 }, [
-	[ \controlKey, nil, UGlobalControlKeySpec() ]
+	[ \controlKey, nil, UGlobalControlKeySpec() ],
+	[ \learn, false, BoolSpec() ]
 ], \control );
