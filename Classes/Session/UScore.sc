@@ -20,6 +20,7 @@
 UScore : UEvent {
 	
 	classvar <>activeScores;
+	classvar <>openFunc;
 
 	/*
 	*   events: Array[UEvent]
@@ -54,12 +55,26 @@ UScore : UEvent {
 
 	*initClass {
 		activeScores = Set();
+		openFunc = { |path|
+			this.readTextArchive( path );
+		};
 	}
 
 	*current { ^UScoreEditorGUI.current !? { |x| x.score } }
 
 	*new { |... events| 
 		^super.new.init( events );
+	}
+	
+	*open { |path, action|
+        if( path.isNil ) {
+		    Dialog.getPaths( { |paths|
+		        action.value( openFunc.(paths[0]) );
+		    });
+	    } {
+            path = path.standardizePath;
+            action.value( openFunc.(path) );
+	    };
 	}
 	
 	/*

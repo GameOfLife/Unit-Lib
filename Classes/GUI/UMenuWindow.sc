@@ -148,7 +148,7 @@ UMenuWindow {
 				OEM(
 					'Score', (),
 					'New', { UScore().gui; },
-					'Open...', { UScore.openWFS(nil, UScoreEditorGUI(_) ); },
+					'Open...', { UScore.open(nil, UScoreEditorGUI(_) ); },
 					'Save', { UScore.current !? _.save; },
 					'Save as...', { UScore.current !! _.saveAs; },
 					' ', (), 

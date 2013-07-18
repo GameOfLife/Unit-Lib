@@ -132,7 +132,7 @@ UMenuBar {
 		}).setShortCut("n",true);
 
 		SCMenuItem.new(scoreMenu, "Open...").action_({
-			UScore.openWFS(nil, UScoreEditorGUI(_) )
+			UScore.open(nil, UScoreEditorGUI(_) )
 		}).setShortCut("o",true);
 
 		SCMenuItem.new(scoreMenu, "Save").action_({
