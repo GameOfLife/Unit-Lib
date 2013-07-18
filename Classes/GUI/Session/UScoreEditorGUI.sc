@@ -37,6 +37,23 @@ UScoreEditorGUI : UAbstractWindow {
 	    ^this.current.selectedEvents
 	}
 
+	//gives a flat array
+	*currentSelectedChains{
+		^this.currentSelectedEvents.collect{ |ev|
+			ev.getAllUChains
+		}.flat
+	}
+
+	*selectedEventsDo{ |f|
+		this.currentSelectedEvents.collect{ |ev|
+			ev.allEvents
+		}.flat.do(f)
+	}
+
+	*selectedChainsDo{ |f|
+		this.currentSelectedChains.do(f)
+	}
+
     init { |inScoreEditor|
         scoreEditor = if(inScoreEditor.class == UScore) {
             UScoreEditor(inScoreEditor)
