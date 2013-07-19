@@ -22,4 +22,7 @@ UMapDef( \rho_theta, { |rho = 0.5, theta = 0|
 })
 	.setSpec( \theta, AngleSpec() )
 	.mappedArgs_( [ \rho ] )
-	.category_( 'point' );
+	.category_( 'point' )
+	.canUseUMapFunc_({ |unit, key, umapdef|
+		unit.getSpec( key ).isKindOf( PointSpec );
+	});
