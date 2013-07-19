@@ -55,4 +55,4 @@ UMapDef( \clip_scale, { |value = 0.0, fromRange = #[0.0, 1.0], toRange = #[0.0, 
 	)
 	.setSpec( \curve, [-16,16,\lin,0,0].asSpec )
 	.setSpec( \invert, BoolSpec(false) )
-	.category_( 'filter' )
+	.category_( 'utility' )
