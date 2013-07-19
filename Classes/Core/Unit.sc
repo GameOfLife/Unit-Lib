@@ -670,9 +670,7 @@ U : ObjectWithArgs {
 	canUseUMap { |key, umapdef|
 		^this.def.canUseUMap == true && 
 		{ umapdef.allowedModes.includes( this.getSpecMode( key ) ) && {
-				this.getSpec( key ).respondsTo( \asControlSpec ) && {
-					this.getDefault( key ).asControlInput.asCollection.size == umapdef.numChannels
-				};
+			umapdef.unitCanUseUMap( this, key );	
 			};
 		}
 	}

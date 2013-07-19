@@ -1,8 +1,10 @@
 UMapDef : Udef {
 	classvar <>all, <>defsFolders, <>userDefsFolder;
+	classvar <>defaultCanUseUMapFunc;
 	
 	var <>mappedArgs;
 	var <>allowedModes = #[ sync, normal ];
+	var <>canUseUMapFunc;
 	var <>apxCPU = 0;
 	
 	*initClass{
@@ -10,6 +12,11 @@ UMapDef : Udef {
 			this.filenameSymbol.asString.dirname.dirname.dirname +/+ "UMapDefs"
 		];
 		this.userDefsFolder = Platform.userAppSupportDir ++ "/UMapDefs/";
+		defaultCanUseUMapFunc = { |unit, key, umapdef|
+			unit.getSpec( key ).respondsTo( \asControlSpec ) && {
+				unit.getDefault( key ).asControlInput.asCollection.size == umapdef.numChannels
+			};
+		};
 	}
 	
 	*prefix { ^"umap_" } // synthdefs get another prefix to avoid overwriting
@@ -124,6 +131,10 @@ UMapDef : Udef {
 	createSynth { |umap, target, startPos = 0| // create A single synth based on server
 		target = target ? Server.default;
 		^Synth( this.synthDefName, umap.getArgsFor( target, startPos ), target, \addBefore );
+	}
+	
+	unitCanUseUMap { |unit, key|
+		^(canUseUMapFunc ? defaultCanUseUMapFunc).value( unit, key, this );
 	}
 }
 
