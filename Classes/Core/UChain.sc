@@ -655,6 +655,14 @@ UChain : UEvent {
 			^units.collect(_.apxCPU).sum;
 		};
 	}
+	
+	setUMapStartBuses {
+		var i = 0;
+		units.do({ |unit|
+			unit.umapStartBus = i;
+			i = i + unit.getUMapBusNumChannels;
+		});
+	}
 
 	prepare { |target, startPos = 0, action|
 		var cpu;
@@ -679,7 +687,8 @@ UChain : UEvent {
 			tg;
 		});
 		preparedServers = target;
-	     units.do( _.prepare(target, startPos, action.getAction ) );
+		this.setUMapStartBuses;
+		units.do( _.prepare(target, startPos, action.getAction ) );
 	     action.getAction.value; // fire action at least once
 	     
 	     if( verbose ) { "% preparing for %".format( this, preparedServers ).postln; };
