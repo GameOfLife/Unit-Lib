@@ -104,8 +104,8 @@ MultiUdef : Udef {
 	
 	synthDef { ^udefs.collect(_.synthDef).flat }
 	
-	createSynth { |unit, target, startPos|
-		^this.findUdefFor( unit ).createSynth( unit, target, startPos );
+	createSynth { |unit, target, startPos, buses|
+		^this.findUdefFor( unit ).createSynth( unit, target, startPos, buses );
 	}
 		
 	prIOids { |mode = \in, rate = \audio, unit|

@@ -34,6 +34,8 @@ UChain : UEvent {
 	classvar <>makeDefaultFunc;
 	classvar <>nowPreparingChain;
 
+	classvar <>busDict;
+
 	var <units; //, <>groups;
 	var <prepareTasks;
 	var <>preparedServers;
@@ -59,6 +61,8 @@ UChain : UEvent {
 		makeDefaultFunc = {
 			UChain( [ \sine, [ \freq, 440 ] ], \output ).duration_(10).fadeIn_(1).fadeOut_(1);
 		};
+
+		busDict = IdentityDictionary();
 	}
 	
 	*new { |...args|
@@ -131,7 +135,7 @@ UChain : UEvent {
 		if( tempDur.notNil ) { this.duration = tempDur };
 		
 		prepareTasks = [];
-		
+		ugroup = \default;
 		this.changed( \init );
 	}
 
@@ -550,10 +554,17 @@ UChain : UEvent {
 	                .freeAction_({ |synth|
 	                    this.removeGroup( group );
 	                    UGroup.end( this );
+				this.buses.do{ |byServer|
+					byServer.do{ |b|
+						b.free;
+						"freeing %".format(b).postln;
+					}
+				};
+				this.buses_(IdentityDictionary());
 	                    this.changed( \end, group );
 	                });
 	        
-	        units.do( _.makeSynth(group, startPos) );
+			units.do( _.makeSynth(group, startPos, buses: this.buses) );
 	        this.addGroup( group );
 	        this.changed( \start, group );
 	    };
@@ -656,8 +667,12 @@ UChain : UEvent {
 		};
 	}
 
+	buses_ { |buses| this.class.busDict.put( this, buses ); }
+
+	buses { ^this.class.busDict.at(this) }
+
 	prepare { |target, startPos = 0, action|
-		var cpu;
+		var cpu, prbuses;
 		
 		nowPreparingChain = this;
 		
@@ -671,6 +686,7 @@ UChain : UEvent {
 		target = target.select({ |tg|
 			this.shouldPlayOn( tg ) != false;
 		});
+
 		//cpu = this.apxCPU;
 		target = target.collect({ |tg|
 			tg = UGroup.start( ugroup, tg, this );
@@ -679,6 +695,21 @@ UChain : UEvent {
 			tg;
 		});
 		preparedServers = target;
+		target.collect{ |x| x.server.postln };
+
+		//bus management
+		prbuses = ();
+		this.units
+		.collect{ |x| (x.audioIns ++ x.audioOuts) }
+		.flat.as(Set).as(Array).do{ |i|
+			var x = IdentityDictionary();
+			target.do{ |t|
+				x.put( t.server, Bus.audio(t.server, 1) )
+			};
+			prbuses.put(i, x )
+		};
+		this.buses_(prbuses);
+
 	     units.do( _.prepare(target, startPos, action.getAction ) );
 	     action.getAction.value; // fire action at least once
 	     

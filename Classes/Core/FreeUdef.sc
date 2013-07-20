@@ -144,12 +144,12 @@ FreeUdef : Udef {
 		} 
 	}
 	
-	createSynth { |unit, server, startPos = 0| // create a single synth based on server
+	createSynth { |unit, server, startPos = 0, buses| // create a single synth based on server
 		if( createSynthFunc.notNil ) {
 			server = server ? Server.default;
-			^createSynthFunc.value( unit, server, startPos );
+			^createSynthFunc.value( unit, server, startPos, buses );
 		} {
-			^super.createSynth( unit, server, startPos );
+			^super.createSynth( unit, server, startPos, buses );
 		};
 	} 
 	

@@ -190,7 +190,8 @@ Udef : GenericDef {
 					}
 					} {
 					s.servers.do{ |s|
-						defs.do(_.send(s))
+						"sending % to %".format(defs, s).postln;
+						defs.do(_.send(s, { "received % ".format(defs).postln }))
 					};
 				}
 
@@ -240,7 +241,7 @@ Udef : GenericDef {
 	load { |server| this.loadSynthDef( server ) }
 	send { |server| this.sendSynthDef( server ) }
 	
-	makeSynth { |unit, target, startPos = 0, synthAction|
+	makeSynth { |unit, target, startPos = 0, synthAction, buses|
 	    var synth;
 	    if( unit.shouldPlayOn( target ) != false ) {
 		    /* // maybe we don't need this, or only at verbose level
@@ -250,7 +251,8 @@ Udef : GenericDef {
 					.warn;
 			};
 			*/
-			synth = this.createSynth( unit, target, startPos );
+			"% makeSynth args: %".format(this, [unit, target, startPos, synthAction, buses]).postln;
+			synth = this.createSynth( unit, target, startPos, buses.postln );
 			synth.startAction_({ |synth|
 				unit.changed( \go, synth );
 			});
@@ -343,9 +345,10 @@ Udef : GenericDef {
 		// assumes the Udef contains a UEnv
 	
 	// these may differ in subclasses of Udef
-	createSynth { |unit, target, startPos = 0| // create A single synth based on server
+	createSynth { |unit, target, startPos = 0, buses| // create A single synth based on server
+		"% createSynth args: %".format(this, [unit, target, startPos, buses]).postln;
 		target = target ? Server.default;
-		^Synth( this.synthDefName, unit.getArgsFor( target, startPos ), target, \addToTail );
+		^Synth( this.synthDefName, unit.getArgsFor( target, startPos, buses ), target, \addToTail );
 	}
 	
 	setSpec { |name, spec, mode|
@@ -455,7 +458,9 @@ U : ObjectWithArgs {
 	
 	classvar <>loadDef = false;
 	classvar <>synthDict;
+
 	classvar <>uneditableCategories;
+
 
 	var def, defName;
 	//var <>synths;
@@ -694,15 +699,24 @@ U : ObjectWithArgs {
 		this.prSet( *args );
 	}
 	
-	getArgsFor { |server, startPos = 0|
+	getArgsFor { |server, startPos = 0, buses|
 		server = server.asTarget.server;
-		^this.class.formatArgs( this.getSynthArgs, server, startPos );
+		^this.class.formatArgs( this.getSynthArgs(server, buses), server, startPos );
 	}
 	
-	getSynthArgs {
+	getSynthArgs { |server, buses|
 		var nonsynthKeys;
 		nonsynthKeys = this.argSpecs.select({ |item| item.mode == \nonsynth }).collect(_.name);
-		^this.args.clump(2).select({ |item| nonsynthKeys.includes( item[0] ).not }).flatten(1);
+		^this.args.clump(2)
+		.select({ |item| nonsynthKeys.includes( item[0] ).not })
+		.collect{ |xs|
+			if( xs[0].asString.findRegexp("u_[oi]_ar_([0-9]*)_bus").size > 0 ) {
+				[xs[0], buses.at(xs[1]).at(server).index ]
+			} {
+				xs
+			}
+		}
+		.flatten(1).postln;
 	}
 	
 	*formatArgs { |inArgs, server, startPos = 0|
@@ -845,9 +859,9 @@ U : ObjectWithArgs {
 		};
 	}
 
-	makeSynth { |target, startPos = 0, synthAction|
+	makeSynth { |target, startPos = 0, synthAction, buses|
 		var synth;
-		synth = this.def.makeSynth( this, target, startPos, synthAction );
+		synth = this.def.makeSynth( this, target, startPos, synthAction, buses );
 		if( synth.notNil ) {
 			this.umapPerform( \makeSynth, synth, startPos );
 		};

@@ -49,7 +49,7 @@ UGroup {
 	
 	makeGroup { |target|
 		var group;
-		group = Group(target);
+		group = ParGroup(target);
 		groups = groups.add( group );
 		this.changed( \start );
 		^group;
