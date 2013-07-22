@@ -120,7 +120,7 @@ UGUI {
 			var viewNumLines;
 			
 			key = argSpec.name;
-			value = unit.get( key );
+			value = unit.at( key );
 			
 			if( argSpec.notNil ) {
 				if( value.isUMap ) {

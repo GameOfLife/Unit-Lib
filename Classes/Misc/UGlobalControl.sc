@@ -109,6 +109,7 @@ UGlobalControl : OEM {
 	}
 	
 	getSpec { ^[0,1].asSpec }
+	getArgSpec { |key| ^ArgSpec( key, 0.5, [0,1].asSpec, false, \init ) }
 	getSpecMode { ^\init }
 	
 	canUseUMap { |key, umapdef|
@@ -128,9 +129,10 @@ UGlobalControl : OEM {
 		^umaps;
 	}
 	
-	argSpecs { ^this.keys.collect({ |key| ArgSpec( key, 0.5, [0,1].asSpec, false, \init ) }) }
+	argSpecs { ^this.keys.collect({ |key| this.getArgSpec(key) }) }
 	defName { ^"UGlobalControl" }
 	guiCollapsed { ^false }
+	argSpecsForDisplay { ^this.argSpecs }
 	getDefault { ^0.5 }
 	
 	args { ^this.getPairs }
