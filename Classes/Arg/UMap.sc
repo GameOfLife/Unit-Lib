@@ -49,6 +49,10 @@ UMapDef : Udef {
 			};
 		});
 	}
+	
+	args { |unit|
+		^this.argSpecs( unit ).collect({ |item| [ item.name, item.default ] }).flatten(1);
+	}
 		
 	getArgSpec { |name, unit|
 		var asp;
