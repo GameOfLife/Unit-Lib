@@ -73,6 +73,10 @@ ArgSpec : Spec {
 		^this.doWithSpec( \uconstrain, value );
 	}
 	
+	constrainDefault {
+		this.default = this.constrain( default );
+	}
+		
 	asSynthArg { |value|
 		^[]
 	}

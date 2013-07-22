@@ -171,9 +171,9 @@ MultiUdef : Udef {
 		};
 	}
 	
-	setSpec { |name, spec, mode| // set the spec for all enclosed udefs
+	setSpec { |name, spec, mode, constrainDefault = true| // set the spec for all enclosed udefs
 		this.findUdefsWithArgName( name ).do({ |item|
-			item.setSpec( name, spec, mode );
+			item.setSpec( name, spec, mode, constrainDefault );
 		});
 	}
 	
