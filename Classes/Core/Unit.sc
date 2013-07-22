@@ -913,6 +913,18 @@ U : ObjectWithArgs {
 		defArgs = (this.def.args( this ) ? []).clump(2);
 		^args.clump(2).select({ |item, i| 
 			(item != defArgs[i]) && { this.dontStoreArgNames.includes( item[0] ).not };
+		 }).collect({ |item|
+			 var umapArgs;
+			 if( item[1].isUMap ) {
+				 umapArgs = item[1].storeArgs;
+				 if( umapArgs.size == 1 ) {
+				 	[ item[0], umapArgs[0] ]
+				 } {
+					 [ item[0], umapArgs ]
+				 };
+			 } {
+				 item
+			 };
 		 }).flatten(1);
 	}
 
