@@ -158,11 +158,12 @@ Udef : GenericDef {
 		});
 	}
 	
-	asArgsArray { |argPairs, constrain = true|
+	asArgsArray { |argPairs, unit, constrain = true|
 		argPairs = argPairs ? #[];
 		^argSpecs.collect({ |item| 
 			var val;
 			val = argPairs.pairsAt(item.name) ?? { item.default.copy };
+			val = val.deepCopy.asUnitArg( unit, item.name );
 			if( constrain && { val.isKindOf( UMap ).not } ) { val = item.constrain( val ) };
 			[ item.name,  val ] 
 		}).flatten(1);
@@ -506,10 +507,7 @@ U : ObjectWithArgs {
 			def = nil;
 		};
 		if( this.def.notNil ) {
-			args = [];
-			this.def.asArgsArray( inArgs ? [] ).pairsDo({ |key, value|
-				args = args ++ [ key, value.deepCopy.asUnitArg( this, key ) ];
-			});
+			args = this.def.asArgsArray( inArgs ? [], this );
 		} {
 			args = inArgs;
 			"def '%' not found".format(in).warn;

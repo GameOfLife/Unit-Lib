@@ -23,11 +23,12 @@ UMapDef : Udef {
 	
 	*from { |item| ^item.asUDef( this ) }
 	
-	asArgsArray { |argPairs, constrain = true|
+	asArgsArray { |argPairs, unit, constrain = true|
 		argPairs = argPairs ? #[];
 		^argSpecs.collect({ |item| 
 			var val;
 			val = argPairs.pairsAt(item.name) ?? { item.default.copy };
+			val = val.deepCopy.asUnitArg( unit, item.name );
 			if( constrain && this.isMappedArg( item.name ).not && { val.isKindOf( UMap ).not } ) { 
 				val = item.constrain( val ) 
 			};

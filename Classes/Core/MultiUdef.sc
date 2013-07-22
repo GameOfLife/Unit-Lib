@@ -53,6 +53,7 @@ MultiUdef : Udef {
 	var <>udefs;
 	var <>chooseFunc;
 	var >defNameKey;
+	var tempDef;
 	
 	*defNameKey { ^\u_defName }
 	defNameKey { ^defNameKey ? this.class.defNameKey }
@@ -71,10 +72,10 @@ MultiUdef : Udef {
 	}
 	
 	findUdefFor { |unit|
-		^this.findUdef( unit.get( this.defNameKey ) );
+		^tempDef ?? { this.findUdef( unit.get( this.defNameKey ) ); };
 	}
 	
-	asArgsArray { |argPairs, constrain = true|
+	asArgsArray { |argPairs, unit, constrain = true|
 		var defName, argz, newDefName;
 		defName = (argPairs ? []).detectIndex({ |item| item == this.defNameKey });
 		if( defName.notNil ) {
@@ -82,14 +83,17 @@ MultiUdef : Udef {
 		} {
 			defName = udefs[0].name;
 		};
-		argz = this.findUdef( defName ).asArgsArray( argPairs ? [], constrain );
+		tempDef = this.findUdef( defName );
+		argz = tempDef.asArgsArray( argPairs ? [], unit, constrain );
 		if( chooseFunc.notNil ) {
 			newDefName = chooseFunc.value( argz );
 			if( newDefName != defName ) { // second pass
 				defName = newDefName;
-				argz = this.findUdef( defName ).asArgsArray( argPairs ? [], constrain );
+				tempDef = this.findUdef( defName );
+				argz = tempDef.asArgsArray( argPairs ? [], unit, constrain );
 			};
 		};
+		tempDef = nil;
 		^argz ++ [ this.defNameKey, defName ];
 	}
 	
