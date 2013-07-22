@@ -1088,8 +1088,34 @@ U : ObjectWithArgs {
 + Symbol { 
 	asUnit { |args| ^U( this, args ) }
 	asUdef { |defClass| ^(defClass ? Udef).fromName( this ); }
+	asUnitArg { |unit, key|
+		var umapdef, umap;
+		if( unit.getSpec( key ).default.isMemberOf( Symbol ).not ) {
+			umapdef = this.asUdef( UMapDef );
+			if( unit.canUseUMap( key, umapdef ) ) {
+				^UMap( this ).asUnitArg( unit, key );
+			} {
+				^this;
+			}; 
+		} {
+			^this;
+		};
+	}
 }
 
 + Array {
 	asUnit { ^U( this[0], *this[1..] ) }
+	asUnitArg { |unit, key|
+		var umapdef, umap;
+		if( this[0].isMemberOf( Symbol ) && { this[1].isArray } ) { 
+			umapdef = this[0].asUdef( UMapDef );
+			if( umapdef.notNil && { unit.canUseUMap( key, umapdef ) } ) {
+				^UMap( *this ).asUnitArg( unit, key );
+			} {
+				^unit.getDefault( key );
+			}; 
+		} {
+			^this;
+		};
+	}
 }
