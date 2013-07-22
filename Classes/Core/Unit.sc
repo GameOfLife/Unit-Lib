@@ -94,6 +94,7 @@ Udef : GenericDef {
 	var <>numChannels = 1;
 	var <>ioNames;
 	var <>canUseUMap = true;
+	var <>showOnCollapse = #[ value ];
 	
 	*initClass{
 		defsFolders = [ 
@@ -616,6 +617,24 @@ U : ObjectWithArgs {
 			this.set( \u_dur, dur );
 		};
 		this.getUMaps.do(_.setDur(dur));
+	}
+	
+	argSpecsForDisplay {
+		var out;
+		if( this.guiCollapsed ) {
+			(this.def !? _.showOnCollapse ? []).do({ |key|
+				var argSpec;
+				if( this.keys.includes( key ) ) {
+					argSpec = this.getArgSpec( key );
+					if( argSpec.private.not ) {
+						out = out.add( argSpec );
+					};
+				};
+			});
+			^out;
+		} {
+			^this.argSpecs.select({ |item| item.private.not })
+		};
 	}
 	
 	mod_ { |newMod|

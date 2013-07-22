@@ -64,12 +64,7 @@ UMapGUI : UGUI {
 		 };
 		 
 		 bounds = bounds.insetAll(0,0,2,0);
-		 
-		 if( unit.guiCollapsed ) {
-			 this.makeHeader(bounds);
-		 } {
-			 this.makeSubViews( bounds );
-		 };
+		 this.makeSubViews( bounds );
 	}
 	
 	makeHeader { |bounds|

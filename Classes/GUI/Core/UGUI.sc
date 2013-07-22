@@ -47,27 +47,18 @@ UGUI {
 	}
 	
 	*viewNumLines { |unit|
-		if( unit.guiCollapsed ) {
-			^0;
-		} {
-			^(unit.argSpecs ? [])
-				.select({|x|
-					x.private.not
-				})
-				.collect({|x|
-					if( unit[ x.name ].isKindOf( UMap ) ) {
-						UMapGUI.viewNumLines( unit[ x.name ] );
-					} {
-						x.spec.viewNumLines
-					};
-				}).sum;
-		};
+		^(unit.argSpecsForDisplay ? [])
+			.collect({|x|
+				if( unit[ x.name ].isKindOf( UMap ) ) {
+					UMapGUI.viewNumLines( unit[ x.name ] );
+				} {
+					x.spec.viewNumLines
+				};
+			}).sum;
 	}
 	
 	makeViews { |bounds|
-		if( unit.guiCollapsed.not ) {
-			this.prMakeViews( bounds );
-		};
+		this.prMakeViews( bounds );
 	}
 	
 	prMakeViews { |bounds|
@@ -121,16 +112,17 @@ UGUI {
 		
 		if( GUI.id == \cocoa ) { View.currentDrag = nil; };
 		
-		unit.args.pairsDo({ |key, value, i|
-			var vw, argSpec;
+		unit.argSpecsForDisplay.do({ |argSpec, i|
+			var vw, key, value;
 			var decLastPos;
 			var umapdragbin;
 			var umapdragbinTask;
 			var viewNumLines;
 			
-			argSpec = unit.argSpecs[i/2];
+			key = argSpec.name;
+			value = unit.get( key );
 			
-			if( argSpec.private.not ) { // show only if not private
+			if( argSpec.notNil ) {
 				if( value.isUMap ) {
 					vw = UMapGUI( composite, composite.bounds.insetBy(0,-24), value );
 					vw.parentUnit = unit;
