@@ -898,6 +898,7 @@ U : ObjectWithArgs {
 	
 	argSpecs { ^this.def.argSpecs( this ) }
 	getSpec { |key| ^this.def.getSpec( key, this ); }
+	getArgSpec { |key| ^this.def.getArgSpec( key, this ) }
 	getSpecMode { |key| ^this.def.getArgSpec( key, this ) !? _.mode }
 	getDefault { |key| ^this.def.getDefault( key, this ); }
 

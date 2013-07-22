@@ -62,6 +62,11 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 		this.init( inUnits ); 
 	}
 	
+	getArgSpec { |name|
+		name = name.asSymbol;
+		^argSpecs.detect({ |item| item.name == name });
+	}
+
 	guiCollapsed { ^units.select(_.isKindOf(U) ).any(_.guiCollapsed) }
 	guiCollapsed_ { |bool|
 		units.select(_.isKindOf(U) ).do(_.guiCollapsed_(bool));

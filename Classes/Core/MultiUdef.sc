@@ -141,7 +141,7 @@ MultiUdef : Udef {
 	
 	getArgSpec { |key, unit|
 		if( key === this.defNameKey ) {
-			^argSpecs[0].spec;
+			^argSpecs[0];
 		} {
 			^this.findUdefFor( unit ).getArgSpec( key, unit );
 		};
