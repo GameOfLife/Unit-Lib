@@ -23,6 +23,8 @@ UMapDef : Udef {
 	
 	*from { |item| ^item.asUDef( this ) }
 	
+	dontStoreValue { ^false }
+	
 	asArgsArray { |argPairs, unit, constrain = true|
 		argPairs = argPairs ? #[];
 		^argSpecs.collect({ |item| 
@@ -220,7 +222,7 @@ UMap : U {
 	
 	u_waitTime { ^this.waitTime }
 	
-	dontStoreArgNames { ^[ 'u_dur', 'u_doneAction', 'u_mapbus', 'u_spec', 'u_store', 'u_prepared' ] }
+	dontStoreArgNames { ^[ 'u_dur', 'u_doneAction', 'u_mapbus', 'u_spec', 'u_store', 'u_prepared' ] ++ if( this.def.dontStoreValue ) { [ \value ] } { [] } }
 	
 	spec_ { |newSpec|
 		if( spec.isNil ) {

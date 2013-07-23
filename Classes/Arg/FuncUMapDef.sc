@@ -8,6 +8,7 @@ FuncUMapDef : UMapDef {
 	*/
 	
 	var <>valueIsMapped = true;
+	var <>dontStoreValue = false;
 	
 	*new { |name, func, args, valueIsPrivate = false, category, addToAll=true|
 		^this.basicNew( name, args ? [], addToAll )
