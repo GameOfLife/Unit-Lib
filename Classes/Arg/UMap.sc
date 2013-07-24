@@ -232,8 +232,14 @@ UMap : U {
 			};
 		} {
 			if( newSpec != spec ) {	
-				this.def.mappedArgs.do({ |item|
-					this.set( item, this.getSpec( item ).unmap( this.get( item ) ) );
+				this.def.mappedArgs.do({ |key|
+					var val;
+					val = this.get( key );
+					if( val.isUMap.not ) {
+						this.set( key, this.getSpec( key ).unmap( this.get( key ) ) );
+					} {
+						val.spec = nil;
+					};
 				});
 				spec = newSpec;
 				unmappedKeys = this.def.mappedArgs.copy;
@@ -244,8 +250,14 @@ UMap : U {
 	
 	mapUnmappedArgs {
 		if( spec.notNil ) {
-			unmappedKeys.copy.do({ |item|
-				this.set( item, this.getSpec( item ).map( this.get( item ) ) );
+			unmappedKeys.copy.do({ |key|
+				var val;
+				val = this.get( key );
+				if( val.isUMap.not ) {
+					this.set( key, this.getSpec( key ).map( val ) );
+				} {
+					val.spec = this.getSpec( key );
+				};
 			});
 		};
 	}
