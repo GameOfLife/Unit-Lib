@@ -14,7 +14,9 @@ density: the average number of grains per second
 timeVar: time variation factor (0-4). 0 means no variation, 4 means times between grains can be within (1/4) and 4 times the original duration
 rateVar: ratio variation in number of octaves
 overlap: average number of overlapping grains. The duration of the grains is change to match this.
+pan: the pan position range. This is only active if numChannels > 1
 seed: random seed
+numChannels: number of output channels
 
 --
 this is an Udef definition file
