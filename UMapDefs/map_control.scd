@@ -26,7 +26,7 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UMapDef( \map_control, { |bus = 0, fromRange = #[0.0, 1.0], toRange = #[0.0,1.0], curve = 0, invert = 0, 	lag = 0.0, clipMode = 0|
+UMapDef( \map_control, { |bus = 0, fromRange = #[0.0, 1.0], toRange = #[0.0,1.0], curve = 0, invert = 0, 	lag = 0.0, clipMode = 0, clipSoftness = 0.1|
 	var sig;
 	sig = In.kr(bus + UIn.firstControlBus);
 	sig = sig.linlin(*fromRange ++ [-1,1,\none]);
@@ -36,13 +36,9 @@ UMapDef( \map_control, { |bus = 0, fromRange = #[0.0, 1.0], toRange = #[0.0,1.0]
 	]);
 	sig = if( invert, sig.neg, sig );
 	sig = Select.kr( clipMode, [
-		sig.clip2(1),
-		sig.fold2(1),
+		sig.softclip2(1, clipSoftness),
+		sig.fold2(1, clipSoftness),
 		sig.wrap2(1),
-		sig.tanh,
-		sig.softclip,
-		sig.distort,
-		(sig.wrap2(1) * pi).sin,
 		sig
 	]);
 	sig = sig.lag( lag );
@@ -50,10 +46,8 @@ UMapDef( \map_control, { |bus = 0, fromRange = #[0.0, 1.0], toRange = #[0.0,1.0]
 	UMapOut.kr(sig);
 })
 	.setSpec( \fromRange, [-1,1].asSpec.asRangeSpec )
-	.setSpec( \clipMode, ListSpec( (..7), 0, [ 
-		\clip, \fold, \wrap, \tanh, \softclip, \distort, \wrap_sine, \none 
-		] ) 
-	)
+	.setSpec( \clipMode, ListSpec( (..3), 0, [ \clip, \fold, \wrap, \none ] ) )
+	.setSpec( \clipSoftness, [0,1,\lin,0,0.1].asSpec )
 	.setSpec( \invert, BoolSpec(false) )
 	.setSpec( \curve, [-16,16,\lin,0,0].asSpec )
 	.setSpec( \bus, PositiveIntegerSpec(0,0,32) )
