@@ -10,15 +10,12 @@ attackTime: the attack time of the amplitude follower
 releaseTime: the release time of the amplitude follower
 invert: if true, the fromRange is inverted (i.e. low values become high and v.v.)
 curve: a curvature value for toRange. If curve == 0, the range is linear.
-clipMode: can be one of the following modes (Symbol):
-	'clip' (default): clip values outside fromRange
-	'fold': fold values outside fromRange
-	'wrap': wrap around values outside fromRange
-	'tanh': distort values to range with a tanh function
-	'softclip': softclip values outside fromRange
-	'distort': use a non-linear distortion curve to keep all values within range
-	'wrap_sine': wrap values around fromRange, and then map them to a sine curve. This means that values at the borders of fromRange will return at the center of toRange.
-	'none': no clipping applied (values can go outside toRange)
+clipMode: can be one of the following modes:
+	0 - 'clip' (default): clip values outside fromRange
+	1 - 'fold': fold values outside fromRange
+	2 - 'wrap': wrap around values outside fromRange
+	3 - 'none': no clipping applied (values can go outside toRange)
+clipSoftness: softens the edges of 'clip' and 'fold' modes.
 
 The 'toRange' arg range is mapped to that of the parameter to which the UMap is connected
 

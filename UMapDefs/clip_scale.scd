@@ -8,12 +8,12 @@ fromRange: the used range of the input value
 toRange: the range to map it to
 invert: if true, the input range is inverted (i.e. low values become high and v.v.)
 curve: a curvature value for the mapped range. If curve == 0, the range is linear.
-clipMode: can be one of the following modes (Symbol):
-	'clip' (default): clip values outside fromRange
-	'fold': fold values outside fromRange
-	'wrap': wrap around values outside fromRange
-	'none': no clipping applied (values can go outside toRange)
-clipSoftness: only used for 'clip' and 'fold'.
+clipMode: can be one of the following modes:
+	0 - 'clip' (default): clip values outside fromRange
+	1 - 'fold': fold values outside fromRange
+	2 - 'wrap': wrap around values outside fromRange
+	3 - 'none': no clipping applied (values can go outside toRange)
+clipSoftness: only used for 'clip' and 'fold' (0-1).
 
 The value arg range is mapped to that of the parameter to which the UMap is connected.
 
