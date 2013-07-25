@@ -46,13 +46,9 @@ ValueUMapDef( \midi_bend, { |unit, midifunc|
 			value = value.neg;
 		};
 		switch( unit.get( \clipMode ),
-			\clip, { value = value.clip2(1) },
-			\fold, { value = value.fold2(1) },
-			\wrap, { value = value.wrap2(1) },
-			\tanh, { value = value.tanh },
-			\softclip, { value = value.softclip },
-			\distort, { value = value.distort },
-			\wrap_sine, { value = (value.wrap2(1) * pi).sin }
+			\clip, { value = value.softclip2(1, unit.get( \clipSoftness ) ) },
+			\fold, { value = value.softfold2(1, unit.get( \clipSoftness )) },
+			\wrap, { value = value.wrap2(1) }
 		);
 		value = value.linlin(-1,1,*toRange ++ [ \none ]);
 		unit.mapSet( \value, value );
@@ -83,10 +79,8 @@ ValueUMapDef( \midi_bend, { |unit, midifunc|
 	[ \toRange, [0,1], RangeSpec(0,1) ], 
 	[ \invert, false, BoolSpec(false) ],
 	[ \curve, 0, [-16,16,\lin,0,0].asSpec ],
-	[ \clipMode, \clip, ListSpec( [ 
-			\ignore, \clip, \fold, \wrap, \tanh, \softclip, \distort, \wrap_sine, \none 
-		] ) 
-	]
+	[ \clipMode, \clip, ListSpec( [ \ignore, \clip, \fold, \wrap, \none ] ) ],
+	[ \clipSoftness, 0, [0,1].asSpec ],
 ]  )
 	.mappedArgs_([\toRange])
 	.category_(\control);
