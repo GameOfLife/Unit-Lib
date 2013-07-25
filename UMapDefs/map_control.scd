@@ -37,7 +37,7 @@ UMapDef( \map_control, { |bus = 0, fromRange = #[0.0, 1.0], toRange = #[0.0,1.0]
 	sig = if( invert, sig.neg, sig );
 	sig = Select.kr( clipMode, [
 		sig.softclip2(1, clipSoftness),
-		sig.fold2(1, clipSoftness),
+		sig.softfold2(1, clipSoftness),
 		sig.wrap2(1),
 		sig
 	]);
