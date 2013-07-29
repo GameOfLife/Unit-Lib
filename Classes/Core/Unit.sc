@@ -835,6 +835,7 @@ U : ObjectWithArgs {
 	numChannels_ { |new| this.set( \numChannels, new ) }
 	value { ^this.get( \value ) }
 	value_ { |new| this.set( \value, new ) }
+	reset { ^this.get( \reset ) }
 
 	cutStart { |amount = 0|
 		this.values.do({ |value|
