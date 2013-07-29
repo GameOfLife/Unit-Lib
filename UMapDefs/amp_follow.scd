@@ -29,7 +29,8 @@ UMapDef( \amp_follow, { |bus = 0, fromRange = #[0.0, 1.0], toRange = #[0.0,1.0],
 	invert = 0, curve = 0, clipMode = 0, clipSoftness = 0.1|
 	var sig, unranged;
 	sig = In.ar(bus + UIn.firstPrivateBus);
-	sig = Amplitude.kr( sig, attackTime, releaseTime );
+	sig = Amplitude.ar( sig, attackTime, releaseTime );
+	sig = A2K.kr( sig );
 	sig = sig.linlin(*fromRange ++ [0,1,\none]);
 	sig = if( invert, 1-sig, sig );
 	sig = Select.kr( curve.inRange(-0.001,0.001), [
