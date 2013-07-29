@@ -98,6 +98,9 @@ UChain : UEvent {
 		});
 		groupDict = IdentityDictionary();
 	}
+	
+	*current { ^UChainGUI.current !? _.chain }
+
 
 	/*
 	* Syntaxes for UChain creation:
