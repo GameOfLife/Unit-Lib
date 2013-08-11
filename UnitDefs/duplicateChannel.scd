@@ -14,6 +14,10 @@ part of the Unit lib default Udefs set
 */
 
 MultiChannelUdef( \duplicateChannel, { 
-	UOut.ar( 0, UIn.ar( 0, 1 ).dup( Udef.numChannels ) );
+	var amps;
+	amps = Udef.numChannels.collect({ |i| 
+		("amp" ++ i).asSymbol.ukr( 1, warp: 'amp' )
+	});
+	UOut.ar( 0, UIn.ar( 0, 1 ).dup( Udef.numChannels ) * amps );
 })
 	.category_( \utility )
