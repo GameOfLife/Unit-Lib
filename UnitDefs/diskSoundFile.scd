@@ -22,7 +22,7 @@ part of the Unit lib default Udefs set
 */
 
 MultiChannelUdef( \diskSoundFile, {
-		UMixOut.ar( 0, DiskSndFilePlayer.ar( Udef.numChannels ), 0, true );
+		UMixOut.ar( 0, DiskSndFilePlayer.ar( Udef.numChannels ) * \level.ukr( 1, \amp ), 0, true );
 	}, [ [ \soundFile, nil, DiskSndFileSpec(nil) ] ], \soundFile, true )
 	.chooseFunc_({ |args|
 		var sf, numChannels;

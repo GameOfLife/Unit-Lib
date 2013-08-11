@@ -43,7 +43,7 @@ MultiChannelUdef( \grainSoundFile, {
 		4,
 		Demand.ar( trigger, 0, Dwhite( *pan ) ),
 	);
-	UMixOut.ar( 0, sig, 0, true );
+	UMixOut.ar( 0, sig * \level.ukr( 1, \amp ), 0, true );
 }, [ 
 	[ \soundFile, nil, MonoBufSndFileSpec(nil) ], 
 	[ \pos, [0,1], [0,1].asSpec.asRangeSpec ],

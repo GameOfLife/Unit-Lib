@@ -40,7 +40,7 @@ MultiChannelUdef( \loopSoundFile, { |loopStart = #[0,0], loopDur = #[1,1], cross
 			loop, crossfade, 4 // 4 voices
 		);
 	
-		UMixOut.ar( 0, sig, 0, true );
+		UMixOut.ar( 0, sig * \level.ukr( 1, \amp ), 0, true );
 		
 		
 	}, [ [ \soundFile, nil, BufSndFileSpec(nil) ] ], \soundFile, true )
