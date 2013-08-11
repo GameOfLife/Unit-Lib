@@ -33,7 +33,7 @@ SyncCenter {
 	
 	classvar <>checkForServerQuit = false;
 	
-	classvar <>round = 128;
+	classvar <round = 128;
 	
 	var <>localCount, <>localCountTime;
 	
@@ -52,6 +52,8 @@ SyncCenter {
 		global = this.new;
 		ready = Ref(false);
 	}
+	
+	*round_ { |new = 128| round = new; this.changed( \round, round ) }
 	
 	*servers{ ^serverCounts.keys.select({ |sv| sv != master }).as(Array) }
 	
