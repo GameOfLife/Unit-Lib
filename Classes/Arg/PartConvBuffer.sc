@@ -44,8 +44,12 @@ PartConvBuffer : AbstractRichBuffer {
 		var test = true;
 		if( soundfile.isNil or: { soundfile.isOpen.not and: { path.notNil }}) {
 			soundfile = soundfile ?? { SoundFile.new }; 
-			test = soundfile.openRead( path.getGPath.asPathFromServer );
-			soundfile.close; // close if it wasn't open
+			if( path.notNil ) {
+				test = soundfile.openRead( path.getGPath.asPathFromServer );
+				soundfile.close; // close if it wasn't open
+			} {
+				test = false;
+			};
 		};
 		if( test ) {	
 			this.numFrames = soundfile.numFrames;
@@ -204,7 +208,7 @@ PartConvBuffer : AbstractRichBuffer {
 
     storeOn { arg stream;
 		stream << this.class.name << ".newBasic(" <<* [ // use newBasic to prevent file reading
-		    path.formatGPath.quote, numFrames
+		    path.formatGPath !? _.quote, numFrames
 		]  <<")"
 	}
 }
