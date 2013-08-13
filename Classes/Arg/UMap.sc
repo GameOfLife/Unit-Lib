@@ -98,6 +98,7 @@ UMapDef : Udef {
 			parentUnit.notNil && { parentUnit.synths.size > 0 } 
 		}) {
 				unit.unit_(parentUnit);
+				unit.setUMapBus;
 				unit.prepareAndStart( unit.unit.synthsForUMap );
 			};
 	}
@@ -159,6 +160,7 @@ UMap : U {
 	*/
 	
 	classvar <>allUnits;
+	classvar <>currentBus = 0, <>maxBus = 499;
 	
 	var <spec;
 	var <>unitArgName;
@@ -199,6 +201,26 @@ UMap : U {
 	
 	setBus { |bus = 0|
 		this.def.setBus( bus, this );
+	}
+	
+	nextBus {
+		var res, nextBus, n;
+		n = this.def.numChannels;
+		nextBus = currentBus + n;
+		if( nextBus > (maxBus + 1) ) {
+			nextBus = 0 + n;
+			res = 0;
+		} {
+			res = currentBus;
+		};
+		currentBus = nextBus;
+		^res;
+	}
+	
+	setUMapBus {
+		if( this.hasBus ) {
+			this.setBus( this.nextBus );
+		};
 	}
 	
 	set { |...args|

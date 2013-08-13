@@ -468,7 +468,6 @@ U : ObjectWithArgs {
 	var <mod;
 	var <guiCollapsed = false;
 	var <>parentChain;
-	var <>umapStartBus = 0;
 	
 	*initClass {
 	    synthDict = IdentityDictionary( );
@@ -678,12 +677,8 @@ U : ObjectWithArgs {
 	}
 	
 	setUMapBuses {
-		var umaps, i;
-		i = umapStartBus;
-		umaps = this.getAllUMaps.select(_.hasBus);
-		umaps.do({ |item|
-			item.setBus(i);
-			i = i + item.def.numChannels;
+		this.getAllUMaps.do({ |item|
+			item.setUMapBus;
 		});
 	}
 	
