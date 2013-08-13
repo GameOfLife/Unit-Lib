@@ -819,7 +819,7 @@ UChainGUI {
 		var addLast, ug, header;
 		var width;
 		var notMassEdit;
-		var scrollerMargin = 12;
+		var scrollerMargin = 16;
 		var realIndex = 0;
 		var massEditWindow;
 		

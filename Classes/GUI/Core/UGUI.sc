@@ -69,7 +69,7 @@ UGUI {
 		if( bounds.isNil ) { 
 			bounds = parent.asView.bounds.insetBy(4,4);
 			if( parent.asView.class.name == \SCScrollTopView ) {
-				bounds.width = bounds.width - 12;
+				bounds.width = bounds.width - 16;
 			};
 			if( parent.asView.class.name == \QScrollTopView ) {
 				bounds.width = bounds.width - 20;
