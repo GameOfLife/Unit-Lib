@@ -18,7 +18,7 @@ part of the Unit lib default Udefs set
 
 (
 var defs, def;
-defs = [8,16,32,64].collect({ |n|
+defs = [8,16,32].collect({ |n|
 	Udef( "klank_%".format(n).asSymbol, {
 		var range, exponential, variation, freqs, amp, ringTime, sig;
 		var in;
@@ -48,7 +48,7 @@ defs = [8,16,32,64].collect({ |n|
 
 def = MultiUdef( \klank, defs, \filter, \n, false );
 
-def.argSpecs.last.spec.labels = [8,16,32,64].collect(_.asSymbol);
+def.argSpecs.last.spec.labels = [8,16,32].collect(_.asSymbol);
 
 def
 )

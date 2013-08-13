@@ -18,7 +18,7 @@ part of the Unit lib default Udefs set
 
 (
 var defs, def;
-defs = [8,16,32,64].collect({ |n|
+defs = [8,16,32].collect({ |n|
 	Udef( "klang_%".format(n).asSymbol, {
 		var range, exponential, variation, freqs, amp, phase, sig;
 		range = \range.kr( [440,880] );
@@ -46,7 +46,7 @@ defs = [8,16,32,64].collect({ |n|
 
 def = MultiUdef( \klang, defs, \synthesis, \n, false );
 
-def.argSpecs.last.spec.labels = [8,16,32,64].collect(_.asSymbol);
+def.argSpecs.last.spec.labels = [8,16,32].collect(_.asSymbol);
 
 def
 )
