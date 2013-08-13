@@ -248,6 +248,10 @@ UMarkerGUI : UChainGUI {
 					{ views[ \notes ].string = chain.notes ? ""; }.defer 
 				};
 			});
+			
+		composite.getParents.last.findWindow !? _.toFrontAction_({ 
+			this.makeCurrent;
+		});
 		
 		chain.changed( \startTime );
 		chain.changed( \name );
