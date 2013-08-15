@@ -84,8 +84,20 @@ UEnvGen {
 	*getLineArgs { |env, timeScale = 1|
 		var start, dur;
 		start = \u_startPos.kr(0.0);
+		timeScale = this.getTimeScale( timeScale );
 		dur = env[3];
 		^[ start / timeScale, dur, ((dur * timeScale)-start).max(0) ]
+	}
+	
+	*getTimeScale { |timeScale = 1|
+		if( timeScale.class == Symbol ) {
+			Udef.addBuildSpec(
+				ArgSpec(timeScale, 1, [0.25,4,\exp,0,1].asSpec, mode: \init)
+			);
+			^timeScale.ir( 1 );
+		} {
+			^timeScale;
+		};
 	}
 
 	*ar { |env, spec, timeScale = 1|
@@ -155,6 +167,7 @@ UEnvGenRel : UEnvGen {
 		var start, dur, envdur;
 		start = \u_startPos.kr(0.0);
 		dur = \u_dur.kr(1.0)+start;
+		timeScale = this.getTimeScale( timeScale );
 		envdur = env[3] / timeScale;
 		^[ envdur * (start/dur), envdur, (dur-start).max(0) ]
 	}

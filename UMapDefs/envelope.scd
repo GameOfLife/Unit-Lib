@@ -14,7 +14,7 @@ part of the Unit lib default UMapDefs set
 
 UMapDef( \envelope, {
 	var sig;
-	sig = UEnvGen.kr( \env );
+	sig = UEnvGen.kr( \env, timeScale: \timeScale );
 	UMapOut.kr(sig);
 }).mappedArgs_([ \env ])
 .category_( 'automation' )
