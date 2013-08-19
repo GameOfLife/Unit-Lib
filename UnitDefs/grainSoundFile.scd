@@ -25,7 +25,7 @@ part of the Unit lib default Udefs set
 
 MultiChannelUdef( \grainSoundFile, {
 	var numChannels, bufnum, rate, trigger, startFrame, loop;
-	var pos, density, timeVar, rateVar, overlap, pan, sig;
+	var pos, density, timeVar, rateVar, rateScale, overlap, pan, sig;
 	#numChannels, bufnum, rate, trigger, startFrame, loop = 
 		BufSndFilePlayer.getArgs( 1, startPos: 0 );
 	rate = rate / BufRateScale.kr( bufnum );
@@ -33,6 +33,7 @@ MultiChannelUdef( \grainSoundFile, {
 	density = \density.kr( 100 );
 	timeVar = (\timeVar.kr( 0 ) * 6).midiratio;
 	rateVar = (\rateVar.kr( 0 ) * 12).midiratio;
+	rate = rate * \rateScale.kr( 1 );
 	overlap = \overlap.kr(4);
 	pan = \pan.kr( [ -1,1 ] );
 	URandSeed.ir(\seed.ir(12345));
@@ -50,6 +51,7 @@ MultiChannelUdef( \grainSoundFile, {
 	[ \density, 100, [1,10000,\exp,0,100].asSpec ],
 	[ \timeVar, 0, [0,4,2].asSpec ],
 	[ \rateVar, 0, [0,4,2].asSpec ],
+	[ \rateScale, 1, [0.125,8,\exp,0,1].asSpec ],
 	[ \overlap, 4, [0.01,100,\exp,0,1].asSpec ],
 	[ \pan, [-1,1], [-1,1].asSpec.asRangeSpec ],
 	[ \seed, 12345, PositiveIntegerSpec(), false, \init ]

@@ -33,6 +33,8 @@ MultiChannelUdef( \loopSoundFile, { |loopStart = #[0,0], loopDur = #[1,1], cross
 		#numChannels, bufnum, rate, trigger, startPos, loop =
 			BufSndFilePlayer.getArgs( Udef.numChannels, \soundFile, 1, 0 );
 			
+		rate = rate * \rateScale.kr( 1 );
+			
 		sig = PlayBufCF.ar( 
 			numChannels, bufnum, rate, 
 			Dwhite( *loopDur * ( BufDur.ir( bufnum ) / rate) ), 
@@ -46,6 +48,7 @@ MultiChannelUdef( \loopSoundFile, { |loopStart = #[0,0], loopDur = #[1,1], cross
 	}, [ [ \soundFile, nil, BufSndFileSpec(nil) ] ], \soundFile, true )
 	.setSpec( \loopStart, RangeSpec( default: [0,0] ) )
 	.setSpec( \loopDur, RangeSpec( default: [1,1] ) )
+	.setSpec( \rateScale,  [0.125,8,\exp,0,1].asSpec )
 	.setSpec( \crossfade, [0,1,\lin,0,0.1," s"].asSpec )
 	.setSpec( \seed, PositiveIntegerSpec(12345) )
 	.chooseFunc_({ |args|
