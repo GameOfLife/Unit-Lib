@@ -1,6 +1,6 @@
 + Number {
-	softfold2 { |aNumber = 1.0, range, normalize = false|
-		^this.fold2( aNumber ).sineclip2( aNumber, range, normalize );
+	softfold2 { |aNumber = 1.0, range|
+		^this.fold2( aNumber ).sineclip2( aNumber, range, false );
 	}
 	
 	softclip2 { |aNumber = 1.0, range|
@@ -11,16 +11,17 @@
 		);
 	}
 	
-	sineclip2 { |aNumber = 1.0, range, normalize = false|
-		var div;
+	sineclip2 { |aNumber = 1.0, range, normalize = true|
+		var div, me;
 		range = range ?? { aNumber / 2 };
 		range = range.clip(1.0e-12, aNumber);
 		aNumber = aNumber.max(1.0e-12);
 		if( normalize.isKindOf( Boolean ) ) { normalize = normalize.binaryValue };
-		div = 1 - ( 0.35971998019677 * ( (range * normalize ) / aNumber ) )
+		div = 1 - ( 0.35971998019677 * ( (range * normalize ) / aNumber ) );
+		me = this * div;
 		^(
-			this.clip2( aNumber-range ) + ( 
-				this.excess( aNumber-range )
+			me.clip2( aNumber-range ) + ( 
+				me.excess( aNumber-range )
 					.linlin( range.neg, range, -0.5pi, 0.5pi  )
 					.sin * 0.64028001980323 * range
 			)
@@ -32,7 +33,7 @@
 		steepness = steepness * aNumber;
 		a = this + steepness;
 		b = this - steepness;
-		^a.blend( b, this.sineclip2(aNumber, range).linlin(aNumber.neg,aNumber,0,1,\minmax) );
+		^a.blend( b, this.sineclip2(aNumber, range, false).linlin(aNumber.neg,aNumber,0,1,\minmax) );
 	}
 	
 	softwrap2 { |aNumber = 1, amt = 0.5|
@@ -47,8 +48,8 @@
 }
 
 + UGen {
-	softfold2 { |aNumber = 1.0, range, normalize = false|
-		^this.fold2( aNumber ).sineclip2( aNumber, range, normalize );
+	softfold2 { |aNumber = 1.0, range|
+		^this.fold2( aNumber ).sineclip2( aNumber, range, false );
 	}
 	
 	softclip2 { |aNumber = 1.0, range|
@@ -59,16 +60,17 @@
 		);
 	}
 	
-	sineclip2 { |aNumber = 1.0, range, normalize = 0|
-		var div;
+	sineclip2 { |aNumber = 1.0, range, normalize = 1|
+		var div, me;
 		range = range ?? { aNumber / 2 };
 		range = range.clip(1.0e-12, aNumber);
 		aNumber = aNumber.max(1.0e-12);
 		if( normalize.isKindOf( Boolean ) ) { normalize = normalize.binaryValue };
 		div = 1 - ( 0.35971998019677 * ( (range * normalize ) / aNumber ) );
+		me = this * div;
 		^(
-			this.clip2( aNumber-range ) + ( 
-				this.excess( aNumber-range )
+			me.clip2( aNumber-range ) + ( 
+				me.excess( aNumber-range )
 					.linlin( range.neg, range, -0.5pi, 0.5pi  )
 					.sin * 0.64028001980323 * range
 			)
@@ -80,7 +82,7 @@
 		steepness = steepness * aNumber;
 		a = this + steepness;
 		b = this - steepness;
-		mix = this.sineclip2(aNumber, range).linlin(aNumber.neg,aNumber,0,1,\minmax);
+		mix = this.sineclip2(aNumber, range, false).linlin(aNumber.neg,aNumber,0,1,\minmax);
 		^( mix * b ) + ( (1-mix) * a );
 	}
 	
@@ -96,7 +98,7 @@
 + SequenceableCollection {
 	softfold2 { arg aNumber = 1.0, range; ^this.collect(_.softfold2(aNumber,range)); }
 	softclip2 { arg aNumber = 1.0, range; ^this.collect(_.softclip2(aNumber,range)); }
-	sineclip2 { arg aNumber = 1.0, range, normalize = false; 
+	sineclip2 { arg aNumber = 1.0, range, normalize = true; 
 		^this.collect(_.sineclip2(aNumber,range, normalize)); 
 	}
 	softexcess2 { arg aNumber = 1.0, range, steepness = 1; 
@@ -106,12 +108,12 @@
 }
 
 + Point {
-	softfold2 { arg aPoint = 1.0, range, normalize = false; 
+	softfold2 { arg aPoint = 1.0, range; 
 		aPoint = aPoint.asPoint;
 		range = (range ?? { aPoint * 0.5 }).asPoint;
 		^Point( 
-			x.softfold2( aPoint.x, range.x, normalize ), 
-			y.softfold2( aPoint.y, range.y, normalize ) 
+			x.softfold2( aPoint.x, range.x ), 
+			y.softfold2( aPoint.y, range.y ) 
 		);
 	}
 	
@@ -121,7 +123,7 @@
 		^Point( x.softclip2( aPoint.x, range.x ), y.softclip2( aPoint.y, range.y ) );
 	}
 	
-	sineclip2 { arg aPoint = 1.0, range, normalize = false; 
+	sineclip2 { arg aPoint = 1.0, range, normalize = true; 
 		aPoint = aPoint.asPoint;
 		range = (range ?? { aPoint * 0.5 }).asPoint;
 		^Point( 
