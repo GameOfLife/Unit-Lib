@@ -1,7 +1,7 @@
 /*
 \select_16
 
-Creates an UMap that can select one from 16 values (or UMaps). If you need to select from <= 8 values, use \sequencer_8 instead.
+Creates an UMap that can select one from 16 values (or UMaps). If you need to select from <= 8 values, use \select_8 instead.
 
 index: the index of the value (0-15)
 smooth: smoothening parameter (0: hard steps, 1: linear interpolation)

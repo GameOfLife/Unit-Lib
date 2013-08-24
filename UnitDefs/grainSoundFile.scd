@@ -16,6 +16,7 @@ rateVar: ratio variation in number of octaves
 overlap: average number of overlapping grains. The duration of the grains is change to match this.
 pan: the pan position range. This is only active if numChannels > 1
 seed: random seed
+level: playback level (amplitude of the soundfile)
 numChannels: number of output channels
 
 --
