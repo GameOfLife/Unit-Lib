@@ -934,6 +934,7 @@ UChain : UEvent {
 	storeModifiersOn { |stream|
 		this.storeTags( stream );
 		this.storeDisplayColor( stream );
+		this.storeDisabledStateOn( stream );
 		if( ugroup.notNil ) {
 			stream << ".ugroup_(" <<< ugroup << ")";
 		};

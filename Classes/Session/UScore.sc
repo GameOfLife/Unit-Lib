@@ -870,6 +870,7 @@ UScore : UEvent {
 		this.storeName( stream );
 		this.storeTags( stream );
 		this.storeDisplayColor( stream );
+		this.storeDisabledStateOn( stream );
 	}
 	
 	storeName { |stream|

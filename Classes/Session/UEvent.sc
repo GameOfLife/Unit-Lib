@@ -236,9 +236,16 @@ UEvent : UArchivable {
 		};
 	}
 	
+	storeDisabledStateOn { |stream|
+		if( this.disabled == true ) {
+			stream << ".disabled_(true)";
+		};
+	}
+	
 	storeModifiersOn { |stream|
 		this.storeTags( stream );
 		this.storeDisplayColor( stream );
+		this.storeDisabledStateOn( stream );
 	}
 	
 	makeView { |i=0, minWidth, maxWidth| ^UEventView( this, i, minWidth, maxWidth ) }
