@@ -53,6 +53,17 @@ FreeUdef : Udef {
 	
 	addSynthDefControls { |def, inArgSpecs|
 		def = def ? synthDef;
+		if( def.notNil ) {
+			this.class.buildUdef = this;
+			this.class.buildArgSpecs = [];
+			def.build( def.func );
+			this.class.buildUdef = nil;
+		};
+		this.prAddSynthDefControls( def, inArgSpecs ++ this.class.buildArgSpecs ); 
+	}
+	
+	prAddSynthDefControls { |def, inArgSpecs|
+		def = def ? synthDef;
 		ArgSpec.fromSynthDef( def, inArgSpecs ).do({ |argSpec| this.addArgSpec( argSpec ); });
 		this.initArgs; // make private if needed
 	}
@@ -72,7 +83,7 @@ FreeUdef : Udef {
 		this.class.buildArgSpecs = [];
 		def = SynthDef( "tmp", { class.perform( selector, *args) } );
 		this.class.buildUdef = nil;
-		this.addSynthDefControls( def, this.class.buildArgSpecs ); 
+		this.prAddSynthDefControls( def, this.class.buildArgSpecs ); 
 	}
 	
 	removeUIO { |class, selector ...args|
