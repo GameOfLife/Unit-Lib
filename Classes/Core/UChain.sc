@@ -44,6 +44,8 @@ UChain : UEvent {
 	var <>handlingUndo = false;
 	
 	var <lastTarget;
+	
+	var <>serverName; // name of a server to match for playback
 
 	*initClass {
 		
@@ -671,6 +673,16 @@ UChain : UEvent {
 			target = (ULib.servers ? Server.default).asCollection;
 		};
 		
+		if( serverName.notNil ) {
+			target = target.select({ |trg|
+				if( trg.isKindOf( LoadBalancer ).not ) {
+					serverName.asCollection.includes( trg.asTarget.server.name );
+				} {
+					true;
+				};
+			});
+		};
+		
 		target = target.select({ |tg|
 			this.shouldPlayOn( tg ) != false;
 		});
@@ -937,6 +949,9 @@ UChain : UEvent {
 		this.storeDisabledStateOn( stream );
 		if( ugroup.notNil ) {
 			stream << ".ugroup_(" <<< ugroup << ")";
+		};
+		if( serverName.notNil ) {
+			stream << ".serverName_(" <<< serverName << ")";
 		};
 		if( addAction != \addToHead ) {
 			stream << ".addAction_(" <<< addAction << ")";
