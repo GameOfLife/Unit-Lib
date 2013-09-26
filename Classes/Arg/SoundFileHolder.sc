@@ -728,6 +728,25 @@ DiskSndFile : AbstractSndFile {
 	}
 }
 
+
+/*
+
+(
+Udef(\test, {
+	Out.ar(0, PlayBuf.ar(1, (String.scDir +/+ "sounds/a11wlk01-44_1.aiff").asBufKr ) )
+})
+)
+
+(
+Udef(\test, {
+	var buf = (String.scDir +/+ "sounds/a11wlk01-44_1.aiff").asBufKr(key: \buf1, numChannels:1, startFrame:0, endFrame:44100 );
+	Out.ar(0, PlayBuf.ar(1, buf ) )
+})
+)
+
+UChain(\test).gui
+*/
+
 + String {
 	asUnitArg { |unit, key|
 		case { unit.getSpec( key ).isKindOf( BufSndFile ) } {
@@ -768,4 +787,95 @@ DiskSndFile : AbstractSndFile {
 			^this;
 		}	
 	}
+
+	asBufKr{ |key, numChannels = 1, startFrame = 0, endFrame|
+		key = key ? \buf;
+		^key.ubufkr( this, startFrame = 0, endFrame, numChannels:numChannels)[0]
+	}
+}
+
+/*
+
+
+(
+Udef(\test, {
+	Out.ar(0, PlayBuf.ar(1, \sndfile.ubufkr()[0] ) )
+})
+)
+
+
+(
+Udef(\test, {
+	var buf, rate, loop;
+	#buf, rate, loop = \sndfile.ubufkr();
+	Out.ar(0, PlayBuf.ar(1, buf, BufRateScale.kr( buf ) * rate, loop:loop ) )
+})
+)
+
+(
+Udef(\test, {
+	var buf, rate, loop;
+	#buf, rate, loop = \sndfile.ubufkr(String.scDir +/+ "sounds/a11wlk01-44_1.aiff", 0, 44100*2, 0.5, true);
+	Out.ar(0, PlayBuf.ar(1, buf, BufRateScale.kr( buf ) * rate, loop:loop ) )
+})
+)
+
+UChain(\test).gui
+
+
+
+(
+Udef(\test, {
+	Out.ar(0, DiskIn.ar(1, \sndfile.udiskkr()[0] ) )
+})
+)
+
+
+(
+Udef(\test, {
+	var buf, rate, loop;
+	#buf, rate, loop = \sndfile.udiskkr();
+	Out.ar(0, VDiskIn.ar(1, buf, BufRateScale.kr( buf ) * rate, loop ) )
+})
+)
+
+(
+Udef(\test, {
+	var buf, rate, loop;
+	#buf, rate, loop = \sndfile.udiskkr(String.scDir +/+ "sounds/a11wlk01-44_1.aiff", 0, 44100*2, 0.5, true);
+	Out.ar(0, VDiskIn.ar(1, buf,  BufRateScale.kr( buf ) * rate, loop ) )
+})
+)
+
+UChain(\test).gui
+
+*/
+
++ Symbol {
+
+	ubufkr{ |path, startFrame = 0, endFrame, rate = 1, loop = false,
+		useChannels, numChannels = 1|
+
+		var default = path !? { |p| BufSndFile(path, startFrame, endFrame,
+			rate, loop, useChannels, numChannels) };
+		var spec = BufSndFileSpec( numChannels );
+
+		Udef.addBuildSpec( ArgSpec(this, default, spec ) );
+
+		//bufnum, rate, loop
+        ^this.kr([ 0, 1, 0 ])
+	}
+
+
+	udiskkr{ |path, startFrame = 0, endFrame, rate = 1, loop = false,
+		useChannels, numChannels = 1|
+
+		var specDefault = path !? { |p| DiskSndFile(path, startFrame, endFrame,
+			rate, loop) };
+		var spec = DiskSndFileSpec( numChannels );
+
+		//bufnum, rate, loop
+        ^this.ukrArgSpec([ 0, 1, 0 ], specDefault, spec )
+	}
+
 }
