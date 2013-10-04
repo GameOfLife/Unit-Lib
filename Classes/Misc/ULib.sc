@@ -155,8 +155,8 @@ ULib {
 
 	*writeDefaultSynthDefs {
 		this.getDefaultSynthDefs.do{ |def|
-			def.writeDefFile;
 			"writting % SynthDef file".format(def.name).postln;
+			def.justWriteDefFile;
 		}
 	}
 
