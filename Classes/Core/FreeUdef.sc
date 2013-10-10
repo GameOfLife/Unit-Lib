@@ -56,7 +56,7 @@ FreeUdef : Udef {
 		if( def.notNil ) {
 			this.class.buildUdef = this;
 			this.class.buildArgSpecs = [];
-			def.build( def.func );
+			SynthDef( "tmp", def.func );
 			this.class.buildUdef = nil;
 		};
 		this.prAddSynthDefControls( def, inArgSpecs ++ this.class.buildArgSpecs ); 
