@@ -18,7 +18,7 @@ Udef( \highShelf, { |freq = 440, rs = 1, db = 0, lag = 0|
 	in = BHiShelf.ar( in, freq.lag(lag).clip(20,20000), rs, db );
 	UOut.ar( 0, in );
 })
-.category_( \filter )
+.category_( \eq )
 .setSpec( \freq, \freq.asSpec )
 .setSpec( \rq, [ 0.01, 10, \exp, 0, 1 ].asSpec )
 .setSpec( \lag, [0,1,\lin].asSpec )
