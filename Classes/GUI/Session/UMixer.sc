@@ -186,7 +186,8 @@ UMixer {
                     unitControllers.add(ctl);
 
 				}{
-					eventsFromFolder = event.allEvents.collect{ |event| (\event: event,\oldLevel: event.getGain) };
+						eventsFromFolder = event.allEvents.select(_.canFreeSynth)
+						.collect{ |event| (\event: event,\oldLevel: event.getGain) };
 					cview = CompositeView(mixerView,40@330);
 					cview.decorator = FlowLayout(cview.bounds);
 					if( [ Color ].includes( event.getTypeColor.class ) ) {
