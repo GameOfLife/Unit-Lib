@@ -23,6 +23,14 @@
 				Pen.line( (i + left) @ top, (i + left) @ bottom );
 			});
 			Pen.stroke;
+		} {
+			if( viewRect.width < (this.view.bounds.width/0.4) ) {
+				(width/10).ceil.do({ |i|
+					i = i*10;
+					Pen.line( (i + left) @ top, (i + left) @ bottom );
+				});
+				Pen.stroke;
+			};
 		};
 		
 		Pen.color = Color.white.alpha_(0.75);
