@@ -19,7 +19,7 @@
 		Pen.width = this.pixelScale.x / 2;
 		Pen.color = Color.gray.alpha_(0.25);
 		
-		if( viewRect.width < (this.view.bounds.width/2) ) {			width.do({ |i|
+		if( viewRect.width < (this.view.bounds.width/4) ) {			width.do({ |i|
 				Pen.line( (i + left) @ top, (i + left) @ bottom );
 			});
 			Pen.stroke;
