@@ -20,6 +20,6 @@ Udef( \lowShelf, { |freq = 440, rs = 1, db = 0, lag = 0|
 })
 .category_( \eq )
 .setSpec( \freq, \freq.asSpec )
-.setSpec( \rq, [ 0.01, 10, \exp, 0, 1 ].asSpec )
+.setSpec( \rs, [ 0.6, 10, \exp, 0, 1 ].asSpec )
 .setSpec( \lag, [0,1,\lin].asSpec )
 .setSpec( \db, [-24,24,\lin].asSpec )
