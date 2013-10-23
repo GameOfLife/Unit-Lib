@@ -198,6 +198,10 @@ UScore : UEvent {
 
 	}
 
+	allUChains{
+	    ^events.collect(_.getAllUChains).flat
+	}
+
 	getAllUChains{
 	    ^events.collect(_.getAllUChains).flat
 	}
