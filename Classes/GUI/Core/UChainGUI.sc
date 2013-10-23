@@ -193,6 +193,7 @@ UChainGUI {
 		var controller;
 		var udefController;
 		var scoreController;
+		var unitControllers;
 		// var unitInitFunc;
 		
 		nowBuildingChain = chain;
@@ -216,6 +217,7 @@ UChainGUI {
 				
 		controller = SimpleController( chain );
 		udefController = SimpleController( Udef.all );
+		unitControllers = List();
 		
 		composite = CompositeView( parent, bounds ).resize_(5);
 		composite.addFlowLayout( margin, gap );
@@ -223,6 +225,7 @@ UChainGUI {
 			controller.remove; 
 			scoreController.remove;
 			udefController.remove;
+			unitControllers.do(_.remove);
 			if( chain.isKindOf( MassEditUChain ) ) { chain.disconnect };
 			this.removeFromAll;
 			if( composite == vw && { current == this } ) { current = nil } 
@@ -731,7 +734,7 @@ UChainGUI {
 			this.makeCurrent;
 		});
 		
-		uguis = this.makeUnitViews(units, margin, gap );
+		uguis = this.makeUnitViews(units, margin, gap, unitControllers );
 		
 		nowBuildingChain = nil;
 	}
@@ -813,7 +816,7 @@ UChainGUI {
 
 	}
 	
-	makeUnitSubViews { |scrollView, units, margin, gap|
+	makeUnitSubViews { |scrollView, units, margin, gap, unitControllers|
 		var unitInitFunc;
 		var comp, uview;
 		var addLast, ug, header;
@@ -884,6 +887,7 @@ UChainGUI {
 			var addBefore, indexLabel, ugui;
 			var currentUMaps;
 			var massEditWindowButton;
+			var startButton;
 				
 			indexLabel = realIndex.asString;
 			
@@ -1001,10 +1005,10 @@ UChainGUI {
 			});
 			
 			if( unit.isKindOf( MassEditU ) ) {
+				var left = comp.bounds.right -
+						((18 + 2) + if( notMassEdit){12 + 4 + 12}{0});
 				massEditWindowButton = SmoothButton( comp, 
-					Rect( comp.bounds.right - 
-						((18 + 2) + if( notMassEdit){12 + 4 + 12}{0}), 
-						1, 18, 12 ) 
+					Rect(left, 1, 18, 12 )
 					)
 					.label_( 'up' )
 					.border_( 1 )
@@ -1058,6 +1062,17 @@ UChainGUI {
 						RoundView.popSkin( skin );
 					}).resize_(3);
 					
+				startButton = SmoothButton( comp, Rect( left - (12 + 2), 1, 12, 12 ) )
+					.label_( ['power', 'power'] )
+					.radius_(7)
+					.background_( Color.clear )
+					.border_(1)
+					.hiliteColor_( Color.green )
+					.action_({ |b|
+						var bool = b.value.booleanValue;
+						unit.units.do{ |u| u.synths.do( _.run(bool) ) };
+					}).resize_(3);
+
 				if( massEditWindowIndex == i ) {
 					massEditWindowButton.doAction;
 				};
@@ -1068,6 +1083,7 @@ UChainGUI {
 			};
 			
 			if( notMassEdit ) {	
+				var left;
 				min = SmoothButton( comp, 
 							Rect( comp.bounds.right - (12 + 4 + 12), 1, 12, 12 ) )
 						.label_( '-' )
@@ -1098,8 +1114,10 @@ UChainGUI {
 						this.setUnits( units );
 					}).resize_(3);
 					
-				if(  unit.isKindOf( MassEditU ).not && { unit.audioOuts.size > 0 } ) {					SmoothButton( comp, 
-						Rect( comp.bounds.right - (45 + 2 + 12 + 4 + 12), 
+				if(  unit.isKindOf( MassEditU ).not && { unit.audioOuts.size > 0 } ) {
+					left = comp.bounds.right - (45 + 2 + 12 + 4 + 12);
+					SmoothButton( comp,
+						Rect( left,
 							1, 45, 12 ) 
 						)
 						.label_( "bounce" )
@@ -1110,7 +1128,23 @@ UChainGUI {
 								chain.bounce( chain.units.indexOf( unit ), path );
 							});
 						}).resize_(3);
+
+				}{
+					left = comp.bounds.right - (12 + 2)
 				};
+
+				startButton = SmoothButton( comp, Rect( left - (12 + 2), 1, 12, 12 ) )
+					.label_( ['power', 'power'] )
+					.radius_(7)
+					.background_( Color.clear )
+					.border_(1)
+					.hiliteColor_( Color.green )
+					.action_({ |b|
+						unit.synths.do( _.run(b.value.booleanValue) )
+					}).resize_(3);
+
+
+
 			};	
 					
 			unit.addDependant( unitInitFunc );
@@ -1120,6 +1154,11 @@ UChainGUI {
 				unit.removeDependant( unitInitFunc );
 				currentUMaps.do(_.removeDependant( unitInitFunc ));
 			});
+			unitControllers.add(
+				SimpleController(unit)
+				.put(\go, { startButton.value = 1 })
+				.put(\end, { startButton.value = 0 })
+			);
 			ugui = unit.gui( scrollView, 
 				scrollView.bounds.copy.width_( 
 					scrollView.bounds.width - scrollerMargin - (margin.x * 2) 
@@ -1184,7 +1223,7 @@ UChainGUI {
 		
 	}
 
-	makeUnitViews { |units, margin, gap|
+	makeUnitViews { |units, margin, gap, unitControllers|
 		
 		var scrollView, presetManagerHeight = 0, notMassEdit;
 		
@@ -1229,7 +1268,7 @@ UChainGUI {
 			).resize_(7)
 		};
 			
-		^this.makeUnitSubViews( scrollView, units, margin, gap );
+		^this.makeUnitSubViews( scrollView, units, margin, gap, unitControllers );
 	}
 	
 	remove {
