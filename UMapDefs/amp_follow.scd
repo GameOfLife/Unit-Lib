@@ -37,13 +37,13 @@ UMapDef( \amp_follow, { |bus = 0, fromRange = #[0.0, 1.0], toRange = #[0.0,1.0],
 		sig.lincurve(0,1,0,1, curve ),
 		sig
 	]);
-	sig = sig.linlin(0,1,*toRange ++ [ \none ]);
 	sig = Select.kr( clipMode, [
 		sig.softclip2(1, clipSoftness),
 		sig.softfold2(1, clipSoftness),
 		sig.wrap2(1),
 		sig
 	]);
+	sig = sig.linlin(0,1,*toRange ++ [ \none ]);
 	UMapOut.kr(sig);
 })
 	.setSpec( \fromRange, \amp.asSpec.asRangeSpec )
