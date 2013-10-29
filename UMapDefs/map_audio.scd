@@ -27,6 +27,7 @@ UMapDef( \map_audio, { |bus = 0, fromRange = #[-1.0, 1.0], toRange = #[0.0,1.0],
 	var sig;
 	sig = In.ar(bus + UIn.firstPrivateBus);
 	sig = A2K.kr( sig );
+	fromRange[1] = fromRange[1].max(fromRange[0] + 1.0e-8);
 	sig = sig.linlin(*fromRange ++ [-1,1,\none]);
 	sig = Select.kr( curve.inRange(-0.001,0.001), [
 		sig.lincurve(-1,1,-1,1, curve, \none ),

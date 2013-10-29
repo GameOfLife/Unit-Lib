@@ -31,6 +31,7 @@ UMapDef( \amp_follow, { |bus = 0, fromRange = #[0.0, 1.0], toRange = #[0.0,1.0],
 	sig = In.ar(bus + UIn.firstPrivateBus);
 	sig = Amplitude.ar( sig, attackTime, releaseTime );
 	sig = A2K.kr( sig );
+	fromRange[1] = fromRange[1].max(fromRange[0] + 1.0e-8);
 	sig = sig.linlin(*fromRange ++ [0,1,\none]);
 	sig = if( invert, 1-sig, sig );
 	sig = Select.kr( curve.inRange(-0.001,0.001), [

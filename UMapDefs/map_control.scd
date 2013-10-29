@@ -26,6 +26,7 @@ part of the Unit lib default UMapDefs set
 UMapDef( \map_control, { |bus = 0, fromRange = #[0.0, 1.0], toRange = #[0.0,1.0], curve = 0, invert = 0, 	lag = 0.0, clipMode = 0, clipSoftness = 0.1|
 	var sig;
 	sig = In.kr(bus + UIn.firstControlBus);
+	fromRange[1] = fromRange[1].max(fromRange[0] + 1.0e-8);
 	sig = sig.linlin(*fromRange ++ [-1,1,\none]);
 	sig = Select.kr( curve.inRange(-0.001,0.001), [
 		sig.lincurve(-1,1,-1,1, curve, \none ),
