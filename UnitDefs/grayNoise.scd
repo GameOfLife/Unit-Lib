@@ -14,5 +14,5 @@ part of the Unit lib default Udefs set
 Udef( \grayNoise, { |amp = 0.1, seed = 12345|
 	URandSeed.ir(seed);
 	UMixOut.ar( 0, GrayNoise.ar * amp, 0, true )
-} ).category_( \oscillator )
+} ).category_( \noise )
 	.setSpec( \seed, PositiveIntegerSpec(12345) )
