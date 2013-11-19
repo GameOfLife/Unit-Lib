@@ -67,8 +67,8 @@ UEQ : EQSetting {
 
 	asUEQ { ^this }
 	
-	*ar { |in, key, def|
-		^this.new( def ).ar( in, key );
+	*ar { |in, key, def, setting|
+		^this.new( def, setting ).ar( in, key );
 	}
 	
 	 ar { |in, key|
