@@ -25,6 +25,5 @@ Udef( \simpleEQ, {
 	in = UIn.ar( 0, 1 );
 	UOut.ar(0, UEQ.ar( in, \lowMidHi, \simpleEQ ) );
 })	
-	.category_( 'eq' )
-	.setSpec( \lowMidHi, UEQSpec( \simpleEQ ) );
+	.category_( 'eq' );
 	

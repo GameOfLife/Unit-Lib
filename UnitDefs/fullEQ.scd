@@ -16,5 +16,4 @@ Udef( \fullEQ, {
 	in = UIn.ar( 0, 1 );
 	UOut.ar(0, UEQ.ar( in, \eq, \default ) );
 })	
-	.category_( 'eq' )
-	.setSpec( \eq, UEQSpec( \default ) );
+	.category_( 'eq' );

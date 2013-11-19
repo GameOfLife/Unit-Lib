@@ -73,6 +73,7 @@ UEQ : EQSetting {
 	
 	 ar { |in, key|
 		key = (key ? \eq).asSymbol;
+		Udef.addBuildSpec( ArgSpec( key, setting, UEQSpec( def, this ) ) );
 	 	^super.ar( in, key.kr( setting.flat ) )
 	 }
 }
