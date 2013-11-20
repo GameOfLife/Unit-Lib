@@ -22,4 +22,4 @@ UMapDef( \in_range, { |value = 0.0, range = #[0.25,0.75], trueValue = 1.0, false
 	UMapOut.kr( output );
 })
 .mappedArgs_([ \trueValue, \falseValue ])
-.category_( 'switch' )
+.category_( 'trigger' )
