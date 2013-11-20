@@ -163,6 +163,8 @@ TriggerSpec : Spec {
 	constrain { |value|
 		^value;
 	}
+	
+	asControlSpec { ^spec ? ControlSpec(0,1,\lin,1,0) }
 }
 
 BoolSpec : Spec {
