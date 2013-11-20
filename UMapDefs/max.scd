@@ -17,4 +17,4 @@ UMapDef( \max, { |a = 0.5, b = 0.5|
 	UMapOut.kr( a.max(b) );
 })
 .mappedArgs_([ \a, \b ])
-.category_( 'switch' )
+.category_( 'utility' )
