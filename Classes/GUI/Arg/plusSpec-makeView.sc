@@ -506,7 +506,11 @@
 		vws[ \buttonView ]
 				.radius_( bounds.height / 8 )
 				.mouseDownAction_({
-					action.value( vws, vws[ \val ] );
+					if( spec.notNil ) {
+						action.value( vws, vws[ \val ] );
+					} {
+						action.value( vws, 1 );
+					}
 				})
 				.resize_( 1 );
 				
