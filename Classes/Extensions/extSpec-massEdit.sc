@@ -49,6 +49,22 @@
 	
 }
 
++ AngleSpec {
+	
+	massEditSpec { |inArray|
+		^AngleArraySpec.newFrom( this ).default_( inArray );
+	}
+	
+	massEditValue { |inArray|
+		^inArray
+	}
+	
+	massEdit { |inArray, params|
+		^params;
+	}
+	
+}
+
 + ListSpec {
 	
 	massEditSpec { |inArray|

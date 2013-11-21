@@ -1070,6 +1070,8 @@ AngleSpec : ControlSpec {
 	}
 }
 
+AngleArraySpec : ArrayControlSpec { }
+
 DisplaySpec : Spec { // a spec for displaying a value that should not be user-edited
 	var <>spec;
 	var <>formatFunc;

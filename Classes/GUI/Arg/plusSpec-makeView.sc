@@ -1984,6 +1984,50 @@
 
 }
 
++ AngleArraySpec {
+	
+	makeView { |parent, bounds, label, action, resize|
+		var mode, vws, act, spec, degMul;
+		mode = AngleSpec.mode;
+		switch( mode, 
+			\rad, { 
+				act = { |vws, value|
+					action.value( vws, value * pi ) 
+				};
+				spec = ArrayControlSpec( minval / pi, maxval / pi, \linear, step, default / pi );
+				vws = spec.makeView( parent, bounds, label, act, resize );
+				vws[ \mode ] = \rad;
+				vws[ \spec ] = spec;
+			},
+			\deg, { 
+				degMul = 180 / pi;
+				act = { |vws, value|
+					action.value( vws, value / degMul );
+				};
+				spec = ArrayControlSpec( minval * degMul, maxval * degMul, \linear, step, 
+					default * degMul );
+				vws = spec.makeView( parent, bounds, label, act, resize );
+				vws[ \mode ] = \deg;
+				vws[ \spec ] = spec;
+			}
+		);
+		^vws;
+	}
+	
+	setView { |view, value, active = false|
+		switch( view[ \mode ],
+			\rad, { value = value / pi },
+			\deg, { value = value * 180 / pi }
+		);
+		view[ \spec ].setView( view, value, active )
+	}
+	
+	mapSetView { |view, value, active = false|
+		this.setView( view, this.map( value ), active );
+	}
+
+}
+
 + DisplaySpec {
 	
 	makeView {
