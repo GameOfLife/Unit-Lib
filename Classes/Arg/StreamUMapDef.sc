@@ -9,7 +9,6 @@ StreamUMapDef : FuncUMapDef {
 		argSpecs = ArgSpec.fromFunc( func, argSpecs )[1..];
 		argSpecs = argSpecs ++ [
 			[ \value, 0, DisplaySpec(), valueIsPrivate ], 
-			[ \range, [0,1], RangeSpec() ],
 			[ \reset, 1, TriggerSpec("reset") ], 
 			[ \next, 1, TriggerSpec("next") ], 
 			[ \id, nil, StringSpec(), false ],
@@ -20,7 +19,7 @@ StreamUMapDef : FuncUMapDef {
 		this.setSpecMode( \value, \nonsynth );
 		this.setSpecMode( \id, \nonsynth );
 		this.setSpecMode( \restart, \nonsynth );
-		mappedArgs = [ \value, \range ];
+		mappedArgs = [ \value ];
 		allowedModes = [ \init, \sync, \normal ];
 		this.changed( \init );
 	}
@@ -50,23 +49,20 @@ StreamUMapDef : FuncUMapDef {
 		if( id.size == 0 ) {
 			id = this.makeID;
 			unit.set( \id, id );
-		} {	
-			stream = this.getStream( id );
-			if( stream.isNil ) {
-				stream = func.value( unit, 
-					*this.asUnmappedArgsArray( unit, unit.args ).clump(2).flop[1]
-				);
-				this.setStream( id, stream );
-			};
-			res = stream.next;
-			if( res.notNil ) {
-				range = unit.mapGet( \range );
-				res = res.linlin(0,1,*range);
-				if( valueIsMapped ) {
-					unit.setArg( \value, unit.getSpec( \value ).map( res ) );
-				} {
-					unit.setArg( \value, res );
-				};
+		};	
+		stream = this.getStream( id );
+		if( stream.isNil ) {
+			stream = func.value( unit, 
+				*this.asUnmappedArgsArray( unit, unit.args ).clump(2).flop[1]
+			);
+			this.setStream( id, stream );
+		};
+		res = stream.next;
+		if( res.notNil ) {
+			if( valueIsMapped ) {
+				unit.setArg( \value, unit.getSpec( \value ).map( res ) );
+			} {
+				unit.setArg( \value, res );
 			};
 		}
 	}
