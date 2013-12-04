@@ -14,10 +14,16 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UMapDef( \lag, { |value = 0.0, timeUp = 0.0, timeDown = 0.0|
-	UMapOut.kr(value.lag(timeUp, timeDown));
+UMapDef( \lag, { |value = 0.0, timeUp = 0.0, timeDown = 0.0, order = 1|
+	4.do({ |i|
+		var amt;
+		amt = (order - i).clip(0,1) * (order ** -0.5 );
+		value = value.lag( timeUp * amt, timeDown * amt );
+	});
+	UMapOut.kr(value);
 })
 .setSpec( \timeUp, [0,10,\lin].asSpec )
 .setSpec( \timeDown, [0,10,\lin].asSpec )
+.setSpec( \order, [1,4,\lin,0,1].asSpec )
 .mappedArgs_([ \value ])
 .category_( 'filter' )
