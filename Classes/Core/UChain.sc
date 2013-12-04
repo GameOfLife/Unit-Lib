@@ -40,6 +40,7 @@ UChain : UEvent {
 	var <muted = false;
 	
 	var <>addAction = \addToHead;
+	var <>global = false;
 	var <>ugroup;
 	var <>handlingUndo = false;
 	
@@ -683,6 +684,16 @@ UChain : UEvent {
 			});
 		};
 		
+		if( global ) {
+			target = target.collect({ |trg|
+				if( trg.isKindOf( LoadBalancer ) ) {
+					trg.servers;
+				} {
+					trg;
+				};
+			}).flat;
+		};
+		
 		target = target.select({ |tg|
 			this.shouldPlayOn( tg ) != false;
 		});
@@ -955,6 +966,9 @@ UChain : UEvent {
 		};
 		if( addAction != \addToHead ) {
 			stream << ".addAction_(" <<< addAction << ")";
+		};
+		if( global != false ) {
+			stream << ".global_(" <<< global << ")";
 		};
 	}
 
