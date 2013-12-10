@@ -7,7 +7,7 @@ EnvM : Env {
 	
 	*new { arg levels = #[0,1,0], times = #[1,1], curve = 'lin', releaseNode, loopNode;
 		^super.newCopyArgs(levels, times, curve)
-			.releaseNode_(releaseNode).loopNode_(loopNode).mapped_(levels.mutable);
+		.releaseNode_(releaseNode).loopNode_(loopNode).offset_(0).mapped_(levels.mutable);
 	}
 	
 	unmappedLevels { ^levels }
