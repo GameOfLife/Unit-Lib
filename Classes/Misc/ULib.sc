@@ -134,7 +134,10 @@ ULib {
 			})
 			}
 		} {
-			ULib.servers.do(_.boot)
+			ULib.servers.do(_.boot);
+			Udef.loadOnInit = false;
+			this.getDefaultUdefs;
+			Udef.loadOnInit = true;
         };
 
         UGlobalGain.gui;
@@ -143,11 +146,15 @@ ULib {
 		"\n\tUnit Lib started".postln
 	}
 
+	*getDefaultUdefs{
+		^Udef.loadAllFromDefaultDirectory ++
+			UMapDef.loadAllFromDefaultDirectory
+	}
+
 	*getDefaultSynthDefs{
 		var defs;
 		Udef.loadOnInit = false;
-		defs = (Udef.loadAllFromDefaultDirectory ++
-			UMapDef.loadAllFromDefaultDirectory).collect(_.synthDef).flat.select(_.notNil);
+		defs = this.getDefaultUdefs.collect(_.synthDef).flat.select(_.notNil);
 		Udef.loadOnInit = true;
 		^defs
 
