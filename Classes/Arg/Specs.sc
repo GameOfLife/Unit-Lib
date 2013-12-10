@@ -84,6 +84,8 @@ ArrayControlSpec : ControlSpec {
 	asControlSpec { ^ControlSpec.newFrom( this ).default_( this.default.asCollection[0] ); }
 	asArrayControlSpec { ^this }
 	
+	uconstrain { |value| ^value.collect{ |x| this.constrain(x) } }
+
 	*testObject { |obj| ^obj.isArray && { obj.every(_.isNumber) } }
 }
 
