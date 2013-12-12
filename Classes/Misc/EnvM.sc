@@ -10,6 +10,12 @@ EnvM : Env {
 		.releaseNode_(releaseNode).loopNode_(loopNode).offset_(0).mapped_(levels.mutable);
 	}
 	
+	offset_ { |value = 0|
+		if( this.class.instVarNames.includes( \offset ) ) {
+			super.offset_( value );
+		};
+	}
+	
 	unmappedLevels { ^levels }
 	unmappedLevels_ { |newLevels| levels = newLevels; mapped = false; array = nil; }
 	
