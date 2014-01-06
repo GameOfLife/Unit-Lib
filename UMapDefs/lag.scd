@@ -6,6 +6,7 @@ An UMap that slows down value changes over time. It is implemented as a one-pole
 value: the value upon which the lag is applied (this can be another UMap as well)
 timeUp: the time it takes to move upwards to within 0.01% towards a new value
 timeDown: the time it takes to move downwards to within 0.01% towards a new value
+order: (1-4) order of the lag, a higher order produces a smoother lag curve. The UMap cascades four lag filters, and the order parameter sets how many of them are actually used.
 
 The value arg range is mapped to that of the parameter to which the UMap is connected.
 
