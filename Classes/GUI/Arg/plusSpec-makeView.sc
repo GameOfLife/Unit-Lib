@@ -868,7 +868,7 @@
 			labelWidth = 0;
 		};
 		
-		vws[ \objectLabel ] = StaticText( view,Ê
+		vws[ \objectLabel ] = StaticText( view,ï¿½
 			(bounds.width-(labelWidth + 2) - 42) @ (bounds.height) 
 		).applySkin( RoundView.skin ).background_( Color.gray(0.8) );
 			
@@ -995,7 +995,7 @@
 				var editor;
 				if( vws[ \editor ].isNil or: { vws[ \editor ].isClosed } ) {
 					RoundView.pushSkin( skin );
-					editor = EnvView( "Envelope editor", env: vws[ \val ], spec: spec )
+					editor = EnvView( "Envelope editor - "++label, env: vws[ \val ], spec: spec )
 						.onClose_({ 
 							if( vws[ \editor ] == editor ) {
 								vws[ \editor ] = nil;

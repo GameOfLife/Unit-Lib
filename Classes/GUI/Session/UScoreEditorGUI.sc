@@ -125,7 +125,7 @@ UScoreEditorGUI : UAbstractWindow {
         topBarH = 22;
         tranBarH = 22;
 
-        centerBounds = Rect(0,0, 680-8, 300-( topBarH + tranBarH + (2*margin) + (2*gap) ));
+        centerBounds = Rect(0,0, bounds.width-8, bounds.height-( topBarH + tranBarH + (2*margin) + (2*gap) ));
         //centerView = CompositeView(view, centerBounds).resize_(5);
         scoreView = UScoreView(view, centerBounds, scoreEditor );
         
@@ -143,7 +143,7 @@ UScoreEditorGUI : UAbstractWindow {
 }	
 
 + UScore {
-	gui {
-		^UScoreEditorGUI( UScoreEditor( this ) );
+	gui { |bounds|
+		^UScoreEditorGUI( UScoreEditor( this ), bounds );
 	}
 }	
