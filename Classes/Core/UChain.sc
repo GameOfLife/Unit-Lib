@@ -869,6 +869,14 @@ UChain : UEvent {
 		^units.select({ |u| u.keys.includes( key ) }).collect(_.get(key));
 	}
 	
+	setAt { |index, key, value|
+		this.units.at(index).set(key, value)
+	}
+
+	getAt{ |index, key|
+		^this.units.at(index).get(key)
+	}
+
 	add { |unit|
 		units = units.add( unit.asUnit );
 		this.changed( \units );
