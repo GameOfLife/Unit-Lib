@@ -6,6 +6,7 @@ UMapOut {
 			if( map ) { \u_spec.asSpecMapKr( channelsArray ) } { channelsArray };
 		);
 		Udef.buildUdef.numChannels = channelsArray.asCollection.size;
+		Udef.buildUdef.outputIsMapped = map;
 		Udef.addBuildSpec(
 			ArgSpec(\u_mapbus, 0, PositiveIntegerSpec(), true ) 
 		);

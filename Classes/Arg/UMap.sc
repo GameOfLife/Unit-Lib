@@ -3,6 +3,8 @@ UMapDef : Udef {
 	classvar <>defaultCanUseUMapFunc;
 	
 	var <>mappedArgs;
+	var <>outputIsMapped = true;
+	var >insertArgName;
 	var <>allowedModes = #[ sync, normal ];
 	var <>canUseUMapFunc;
 	var <>apxCPU = 0;
@@ -143,6 +145,27 @@ UMapDef : Udef {
 	
 	unitCanUseUMap { |unit, key|
 		^(canUseUMapFunc ? defaultCanUseUMapFunc).value( unit, key, this );
+	}
+	
+	canInsert {
+		^this.insertArgName.notNil;
+	}
+	
+	insertArgName {
+		if( insertArgName.isNil ) {
+			if( outputIsMapped ) {
+				insertArgName = mappedArgs.asCollection.detect({ |item|
+					this.getDefault( item ).asControlInput.asCollection.size == this.numChannels
+				});
+			} {
+				insertArgName = argSpecs.select({ |item|
+					item.private.not && { mappedArgs.asCollection.includes( item.name ).not }
+				}).detect({ |item| 
+					item.default.asControlInput.asCollection.size == this.numChannels;
+				}) !? _.name;
+			};
+		};
+		^insertArgName;
 	}
 }
 
