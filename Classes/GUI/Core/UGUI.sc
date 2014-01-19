@@ -129,19 +129,17 @@ UGUI {
 					vw.mapSetAction = { mapSetAction.value( this ) };
 					vw.removeAction = { |umap|
 						if( unit.isKindOf( MassEditU ) ) {
-							var value;
-							value = unit.units.first.getDefault( key );
 							umap.units.do({ |item|
 								if( item.isUMap ) { item.stop };
 							});
 							unit.units.do({ |item|
 								if( item.get( key ).isUMap ) {
-									item.set( key, value );
+									item.removeUMap( key );
 								};
 							});
 						} {
 							umap.stop;
-							unit.set( key, unit.getDefault( key ) );
+							unit.removeUMap( key );
 						};
 					};
 				} {
@@ -205,12 +203,12 @@ UGUI {
 						if( unit.isKindOf( MassEditU ) ) {
 							umapdragbin.receiveDragHandler_({
 								unit.units.do({ |unit|
-									unit.set( key, UMap( View.currentDrag ) );
+									unit.insertUMap( key, View.currentDrag );
 								});
 							});
 						} {
 							umapdragbin.receiveDragHandler_({
-								unit.set( key, UMap( View.currentDrag ) );
+								unit.insertUMap( key, View.currentDrag );
 							});
 						};
 						composite.decorator.nextLine;
