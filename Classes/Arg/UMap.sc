@@ -4,6 +4,7 @@ UMapDef : Udef {
 	
 	var <>mappedArgs;
 	var <>outputIsMapped = true;
+	var >canInsert;
 	var >insertArgName;
 	var <>allowedModes = #[ sync, normal ];
 	var <>canUseUMapFunc;
@@ -148,7 +149,7 @@ UMapDef : Udef {
 	}
 	
 	canInsert {
-		^this.insertArgName.notNil;
+		^(canInsert != false) && { this.insertArgName.notNil; };
 	}
 	
 	insertArgName {

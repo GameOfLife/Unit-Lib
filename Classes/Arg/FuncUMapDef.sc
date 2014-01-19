@@ -110,6 +110,8 @@ FuncUMapDef : UMapDef {
 			};
 		});
 	}
+	
+	canInsert { ^false }
 
 }
 
