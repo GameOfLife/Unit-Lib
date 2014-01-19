@@ -584,6 +584,31 @@ U : ObjectWithArgs {
 		this.def.setSynth( this, *args );
 	}
 	
+	insertUMap { |key, umapdef, args|
+		umapdef = umapdef.asUdef( UMapDef );
+		if( umapdef.notNil ) {
+			if( umapdef.canInsert ) {
+				this.set( key, 
+					UMap( umapdef, [ umapdef.insertArgName, this.get( key ) ] ++ args )
+				);
+			} {
+				this.set( key, UMap( umapdef, args ) );
+			};
+		};
+	}
+	
+	removeUMap { |key|
+		var umap;
+		umap = this.get( key );
+		if( umap.isKindOf( UMap ) ) {
+			if( umap.def.canInsert ) {
+				this.set( key, umap.get( umap.def.insertArgName ) );
+			} {
+				this.set( key, this.getDefault( key ) );
+			};
+		};
+	}
+	
 	get { |key|
 		^this.getArg( key );
 	}
@@ -1136,7 +1161,9 @@ U : ObjectWithArgs {
 	asUnit { ^U( this[0], *this[1..] ) }
 	asUnitArg { |unit, key|
 		var umapdef, umap;
-		if( this[0].isMemberOf( Symbol ) && { this[1].isArray } ) { 
+		if( ( this[0].isMemberOf( Symbol ) or: this[0].isKindOf( UMapDef ) ) && { 
+			this[1].isArray 
+		} ) { 
 			umapdef = this[0].asUdef( UMapDef );
 			if( umapdef.notNil && { unit.canUseUMap( key, umapdef ) } ) {
 				^UMap( *this ).asUnitArg( unit, key );
