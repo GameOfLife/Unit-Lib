@@ -10,7 +10,7 @@ UMapGUI : UGUI {
 		^super.viewNumLines( unit ) + 1.1;
 	}
 	
-	*color { ^color ?? { color = Color.blue.blend( Color.white, 0.8 ).alpha_(0.5) }; }
+	*color { ^color ?? { color = Color.blue.blend( Color.white, 0.8 ).alpha_(0.4) }; }
 	
 	makeViews { |bounds|
 		var margin = 0@0, gap = 4@4;
@@ -80,7 +80,7 @@ UMapGUI : UGUI {
 		
 		StaticText( header, labelWidth @ viewHeight )
 			.applySkin( RoundView.skin )
-			.font_( boldFont )
+			//.font_( boldFont )
 			.string_( unit.unitArgName.asString )
 			.align_( \right );
 
