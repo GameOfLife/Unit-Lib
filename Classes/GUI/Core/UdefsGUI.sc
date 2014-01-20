@@ -22,8 +22,8 @@ UdefsGUI {
 		} {
 			bounds = bounds ? Rect(
 				Window.screenBounds.width - 505, 
-				Window.screenBounds.height - 550, 
-				400, 400
+				Window.screenBounds.height - 750, 
+				400, 600
 			);
 		};
 		
