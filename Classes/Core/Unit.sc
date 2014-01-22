@@ -351,13 +351,14 @@ Udef : GenericDef {
 		^Synth( this.synthDefName, unit.getArgsFor( target, startPos ), target, \addToTail );
 	}
 	
-	setSpec { |name, spec, mode, constrainDefault = true|
+	setSpec { |name, spec, mode, constrainDefault = true, private|
 		var asp;
 		asp = this.getArgSpec(name);
 		if( asp.notNil ) { 
-			asp.spec = spec.asSpec;
+			if( spec.notNil ) { asp.spec = spec.asSpec; };
 			if( mode.notNil ) { asp.mode = mode; };
 			if( constrainDefault ) { asp.constrainDefault };
+			if( private.notNil ) { asp.private = private };
 		};
 	}
 	
