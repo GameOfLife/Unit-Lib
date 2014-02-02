@@ -16,7 +16,7 @@ part of the Unit lib default UMapDefs set
 
 UMapDef( \slew, { |value = 0.0, timeUp = 0.0, timeDown = 0.0|
 	UMapOut.kr( Slew.kr( value, 1/timeUp, 1/timeDown ));
-}).mappedArgs_([ \env ])
+})
 .setSpec( \timeUp, [0,10,\lin].asSpec )
 .setSpec( \timeDown, [0,10,\lin].asSpec )
 .mappedArgs_([ \value ])
