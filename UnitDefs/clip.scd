@@ -38,7 +38,7 @@ Udef( \clip, { |scale = 1, offset = 0, clip = 1, clipMode = 0, clipSoftness = 0.
 	sig = BHiCut.ar( sig, cutoff.clip(20,20000), 1 );
 	UOut.ar( 0, sig )
 } )
-	.category_( \effect )
+	.category_( \distortion )
 	.setSpec( \scale, [0.25, 4, \exp, 0, 1 ].asSpec )
 	.setSpec( \offset, [-1, 1, \lin, 0, 0 ].asSpec )
 	.setSpec( \clip, \amp.asSpec )
