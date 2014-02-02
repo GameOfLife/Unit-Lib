@@ -33,7 +33,7 @@ UMapDef( \trig_select_8, {
 	});
 	sig = SelectCF.kr( index, values, lag, 0 ).linlin(-1,1,0,1);
 	UMapOut.kr( sig );
-}).category_( \trigger )
+}).category_( \trigger_to_value )
 	.setSpec( \trigger, TriggerSpec() )
 	.setSpec( \reset, TriggerSpec() )
 	.setSpec( \step, [1,8,\lin,1,1].asSpec )

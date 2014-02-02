@@ -41,4 +41,4 @@ UMapDef( \logical, { |a = 0, b = 0, mode = 0, trueValue = 1.0, falseValue = 0.0|
 .setSpec( \b, BoolSpec(false) )
 .setSpec( \mode, ListSpec( [0,1,2,3,4,5], 0, ['and', 'or', 'nand', 'xor', 'a', 'b' ] ) )
 .mappedArgs_([ \trueValue, \falseValue ])
-.category_( 'trigger' )
+.category_( 'trigger_test' )

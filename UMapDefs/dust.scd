@@ -20,4 +20,4 @@ UMapDef( \dust, { |density = 20, range = #[0.0,1.0]|
 })
 	.setSpec( \density, [1,1000,\exp, 0, 20].asSpec )
 	.mappedArgs_( [ \range ] )
-	.category_( 'trigger' )
+	.category_( 'trigger_utility' )

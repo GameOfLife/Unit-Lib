@@ -22,4 +22,4 @@ UMapDef( \greater_than, { |a = 0.0, b = 0.5, trueValue = 1.0, falseValue = 0.0|
 	UMapOut.kr( output );
 })
 .mappedArgs_([ \trueValue, \falseValue ])
-.category_( 'trigger' )
+.category_( 'trigger_test' )

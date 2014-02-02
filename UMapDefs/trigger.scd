@@ -25,4 +25,4 @@ UMapDef( \trigger, {
 })
 .mappedArgs_([ \range ])
 .setSpec( \trigger, TriggerSpec() )
-.category_( 'trigger' )
+.category_( 'trigger_utility' )
