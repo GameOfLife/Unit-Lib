@@ -138,6 +138,8 @@ UChain : UEvent {
 		
 		prepareTasks = [];
 		
+		units.do(_.uchainInit( this ));
+		
 		this.changed( \init );
 	}
 

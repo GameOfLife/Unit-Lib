@@ -96,6 +96,7 @@ Udef : GenericDef {
 	var <>canUseUMap = true;
 	var <>showOnCollapse = #[ value ];
 	var <>prepareArgsFunc;
+	var <>uchainInitFunc;
 	
 	*initClass{
 		defsFolders = [ 
@@ -521,6 +522,10 @@ U : ObjectWithArgs {
 	}
 	allKeys { ^this.keys }
 	allValues { ^this.values }
+	
+	uchainInit { |chain|
+		this.def !? { |d| d.uchainInitFunc.value( this, chain ) };
+	}
 	
 	guiCollapsed_ { |bool = false|
 		if( guiCollapsed != bool ) {
