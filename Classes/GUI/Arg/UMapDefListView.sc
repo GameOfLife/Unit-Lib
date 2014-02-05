@@ -132,6 +132,11 @@ UMapDefListView {
             
             views[ cat ].background = UMapGUI.color;
             
+            // temporary hack to make point and trigger sub-categories stick out
+            if( cat.asString.find("point").notNil or: { cat.asString.find("trigger").notNil } ) {
+	            views[ cat ].background = UMapGUI.color.blend( Color.gray(0.5,0.75), 0.33 );
+            };
+            
             views[ cat ].button.background = nil;
 
             views[ cat ].addFlowLayout( 0@0, 4@4 );
