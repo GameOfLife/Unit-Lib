@@ -3,7 +3,6 @@
 
 A median filter, effectively removing spikes from incoming values by calculating the median value of a number of samples (length).
 
-value: the value upon which the median is applied (this can be another UMap as well)
 length: length of the median window
 amount: mix between original signal and filtered signal (0-1)
 residue: (boolean) if true the unit will output the difference between the original input signal and the output signal.

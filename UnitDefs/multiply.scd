@@ -4,14 +4,13 @@
 A simple amplitude multiplication Udef.
 
 mul: amplitude multiplication value (can be UMap)
-numChannels: number of channels
 
 --
 this is an Udef definition file
 part of the Unit lib default Udefs set
 */
 
-Udef( \multiply, { |mul = 1, lag = 0|
+Udef( \multiply, { |mul = 1|
 	var in;
 	in = UIn.ar(0, 1 );
 	in = in * mul;
