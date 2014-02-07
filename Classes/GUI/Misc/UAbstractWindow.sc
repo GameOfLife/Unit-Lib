@@ -38,6 +38,12 @@ UAbstractWindow {
         };
     }
 
+	close {
+        if( window.isClosed.not ) {
+         window.close;
+        };
+    }
+
     addToAll {
         allDict[this.class] = allDict[this.class].asCollection.add( this );
     }
