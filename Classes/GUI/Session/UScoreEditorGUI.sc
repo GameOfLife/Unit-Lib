@@ -24,6 +24,7 @@ UScoreEditorGUI : UAbstractWindow {
 	var <>scoreView, <tranportBar, topBar;
 	var <usessionMouseEventsManager;
 	var <scoreController;
+	var <>askForSave = true;
 
 	//*initClass { UI.registerForShutdown({ scoreEditor.askForSave = false }); }
 
@@ -107,7 +108,7 @@ UScoreEditorGUI : UAbstractWindow {
             scoreView.remove;
             tranportBar.remove;
             {
-                if( (this.score.events.size != 0) && (this.score.isDirty) ) {
+                if( (this.score.events.size != 0) && (this.score.isDirty) && askForSave ) {
                     SCAlert( "Do you want to save your score? (" ++ this.score.name ++ ")" ,
                         [ [ "Don't save" ], [ "Cancel" ], [ "Save" ],[ "Save as"] ],
                         [ 	nil,
