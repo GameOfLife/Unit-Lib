@@ -868,7 +868,7 @@
 			labelWidth = 0;
 		};
 		
-		vws[ \objectLabel ] = StaticText( view,�
+		vws[ \objectLabel ] = StaticText( view,
 			(bounds.width-(labelWidth + 2) - 42) @ (bounds.height) 
 		).applySkin( RoundView.skin ).background_( Color.gray(0.8) );
 			
