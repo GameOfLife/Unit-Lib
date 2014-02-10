@@ -44,7 +44,7 @@ defs = [
 	}, addToAll: false)
 		.setSpec( \value, spec )
 		.setSpec( \range, spec.asControlSpec.asRangeSpec )
-		.setSpec( \id, IntegerSpec( 0, 0, 99 ) );
+		.setSpec( \id, PositiveIntegerSpec( 0, 0, 99 ) );
 });
 
 def = MultiUdef( \shared_value, defs, \utility, \type, false );
