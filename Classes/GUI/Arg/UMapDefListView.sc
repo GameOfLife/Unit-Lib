@@ -124,6 +124,8 @@ UMapDefListView {
 		};
 
 		g = { |cat, udefs|
+            if( cat !== \private ) {
+            
             views[ cat ] = ExpandView( views[ \scrollview ],
                 (bounds.width - (scrollerMargin+6))@( (udefs.size + 1) * 22 ),
                 (bounds.width - (scrollerMargin+6))@18,
@@ -187,6 +189,7 @@ UMapDefListView {
             	.collapseAction_({ collapsed[ cat ] = true })
             	.hideOutside;
             
+            };
         };
 
 		RoundView.useWithSkin( UChainGUI.skin ++ (RoundView.skin ? ()), {
