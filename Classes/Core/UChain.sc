@@ -138,7 +138,7 @@ UChain : UEvent {
 		
 		prepareTasks = [];
 		
-		units.copy.do(_.uchainInit( this ));
+		units.reverse.do(_.uchainInit( this ));
 		
 		this.changed( \init );
 	}
