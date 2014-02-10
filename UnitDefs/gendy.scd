@@ -26,7 +26,6 @@ initCPs: Initialise the number of control points in the memory. Xenakis specifie
 knum: Current number of utilised control points (can be modulated).
 
 amp: the amplitude of the signal (0-1).
-lag: smoothing time for various parameters.
 seed: random seed (positive whole number). The same seed will always result in exactly the same signal on any computer. If you want different signals for different UChains that play at the same moment, use different seeds.
 
 --
@@ -34,12 +33,9 @@ this is an Udef definition file
 part of the Unit lib default Udefs set
 */
 
-Udef( \gendy, { |ampdist = 1, durdist = 1, adparam = 1, ddparam = 1, freq = #[290,590], ampscale = 0.5, durscale = 0.5, initCPs = 12, knum = 12, amp = 0.1, lag = 0, seed = 12345|
+Udef( \gendy, { |ampdist = 1, durdist = 1, adparam = 1, ddparam = 1, freq = #[290,590], ampscale = 0.5, durscale = 0.5, initCPs = 12, knum = 12, amp = 0.1, seed = 12345|
 	var sig;
 	URandSeed.ir(seed);
-	
-	#adparam, ddparam, freq, ampscale, durscale, amp = 
-		[ adparam, ddparam, freq, ampscale, durscale, amp ].collect(_.lag(lag));
 		
 	freq[1] = freq[1].min( SampleRate.ir / knum );
 		

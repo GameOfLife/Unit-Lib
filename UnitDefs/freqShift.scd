@@ -5,17 +5,16 @@ freqShift implements single sideband amplitude modulation, also known as frequen
 
 freq: the amount of shifting (Hz)
 phase: phase of the freq shift (radians)
-lag: smoothing time (s) for all controls
 
 --
 this is an Udef definition file
 part of the Unit lib default Udefs set
 */
 
-Udef( \freqShift, { |freq = 0, phase = 0, lag = 0.0|
+Udef( \freqShift, { |freq = 0, phase = 0|
 	var sig;
 	sig = UIn.ar( 0, 1 );
-	sig = FreqShift.ar( sig, freq.lag(lag), phase.lag(lag) );
+	sig = FreqShift.ar( sig, freq, phase );
 	UMixOut.ar(0, sig );
 })	
 	.category_( \effect )

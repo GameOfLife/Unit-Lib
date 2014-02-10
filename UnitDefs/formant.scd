@@ -7,16 +7,15 @@ freq: frequency (Hz)
 fromant: frequency of the formant (Hz)
 bw: bandwidth of the formant as multiplier of the freq
 amp: amplitude (0-1)
-lag: smoothing time for all parameters
 
 --
 this is an Udef definition file
 part of the Unit lib default Udefs set
 */
 
-Udef( \formant, { |freq = 440, formant = 1760, bw = 2, amp = 0.1, lag = 0|
+Udef( \formant, { |freq = 440, formant = 1760, bw = 2, amp = 0.1|
 	var sig;
-	sig = Formant.ar( freq.lag( lag ), formant.lag( lag ), (bw * freq).lag(lag), amp.lag( lag ) );
+	sig = Formant.ar( freq, formant, (bw * freq), amp );
 	UMixOut.ar( 0, sig, 0, true ) 
 } ).category_( \oscillator )
 	.setSpec( \freq, FreqSpec( 2, 20000 ) )

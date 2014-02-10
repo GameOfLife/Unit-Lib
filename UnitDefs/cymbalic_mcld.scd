@@ -13,7 +13,7 @@ this is an Udef definition file
 part of the Unit lib default Udefs set
 */
 
-Udef(\cymbalic_mcld,{ |decay = 10, ratio = 1, amp = 0.1, lag = 0, seed = 12345|
+Udef(\cymbalic_mcld,{ |decay = 10, ratio = 1, amp = 0.1, seed = 12345|
 	var lodriver, locutoffenv, hidriver, hicutoffenv, freqs, res, thwack;
 	
 	URandSeed.ir( seed ); // always the same sound
@@ -27,7 +27,7 @@ Udef(\cymbalic_mcld,{ |decay = 10, ratio = 1, amp = 0.1, lag = 0, seed = 12345|
 	
 	thwack = EnvGen.ar(Env.perc(0.001,0.001,1));
 	
-	freqs  = ExpRand( 300.dup(100), 20000 ) * ratio.lag( lag );
+	freqs  = ExpRand( 300.dup(100), 20000 ) * ratio;
 	
 	res = Ringz.ar(lodriver + hidriver + thwack, freqs).mean;
 		
@@ -36,5 +36,4 @@ Udef(\cymbalic_mcld,{ |decay = 10, ratio = 1, amp = 0.1, lag = 0, seed = 12345|
 }).category_( \synthesis )
 	.setSpec( \decay, [2.5,100,\exp, 0, 10].asSpec, \init )
 	.setSpec( \ratio, [0.25, 4, \exp, 0, 1].asSpec )
-	.setSpec( \lag, [0,1,\lin].asSpec )
 	.setSpec( \seed, PositiveIntegerSpec(12345) );

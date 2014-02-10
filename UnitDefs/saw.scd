@@ -6,15 +6,13 @@ http://en.wikipedia.org/wiki/Sawtooth_wave
 
 freq: frequency (Hz)
 amp: amplitude (0-1)
-lag: smoothing time for all parameters
 
 --
 this is an Udef definition file
 part of the Unit lib default Udefs set
 */
 
-Udef( \saw, { |freq = 440, amp = 0.1, lag = 0|
-	UMixOut.ar( 0, Saw.ar( freq.lag( lag ), amp.lag( lag ) ), 0, true ) 
+Udef( \saw, { |freq = 440, amp = 0.1|
+	UMixOut.ar( 0, Saw.ar( freq, amp ), 0, true ) 
 } ).category_( \oscillator )
-	.setSpec( \freq, FreqSpec( 2, 20000 ) )
-	.setSpec( \lag, [0,1,\lin].asSpec );
+	.setSpec( \freq, FreqSpec( 2, 20000 ) );
