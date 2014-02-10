@@ -191,6 +191,7 @@
 							vws[ \val ] = vw.value;
 							vws[ \range ] = [ vws[ \val ].minItem, vws[ \val ].maxItem ];
 							vws[ \setRangeSlider ].value;
+							vws[ \setMeanSlider ].value;
 							action.value( vws, vws[ \val ] );
 						});
 						
@@ -302,6 +303,7 @@
 				};
 				vws[ \val ] = this.map( values );
 				vws[ \setPlotter ].value;
+				vws[ \setMeanSlider ].value;
 				action.value( vws, vws[ \val ] ); 
 			}
 		);
@@ -314,6 +316,45 @@
 		};
 		
 		vws[ \setRangeSlider ].value;
+		
+		vws[ \meanSlider ] = SmoothSlider( 
+			vws[ \rangeSlider ].rangeSlider.parent, 
+			vws[ \rangeSlider ].rangeSlider.bounds.insetAll(0,0,0,
+				vws[ \rangeSlider ].rangeSlider.bounds.height * 0.6 )
+		)
+			.hiliteColor_( nil )
+			.background_( Color.white.alpha_(0.125) )
+			.knobSize_(0.6)
+			.mode_( \move )
+			.action_({ |sl|
+				var values, min, max, mean;
+				values = this.unmap( vws[ \val ] );
+				min = values.minItem;
+				max = values.maxItem;
+				mean = [ min, max ].mean;
+				values = values.normalize( *(([ min, max ] - mean) + sl.value).clip(0,1) );
+				vws[ \val ] = this.map( values );
+				vws[ \setPlotter ].value;
+				vws[ \setRangeSlider ].value;
+				action.value( vws, vws[ \val ] );
+			});
+		
+		vws[ \meanSlider ].mouseDownAction = { |sl, x,y,mod, xx, clickCount|
+			if( clickCount == 2 ) {
+				vws[ \val ] = this.map( sl.value ) ! vws[ \val ].size;
+				vws[ \setRangeSlider ].value;
+				vws[ \setPlotter ].value;
+			};
+		};
+		
+		vws[ \setMeanSlider ] = {
+			var min, max;
+			min = vws[ \val ].minItem;
+			max = vws[ \val ].maxItem;
+			vws[ \meanSlider ].value_( this.unmap( [ min, max ] ).mean );
+		};
+		
+		vws[ \setMeanSlider ].value;
 		
 		if( GUI.id === \qt ) { optionsWidth = 80; operationsOffset = 0; };
 		
@@ -352,10 +393,12 @@
 		
 		vws[ \update ] = {
 			vws[ \setRangeSlider ].value;
+			vws[ \setMeanSlider ].value;
 			vws[ \setPlotter ].value;
 		};
 		
 		vws[ \rangeSlider ].view.resize_(2);
+		vws[ \meanSlider ].resize_(2);
 		vws[ \options ].resize_(3);
 			
 		view.view.onClose_({
