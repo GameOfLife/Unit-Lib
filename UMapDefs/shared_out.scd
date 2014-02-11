@@ -26,4 +26,4 @@ UMapDef( \shared_out, { |value = 0.0, id = 0, range = #[0,1]|
 })
 	.mappedArgs_([ \value, \range ])
 	.setSpec( \id, PositiveIntegerSpec( 0, 0, 99 ) )
-	.category_( 'utility' );
+	.category_( 'shared_io' );

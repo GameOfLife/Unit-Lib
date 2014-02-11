@@ -46,4 +46,4 @@ UMapDef( \shared_in, { |id = 0, range = #[0.0, 1.0], curve = 0.0, invert = 0, cl
 	.setSpec( \clipSoftness, [0,1,\lin,0,0].asSpec )
 	.setSpec( \curve, [-16,16,\lin,0,0].asSpec )
 	.setSpec( \invert, BoolSpec(false) )
-	.category_( 'utility' );
+	.category_( 'shared_io' );
