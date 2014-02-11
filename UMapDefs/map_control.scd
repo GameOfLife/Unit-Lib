@@ -50,5 +50,5 @@ UMapDef( \map_control, { |bus = 0, fromRange = #[0.0, 1.0], toRange = #[0.0,1.0]
 	.setSpec( \curve, [-16,16,\lin,0,0].asSpec )
 	.setSpec( \bus, PositiveIntegerSpec(0,0,32) )
 	.mappedArgs_([ \toRange ])
-	.category_(\input)
+	.category_(\private)
 

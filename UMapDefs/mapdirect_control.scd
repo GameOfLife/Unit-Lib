@@ -16,4 +16,4 @@ FuncUMapDef( \mapdirect_control, { |unit, bus = 0|
 	.valueIsMapped_( false )
 	.setSpec( \value, MapSpec() )
 	.setSpec( \bus, PositiveIntegerSpec(0,0,31) )
-	.category_( 'input' )
+	.category_( 'private' )
