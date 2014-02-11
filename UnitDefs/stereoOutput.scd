@@ -18,12 +18,12 @@ this is an Udef definition file
 part of the Unit lib default Udefs set
 */
 
-Udef( \stereoOutput, { |bus = 0, point = #[0,0], dbRollOff = (-6), speakerRadius = 0.3, lag = 2|
+Udef( \stereoOutput, { |bus = 0, point = #[0,0], dbRollOff = (-6), speakerRadius = 0.3|
 	var sig, panned, pankr, polar, angle, amp;
 	
 	sig = UIn.ar( 0 );
-	speakerRadius = speakerRadius.lag(lag);
-	point = if( Line.kr(2,0,lag * 2).min( 1 ), point, LPFLag.kr( point, lag ) ).asPoint;
+	speakerRadius = speakerRadius;
+	point = point.asPoint;
 	panned = VirtualMics.ar( [ speakerRadius.neg @ 0,  speakerRadius @ 0 ], sig, point, dbRollOff );
 	polar = point.asPolar;
 	angle = polar.angle.fold(0,pi).linlin(0,pi,1,-1,\none);
@@ -37,5 +37,4 @@ Udef( \stereoOutput, { |bus = 0, point = #[0,0], dbRollOff = (-6), speakerRadius
 	.setSpec( \bus, PositiveIntegerSpec( 0 ) )
 	.setSpec( \point, PointSpec( 200, step: 0.1 ) )
 	.setSpec( \dbRollOff,  [-24, 0, \lin, 1, -6 ].asSpec )
-	.setSpec( \speakerRadius, [0,1,\lin,0,0.3].asSpec )
-	.setSpec( \lag, [ 0, 10, 4, 0, 0.1 ].asSpec );
+	.setSpec( \speakerRadius, [0,1,\lin,0,0.3].asSpec );
