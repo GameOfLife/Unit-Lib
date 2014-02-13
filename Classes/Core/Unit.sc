@@ -1165,7 +1165,13 @@ U : ObjectWithArgs {
 }
 
 + Array {
-	asUnit { ^U( this[0], *this[1..] ) }
+	asUnit {
+		^if( this[0].isKindOf(SimpleNumber) ) {
+			UX(this[0], this[1], *this[2..])
+		}{
+			U( this[0], *this[1..] )
+		}
+	}
 	asUnitArg { |unit, key|
 		var umapdef, umap;
 		if( ( this[0].isMemberOf( Symbol ) or: this[0].isKindOf( UMapDef ) ) && { 
