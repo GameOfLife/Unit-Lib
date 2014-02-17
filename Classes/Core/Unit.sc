@@ -125,6 +125,16 @@ Udef : GenericDef {
 		}
 	}
 
+	//Udef.find("pass")
+	*find { |string|
+		string = string.asString;
+		^Udef.all.select{ |x| x.name.asString.find(string, true).notNil }.asArray
+	}
+
+	*open { |symbol|
+		Udef.all.at(symbol).openDefFile
+	}
+
     prGenerateSynthDefName {
        ^this.class.prefix ++ (extraPrefix ? "") ++ this.name.asString
     }
