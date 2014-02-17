@@ -18,7 +18,9 @@ part of the Unit lib default Udefs set
 
 UMapDef( \delay, { |value = 0.0, time = 0.1, timeScale = 1, lag = 0|
 	var delayed;
-	delayed = DelayC.kr( value, timeScale * 2, time.lag3( lag ) * timeScale );
+	time = time.lag3( lag ) * timeScale;
+	delayed = DelayC.kr( value, timeScale * 2, time );
+	delayed = Select.kr( Line.kr(0,1,time) >= 1, [Latch.kr( value, Impulse.kr(0) ), delayed] );
 	UMapOut.kr( delayed )
 } )
 	.category_( \filter )
