@@ -22,7 +22,7 @@ UScoreEditor {
     classvar <clipboard;
 
 	var <score;
-	var <undoStates, <redoStates, maxUndoStates = 40;
+	var <undoStates, <redoStates, maxUndoStates = 3;
 
 	*new { |score|
 		^super.newCopyArgs( score)
