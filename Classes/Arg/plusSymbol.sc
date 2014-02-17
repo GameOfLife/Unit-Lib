@@ -87,8 +87,8 @@ intelligently sense the size of the default, and switch to ControlSpec, RangeSpe
 		^this.kr(default, lag, fixedLag)
 	}
 
-	ukrArgSpec{ |controlDefault, specDefault,  spec, lag, fixedLag = false|
-		Udef.addBuildSpec( ArgSpec(this, specDefault, spec ) );
+	ukrArgSpec{ |controlDefault, specDefault,  spec, private, mode, lag, fixedLag = false|
+		Udef.addBuildSpec( ArgSpec(this, specDefault, spec, private, mode ) );
 		^this.kr(controlDefault, lag, fixedLag)
 	}
 
