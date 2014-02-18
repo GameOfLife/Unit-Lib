@@ -28,12 +28,25 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 	
 	init { |inUnits|
 		var firstDef, defs;
+		var dkey, dval;
 		units = inUnits.asCollection;
 		defs = inUnits.collect(_.def);
 		firstDef = defs[0];
 		if( defs.every({ |item| item == firstDef }) ) {
 			def = firstDef;
-			argSpecs = def.argSpecs.collect({ |argSpec|
+			if( def.isKindOf( MultiUdef ).not or: {
+				dkey = def.defNameKey;
+				dval = units[0].get( dkey );
+				units.every({ |unit|
+					unit.get( dkey ) == dval
+				});
+			}) {	
+				argSpecs = def.argSpecs( inUnits[0] );
+			} {
+				argSpecs = [ def.getArgSpec( dkey, units[0] ) ];
+			};
+			
+			argSpecs = argSpecs.collect({ |argSpec|
 				var values, massEditSpec, value;
 				values = units.collect({ |unit|
 					unit.get( argSpec.name );
@@ -45,11 +58,12 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 					massEditSpec = argSpec.spec.massEditSpec( values );
 				};
 				if( massEditSpec.notNil ) {
-					ArgSpec( argSpec.name, massEditSpec.default, massEditSpec, argSpec.private, argSpec.mode ); 
+					ArgSpec( argSpec.name, massEditSpec.default, massEditSpec,
+						argSpec.private, argSpec.mode ); 
 				} {
 					nil;
 				};
-			}).select(_.notNil);
+			}).select(_.notNil);	
 			args = argSpecs.collect({ |item| [ item.name, item.default ] }).flatten(1);
 			this.changed( \init );
 		} {
