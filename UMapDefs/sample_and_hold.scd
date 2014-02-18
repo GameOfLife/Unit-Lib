@@ -15,8 +15,10 @@ part of the Unit lib default UMapDefs set
 */
 
 UMapDef( \sample_and_hold, {
-	var output;
-	output = Latch.kr( \value.kr(0.0), \trigger.tr );
+	var value, trigger, output;
+	value = \value.kr(0.0);
+	trigger = \trigger.tr;
+	output = Select.kr( Peak.kr( trigger ), [ DC.kr( value ), Latch.kr( value, trigger ) ] );
 	output = output.varlag( \time.kr(0.0) );
 	UMapOut.kr( output );
 })
