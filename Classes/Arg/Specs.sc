@@ -195,7 +195,11 @@ BoolSpec : Spec {
 	}
 	
 	constrain { |value|
-		^value.booleanValue;
+		if( value.size == 0 ) { 
+			^value.booleanValue;
+		} {
+			^value.mean.booleanValue;
+		};
 	}
 	
 	default_ { |value| 
