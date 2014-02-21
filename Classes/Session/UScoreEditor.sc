@@ -20,6 +20,7 @@
 UScoreEditor {
 
     classvar <clipboard;
+    classvar <>enableUndo = false;
 
 	var <score;
 	var <undoStates, <redoStates, maxUndoStates = 3;
@@ -74,13 +75,13 @@ UScoreEditor {
 
 	//--UNDO/REDO--
 	storeUndoState {
-
-		redoStates = List.new;
-		undoStates.add( score.events.collect( _.duplicate ) );
-		if(undoStates.size > maxUndoStates) {
-			undoStates.removeAt(0);
-		}
-
+		if( enableUndo ) {	
+			redoStates = List.new;
+			undoStates.add( score.events.collect( _.duplicate ) );
+			if(undoStates.size > maxUndoStates) {
+				undoStates.removeAt(0);
+			}
+		};
 	}
 
 	undo {
