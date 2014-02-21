@@ -35,7 +35,7 @@ UScoreView {
      var <currentScoreEditorController, <scoreController, <eventControllers = #[];
      var <tempoMapControllers;
      
-     var <updateTask, calledUpdate = false, <>updateInterval = 0.1;
+     var <updateTask, calledUpdate = false, <>updateInterval = 0.2;
      var <showTempoMap = false;
      
      var <followPos = false;
