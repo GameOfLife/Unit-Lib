@@ -48,8 +48,8 @@ UScoreEditorGui_TopBar {
     addScoreEditorController{
 
         var checkUndo = {
-            views[\redo].enabled_(this.scoreEditor.redoStates.size != 0);
-            views[\undo].enabled_(this.scoreEditor.undoStates.size != 0);
+            views[\redo].enabled_(this.scoreEditor.redoSize != 0);
+            views[\undo].enabled_(this.scoreEditor.undoSize != 0);
         };
         if(scoreEditorController.notNil) {
                 scoreEditorController.remove;
@@ -67,8 +67,8 @@ UScoreEditorGui_TopBar {
     }
 
     resetUndoRedoButtons{
-        views[\redo].enabled_(this.scoreEditor.redoStates.size != 0);
-        views[\undo].enabled_(this.scoreEditor.undoStates.size != 0);
+        views[\redo].enabled_(this.scoreEditor.redoSize != 0);
+        views[\undo].enabled_(this.scoreEditor.undoSize != 0);
     }
 
     selectedEvents{

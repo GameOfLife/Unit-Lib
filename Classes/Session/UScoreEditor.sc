@@ -20,10 +20,10 @@
 UScoreEditor {
 
     classvar <clipboard;
-    classvar <>enableUndo = false;
+    classvar <>enableUndo = true;
 
 	var <score;
-	var <undoStates, <redoStates, maxUndoStates = 3;
+	var <undoStates,  maxUndoStates = 10, <undoPos = 0, <undoSize = 0, <redoSize = 0;
 
 	*new { |score|
 		^super.newCopyArgs( score)
@@ -31,8 +31,7 @@ UScoreEditor {
 	}
 
 	init {
-		undoStates = List.new;
-		redoStates = List.new;
+		undoStates = Array.newClear( maxUndoStates );
 	}
 
 	*initClass {
@@ -74,38 +73,47 @@ UScoreEditor {
     }
 
 	//--UNDO/REDO--
+	clearUndo {
+		undoStates = Array.newClear( maxUndoStates );
+		undoPos = 0;
+		undoSize = 0;
+		redoSize = 0;
+		this.changed(\something);
+	}
+	
 	storeUndoState {
 		if( enableUndo ) {	
-			redoStates = List.new;
-			undoStates.add( score.events.collect( _.duplicate ) );
-			if(undoStates.size > maxUndoStates) {
-				undoStates.removeAt(0);
-			}
+			undoStates.wrapPut( undoPos, score.events.collect( _.duplicate ) );
+			undoPos = undoPos + 1;
+			undoSize = (undoSize + 1).min( maxUndoStates );
+			redoSize = 0;
 		};
 	}
 
 	undo {
-
-		if(undoStates.size > 0) {
-			redoStates.add(score.events);
-			score.events = undoStates.pop;
+		if( undoSize > 0 ) {
+			undoStates.wrapPut( undoPos, score.events );
+			undoPos = undoPos - 1;
+			score.events = undoStates.wrapAt( undoPos ) ?? { "empty".postln; [] };
+			undoSize = (undoSize - 1).max(0);
+			redoSize = (redoSize + 1).min(maxUndoStates);
+			score.changed(\numEventsChanged);
+			score.changed(\something);
+			this.changed(\undo);
 		};
-		score.changed(\numEventsChanged);
-		score.changed(\something);
-		this.changed(\undo);
-
 	}
 
 	redo {
-
-		if( redoStates.size > 0 ) {
-			undoStates.add(score.events);
-			score.events = redoStates.pop;
+		if( redoSize > 0 ) {
+			undoStates.wrapPut( undoPos, score.events );
+			undoPos = undoPos + 1;
+			score.events = undoStates.wrapAt( undoPos ) ?? { "empty".postln; [] };
+			undoSize = (undoSize + 1).min(maxUndoStates);
+			redoSize = (redoSize - 1).max(0);
+			score.changed(\numEventsChanged);
+			score.changed(\something);
+			this.changed(\redo);
 		};
-		score.changed(\numEventsChanged);
-		score.changed(\something);
-		this.changed(\redo);
-
 	}
 
 	//--EVENT MANAGEMENT--
