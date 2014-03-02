@@ -85,7 +85,7 @@ UMarker : UEvent {
 	fromPreset { |name| ^presetManager.apply( name, this ); }
 	
 	start { |target, startPos = 0, latency| 
-		if( startPos == 0 ) { action.value( this, this.score ); }
+		if( startPos == 0 ) { action.value( this, this.score ); this.score = nil; }
 	}
 	
 	prepare { |target, startPos = 0, action| action.value( this ) }
@@ -96,13 +96,13 @@ UMarker : UEvent {
 	preparedServers {^[] }
 	getAllUChains { ^[] }
 	
-	stop { }
-	release { }
+	stop { this.score = nil; }
+	release { this.score = nil;  }
 	
 	mute { }
 	unmute { }
 	
-	dispose { }
+	dispose { this.score = nil; }
 	
 	releaseSelf { ^true }
 	releaseSelf_ { "%:releaseSelf - can't use releaseSelf\n".postf( this.class ) }
