@@ -48,12 +48,8 @@ UScoreEditorGui_TopBar {
     addScoreEditorController{
 
         var checkUndo = {
-            if( this.scoreEditor.undoStates.size != 0 ) {
-                views[\undo].enabled_(true)
-            };
-            if( this.scoreEditor.redoStates.size != 0 ) {
-                views[\redo].enabled_(true)
-            }
+            views[\redo].enabled_(this.scoreEditor.redoStates.size != 0);
+            views[\undo].enabled_(this.scoreEditor.undoStates.size != 0);
         };
         if(scoreEditorController.notNil) {
                 scoreEditorController.remove;
