@@ -46,29 +46,29 @@ UScoreEditorGui_TopBar {
     }
 
     addScoreEditorController{
-
-        var checkUndo = {
-            views[\redo].enabled_(this.scoreEditor.redoSize != 0);
-            views[\undo].enabled_(this.scoreEditor.undoSize != 0);
-        };
+	    
         if(scoreEditorController.notNil) {
                 scoreEditorController.remove;
         };
         scoreEditorController = SimpleController( scoreView.currentEditor );
-		scoreEditorController.put(\undo, { checkUndo.value });
-        scoreEditorController.put(\redo, { checkUndo.value });
+        scoreEditorController.put(\undo, { this.resetUndoRedoButtons });
+        scoreEditorController.put(\redo, { this.resetUndoRedoButtons });
 
         if( scoreController.notNil ) {
 	        scoreController.remove;
 	    };
         scoreController = SimpleController( scoreView.currentScore );
-        scoreController.put(\something, { checkUndo.value });
+        scoreController.put(\something, { this.resetUndoRedoButtons });
 
     }
 
     resetUndoRedoButtons{
-        views[\redo].enabled_(this.scoreEditor.redoSize != 0);
-        views[\undo].enabled_(this.scoreEditor.undoSize != 0);
+        views[\redo]
+            	.enabled_(this.scoreEditor.redoSize != 0)
+            	.stringColor_( Color.gray( [0.5,0][ UScoreEditor.enableUndo.binaryValue ] ) );
+        views[\undo]
+            	.enabled_(this.scoreEditor.undoSize != 0)
+            	.stringColor_( Color.gray( [0.5,0][ UScoreEditor.enableUndo.binaryValue ] ) );
     }
 
     selectedEvents{
@@ -148,10 +148,12 @@ UScoreEditorGui_TopBar {
  			.canFocus_(false)
 			.radius_( 0 )
 			.font_( Font( font.name, 10 ).boldVariant )
-			.radius_([8,0,0,8])
+			.radius_([9,0,0,9])
 			.action_({
 				this.selectedEventsOrAll !? { |x| this.scoreEditor.trimEventsStartAtPos( x ) }
 			});
+		
+		header.decorator.shift(-1);
 
 		SmoothButton( header, size@size  )
 			.states_( [[ "|", Color.black, Color.clear ]] )
@@ -161,11 +163,13 @@ UScoreEditorGui_TopBar {
 			.action_({
 				this.selectedEventsOrAll !? { |x| this.scoreEditor.splitEventsAtPos( x ) }
 			});
+			
+		header.decorator.shift(-1);
 
 		SmoothButton( header, size@size  )
 			.states_( [[ "]", Color.black, Color.clear ]] )
 			.canFocus_(false)
-			.radius_([0,8,8,0])
+			.radius_([0,9,9,0])
 			.font_( Font( font.name, 10 ).boldVariant )
 			.action_({
 			    this.selectedEventsOrAll !? { |x| this.scoreEditor.trimEventsEndAtPos( x ) }
@@ -173,22 +177,49 @@ UScoreEditorGui_TopBar {
 
 		header.decorator.shift(10);
 
-		views[\undo] = SmoothButton( header, size@size )
+		views[\undo] = SmoothButton( header, (size * 0.8)@size )
 			.states_( [[ 'arrow_pi' ]] )
+			.radius_( [1,0,0,1] * (size/2) )
 			.canFocus_(false)
 			.enabled_(false)
+			.stringColor_( Color.gray( [0.5,0][ UScoreEditor.enableUndo.binaryValue ] ) )
 			.action_({
 				this.scoreEditor.undo
 			});
+			
+		header.decorator.shift(-1);
 
-		views[\redo] = SmoothButton( header, size@size )
+		views[\redo] = SmoothButton( header, (size * 0.8)@size )
 			.states_( [[ 'arrow' ]] )
+			.radius_( [0,1,1,0] * (size/2) )
 			.canFocus_(false)
 			.enabled_(false)
+			.stringColor_( Color.gray( [0.5,0][ UScoreEditor.enableUndo.binaryValue ] ) )
 			.action_({
 				this.scoreEditor.redo
 			});
 
+		header.decorator.shift(-5);
+		
+		views[ \disableUndo ] = SmoothButton( header, 9@9 )
+			.states_( [ ['+'], ['-'] ] )
+			.hiliteColor_( nil )
+			.value_( UScoreEditor.enableUndo.binaryValue )
+			.canFocus_(false)
+			.action_({ |bt|
+				switch( bt.value,
+					1, { 
+						UScoreEditor.enableUndo = true; 
+						this.scoreEditor.changed( \undo );
+					},
+					0, { 
+						UScoreEditor.enableUndo = false;
+						this.scoreEditor.clearUndo;
+						this.scoreEditor.changed( \undo );
+					}
+				);  
+			});
+		
 		header.decorator.shift(10);
 
 		SmoothButton( header, size@size  )
