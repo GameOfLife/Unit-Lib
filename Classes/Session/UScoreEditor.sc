@@ -83,7 +83,7 @@ UScoreEditor {
 	
 	storeUndoState {
 		if( enableUndo ) {	
-			undoStates.wrapPut( undoPos, score.events.collect( _.duplicate ) );
+			undoStates.wrapPut( undoPos, score.events.collect( _.copy ) );
 			undoPos = undoPos + 1;
 			undoSize = (undoSize + 1).min( maxUndoStates );
 			redoSize = 0;
