@@ -56,7 +56,7 @@ defs = [
 		.setSpec( \hi_id, PositiveIntegerSpec( 1, 0, 99 ) );
 });
 
-def = MultiUdef( \shared_value, defs, \utility, \type, false );
+def = MultiUdef( \shared_value, defs, \shared_io, \type, false );
 
 def
 )
