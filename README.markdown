@@ -23,7 +23,7 @@ The library comes with a comprehensive set of GUI's that allow for manipulation 
 
 ## System Requirements ##
 
- - SuperCollider 3.5
+ - SuperCollider 3.5 or higher
  - PopUpTreeMenu quark (only required for Qt)
  - VectorSpace quark
  - wslib quark
