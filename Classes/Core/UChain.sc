@@ -42,6 +42,7 @@ UChain : UEvent {
 	var <>addAction = \addToHead;
 	var <>global = false;
 	var <>ugroup;
+	var <>parentUGroup;
 	var <>handlingUndo = false;
 	
 	var <lastTarget;
@@ -701,7 +702,7 @@ UChain : UEvent {
 		});
 		//cpu = this.apxCPU;
 		target = target.collect({ |tg|
-			tg = UGroup.start( ugroup, tg, this );
+			tg = UGroup.start( ugroup, tg, this, parentUGroup );
 			tg = tg.asTarget;
 			tg.server.loadBalancerAddLoad(this.apxCPU(tg));
 			tg;
