@@ -56,7 +56,7 @@ UScoreEditorGUI : UAbstractWindow {
 	}
 
     init { |inScoreEditor|
-        scoreEditor = if(inScoreEditor.class == UScore) {
+		scoreEditor = if(inScoreEditor.isKindOf(UScore)) {
             UScoreEditor(inScoreEditor)
         } {
             inScoreEditor;
