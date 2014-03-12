@@ -4,20 +4,22 @@ UGroup {
 	var <>id;
 	var <>groups;
 	var <>children;
+	var <>parent;
+	var <>addAction = \addToHead;
 	
-	*new { |id = \default| // only returns new object if doesn't exist
+	*new { |id = \default, parent| // only returns new object if doesn't exist
 		var result;
 		result = all.detect({ |item| item.id === id });
-		^result ?? { this.basicNew( id ) };
+		^this.get(id) ?? { this.basicNew( id, parent ) };
 	}
 	
-	*basicNew { |id = \default|
-		^super.new.id_( id ).addToAll;
+	*basicNew { |id = \default, parent|
+		^super.new.id_( id ).parent_(parent).addToAll;
 	}
 	
-	*start { |id, targets, obj|
+	*start { |id, targets, obj, parent|
 		if( id.notNil ) {
-			^this.new( id ).start( targets, obj );
+			^this.new( id, parent ).start( targets, obj );
 		} {
 			^targets;
 		};
@@ -29,6 +31,10 @@ UGroup {
 		});
 	}
 	
+	*get { |id|
+		^all.detect({ |item| item.id === id })
+	}
+
 	start { |targets, obj|
 		var grps;
 		grps = this.makeIfEmpty( targets );
@@ -39,6 +45,7 @@ UGroup {
 	end { |obj|
 		this.removeChild( obj );
 		this.freeIfEmpty;
+		parent !? { UGroup.get(parent) !? { |x| x.end(this) } };
 	}
 	
 	addToAll {
@@ -49,7 +56,7 @@ UGroup {
 	
 	makeGroup { |target|
 		var group;
-		group = Group(target);
+		group = Group(target, addAction);
 		groups = groups.add( group );
 		this.changed( \start );
 		^group;
@@ -79,10 +86,11 @@ UGroup {
 	makeIfEmpty { |targets|
 		var grps;
 		targets = targets.asCollection;
+		if(parent.isNil){
 		if( children.size == 0 ) {
 			grps = targets.collect({ |item|
 				this.makeGroup( item.asTarget );
-			});
+				})
 		} {
 			grps = targets.collect({ |target|
 				groups.detect({ |item|
@@ -95,6 +103,17 @@ UGroup {
 					this.makeGroup( target.asTarget );
 				};
 			});
+			}
+		} {
+			if( children.size == 0 ) {
+				var parentUGroup = UGroup(parent);
+				parentUGroup.start( targets, this );
+				grps = parentUGroup.groups.collect{ |item|
+					this.makeGroup( item.asTarget )
+				}
+			} {
+				grps = groups
+			}
 		};
 		^if( targets.size == 1 ) {
 			grps[0];
