@@ -224,12 +224,31 @@ UdefListView {
 				.radius_(2)
 				.canFocus_(false)
 				.action_({ |bt|
+					var defs;
 					Udef.loadOnInit = false;
-					Udef.loadAllFromDefaultDirectory.collect(_.synthDef).flat.select(_.notNil)
-						.do({ |def|
-							ULib.servers.do({ |srv| def.send( srv ) });
-					});
+					defs = Udef.loadAllFromDefaultDirectory.collect(_.synthDef).flat.select(_.notNil);
 					Udef.loadOnInit = true;
+					ULib.servers.do({ |srv| 
+						if( srv.class == LoadBalancer ) {
+							if( srv.servers[0].isLocal ) {
+								defs.do(_.justWriteDefFile); 
+								srv.servers.do({ |sx|
+									sx.loadDirectory( SynthDef.synthDefDir );
+								});
+							} {
+								srv.servers.do{ |s|
+									defs.do(_.send(s))
+								};
+							};
+						} {
+							if( srv.isLocal ) { 
+								defs.do(_.justWriteDefFile); 
+								srv.loadDirectory( SynthDef.synthDefDir ); 
+							} {
+								defs.do(_.send(srv)); 
+							};
+						};
+					});
 					UnitRack.loadAllFromDefaultDirectory;
 				});
 				
