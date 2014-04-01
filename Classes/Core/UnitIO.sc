@@ -83,12 +83,12 @@ UIn {
 		^([this.key] ++ args).join("_").asSymbol;
 	}
 	
-	*getControl { |mode = \kr, name, what, value, lag|
+	*getControl { |mode = \kr, name, what, value, lag, argMode|
 		var spec;
 		name = (name ++ "_" ++ what).asSymbol;
 		spec = specs[ what.asSymbol ];
 		if( spec.notNil ) {
-			Udef.addBuildSpec( ArgSpec( name, value, specs[ what.asSymbol ], true ) );
+			Udef.addBuildSpec( ArgSpec( name, value, specs[ what.asSymbol ], true, argMode ) );
 		};
 		^name.perform( mode, value, lag );
 	}

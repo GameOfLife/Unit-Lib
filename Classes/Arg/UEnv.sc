@@ -56,7 +56,7 @@ UEnv : UIn {
 		var gate = this.getControl( \kr, name, 'gate', 1 );
 		var mute = this.getControl( \kr, name, 'mute', 0 );
 		var dur = this.getControl( \kr, name, 'dur', inf );
-		var doneAction = this.getControl( \kr, name, 'doneAction', 0 );
+		var doneAction = this.getControl( \kr, name, 'doneAction', 0, argMode: \init );
 		
 		gain = this.getControl( \kr, name, 'gain', gain, 0.5 ); // 0.5s lag time
 		if( ignoreFadeIn != true ) {
