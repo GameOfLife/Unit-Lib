@@ -22,6 +22,10 @@ BarMap {
 		this.changed( \init );
 	}
 	
+	duplicate {
+		^this.class.newCopyArgs( events.collect(_.copy), beatDenom );
+	}
+	
 	*formatSignature { |signature = #[4,4]|
 		if( signature.isFloat ) {
 			signature = signature.asFraction;

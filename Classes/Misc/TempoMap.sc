@@ -18,7 +18,7 @@ TempoMap {
 			defaultBarMap = BarMap();
 			default = TempoMap();
 			presetManager = PresetManager( this, [ \default, default ] )
-				.getFunc_({ |obj| obj.deepCopy })
+				.getFunc_({ |obj| obj.duplicate })
 				.applyFunc_({ |object, preset|
 			 		object.fromObject( preset );
 		 		});
@@ -32,8 +32,8 @@ TempoMap {
 	*presets { ^presetManager.presets.as(IdentityDictionary) }
 	
 	fromObject { |obj|
-		this.events = obj.value.events.deepCopy;
-		this.barMap.events = obj.value.barMap.events.deepCopy; // update duration of units
+		this.events = obj.value.events.collect(_.copy);
+		this.barMap.events = obj.value.barMap.events.collect(_.copy); // update duration of units
 		this.barMap.beatDenom = obj.value.barMap.beatDenom;
 	}
 	
@@ -50,7 +50,7 @@ TempoMap {
 		args.pairsDo({ |tempo, beat|
 			events = events.add([ tempo, beat, 0 ]);
 		});
-		this.barMap = defaultBarMap.deepCopy;
+		this.barMap = defaultBarMap.duplicate;
 		this.prUpdateTimes;
 		this.changed( \init );
 	}
@@ -59,6 +59,10 @@ TempoMap {
 		events = evts ? events;
 		this.prUpdateTimes;
 		this.changed( \events );
+	}
+	
+	duplicate {
+		^this.class.newCopyArgs( events.collect(_.copy), size, barMap.duplicate );
 	}
 	
 	*secondsToBeats { |time = 0, tempo = 1|

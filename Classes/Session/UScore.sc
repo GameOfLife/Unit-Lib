@@ -137,6 +137,7 @@ UScore : UEvent {
 	    .name_( name )
 	    .startTime_( startTime )
 	    .track_( track )
+	    .tempoMap_( tempoMap.duplicate )
 	    .displayColor_( displayColor ); 
 	}
 
