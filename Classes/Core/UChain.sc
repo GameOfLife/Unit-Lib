@@ -672,7 +672,7 @@ UChain : UEvent {
 		
 		nowPreparingChain = this;
 		
-		lastTarget = target;
+		// lastTarget = target;
 		action = MultiActionFunc( action );
 		target = target.asCollection;
 		if( target.size == 0 ) {
