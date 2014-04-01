@@ -549,13 +549,16 @@ UChain : UEvent {
 	makeGroupAndSynth { |target, startPos = 0|
 		var maxDurUnit;
 	    var group;
+	    var started = false;
 	    if( this.shouldPlayOn( target ) != false ) {
 	    		group = Group( target, addAction )
-	                .startAction_({ |synth|
+	                .startAction_({ |group|
 	                    // only add if started (in case this is a bundle)
 	                    this.changed( \go, group );
+	                    started = true;
 	                })
-	                .freeAction_({ |synth|
+	                .freeAction_({ |group|
+		                if( started == false ) { group.changed( \n_go ) };
 	                    this.removeGroup( group );
 	                    UGroup.end( this );
 	                    this.changed( \end, group );

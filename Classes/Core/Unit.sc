@@ -256,6 +256,7 @@ Udef : GenericDef {
 	
 	makeSynth { |unit, target, startPos = 0, synthAction|
 	    var synth;
+	    var started = false;
 	    if( unit.shouldPlayOn( target ) != false ) {
 		    /* // maybe we don't need this, or only at verbose level
 		    if( unit.preparedServers.includes( target.asTarget.server ).not ) {
@@ -267,8 +268,10 @@ Udef : GenericDef {
 			synth = this.createSynth( unit, target, startPos );
 			synth.startAction_({ |synth|
 				unit.changed( \go, synth );
+				started = true;
 			});
 			synth.freeAction_({ |synth|
+				if( started == false ) { synth.changed( \n_go ) };
 				unit.removeSynth( synth );
 				synth.server.loadBalancerAddLoad( this.apxCPU.neg );
 				unit.changed( \end, synth );
