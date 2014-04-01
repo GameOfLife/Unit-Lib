@@ -185,12 +185,16 @@ UMap : U {
 	
 	classvar <>allUnits;
 	classvar <>currentBus = 0, <>maxBus = 499;
+	classvar >guiColor;
 	
 	var <spec;
 	var <>unitArgName;
 	var <>unmappedKeys;
 	
 	*busOffset { ^1500 }
+	
+	*guiColor { ^guiColor ?? { guiColor = Color.blue.blend( Color.white, 0.8 ).alpha_(0.4) }; }
+	guiColor { ^this.class.guiColor }
 	
 	init { |in, inArgs, inMod|
 		super.init( in, inArgs ? [], inMod );

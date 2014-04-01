@@ -1,7 +1,5 @@
 UMapGUI : UGUI {
 	
-	classvar >color;
-	
 	var <>header, <>userView, <>mainComposite;
 	var <>removeAction;
 	var <>parentUnit;
@@ -9,8 +7,6 @@ UMapGUI : UGUI {
 	*viewNumLines { |unit|
 		^super.viewNumLines( unit ) + 1.1;
 	}
-	
-	*color { ^color ?? { color = Color.blue.blend( Color.white, 0.8 ).alpha_(0.4) }; }
 	
 	makeViews { |bounds|
 		var margin = 0@0, gap = 4@4;
@@ -44,7 +40,7 @@ UMapGUI : UGUI {
 		
 		userView.drawFunc = { |vw|
 			Pen.width = 1;
-			Pen.fillColor = this.class.color;
+			Pen.fillColor = unit.guiColor;
 			Pen.strokeColor = Color.black.alpha_(0.5);
 			Pen.roundedRect( vw.bounds.moveTo(0,0).insetBy(0.5,0.5), 3 );
 			Pen.fillStroke;
