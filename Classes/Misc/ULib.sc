@@ -60,15 +60,15 @@ ULib {
         killer.states = [["K"]];
         killer.canFocus = false;
         killer.action = { Server.killAll };
-        w.view.decorator.postln.nextLine;
+        w.view.decorator.nextLine;
         servers.do{ |s| s.makeView(w) };
         w.view.keyDownAction = { arg view, char, modifiers;
             // if any modifiers except shift key are pressed, skip action
             if(modifiers & 16515072 == 0) {
 
                 case
-                {char === $n } { servers.do( _.queryAllNodes(false) ) }
-                {char === $N } { servers.do( _.queryAllNodes(true) ) }
+				{char === $n } { fork{ servers.do{ |s| s.queryAllNodes(false); 0.5.wait; } } }
+				{char === $N } { fork{ servers.do{ |s| s.queryAllNodes(true); 0.5.wait; } } }
                 {char === $l } { makeMeter.() }
                 {char === $p}  { makePlotTree.() }
                 {char === $ }  { servers.do{ |s| if(s.serverRunning.not) { s.boot } } }
@@ -105,43 +105,55 @@ ULib {
         ^w
     }
 
-	*startup { |sendDefsOnInit = true|
+	*startup { |sendDefsOnInit = true, createServers = false, numServers = 4, options, startGuis = true|
 
 		UChain.makeDefaultFunc = {
 			UChain( \bufSoundFile, \stereoOutput ).useSndFileDur
-		};
-
-		if( (thisProcess.platform.class.asSymbol == 'OSXPlatform') && {
-				thisProcess.platform.ideName.asSymbol === \scapp
-		}) {
-			UMenuBar();
-		} {
-			UMenuWindow();
 		};
 
 		UnitRack.defsFolders = UnitRack.defsFolders.add(
 			Platform.userAppSupportDir ++ "/UnitRacks/";
 		);
 
+		if(createServers) {
+			servers = [LoadBalancer(*numServers.collect{ |i|
+				Server("ULib server "++(i+1), NetAddr("127.0.0.1",57110+i), options)
+			})];
+			Server.default = this.allServers[0]
+		};
+
+		if( startGuis ) {
+			if( (thisProcess.platform.class.asSymbol == 'OSXPlatform') && {
+				thisProcess.platform.ideName.asSymbol === \scapp
+			}) {
+				UMenuBar();
+			} {
+				UMenuWindow();
+			};
+			UGlobalGain.gui;
+			UGlobalEQ.gui;
+			if( ((thisProcess.platform.ideName == "scqt") && (ULib.allServers.size == 1)).not  ) {
+				ULib.serversWindow
+			}
+		};
+
+
 		//if not sending the defs they should have been written to disk once before
 		// with writeDefaultSynthDefs
 		if( sendDefsOnInit ) {
 			var defs = this.getDefaultSynthDefs;
-			ULib.servers.do{ |sv| sv.waitForBoot({
+			ULib.allServers.do{ |sv| sv.waitForBoot({
 
 				defs.do( _.load( sv ) );
 
 			})
 			}
 		} {
-			ULib.servers.do(_.boot);
+			ULib.allServers.do(_.boot);
 			Udef.loadOnInit = false;
 			this.getDefaultUdefs;
 			Udef.loadOnInit = true;
         };
-
-        UGlobalGain.gui;
-        UGlobalEQ.gui;
 
 		"\n\tUnit Lib started".postln
 	}
