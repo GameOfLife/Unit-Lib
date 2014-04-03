@@ -378,7 +378,7 @@ UMap : U {
 	}
 	
 	disposeFor {
-		if( this.unit.notNil && { this.unit.synths.size == 0 }) {
+		if( this.unit.notNil && { this.unit.synths.select(_.isKindOf( Synth ) ).size == 0 }) {
 			this.unit = nil;
 		};
 	}
