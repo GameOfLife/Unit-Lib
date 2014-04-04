@@ -80,6 +80,17 @@ UPat : UMap {
 		^res;
 	}
 	
+	disposeFor { |...args|
+	    if( this.unit.notNil && { this.unit.synths.select(_.isKindOf( Synth ) ).size == 0 }) {
+			this.unit = nil;
+		};
+		this.values.do{ |val|
+	        if(val.respondsTo(\disposeFor)) {
+	            val.disposeFor( *args );
+	        }
+	    };
+	}
+	
 	/*
 	spec_ { |newSpec|
 		super.spec_( newSpec );
