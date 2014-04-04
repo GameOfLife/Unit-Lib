@@ -55,8 +55,14 @@ UPatDef : FuncUMapDef {
 UPat : UMap {
 	
 	classvar >guiColor;
-		
-	var <>stream;
+	classvar <>allStreams;
+	classvar <>currentStreamID = 0;
+	
+	var <>streamID;
+	
+	*initClass {
+		allStreams = Order();
+	}
 	
 	*defClass { ^UPatDef }
 	
@@ -65,6 +71,21 @@ UPat : UMap {
 	init { |in, inArgs, inMod|
 		super.init( in, inArgs ? [], inMod );
 		this.makeStream;
+	}
+	
+	stream {
+		^allStreams[ streamID ? -1 ];
+	}
+	
+	stream_ { |stream|
+		if( streamID.isNil ) {
+			streamID = this.class.nextStreamID;
+		};
+		allStreams[ streamID ] = stream;
+	}
+	
+	*nextStreamID {
+		^currentStreamID = currentStreamID + 1;
 	}
 	
 	makeStream {
@@ -99,7 +120,7 @@ UPat : UMap {
 	*/
 	
 	reset {
-		stream.reset;
+		this.stream.reset;
 	}
 }
 
