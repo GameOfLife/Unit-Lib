@@ -186,10 +186,13 @@ UMap : U {
 	classvar <>allUnits;
 	classvar <>currentBus = 0, <>maxBus = 499;
 	classvar >guiColor;
+	classvar <>allStreams;
+	classvar <>currentStreamID = 0;
 	
 	var <spec;
 	var <>unitArgName;
 	var <>unmappedKeys;
+	var <>streamID;
 	
 	*busOffset { ^1500 }
 	
@@ -200,6 +203,9 @@ UMap : U {
 		super.init( in, inArgs ? [], inMod );
 		this.setunmappedKeys( inArgs );
 		this.mapUnmappedArgs;
+		if( this.def.isKindOf( UPatDef ) ) {
+			this.makeStream;
+		};
 	}
 	
 	setunmappedKeys { |args|
@@ -213,6 +219,7 @@ UMap : U {
 	
 	*initClass { 
 	    allUnits = IdentityDictionary();
+	    allStreams = Order();
 	}
 	
 	*defClass { ^UMapDef }
@@ -377,9 +384,43 @@ UMap : U {
 			.flatten(1);
 	}
 	
+	/// UPat
+	
+	stream {
+		^allStreams[ streamID ? -1 ];
+	}
+	
+	stream_ { |stream|
+		if( streamID.isNil ) {
+			streamID = this.class.nextStreamID;
+		};
+		allStreams[ streamID ] = stream;
+	}
+	
+	*nextStreamID {
+		^currentStreamID = currentStreamID + 1;
+	}
+	
+	makeStream {
+		this.def.makeStream( this );
+	}
+
+	reset {
+		this.stream.reset;
+	}
+
+	next { ^this.asControlInput }
+	
 	disposeFor {
 		if( this.unit.notNil && { this.unit.synths.select(_.isKindOf( Synth ) ).size == 0 }) {
 			this.unit = nil;
+		};
+		if( this.def.isKindOf( FuncUMapDef ) ) {
+			this.values.do{ |val|
+	       	 if(val.respondsTo(\disposeFor)) {
+		            val.disposeFor( *args );
+		        }
+		    };
 		};
 	}
 	
