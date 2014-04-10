@@ -13,6 +13,7 @@ UPatDef : FuncUMapDef {
 	
 	doFunc { |unit|
 		var res;
+		if( unit.stream.isNil ) { this.makeStream( unit ) };
 		this.class.currentUnit = unit;
 		res = unit.stream.next;
 		this.class.currentUnit = nil;
@@ -24,7 +25,7 @@ UPatDef : FuncUMapDef {
 	}
 	
 	activateUnit { |unit| // called at UMap:asUnitArg
-		this.makeStream( unit );
+		unit.makeStreamID;
 		if( unit.unit.notNil && { unit.unit.synths.size > 0 } ) {
 			unit.prepare;
 		};

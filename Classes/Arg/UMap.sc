@@ -203,9 +203,6 @@ UMap : U {
 		super.init( in, inArgs ? [], inMod );
 		this.setunmappedKeys( inArgs );
 		this.mapUnmappedArgs;
-		if( this.def.isKindOf( UPatDef ) ) {
-			this.makeStream;
-		};
 	}
 	
 	setunmappedKeys { |args|
@@ -391,14 +388,18 @@ UMap : U {
 	}
 	
 	stream_ { |stream|
-		if( streamID.isNil ) {
-			streamID = this.class.nextStreamID;
-		};
+		this.makeStreamID;
 		allStreams[ streamID ] = stream;
 	}
 	
 	*nextStreamID {
 		^currentStreamID = currentStreamID + 1;
+	}
+	
+	makeStreamID { |replaceCurrent = false|
+		if( replaceCurrent or: { streamID.isNil }) {
+			streamID = this.class.nextStreamID;
+		};
 	}
 	
 	makeStream {
