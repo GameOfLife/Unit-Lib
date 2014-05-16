@@ -67,8 +67,8 @@ ULib {
             if(modifiers & 16515072 == 0) {
 
                 case
-                {char === $n } { servers.do( _.queryAllNodes(false) ) }
-                {char === $N } { servers.do( _.queryAllNodes(true) ) }
+				{char === $n } { fork{ servers.do{ |s| s.queryAllNodes(false); 0.5.wait; } } }
+				{char === $N } { fork{ servers.do{ |s| s.queryAllNodes(true); 0.5.wait; } } }
                 {char === $l } { makeMeter.() }
                 {char === $p}  { makePlotTree.() }
                 {char === $ }  { servers.do{ |s| if(s.serverRunning.not) { s.boot } } }
