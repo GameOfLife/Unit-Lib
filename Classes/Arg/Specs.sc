@@ -1023,7 +1023,7 @@ IntegerSpec : Spec {
 PositiveIntegerSpec : IntegerSpec {
 	
 	constrain { |value|
-		^value.clip(minval.max(0), maxval).asInteger;
+		^if(value.class == UBus) {value} { value.clip(minval.max(0), maxval).asInteger };
 	}
 	
 	minval { ^minval.max(0) }
