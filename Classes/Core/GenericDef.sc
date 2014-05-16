@@ -21,6 +21,7 @@ GenericDef : UArchivable {
 	
 	classvar <>all; // overwrite in subclass to create class specific lib
 	classvar <>defsFolders, <>userDefsFolder;
+	classvar <>errorOnNotFound = false;
 
 	var <>argSpecs;
 	var filePath;
@@ -54,10 +55,15 @@ GenericDef : UArchivable {
 		^if( path.notNil ) {
 			path.load
 		} {
+			if(GenericDef.errorOnNotFound){
+				Error("%:% - no % found for %\n"
+					.format( this, thisMethod.name, this, this.cleanDefName(name), path ) ).throw;
+			}{
 			"%:% - no % found for %\n"
 			.postf( this, thisMethod.name, this, this.cleanDefName(name), path );
 			nil
 		}
+	}
 	}
 	
 	*findDefFilePath { arg name;
