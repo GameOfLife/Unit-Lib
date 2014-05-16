@@ -67,8 +67,8 @@ ULib {
             if(modifiers & 16515072 == 0) {
 
                 case
-                {char === $n } { servers.do( _.queryAllNodes(false) ) }
-                {char === $N } { servers.do( _.queryAllNodes(true) ) }
+				{char === $n } { fork{ servers.do{ |s| s.queryAllNodes(false); 0.5.wait; } } }
+				{char === $N } { fork{ servers.do{ |s| s.queryAllNodes(true); 0.5.wait; } } }
                 {char === $l } { makeMeter.() }
                 {char === $p}  { makePlotTree.() }
                 {char === $ }  { servers.do{ |s| if(s.serverRunning.not) { s.boot } } }
@@ -105,7 +105,7 @@ ULib {
         ^w
     }
 
-	*startup { |sendDefsOnInit = true|
+	*startup { |sendDefsOnInit = true, createServers = false, numServers = 4, options|
 
 		UChain.makeDefaultFunc = {
 			UChain( \bufSoundFile, \stereoOutput ).useSndFileDur
@@ -123,18 +123,26 @@ ULib {
 			Platform.userAppSupportDir ++ "/UnitRacks/";
 		);
 
+		if(createServers) {
+			servers = [LoadBalancer(*numServers.collect{ |i|
+				Server("ULib server "++(i+1), NetAddr("localhost",57110+i), options)
+			})];
+			Server.default = servers[0]
+		};
+
+
 		//if not sending the defs they should have been written to disk once before
 		// with writeDefaultSynthDefs
 		if( sendDefsOnInit ) {
 			var defs = this.getDefaultSynthDefs;
-			ULib.servers.do{ |sv| sv.waitForBoot({
+			ULib.allServers.do{ |sv| sv.waitForBoot({
 
 				defs.do( _.load( sv ) );
 
 			})
 			}
 		} {
-			ULib.servers.do(_.boot);
+			ULib.allServers.do(_.boot);
 			Udef.loadOnInit = false;
 			this.getDefaultUdefs;
 			Udef.loadOnInit = true;
