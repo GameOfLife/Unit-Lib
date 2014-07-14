@@ -128,7 +128,7 @@ UMixer {
 		var events = score.events;
         var viewBounds;
         unitControllers.do(_.remove);
-        evs = events.select(_.canFreeSynth);
+		evs = events.select({ |x| x.canFreeSynth && x.hideInGUI.not });
         maxTrack = evs.collect{ |event| event.track }.maxItem + 1;
 		count = 0;
 		spec = [-90,12,\db].asSpec;
