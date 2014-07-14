@@ -116,7 +116,7 @@ AbstractRichBuffer {
 	    if( server.notNil ) {
 		    this.currentBuffers( server ).do( this.freeBuffer(_) )
 		}{
-		    this.buffers.do( this.freeBuffer(_) )
+		    this.buffers.copy.do( this.freeBuffer(_) )
 		}
 	}
 	
