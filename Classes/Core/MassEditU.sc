@@ -260,6 +260,26 @@ MassEditUChain {
 		^uchains.collect({ |item| item.fadeIn }).maxItem ? 0;
 	}
 	
+	fadeInCurve_ { |curve = 0|
+		uchains.do({ |item|
+			item.fadeInCurve_( curve );
+		});
+	}
+
+	fadeOutCurve_ { |curve = 0|
+		uchains.do({ |item|
+			item.fadeOutCurve_( curve );
+		});
+	}
+
+	fadeOutCurve {
+		^uchains.collect({ |item| item.fadeOutCurve }).maxItem ? 0;
+	}
+
+	fadeInCurve {
+		^uchains.collect({ |item| item.fadeInCurve }).maxItem ? 0;
+	}
+
 	useSndFileDur { // look for SndFiles in all units, use the longest duration found
 		var durs;
 		uchains.do(_.useSndFileDur);

@@ -247,6 +247,29 @@ UChain : UEvent {
 
 	fadeTimes { ^[this.fadeIn, this.fadeOut] }
 	
+	fadeInCurve_{ |curve = 0|
+		this.prSetCanFreeSynths(\u_fadeInCurve, curve);
+    this.changed( \fadeInCurve );
+	}
+
+	fadeOutCurve_{ |curve = 0|
+		this.prSetCanFreeSynths(\u_fadeOutCurve, curve);
+    this.changed( \fadeOutCurve );
+	}
+
+	fadeCurve_{ |curve = 0|
+		this.fadeInCurve_(curve);
+		this.fadeOutCurve_(curve.neg);
+	}
+
+	fadeInCurve {
+		^this.prGetCanFreeSynths.collect({ |item| item.get( \u_fadeInCurve ) }).maxItem ? 0;
+	}
+
+	fadeOutCurve {
+		^this.prGetCanFreeSynths.collect({ |item| item.get( \u_fadeOutCurve ) }).maxItem ? 0;
+	}
+
 	useSndFileDur { // look for SndFiles in all units, use the longest duration found
 		var durs;
 		units.do({ |unit|
