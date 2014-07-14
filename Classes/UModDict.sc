@@ -23,6 +23,8 @@ UModDict : UEvent {
 	muted {^false}
 	fadeIn {^0}
 	fadeOut {^0}
+	fadeInCurve {^0}
+	fadeOutCurve {^0}
 	
 	gui { |parent, bounds| ^UGUI( parent, bounds, this ) }
 

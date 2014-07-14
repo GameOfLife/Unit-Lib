@@ -578,6 +578,29 @@ UChainGUI {
 				});
 				
 			composite.decorator.nextLine;
+
+			StaticText( composite, labelWidth@14 )
+				.applySkin( RoundView.skin )
+				.string_( "fade curves" )
+				.align_( \right );
+
+			views[ \fadeInCurve ] = SmoothNumberBox( composite, 40@14 )
+				.clipLo_(-20)
+			    .clipHi_(20)
+				.scroll_step_(0.1)
+				.action_({ |nb|
+					chain.fadeInCurve_( nb.value );
+				});
+
+			views[ \fadeOutCurve ] = SmoothNumberBox( composite, 40@14 )
+				.clipLo_(-20)
+			    .clipHi_(20)
+				.scroll_step_(0.1)
+				.action_({ |nb|
+					chain.fadeOutCurve_( nb.value );
+				});
+
+			composite.decorator.nextLine;
 		};
 		
 		// gain
@@ -699,6 +722,8 @@ UChainGUI {
 				})
 				.put( \fadeIn, { views[ \fadeIn ].value = chain.fadeIn })
 				.put( \fadeOut, { views[ \fadeOut ].value = chain.fadeOut })
+				.put( \fadeInCurve, { views[ \fadeInCurve ].value = chain.fadeInCurve })
+				.put( \fadeOutCurve, { views[ \fadeOutCurve ].value = chain.fadeOutCurve })
 				.put( \releaseSelf, {  
 					views[ \releaseSelf ].value = chain.releaseSelf.binaryValue;
 					{ views[ \displayColor ].refresh; }.defer; 
@@ -725,6 +750,8 @@ UChainGUI {
 		chain.changed( \dur );
 		chain.changed( \fadeIn );
 		chain.changed( \fadeOut );
+		chain.changed( \fadeInCurve );
+		chain.changed( \fadeOutCurve );
 		chain.changed( \releaseSelf );
 		
 		composite.getParents.last.findWindow !? _.toFrontAction_({ 
