@@ -393,7 +393,7 @@ UScore : UEvent {
 			if( (item.releaseSelf != true) && { item.duration < inf } ) {
 				endTime = item.eventEndTime;
 				if( (endTime >= startPos) && { endTime != item.startTime } ) {
-					releaseEvents.add( [endTime, 2, item] );
+					releaseEvents.add( [endTime + Server.default.latency, 2, item] );
 				};
 			};
 		});
