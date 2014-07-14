@@ -151,7 +151,7 @@ UEvent : UArchivable {
 	    };
 	    
 	    ^Score( 
-	    		this.collectOSCBundles( ULib.servers.first, timeOffset, duration  )
+			this.collectOSCBundles( ULib.allServers.first, timeOffset, duration  )
 	    			++ [ [ duration, [ \c_set, 0,0 ] ] ]
 	    	);
     }
