@@ -730,6 +730,10 @@ UChain : UEvent {
 			target = this.prepare( target, startPos, { cond.test = true; cond.signal } );
 			cond.wait;
 	       	this.start(target, startPos);
+			if( releaseSelf.not ) {
+				(this.duration + Server.default.latency).wait;
+				this.release;
+			};
 	       	prepareTasks.remove(task);
 		};
 	    prepareTasks = prepareTasks.add( task );
