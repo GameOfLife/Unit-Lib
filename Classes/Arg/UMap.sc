@@ -406,7 +406,7 @@ UMap : U {
 		this.def.makeStream( this );
 	}
 
-	reset {
+	resetStream {
 		this.stream.reset;
 	}
 
