@@ -19,8 +19,12 @@ UMarker : UEvent {
 		 	});
 		 	
 		 presetManager.put( \pause, UMarker( 0,0, "pause", { |marker, score| 
-	// pause the score
-	score.pause; 
+	// pause the score, if not just started
+	if( score.startedAt.notNil && {
+		marker.startTime > (score.startedAt[0] + 0.25) 
+	}) { 
+		score.pause; 
+	};
 }) );
 		 presetManager.put( \post, UMarker( 0,0, "post", { |marker, score| 
 	// post the name of the current marker
