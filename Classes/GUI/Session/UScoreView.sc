@@ -486,15 +486,7 @@ UScoreView {
 					8, { this.deleteSelected }, // backspace QT
 					127, { this.deleteSelected }, // backspace Cocoa
 					32, { // space bar
-						case { score.isStopped } {
-							score.prepareAndStart( ULib.servers, score.pos, true, score.loop);
-						} { score.isPaused } {
-							score.resume( ULib.servers );
-						} { score.isPrepared } {
-							score.start( ULib.servers, score.pos, true);
-						} {
-							score.stop;
-						};
+						score.togglePlayback( ULib.servers );
 					},
 					100, { // d
 						this.duplicateSelected;

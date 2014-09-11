@@ -682,6 +682,18 @@ UScore : UEvent {
 		}
 	}
 	
+	togglePlayback { |targets|
+		case { this.isStopped } {
+			this.prepareAndStart( targets, this.pos, true, this.loop);
+		} { this.isPaused } {
+			this.resume( targets );
+		} { this.isPrepared } {
+			this.start( targets, this.pos, true);
+		} {
+			this.stop;
+		};
+	}
+	
 	dispose { events.do(_.dispose) }
 	
 	collectOSCBundleFuncs { |server, startOffset = 0, infdur = 60|
