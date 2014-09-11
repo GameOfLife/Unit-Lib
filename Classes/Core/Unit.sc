@@ -604,13 +604,28 @@ U : ObjectWithArgs {
 		this.def.setSynth( this, *args );
 	}
 	
+	setConstrain { |...args|
+		this.set( 
+			*args.clump(2).collect({ |item|
+				var key, value;
+				#key, value = item;
+				if( value.isUMap.not ) {
+					[ key, this.getSpec( key ).uconstrain( value ) ]
+				} {
+					item;
+				};
+			}).flatten(1)
+		);
+	}
+	
 	insertUMap { |key, umapdef, args|
+		var item;
 		umapdef = umapdef.asUdef( UMapDef );
 		if( umapdef.notNil ) {
 			if( umapdef.canInsert ) {
-				this.set( key, 
-					UMap( umapdef, [ umapdef.insertArgName, this.get( key ) ] ++ args )
-				);
+				item = this.get( key );
+				this.set( key, UMap( umapdef,  args ) );
+				this.get( key ).setConstrain( umapdef.insertArgName, item );
 			} {
 				this.set( key, UMap( umapdef, args ) );
 			};
