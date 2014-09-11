@@ -77,6 +77,19 @@ UScore : UEvent {
 	    };
 	}
 	
+	*openMultiple { |paths, action| // action fired for each path
+		if( paths.isNil ) {
+		    Dialog.getPaths( { |paths|
+			    paths.do({ |path| action.value( openFunc.(path) ); });
+		    });
+	    } {
+		    paths.do({ |path|
+			    path = path.standardizePath;
+			    action.value( openFunc.(path) );
+			});
+	    };
+	}
+	
 	/*
 	* Syntaxes for UScore creation:
 	* UScore( <UEvent 1>, <UEvent 2>,...)
