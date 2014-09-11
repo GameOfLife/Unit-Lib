@@ -13,7 +13,8 @@ soundFile: a BufSndFile object, a region of an existig soundfile url on your har
 	- end: end of the region (samples or seconds)
 	- loop: loop mode on or off (can be changed during playback)
 	- rate: playback rate (semitones or ratio)
-
+rateScale: a scale value for the playback rate (can be modulated)
+level: playback level (amplitude of the soundfile)
 	
 only the following numbers of channels are allowed:
 1,2,3,4,5,6,7,8,10,12,16,24,32
