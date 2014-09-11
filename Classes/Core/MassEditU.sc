@@ -26,7 +26,7 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 		^super.newCopyArgs.init( units );
 	}
 	
-	guiColor { ^units[0].guiColor }
+	guiColor { ^units.detect(_.respondsTo(\guiColor)) !? _.guiColor ?? { Color.clear; } }
 	
 	init { |inUnits|
 		var firstDef, defs;
