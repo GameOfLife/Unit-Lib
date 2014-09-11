@@ -451,6 +451,7 @@ UScoreView {
             });
 
 		scoreView.maxZoom = [64,8];
+		scoreView.zoomCurve = 8;
 
 		usessionMouseEventsManager = UScoreEditorGuiMouseEventsManager(this);
 
