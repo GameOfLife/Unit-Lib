@@ -241,12 +241,17 @@ UScoreEditorGui_TopBar {
 			.canFocus_(false)
 			.action_({
 			    this.selectedEvents !? { |x|
-                    if( x.every(_.isFolder) ) {
-                        this.scoreEditor.unpackSelectedFolders(x)
-                    }{
-                        this.scoreEditor.folderFromEvents(x);
-                    }
+                        	this.scoreEditor.folderFromEvents(x);
 				}
+			});
+			
+		SmoothButton( header, 40@size  )
+			.states_( [[ "unfold" , Color.black, Color.clear ]] )
+			.canFocus_(false)
+			.action_({
+			    this.selectedEvents !? { |x|
+                        	this.scoreEditor.unpackSelectedFolders(x)
+			     }
 			});
 
 		header.decorator.shift(10);
