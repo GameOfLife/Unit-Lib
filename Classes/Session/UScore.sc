@@ -431,7 +431,11 @@ UScore : UEvent {
             if(a[0] != b[0]) {
                 a[0] <= b[0]
             } {
-                a[1] <= b[1]
+	            if( a[1] != b[1] ) {
+		            a[1] <= b[1]
+	            } {
+		            a[2].isKindOf( UMarker )
+	            };
             }
         };
         doPrepare = prepareEvents.size > 0
@@ -658,7 +662,7 @@ UScore : UEvent {
 	    if(playState == \playing){
 		    this.stopScore;
 		    events.select(_.isFolder).do(_.pause);
-		    pos = this.pos + 1.0e-12;
+		    pos = this.pos;
 		    pausedAt = pos;
 		    startedAt = nil;
 		    this.playState_(\paused);
