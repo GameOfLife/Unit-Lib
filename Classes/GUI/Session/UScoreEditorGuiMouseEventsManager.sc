@@ -181,7 +181,9 @@ UScoreEditorGuiMouseEventsManager {
 							if(clickCount == 2) {
 							    if( scoreView.currentScore.isStopped ) {
                                     score.pos = mouseDownPos.x;
-                                }
+                                } {
+	                                score.jumpTo( mouseDownPos.x );
+                                };
                             };
 						}
 					}
