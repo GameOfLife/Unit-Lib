@@ -196,6 +196,16 @@ UMarkerGUI : UChainGUI {
 		
 		composite.decorator.nextLine;
 		
+		// autoPause
+		
+		RoundView.useWithSkin( RoundView.skin ++ ( labelWidth: 82 ), {
+			views[ \action ] = ObjectView( composite, (labelWidth + 120) @ 14, 
+				chain, \autoPause, BoolSpec(), controller
+			);
+		});
+		
+		composite.decorator.nextLine;
+		
 		// notes
 		StaticText( composite, labelWidth@14 )
 			.applySkin( RoundView.skin )

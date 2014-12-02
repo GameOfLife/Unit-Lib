@@ -145,6 +145,11 @@ UMarkerEventView : UEventView {
 						DrawIcon( \lock, Rect( scaledRect.left + 2, scaledRect.top, 14, 14 ) );
 						textLeft = textLeft + 12;
 				     };
+				     if( event.autoPause == true ) {
+						DrawIcon( \pause, Rect( scaledRect.left + textLeft, 
+							scaledRect.top, 14, 14 ) );
+						textLeft = textLeft + 12;
+				     };
 					Pen.stringAtPoint(
 						" " ++ this.getName,
 						scaledRect.leftTop.max( 0 @ -inf ) + (textLeft @ 1)

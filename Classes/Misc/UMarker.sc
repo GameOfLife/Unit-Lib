@@ -7,6 +7,7 @@ UMarker : UEvent {
 	var <>score; // set at playback from score
 	var <action; 
 	var <notes;
+	var <autoPause = false;
 	
 	*initClass {
 		
@@ -18,14 +19,7 @@ UMarker : UEvent {
 			 	object.fromObject( preset );
 		 	});
 		 	
-		 presetManager.put( \pause, UMarker( 0,0, "pause", { |marker, score| 
-	// pause the score, if not just started
-	if( score.startedAt.notNil && {
-		marker.startTime > (score.startedAt[0] + 0.25) 
-	}) { 
-		score.pause; 
-	};
-}) );
+		 presetManager.put( \pause, UMarker( 0,0, "pause", autoPause: true ) );
 		 presetManager.put( \post, UMarker( 0,0, "post", { |marker, score| 
 	// post the name of the current marker
 	"passed marker '%' at %\n".postf( 
@@ -66,18 +60,20 @@ UMarker : UEvent {
 		defaultAction = { |marker, score| };
 	}
 	
-	*new { |startTime = 0, track, name, action, notes|
+	*new { |startTime = 0, track, name, action, notes, autoPause = false|
 		^super.newCopyArgs
 			.startTime_( startTime )
 			.track_( track ? 0 )
 			.name_( name ? "marker" )
 			.action_( action ? defaultAction )
-			.notes_( notes );
+			.notes_( notes )
+			.autoPause_( autoPause ? false );
 	}
 	
 	fromObject { |obj|
 		this.name = obj.name;
 		this.action = obj.action; // only copy the action from presets (perhaps more later)
+		this.autoPause = obj.autoPause;
 	}
 	
 	*fromObject { |obj|
@@ -89,7 +85,17 @@ UMarker : UEvent {
 	fromPreset { |name| ^presetManager.apply( name, this ); }
 	
 	start { |target, startPos = 0, latency| 
-		if( startPos == 0 ) { action.value( this, this.score ); this.score = nil; }
+		if( startPos == 0 ) { 
+			if( autoPause ) {
+				if( this.score.startedAt.notNil && {
+					startTime > (this.score.startedAt[0] + 0.125) 
+				}) { 
+					this.score.pause; 
+				};
+			};
+			action.value( this, this.score ); 
+			this.score = nil; 
+		}
 	}
 	
 	prepare { |target, startPos = 0, action| action.value( this ) }
@@ -122,6 +128,7 @@ UMarker : UEvent {
     	name_ { |x| name = x; this.changed(\name, name) }
     	action_ { |x| action = x; this.changed(\action, action) }
     	notes_ { |x| notes = x; this.changed(\notes, notes) }
+    	autoPause_ { |bool| autoPause = bool; this.changed(\autoPause, autoPause) }
 
 	makeView{ |i,minWidth,maxWidth| ^UMarkerEventView(this,i,minWidth, maxWidth) }
 	
@@ -129,5 +136,5 @@ UMarker : UEvent {
 	    ^this.deepCopy;
 	}
 	
-	storeArgs { ^[ startTime, track, name, if( action != defaultAction ) { action }, notes ] }
+	storeArgs { ^[ startTime, track, name, if( action != defaultAction ) { action }, notes, autoPause ] }
 }
