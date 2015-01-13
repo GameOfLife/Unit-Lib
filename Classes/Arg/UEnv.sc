@@ -72,7 +72,7 @@ UEnv : UIn {
 		^DemandEnvGen.kr( 
 				Dseq( [ 0, 1, 1, 0, 0 ], 1 ), 
 				Dseq( [ fadeIn, dur - (fadeIn+fadeOut), fadeOut, extraSilence ], 1 ),
-				5, Dseq( [ fadeInCurve, 1, fadeOutCurve, 1 ], 1 ),
+				//5, Dseq( [ fadeInCurve, 1, fadeOutCurve, 1 ], 1 ),
 				doneAction: doneAction ) *
 			Env([ 1, 0, 0 ],[ fadeOut, extraSilence ], \lin, 0 )
 				.kr( doneAction, RunningMin.kr( gate ) + Impulse.kr(0) ) *
