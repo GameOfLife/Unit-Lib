@@ -32,7 +32,7 @@ BufSndFilePlayer {
 		key = key ? 'soundFile';
 		#bufnum, rate, loop = key.asSymbol.kr( [ 0, 1, 0 ] );
 		if( startPos.isNil ) { startPos = 'u_startPos'.kr(0); }; // for use inside a U or UChain
-		startFrame = ((startPos * BufSampleRate.kr( bufnum )) / rate.abs.max(1.0e-12));
+		startFrame = ((startPos * BufSampleRate.kr( bufnum )) * rate.abs.max(1.0e-12));
 		if( ugenRate == \control ) { startFrame = startFrame / (SampleRate.ir / ControlRate.ir); };
 		^[ numChannels, bufnum, BufRateScale.kr( bufnum ) * rate, trigger, startFrame, loop ];
 	}
