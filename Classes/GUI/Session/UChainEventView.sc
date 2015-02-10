@@ -359,12 +359,28 @@ UChainEventView : UEventView {
 		            
 		            // fade in
 		            Pen.moveTo(innerRect.leftBottom);
+		            if( event.fadeInCurve != 0 ) {
+			            ((..7)/8).do({	 |item|
+				            Pen.lineTo(
+				            	innerRect.left.blend( fadeinScaled, item ) @ 
+				            	(innerRect.bottom.blend( innerRect.top, item.lincurve(0,1,0,1, event.fadeInCurve) )) 
+				            );
+			            });
+		            };
 		            Pen.lineTo(fadeinScaled @ (innerRect.top) );
 		            Pen.lineTo(innerRect.leftTop);
 		            Pen.lineTo(innerRect.leftBottom);
 		           
 		            // fade out
 		            Pen.lineTo(innerRect.rightBottom);
+		            if( event.fadeOutCurve != 0 ) {
+			            ((..7)/8).do({	 |item|
+				            Pen.lineTo(
+				            	innerRect.right.blend( fadeoutScaled, item ) @ 
+				            	(innerRect.bottom.blend( innerRect.top, item.lincurve(0,1,0,1, event.fadeOutCurve.neg) )) 
+				            );
+			            });
+		            };
 		            Pen.lineTo(fadeoutScaled @ (innerRect.top));
 		            Pen.lineTo(innerRect.rightTop);
 		            Pen.lineTo(innerRect.rightBottom);
