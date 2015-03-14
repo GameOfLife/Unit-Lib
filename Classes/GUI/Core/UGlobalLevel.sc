@@ -66,7 +66,52 @@ UGlobalGain {
 					.scroll_step_( 1 )
 					.formatFunc_({ |value| value.round(1) });
 				view.sliderView.mode_( \move );
-			});
+				view.sliderView.keyDownAction = { |v, a,b,c,keycode,key|
+					var score;
+					score = UScore.current;
+					if( score.notNil ) {
+						switch( c.asInt,
+							32, { // space bar
+								score.togglePlayback( ULib.servers );
+							},
+							112, { // p
+								case { score.isPlaying } {
+					            		score.pause;
+					       		} { score.isPaused } {
+						       		score.resume( ULib.servers );
+					       		} { score.isPrepared } {
+					       			score.stop;
+					       		} {
+					            		score.prepare( ULib.servers, score.pos );
+					       		};
+							},
+							45, { // -
+								score.toPrevMarker;
+							},
+							43, { // +
+								score.toNextMarker;
+							},
+							46, { // .
+								// always stop
+								score.stop;
+							},
+							44, { // , 
+								// always play
+								case { score.isPaused } {
+					            		score.resume( ULib.servers );
+					       		} { score.isPrepared } { 
+						       		score.start( ULib.servers, score.pos, true);
+						       	} { score.isStopped } {
+					       			score.prepareAndStart( ULib.servers, score.pos, true, score.loop);
+					       		};
+							},
+							48, { // 0
+								score.jumpTo( 0 );
+							},
+						);
+					};
+				};
+				});
 			^view;
 		} {
 			^view.front;
