@@ -636,7 +636,9 @@ UScoreView {
 				Pen.color = Color.grey(0.5,1);
 				Pen.strokeRect( rect.insetBy(0.5,0.5) );
 
-		})
+		});
+		
+		scoreView.userView.view.focus;
      }
 
      refresh{ scoreView.refresh; }
