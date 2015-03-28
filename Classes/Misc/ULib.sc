@@ -159,8 +159,8 @@ ULib {
 	}
 
 	*getDefaultUdefs{
-		^Udef.loadAllFromDefaultDirectory ++
-			UMapDef.loadAllFromDefaultDirectory
+		^(Udef.loadAllFromDefaultDirectory ++
+			UMapDef.loadAllFromDefaultDirectory).select(_.notNil)
 	}
 
 	*getDefaultSynthDefs{
