@@ -37,6 +37,10 @@ or
 
 2) Clone with git: ‘git clone git://github.com/GameOfLife/Unit-Lib.git’
 
+or
+
+3) In sc3.7alpha0 or higher run 'Quarks.install("Unit-Lib")'
+
 ## Git Repo##
 
 [github](https://github.com/GameOfLife/Unit-Lib)
