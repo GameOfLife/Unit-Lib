@@ -334,8 +334,17 @@ UChain : UEvent {
         duration = dur;
         this.changed( \dur );
         this.prSetChainsDur(dur);
-        this.fadeOut_(this.fadeOut.min(dur));
-        this.fadeIn_(this.fadeIn.min(dur));
+        //this.fadeOut_(this.fadeOut.min(dur));
+        //this.fadeIn_(this.fadeIn.min(dur));
+    }
+    
+    updateDur {
+	    units.do(_.setDur(duration));
+	    if( releaseSelf ) {
+			this.prSetCanFreeSynths( \u_doneAction, 14 );
+		} {
+			this.prSetCanFreeSynths( \u_doneAction, 14, \u_dur, inf );
+		};
     }
 
     releaseSelf_ { |bool|
@@ -733,6 +742,7 @@ UChain : UEvent {
 			tg;
 		});
 		preparedServers = target;
+		this.updateDur;
 		units.do( _.prepare(target, startPos, action.getAction ) );
 	     action.getAction.value; // fire action at least once
 	     
