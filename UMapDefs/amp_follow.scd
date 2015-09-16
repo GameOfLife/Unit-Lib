@@ -24,11 +24,13 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UMapDef( \amp_follow, { |bus = 0, fromRange = #[0.0, 1.0], toRange = #[0.0,1.0], 
+UMapDef( \amp_follow, { |bus = 0, filter = #[20,20000], fromRange = #[0.0, 1.0], toRange = #[0.0,1.0], 
 	attackTime = 0.01, releaseTime = 0.01,
 	invert = 0, curve = 0, clipMode = 0, clipSoftness = 0.1|
 	var sig, unranged;
 	sig = In.ar(bus + UIn.firstPrivateBus);
+	sig = BLowCut.ar( sig, filter[0], 2 );
+	sig = BHiCut.ar( sig, filter[1], 2 );
 	sig = Amplitude.ar( sig, attackTime, releaseTime );
 	sig = A2K.kr( sig );
 	fromRange[1] = fromRange[1].max(fromRange[0] + 1.0e-8);
@@ -47,6 +49,7 @@ UMapDef( \amp_follow, { |bus = 0, fromRange = #[0.0, 1.0], toRange = #[0.0,1.0],
 	sig = sig.linlin(0,1,*toRange ++ [ \none ]);
 	UMapOut.kr(sig);
 })
+	.setSpec( \filter, \freq.asSpec.asRangeSpec )
 	.setSpec( \fromRange, \amp.asSpec.asRangeSpec )
 	.setSpec( \attackTime, [0,1,4].asSpec )
 	.setSpec( \releaseTime, [0,1,4].asSpec )
