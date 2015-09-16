@@ -2,6 +2,7 @@ UMarker : UEvent {
 	
 	classvar <>defaultAction;
 	classvar <>presetManager;
+	classvar <>current;
 	
 	var <name = "marker";
 	var <>score; // set at playback from score
@@ -85,7 +86,8 @@ UMarker : UEvent {
 	fromPreset { |name| ^presetManager.apply( name, this ); }
 	
 	start { |target, startPos = 0, latency| 
-		if( startPos == 0 ) { 
+		var old;
+		if( startPos == 0 ) {
 			if( autoPause ) {
 				if( this.score.startedAt.notNil && {
 					startTime > (this.score.startedAt[0] + 0.125) 
@@ -93,6 +95,10 @@ UMarker : UEvent {
 					this.score.pause; 
 				};
 			};
+			old = current;
+			current = this;
+			old.changed( \current );
+			this.changed( \current );
 			action.value( this, this.score ); 
 			this.score = nil; 
 		}
