@@ -367,6 +367,14 @@ UMap : U {
 		};
 	}
 	
+	parentSynthSet { // sets this object in the unit to enforce setting of the synths
+		if( this.unit.notNil ) {	
+			if( this.unitArgName.notNil ) {
+				this.unit.synthSet( this.unitArgName, this );
+			};
+		};
+	}
+	
 	getSynthArgs {
 		var nonsynthKeys;
 		nonsynthKeys = this.argSpecs.select({ |item| item.mode == \nonsynth }).collect(_.name);
@@ -415,8 +423,9 @@ UMap : U {
 	disposeFor {
 		if( this.unit.notNil && { this.unit.synths.select(_.isKindOf( Synth ) ).size == 0 }) {
 			this.unit = nil;
+			if( this.def.isKindOf( TaskUMapDef ) ) { this.free; };
 		};
-		if( this.def.isKindOf( FuncUMapDef ) ) {
+		if( this.def.isKindOf( FuncUMapDef ) or: this.def.isKindOf( TaskUMapDef ) ) {
 			this.values.do{ |val|
 	       	 if(val.respondsTo(\disposeFor)) {
 		            val.disposeFor( *args );

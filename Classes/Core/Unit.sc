@@ -618,6 +618,10 @@ U : ObjectWithArgs {
 		);
 	}
 	
+	setSynth { |key, value|
+		this.def.setSynth( this, [ key, value ?? { this.get( key ) } ] );
+	}
+	
 	insertUMap { |key, umapdef, args|
 		var item;
 		umapdef = umapdef.asUdef( UMapDef );
@@ -676,6 +680,10 @@ U : ObjectWithArgs {
 			this.set( \u_dur, dur );
 		};
 		this.getUMaps.do(_.setDur(dur));
+	}
+	
+	getDur {
+		^this.get( \u_dur );
 	}
 	
 	argSpecsForDisplay {
@@ -1097,9 +1105,9 @@ U : ObjectWithArgs {
 			    valuesToPrepare.do({ |val|
 				     val.prepare(servers, startPos, action: act.getAction)
 			    });
-			    this.def.prepare(servers, this, act.getAction)
+			    this.def.prepare(servers, this, act.getAction, startPos)
 		    } {
-			    this.def.prepare(servers, this, act);
+			    this.def.prepare(servers, this, act, startPos);
 		    };
 		} {
 			action.value;
