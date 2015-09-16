@@ -662,7 +662,7 @@ UScore : UEvent {
 	    if(playState == \playing){
 		    this.stopScore;
 		    events.select(_.isFolder).do(_.pause);
-		    pos = this.pos;
+		    pos = this.pos - 1e-12;
 		    pausedAt = pos;
 		    startedAt = nil;
 		    this.playState_(\paused);
