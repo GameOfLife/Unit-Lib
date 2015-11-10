@@ -344,6 +344,7 @@
 				vws[ \val ] = this.map( sl.value ) ! vws[ \val ].size;
 				vws[ \setRangeSlider ].value;
 				vws[ \setPlotter ].value;
+				action.value( vws, vws[ \val ] );
 			};
 		};
 		
