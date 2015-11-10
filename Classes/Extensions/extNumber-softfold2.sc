@@ -5,27 +5,35 @@
 	
 	softclip2 { |aNumber = 1.0, range|
 		range = range ?? { aNumber / 2 };
-		range = range.clip(1.0e-12,aNumber);
-		^this.clip2( aNumber-range ) + ( 
-			(this.excess( aNumber-range ) / range).distort * range
-		);
+		if( range > 0 && { aNumber != 0 }) {
+			range = range.clip(1.0e-12, aNumber);
+			^this.clip2( aNumber-range ) + ( 
+				(this.excess( aNumber-range ) / range).distort * range
+			);
+		} {
+			^this.clip2( aNumber );
+		};
 	}
 	
 	sineclip2 { |aNumber = 1.0, range, normalize = true|
 		var div, me;
 		range = range ?? { aNumber / 2 };
-		range = range.clip(1.0e-12, aNumber);
-		aNumber = aNumber.max(1.0e-12);
-		if( normalize.isKindOf( Boolean ) ) { normalize = normalize.binaryValue };
-		div = 1 - ( 0.35971998019677 * ( (range * normalize ) / aNumber ) );
-		me = this * div;
-		^(
-			me.clip2( aNumber-range ) + ( 
-				me.excess( aNumber-range )
-					.linlin( range.neg, range, -0.5pi, 0.5pi  )
-					.sin * 0.64028001980323 * range
-			)
-		)  / div;
+		if( range > 0 && { aNumber != 0 }) {
+			range = range.min( aNumber );
+			aNumber = aNumber.max(1.0e-12);
+			if( normalize.isKindOf( Boolean ) ) { normalize = normalize.binaryValue };
+			div = 1 - ( 0.35971998019677 * ( (range * normalize ) / aNumber ) );
+			me = this * div;
+			^(
+				me.clip2( aNumber-range ) + ( 
+					me.excess( aNumber-range )
+						.linlin( range.neg, range, -0.5pi, 0.5pi  )
+						.sin * 0.64028001980323 * range
+				)
+			)  / div;
+		} {
+			^this.clip2( aNumber );
+		};
 	}
 	
 	softexcess2 { |aNumber = 0.1, range, steepness = 1|
