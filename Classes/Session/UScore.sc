@@ -219,6 +219,9 @@ UScore : UEvent {
 	getAllUChains{
 	    ^events.collect(_.getAllUChains).flat
 	}
+	getAllUMarkers {
+		^events.collect(_.getAllUMarkers).flat
+	}
 	startTimes { ^events.collect( _.startTime ); }
 	startTimes_ { |times| 
 		times = times.asCollection;

@@ -36,7 +36,7 @@ UMapDef( \clip_scale, { |value = 0.0, fromRange = #[0.0, 1.0], toRange = #[0.0, 
 	sig = Select.kr( clipMode, [
 		sig.softclip2(1, clipSoftness),
 		sig.softfold2(1, clipSoftness),
-		sig.wrap2(1),
+		sig.softwrap2(1, clipSoftness),
 		sig
 	]);
 	sig = sig.linlin(-1,1,*toRange ++ [ \none ]);

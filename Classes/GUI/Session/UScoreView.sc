@@ -187,25 +187,26 @@ UScoreView {
     selectedEventsOrAll { ^usessionMouseEventsManager.selectedEventsOrAll }
 
     editSelected{
-        var event, events = this.selectedEvents, gui, currentScore, chains;
+        var event, events = this.selectedEvents, gui, currentScore, chains, markers;
         switch(events.size)
             {0}{ 
 	            currentScore = this.currentScore;
 	            chains = currentScore.getAllUChains;
-	            if( chains.size > 0 ) {
-	           	 gui = MassEditUChain( chains ).gui;
-	                 gui.windowName = "MassEditUChain : % (all % events)".format( 
+	            markers = currentScore.getAllUMarkers;
+	            if( chains.size > 0 or: { markers.size > 0 } ) {
+	           	 gui = MassEditUChain( chains, markers ).gui;
+	                 gui.windowName = "MassEdit : % (all % events)".format( 
 	                    currentScore.name, 
-	                    chains.size
+	                    chains.size + markers.size
 	                 );
 	            };
 	        }
             {1}{
                 event = events[0];
                 if(event.isFolder){
-                    gui = MassEditUChain(event.getAllUChains).gui( score: event );
+                    gui = MassEditUChain(event.getAllUChains, event.getAllUMarkers).gui( score: event );
                     currentScore = this.currentScore;
-                    gui.windowName = "MassEditUChain : % [ % ]".format( 
+                    gui.windowName = "MassEdit : % [ % ]".format( 
                     	currentScore.name, 
                     	currentScore.events.indexOf( event )
                     );
@@ -221,10 +222,13 @@ UScoreView {
             }
             { 
 	            
-	            gui = MassEditUChain(events.collect(_.getAllUChains).flat).gui;
-                 gui.windowName = "MassEditUChain : % ( % events )".format( 
+	            gui = MassEditUChain(
+	            	events.collect(_.getAllUChains).flat, 
+	            	events.collect(_.getAllUMarkers).flat
+	            ).gui;
+                 gui.windowName = "MassEdit : % ( % events )".format( 
                     this.currentScore.name, 
-                    gui.chain.uchains.size
+                    gui.chain.uchains.size + gui.chain.umarkers.size
                  );
 	       }
 

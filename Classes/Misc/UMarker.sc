@@ -111,6 +111,7 @@ UMarker : UEvent {
 	eventSustain{ ^0 }
 	preparedServers {^[] }
 	getAllUChains { ^[] }
+	getAllUMarkers{ ^this }
 	
 	stop { this.score = nil; }
 	release { this.score = nil;  }
@@ -126,6 +127,8 @@ UMarker : UEvent {
 	duration { ^0 }
 	duration_{ }
      dur_ { }
+     
+     units { ^[] }
      
      getTypeColor {
         ^this.displayColor ? Color.yellow.alpha_(0.75);

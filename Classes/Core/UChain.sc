@@ -968,6 +968,7 @@ UChain : UEvent {
 	}
 
     getAllUChains{ ^this }
+    getAllUMarkers{ ^[] }
 
 	printOn { arg stream;
 		stream << this.class.name << "( " <<* units.collect(_.defName)  << " )"

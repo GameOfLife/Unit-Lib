@@ -160,11 +160,12 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 MassEditUChain {
 	
 	var <uchains;
+	var <umarkers;
 	var <units;
 	var <>prepareTasks;
 	
-	*new { |uchains|
-		^super.newCopyArgs( uchains ).init;
+	*new { |uchains, umarkers|
+		^super.newCopyArgs( uchains, umarkers ).init;
 	}
 	
 	lockStartTime { ^uchains.any(_.lockStartTime) }
@@ -219,20 +220,23 @@ MassEditUChain {
 		uchains.do(_.releaseSelf_(bool));
 	}
 	
+	uchainsOrUMarkers { if( uchains.size > 0 ) { ^uchains } { ^umarkers } }
+	
 	getTypeColor {
 		^Color( 
-			*uchains.collect(_.getTypeColor).select(_.isKindOf( Color ) ).collect(_.asArray).mean
+			*this.uchainsOrUMarkers
+				.collect(_.getTypeColor).select(_.isKindOf( Color ) ).collect(_.asArray).mean
 		 );
 	}
 	
 	displayColor { 
-		^if( uchains.any({ |item| item.displayColor != nil }) ) {
+		^if( this.uchainsOrUMarkers.any({ |item| item.displayColor != nil }) ) {
 			this.getTypeColor
 		}; 
 	}
 	
 	displayColor_ { |color| 
-		uchains.do({ |item| item.displayColor = color }); 
+		this.uchainsOrUMarkers.do({ |item| item.displayColor = color }); 
 		this.changed( \displayColor, color );
 	}
 	
@@ -339,7 +343,8 @@ MassEditUChain {
 	} 
 	
 	startTime {
-		^uchains.collect({ |ch| ch.startTime ? 0 }).minItem;
+		^(uchains.collect({ |ch| ch.startTime ? 0 }) ++ 
+		umarkers.collect({ |ch| ch.startTime ? 0 })).minItem;
 	}
 	
 	startTime_ { |newTime|
@@ -352,6 +357,9 @@ MassEditUChain {
 		};
 		if( delta != 0 ) {
 			uchains.do({ |ch|
+				ch.startTime = (ch.startTime ? 0) + delta;
+			});
+			umarkers.do({ |ch|
 				ch.startTime = (ch.startTime ? 0) + delta;
 			});
 		};
@@ -371,6 +379,15 @@ MassEditUChain {
 		var gains;
 		gains = this.uchains.collect(_.getGain);
 		if( gains.size > 0 ) { ^gains.mean } { ^0 };
+	}
+	
+	autoPause { ^umarkers.collect(_.autoPause) }
+	autoPause_ { |newAutoPause|
+		newAutoPause = newAutoPause.asCollection.wrapExtend( umarkers.size );
+		newAutoPause.do({ |bool, i|
+			umarkers[i].autoPause = bool;
+		});
+		this.changed( \autoPause );
 	}
 	
 	

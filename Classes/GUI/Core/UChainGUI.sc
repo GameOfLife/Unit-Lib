@@ -467,165 +467,186 @@ UChainGUI {
 			
 			composite.decorator.nextLine;
 			
-			// duration
-			PopUpMenu( composite, labelWidth@14 )
-				.applySkin( RoundView.skin )
-				.items_( [ "duration", "endTime", "endBar" ] )
-				.canFocus_( false )
-				.action_({ |pu|
-					durationMode = [ \duration, \endTime, \endBar ][ pu.value ];
-					views[ \dur ].visible = (durationMode === \duration );
-					views[ \endTime ].visible = (durationMode === \endTime );
-					views[ \endBar ].visible = (durationMode === \endBar );
-				})
-				.value_( [ \duration, \endTime, \endBar ].indexOf( durationMode ) ? 0 );
+			if( chain.isKindOf( MassEditUChain ).not or: { chain.uchains.size > 0 } ) {	
+				// duration
+				PopUpMenu( composite, labelWidth@14 )
+					.applySkin( RoundView.skin )
+					.items_( [ "duration", "endTime", "endBar" ] )
+					.canFocus_( false )
+					.action_({ |pu|
+						durationMode = [ \duration, \endTime, \endBar ][ pu.value ];
+						views[ \dur ].visible = (durationMode === \duration );
+						views[ \endTime ].visible = (durationMode === \endTime );
+						views[ \endBar ].visible = (durationMode === \endBar );
+					})
+					.value_( [ \duration, \endTime, \endBar ].indexOf( durationMode ) ? 0 );
+					
+				views[ \dur ] = SMPTEBox( composite, 84@14 )
+					.applySmoothSkin
+					.applySkin( RoundView.skin )
+					.clipLo_(0)
+					.visible_( durationMode === \duration )
+					.action_({ |nb|
+						if( nb.value == 0 ) {
+							chain.dur_( inf );
+						} {
+							chain.dur_( nb.value );
+						};
+					});
+					
+				composite.decorator.shift( -88, 0 );
 				
-			views[ \dur ] = SMPTEBox( composite, 84@14 )
-				.applySmoothSkin
-				.applySkin( RoundView.skin )
-				.clipLo_(0)
-				.visible_( durationMode === \duration )
-				.action_({ |nb|
-					if( nb.value == 0 ) {
-						chain.dur_( inf );
-					} {
-						chain.dur_( nb.value );
-					};
+				views[ \endTime ] = SMPTEBox( composite, 84@14 )
+					.applySmoothSkin
+					.applySkin( RoundView.skin )
+					.clipLo_(0)
+					.visible_( durationMode === \endTime )
+					.action_({ |nb|
+						if( nb.value <= chain.startTime ) {
+							chain.dur_( inf );
+						} {
+							chain.dur_( nb.value - chain.startTime );
+						};
+					});
+					
+				composite.decorator.shift( -88, 0 );
+				
+				views[ \endBar ] = TempoBarMapView( composite, 84@14, tempoMap  )
+					.applySkin( RoundView.skin )
+					.radius_(2)
+					.clipLo_(0)
+					.visible_( durationMode === \endBar )
+					.action_({ |nb|
+						if( nb.value <= chain.startTime ) {
+							chain.dur_( inf );
+						} {
+							chain.dur_( nb.value - chain.startTime );
+						};
+					});
+					
+				views[ \infDur ] = SmoothButton( composite, 25@14 )
+					.border_( 1 )
+					.radius_( 3 )
+					.label_( [ "inf", "inf" ] )
+					.hiliteColor_( Color.green )
+					.action_({ |bt|
+						var dur;
+						switch( bt.value, 
+							0, { dur = views[ \dur ].value;
+								if( dur == 0 ) {
+									dur = 1;
+								};
+								chain.dur_( dur ) },
+							1, { chain.dur_( inf ) }
+						);
 				});
+		
+				views[ \fromSoundFile ] = SmoothButton( composite, 90@14 )
+					.border_( 1 )
+					.radius_( 3 )
+					.label_( "from soundFile" )
+					.action_({ chain.useSndFileDur });
+					
+				composite.decorator.nextLine;
 				
-			composite.decorator.shift( -88, 0 );
-			
-			views[ \endTime ] = SMPTEBox( composite, 84@14 )
-				.applySmoothSkin
-				.applySkin( RoundView.skin )
-				.clipLo_(0)
-				.visible_( durationMode === \endTime )
-				.action_({ |nb|
-					if( nb.value <= chain.startTime ) {
-						chain.dur_( inf );
-					} {
-						chain.dur_( nb.value - chain.startTime );
-					};
-				});
+				// fadeTimes
+				StaticText( composite, labelWidth@14 )
+					.applySkin( RoundView.skin )
+					.string_( "fadeTimes" )
+					.align_( \right );
 				
-			composite.decorator.shift( -88, 0 );
-			
-			views[ \endBar ] = TempoBarMapView( composite, 84@14, tempoMap  )
-				.applySkin( RoundView.skin )
-				.radius_(2)
-				.clipLo_(0)
-				.visible_( durationMode === \endBar )
-				.action_({ |nb|
-					if( nb.value <= chain.startTime ) {
-						chain.dur_( inf );
-					} {
-						chain.dur_( nb.value - chain.startTime );
-					};
-				});
-				
-			views[ \infDur ] = SmoothButton( composite, 25@14 )
-				.border_( 1 )
-				.radius_( 3 )
-				.label_( [ "inf", "inf" ] )
-				.hiliteColor_( Color.green )
-				.action_({ |bt|
-					var dur;
-					switch( bt.value, 
-						0, { dur = views[ \dur ].value;
-							if( dur == 0 ) {
-								dur = 1;
-							};
-							chain.dur_( dur ) },
-						1, { chain.dur_( inf ) }
-					);
-			});
+				views[ \fadeIn ] = SmoothNumberBox( composite, 40@14 )
+					.clipLo_(0)
+					.scroll_step_(0.1)
+					.action_({ |nb|
+						chain.fadeIn_( nb.value );
+					});
+					
+				views[ \fadeOut ] = SmoothNumberBox( composite, 40@14 )
+					.clipLo_(0)
+					.scroll_step_(0.1)
+					.action_({ |nb|
+						chain.fadeOut_( nb.value );
+					});
+					
+				views[ \releaseSelf ] = SmoothButton( composite, 70@14 )
+					.border_( 1 )
+					.radius_( 3 )
+					.label_( [ "releaseSelf", "releaseSelf" ] )
+					.hiliteColor_( Color.green )
+					.action_({ |bt|
+						chain.releaseSelf = bt.value.booleanValue;
+					});
+					
+				composite.decorator.nextLine;
 	
-			views[ \fromSoundFile ] = SmoothButton( composite, 90@14 )
-				.border_( 1 )
-				.radius_( 3 )
-				.label_( "from soundFile" )
-				.action_({ chain.useSndFileDur });
-				
-			composite.decorator.nextLine;
-			
-			// fadeTimes
-			StaticText( composite, labelWidth@14 )
-				.applySkin( RoundView.skin )
-				.string_( "fadeTimes" )
-				.align_( \right );
-			
-			views[ \fadeIn ] = SmoothNumberBox( composite, 40@14 )
-				.clipLo_(0)
-				.scroll_step_(0.1)
-				.action_({ |nb|
-					chain.fadeIn_( nb.value );
-				});
-				
-			views[ \fadeOut ] = SmoothNumberBox( composite, 40@14 )
-				.clipLo_(0)
-				.scroll_step_(0.1)
-				.action_({ |nb|
-					chain.fadeOut_( nb.value );
-				});
-				
-			views[ \releaseSelf ] = SmoothButton( composite, 70@14 )
-				.border_( 1 )
-				.radius_( 3 )
-				.label_( [ "releaseSelf", "releaseSelf" ] )
-				.hiliteColor_( Color.green )
-				.action_({ |bt|
-					chain.releaseSelf = bt.value.booleanValue;
-				});
-				
-			composite.decorator.nextLine;
-
-			StaticText( composite, labelWidth@14 )
-				.applySkin( RoundView.skin )
-				.string_( "fade curves" )
-				.align_( \right );
-
-			views[ \fadeInCurve ] = SmoothNumberBox( composite, 40@14 )
-				.clipLo_(-20)
-			    .clipHi_(20)
-				.scroll_step_(0.1)
-				.action_({ |nb|
-					chain.fadeInCurve_( nb.value );
-				});
-
-			views[ \fadeOutCurve ] = SmoothNumberBox( composite, 40@14 )
-				.clipLo_(-20)
-			    .clipHi_(20)
-				.scroll_step_(0.1)
-				.action_({ |nb|
-					chain.fadeOutCurve_( nb.value );
-				});
-
-			composite.decorator.nextLine;
+				StaticText( composite, labelWidth@14 )
+					.applySkin( RoundView.skin )
+					.string_( "fade curves" )
+					.align_( \right );
+	
+				views[ \fadeInCurve ] = SmoothNumberBox( composite, 40@14 )
+					.clipLo_(-20)
+				    .clipHi_(20)
+					.scroll_step_(0.1)
+					.action_({ |nb|
+						chain.fadeInCurve_( nb.value );
+					});
+	
+				views[ \fadeOutCurve ] = SmoothNumberBox( composite, 40@14 )
+					.clipLo_(-20)
+				    .clipHi_(20)
+					.scroll_step_(0.1)
+					.action_({ |nb|
+						chain.fadeOutCurve_( nb.value );
+					});
+	
+				composite.decorator.nextLine;
+			}
 		};
 		
-		// gain
-		StaticText( composite, labelWidth@14 )
-			.applySkin( RoundView.skin )
-			.string_( "gain" )
-			.align_( \right );
-		
-		views[ \gain ] = SmoothNumberBox( composite, 40@14 )
-			.clipHi_(24) // just to be safe)
-			.action_({ |nb|
-				chain.setGain( nb.value );
-			});
+		if( chain.isKindOf( MassEditUChain ).not or: { chain.uchains.size > 0 } ) {	
+			// gain
+			StaticText( composite, labelWidth@14 )
+				.applySkin( RoundView.skin )
+				.string_( "gain" )
+				.align_( \right );
 			
-		views[ \muted ] = SmoothButton( composite, 40@14 )
-			.border_( 1 )
-			.radius_( 3 )
-			.label_( [ "mute", "mute" ] )
-			.hiliteColor_( Color.red )
-			.action_({ |bt|
-				switch( bt.value, 
-					0, { chain.muted = false },
-					1, { chain.muted = true }
-				);
-			});
+			views[ \gain ] = SmoothNumberBox( composite, 40@14 )
+				.clipHi_(24) // just to be safe)
+				.action_({ |nb| 
+					chain.setGain( nb.value );
+				});
+				
+			views[ \muted ] = SmoothButton( composite, 40@14 )
+				.border_( 1 )
+				.radius_( 3 )
+				.label_( [ "mute", "mute" ] )
+				.hiliteColor_( Color.red )
+				.action_({ |bt|
+					switch( bt.value, 
+						0, { chain.muted = false },
+						1, { chain.muted = true }
+					);
+				});
+				
+			composite.decorator.nextLine;
+			
+			controller.put( \gain, { views[ \gain ].value = chain.getGain } );
+			controller.put( \muted, { views[ \muted ].value = chain.muted.binaryValue } );
+		};
+			
+		if( chain.isKindOf( MassEditUChain ) && { chain.umarkers.size > 0 } ) {
+			
+			StaticText( composite, labelWidth@14 )
+				.applySkin( RoundView.skin )
+				.string_( "autoPause" )
+				.align_( \right );
+		
+			views[ \autoPause ] = BoolSpec(true).massEditSpec( chain.autoPause ).makeView( composite, 126@14, action: { |vws, value|
+				chain.autoPause = value
+			} );
+		};
 			
 		controller
 			.put( \start, { views[ \startButton ].value = 1 } )
@@ -635,8 +656,6 @@ UChainGUI {
 					releaseTask.stop;
 				};
 			} )
-			.put( \gain, { views[ \gain ].value = chain.getGain } )
-			.put( \muted, { views[ \muted ].value = chain.muted.binaryValue } )
 			.put( \units, { 
 				if( composite.isClosed.not ) {
 					{
@@ -684,20 +703,29 @@ UChainGUI {
 		if( score.isNil ) {
 			controller
 				.put( \displayColor, { { views[ \displayColor ].refresh; }.defer; } )
-				.put( \startTime, { 
-					views[ \startTime ].value = chain.startTime ? 0; 
-					views[ \startBar ].value = chain.startTime ? 0;
-					if( chain.dur == inf ) {
-						views[ \endTime ].value = chain.startTime ? 0;
-						views[ \endBar ].value = chain.startTime ? 0; 
-					} {
-						views[ \endTime ].value = (chain.startTime + chain.dur) ? 0; 
-						views[ \endBar ].value = (chain.startTime + chain.dur) ? 0; 
-					};
-				})
 				.put( \lockStartTime, {
 					views[ \lockStartTime ].value = chain.lockStartTime.binaryValue;
-				})
+				});
+			
+			if( chain.isKindOf( MassEditUChain ) && { chain.uchains.size == 0 } ) {
+				controller
+					.put( \startTime, { 
+						views[ \startTime ].value = chain.startTime ? 0; 
+						views[ \startBar ].value = chain.startTime ? 0;
+					})
+			} {
+				controller
+					.put( \startTime, { 
+						views[ \startTime ].value = chain.startTime ? 0; 
+						views[ \startBar ].value = chain.startTime ? 0;
+						if( chain.dur == inf ) {
+							views[ \endTime ].value = chain.startTime ? 0;
+							views[ \endBar ].value = chain.startTime ? 0; 
+						} {
+							views[ \endTime ].value = (chain.startTime + chain.dur) ? 0; 
+							views[ \endBar ].value = (chain.startTime + chain.dur) ? 0; 
+						};
+					})
 				.put( \dur, { var dur;
 					dur = chain.dur;
 					if( dur == inf ) {
@@ -727,7 +755,9 @@ UChainGUI {
 				.put( \releaseSelf, {  
 					views[ \releaseSelf ].value = chain.releaseSelf.binaryValue;
 					{ views[ \displayColor ].refresh; }.defer; 
-				})
+				});
+			};
+				
 		} {
 			scoreController = SimpleController( score );
 			scoreController
@@ -767,7 +797,7 @@ UChainGUI {
 		var comp, header, min, io, defs, mapdefs, code;
 		var notMassEdit, headerInset = 0;
 		
-		notMassEdit = chain.class != MassEditUChain;
+		notMassEdit = chain.isKindOf( MassEditUChain ).not;
 		
 		comp = CompositeView( composite, (composite.bounds.width - (margin.x * 2))@16 )
 			.resize_(2);
@@ -863,7 +893,7 @@ UChainGUI {
 			};
 		};
 		
-		if( units.size == 0 ) {
+		if( units.size == 0 && { chain.isKindOf( MassEditUChain ).not } ) {
 			comp = CompositeView( scrollView, width@100 )
 				.resize_(2);
 			
