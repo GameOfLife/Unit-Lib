@@ -749,9 +749,9 @@ UChain(\test).gui
 
 + String {
 	asUnitArg { |unit, key|
-		case { unit.getSpec( key ).isKindOf( BufSndFile ) } {
+		case { unit.getSpec( key ).isKindOf( BufSndFileSpec ) } {
 			^this.asBufSndFile.asUnitArg(unit, key)
-		} { unit.getSpec( key ).isKindOf( DiskSndFile ) } {
+		} { unit.getSpec( key ).isKindOf( DiskSndFileSpec ) } {
 			^this.asDiskSndFile.asUnitArg(unit, key)
 		} {
 			^this;
