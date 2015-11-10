@@ -397,6 +397,10 @@ EQSetting {
 		});
 	 }
 	 
+	 magResponse { |freqs|
+		  ^this.magResponses(freqs).product;
+	 }
+	 
 	 storeArgs { ^[ def, setting ] }
 	 
 	 gui { |parent, bounds|
