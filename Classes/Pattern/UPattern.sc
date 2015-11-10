@@ -1,6 +1,6 @@
 UPattern : UChain {
 	
-	var repeats = inf;
+	var <>repeats = inf;
 	var <>sustain = 1;
 	var <>timeToNext = 1;
 	var task;
