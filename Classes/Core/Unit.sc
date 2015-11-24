@@ -536,8 +536,9 @@ U : ObjectWithArgs {
 	allKeys { ^this.keys }
 	allValues { ^this.values }
 	
-	uchainInit { |chain|
-		this.def !? { |d| d.uchainInitFunc.value( this, chain ) };
+	uchainInit { |...args|
+		this.def !? { |d| d.uchainInitFunc.value( this, *args ) };
+		this.getUMaps.do(_.uchainInit(this, *args));
 	}
 	
 	guiCollapsed_ { |bool = false|
