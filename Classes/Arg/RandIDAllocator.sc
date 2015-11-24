@@ -41,6 +41,7 @@ RandIDAllocator {
 }
 
 URandSeed {
+	var <>seed;
 	
 	*getRandID {
 		var id = \u_randID.ir( 0 );
@@ -57,4 +58,29 @@ URandSeed {
 		this.getRandID;
 		RandSeed.kr( trig, seed );
 	}
+	
+	*new { ^super.new.next }
+	
+	value { ^seed }
+	next { seed = 16777216.rand }
+	prepare { this.next }
+	
+	asControlInput { ^this.value; }
+	asControlInputFor { ^this.value; }
+	
+	*asSpec { ^this }
+	*constrain { |value| 
+		if( value.isNumber or: value.isKindOf( URandSeed ) ) {
+			^value 
+		} {  
+			^URandSeed();
+		} 
+	}
+	
+	*default { ^URandSeed() }
+	*massEditSpec { ^nil }
+	*findKey {
+		^Spec.specs.findKeyForValue(this);
+	}
+	
 }
