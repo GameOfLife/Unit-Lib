@@ -299,7 +299,7 @@ PointSpec : Spec {
 	}
 	
 	constrain { |value|
-		^value.asPoint.clip( clipRect.leftTop, clipRect.rightBottom ); //.round( step );
+		^(value ?? { 0@0 }).asPoint.clip( clipRect.leftTop, clipRect.rightBottom ); //.round( step );
 	}
 	
 	map { |value|
