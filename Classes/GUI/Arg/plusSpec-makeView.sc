@@ -1807,6 +1807,71 @@
 
 }
 
++ SharedValueIDSpec {
+
+	makeView { |parent, bounds, label, action, resize|
+		var vws, view, labelWidth;
+		var boxWidth;
+		
+		bounds.isNil.if{bounds= 160 @ 18 };
+		
+		vws = ();
+		#view, bounds = EZGui().prMakeMarginGap.prMakeView( parent, bounds );
+		vws[ \view ] = view;
+		
+		if( label.notNil ) {
+			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
+			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ 14 )
+				.string_( label.asString ++ " " )
+				.align_( \right )
+				.resize_( 4 )
+				.applySkin( RoundView.skin );
+		} {
+			labelWidth = -4;
+		};
+		
+		boxWidth = bounds.width-(labelWidth + 2 + 40 + 2);
+		
+		vws[ \box ] = SmoothNumberBox( vws[ \view ], 
+				Rect(labelWidth + 2, 0, boxWidth, bounds.height)
+			)
+		    .action_({ |vw|
+		        action.value( vw, vw.value.asInt );
+		    } ).resize_(5)
+		    .allowedChars_( "" )
+			.step_( step )
+			.scroll_step_( step )
+			.alt_scale_( alt_step / step )
+			.clipLo_( this.minval )
+			.clipHi_( this.maxval );
+			
+		vws[ \drag ] = DragBoth( vws[ \view ], 
+				Rect( labelWidth + boxWidth + 2, 0, 40,bounds.height)
+			)
+			.beginDragAction_({ 
+				{ UChainGUI.current.view.refresh }.defer(0.1);
+				UMap( this.class.umap_name, [ \id, vws[ \box ].value ] ); 
+			})
+			.canReceiveDragHandler_({ 
+				View.currentDrag.isKindOf( UMap ) && {
+					View.currentDrag.defName === (this.class.umap_name)
+				};
+			})
+			.receiveDragHandler_({ 
+				vws[ \box ].valueAction = View.currentDrag.id;
+			});
+					    
+		if( resize.notNil ) { vws[ \view ].resize = resize };
+		^vws;
+	}
+
+	setView { |view, value, active = false|
+		view[ \box ].value = value;
+		if( active ) { view.doAction };
+	}
+
+}
+
 + FreqSpec {
 	
 	makeView { |parent, bounds, label, action, resize|

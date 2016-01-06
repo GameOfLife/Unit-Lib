@@ -51,9 +51,9 @@ defs = [
 	}, addToAll: false)
 		.setSpec( \value, spec )
 		.setSpec( \range, spec.asControlSpec.asRangeSpec )
-		.setSpec( \id, PositiveIntegerSpec( 0, 0, 99 ) )
-		.setSpec( \lo_id, PositiveIntegerSpec( 0, 0, 99 ) )
-		.setSpec( \hi_id, PositiveIntegerSpec( 1, 0, 99 ) );
+		.setSpec( \id, SharedValueIDSpec() )
+		.setSpec( \lo_id, SharedValueIDSpec() )
+		.setSpec( \hi_id, SharedValueIDSpec(1) );
 });
 
 def = MultiUdef( \shared_value, defs, \shared_io, \type, false );

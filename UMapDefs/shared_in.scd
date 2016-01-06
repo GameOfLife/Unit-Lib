@@ -41,7 +41,7 @@ UMapDef( \shared_in, { |id = 0, range = #[0.0, 1.0], curve = 0.0, invert = 0, cl
 	UMapOut.kr(sig);
 })
 	.mappedArgs_([ \range ])
-	.setSpec( \id, PositiveIntegerSpec( 0, 0, 99 ) )
+	.setSpec( \id, SharedValueIDSpec( 0 ) )
 	.setSpec( \clipMode, ListSpec( (..3), 0, [ \clip, \fold, \wrap, \none ] ) )
 	.setSpec( \clipSoftness, [0,1,\lin,0,0].asSpec )
 	.setSpec( \curve, [-16,16,\lin,0,0].asSpec )

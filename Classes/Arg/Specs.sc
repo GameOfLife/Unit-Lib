@@ -1030,6 +1030,17 @@ PositiveIntegerSpec : IntegerSpec {
 
 }
 
+SharedValueIDSpec : PositiveIntegerSpec {
+	
+	*umap_name { ^'shared_in' }
+	
+	*new{ |default = 0|
+        ^super.new.minval_( 0 ).maxval_( 99 ).default_(default);
+	}
+		
+	storeArgs { ^[ default ] }
+}
+
 PositiveRealSpec : Spec {
 
 	var <default = 0;
