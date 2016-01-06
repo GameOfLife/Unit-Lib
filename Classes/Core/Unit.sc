@@ -624,15 +624,22 @@ U : ObjectWithArgs {
 	}
 	
 	insertUMap { |key, umapdef, args|
-		var item;
-		umapdef = umapdef.asUdef( UMapDef );
-		if( umapdef.notNil ) {
-			if( umapdef.canInsert ) {
+		var item, umap;
+		if( umapdef.isKindOf( UMap ) ) {
+			umap = umapdef;
+		} {
+			umapdef = umapdef.asUdef( UMapDef );
+			if( umapdef.notNil ) {
+				umap = UMap( umapdef,  args );
+			};
+		};
+		if( umap.notNil ) {
+			if( umap.def.canInsert ) {
 				item = this.get( key );
-				this.set( key, UMap( umapdef,  args ) );
+				this.set( key, umap );
 				this.get( key ).setConstrain( umapdef.insertArgName, item );
 			} {
-				this.set( key, UMap( umapdef, args ) );
+				this.set( key, umap );
 			};
 		};
 	}

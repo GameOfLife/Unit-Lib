@@ -169,9 +169,11 @@ UGUI {
 									last !? _.refresh;
 									vw.refresh;
 								};
-								View.currentDrag.isKindOf( UMapDef ) && {
+								(View.currentDrag.isKindOf( UMapDef ) && {
 									unit.canUseUMap( key, View.currentDrag ); 
-								};
+								}) or: (View.currentDrag.isKindOf( UMap ) && {
+									unit.canUseUMap( key, View.currentDrag.def ); 
+								});
 							});
 																		umapdragbin.drawFunc = { |vw|
 							if( View.currentDrag.notNil && {

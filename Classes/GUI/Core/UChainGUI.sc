@@ -919,7 +919,7 @@ UChainGUI {
                     { true }
 					{ [ Symbol, String ].includes( drg.class ) }
 					{ Udef.all.keys.includes( drg.asSymbol ) }
-					{ drg.isKindOf( U ) }
+					{ drg.isKindOf( U ) && { drg.isKindOf( UMap ).not } }
 					{ true }
 					{ false }
 			})
@@ -965,7 +965,7 @@ UChainGUI {
 	                        { true }
 							{ [ Symbol, String ].includes( drg.class ) }
 							{ Udef.all.keys.includes( drg.asSymbol ) }
-							{ drg.isKindOf( U ) }
+							{ drg.isKindOf( U ) && { drg.isKindOf( UMap ).not } }
 							{ true }
 							{ false }
 					})
@@ -1028,7 +1028,7 @@ UChainGUI {
                         { true }
 					{ [ Symbol, String ].includes( drg.class ) }
 					{ Udef.all.keys.includes( drg.asSymbol ) }
-					{ drg.isKindOf( U ) }
+					{ drg.isKindOf( U ) && { drg.isKindOf( UMap ).not } }
 					{ true }
 					{ false }
 			})
@@ -1201,7 +1201,7 @@ UChainGUI {
                         { true }
 						{ [ Symbol, String ].includes( drg.class ) }
 						{ Udef.all.keys.includes( drg.asSymbol ) }
-						{ drg.isKindOf( U ) }
+						{ drg.isKindOf( U ) && { drg.isKindOf( UMap ).not } }
 						{ true }
 						{ false }
 				})

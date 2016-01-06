@@ -67,6 +67,7 @@ UMapGUI : UGUI {
 		var boldFont;
 		var umapdragbin;
 		var umapdragbinTask;
+		var dragging;
 		
 		header = CompositeView( composite, bounds.width @ viewHeight )
 			.resize_(2);
@@ -87,6 +88,16 @@ UMapGUI : UGUI {
 			.font_( boldFont )
 			.string_( ":" + unit.defName );
 			
+			DragBoth( header, Rect( bounds.width - 12 - 12 - 2, 2, 12, 12 ) )
+				.beginDragAction_({
+					{ UChainGUI.current.view.refresh }.defer(0.1);
+					dragging = unit.deepCopy;
+				})
+				.canReceiveDragHandler_({ View.currentDrag === dragging })
+				.receiveDragHandler_({ })
+				.background_( Color.gray(0.8,0.8) )
+				.string_( " +" );
+							
 			SmoothButton( header, Rect( bounds.width - 12, 2, 12, 12 ) )
 				.label_( '-' )
 				.canFocus_( false )
@@ -160,7 +171,7 @@ UMapGUI : UGUI {
 				});
 			
 			UserView( header, // replace UMap
-				Rect( labelWidth + 8, 2, (bounds.width - labelWidth - 16 - 6 ), 12 ) 
+				Rect( labelWidth + 8, 2, (bounds.width - labelWidth - 16 - 6 - 16 ), 12 ) 
 			)
 				.canReceiveDragHandler_({ |vw, x,y|
 					var last;
