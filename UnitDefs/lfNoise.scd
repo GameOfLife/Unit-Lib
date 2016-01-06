@@ -9,6 +9,7 @@ type: the type of noise:
 	0: step or sample-and-hold noise; hard jumps at each value change
 	1: linear interpolated noise
 	2: cubic interpolated noise
+	- settings in between these types are also possible, effectively crossfading between them.
 seed: random seed (positive whole number). The same seed will always result in exactly the same noise on any computer. If you want decorrelated noise from multiple sources, change the seed on each source to a different number.
 
 --
