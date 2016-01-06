@@ -651,7 +651,7 @@ U : ObjectWithArgs {
 			if( umap.def.canInsert ) {
 				this.set( key, umap.get( umap.def.insertArgName ) );
 			} {
-				this.set( key, this.getDefault( key ) );
+				this.set( key, this.getDefault( key ).copy );
 			};
 		};
 	}
