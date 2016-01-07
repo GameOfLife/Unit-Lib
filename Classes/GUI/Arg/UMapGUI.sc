@@ -88,6 +88,7 @@ UMapGUI : UGUI {
 			.font_( boldFont )
 			.string_( ":" + unit.defName );
 			
+		if( unit.isKindOf( MassEditUMap ).not ) {
 			DragBoth( header, Rect( bounds.width - 12 - 12 - 2, 2, 12, 12 ) )
 				.beginDragAction_({
 					{ UChainGUI.current.view.refresh }.defer(0.1);
@@ -97,6 +98,7 @@ UMapGUI : UGUI {
 				.receiveDragHandler_({ })
 				.background_( Color.gray(0.8,0.8) )
 				.string_( " +" );
+		};
 							
 			SmoothButton( header, Rect( bounds.width - 12, 2, 12, 12 ) )
 				.label_( '-' )
@@ -116,17 +118,10 @@ UMapGUI : UGUI {
 					unit.guiCollapsed = bt.value.booleanValue;
 				});
 				
-			UserView( header, // insert UMap
+			UDragBin( header, // insert UMap
 				Rect( 14, 2, labelWidth - 10, 12 ) 
 			)
 				.canReceiveDragHandler_({ |vw, x,y|
-					var last;
-					if( x.notNil ) {
-						last = currentUMapSink;
-						currentUMapSink = vw;
-						last !? _.refresh;
-						vw.refresh;
-					};
 					View.currentDrag.isKindOf( UMapDef ) && {
 						(parentUnit !? (_.canUseUMap( unit.unitArgName, View.currentDrag )) 
 							? false) && {
@@ -142,46 +137,12 @@ UMapGUI : UGUI {
 						});
 					} {
 						parentUnit.insertUMap( unit.unitArgName, View.currentDrag );					};
-				})
-				.drawFunc_({ |vw|
-					if( View.currentDrag.notNil && {
-						vw.canReceiveDragHandler.value == true;
-					}) {
-						Pen.width = 2;
-						if( currentUMapSink === vw ) {
-							Pen.color = Color.blue.alpha_(1);
-						} {
-							Pen.color = Color.blue.alpha_(0.25);
-						};
-						Pen.addRect( vw.bounds.moveTo(0,0).insetBy(1,1) );
-						Pen.stroke;
-						if( umapdragbinTask.isPlaying.not ) {
-							umapdragbinTask = Task({
-								while { vw.isClosed.not && {												vw.canReceiveDragHandler.value == true
-									} 
-								} {
-									0.25.wait;
-								};
-								if( vw.isClosed.not ) {
-									vw.refresh;
-								};
-							}, AppClock).start;
-						};
-					};
 				});
-			
-			UserView( header, // replace UMap
+				
+			UDragBin( header, // replace UMap
 				Rect( labelWidth + 8, 2, (bounds.width - labelWidth - 16 - 6 - 16 ), 12 ) 
 			)
-				.canReceiveDragHandler_({ |vw, x,y|
-					var last;
-					if( x.notNil ) {
-						last = currentUMapSink;
-						currentUMapSink = vw;
-						last !? _.refresh;
-						vw.refresh;
-					};
-					View.currentDrag.isKindOf( UMapDef ) && {
+				.canReceiveDragHandler_({ |vw, x,y|						View.currentDrag.isKindOf( UMapDef ) && {
 						parentUnit !? (_.canUseUMap( unit.unitArgName, View.currentDrag )) 
 							? false; 
 					};
@@ -189,32 +150,6 @@ UMapGUI : UGUI {
 				.receiveDragHandler_({
 					unit.stop;
 					unit.def = View.currentDrag;
-				})
-				.drawFunc_({ |vw|
-					if( View.currentDrag.notNil && {
-						vw.canReceiveDragHandler.value == true;
-					}) {
-						Pen.width = 2;
-						if( currentUMapSink === vw ) {
-							Pen.color = Color.blue.alpha_(1);
-						} {
-							Pen.color = Color.blue.alpha_(0.25);
-						};
-						Pen.addRect( vw.bounds.moveTo(0,0).insetBy(1,1) );
-						Pen.stroke;
-						if( umapdragbinTask.isPlaying.not ) {
-							umapdragbinTask = Task({
-								while { vw.isClosed.not && {												vw.canReceiveDragHandler.value == true
-									} 
-								} {
-									0.25.wait;
-								};
-								if( vw.isClosed.not ) {
-									vw.refresh;
-								};
-							}, AppClock).start;
-						};
-					};
 				});
 	}
 }

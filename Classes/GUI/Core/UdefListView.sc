@@ -164,6 +164,15 @@ UdefListView {
 	            };
                 DragSource( views[ cat ], (bounds.width - wd)@18 )
                     .object_( udef )
+                     .beginDragAction_({ |vw|
+	                    this.setEndFrontAction( true );
+	                    UDragBin.current = nil;
+	                    { 
+		                    UChainGUI.all.do({ |x| x.view.refresh });
+		                    UGlobalControlGUI.current !? {|x| x.view.view.refresh };
+		               }.defer(0.1);
+	                    vw.object;
+                    })
                     .string_( " " ++ udef.name.asString )
                     .applySkin( RoundView.skin ? () );
                   
@@ -175,7 +184,7 @@ UdefListView {
 	                	.resize_(3)
 	                	.canFocus_( false )
 	                	.action_({
-		                	this.setEndFrontAction;
+		                	this.setEndFrontAction( false );
 		                	udef.openDefFile 
 		                });
                 };
@@ -261,11 +270,22 @@ UdefListView {
             rackCategories = rackCategories.clump(2).sort({ |a,b| a[0] <= b[0] }).flatten(1);
             rackCategories.pairsDo(g);
 		});
+		
+		this.setEndFrontAction( true );
 	}
 	
-	setEndFrontAction {
+	setEndFrontAction { |bool = true|
 		 if( GUI.id == \cocoa ) {
-			 view.findWindow.endFrontAction = nil;
+			if( bool ) {
+				view.findWindow.endFrontAction = {
+					if( View.currentDrag.isKindOf( Udef ) ) {
+						View.currentDrag = nil;
+					};
+				};
+			} {
+				view.findWindow.endFrontAction = nil;
+				View.currentDrag = nil;
+			};
 		 };
 	}	
 }

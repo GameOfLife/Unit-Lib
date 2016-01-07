@@ -907,8 +907,9 @@ UChainGUI {
 						{ Font( Font.defaultSansFace, 12) }).boldVariant 
 				);
 				
-			uview = UserView( comp, comp.bounds.width @ 100 );
+			uview = UDragBin( comp, comp.bounds.width @ 100 );
 			uview.background_( Color.white.alpha_(0.25) );
+			uview.color_( Color.gray(0.2) );
 				
 			uview.canReceiveDragHandler_({ |sink|
 				var drg;
@@ -951,7 +952,8 @@ UChainGUI {
 				realIndex = realIndex + 1;
 			};
 			
-			addBefore = UserView( scrollView, width@6 )
+			addBefore = UDragBin( scrollView, width@6 )
+				.color_( Color.gray(0.2) )
 				.resize_(2);
 			
 			if( notMassEdit ) {
@@ -1017,7 +1019,8 @@ UChainGUI {
 			
 			//if( chain.class != MassEditUChain )
 				
-			uview = UserView( comp, comp.bounds.moveTo(0,0) );
+			uview = UDragBin( comp, comp.bounds.moveTo(0,0) );
+			uview.color_( Color.gray(0.2) );
 			
 			uview.canReceiveDragHandler_({ |sink|
 				var drg;
@@ -1187,8 +1190,9 @@ UChainGUI {
 		});
 		
 		if( notMassEdit && { units.size > 0 } ) {
-			addLast = UserView( scrollView, width@6 )
+			addLast = UDragBin( scrollView, width@6 )
 				.resize_(2)
+				.color_( Color.gray(0.2) )
 				.background_( Color.white.alpha_(0.25) )
 				.canFocus_(false);
 					

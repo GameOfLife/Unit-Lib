@@ -158,7 +158,7 @@ UMapDefListView {
                     .object_( udef )
                     .beginDragAction_({ |vw|
 	                    this.setEndFrontAction( true );
-	                    UGUI.currentUMapSink = nil;
+	                    UDragBin.current = nil;
 	                    { 
 		                    UChainGUI.all.do({ |x| x.view.refresh });
 		                    UGlobalControlGUI.current !? {|x| x.view.view.refresh };
@@ -266,7 +266,7 @@ UMapDefListView {
 		 if( GUI.id == \cocoa ) {
 			if( bool ) {
 				view.findWindow.endFrontAction = {
-					if( View.currentDrag.isKindOf( UMapDef ) ) {
+					if( View.currentDrag.isKindOf( Udef ) ) {
 						View.currentDrag = nil;
 					};
 				};
