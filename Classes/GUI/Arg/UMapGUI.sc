@@ -97,7 +97,7 @@ UMapGUI : UGUI {
 				.canReceiveDragHandler_({ View.currentDrag === dragging })
 				.receiveDragHandler_({ })
 				.background_( Color.gray(0.8,0.8) )
-				.string_( " +" );
+				.string_( "" );
 		};
 							
 			SmoothButton( header, Rect( bounds.width - 12, 2, 12, 12 ) )
