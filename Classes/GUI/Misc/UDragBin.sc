@@ -34,7 +34,7 @@ UDragBin {
 				} {
 					Pen.color = color.copy.alpha_(0.25);
 				};
-				Pen.addRect( vw.bounds.moveTo(0,0).insetBy(1,1) );
+				Pen.roundedRect( vw.bounds.moveTo(0,0).insetBy(1,1), 3 );
 				Pen.stroke;
 				if( task.isPlaying.not ) {
 					task = Task({
