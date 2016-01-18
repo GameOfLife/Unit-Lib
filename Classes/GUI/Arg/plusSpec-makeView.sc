@@ -485,11 +485,11 @@
 				.resize_( 4 )
 				.applySkin( RoundView.skin );
 		} {
-			labelWidth = -4;
+			labelWidth = -2;
 		};
 		
 		vws[ \box ] = SMPTEBox( vws[ \view ], 
-				Rect(labelWidth + 4,0,bounds.width-(labelWidth + 4),bounds.height)
+				Rect(labelWidth + 2,0,bounds.width-(labelWidth + 2),bounds.height)
 			)
 			.applySmoothSkin
 		    .action_({ |vw|
