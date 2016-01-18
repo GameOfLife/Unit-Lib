@@ -98,6 +98,36 @@
 	}
 }
 
++ SMPTESpec {
+	
+	massEditSpec { |inArray|
+		^this.copy.default_( this.massEditValue( inArray ) );
+	}
+	
+	massEditValue { |inArray|
+		^inArray.minItem;
+	}
+	
+	massEdit { |inArray, params|
+		^(params - inArray.minItem) + inArray;
+	}
+}
+
++ TriggerSpec {
+	
+	massEditSpec { |inArray|
+		^this.copy;
+	}
+	
+	massEditValue { |inArray|
+		^inArray[0];
+	}
+	
+	massEdit { |inArray, params|
+		^inArray.collect({ |item| params });
+ 	}
+}
+
 + BoolSpec {
 	
 	massEditSpec { |inArray|

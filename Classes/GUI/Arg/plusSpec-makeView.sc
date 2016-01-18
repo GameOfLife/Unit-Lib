@@ -577,7 +577,9 @@
 		};
 		view[ \task ] = Task({ 
 			0.1.wait; 
-			view[ \buttonView ].background = view[ \normalBackground ]; 
+			if( view[ \buttonView ].isClosed.not ) {
+				view[ \buttonView ].background = view[ \normalBackground ]; 
+			};
 		}).start;
 		view[ \val ] = value;
 		if( view[ \valueView ].notNil ) {
