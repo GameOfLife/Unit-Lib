@@ -101,3 +101,35 @@
 		stream << "]" ;
 	}
 }
+
++ Dictionary {
+
+	prettyPrintGetItems { |indent = 0|
+		^this.collect { | item, key |
+			var itemString0 = item.asPrettyString(0);
+			var keyString0 = key.asPrettyString(0);
+			if( (itemString0.includes( $\n ) ) or: { ( keyString0.size + itemString0.size + 5 ) > 80 } ) {
+				key.asPrettyString( indent )[indent..]++":\n"++
+				item.asPrettyString( indent )
+			}{
+				key.asPrettyString( indent )[indent..]++": "++itemString0
+			}
+		}.asArray.sort({ |a,b| a.size < b.size });
+	}
+
+	prettyPrintOn { | stream, indent |
+		if (stream.atLimit) { ^this };
+		stream << this.prettyPrintIndent( indent ) << "( ";
+		this.prettyPrintItemsOn(stream, indent + 1);
+		stream << ")" ;
+	}
+}
+
++ String {
+
+	prettyPrintOn{ | stream, indent |
+		stream << this.prettyPrintIndent( indent );
+		this.storeOn( stream );
+	}
+
+}
