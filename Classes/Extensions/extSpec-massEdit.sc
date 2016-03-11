@@ -216,3 +216,10 @@
 	}
 
 }
+
++ ArrayControlSpec {
+	massEditSpec { |inArray|
+		^nil
+	}
+}
+	
