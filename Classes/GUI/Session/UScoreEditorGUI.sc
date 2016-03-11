@@ -55,6 +55,10 @@ UScoreEditorGUI : UAbstractWindow {
 		this.currentSelectedChains.do(f)
 	}
 
+	*currentInnerScore{
+		^UScoreView.current !? { |x| x.scoreList.last }
+	}
+
     init { |inScoreEditor|
 		scoreEditor = if(inScoreEditor.isKindOf(UScore)) {
             UScoreEditor(inScoreEditor)
@@ -65,11 +69,11 @@ UScoreEditorGUI : UAbstractWindow {
         scoreController.put(\name,{
             window.name = this.windowTitle
         });
-        
+
         scoreController.put(\something,{
             { window.name = this.windowTitle }.defer;
         });
-        
+
     }
 
 	score { ^scoreEditor.score }
@@ -129,19 +133,19 @@ UScoreEditorGUI : UAbstractWindow {
         centerBounds = Rect(0,0, bounds.width-8, bounds.height-( topBarH + tranBarH + (2*margin) + (2*gap) ));
         //centerView = CompositeView(view, centerBounds).resize_(5);
         scoreView = UScoreView(view, centerBounds, scoreEditor );
-        
+
         //TOP
         topBar = UScoreEditorGui_TopBar(view,Rect(0,0, bounds.width-(2*margin), topBarH ),scoreView);
         view.decorator.nextLine;
-        
+
         //CENTER
         scoreView.makeView;
         view.decorator.nextLine;
-        
+
         //BOTTOM
         tranportBar = UScoreEditorGui_TransportBar(view,  Rect(0,0, bounds.width - (2*margin), tranBarH ), scoreView);
 	}
-}	
+}
 
 + UScore {
 	gui { |bounds|
