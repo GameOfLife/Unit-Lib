@@ -57,7 +57,7 @@ UAbstractWindow {
 
         window = Window(title, bounds).front;
         window.onClose_(onClose);
-        window.toFrontAction_({ currentDict[this.class] = this });
+		window.toFrontAction_({ this.class.changed(\activeWindow, this); currentDict[this.class] = this });
         margin = margin ? 4;
         gap = gap ? 2;
         view = window.view;
