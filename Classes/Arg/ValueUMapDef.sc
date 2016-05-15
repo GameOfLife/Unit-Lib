@@ -6,12 +6,12 @@ ValueUMapDef : UMapDef {
 	var <>startFunc, <>endFunc;
 	
 	*initClass {
-		activeUnits = IdentitySet();
+		activeUnits = IdentityDictionary();
 		CmdPeriod.add( this );
 	}
 	
 	*cmdPeriod {
-		activeUnits = IdentitySet();
+		activeUnits.keys.asArray.do(_.set( \active, false ));
 	}
 	
 	*new { |name, startFunc, endFunc, args, category, addToAll=true|
@@ -25,7 +25,6 @@ ValueUMapDef : UMapDef {
 		argSpecs = ([
 			[ \value, 0, ControlSpec(0,1) ], 
 			[ \active, false, BoolSpec(false) ],
-			[ \u_store, nil, AnythingSpec(), true ], // func can store things here
 			[ \u_spec, [0,1].asSpec, ControlSpecSpec(), true ],
 		] ++ argSpecs).collect(_.asArgSpec);
 		argSpecs.do(_.mode_( \init ));
@@ -51,7 +50,7 @@ ValueUMapDef : UMapDef {
 	
 	activateUnit { |unit|
 		if( unit.get( \active ).booleanValue == true && { 
-			activeUnits.includes( unit ).not 
+			activeUnits.keys.includes( unit ).not 
 		}) {
 			unit.set( \active, true );
 		};
@@ -83,11 +82,9 @@ ValueUMapDef : UMapDef {
 				 \value, { unit.unitSet; },
 				 \active, { 
 					 if( item[1].booleanValue ) {
-						 activeUnits.add( unit );
-						 unit.set( \u_store, startFunc.value( unit, unit.get( \u_store ) ) ); 
+						 activeUnits.put( unit, startFunc.value( unit, activeUnits[ unit ] ) );
 					 } {
-						 unit.set( \u_store, endFunc.value( unit, unit.get( \u_store ) ) );
-						 activeUnits.remove( unit );
+						 activeUnits.put( unit, endFunc.value( unit, activeUnits[ unit ] ) );
 					 };
 				 }
 			)
