@@ -921,6 +921,24 @@ UScore : UEvent {
 	onSaveAction { this.name = filePath.basename.removeExtension }
 	
 	readTextArchiveAction{ this.name = filePath.basename.removeExtension }
+	
+	windowBounds {
+		^UScoreEditorGUI.all.detect({ |item|
+			item.score == this
+		}) !? { |gui| gui.window.bounds };
+	}
+	
+	windowBounds_ { |rect|
+		UScoreEditorGUI.all.detect({ |item|
+			item.score == this
+		}) !? { |gui| 
+			case { rect.isKindOf( Rect ) } {
+				gui.window.bounds = rect;
+			} { rect.isKindOf( Point ) } {
+				gui.window.bounds = gui.window.bounds.extent_( rect );
+			};
+		};
+	}
 
 	name_ { |x| name = x; this.changed(\name) }
 	
