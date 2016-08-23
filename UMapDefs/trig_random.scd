@@ -1,5 +1,5 @@
 /*
-\trig_rand
+\trig_random
 
 This UMap implements triggered random value generator. Every time a trigger is received the output value a random value within the set 'range' of the UMap.
 
@@ -14,7 +14,7 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UMapDef( \trig_rand, {
+UMapDef( \trig_random, {
 	var lo, hi, trigger, time, output;
 	var sig;
 	trigger = \trigger.tr;
