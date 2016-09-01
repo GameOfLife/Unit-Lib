@@ -701,6 +701,17 @@ UScore : UEvent {
 		};
 	}
 	
+	playAnyway { |targets|
+		// play, resume or keep playing (but not stop)
+		case { this.isPaused } {
+			this.resume( targets );
+		} { this.isPrepared } {
+			this.start( targets, this.pos, true);
+		} { this.isStopped } {
+			this.prepareAndStart( targets, this.pos, true, this.loop);
+		};
+	}
+	
 	dispose { events.do(_.dispose) }
 	
 	collectOSCBundleFuncs { |server, startOffset = 0, infdur = 60|

@@ -24,6 +24,8 @@
 
 */
 UScoreView {
+	
+	classvar <spaceBarPlayAnyway = false;
 
      var <scoreEditorsList;
      var <usessionMouseEventsManager;
@@ -44,6 +46,11 @@ UScoreView {
      
      *current {
 	     ^UScoreEditorGUI.current !? _.scoreView
+     }
+     
+     *spaceBarPlayAnyway_ { |bool = true|
+	     spaceBarPlayAnyway = bool;
+	     this.changed( \spaceBarPlayAnyway, spaceBarPlayAnyway );
      }
 
      init { |scoreEditor, inParent, inBounds|
@@ -491,7 +498,11 @@ UScoreView {
 					8, { this.deleteSelected }, // backspace QT
 					127, { this.deleteSelected }, // backspace Cocoa
 					32, { // space bar
-						score.togglePlayback( ULib.servers );
+						if( spaceBarPlayAnyway == true ) {
+							score.playAnyway(  ULib.servers );
+						} {
+							score.togglePlayback( ULib.servers );
+						};
 					},
 					100, { // d
 						this.duplicateSelected;
@@ -524,14 +535,7 @@ UScoreView {
 						score.stop;
 					},
 					44, { // , 
-						// always play
-						case { score.isPaused } {
-			            		score.resume( ULib.servers );
-			       		} { score.isPrepared } { 
-				       		score.start( ULib.servers, score.pos, true);
-				       	} { score.isStopped } {
-			       			score.prepareAndStart( ULib.servers, score.pos, true, score.loop);
-			       		};
+						score.playAnyway(  ULib.servers );
 					},
 					48, { // 0
 						score.jumpTo( 0 );

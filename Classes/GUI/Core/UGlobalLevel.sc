@@ -72,7 +72,11 @@ UGlobalGain {
 					if( score.notNil ) {
 						switch( c.asInt,
 							32, { // space bar
-								score.togglePlayback( ULib.servers );
+								if( UScoreView.spaceBarPlayAnyway == true ) {
+									score.playAnyway(  ULib.servers );
+								} {
+									score.togglePlayback( ULib.servers );
+								};
 							},
 							112, { // p
 								case { score.isPlaying } {
