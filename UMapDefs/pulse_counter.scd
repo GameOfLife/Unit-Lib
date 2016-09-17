@@ -37,7 +37,6 @@ UMapDef( \pulse_counter, {
 		index,
 		index.fold(0, max),
 	]);
-	//output = DC.kr(0.5);
 	UMapOut.kr( output.linlin(0,max,*range ) );
 })
 .mappedArgs_([ \range ])
