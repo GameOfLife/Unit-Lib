@@ -703,6 +703,7 @@ UScore : UEvent {
 	
 	playAnyway { |targets|
 		// play, resume or keep playing (but not stop)
+		if( targets.isNumber ) { targets = nil };
 		case { this.isPaused } {
 			this.resume( targets );
 		} { this.isPrepared } {

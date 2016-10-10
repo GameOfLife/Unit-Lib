@@ -75,9 +75,9 @@ UOSCsetter {
 		
 		if( { 
 			if( path.size > 0 ) {
-				obj = uobject.at( *path );
+				obj = this.uobject.at( *path );
 			} {
-				obj = uobject;
+				obj = this.uobject;
 			};
 		}.try.notNil ) {
 			switch( args.size,
@@ -145,4 +145,25 @@ UOSCsetter {
 		all.do(_.enable);
 	}
 	
+}
+
+UOSCSetterCurrent : UOSCsetter {
+	*new { |recvPort|
+		^super.newCopyArgs().init( recvPort );
+	}
+	
+	uobject { ^UScore.current }
+	
+	init { |recvPort|
+		
+		name = "current";
+		
+		oscfunc = OSCFunc({ |msg| 
+			if( this.uobject.notNil ) { this.set( *msg ); };
+		}, this.oscPath, recvPort: recvPort, dispatcher: OSCMethodPatternDispatcher.new );
+		
+		oscfunc.permanent = true;
+		oscfunc.enable;
+		"started UOSCsetter for %\n - messages should start with '/%/'\n - port: %\n".postf( uobject, name, recvPort ?? { NetAddr.langPort });
+	}
 }
