@@ -378,7 +378,16 @@ EQSetting {
 	 }
 	 
 	 *ar { |in, setting, def|
-		^this.new( def ).ar( in, setting );
+		 var new;
+		 if( setting.isKindOf( EQSetting ) ) {
+			 def = def ? setting.def;
+			 setting = setting.setting;
+		 };
+		 new = this.new( def );
+		 if( setting.isKindOf( Symbol ) ) {
+			 setting = setting.kr( new.setting.flat );
+		 };
+		^new.ar( in, setting );
 	}
 	 
 	 ar { |in, setting|
