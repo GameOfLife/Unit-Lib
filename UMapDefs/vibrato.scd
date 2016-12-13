@@ -22,11 +22,14 @@ part of the Unit lib default UMapDefs set
 
 UMapDef( \vibrato, { |value = 0.58560567020555, freq = 6, depth = 0.02, delay = 0, onset = 0
 		rateVar = 0.04, depthVar = 0.1, lag = 0.1, seed = 12345|
-	var sig;
+	var sig, spec;
 	URandSeed.ir(seed);
-	sig = Vibrato.kr( value.linexp(0,1,20,20000).lag(lag), freq, depth, delay, onset, rateVar, depthVar );
-	sig = sig.explin(20,20000,0,1);
-	UMapOut.kr(sig);
+	spec = \u_spec.kr([0,1,1,-2,0]);
+	value = spec.asSpecMapKr( value );
+	sig = Vibrato.kr( value, freq, depth, delay, onset, rateVar, depthVar );
+	sig = sig.clip( spec[0], spec[1] );
+	UMapOut.kr(sig, map: false);
+	Udef.buildUdef.outputIsMapped = true;
 })
 	.setSpec( \freq, FreqSpec(1,300, default: 6) )
 	.setSpec( \depth, [0,1,4,0,0.02].asSpec )
@@ -36,4 +39,4 @@ UMapDef( \vibrato, { |value = 0.58560567020555, freq = 6, depth = 0.02, delay = 
 	.setSpec( \depthVar, [0,1,4,0,0.1].asSpec )
 	.setSpec( \seed, PositiveIntegerSpec(12345), \init )
 	.mappedArgs_( [ \value ] )
-	.category_( 'modulation' )
+	.category_( 'freq' )
