@@ -50,6 +50,7 @@ UMenuWindow {
 		
 		sessionMenu = PopUpTreeMenu(window, 120@20 )
 			.font_( font )
+			.background_( Color.white(0.1) )
 			.tree_(
 				OEM(
 					'Session', (),
@@ -144,6 +145,7 @@ UMenuWindow {
 		
 		scoreMenu = PopUpTreeMenu(window, 150@20 )
 			.font_( font )
+			.background_( Color.white(0.1) )
 			.tree_(
 				OEM(
 					'Score', (),
@@ -208,6 +210,7 @@ UMenuWindow {
 		
 		viewMenu = PopUpTreeMenu(window, 140@20 )
 			.font_( font )
+			.background_( Color.white(0.1) )
 			.tree_(
 				OEM(
 					'View', (),
