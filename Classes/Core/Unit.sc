@@ -636,8 +636,14 @@ U : ObjectWithArgs {
 		if( umap.notNil ) {
 			if( umap.def.canInsert ) {
 				item = this.get( key );
-				this.set( key, umap );
-				this.get( key ).setConstrain( umapdef.insertArgName, item );
+				if( item.isUMap ) {
+					this.set( key, umap );
+					this.get( key ).set( umapdef.insertArgName, item );
+				} {
+					item = this.mapGet( key );
+					this.set( key, umap );
+					this.get( key ).mapSet( umapdef.insertArgName, item );
+				};
 			} {
 				this.set( key, umap );
 			};
@@ -645,11 +651,16 @@ U : ObjectWithArgs {
 	}
 	
 	removeUMap { |key|
-		var umap;
+		var umap, insertArg;
 		umap = this.get( key );
 		if( umap.isKindOf( UMap ) ) {
 			if( umap.def.canInsert ) {
-				this.set( key, umap.get( umap.def.insertArgName ) );
+				insertArg = umap.get( umap.def.insertArgName );
+				if( insertArg.isUMap ) {
+					this.set( key, insertArg );
+				} {
+					this.mapSet( key, umap.mapGet( umap.def.insertArgName ) );
+				};
 			} {
 				this.set( key, this.getDefault( key ).copy );
 			};

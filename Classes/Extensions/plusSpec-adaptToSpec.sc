@@ -1,3 +1,15 @@
+UAdaptSpec : ControlSpec {
+	var <>func;
+	
+	*new { |func|
+		^super.new( 0, 1, \lin, 0.0, 0 ).func_( func );
+	}
+	
+	adaptToSpec { |spec|
+		^func.value( spec ) ? this;
+	}
+}
+
 + Spec {
 	
 	adaptToSpec { }
