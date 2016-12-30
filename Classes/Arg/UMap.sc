@@ -3,6 +3,7 @@ UMapDef : Udef {
 	classvar <>defaultCanUseUMapFunc;
 	
 	var <>mappedArgs;
+	var <useMappedArgs = true;
 	var <>outputIsMapped = true;
 	var >canInsert;
 	var >insertArgName;
@@ -25,6 +26,22 @@ UMapDef : Udef {
 	*prefix { ^"umap_" } // synthdefs get another prefix to avoid overwriting
 	
 	*from { |item| ^item.asUDef( this ) }
+	
+	*useMappedArgs {
+		^this.buildUdef.useMappedArgs ? true;
+	}
+	
+	*useMappedArgs_ { |bool = true|
+		this.buildUdef.useMappedArgs = bool;
+	}
+	
+	useMappedArgs_ { |bool = true|
+		if( Udef.buildUdef == this ) {
+			useMappedArgs = bool;
+		} {
+			"UMapDef:useMappedArgs can only be set from inside the synth function".warn;
+		};
+	}
 	
 	dontStoreValue { ^false }
 	
@@ -87,7 +104,7 @@ UMapDef : Udef {
 	
 	setSynth { |unit ...keyValuePairs|
 		keyValuePairs = keyValuePairs.clump(2).collect({ |item|
-			if( this.isMappedArg( item[0] ) && { item[1].isUMap.not } ) {
+			if( this.useMappedArgs && { this.isMappedArg( item[0] ) && { item[1].isUMap.not } } ) {
 				[ item[0], this.getSpec( item[0], unit ) !? _.unmap( item[1] ) ? item[1] ];
 			} {
 				item
@@ -276,7 +293,7 @@ UMap : U {
 	
 	u_waitTime { ^this.waitTime }
 	
-	dontStoreArgNames { ^[ 'u_dur', 'u_doneAction', 'u_mapbus', 'u_spec', 'u_store', 'u_prepared' ] ++ if( this.def.dontStoreValue ) { [ \value ] } { [] } }
+	dontStoreArgNames { ^[ 'u_dur', 'u_doneAction', 'u_mapbus', 'u_spec', 'u_store', 'u_prepared', 'u_originalSpec', 'u_useSpec' ] ++ if( this.def.dontStoreValue ) { [ \value ] } { [] } }
 	
 	spec_ { |newSpec|
 		if( spec.isNil ) {
@@ -321,10 +338,11 @@ UMap : U {
 		if( unit.canUseUMap( key, this.def ) ) {
 			this.unitArgName = key;
 			if( key.notNil ) {
-				if( unit.isUMap && { unit.def.isMappedArg( key ) } ) {
+				if( unit.isUMap && { unit.def.useMappedArgs && { unit.def.isMappedArg( key ) } } ) {
 					if( unit.spec.notNil ) {
 						this.spec = unit.getSpec( key ).copy;
-						this.set( \u_spec, [0,1,\lin].asSpec );
+						this.set( \u_spec, spec );
+						this.set( \u_useSpec, false );
 					};
 				} {
 					this.spec = unit.getSpec( key ).copy;
@@ -380,7 +398,7 @@ UMap : U {
 		nonsynthKeys = this.argSpecs.select({ |item| item.mode == \nonsynth }).collect(_.name);
 		^this.args.clump(2).select({ |item| nonsynthKeys.includes( item[0] ).not })
 			.collect({ |item|
-				if( this.def.isMappedArg( item[0] ) && { item[1].isUMap.not }) {
+				if( this.def.useMappedArgs && {this.def.isMappedArg( item[0] ) && { item[1].isUMap.not }}) {
 					[ item[0], this.getSpec( item[0] ) !? _.unmap( item[1] ) ? item[1] ];
 				} {
 					item

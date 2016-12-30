@@ -1,17 +1,34 @@
 UMapOut {
 	
-	*kr { |channelsArray, map = true|
+	*kr { |channelsArray, map = true, clip = true|
+		var spec;
 		ReplaceOut.kr( 
 			UMap.busOffset + \u_mapbus.ir(0), 
-			if( map ) { \u_spec.asSpecMapKr( channelsArray ) } { channelsArray };
+			if( map ) { 
+				Udef.addBuildSpec(
+					ArgSpec(\u_spec, [0,1,\lin].asSpec, ControlSpecSpec(), true, \init ) 
+				);
+				Udef.addBuildSpec(
+					ArgSpec(\u_useSpec, true, BoolSpec(true), true, \init ) 
+				);
+				spec = \u_spec.kr([0,1,1,-2,0]);
+				if( UMapDef.useMappedArgs ) {
+					if( \u_useSpec.ir(1),
+						spec.asSpecMapKr( channelsArray ),
+						if( clip ) { channelsArray.clip( 0, 1 ) } { channelsArray }
+					);
+				} {
+					if( \u_useSpec.ir(1),
+						if( clip ) { channelsArray.clip( spec[0], spec[1] ) } { channelsArray },
+						spec.asSpecUnmapKr( channelsArray ),
+					);
+				};
+			} { channelsArray };
 		);
 		Udef.buildUdef.numChannels = channelsArray.asCollection.size;
 		Udef.buildUdef.outputIsMapped = map;
 		Udef.addBuildSpec(
 			ArgSpec(\u_mapbus, 0, PositiveIntegerSpec(), true, \init ) 
-		);
-		Udef.addBuildSpec(
-			ArgSpec(\u_spec, [0,1,\lin].asSpec, ControlSpecSpec(), true ) 
 		);
 	}
 	
