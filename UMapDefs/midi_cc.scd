@@ -85,4 +85,4 @@ ValueUMapDef( \midi_cc, { |unit, midifunc|
 	[ \clipSoftness, 0, [0,1].asSpec ],
 ]  )
 	.mappedArgs_([\toRange])
-	.category_(\control);
+	.category_(\midi);

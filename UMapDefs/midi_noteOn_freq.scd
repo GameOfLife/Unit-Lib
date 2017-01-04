@@ -63,4 +63,4 @@ ValueUMapDef( \midi_noteOn_freq, { |unit, midifunc|
 	[ \scale, 1, [0.25,4,\exp,0,1].asSpec ],
 	[ \invert, false, BoolSpec(false) ],
 ]  )
-	.category_(\control);
+	.category_(\midi);
