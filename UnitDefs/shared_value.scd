@@ -48,7 +48,7 @@ defs = [
 		} {
 			ReplaceOut.kr(\id.kr(0) + 1400, sig);
 		};
-	}, addToAll: false)
+	}, addToAll: false, extraPrefix: \shared_ )
 		.setSpec( \value, spec )
 		.setSpec( \range, spec.asControlSpec.asRangeSpec )
 		.setSpec( \id, SharedValueIDSpec() )
