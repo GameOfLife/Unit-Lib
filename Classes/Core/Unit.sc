@@ -105,12 +105,14 @@ Udef : GenericDef {
 		userDefsFolder = Platform.userAppSupportDir ++ "/UnitDefs/";
 	}
 
-	*basicNew { |name, args, category, addToAll=true|
-		^super.new( name, args, addToAll ).category_( category ? \default );
+	*basicNew { |name, args, category, addToAll=true, extraPrefix|
+		^super.new( name, args, addToAll )
+			.extraPrefix_( extraPrefix ).category_( category ? \default );
 	}
 	
-	*new { |name, func, args, category, addToAll=true|
-		^super.new( name, args, addToAll ).init( func ).category_( category ? \default );
+	*new { |name, func, args, category, addToAll=true, extraPrefix|
+		^super.new( name, args, addToAll )
+			.extraPrefix_( extraPrefix ).init( func ).category_( category ? \default );
 	}
 	
 	*prefix { ^"u_" }
