@@ -26,4 +26,4 @@ UMapDef( \peak, { |value = 0.5, decay = 0.999, direction = 1.0|
 	.mappedArgs_( [ \value ] )
 	.setSpec( \decay, [0,1,-8].asSpec )
 	.setSpec( \direction, [-1,1].asSpec )
-	.category_( 'utility' );
+	.category_( 'filter' );
