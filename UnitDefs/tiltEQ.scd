@@ -19,7 +19,7 @@ Udef( \tiltEQ, { |tilt = 0, center = 650, rs = 2|
 	in = BLowShelf.ar( in, center, rs, tilt.neg );
 	UOut.ar( 0, in );
 })
-.category_( \filter )
+.category_( \eq )
 .setSpec( \tilt, [-12,12,\lin,0,0].asSpec )
 .setSpec( \center, \freq.asSpec.copy.default_(650) )
 .setSpec( \rs, [ 0.6, 10, \exp, 0, 1 ].asSpec )
