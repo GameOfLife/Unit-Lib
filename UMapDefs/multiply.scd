@@ -6,8 +6,7 @@ Creates an UMap for multiplication (*) of two values.
 value: the value
 multiply: the multiplier
 negative: multiply with negative value
-factor: 
-
+factor: exponent of 10 to multiply the multiplier by
 
 The value arg range is mapped to that of the parameter to which the UMap is connected.
 
@@ -29,4 +28,4 @@ UMapDef( \multiply, { |value = 0.0, multiply = 1.0, negative = 0, factor = 0|
 	.setSpec( \factor, ListSpec( [-2,-1,0,1,2,3,4,5], 2, 
 		[-2,-1,0,1,2,3,4,5].collect({ |x| (10**x).asString })
 	 ) )
-	.category_( 'utility' )
+	.category_( 'operator' )

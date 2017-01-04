@@ -19,6 +19,6 @@ d = UMapDef( \round, { |value = 0.5, round = 0|
 	UMapOut.kr(value);
 })
 	.mappedArgs_( [ \value, \round ] )
-	.category_( 'utility' )
+	.category_( 'operator' )
 
 
