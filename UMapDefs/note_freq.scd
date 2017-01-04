@@ -4,7 +4,8 @@
 Creates an UMap for converting diatonic mini-note values to a frequency, in semitones where 69 == 440Hz.
 
 note: a midi note value 
-round: rounding factor (0-12)
+round: rounding factor (0 - 12)
+detune: detune amount in cents (-50 - 50)
 
 --
 this is an UMapDef definition file
