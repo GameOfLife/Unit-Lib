@@ -13,15 +13,17 @@ UMapOut {
 				);
 				spec = \u_spec.kr([0,1,1,-2,0]);
 				if( UMapDef.useMappedArgs ) {
-					if( \u_useSpec.ir(1),
-						spec.asSpecMapKr( channelsArray ),
-						if( clip ) { channelsArray.clip( 0, 1 ) } { channelsArray }
-					);
+					Select.kr( \u_useSpec.ir(1), [
+						if( clip ) { channelsArray.clip( 0, 1 ) } { channelsArray },
+						spec.asSpecMapKr( channelsArray )
+					]);
 				} {
-					if( \u_useSpec.ir(1),
-						if( clip ) { channelsArray.clip( spec[0], spec[1] ) } { channelsArray },
+					Select.kr( \u_useSpec.ir(1), [
 						spec.asSpecUnmapKr( channelsArray ),
-					);
+						if( clip ) { 
+							channelsArray.clip( spec[0], spec[1] ) 
+						} { channelsArray }
+					]);
 				};
 			} { channelsArray };
 		);

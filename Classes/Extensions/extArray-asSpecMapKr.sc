@@ -75,10 +75,10 @@ x = Synth( "test_map", [ \freq, [220,440,\exp].asSpec ] );
 				value_squared * range + minval, 
 				(1 - (1-value).squared) * range + minval 
 			),
-			if(dbrange >= 0, // db
-				(value_squared * dbrange + minval_dbamp).ampdb, 
-				((1 - (1-value).squared) * dbrange + minval_dbamp).ampdb 
-			)
+			Select.kr( dbrange >= 0, [ // db
+				((1 - (1-value).squared) * dbrange + minval_dbamp).ampdb,
+				(value_squared * dbrange + minval_dbamp).ampdb 
+			])
 		]).round(step);
 	}
 	
@@ -87,7 +87,7 @@ x = Synth( "test_map", [ \freq, [220,440,\exp].asSpec ] );
 		var range, dbrange, ratio, grow, a, b, minval_dbamp, maxval_dbamp, value_dbamp;
 		var lin;
 		#minval, maxval, curvenum, curve, step = [0,1,1,-2,0].overWrite( this );
-		value = value.round(step);
+		value = value.round(step).clip( minval, maxval );
 		range = maxval - minval;
 		ratio = maxval / minval.max(1e-12);
 		curve = if( InRange.kr(curve, -0.001, 0.001 ), 0.001, curve );
