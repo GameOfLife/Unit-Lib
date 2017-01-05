@@ -347,6 +347,7 @@ UMap : U {
 				} {
 					this.spec = unit.getSpec( key ).copy;
 					this.set( \u_spec, spec );
+					this.set( \u_useSpec, true );
 				};
 				this.def.activateUnit( this, unit );
 				this.valuesAsUnitArg
