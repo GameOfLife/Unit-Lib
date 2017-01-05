@@ -141,6 +141,11 @@ SMPTESpec : Spec {
 	}
 	
 	constrain { |value| ^value.clip( minval, maxval ); }
+	
+	map { |value| ^value }
+	unmap { |value| ^value }
+	
+	asControlSpec { ^ControlSpec( minval, maxval, \lin, 0, default ) }
 
 	storeArgs { ^[minval, maxval, fps] }
 }
