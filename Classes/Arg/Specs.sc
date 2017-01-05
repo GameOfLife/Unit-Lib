@@ -731,10 +731,11 @@ RichBufferSpec : Spec {
 	
 	var <>numChannels = 1; // fixed number of channels
 	var <numFrames;
+	var <>editMode; // nil (no gui), \seconds
 
 	
-	*new { |numChannels = 1, numFrames|
-		^super.newCopyArgs( numChannels, numFrames ).init;
+	*new { |numChannels = 1, numFrames, editMode|
+		^super.newCopyArgs( numChannels, numFrames, editMode ).init;
 	}
 	
 	*testObject { |obj|

@@ -1527,6 +1527,65 @@
 	viewClass { ^DiskSndFileView }
 }
 
++ RichBufferSpec {
+	
+	viewNumLines { ^if( editMode.notNil ) { 1 } { 0 } }
+	
+	makeView { |parent, bounds, label, action, resize|
+		var vws, view, labelWidth;
+		
+		bounds.isNil.if{bounds= 160 @ 18 };
+		
+		switch( editMode, 
+			\duration, {
+				vws = ();
+				
+				#view, bounds = EZGui().prMakeMarginGap.prMakeView( parent, bounds );
+				vws[ \view ] = view;
+				vws[ \val ] = this.default.copy;
+				
+				if( label.notNil ) {
+					labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
+					vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ 14 )
+						.string_( label.asString ++ " " )
+						.align_( \right )
+						.resize_( 4 )
+						.applySkin( RoundView.skin );
+				} {
+					labelWidth = -2;
+				};
+				
+				vws[ \box ] = SMPTEBox( vws[ \view ], 
+						Rect(labelWidth + 2,0,bounds.width-(labelWidth + 2),bounds.height)
+					)
+					.applySmoothSkin
+				    .action_({ |vw|
+					    vws[ \val ].numFrames = (vw.value * vws[ \val ].sampleRate).asInt;
+				        action.value( vw, vws[ \val ] );
+				    } ).resize_(5)
+				    .fps_( 1000 )
+					.clipLo_( 128 / 44100 )
+					.clipHi_( 60 * 60 );
+				
+				vws[ \updateViews ] = {
+					vws[ \box ].value = vws[ \val ].numFrames / vws[ \val ].sampleRate;
+				};
+				
+				vws[ \updateViews ].value;				    
+				if( resize.notNil ) { vws[ \view ].resize = resize };
+		
+			},
+		);
+		^vws;
+	}
+
+	setView { |view, value, active = false|
+		view[ \val ] = value;
+		view[ \updateViews ].value;
+		if( active ) { view[ \box ].doAction };
+	}
+}
+
 + MultiSndFileSpec {
 	
 	viewNumLines { ^3 }
