@@ -6,7 +6,7 @@ UAdaptSpec : ControlSpec {
 	}
 	
 	adaptToSpec { |spec|
-		^func.value( spec ) ? this;
+		^spec !? { func.value( spec ) } ? this;
 	}
 }
 
