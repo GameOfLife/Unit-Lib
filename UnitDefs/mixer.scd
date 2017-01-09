@@ -16,7 +16,7 @@ part of the Unit lib default Udefs set
 
 MultiChannelUdef( \mixer, { 
 	var sig, amps;
-	sig = UIn.ar( 0, Udef.numChannels );
+	sig = UIn.ar( 0, Udef.numChannels, endPoint: true );
 	amps = Udef.numChannels.collect({ |i| 
 		("amp" ++ i).asSymbol.ukr( 1/Udef.numChannels.sqrt, warp: 'amp' )
 	});

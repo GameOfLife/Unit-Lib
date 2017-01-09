@@ -36,7 +36,7 @@ var defs, def;
 defs = (1..8).collect({ |n|
 	MultiChannelUdef( "splay_%".format(n).asSymbol, { |spread = 1, width = 2, center = 0|
 		var sig;
-		sig = UIn.ar( 0, Udef.numChannels );
+		sig = UIn.ar( 0, Udef.numChannels, endPoint: true );
 		switch( n,
 			1, { UOut.ar( 0, sig.asCollection.sum * sig.asCollection.size.reciprocal.sqrt ) },
 			2, { UOut.ar( 0, Splay.ar( sig.asCollection, spread, 1, center ) ) },

@@ -15,7 +15,7 @@ part of the Unit lib default Udefs set
 */
 
 MultiChannelUdef( \output, { |bus|
-	Out.ar( bus, UGlobalEQ.ar( UIn.ar( 0, Udef.numChannels ) ) * UEnv.kr );
+	Out.ar( bus, UGlobalEQ.ar( UIn.ar( 0, Udef.numChannels, endPoint: true ) ) * UEnv.kr );
 })	
 	.category_( \io )
 	.setSpec( \bus, PositiveIntegerSpec( 0, 0, 192 ) )
