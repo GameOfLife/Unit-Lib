@@ -97,6 +97,7 @@ Udef : GenericDef {
 	var <>showOnCollapse = #[ value ];
 	var <>prepareArgsFunc;
 	var <>uchainInitFunc;
+	var <>inputIsEndPoint = false;
 	
 	*initClass{
 		defsFolders = [ 
@@ -875,6 +876,8 @@ U : ObjectWithArgs {
 	controlIns { ^this.def.controlIns( this ); }
 	audioOuts { ^this.def.audioOuts( this ); }
 	controlOuts { |unit| ^this.def.controlOuts( this ); }
+	
+	inputIsEndPoint { ^this.def.inputIsEndPoint( this ); }
 	
 	increaseIOs { |amt = 1|
 		var audioIns = this.audioIns;

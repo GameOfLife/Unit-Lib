@@ -116,6 +116,10 @@ MultiUdef : Udef {
 		^this.findUdefFor( unit ).prIOids( mode, rate, unit );
 	}
 	
+	inputIsEndPoint { |unit|
+		^this.findUdefFor( unit ).inputIsEndPoint( unit );
+	}
+	
 	canFreeSynth { |unit| ^this.findUdefFor( unit ).canFreeSynth( unit ) }
 	
 	chooseDef { |unit|

@@ -93,17 +93,23 @@ UIn {
 		^name.perform( mode, value, lag );
 	}
 	
-	*ar { |id = 0, numChannels = 1|
-		^numChannels.collect({ |i| this.new1( \ar, id + i ); }).returnFirstIfSize1;
+	*ar { |id = 0, numChannels = 1, endPoint = false|
+		^numChannels.collect({ |i| this.new1( \ar, id + i, endPoint ); }).returnFirstIfSize1;
 	}
 	
-	*kr { |id = 0, numChannels = 1|
-		^numChannels.collect({ |i| this.new1( \kr, id + i ); }).returnFirstIfSize1;
+	*kr { |id = 0, numChannels = 1, endPoint = false|
+		^numChannels.collect({ |i| this.new1( \kr, id + i, endPoint ); }).returnFirstIfSize1;
 	}	
 	
-	*new1 { |selector = \ar, id = 0|
+	*new1 { |selector = \ar, id = 0, endPoint = false|
+		var res;
 		id = this.getControl( \kr, this.getControlName( 'i',  selector, id ), "bus", id); 
-		^In.perform( selector, this.firstBusFor( selector ) + id, 1 );
+		res = In.perform( selector, this.firstBusFor( selector ) + id, 1 );
+		if( endPoint ) {
+			ReplaceOut.perform( selector, this.firstBusFor( selector ) + id, Silent.ar );
+			Udef.buildUdef.inputIsEndPoint = true;
+		};
+		^res;
 	}
 }
 
