@@ -256,7 +256,7 @@ UChainIOGUI : UChainGUI {
 						if( used ) {
 							Pen.color = Color.green(0.65);
 						} {
-							Pen.color = Color.gray(0.75); 
+							Pen.color = Color.gray(0.65); 
 						};
 						Pen.fillOval( rect.insetAll(3,3,3,3) ) 
 					} },
