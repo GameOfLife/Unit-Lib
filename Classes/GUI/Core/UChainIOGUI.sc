@@ -19,31 +19,47 @@
 
 UChainIOGUI : UChainGUI {
 	
-	classvar <>showControl = true, <>showAudio = true;
-	
 	var <analyzers;
 	var <unitColors;
-	var <>audioMax = 0, <>controlMax = 0;
+	var <>max = 7;
+	var <>allBuses;
+	var <>usedBuses;
+	var <>setMaxFunc;
 	
 	makeViews { |bounds|
 		
-		analyzers = ( 
-			\audio: UChainAudioAnalyzer(chain),
-			\control:  UChainControlAnalyzer(chain)
-		);
-		
+		allBuses = [];
+		usedBuses = [];
+		setMaxFunc = nil;
 		RoundView.useWithSkin( skin ++ (RoundView.skin ? ()), {
 			this.prMakeViews( bounds );
 		});
-		
+		this.updateMax;
+	}
+	
+	updateMax {
+		var oldMax;
+		max = ((((allBuses.maxItem+1)/ 8).ceil.max(1) * 8)-1).clip(7,31);
+		if( oldMax != max ) {
+			setMaxFunc.value;
+		};
+	}
+	
+	getControlsForUnit { |unit|
+		var ins, outs, mix;
+		ins = unit.audioIns;
+		outs = unit.audioOuts;
+		mix = outs.select({ |item|
+			unit.keys.includes( unit.getIOKey( \out, \audio, item, "lvl" ) )
+		});
+		^[ ins, outs, mix ];
 	}
 	
 	getHeight { |units, margin, gap|
 		^units.collect({ |unit, i|
 			((14 + gap.y) * (
-				analyzers[ \audio ].numIOFor( i ) + 
-				analyzers[ \control ].numIOFor( i ))
-			) +
+				this.getControlsForUnit( unit ).flatten(1).size
+			)) +
 				14 + gap.y + gap.y;
 		}).sum + (4 * (14 + gap.y));
 	}
@@ -62,30 +78,7 @@ UChainIOGUI : UChainGUI {
 				.string_( " units" )
 				.align_( \left )
 				.resize_(2);
-		
-		audio = SmoothButton( comp, Rect( comp.bounds.right - (80+8+60), 1, 40, 12 ) )
-			.label_( ["audio", "audio"] )
-			.border_( 1 )
-			.radius_( 2 )
-			.value_( showAudio.binaryValue )
-			.hiliteColor_( Color.green )
-			.action_({ |bt|
-				 showAudio = bt.value.booleanValue;
-				 chain.changed( \units );
-			}).resize_(3);
-		
-		control = SmoothButton( comp, Rect( comp.bounds.right - (40+4+60), 1, 40, 12 ) )
-			.label_( ["control", "control"] )
-			.border_( 1 )
-			.radius_( 2 )
-			.value_( showControl.binaryValue )
-			.hiliteColor_( Color.green )
-			.action_({ |bt|
-				 showControl = bt.value.booleanValue;
-				 chain.changed( \units );
-			}).resize_(3);
-
-				
+	
 		params = SmoothButton( comp, Rect( comp.bounds.right - 60, 1, 60, 12 ) )
 			.label_( "params" )
 			.border_( 1 )
@@ -120,22 +113,20 @@ UChainIOGUI : UChainGUI {
 			if( what === \init ) { // close all views and create new
 				chain.changed( \units );
 			};
-		};
+		};		
 		
-		unitColors = units.collect({ |item, i|
-			Color.hsv( i.linlin( 0, units.size, 0, 1 ), 0.1, 0.9 );
-		});
+		scrollView.decorator.gap = 4@0;
 		
 		^units.collect({ |unit, i|
 			var header, comp, views, params;
 			
-			comp = CompositeView( scrollView, width@14 )
+			comp = CompositeView( scrollView, width@16 )
 				.resize_(2);
-			
-			header = StaticText( comp, comp.bounds.moveTo(0,0) )
+				
+			header = StaticText( comp, width @ 14 )
 				.applySkin( RoundView.skin )
 				.string_( " " ++ i ++ ": " ++ if(unit.def.class == LocalUdef){"[Local] "}{""} ++ unit.defName )
-				.background_( unitColors[i] )
+				.background_( Color.gray(0.9) )
 				.resize_(2)
 				.font_( 
 					(RoundView.skin.tryPerform( \at, \font ) ?? 
@@ -157,224 +148,207 @@ UChainIOGUI : UChainGUI {
 	
 	}
 	
-	getMax { |rate = \audio|
-		^analyzers[ rate ].usedBuses.maxItem ? 0;
+	prScanForBus { |array, bus = 0|
+		var neg;
+		neg = (bus+1).neg;
+		array.reverseDo({ |item|
+			switch( item,
+				neg, { ^false; },
+				bus, { ^true; }
+			);
+		});
+		^false;
 	}
 	
 	makeUnitView { |scrollView, unit, i, labelWidth, width|
 		var ctrl;
-		var setPopUps;
-		var max;
 		var views;
-		var array = [];
-		
-		max = (
-			\audio: this.getMax( \audio ),
-			\control: this.getMax( \control )
-		);
+		var controls;
+		var func;
 		
 		views = ();
 		
+		controls = this.getControlsForUnit( unit );
+		
 		ctrl = SimpleController( unit );
 		
-		if( showAudio ) {
-			array = [ 
-				[ \audio, \in ], 
-				[ \audio, \out ], 
-			]
-		};
-		if( showControl ) {
-			array = array ++ [ 
-				[ \control, \in ], 
-				[ \control, \out ],
-			]
+		func = { |item, mode = \in, mix = 0|
+			var nb, sl;
+			var key, val;
+			var spec, allBusesIndex, usedBusesIndex;
+			var endPoint;
+			key = unit.getIOKey( mode, \audio, item, "bus" );
+			val = unit.get( key );
+			allBuses = allBuses.add( val.asInt );
+			allBusesIndex = allBuses.size-1;
+			endPoint = (mode === \in) && { unit.inputIsEndPoint };
+			if( mode == \out ) {
+				usedBuses = usedBuses.add( val.asInt );
+			} {
+				if( endPoint ) {
+					usedBuses = usedBuses.add( (val +1).neg.asInt );
+				};
+			};
+			usedBusesIndex = usedBuses.size-1;
+			StaticText( scrollView, labelWidth @ 14 )
+				.applySkin( RoundView.skin )
+				.align_( \right )
+				.string_( "% %".format( mode, item )  );
+							
+			sl = SmoothSlider( scrollView, (width - labelWidth - (45 + 4 + 4))@16 )
+				.hiliteColor_( nil )
+				.knobSize_( 0 )
+				.thumbSize_( 16 )
+				.step_( 1/max )
+				.focusColor_( Color.clear )
+				.action_( { |nb|
+					unit.set( key, (nb.value * max).round(1) );				} );
+
+			sl.background_({ |rect ...args|
+				var size, bounds;
+				var which;
+				which = usedBuses[..usedBusesIndex];
+				which = (..max.asInt).select({ |item|
+					this.prScanForBus( which, item );
+				});
+				size = (1 / sl.step);
+				bounds = sl.sliderBounds;
+				(size.asInt ..0).do({ |i, index|
+					var y, alpha;
+					if( (sl.value * max).round(1) != index ) {
+						if( which.includes( index.asInt ) ) { 
+							alpha = 0.75;
+						} { 
+							alpha = 0.1; 
+						};
+					} {
+						alpha = mix.value * 0.75;
+					};
+					if( alpha > 0 ) {
+						Pen.width = 5;
+						Pen.color = Color.gray(0.4).alpha_(alpha);
+						y = bounds.top + ((i / size) * bounds.height);
+						Pen.line( bounds.left @ y, bounds.right @ y );
+						Pen.stroke;
+					};
+				});
+			});
+			
+			sl.knobColor_(
+				switch( mode,
+					\in, { { |rect|
+						var center, used, alpha;
+						if( endPoint ) {
+							used = this.prScanForBus( usedBuses[..usedBusesIndex-1], allBuses[ allBusesIndex ] );
+						} {
+							used = this.prScanForBus( usedBuses[..usedBusesIndex], allBuses[ allBusesIndex ] );
+						};
+						if( used ) { alpha = 0.75 } { alpha = 0.1 };
+						Pen.width = 5;
+						center = rect.center;
+						Pen.color	 = Color.gray(0.4).alpha_( alpha );
+						if( unit.def.inputIsEndPoint ) {
+							Pen.line( rect.left @ center.y, center.x @ center.y ).stroke;
+						} {
+							Pen.line( rect.left @ center.y, rect.right @ center.y ).stroke;
+						};
+						
+						if( used ) {
+							Pen.color = Color.green(0.65);
+						} {
+							Pen.color = Color.gray(0.75); 
+						};
+						Pen.fillOval( rect.insetAll(3,3,3,3) ) 
+					} },
+					\out, { { |rect|
+						var center;
+						
+						Pen.width = 5;
+						Pen.color = Color.gray(0.4).alpha_(0.75);
+						center = rect.center;
+						Pen.line( rect.right @ center.y, center ).stroke;
+						
+						Pen.color = Color.red(0.75); 
+						Pen.fillOval( rect.insetAll(3,3,3,3) );
+					} }
+				)
+			);
+						
+			nb = SmoothNumberBox( scrollView, 45@14 )
+				.clipLo_( 0 )
+				.clipHi_( 31 )
+				.step_( 1 )
+				.scroll_step_( 1 )
+				.value_( val )
+				.action_( { |nb|
+					unit.set( key, nb.value.round(1) );
+				} );
+				
+			setMaxFunc = setMaxFunc.addFunc({
+				sl.step = 1/max;
+				sl.value = allBuses[ allBusesIndex ]/max;
+			});
+					
+			ctrl.put( key, {
+				var val;
+				val = unit.get( key );
+				nb.value = val;
+				sl.value = val/max;
+				allBuses.put( allBusesIndex, val.asInt );
+				case { mode == \out } { 
+					usedBuses.put( usedBusesIndex, val.asInt );
+				} { endPoint } { 
+					usedBuses.put( usedBusesIndex, (val+1).neg.asInt );
+				};
+				this.updateMax;
+			});
+			
+			views[ mode ] = views[ mode ].add( [ nb, sl ] );
+			
+			[ nb, sl ];
 		};
 		
-		array.do({ |item|
-			var rate, mode;
-			var io, etter, setter, getter;
-			var mixOutSetter;
-			#rate, mode = item;
-			etter = "et" ++ (rate.asString.firstToUpper ++ mode.asString.firstToUpper);
-			setter = ("s" ++ etter).asSymbol;
-			getter = ("g" ++ etter).asSymbol;
-			
-			io = analyzers[ rate ].ioFor( mode, i );
-			
-			if( io.notNil ) {
-				
-				views[ rate ] = views[ rate ] ? ();
-				views[ rate ][ mode ] = [ ];
-				
-				io[2].do({ |item, ii|
-					var nb, pu, mx, stringColor;
-					
-					
-					if( rate === \control ) {
-						stringColor = Color.gray(0.25);
-					} {
-						stringColor = Color.black;
-					};
-					
-					StaticText( scrollView, labelWidth @ 14 )
-						.applySkin( RoundView.skin )
-						.align_( \right )
-						.stringColor_( stringColor )
-						.string_( "% % %".format( 
-								if( ii == 0 ) { rate } { "" }, 
-								mode,
-								unit.def.prGetIOName( mode, rate, item ) ? item 
-							) 
-						);
-						
-					nb = SmoothNumberBox( scrollView, 20@14 )
-						.clipLo_( 0 )
-						.stringColor_( stringColor )
-						.value_(  io[3][ii] )
-						.action_( { |nb|
-							unit.perform( setter, ii, nb.value ); 					} );
-						
-					pu = PopUpMenu( scrollView, (width - labelWidth - 28)@14 )
-						.applySkin( RoundView.skin )
-						.stringColor_( stringColor )
-						.resize_(2)
-						.action_({ |pu| 
-							unit.perform( setter, ii, pu.value );
-						});
-					
-					this.setPopUp( pu, io[3][ii], i, rate, mode, max[ rate ] );
-					
-					setPopUps = setPopUps.addFunc({
-						this.setPopUp( pu, nb.value, i, rate, mode, max[ rate ] );
-					});
-					
-					if( (mode === \out) && { io[4][ii].notNil }) {
-						
-						mixOutSetter = "set" ++ rate.asString.firstToUpper ++ "MixOutLevel";
-						mixOutSetter = mixOutSetter.asSymbol;
-							
-						mx = EZSmoothSlider(  scrollView, width@14,
-							"% mix %".format( 
-								if( ii == 0 ) { rate } { "" }, 
-								unit.def.prGetIOName( mode, rate, item ) ? item 
-							),
-							\amp.asSpec, 
-							{ |vw| 
-								unit.perform( mixOutSetter, ii, vw.value );
-							}, 
-							labelWidth: labelWidth
-						);
-						
-						mx.setColors( stringColor: stringColor );
-						
-						mx.value = io[4][ii];
-						mx.view.resize = 2;
-						
-						ctrl.put( unit.getIOKey( mode, rate, ii, "lvl" ), {  |obj, what, val|
-							mx.value = val;				
-						});
-						
-						this.setMixSlider( mx, io[3][ii], i, rate, stringColor );
-						
-						setPopUps = setPopUps.addFunc({
-							this.setMixSlider( mx, nb.value, i, rate, stringColor );
-						});
-					};
-					
-					views[ rate ][ mode ] = views[ rate ][ mode ].add( [nb, pu, mx] );
-					
-					ctrl.put( unit.getIOKey( mode, rate, ii ), { |obj, what, val|
-						nb.value = val;
-						analyzers[ rate ].init;
-						max[ rate ] = this.getMax( rate );
-						uguis.do({ |vws| vws[ \setPopUps ].value; });
-					});
-						
-					composite.decorator.nextLine;
-				});		
-			};
+		controls[0].do({ |item|
+			func.( item, \in );
 		});
 		
+		controls[1].do({ |item| // out
+			var key, val, mx;
+			
+			if( controls[2].includes( item ) ) {	
+				key = unit.getIOKey( \out, \audio, item, "lvl" );
+				val = unit.get( key );
+				
+				mx = EZSmoothSlider(  scrollView, width@14,
+					"mix %".format( item ),
+					\amp.asSpec, 
+					{ |vw| 
+						unit.set( key, vw.value );
+					}, 
+					labelWidth: labelWidth
+				);
+				mx.labelWidth_( labelWidth );
+						
+				mx.value = val;
+				mx.view.resize = 2;
+				mx.sliderView.focusColor = Color.gray(0.2).alpha_(0.2);
+				
+				ctrl.put( key, {
+					mx.value = unit.get( key );
+				});	
+				
+				views[ \mix ] = views[ \mix ].add( mx );
+			};
+			
+			func.( item, \out, mx ? 0 );
+		});
+				
 		if( views.size == 0 ) { 
 			ctrl.remove;
 		} {
 			views[ \ctrl ] = ctrl;
 		};
-		views[ \setPopUps ] = setPopUps;
 		^views;
-		
-	}
-	
-	setPopUp { |pu, value = 0, i = 0, rate = \audio, mode = \in, max = 10|
-		var busConnections;
-		busConnections = this.getBusConnections( i, rate, mode, max );
-		{ 	
-			pu.items = this.prGetPopUpItems( busConnections, mode, rate ); 
-			pu.value = value.clip( 0, busConnections.size-1);
-			pu.background = this.getPopUpColor( busConnections, value );
-		}.defer;
-	}
-	
-	setMixSlider { |mx, bus = 0, i = 0, rate = \audio, stringColor|
-		var busConnection;
-		busConnection = analyzers[ rate ].busConnection( \in, bus.asInt, i.asInt );
-		mx.sliderView.string = this.getBusLabel( busConnection, \in, bus, rate );
-		mx.sliderView.hiliteColor = this.getPopUpColor( [busConnection], 0 );
-		mx.sliderView.stringColor = stringColor;
-		mx.numberView.stringColor = stringColor;
-	}
-	
-	getBusConnections { |i = 0, rate = \audio, mode = \in, max = 10|
-		var items, lastNotNil = 0;
-		var func;
-		
-		func = { |bus| analyzers[ rate ].busConnection( mode, bus.asInt, i.asInt ) };
-				
-		items = (max+2).asInt.collect( func );
-		items.do({ |item, ii|
-			if( item.notNil ) {
-				lastNotNil = ii;
-			};
-		});
-		^items[..lastNotNil + 1];
-	}
-	
-	getBusLabel { |busConnection, mode = \in, bus = 0, rate = \audio|
-		var prefix, index, reverseMode;
-		
-		prefix = switch( mode, \in, "from", \out, "to" );
-		reverseMode =  switch( mode, \in, \out, \out, \in );
-		
-		^if( busConnection.notNil ) {
-			index = busConnection[2][ 
-				busConnection[3].indexOfEqual( bus.asInt ) 
-			];
-			"% %:% (%)".format( 
-				prefix,
-				busConnection[1], 
-				busConnection[0].defName,
-				busConnection[0].def.prGetIOName( reverseMode, rate, index ) ? index
-			);
-		} {
-			"no signal"
-		};
-	}
-	
-	prGetPopUpItems { |busConnections, mode = \in, rate = \audio|
-		^busConnections.collect({ |item, bus| this.getBusLabel( item, mode, bus, rate ); });			
-	}
-
-	getPopUpItems { |i = 0, rate = \audio, mode = \in, max = 10|
-		^this.prGetPopUpItems( this.getBusConnections( i, rate, mode, max ), mode, rate );	}
-	
-	getPopUpColor { |busConnections, bus = 0|
-		var item;
-		item = busConnections.clipAt( bus.asInt );
-		if( item.notNil ) {
-			^unitColors[ item[1] ]
-		} {
-			^Color.clear;
-		};
 	}
 
 }
