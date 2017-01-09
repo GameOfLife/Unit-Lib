@@ -16,14 +16,13 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UMapDef( \shared_out, { |value = 0.0, id = 0, range = #[0,1]|
+UMapDef( \shared_out, { |value = 0.0, range = #[0,1]|
 	var sig;
 	sig = value;
 	range[1] = range[1].max(range[0] + 1.0e-8);
 	sig = sig.linlin(*range ++ [0,1,\none]);
-	ReplaceOut.kr(id + 1400, sig);
+	USharedValueOut.kr( \id, sig );
 	UMapOut.kr(value);
 })
 	.mappedArgs_([ \value, \range ])
-	.setSpec( \id, SharedValueIDSpec( 0 ) )
 	.category_( 'shared_io' );

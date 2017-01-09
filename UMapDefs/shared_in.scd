@@ -25,7 +25,7 @@ part of the Unit lib default UMapDefs set
 
 UMapDef( \shared_in, { |id = 0, range = #[0.0, 1.0], curve = 0.0, invert = 0, clipMode = 0, clipSoftness = 0|
 	var sig;
-	sig = (In.kr(id + 1400) * 2) - 1;
+	sig = (USharedValueIn.kr(id) * 2) - 1;
 	sig = Select.kr( curve.inRange(-0.001,0.001), [
 		sig.lincurve(-1,1,-1,1, curve, \none ),
 		sig

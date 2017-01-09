@@ -43,17 +43,13 @@ defs = [
 			}
 		);
 		if( type === \range ) {
-			ReplaceOut.kr( \lo_id.kr(0) + 1400, sig[0] );
-			ReplaceOut.kr( \hi_id.kr(1) + 1400, sig[1] );
+			USharedValueOut.kr( [ \lo_id, \hi_id ], sig, [0,1] );
 		} {
-			ReplaceOut.kr(\id.kr(0) + 1400, sig);
+			USharedValueOut.kr( \id, sig );
 		};
 	}, addToAll: false, extraPrefix: \shared_ )
 		.setSpec( \value, spec )
-		.setSpec( \range, spec.asControlSpec.asRangeSpec )
-		.setSpec( \id, SharedValueIDSpec() )
-		.setSpec( \lo_id, SharedValueIDSpec() )
-		.setSpec( \hi_id, SharedValueIDSpec(1) );
+		.setSpec( \range, spec.asControlSpec.asRangeSpec );
 });
 
 def = MultiUdef( \shared_value, defs, \shared_io, \type, false );
