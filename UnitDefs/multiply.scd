@@ -14,7 +14,7 @@ Udef( \multiply, { |mul = 1|
 	var in;
 	in = UIn.ar(0, 1 );
 	in = in * mul;
-	UMixOut.ar( 0, in );
+	UOut.ar( 0, in );
 })
 	.category_( \utility )
 	.setSpec( \mul, [-1,1,\lin,0,1].asSpec );

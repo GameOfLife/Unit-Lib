@@ -16,7 +16,7 @@ MultiChannelUdef( \gain, { |gain = 0, inverse = 0|
 	var in;
 	in = UIn.ar(0, Udef.numChannels );
 	in = in * gain.dbamp * inverse.linlin(0,1,1,-1);
-	UMixOut.ar( 0, in );
+	UOut.ar( 0, in );
 })
 	.category_( \utility )
 	.setSpec( \gain, [-96,24,\lin,0,0].asSpec )
