@@ -341,12 +341,12 @@ UMap : U {
 				if( unit.isUMap && { unit.def.useMappedArgs && { unit.def.isMappedArg( key ) } } ) {
 					if( unit.spec.notNil ) {
 						this.spec = unit.getSpec( key ).copy;
-						this.set( \u_spec, spec );
+						this.set( \u_spec, this.spec );
 						this.set( \u_useSpec, false );
 					};
 				} {
 					this.spec = unit.getSpec( key ).copy;
-					this.set( \u_spec, spec );
+					this.set( \u_spec, this.spec );
 					this.set( \u_useSpec, true );
 				};
 				this.def.activateUnit( this, unit );
