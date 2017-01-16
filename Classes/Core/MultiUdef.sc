@@ -71,6 +71,14 @@ MultiUdef : Udef {
 		^udefs.detect({ |item| item.name == name }) ? udefs[0];
 	}
 	
+	dontStoreArgNames { 
+		^dontStoreArgNames ?? {
+			if( this.getArgSpec( this.defNameKey ).private ) {
+				[ this.defNameKey ]
+			}
+		};
+	}
+	
 	findUdefFor { |unit|
 		^tempDef ?? { this.findUdef( unit.get( this.defNameKey ) ); };
 	}

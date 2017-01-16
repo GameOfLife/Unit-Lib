@@ -98,6 +98,7 @@ Udef : GenericDef {
 	var <>prepareArgsFunc;
 	var <>uchainInitFunc;
 	var <>inputIsEndPoint = false;
+	var <>dontStoreArgNames;
 	
 	*initClass{
 		defsFolders = [ 
@@ -567,6 +568,15 @@ U : ObjectWithArgs {
         this.init( newDefName, if( keepArgs ) { args } { [] }, mod); // keep args
     }
     
+    subDef { 
+	    var df;
+	    df = this.def;
+	    while { df.respondsTo( \findUdefFor ) } {
+		    df = df.findUdefFor( this );
+	    };
+	    ^df;
+    }
+    
     checkDef {
 	    if( this.def.notNil && { this.def.argNamesFor( this ) != this.argNames } ) {
 		    this.init( this.def, args, mod );
@@ -1015,7 +1025,9 @@ U : ObjectWithArgs {
 		stream << this.class.name << "( " <<* this.argsForPrint  <<" )"
 	}
 	
-	dontStoreArgNames { ^[ 'u_dur', 'u_doneAction' ] }
+	dontStoreArgNames { ^[ 'u_dur', 'u_doneAction' ] 
+		++ this.def.dontStoreArgNames.value( this );
+	}
 	
 	getInitArgs {
 		var defArgs;
