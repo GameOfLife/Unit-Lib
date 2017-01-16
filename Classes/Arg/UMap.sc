@@ -381,7 +381,7 @@ UMap : U {
 	unitSet { // sets this object in the unit to enforce setting of the synths
 		if( this.unit.notNil ) {	
 			if( this.unitArgName.notNil ) {
-				this.unit.set( this.unitArgName, this );
+				this.unit.prSet( this.unitArgName, this );
 			};
 		};
 	}
