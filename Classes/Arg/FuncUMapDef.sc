@@ -21,6 +21,7 @@ FuncUMapDef : UMapDef {
 		argSpecs = argSpecs ++ [
 			[ \value, 0, DisplaySpec(), valueIsPrivate ], 
 			[ \u_spec, [0,1].asSpec, ControlSpecSpec(), true ],
+			[ \u_useSpec, true, BoolSpec( true ), true ],
 			[ \u_prepared, false, BoolSpec(false), true ]
 		].collect(_.asArgSpec);
 		argSpecs.do(_.mode_( \init ));
@@ -38,12 +39,14 @@ FuncUMapDef : UMapDef {
 		};
 	}
 	
+	useMappedArgs_ { |bool| useMappedArgs = bool }
+	
 	asUnmappedArgsArray { |unit, argPairs|
 		argPairs = argPairs ? #[];
 		^unit.argSpecs.collect({ |item| 
 			var val;
 			val = argPairs.pairsAt(item.name) ?? { item.default.copy };
-			if( this.isMappedArg( item.name ) ) { 
+			if( this.useMappedArgs && { this.isMappedArg( item.name ) } ) { 
 				val = item.spec.unmap( val.value ); 
 			} {
 				val = val.value;
@@ -57,7 +60,7 @@ FuncUMapDef : UMapDef {
 		res = func.value( unit, 
 			*this.asUnmappedArgsArray( unit, unit.args ).clump(2).flop[1]
 		);
-		if( valueIsMapped ) {
+		if( this.useMappedArgs && valueIsMapped && (unit.get( \u_useSpec ) != false) ) {
 			unit.setArg( \value, unit.getSpec( \value ).map( res ) );
 		} {
 			unit.setArg( \value, res );
@@ -93,12 +96,12 @@ FuncUMapDef : UMapDef {
 	hasBus { ^false }
 	
 	value { |unit|
-		if( valueIsMapped ) {
+		if( this.useMappedArgs && valueIsMapped ) {
 			^(unit.get( \u_spec ) ?? { [0,1].asSpec }).map( 
-				unit.getSpec( \value ).unmap( unit.value )
+				unit.getSpec( \value ).unmap( unit.get( \value ) )
 			);
 		} {
-			^unit.value
+			^unit.get( \value );
 		};
 	}
 	
@@ -109,6 +112,15 @@ FuncUMapDef : UMapDef {
 				unit.unitSet;
 			};
 		});
+	}
+	
+	getControlInput { |unit|
+		var out;
+		out = unit.get( \value );
+		if( out.isUMap ) {
+			out = out.asControlInput( unit );
+		};
+		^out;
 	}
 	
 	canInsert { ^false }
