@@ -1872,13 +1872,25 @@
 
 	makeView { |parent, bounds, label, action, resize|
 		var vws, view, labelWidth;
-		var boxWidth;
+		var boxWidth, setColor;
 		
 		bounds.isNil.if{bounds= 160 @ 18 };
 		
 		vws = ();
 		#view, bounds = EZGui().prMakeMarginGap.prMakeView( parent, bounds );
 		vws[ \view ] = view;
+		
+		vws[ \setColor ] = {
+			var hash;
+			hash = (vws[ \box ].value + this.class.umap_name.asString.size).hash;
+			
+			vws[ \drag ].background = Color.new255(
+				(hash & 16711680) / 65536,
+				(hash & 65280) / 256,
+				hash & 255,
+				128
+			);
+		};
 		
 		if( label.notNil ) {
 			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
@@ -1898,6 +1910,7 @@
 			)
 		    .action_({ |vw|
 		        action.value( vw, vw.value.asInt );
+		        vws.setColor;
 		    } ).resize_(5)
 		    .allowedChars_( "" )
 			.step_( step )
@@ -1923,11 +1936,13 @@
 			});
 					    
 		if( resize.notNil ) { vws[ \view ].resize = resize };
+		vws.setColor;
 		^vws;
 	}
 
 	setView { |view, value, active = false|
 		view[ \box ].value = value;
+		view.setColor;
 		if( active ) { view.doAction };
 	}
 
