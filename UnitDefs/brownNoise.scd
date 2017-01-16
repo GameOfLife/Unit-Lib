@@ -16,4 +16,4 @@ Udef( \brownNoise, { |amp = 0.1, seed = 12345|
 	URandSeed.ir(seed);
 	UMixOut.ar( 0, BrownNoise.ar * amp, 0, true )
 } ).category_( \noise )
-	.setSpec( \seed, PositiveIntegerSpec(12345) )
+	.setSpec( \seed, PositiveIntegerSpec(12345), \init )
