@@ -7,6 +7,7 @@ value: the value to be mapped (0-1)
 min: minimum map output (value == 0)
 max: maxmum map output (value == 1)
 warp: warp type
+	-1: auto (default - warp type of input Spec)
 	0: \step
 	1: \lin
 	2: \exp
@@ -44,7 +45,7 @@ d = UMapDef( \map, { |value = 0.5, min = 0, max = 1, warp = -1, curve = 0|
 			warp = sp.warp.asSpecifier;
 		};
 		ListSpec([-1,0,1,2,3,4,5,6],-1,[
-			"auto (%)".format( sp.warp.asSpecifier ).asSymbol, 
+			"auto (%)".format( warp ).asSymbol, 
 			\step,\lin,\exp,\cos,\sin,\curve,\amp
 		])
 	})
