@@ -125,7 +125,12 @@ UChainIOGUI : UChainGUI {
 				
 			header = StaticText( comp, width @ 14 )
 				.applySkin( RoundView.skin )
-				.string_( " " ++ i ++ ": " ++ if(unit.def.class == LocalUdef){"[Local] "}{""} ++ unit.defName )
+				.string_( 
+				 	" " ++ i ++ ": " ++ 
+					if( unit.def.class == LocalUdef ) { "[Local] " } { "" } ++ 
+					unit.defName ++ 
+					if( unit.def.isKindOf( MultiUdef ) ) { " / " ++ unit.get( unit.def.defNameKey ) } { "" }
+				)
 				.background_( Color.gray(0.9) )
 				.resize_(2)
 				.font_( 
