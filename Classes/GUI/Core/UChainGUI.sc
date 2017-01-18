@@ -1019,9 +1019,6 @@ UChainGUI {
 					(RoundView.skin.tryPerform( \at, \font ) ?? 
 						{ Font( Font.defaultSansFace, 12) }).boldVariant 
 				);
-			
-			
-			//if( chain.class != MassEditUChain )
 				
 			uview = UDragBin( comp, comp.bounds.moveTo(0,0) );
 			uview.color_( Color.gray(0.2) );
