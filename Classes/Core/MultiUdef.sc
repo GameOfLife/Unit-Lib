@@ -85,6 +85,7 @@ MultiUdef : Udef {
 	
 	asArgsArray { |argPairs, unit, constrain = true|
 		var defName, argz, newDefName;
+		argPairs = prepareArgsFunc.value( argPairs ) ? argPairs;
 		defName = (argPairs ? []).detectIndex({ |item| item == this.defNameKey });
 		if( defName.notNil ) {
 			defName = argPairs[ defName + 1 ];

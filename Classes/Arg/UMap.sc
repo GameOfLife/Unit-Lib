@@ -46,7 +46,7 @@ UMapDef : Udef {
 	dontStoreValue { ^false }
 	
 	asArgsArray { |argPairs, unit, constrain = true|
-		argPairs = argPairs ? #[];
+		argPairs = prepareArgsFunc.value( argPairs ) ? argPairs ? #[];
 		^argSpecs.collect({ |item| 
 			var val;
 			val = argPairs.pairsAt(item.name) ?? { item.default.copy };
