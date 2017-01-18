@@ -577,6 +577,20 @@ U : ObjectWithArgs {
 	    ^df;
     }
     
+    subDefNames {  
+	    var df, res;
+	    df = this.def;
+	    while { df.respondsTo( \findUdefFor ) } {
+		    df = df.findUdefFor( this );
+		    res = res.add( df.name );
+	    };
+	    ^res;
+    }
+    
+    fullDefName {
+	    ^([ this.defName ] ++ this.subDefNames).join( " / " );
+    }
+    
     checkDef {
 	    if( this.def.notNil && { this.def.argNamesFor( this ) != this.argNames } ) {
 		    this.init( this.def, args, mod );

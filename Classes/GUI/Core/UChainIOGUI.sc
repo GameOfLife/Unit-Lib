@@ -128,8 +128,7 @@ UChainIOGUI : UChainGUI {
 				.string_( 
 				 	" " ++ i ++ ": " ++ 
 					if( unit.def.class == LocalUdef ) { "[Local] " } { "" } ++ 
-					unit.defName ++ 
-					if( unit.def.isKindOf( MultiUdef ) ) { " / " ++ unit.get( unit.def.defNameKey ) } { "" }
+					unit.fullDefName
 				)
 				.background_( Color.gray(0.9) )
 				.resize_(2)

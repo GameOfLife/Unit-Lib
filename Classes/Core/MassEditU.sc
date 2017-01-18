@@ -22,6 +22,7 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 	var <units, <>argSpecs;
 	var <>autoUpdate = true;
 	var <>defNameKey;
+	var <>subDef;
 	
 	*new { |units| // all units have to be of the same Udef
 		^super.newCopyArgs.init( units );
@@ -49,7 +50,13 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 				argSpecs = [ def.getArgSpec( dkey, units[0] ) ];
 			};
 			
-			if( def.isKindOf( MultiUdef ) ) { defNameKey = def.defNameKey; };
+			if( def.isKindOf( MultiUdef ) ) { 
+				defNameKey = def.defNameKey;
+				subDef = units[0].subDef;
+				if( units[1..].any({ |item| item.subDef != subDef }) ) {
+					subDef = nil;
+				};
+			};
 			
 			argSpecs = argSpecs.collect({ |argSpec|
 				var values, massEditSpec, value;
@@ -159,7 +166,13 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 		^units.first.canUseUMap( key, umapdef );
 	}
 	
-	defName { ^((this.def !? { this.def.name }).asString + "(% units)".format( units.size )).asSymbol }
+	defName { ^((this.def !? { this.def.name } ? "mixed").asString + "(% units)".format( units.size )).asSymbol }
+	
+	fullDefName {
+		^((this.def !? { this.def.name } ? "mixed").asString ++
+		if( defNameKey.notNil && subDef.notNil ) { " /" + units[0].subDefNames.join( " / " ) } { "" } ++
+		" (% units)".format( units.size ));
+	}
 	
 	def_ { |def|  units.do(_.def_( def ) ); this.init( units ); }
 	
@@ -212,10 +225,10 @@ MassEditUChain {
 					if( multiUdefs.includes( allDefNames[i] ) ) {
 						item.do({ |unit|
 							var val;
-							val = unit.get( unit.def.defNameKey );
+							val = unit.subDef;
 							variants[ val ] = variants[ val ].add( unit );
 						});
-						variants.keys.as(Array).sort.collect({ |key|
+						variants.keys.as(Array).sort({ |a,b| a.name <= b.name }).collect({ |key|
 							if( variants[ key ].size == 1 ) {
 								variants[ key ][ 0 ];
 							} {

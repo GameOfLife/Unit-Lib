@@ -1007,9 +1007,8 @@ UChainGUI {
 				.applySkin( RoundView.skin )
 				.string_( 
 					" " ++ indexLabel ++ ": " ++ 
-					if( unit.def.class == LocalUdef ) { "[Local] " } { "" } ++ 
-					unit.defName ++ 
-					if( unit.def.isKindOf( MultiUdef ) ) { " / " ++ unit.get( unit.def.defNameKey ) } { "" }
+					if( unit.def.class == LocalUdef ) { "[Local] " } { "" } ++
+					unit.fullDefName
 				)
 				.background_( if( notMassEdit ) 
 					{ Color.white.alpha_(0.5) }
