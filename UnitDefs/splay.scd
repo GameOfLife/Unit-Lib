@@ -34,7 +34,7 @@ part of the Unit lib default Udefs set
 (
 var defs, def;
 defs = (1..8).collect({ |n|
-	MultiChannelUdef( "splay_%".format(n).asSymbol, { |spread = 1, width = 2, center = 0|
+	MultiChannelUdef( n, { |spread = 1, width = 2, center = 0|
 		var sig;
 		sig = UIn.ar( 0, Udef.numChannels, endPoint: true );
 		switch( n,
@@ -48,7 +48,7 @@ defs = (1..8).collect({ |n|
 				};
 			}
 		);
-	}, addToAll: false)
+	}, addToAll: false, extraPrefix: "splay_" )
 		.setSpec( \spread, [0,1,\lin,0,1].asSpec )
 		.setSpec( \width, [1,n.max(2),\exp,0,2].asSpec )
 		.setSpec( \center, [-1,1,\lin,0,0].asSpec );
