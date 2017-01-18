@@ -56,7 +56,13 @@ defs = (1..8).collect({ |n|
 
 def = MultiUdef( \splay, defs, \utility, \numOutputs, false );
 
-def.argSpecs.last.spec.labels = (1..8).collect(_.asSymbol);
+def.uchainInitFunc_({ |unit, chain| // backwards compatibility
+	if( unit.numOutputs.isKindOf( Symbol ) ) {
+		unit.numOutputs = unit.numOutputs.asString.last.digit;
+	};
+});
+
+// def.argSpecs.last.spec.labels = (1..8).collect(_.asSymbol);
 
 def
 )
