@@ -75,7 +75,7 @@ UChainGUI {
 	init { |inParent, bounds|
 		parent = inParent;
 		
-		packUnits = packUnitsDefault;
+		packUnits = if( chain.isKindOf( MassEditUChain ) ) { false; } { packUnitsDefault; };
 		
 		tempoMap = UScore.current !? _.tempoMap ?? { TempoMap() };
 		
@@ -144,10 +144,20 @@ UChainGUI {
 				} {
 					units.add( item );
 				} { item.def == units.last.def } {
-					if( units.last.isKindOf( MassEditU ) ) {
-						units.last.units = units.last.units.add(item);
+					if( item.def.isKindOf( MultiUdef ) && {
+						if(  units.last.isKindOf( MassEditU ) ) {
+							item.get( item.def.defNameKey ) == units.last.units.last.get( item.def.defNameKey );
+						} {
+							item.get( item.def.defNameKey ) == units.last.get( item.def.defNameKey );
+						};
+					} ) {	
+						if( units.last.isKindOf( MassEditU ) ) {
+							units.last.units = units.last.units.add(item);
+						} {
+							units[ units.size - 1 ] = MassEditU([ units.last, item ]);  
+						};
 					} {
-						units[ units.size - 1 ] = MassEditU([ units.last, item ]);  
+						units.add( item );
 					};
 				} { units.add( item ); }
 			});

@@ -173,11 +173,15 @@ MassEditUChain {
 	
 	init {
 		var allDefNames = [], allUnits = Order();
+		var multiUdefs = Set();
 		
 		uchains.do({ |uchain|
 			uchain.units.select({|x| x.def.class != LocalUdef}).do({ |unit|
 				var defName, index;
 				defName = unit.defName;
+				if( unit.def.isKindOf( MultiUdef ) ) {
+					multiUdefs.add( defName );
+				};
 				if( allDefNames.includes( defName ).not ) {
 					allDefNames = allDefNames.add( defName );
 				};
@@ -187,16 +191,32 @@ MassEditUChain {
 		});
 		
 		units = allUnits.asArray.collect({ |item, i|
+			var variants = ();
 			if( allDefNames[i].notNil ) {
 				if( item.size == 1 ) {
-					item[0];
+					[ item[0] ]
 				} {
-					MassEditU( item );
+					if( multiUdefs.includes( allDefNames[i] ) ) {
+						item.do({ |unit|
+							var val;
+							val = unit.get( unit.def.defNameKey );
+							variants[ val ] = variants[ val ].add( unit );
+						});
+						variants.keys.as(Array).sort.collect({ |key|
+							if( variants[ key ].size == 1 ) {
+								variants[ key ][ 0 ];
+							} {
+								MassEditU( variants[ key ] ) 
+							};
+						});
+					} {
+						[ MassEditU( item ) ]
+					};
 				};
 			} {
 				nil
 			};
-		}).select(_.notNil);
+		}).select(_.notNil).flatten(1);
 		
 		this.changed( \init );
 	}
