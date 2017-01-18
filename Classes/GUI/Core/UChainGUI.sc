@@ -1015,7 +1015,12 @@ UChainGUI {
 			
 			header = StaticText( comp, comp.bounds.moveTo(0,0) )
 				.applySkin( RoundView.skin )
-				.string_( " " ++ indexLabel ++ ": " ++ if(unit.def.class == LocalUdef){"[Local] "}{""}++unit.defName )
+				.string_( 
+					" " ++ indexLabel ++ ": " ++ 
+					if( unit.def.class == LocalUdef ) { "[Local] " } { "" } ++ 
+					unit.defName ++ 
+					if( unit.def.isKindOf( MultiUdef ) ) { " / " ++ unit.get( unit.def.defNameKey ) } { "" }
+				)
 				.background_( if( notMassEdit ) 
 					{ Color.white.alpha_(0.5) }
 					{ Color.white.blend( Color.yellow, 0.33 ).alpha_(0.5) }
