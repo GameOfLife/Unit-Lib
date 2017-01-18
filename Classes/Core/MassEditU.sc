@@ -21,6 +21,7 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 	
 	var <units, <>argSpecs;
 	var <>autoUpdate = true;
+	var <>defNameKey;
 	
 	*new { |units| // all units have to be of the same Udef
 		^super.newCopyArgs.init( units );
@@ -47,6 +48,8 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 			} {
 				argSpecs = [ def.getArgSpec( dkey, units[0] ) ];
 			};
+			
+			defNameKey = def.defNameKey;
 			
 			argSpecs = argSpecs.collect({ |argSpec|
 				var values, massEditSpec, value;
@@ -119,7 +122,11 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 	}
 	
 	set { |...args|
-		var autoUpdateWas;
+		var autoUpdateWas, defNameWas;
+		
+		if( defNameKey.notNil ) {
+			defNameWas = units.first.get( defNameKey );
+		};
 		
 		// disable auto updating to prevent loop
 		autoUpdateWas = autoUpdate;
@@ -136,6 +143,12 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 		
 		// re-enable auto updating
 		autoUpdate = autoUpdateWas;
+		
+		if( defNameWas.notNil && { units.any( { |unit| 
+				unit.get( defNameKey ) != defNameWas } ) 
+		} ) {
+			this.changed( \init );
+		};
 	}
 	
 	getSpec { |name|
