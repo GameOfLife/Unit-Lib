@@ -3,7 +3,6 @@
 
 Creates an UMap that listens to an audio bus from a previous unit in the chain and detects the beginning of notes/drumbeats/etc..
 
-bus: the number of the bus from the audio chain(usually 0)
 threshold: the detection threshold, typically between 0 and 1
 odftype: chooses which onset detection function is used. In many cases the default will be fine. The following choices are available;
 	\power
@@ -34,7 +33,7 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UMapDef( \onsets, { |bus = 0, 
+UMapDef( \onsets, { | 
 	filter = #[20,20000], 
 	threshold = 0.5,
 	odftype = 3,
@@ -45,7 +44,7 @@ UMapDef( \onsets, { |bus = 0,
 	range = #[0.0,1.0]|
 	var sig, fft, onsets, fftsize;
 	fftsize = \fftsize.ir( 512 );
-	sig = In.ar(bus + UIn.firstPrivateBus);
+	sig = UIn.ar( 0 );
 	sig = BLowCut.ar( sig, filter[0], 2 );
 	sig = BHiCut.ar( sig, filter[1], 2 );
 	fft = FFT( LocalBuf( fftsize, 1 ), sig );
@@ -62,7 +61,11 @@ UMapDef( \onsets, { |bus = 0,
 	.setSpec( \mingap, [1,100,\lin,1,10].asSpec )
 	.setSpec( \medianspan, [1,100,\lin,1,11].asSpec )
 	.setSpec( \fftsize, ListSpec([512,1024],0), \init )
-	.setSpec( \bus, PositiveIntegerSpec(0,0,32) )
+	.prepareArgsFunc_( { |args| 
+		var bus;
+		bus = args.pairsAt( \bus );
+		args ++ [ \u_i_ar_0_bus, bus ];
+	 } )
 	.mappedArgs_([ \range ])
 	.category_(\input);
 

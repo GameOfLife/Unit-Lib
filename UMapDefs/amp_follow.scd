@@ -3,7 +3,6 @@
 
 Creates an UMap that listens to an audio bus from a previous unit in the chain, and follow it's amplitude.
 
-bus: the number of the bus (usually 0)
 fromRange: the amplitude range to be used as output
 toRange: the range to which the output is scaled
 attackTime: the attack time of the amplitude follower
@@ -24,11 +23,11 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UMapDef( \amp_follow, { |bus = 0, filter = #[20,20000], fromRange = #[0.0, 1.0], toRange = #[0.0,1.0], 
+UMapDef( \amp_follow, { |filter = #[20,20000], fromRange = #[0.0, 1.0], toRange = #[0.0,1.0], 
 	attackTime = 0.01, releaseTime = 0.01,
 	invert = 0, curve = 0, clipMode = 0, clipSoftness = 0.1|
 	var sig, unranged;
-	sig = In.ar(bus + UIn.firstPrivateBus);
+	sig = UIn.ar(0);
 	sig = BLowCut.ar( sig, filter[0], 2 );
 	sig = BHiCut.ar( sig, filter[1], 2 );
 	sig = Amplitude.ar( sig, attackTime, releaseTime );
@@ -57,7 +56,11 @@ UMapDef( \amp_follow, { |bus = 0, filter = #[20,20000], fromRange = #[0.0, 1.0],
 	.setSpec( \clipSoftness, [0,1,\lin,0,0.1].asSpec )
 	.setSpec( \invert, BoolSpec(false) )
 	.setSpec( \curve, [-16,16,\lin,0,0].asSpec )
-	.setSpec( \bus, PositiveIntegerSpec(0,0,32) )
+	.prepareArgsFunc_( { |args| 
+		var bus;
+		bus = args.pairsAt( \bus );
+		args ++ [ \u_i_ar_0_bus, bus ];
+	 } )
 	.mappedArgs_([ \toRange ])
 	.category_(\input)
 

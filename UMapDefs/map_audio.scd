@@ -3,7 +3,6 @@
 
 Creates an UMap that listens to an audio bus from a previous unit in the chain and converts it to a control signal.
 
-bus: the number of the bus (usually 0)
 fromRange: the input range to listen to (-1 to 1)
 toRange: the range to which the output is scaled
 curve: a curvature value for toRange. If curve == 0, the range is linear.
@@ -23,9 +22,9 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UMapDef( \map_audio, { |bus = 0, fromRange = #[-1.0, 1.0], toRange = #[0.0,1.0], 	curve = 0, invert = 0, lag = 0.0, clipMode = 0, clipSoftness = 0.1|
+UMapDef( \map_audio, { |fromRange = #[-1.0, 1.0], toRange = #[0.0,1.0], 	curve = 0, invert = 0, lag = 0.0, clipMode = 0, clipSoftness = 0.1|
 	var sig;
-	sig = In.ar(bus + UIn.firstPrivateBus);
+	sig = UIn.ar( 0 );
 	sig = A2K.kr( sig );
 	fromRange[1] = fromRange[1].max(fromRange[0] + 1.0e-8);
 	sig = sig.linlin(*fromRange ++ [-1,1,\none]);
@@ -49,6 +48,10 @@ UMapDef( \map_audio, { |bus = 0, fromRange = #[-1.0, 1.0], toRange = #[0.0,1.0],
 	.setSpec( \clipSoftness, [0,1,\lin,0,0.1].asSpec )
 	.setSpec( \invert, BoolSpec(false) )
 	.setSpec( \curve, [-16,16,\lin,0,0].asSpec )
-	.setSpec( \bus, PositiveIntegerSpec(0,0,32) )
+	.prepareArgsFunc_( { |args| 
+		var bus;
+		bus = args.pairsAt( \bus );
+		args ++ [ \u_i_ar_0_bus, bus ];
+	 } )
 	.mappedArgs_([ \toRange ])
 	.category_(\input)

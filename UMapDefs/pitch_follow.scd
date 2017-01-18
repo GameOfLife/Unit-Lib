@@ -3,7 +3,6 @@
 
 Creates an UMap that listens to an audio bus from a previous unit in the chain, and follow it's pitch.
 
-bus: the number of the bus (usually 0)
 ampTreshold: an amplitude threshold above which pitch detection is performed
 median: number of frames of built-in median filter
 pitchRange: the range of pitches to detect (will never go out of range)
@@ -18,12 +17,12 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UMapDef( \pitch_follow, { |bus = 0,
+UMapDef( \pitch_follow, { |
 	ampThreshold = 0.02, median = 7,
 	pitchRange = #[60, 4000], toRange = #[0.0,1.0], 
 	invert = 0, curve = 0|
 	var sig, unranged;
-	sig = In.ar(bus + UIn.firstPrivateBus);
+	sig = UIn.ar( 0 );
 	sig = Pitch.kr( sig, 440, pitchRange[0], pitchRange[1], 
 		ampThreshold: ampThreshold, median: median 
 	)[0];
@@ -41,7 +40,11 @@ UMapDef( \pitch_follow, { |bus = 0,
 	.setSpec( \pitchRange, FreqSpec().asRangeSpec )
 	.setSpec( \invert, BoolSpec(false) )
 	.setSpec( \curve, [-16,16,\lin,0,0].asSpec )
-	.setSpec( \bus, PositiveIntegerSpec(0,0,32) )
+	.prepareArgsFunc_( { |args| 
+		var bus;
+		bus = args.pairsAt( \bus );
+		args ++ [ \u_i_ar_0_bus, bus ];
+	 } )
 	.mappedArgs_([ \toRange ])
 	.category_(\input)
 
