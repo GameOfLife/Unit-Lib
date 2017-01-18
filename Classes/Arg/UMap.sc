@@ -408,6 +408,8 @@ UMap : U {
 			.flatten(1);
 	}
 	
+	value { ^this.get( \value ) ? this }
+	
 	/// UPat
 	
 	stream {

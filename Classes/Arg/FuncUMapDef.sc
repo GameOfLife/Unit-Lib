@@ -91,6 +91,7 @@ FuncUMapDef : UMapDef {
 	
 	makeSynth { |unit, target, startPos = 0, synthAction|
 		unit.set( \u_prepared, false );
+		^target;
 	}
 	
 	hasBus { ^false }

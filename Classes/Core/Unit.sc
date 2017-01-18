@@ -765,7 +765,15 @@ U : ObjectWithArgs {
 		});
 	}
 	
-	getUMaps { ^this.values.select( _.isUMap ) }
+	getUMaps { 
+		var res = [];
+		this.values.do({ |item|
+			if( item.isUMap && { res.includes( item ).not } ) {
+				res = res.add( item );
+			};
+		});
+		^res;
+	}
 	
 	getAllUMaps { 
 		var umaps;
