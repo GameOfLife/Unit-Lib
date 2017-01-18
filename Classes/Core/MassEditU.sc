@@ -49,7 +49,7 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 				argSpecs = [ def.getArgSpec( dkey, units[0] ) ];
 			};
 			
-			defNameKey = def.defNameKey;
+			if( def.isKindOf( MultiUdef ) ) { defNameKey = def.defNameKey; };
 			
 			argSpecs = argSpecs.collect({ |argSpec|
 				var values, massEditSpec, value;

@@ -143,21 +143,11 @@ UChainGUI {
 						{ item.def.isKindOf( LocalUdef ) } } 
 				} {
 					units.add( item );
-				} { item.def == units.last.def } {
-					if( item.def.isKindOf( MultiUdef ) && {
-						if(  units.last.isKindOf( MassEditU ) ) {
-							item.get( item.def.defNameKey ) == units.last.units.last.get( item.def.defNameKey );
-						} {
-							item.get( item.def.defNameKey ) == units.last.get( item.def.defNameKey );
-						};
-					} ) {	
-						if( units.last.isKindOf( MassEditU ) ) {
-							units.last.units = units.last.units.add(item);
-						} {
-							units[ units.size - 1 ] = MassEditU([ units.last, item ]);  
-						};
+				} { item.subDef == units.last.subDef } {
+					if( units.last.isKindOf( MassEditU ) ) {
+						units.last.units = units.last.units.add(item);
 					} {
-						units.add( item );
+						units[ units.size - 1 ] = MassEditU([ units.last, item ]);  
 					};
 				} { units.add( item ); }
 			});
