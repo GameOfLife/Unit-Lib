@@ -64,7 +64,18 @@ UChainIOGUI : UChainGUI {
 		}).sum + (4 * (14 + gap.y));
 	}
 	
-	getUnits { ^chain.units }
+	getUnits {
+		var units = [];
+		chain.units.do({ |unit|
+			unit.getAllUMaps.do({ |umap|
+				if ( (umap.audioIns.size > 0) or: (umap.audioOuts.size > 0) ) {
+					units = units.add( umap );
+				};
+			});
+			units = units.add( unit );
+		});
+		^units;
+	}
 	
 	makeUnitHeader { |units, margin, gap|
 		var comp, header,params;
@@ -130,7 +141,7 @@ UChainIOGUI : UChainGUI {
 					if( unit.def.class == LocalUdef ) { "[Local] " } { "" } ++ 
 					unit.fullDefName
 				)
-				.background_( Color.gray(0.9) )
+				.background_( if( unit.isUMap ) { unit.guiColor } { Color.gray(0.9) } )
 				.resize_(2)
 				.font_( 
 					(RoundView.skin.tryPerform( \at, \font ) ?? 
