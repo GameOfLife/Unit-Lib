@@ -11,10 +11,10 @@ this is an Udef definition file
 part of the Unit lib default Udefs set
 */
 
-MultiChannelUdef( \babblingbrook_jmc, { |amp = 0.1, seed = 12345|
+MultiChannelUdef( \babblingbrook_jmc, { |amp = 0.1|
 	var son;
 	
-	URandSeed.ir(seed);
+	URandSeed.ir();
 	son = ({RHPF.ar(OnePole.ar(BrownNoise.ar, 0.99), LPF.ar(BrownNoise.ar, 14)
 		* 400 + 500, 0.03, 0.003)}! Udef.numChannels )
 		+ ({RHPF.ar(OnePole.ar(BrownNoise.ar, 0.99), LPF.ar(BrownNoise.ar, 20)
@@ -22,6 +22,5 @@ MultiChannelUdef( \babblingbrook_jmc, { |amp = 0.1, seed = 12345|
 	
 	UMixOut.ar( 0, son * (amp * 100), 0, true )
 }, [ 
-	[ \amp, 0.1, \amp.asSpec ], 
-	[ \seed, 12345, PositiveIntegerSpec(12345)  ] 
+	[ \amp, 0.1, \amp.asSpec ]
 ], channels: [1,2,3,4,5,6,7,8] ).category_( \synthesis )

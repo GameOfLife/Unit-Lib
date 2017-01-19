@@ -14,9 +14,9 @@ this is an Udef definition file
 part of the Unit lib default Udefs set
 */
 
-Udef( \magFreeze, { |fftSize = 4096, hold = 0, amp = 0.1, noise = 0.0, seed = 12345|
+Udef( \magFreeze, { |fftSize = 4096, hold = 0, amp = 0.1, noise = 0.0|
 	var sig, fft1, fft2, conv, normal, delay;
-	URandSeed.ir( seed );
+	URandSeed.ir();
 	sig = UIn.ar( 0, Udef.numChannels );
 	fft1 = FFT( LocalBuf(fftSize).clear, sig );
 	fft2 = FFT( LocalBuf(fftSize).clear, WhiteNoise.ar(0.05) );
@@ -28,6 +28,5 @@ Udef( \magFreeze, { |fftSize = 4096, hold = 0, amp = 0.1, noise = 0.0, seed = 12
 	UOut.ar( 0, sig * amp );
 })	
 	.setSpec( \hold, BoolSpec(false) )
-	.setSpec( \seed, PositiveIntegerSpec(), \init )
 	.setSpec( \fftSize, ListSpec([512,1024,2048,4096]), \init)
 	.category_( \effect );

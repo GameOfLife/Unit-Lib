@@ -13,11 +13,11 @@ this is an Udef definition file
 part of the Unit lib default Udefs set
 */
 
-Udef(\sos_bell,{ |freq = 440, decay = 10,  amp = 0.1, seed = 12345|
+Udef(\sos_bell,{ |freq = 440, decay = 10,  amp = 0.1|
 	var out, env;	
 	var son, strike, hum;
 	
-	URandSeed.ir( seed ); // always the same sound
+	URandSeed.ir(); // always the same sound
 	
 	// Stretched harmonic series
 	son = SinOsc.ar(#[2, 3, 4.1, 5.43, 6.8, 8.21] * freq, 0, 
@@ -42,4 +42,3 @@ Udef(\sos_bell,{ |freq = 440, decay = 10,  amp = 0.1, seed = 12345|
 	
 }).category_( \synthesis )
 	.setSpec( \decay, [0.3,1000,\exp].asSpec )
-	.setSpec( \seed, PositiveIntegerSpec(12345) );

@@ -37,7 +37,7 @@ MultiChannelUdef( \grainSoundFile, {
 	rate = rate * \rateScale.kr( 1 );
 	overlap = \overlap.kr(4);
 	pan = \pan.kr( [ -1,1 ] );
-	URandSeed.ir(\seed.ir(12345));
+	URandSeed.ir(\seed);
 	trigger = TDuty.ar( Dwhite( 0,1 ).linexp( 0,1, 1/timeVar/density, timeVar/density ) );
 	sig = GrainBuf.ar( Udef.numChannels, trigger, overlap/density, bufnum, 
 		Demand.ar( trigger, 0, Dwhite( 0,1 ).linexp( 0,1, rate/rateVar, rate*rateVar ) ),
@@ -55,5 +55,4 @@ MultiChannelUdef( \grainSoundFile, {
 	[ \rateScale, 1, [0.125,8,\exp,0,1].asSpec ],
 	[ \overlap, 4, [0.01,100,\exp,0,1].asSpec ],
 	[ \pan, [-1,1], [-1,1].asSpec.asRangeSpec ],
-	[ \seed, 12345, PositiveIntegerSpec(), false, \init ]
 ], \soundFile )

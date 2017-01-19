@@ -18,9 +18,9 @@ this is an Udef definition file
 part of the Unit lib default Udefs set
 */
 
-Udef( \lfNoise, { |freq = 440, amp = 0.1, type = 0, seed = 12345|
+Udef( \lfNoise, { |freq = 440, amp = 0.1, type = 0|
 	var sig;
-	URandSeed.ir(seed);
+	URandSeed.ir();
 	sig = [
 		LFDNoise0.ar( freq, amp ),
 		LFDNoise1.ar( freq, amp ),
@@ -32,4 +32,3 @@ Udef( \lfNoise, { |freq = 440, amp = 0.1, type = 0, seed = 12345|
 } ).category_( \noise )
 	.setSpec( \type, [0,2,\lin,0,0].asSpec )
 	.setSpec( \freq, FreqSpec(2, 20000, default: 440) )
-	.setSpec( \seed, PositiveIntegerSpec(12345) )

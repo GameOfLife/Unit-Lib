@@ -24,12 +24,11 @@ this is an Udef definition file
 part of the Unit lib default Udefs set
 */
 
-MultiChannelUdef( \loopSoundFile, { |loopStart = #[0,0], loopDur = #[1,1], crossfade = 0.1, 
-			seed = 12345|
+MultiChannelUdef( \loopSoundFile, { |loopStart = #[0,0], loopDur = #[1,1], crossfade = 0.1|
 		var sig;
 		var numChannels, bufnum, rate, trigger, startPos, loop;
 		
-		URandSeed.ir(seed);
+		URandSeed.ir();
 		
 		#numChannels, bufnum, rate, trigger, startPos, loop =
 			BufSndFilePlayer.getArgs( Udef.numChannels, \soundFile, 1, 0 );
@@ -51,7 +50,6 @@ MultiChannelUdef( \loopSoundFile, { |loopStart = #[0,0], loopDur = #[1,1], cross
 	.setSpec( \loopDur, RangeSpec( default: [1,1] ) )
 	.setSpec( \rateScale,  [0.125,8,\exp,0,1].asSpec )
 	.setSpec( \crossfade, [0,1,\lin,0,0.1," s"].asSpec )
-	.setSpec( \seed, PositiveIntegerSpec(12345) )
 	.chooseFunc_({ |args|
 		var sf, numChannels;
 		sf = (args ? []).pairsAt( \soundFile );

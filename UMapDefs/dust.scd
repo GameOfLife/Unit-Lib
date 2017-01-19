@@ -13,13 +13,12 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UMapDef( \dust, { |density = 20, range = #[0.0,1.0], seed = 12345|
+UMapDef( \dust, { |density = 20, range = #[0.0,1.0]|
 	var sig;
-	URandSeed.ir(seed);
+	URandSeed.ir();
 	sig = Dust.kr( density ).range(*range);
 	UMapOut.kr(sig);
 })
 	.setSpec( \density, [0.01,1000,\exp, 0, 20].asSpec )
-	.setSpec( \seed, PositiveIntegerSpec(12345), \init )
 	.mappedArgs_( [ \range ] )
 	.category_( 'trigger_utility' )

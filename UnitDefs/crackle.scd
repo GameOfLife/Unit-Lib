@@ -12,9 +12,8 @@ this is an Udef definition file
 part of the Unit lib default Udefs set
 */
 
-Udef( \crackle, { |chaosParam = 1.5, amp = 0.1, seed = 12345|
-	URandSeed.ir(seed);
+Udef( \crackle, { |chaosParam = 1.5, amp = 0.1|
+	URandSeed.ir();
 	UMixOut.ar( 0, Crackle.ar( chaosParam, amp ), 0, true )
 } ).category_( \noise )
-	.setSpec( \seed, PositiveIntegerSpec(12345) )
-	.setSpec( \chaosParam, [1,2,\lin].asSpec );
+	.setDefault( \seed, 12345 )

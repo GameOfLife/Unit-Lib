@@ -36,9 +36,9 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UMapDef( \gendy, { |ampdist = 1, durdist = 1, adparam = 1, ddparam = 1, freq = #[0.1,100], ampscale = 0.5, durscale = 0.5, initCPs = 12, knum = 12, seed = 12345, range = #[0,1]|
+UMapDef( \gendy, { |ampdist = 1, durdist = 1, adparam = 1, ddparam = 1, freq = #[0.1,100], ampscale = 0.5, durscale = 0.5, initCPs = 12, knum = 12, range = #[0,1]|
 	var sig;
-	URandSeed.ir(seed);
+	URandSeed.ir();
 	
 	freq[0] = freq[0].min( ControlRate.ir / knum );
 	freq[1] = freq[1].min( ControlRate.ir / knum );
@@ -60,4 +60,3 @@ UMapDef( \gendy, { |ampdist = 1, durdist = 1, adparam = 1, ddparam = 1, freq = #
 	.setSpec( \initCPs, IntegerSpec( 12, 1, 40 ), \init )
 	.setSpec( \knum, [1,40,\lin,1,12].asSpec )
 	.setSpec( \lag, [0,1,\lin].asSpec )
-	.setSpec( \seed, PositiveIntegerSpec(12345) );

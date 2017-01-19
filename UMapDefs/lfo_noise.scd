@@ -18,9 +18,9 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UMapDef( \lfo_noise, { |freq = 2, type = 2, seed = 12345, range = #[0.0,1.0]|
+UMapDef( \lfo_noise, { |freq = 2, type = 2, range = #[0.0,1.0]|
 	var sig;
-	URandSeed.ir(seed);
+	URandSeed.ir();
 	sig = [
 		LFDNoise0.kr( freq ),
 		LFDNoise1.kr( freq ),
@@ -32,6 +32,5 @@ UMapDef( \lfo_noise, { |freq = 2, type = 2, seed = 12345, range = #[0.0,1.0]|
 })
 	.setSpec( \type, ListSpec([0,1,2,3], 0, [\step, \linear, \cubic, \clip]) )
 	.setSpec( \freq, FreqSpec(0.01,300, default: 2) )
-	.setSpec( \seed, PositiveIntegerSpec(12345), \init )
 	.mappedArgs_( [ \range ] )
 	.category_( 'modulation' )

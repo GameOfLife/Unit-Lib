@@ -13,10 +13,10 @@ this is an Udef definition file
 part of the Unit lib default Udefs set
 */
 
-Udef(\cymbalic_mcld,{ |decay = 10, ratio = 1, amp = 0.1, seed = 12345|
+Udef(\cymbalic_mcld,{ |decay = 10, ratio = 1, amp = 0.1|
 	var lodriver, locutoffenv, hidriver, hicutoffenv, freqs, res, thwack;
 	
-	URandSeed.ir( seed ); // always the same sound
+	URandSeed.ir( ); // always the same sound
 	
 	locutoffenv = EnvGen.ar(Env.perc(0.5, decay)) * 20000 + 10;
 	lodriver = LPF.ar(WhiteNoise.ar(0.1), locutoffenv);
@@ -36,4 +36,3 @@ Udef(\cymbalic_mcld,{ |decay = 10, ratio = 1, amp = 0.1, seed = 12345|
 }).category_( \synthesis )
 	.setSpec( \decay, [2.5,100,\exp, 0, 10].asSpec, \init )
 	.setSpec( \ratio, [0.25, 4, \exp, 0, 1].asSpec )
-	.setSpec( \seed, PositiveIntegerSpec(12345) );

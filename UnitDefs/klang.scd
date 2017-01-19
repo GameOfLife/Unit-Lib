@@ -26,7 +26,7 @@ defs = [8,16,32].collect({ |n|
 		variation = \variation.kr( 0 );
 		amp = \amp.asSpec.unmap( \amp.kr([0.1,0.1]) );
 		phase = \phase.kr([0,0]);
-		URandSeed.ir( \seed.ir(12345) );
+		URandSeed.ir();
 		freqs = SortedRand.ir( n, 0, 1, \lin, variation * 2 );
 		freqs = (exponential * freqs.linexp(0,1,*range)) + 
 			((1-exponential) * freqs.linlin(0,1,*range));
@@ -39,8 +39,7 @@ defs = [8,16,32].collect({ |n|
 		[ \exponential, 1, [0,1].asSpec ],
 		[ \variation, 0, [0,1].asSpec ],
 		[ \amp, [0.1,0.1], \amp.asSpec.asRangeSpec ],
-		[ \phase, [ 0, 0 ], AngleSpec().asRangeSpec ],
-		[ \seed, 12345, PositiveIntegerSpec(), false, \init ]
+		[ \phase, [ 0, 0 ], AngleSpec().asRangeSpec ]
 	], addToAll: false )
 });
 

@@ -33,9 +33,9 @@ this is an Udef definition file
 part of the Unit lib default Udefs set
 */
 
-Udef( \gendy, { |ampdist = 1, durdist = 1, adparam = 1, ddparam = 1, freq = #[290,590], ampscale = 0.5, durscale = 0.5, initCPs = 12, knum = 12, amp = 0.1, seed = 12345|
+Udef( \gendy, { |ampdist = 1, durdist = 1, adparam = 1, ddparam = 1, freq = #[290,590], ampscale = 0.5, durscale = 0.5, initCPs = 12, knum = 12, amp = 0.1|
 	var sig;
-	URandSeed.ir(seed);
+	URandSeed.ir();
 		
 	freq[1] = freq[1].min( SampleRate.ir / knum );
 		
@@ -54,4 +54,3 @@ Udef( \gendy, { |ampdist = 1, durdist = 1, adparam = 1, ddparam = 1, freq = #[29
 	.setSpec( \initCPs, IntegerSpec( 12, 1, 40 ), \init )
 	.setSpec( \knum, [1,40,\lin,1,12].asSpec )
 	.setSpec( \lag, [0,1,\lin].asSpec )
-	.setSpec( \seed, PositiveIntegerSpec(12345) );

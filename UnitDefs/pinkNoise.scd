@@ -12,8 +12,7 @@ this is an Udef definition file
 part of the Unit lib default Udefs set
 */
 
-Udef( \pinkNoise, { |amp = 0.1, seed = 12345|
-	URandSeed.ir(seed);
+Udef( \pinkNoise, { |amp = 0.1|
+	URandSeed.ir();
 	UMixOut.ar( 0, PinkNoise.ar * amp, 0, true )
 } ).category_( \noise )
-	.setSpec( \seed, PositiveIntegerSpec(12345) )

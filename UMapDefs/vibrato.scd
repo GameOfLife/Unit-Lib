@@ -21,8 +21,8 @@ part of the Unit lib default UMapDefs set
 */
 
 UMapDef( \vibrato, { |value = 0.58560567020555, freq = 6, depth = 0.02, delay = 0, onset = 0
-		rateVar = 0.04, depthVar = 0.1, lag = 0.1, seed = 12345|
-	URandSeed.ir(seed);
+		rateVar = 0.04, depthVar = 0.1, lag = 0.1|
+	URandSeed.ir();
 	UMapDef.useMappedArgs = false;
 	value = Vibrato.kr( value, freq, depth, delay, onset, rateVar, depthVar );
 	UMapOut.kr(value);
@@ -33,6 +33,5 @@ UMapDef( \vibrato, { |value = 0.58560567020555, freq = 6, depth = 0.02, delay = 
 	.setSpec( \onset, SMPTESpec(), \init )
 	.setSpec( \rateVar, [0,1,4,0,0.04].asSpec )
 	.setSpec( \depthVar, [0,1,4,0,0.1].asSpec )
-	.setSpec( \seed, PositiveIntegerSpec(12345), \init )
 	.mappedArgs_( [ \value ] )
 	.category_( 'freq' )
