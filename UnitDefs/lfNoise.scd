@@ -30,5 +30,5 @@ Udef( \lfNoise, { |freq = 440, amp = 0.1, type = 0|
 	sig = SelectX.ar( type, sig );
 	UMixOut.ar( 0, sig, 0, true )
 } ).category_( \noise )
-	.setSpec( \type, [0,2,\lin,0,0].asSpec )
+	.setSpec( \type, [0,3,\lin,0,0].asSpec )
 	.setSpec( \freq, FreqSpec(2, 20000, default: 440) )
