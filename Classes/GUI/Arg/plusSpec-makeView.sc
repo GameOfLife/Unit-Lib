@@ -2213,6 +2213,91 @@
 
 }
 
++ URandSeed { // is actually a Spec too
+	
+	*viewNumLines { ^1 }
+
+	*makeView { |parent, bounds, label, action, resize|
+		var vws, view, labelWidth, boxWidth;
+		
+		bounds.isNil.if{bounds= 160 @ 18 };
+		
+		vws = ();
+		#view, bounds = EZGui().prMakeMarginGap.prMakeView( parent, bounds );
+		vws[ \view ] = view;
+		
+		vws[ \setValue ] = { |vwx, value|
+			if( vws[ \val ] != value ) {
+				vws[ \ctrl ].remove;
+				vws[ \val ] = value;
+				if( vws[ \val ].isKindOf( URandSeed ) ) {
+					vws[ \auto ].value = 1;
+					vws[ \box ].value = vws[ \val ].value;
+					vws[ \box ].enabled = false;
+					vws[ \ctrl ] = SimpleController( vws[ \val ] )
+						.put( \seed, {
+							vws[ \box ].value = vws[ \val ].value;
+						});
+				} {
+					vws[ \auto ].value = 0;
+					vws[ \box ].value = vws[ \val ];
+					vws[ \box ].enabled = true;
+				};
+			};
+		};
+		
+		vws[ \view ].onClose_({ vws[ \ctrl ].remove });
+		
+		if( label.notNil ) {
+			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
+			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ 14 )
+				.string_( label.asString ++ " " )
+				.align_( \right )
+				.resize_( 4 )
+				.applySkin( RoundView.skin );
+		} {
+			labelWidth = -4;
+		};
+		
+		boxWidth = bounds.width-(40 + labelWidth + 2);
+		
+		vws[ \box ] = SmoothNumberBox( vws[ \view ], 
+				Rect(labelWidth + 2,0,boxWidth,bounds.height)
+			)
+		    .action_({ |vw|
+		        action.value( vw, vw.value.asInt );
+		    } ).resize_(5)
+		    .allowedChars_( "" )
+			.step_( 1 )
+			.scroll_step_( 1)
+			.alt_scale_( 10 )
+			.clipLo_( 0 )
+			.clipHi_( 16777216 );
+			
+		vws[ \auto ] = SmoothButton( vws[ \view ], 
+			Rect(labelWidth + 2 + boxWidth + 2,0,38,bounds.height)
+		)
+			.radius_(2)
+			.resize_(3)
+			.action_( { |bt| 
+				switch( bt.value, 
+					0, { action.value( vws, vws[ \box ].value ) },
+					1, { action.value( vws, URandSeed() ) }
+				);
+			})
+			.label_( [ "auto", "auto" ] );
+		    
+		if( resize.notNil ) { vws[ \view ].resize = resize };
+		^vws;
+	}
+
+	*setView { |view, value, active = false|
+		view.setValue( value );
+		if( active ) { view[ \auto ].doAction };
+	}
+
+}
+
 + DisplaySpec {
 	
 	makeView {

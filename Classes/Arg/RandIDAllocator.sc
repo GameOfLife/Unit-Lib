@@ -49,21 +49,38 @@ URandSeed {
 		RandID.ir( id );
 	}
 	
-	*ir { |seed = 12345|
-		this.getRandID;
-		RandSeed.ir( 1, seed );
+	*getSeed { |seed|
+		seed = seed ? \seed;
+		if( seed.isKindOf( Symbol ) ) {
+			Udef.addBuildSpec( 
+				ArgSpec( seed, URandSeed(), URandSeed, false, \init ) 
+			);
+			seed = seed.ir( 12345 );
+		};
+		^seed;
 	}
 	
-	*kr { |trig = 1, seed = 12345|
+	*ir { |seed|
 		this.getRandID;
-		RandSeed.kr( trig, seed );
+		RandSeed.ir( 1, this.getSeed( seed ) );
+	}
+	
+	*kr { |trig = 1, seed|
+		this.getRandID;
+		RandSeed.kr( trig, this.getSeed( seed ) );
 	}
 	
 	*new { ^super.new.next }
 	
+	== { |obj| ^obj.class == this.class }
+	
 	value { ^seed }
-	next { seed = 16777216.rand }
-	prepare { this.next }
+	next { seed = 16777216.rand; this.changed( \seed ); }
+	
+	prepare { |target, startPos, action| 
+		this.next;
+		action.value( this );
+	}
 	
 	asControlInput { ^this.value; }
 	asControlInputFor { ^this.value; }
