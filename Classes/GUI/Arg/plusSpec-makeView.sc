@@ -2259,7 +2259,7 @@
 			labelWidth = -4;
 		};
 		
-		boxWidth = bounds.width-(40 + labelWidth + 2);
+		boxWidth = bounds.width-(42 + labelWidth + 2);
 		
 		vws[ \box ] = SmoothNumberBox( vws[ \view ], 
 				Rect(labelWidth + 2,0,boxWidth,bounds.height)
@@ -2275,7 +2275,7 @@
 			.clipHi_( 16777216 );
 			
 		vws[ \auto ] = SmoothButton( vws[ \view ], 
-			Rect(labelWidth + 2 + boxWidth + 2,0,38,bounds.height)
+			Rect(labelWidth + 2 + boxWidth + 2,0,40,bounds.height)
 		)
 			.radius_(2)
 			.resize_(3)

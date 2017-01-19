@@ -72,6 +72,10 @@ URandSeed {
 	
 	*new { ^super.new.next }
 	
+	*asControlSpec {
+		^ControlSpec( 0, 2**24, \lin, 1, 12345 )
+	}
+	
 	== { |obj| ^obj.class == this.class }
 	
 	value { ^seed }
