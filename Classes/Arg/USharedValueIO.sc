@@ -1,3 +1,13 @@
+/*
+Unit Lib reserved bus numbers:
+
+1100 - 1199: shared buffer
+1200 - 1399: shared point (WFSCollider Class Library)
+1400 - 1499: shared value
+1500 - 1999: UMap map bus
+2000 - 20**: wfs panner Udefs (WFSCollider Class Library)
+*/
+
 USharedValueIn {
 	
 	classvar <>busOffset = 1400;
