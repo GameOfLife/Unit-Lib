@@ -38,3 +38,16 @@ USharedValueOut : USharedValueIn {
 		^ReplaceOut.kr( this.makeInput( id, default ) + this.busOffset, channel );
 	}
 }
+
+USharedBufferIn : USharedValueIn {
+	classvar <>busOffset = 1100;
+	
+	*spec { |default| ^SharedBufferIDSpec( default ) }
+}
+
+USharedBufferOut : USharedBufferIn {
+	
+	*kr { |id, channel, default = 0|
+		^ReplaceOut.kr( this.makeInput( id, default ) + this.busOffset, channel );
+	}
+}

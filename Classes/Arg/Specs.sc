@@ -1047,6 +1047,10 @@ SharedValueIDSpec : PositiveIntegerSpec {
 	storeArgs { ^[ default ] }
 }
 
+SharedBufferIDSpec : SharedValueIDSpec {
+	 *umap_name { ^'shared_buffer_in' }
+}
+
 PositiveRealSpec : Spec {
 
 	var <default = 0;
