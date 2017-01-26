@@ -1882,7 +1882,7 @@
 		
 		vws[ \setColor ] = {
 			var hash;
-			hash = (vws[ \box ].value + this.class.umap_name.asString.size).hash;
+			hash = (vws[ \box ].value + this.class.umap_name.hash).hash;
 			
 			vws[ \drag ].background = Color.new255(
 				(hash & 16711680) / 65536,
