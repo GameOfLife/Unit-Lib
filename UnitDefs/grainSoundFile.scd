@@ -24,7 +24,9 @@ this is an Udef definition file
 part of the Unit lib default Udefs set
 */
 
-MultiChannelUdef( \grainSoundFile, {
+var d;
+
+d = MultiChannelUdef( \grainSoundFile, {
 	var numChannels, bufnum, rate, trigger, startFrame, loop;
 	var pos, density, timeVar, rateVar, rateScale, overlap, pan, sig;
 	#numChannels, bufnum, rate, trigger, startFrame, loop = 
@@ -55,4 +57,8 @@ MultiChannelUdef( \grainSoundFile, {
 	[ \rateScale, 1, [0.125,8,\exp,0,1].asSpec ],
 	[ \overlap, 4, [0.01,100,\exp,0,1].asSpec ],
 	[ \pan, [-1,1], [-1,1].asSpec.asRangeSpec ],
-], \soundFile )
+], \soundFile );
+
+d.udefs[0].getArgSpec( \pan ).private_( true );
+
+d;
