@@ -23,6 +23,7 @@ LoadBalancer {
 	
 	classvar <>all;
 	
+	var <>name;
 	var <servers;
 	var <>loads;
 	var <>verbose = false;
