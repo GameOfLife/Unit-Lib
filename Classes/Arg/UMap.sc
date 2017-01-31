@@ -189,10 +189,6 @@ UMapDef : Udef {
 
 UMap : U {
 	
-	// This class is under development. For now it plays a line between min and max.
-	// it can only be used for args that have a single value ControlSpec
-	// gui doesn't work yet
-	
 	/* 
 	example:
 	x = UChain([ 'sine', [ 'freq', UMap() ] ], 'output');
@@ -382,14 +378,6 @@ UMap : U {
 		if( this.unit.notNil ) {	
 			if( this.unitArgName.notNil ) {
 				this.unit.prSet( this.unitArgName, this );
-			};
-		};
-	}
-	
-	parentSynthSet { // sets this object in the unit to enforce setting of the synths
-		if( this.unit.notNil ) {	
-			if( this.unitArgName.notNil ) {
-				this.unit.synthSet( this.unitArgName, this );
 			};
 		};
 	}
