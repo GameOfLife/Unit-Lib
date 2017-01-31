@@ -16,5 +16,8 @@ part of the Unit lib default UMapDefs set
 UMapDef( \x_y, { |x = 0.5, y = 0.5|
 	UMapOut.kr([x,y]);
 })
+	.uchainInitFunc_({ |unit, chain|
+		unit.def = \expand;
+	})
 	.mappedArgs_( [ \x, \y ] )
-	.category_( 'point_convert' );
+	.category_( 'private' );
