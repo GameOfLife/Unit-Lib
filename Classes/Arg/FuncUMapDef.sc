@@ -97,12 +97,14 @@ FuncUMapDef : UMapDef {
 	hasBus { ^false }
 	
 	value { |unit|
-		if( this.useMappedArgs && valueIsMapped ) {
+		var out;
+		out = unit.get( \value );
+		if( out.isUMap.not && { this.useMappedArgs && valueIsMapped }) {
 			^(unit.get( \u_spec ) ?? { [0,1].asSpec }).map( 
-				unit.getSpec( \value ).unmap( unit.get( \value ) )
+				unit.getSpec( \value ).unmap( out );
 			);
 		} {
-			^unit.get( \value );
+			^out;
 		};
 	}
 	
