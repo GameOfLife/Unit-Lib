@@ -35,10 +35,20 @@ ObjectWithArgs {
 			this.setArg( keys[i], val )
 		});
 	}
+	
+	getIndexForKey { |key|
+		var keys;
+		keys = this.keys;
+		^keys.indexOf( key ) ?? {
+			if( key.isNumber && { (0 <= key) and: ( key < keys.size ) } ) {
+				key.asInt;
+			};
+		};
+	}
 
 	setArg { |key, value|
 		var index;
-		index = this.keys.indexOf( key );
+		index = this.getIndexForKey( key );
 		if( index.notNil ) { 
 			args[ (index * 2) + 1 ] = value;
 			this.changed( key, value );
@@ -51,7 +61,7 @@ ObjectWithArgs {
 	
 	getArg { |key|
 		var index;
-		index = this.keys.indexOf( key );
+		index = this.getIndexForKey( key );
 		if( index.notNil ) { 
 			^args[ (index * 2) + 1 ] 
 		} { 
