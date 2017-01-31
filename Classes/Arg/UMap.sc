@@ -186,6 +186,10 @@ UMapDef : Udef {
 		};
 		^insertArgName;
 	}
+	
+	argNeedsUnmappedInput { |key|
+		^useMappedArgs && { this.isMappedArg( key ) } 
+	}
 }
 
 UMap : U {
@@ -204,6 +208,7 @@ UMap : U {
 	classvar <>currentStreamID = 0;
 	
 	var <spec;
+	var <>useSpec;
 	var <>unitArgName;
 	var <>unmappedKeys;
 	var <>streamID;
@@ -335,14 +340,16 @@ UMap : U {
 		if( unit.canUseUMap( key, this.def ) ) {
 			this.unitArgName = key;
 			if( key.notNil ) {
-				if( unit.isUMap && { unit.def.useMappedArgs && { unit.def.isMappedArg( key ) } } ) {
+				if( unit.argNeedsUnmappedInput( key ) ) {
 					if( unit.spec.notNil ) {
 						this.spec = unit.getSpec( key ).copy;
+						this.useSpec = false;
 						this.set( \u_spec, this.spec );
 						this.set( \u_useSpec, false );
 					};
 				} {
 					this.spec = unit.getSpec( key ).copy;
+					this.useSpec = true;
 					this.set( \u_spec, this.spec );
 					this.set( \u_useSpec, true );
 				};
@@ -353,6 +360,10 @@ UMap : U {
 		} {
 			^unit.getDefault( key );
 		};
+	}
+	
+	argNeedsUnmappedInput { |key|
+		^this.def.argNeedsUnmappedInput( key, this );
 	}
 	
 	unit_ { |aUnit|

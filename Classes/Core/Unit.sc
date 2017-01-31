@@ -694,6 +694,8 @@ U : ObjectWithArgs {
 		};
 	}
 	
+	argNeedsUnmappedInput { ^false }
+	
 	get { |key|
 		^this.getArg( key );
 	}
