@@ -48,7 +48,7 @@ UMapDef : Udef {
 	
 	asArgsArray { |argPairs, unit, constrain = true|
 		argPairs = prepareArgsFunc.value( argPairs ) ? argPairs ? #[];
-		^argSpecs.collect({ |item| 
+		^this.argSpecs( unit ).collect({ |item| 
 			var val;
 			val = argPairs.pairsAt(item.name) ?? { item.default.copy };
 			val = val.deepCopy.asUnitArg( unit, item.name );
