@@ -673,7 +673,13 @@ RangeSpec : ControlSpec {
 	}
 	
 	asRangeSpec { ^this }
-	asControlSpec { ^ControlSpec.newFrom( this ).default_( this.default[0] ); }
+	asControlSpec { 
+		if( this.units == " Hz" ) {
+			^FreqSpec.newFrom( this ).default_( this.default[0] ); 
+		} {
+			^ControlSpec.newFrom( this ).default_( this.default[0] ); 
+		};
+	}
 	asArrayControlSpec { ^ArrayControlSpec.newFrom( this ); }
 
 }
