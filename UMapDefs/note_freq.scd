@@ -12,9 +12,9 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UMapDef( \note_freq, { |note = 64, round = 1, detune = 0|
+UMapDef( \note_freq, { |note = 64, round = 1, detune = 0, transpose = 0|
 	UMapDef.useMappedArgs = false; // use raw values instead of mapped (0-1)
-	UMapOut.kr( (note.round(round) + (detune/100)).midicps );
+	UMapOut.kr( ((note.round(round) + (detune/100)) + transpose).midicps );
 })
 	.mappedArgs_([ \note ])
 	.setSpec( \note, UAdaptSpec({ |spec|
@@ -22,6 +22,7 @@ UMapDef( \note_freq, { |note = 64, round = 1, detune = 0|
 	}) )
 	.setSpec( \round, [0,12,\lin,0,1] )
 	.setSpec( \detune, [-50,50,\lin,0,0, " cents"].asSpec )
+	.setSpec( \transpose, [-12,12,\lin,1,0, " cents"].asSpec )
 	.canUseUMapFunc_({ |unit, key, umapdef|
 		var spec;
 		spec = unit.getSpec( key );
