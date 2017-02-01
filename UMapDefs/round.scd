@@ -18,6 +18,23 @@ d = UMapDef( \round, { |value = 0.5, round = 0|
 	value = value.round( round );
 	UMapOut.kr(value);
 })
+	.setSpec( \round, UAdaptSpec( { |spec| 
+		var center;
+		spec = spec.copy;
+		if( spec.isKindOf( FreqSpec ) ) {
+			spec = ControlSpec.newFrom( spec );
+		};
+		if( spec.respondsTo( \warp ) ) {
+			if( spec.warp.asSpecifier == \exp ) {
+				center = spec.map( 0.5 );
+				center = center / spec.maxval;
+				spec.warp = (center.reciprocal-1).squared.log;
+			};
+		};
+		spec.minval = 0;
+		spec.warp = spec.warp.asSpecifier;
+		spec;
+	} ) )
 	.mappedArgs_( [ \value, \round ] )
 	.category_( 'operator' )
 
