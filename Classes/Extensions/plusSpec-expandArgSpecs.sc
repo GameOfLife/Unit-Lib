@@ -25,6 +25,14 @@
 			ArgSpec( \hi, this.default[1], this.asControlSpec.default_( this.default[1] ) ),
 		]
 	}
+	
+	expandValues { |obj|
+		^obj
+	}
+	
+	objFromExpandValues { |values|
+		^values;
+	}
 }
 
 + ArrayControlSpec {
@@ -33,11 +41,28 @@
 			ArgSpec( ("value" ++ i).asSymbol, item, this.asControlSpec );
 		});
 	}
+	
+	expandValues { |obj|
+		^obj;
+	}
+	
+	objFromExpandValues { |values|
+		^values;
+	}
 }
 
 + PointSpec {
 	expandArgSpecs {
 		^[\x,\y].collect({ |item| ArgSpec( item, 0, this.asControlSpec ) });
+	}
+	
+	expandValues { |obj|
+		obj = obj.asPoint;
+		^[obj.x, obj.y]
+	}
+	
+	objFromExpandValues { |values|
+		^values.asPoint;
 	}
 }
 
@@ -52,6 +77,14 @@
 				ArgSpec( (item ++ "_" ++ argName).asSymbol, spec.default, spec )
 			});
 		}).flatten(1);
+	}
+	
+	expandValues { |obj|
+		^obj.setting.flatten(1);
+	}
+	
+	objFromExpandValues { |values|
+		^this.default.copy.setting_( values );
 	}
 }
 	
