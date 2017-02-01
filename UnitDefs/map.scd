@@ -37,8 +37,8 @@ d = UMapDef( \map, { |value = 0.5, min = 0, max = 1, warp = -1, curve = 0|
 })
 	.mappedArgs_( [ \min, \max, \warp ] )
 	.insertArgName_( \value )
-	.setSpec( \min, UAdaptSpec({ |sp| sp }) )
-	.setSpec( \max, UAdaptSpec({ |sp| sp }) )
+	.setSpec( \min, UAdaptSpec() )
+	.setSpec( \max, UAdaptSpec() )
 	.setSpec( \warp, UAdaptSpec({ |sp|
 		var warp = \lin;
 		if( sp.respondsTo( \warp ) ) {
