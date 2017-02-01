@@ -15,17 +15,19 @@ part of the Unit lib default Udefs set
 
 Udef(\cymbalic_mcld,{ |decay = 10, ratio = 1, amp = 0.1|
 	var lodriver, locutoffenv, hidriver, hicutoffenv, freqs, res, thwack;
+	var trig;
+	trig = \trigger.tr(1);
 	
 	URandSeed.ir( ); // always the same sound
 	
-	locutoffenv = EnvGen.ar(Env.perc(0.5, decay)) * 20000 + 10;
+	locutoffenv = EnvGen.ar(Env.perc(0.5, decay), trig ) * 20000 + 10;
 	lodriver = LPF.ar(WhiteNoise.ar(0.1), locutoffenv);
 	
-	hicutoffenv = 10001 - (EnvGen.ar(Env.perc(1, 3)) * 10000);
+	hicutoffenv = 10001 - (EnvGen.ar(Env.perc(1, 3), trig) * 10000);
 	hidriver = HPF.ar(WhiteNoise.ar(0.1), hicutoffenv);
-	hidriver = hidriver * EnvGen.ar(Env.perc(1, 2, 0.25));
+	hidriver = hidriver * EnvGen.ar(Env.perc(1, 2, 0.25), trig);
 	
-	thwack = EnvGen.ar(Env.perc(0.001,0.001,1));
+	thwack = EnvGen.ar(Env.perc(0.001,0.001,1), trig);
 	
 	freqs  = ExpRand( 300.dup(100), 20000 ) * ratio;
 	
@@ -34,5 +36,6 @@ Udef(\cymbalic_mcld,{ |decay = 10, ratio = 1, amp = 0.1|
 	UMixOut.ar(0, ((res * 1) + (lodriver * 2) + thwack) * amp * 0.5, 0, true );
 	
 }).category_( \synthesis )
+	.setSpec( \trigger, TriggerSpec() )
 	.setSpec( \decay, [2.5,100,\exp, 0, 10].asSpec, \init )
 	.setSpec( \ratio, [0.25, 4, \exp, 0, 1].asSpec )
