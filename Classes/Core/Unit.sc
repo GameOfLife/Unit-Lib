@@ -1042,6 +1042,28 @@ U : ObjectWithArgs {
 	getArgSpec { |key| ^this.def.getArgSpec( key, this ) }
 	getSpecMode { |key| ^this.def.getArgSpec( key, this ) !? _.mode }
 	getDefault { |key| ^this.def.getDefault( key, this ); }
+	
+	indexOf { |obj|  // returns key of first arg found to be equal to object
+		var keyIndex;
+		keyIndex = this.values.indexOf( obj );
+		^keyIndex !? { |x| this.keys[x] }
+	}
+	
+	deepIndexOf { |obj|  // returns key of first arg found to be equal to object
+		var key, val;
+		^this.indexOf( obj ) ?? {
+			this.args.pairsDo({ |key, value|
+				var res;
+				if( value.isUMap ) {
+					res = value.deepIndexOf( obj );
+					if( res.notNil ) {
+						^[ key ] ++ res.asCollection;
+					};
+				};
+			});
+			nil
+		};
+	}
 
 	isPlaying { ^(this.synths.size != 0) }
 		

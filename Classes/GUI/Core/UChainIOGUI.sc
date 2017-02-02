@@ -137,7 +137,7 @@ UChainIOGUI : UChainGUI {
 			header = StaticText( comp, width @ 14 )
 				.applySkin( RoundView.skin )
 				.string_( 
-				 	" " ++ i ++ ": " ++ 
+				 	" " ++ chain.deepIndexOf( unit ).asCollection.join( ": " ) ++ ": " ++ 
 					if( unit.def.class == LocalUdef ) { "[Local] " } { "" } ++ 
 					unit.fullDefName
 				)

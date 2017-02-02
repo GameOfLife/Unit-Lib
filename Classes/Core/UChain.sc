@@ -897,6 +897,20 @@ UChain : UEvent {
 	first { ^units.first }
 	indexOf { |obj| ^units.indexOf( obj ); }
 	
+	deepIndexOf { |obj|
+		var key, val;
+		^this.indexOf( obj ) ?? {
+			this.units.do({ |unit, i|
+				var res;
+				res = unit.deepIndexOf( obj );
+				if( res.notNil ) {
+					^[ i ] ++ res.asCollection;
+				};
+			});
+			nil;
+		};
+	}
+	
 	set { |key, value| // sets all units that respond to  key
 		var extid, subkey;
 		subkey = key;
