@@ -56,6 +56,8 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 				if( units[1..].any({ |item| item.subDef != subDef }) ) {
 					subDef = nil;
 				};
+			} {
+				subDef = units[0].subDef;
 			};
 			
 			argSpecs = argSpecs.collect({ |argSpec|
