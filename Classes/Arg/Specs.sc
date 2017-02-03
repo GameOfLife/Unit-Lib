@@ -800,6 +800,9 @@ BufSndFileSpec : RichBufferSpec {
 		^value;
 	}
 	
+	map { |in| ^this.constrain( in ) }
+	unmap { |in| ^in }
+	
 	default { 
 		^nil.asBufSndFile;
 	}
