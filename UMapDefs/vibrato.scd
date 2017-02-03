@@ -34,4 +34,4 @@ UMapDef( \vibrato, { |value = 0.58560567020555, freq = 6, depth = 0.02, delay = 
 	.setSpec( \rateVar, [0,1,4,0,0.04].asSpec )
 	.setSpec( \depthVar, [0,1,4,0,0.1].asSpec )
 	.mappedArgs_( [ \value ] )
-	.category_( 'freq' )
+	.category_( 'modulation' )

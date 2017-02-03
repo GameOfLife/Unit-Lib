@@ -28,4 +28,4 @@ UMapDef( \note_freq, { |note = 64, round = 1, detune = 0, transpose = 0|
 		spec = unit.getSpec( key );
 		spec.isKindOf( ControlSpec ) && { spec.warp.isKindOf( ExponentialWarp ) };
 	})
-	.category_( 'freq' )
+	.category_( 'convert' )
