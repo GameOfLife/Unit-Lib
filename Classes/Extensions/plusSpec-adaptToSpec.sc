@@ -2,7 +2,7 @@ UAdaptSpec : ControlSpec {
 	var <>func;
 	
 	*new { |func|
-		func = func ?? { { |spec| spec } };
+		func = func ?? { { |spec| spec.copy } };
 		^super.new( 0, 1, \lin, 0.0, 0 ).func_( func );
 	}
 	
