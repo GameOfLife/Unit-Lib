@@ -846,6 +846,15 @@ U : ObjectWithArgs {
 		^this.args.clump(2).select({ |item| nonsynthKeys.includes( item[0] ).not }).flatten(1);
 	}
 	
+	getArgs { |selection|
+		if( selection.notNil ) {
+			selection = selection.asArray;
+			^this.args.clump(2).select({ |item| selection.includes( item[0] ) }).flatten(1);
+		} {
+			^this.args;
+		};
+	}
+	
 	*formatArgs { |inArgs, server, startPos = 0|
 		^inArgs.clump(2).collect({ |item, i|
 			[ item[0], switch( item[0], 

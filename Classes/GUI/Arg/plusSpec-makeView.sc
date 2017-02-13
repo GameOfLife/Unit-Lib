@@ -1919,7 +1919,7 @@
 			.clipLo_( this.minval )
 			.clipHi_( this.maxval );
 			
-		vws[ \drag ] = DragBoth( vws[ \view ], 
+		vws[ \drag ] = UDragBoth( vws[ \view ], 
 				Rect( labelWidth + boxWidth + 2, 0, 40,bounds.height)
 			)
 			.beginDragAction_({ 

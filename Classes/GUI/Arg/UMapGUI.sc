@@ -89,7 +89,7 @@ UMapGUI : UGUI {
 			.string_( ":" + unit.defName );
 			
 		if( unit.isKindOf( MassEditUMap ).not ) {
-			DragBoth( header, Rect( bounds.width - 12 - 12 - 2, 2, 12, 12 ) )
+			UDragBoth( header, Rect( bounds.width - 12 - 12 - 2, 2, 12, 12 ) )
 				.beginDragAction_({
 					{ UChainGUI.current.view.refresh }.defer(0.1);
 					dragging = unit.deepCopy;
