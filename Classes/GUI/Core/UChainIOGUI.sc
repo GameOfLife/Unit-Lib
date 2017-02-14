@@ -208,7 +208,14 @@ UChainIOGUI : UChainGUI {
 			StaticText( scrollView, labelWidth @ 14 )
 				.applySkin( RoundView.skin )
 				.align_( \right )
-				.string_( "% %".format( mode, item )  );
+				.background_(
+					switch( mode,
+						\out, { Color.red(0.75).alpha_(0.125) },
+						\in, { Color.green(0.65).alpha_(0.125) },
+						{ nil }
+					)
+				)
+				.string_( "% % ".format( mode, item )  );
 							
 			sl = SmoothSlider( scrollView, (width - labelWidth - (45 + 4 + 4))@16 )
 				.hiliteColor_( nil )
@@ -335,7 +342,7 @@ UChainIOGUI : UChainGUI {
 				val = unit.get( key );
 				
 				mx = EZSmoothSlider(  scrollView, width@14,
-					"mix %".format( item ),
+					"mix % ".format( item ),
 					\amp.asSpec, 
 					{ |vw| 
 						unit.set( key, vw.value );
