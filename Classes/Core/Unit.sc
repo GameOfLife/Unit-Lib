@@ -654,6 +654,7 @@ U : ObjectWithArgs {
 		var item, umap;
 		if( umapdef.isKindOf( UMap ) ) {
 			umap = umapdef;
+			umapdef = umap.def;
 		} {
 			umapdef = umapdef.asUdef( UMapDef );
 			if( umapdef.notNil ) {
