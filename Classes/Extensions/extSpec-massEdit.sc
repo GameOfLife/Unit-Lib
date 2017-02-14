@@ -169,7 +169,7 @@
  	}
 }
 
-+ PositiveIntegerSpec {
++ IntegerSpec {
 	
 	massEditSpec { |inArray|
 		^ArrayControlSpec( ).adaptToSpec( this ).default_( inArray );
