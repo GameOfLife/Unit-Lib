@@ -78,8 +78,11 @@ ObjectWithArgs {
 		^index !? { this.keys[ index ] }
 	}
 	
-	at { |key| ^this.getArg( key ) }
-	put { |key| ^this.setArg( key ) }
+	at { |key| ^if( key.isNumber ) { ^object.values[ key ] } { this.getArg( key ) }
+	put { |key, what| 
+		if( key.isNumber ) { key = this.keys[ key ] };
+		if( key.notNil ) { this.setArg( key, what ) };
+	}
 
 	doesNotUnderstand { |selector ...args| 
 		// bypasses errors; warning if arg not found
