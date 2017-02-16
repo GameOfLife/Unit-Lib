@@ -78,7 +78,7 @@ ObjectWithArgs {
 		^index !? { this.keys[ index ] }
 	}
 	
-	at { |key| ^if( key.isNumber ) { ^object.values[ key ] } { this.getArg( key ) }
+	at { |key| ^if( key.isNumber ) { ^this.values[ key ] } { this.getArg( key ) } }
 	put { |key, what| 
 		if( key.isNumber ) { key = this.keys[ key ] };
 		if( key.notNil ) { this.setArg( key, what ) };
