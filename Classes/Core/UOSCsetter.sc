@@ -68,64 +68,9 @@ UOSCsetter {
 			} {
 				item.asSymbol;
 			}
-		});
+		}).select(_.notNil);
 		
-		args = path.select(_.isKindOf( Symbol )) ++ inArgs;
-		path = path.select(_.isNumber);
-		
-		if( { 
-			if( path.size > 0 ) {
-				obj = this.uobject.at( *path );
-			} {
-				obj = this.uobject;
-			};
-		}.try.notNil ) {
-			switch( args.size,
-				0, { 
-					"%:set - received message points to object:\n\t".postf( this.class );
-					obj.asCompileString.postln;
-				},
-				1, {
-					if( obj.respondsTo( args[0].asSymbol ) ) { 
-						obj.perform( args[0].asSymbol );
-					} {
-						"%:set - object does not understand '%':\n\tobject: "
-							.postf( this.class, args[0] );
-						obj.asCompileString.postln;
-						"\tmessage: %\n".postf( [ pth ] ++ args );
-					};
-				}, 
-				2, {
-					if( obj.respondsTo( \set ) ) {
-						obj.set( *args );
-					} {
-						obj.perform( *[args[0].asSymbol] ++ args[1..] );
-					};
-				},
-				{
-					if( args[1].class == Symbol ) {
-						setObj = obj.get(args[0]);
-						setter =  args[1].asSetter;
-						if( setObj.respondsTo( setter ) ) {
-							obj.set( args[0], setObj.perform( setter, *args[2..] ) );
-						};
-					} {
-						if( args[0] == \point ) { // special case
-							obj.set( \point, args[[1,2]].asPoint );
-						} {
-							if( obj.respondsTo( \set ) ) {
-								obj.set( args[0], args[1..] ); // array
-							} {
-								obj.perform( *[args[0].asSymbol] ++ args[1..] );
-							};
-						};
-					};
-				}
-			);	
-		} {
-			"%:set - received message points to non-existing object:\n\tmessage: %\n"
-				.postf( this.class, [ pth ] ++ args );
-		};
+		this.uobject.setOrPerform( path, *inArgs );
 	}
 	
 	enable { oscfunc.enable }

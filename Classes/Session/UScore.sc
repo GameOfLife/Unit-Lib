@@ -161,7 +161,9 @@ UScore : UEvent {
 		 var out;
 		 out = events;
 		 path.do({ |item|
-			 out = out[ item ];
+			 if( out.respondsTo( \at ) ) {
+			 	out = out[ item ];
+			 } { ^nil }
 		 });
 		 ^out
 	}
@@ -181,6 +183,55 @@ UScore : UEvent {
 			^nil;
 		} {
 			^index
+		};
+	}
+	
+	setOrPerform { |key ...value|
+		// args: list of keys, ending with the value to set
+		var setter, parent, res;
+		key = key.asCollection;	
+		setter = key.last;
+		key.pop;
+		if( key.size > 0 ) {
+			parent = this.at( *key );
+		} {
+			parent = this;
+		};
+		if( parent.notNil ) {
+			if( parent.isKindOf( U ) ) {
+				if( parent.keys.includes( setter.asString.split($.).first.asSymbol ) ) {
+					if( value.size > 1 ) {
+						if( parent.getSpec( setter ).isKindOf( PointSpec ) ) {
+							parent.set( setter, value.asPoint );
+						} {
+							parent.set( setter, value );
+						};
+					} {
+						parent.set( setter, value[0] );
+					};
+				} {
+					if( parent.respondsTo( setter ) ) {
+						res = parent.perform( setter, value );
+						if( res != parent ) {
+							^res;
+						};
+					} {
+						"UScore:set : can't set %, % to %"
+							.format( key.join( ", " ), setter, *value )
+							.warn;
+					};
+				};
+			} {
+				{ parent.perform( setter, *value ); }.try({
+					"UScore:perform : can't perform %, % ( % )"
+					.format( key.join( ", " ), setter, value )
+					.warn;
+				});
+			};
+		} {
+			"UScore:set : invalid args [%, %], %"
+				.format( key.join( ", " ), setter, value )
+				.warn;
 		};
 	}
 

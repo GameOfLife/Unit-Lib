@@ -636,12 +636,16 @@ U : ObjectWithArgs {
 		this.set( 
 			*args.clump(2).collect({ |item|
 				var key, value;
-				#key, value = item;
-				if( value.isUMap.not ) {
-					[ key, this.getSpec( key ).uconstrain( value ) ]
-				} {
-					item;
-				};
+				if( key.asString.includes($.) ) { // don't constrain in this case
+					item
+				} {	
+					#key, value = item;
+					if( value.isUMap.not ) {
+						[ key, this.getSpec( key ).uconstrain( value ) ]
+					} {
+						item;
+					};
+				}
 			}).flatten(1)
 		);
 	}
