@@ -2,8 +2,7 @@
 \output
 
 Sends sounds from the previous units in the UChain to hardware output busses. 
-
-Note to WFSCollider users: This sends only to the outputs of the master server. To send to individual speakers on the WFS system, use wfsStaticIndex or wfsDynamicIndex instead. To send output "the official way" only to the outputs of the master audio interface, use the wfsMasterOut Udef instead (and set "toServers" to false if you really want the analog outputs of the master interface)
+WFSCollider users: This sends only to the outputs of the master server. To send to individual speakers on the WFS system, use wfsIndex instead. To send output "the official way" only to the outputs of the master audio interface, use the wfsMasterOut Udef instead (and set "toServers" to false if you really want the analog outputs of the master interface)
 bus: the channels are sent out starting with this bus.numChannels: number of channels (*).
 	
 (*) only the following numbers of channels are allowed:
