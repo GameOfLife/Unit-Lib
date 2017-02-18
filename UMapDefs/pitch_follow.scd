@@ -40,7 +40,7 @@ UMapDef( \pitch_follow, { |
 })
 	.setSpec( \ampThreshold, \amp.asSpec )
 	.setSpec( \median, [1,31,\lin,1,7].asSpec )
-	.setSpec( \pitchRange, FreqSpec().asRangeSpec )
+	.setSpec( \pitchRange, FreqSpec(2,20000).asRangeSpec )
 	.setSpec( \invert, BoolSpec(false) )
 	.setSpec( \curve, [-16,16,\lin,0,0].asSpec )
 	.prepareArgsFunc_( { |args| 
