@@ -3,7 +3,7 @@
 
 Creates an UMap that expands certain multi-value args into single values. This UMap patches it stored values and UMaps directly to the correct inputs. Use it for example to control the x and y values of a Point separately, or to make EQ's change over time.
 
-argnames depend on the type of Spec. The following Specs have dedicated argnames:
+Argnames depend on the type of Spec. The following Specs have dedicated argnames:
 
 RangeSpec:
 lo: low / first value

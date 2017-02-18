@@ -1,6 +1,6 @@
 /*
 \magFreeze
-	
+
 An FFT-based (spectral) Udef that is able to freeze the magnitude of an incoming audio signal. The freeze parameter (named 'hold') can be modulated. There is also the option to convolve the signal with noise, effectively randomizing the phase information.
 
 fftSize: (512, 1024, 2048 or 4096) the window size of the FFT. Smaller windows result in faster response but more side effects

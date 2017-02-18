@@ -6,6 +6,7 @@ Parametric equalizer
 freq: cutoff frequency.
 rq: the reciprocal of Q. bandwidth / cutoffFreq
 db: boost/cut the center frequency (in dBs).
+
 --
 this is an Udef definition file
 part of the Unit lib default Udefs set

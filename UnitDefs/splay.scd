@@ -7,12 +7,10 @@ spread: the amount of spreading; 0 means all inputs go to first output, 1 (defau
 width: the width sets how many outputs are used for each input. A cosine window is applied here.
 center: rotates the outputs; 0 means the first input goes to the first output, 1 or -1 means the first input goes to the middle output.
 numChannels: number of input channels (*).
-numOutputs: number of output channels (1-8) (**).
+numOutputs: number of output channels (1-8)
 
 (*) only the following numbers of channels are allowed:
 1,2,3,4,5,6,7,8,10,12,16,24,32
-
-(**) in the UChainGUI these numbers are displayed as normal numbers, but in the source code the actual value is a Symbol formatted as follows: 'splay_1', 'splay_2' .. 'splay_8'
 
 example:
 

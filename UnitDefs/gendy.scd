@@ -16,15 +16,10 @@ durdist: Choice of distribution for the perturbation of the current inter contro
 adparam: A parameter for the shape of the amplitude probability distribution
 ddparam: A parameter for the shape of the duration probability distribution
 freq: Minimum and maximum allowed frequencies of oscillation for the Gendy1 oscillator, so gives the smallest and largest period the duration is allowed to take on.
-
 ampscale: Multiplier for the distribution's delta value for amplitude. An ampscale of 1.0 allows the full range of -1 to 1 for a change of amplitude.
-
 durscale: Multiplier for the distribution's delta value for duration. An ampscale of 1.0 allows the full range of -1 to 1 for a change of duration.
-
 initCPs: Initialise the number of control points in the memory. Xenakis specifies 12. There would be this number of control points per cycle of the oscillator, though the oscillator's period will constantly change due to the duration distribution.
-
 knum: Current number of utilised control points (can be modulated).
-
 amp: the amplitude of the signal (0-1).
 seed: random seed (positive whole number). The same seed will always result in exactly the same signal on any computer. If you want different signals for different UChains that play at the same moment, use different seeds.
 

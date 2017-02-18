@@ -7,7 +7,7 @@ A realtime convolution udef, that uses partioned convolution, useful for creatin
 file: a PartConvBuffer object; points to a .partconv file on disk.
 wet: wet (processed sound) level
 dry: dry level
-	
+
 --
 this is an Udef definition file
 part of the Unit lib default Udefs set

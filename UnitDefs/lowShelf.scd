@@ -6,6 +6,7 @@ Low Shelf filter
 freq: cutoff frequency.
 rs: the reciprocal of S. Shell boost/cut slope
 db: boost/cut the center frequency (in dBs).
+
 --
 this is an Udef definition file
 part of the Unit lib default Udefs set

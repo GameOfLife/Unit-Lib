@@ -1,6 +1,6 @@
 /*
 \tremolo
-
+Applies a tremolo to the amplitude of the input sound.
 speed: number of tremolo's per second.amount: sets the minimum and maximum of the tremolo effect.smooth: smoothen the modulator signal; 0 means square wave, 1 means sine wave, and everything in between.
 
 --
