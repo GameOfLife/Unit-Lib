@@ -34,6 +34,9 @@ Udef( \stereoOutput, { |bus = 0, point = #[0,0], dbRollOff = (-6), speakerRadius
 	Out.ar( bus, UGlobalEQ.ar( panned ) * pankr * UEnv.kr  );
 } )
 	.category_( \io )
+	.shouldPlayOnFunc_({ |unit, target|
+		target.asTarget.server.isLocal; // safety measure: no output on wfs servers
+	})
 	.setSpec( \bus, PositiveIntegerSpec( 0 ) )
 	.setSpec( \point, PointSpec( 200, step: 0.1 ) )
 	.setSpec( \dbRollOff,  [-24, 0, \lin, 1, -6 ].asSpec )
