@@ -130,6 +130,12 @@ UChainIOGUI : UChainGUI {
 		
 		^units.collect({ |unit, i|
 			var header, comp, views, params;
+			var index;
+			
+			index = chain.deepIndexOf( unit );
+			if( index.size > 1 ) {
+				index[ 0 ] = "%: %".format(  index[0], chain.units[ index[0] ].fullDefName );
+			};
 			
 			comp = CompositeView( scrollView, width@16 )
 				.resize_(2);
@@ -137,7 +143,7 @@ UChainIOGUI : UChainGUI {
 			header = StaticText( comp, width @ 14 )
 				.applySkin( RoundView.skin )
 				.string_( 
-				 	" " ++ chain.deepIndexOf( unit ).asCollection.join( "." ) ++ ": " ++ 
+				 	" " ++ index.asCollection.join( "." ) ++ ": " ++ 
 					if( unit.def.class == LocalUdef ) { "[Local] " } { "" } ++ 
 					unit.fullDefName
 				)
