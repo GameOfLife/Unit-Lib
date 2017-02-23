@@ -99,9 +99,33 @@ URandSeed {
 	}
 	
 	*default { ^URandSeed() }
-	*massEditSpec { ^nil }
+	*massEditSpec { |inArray|
+		^URandSeedMassEditSpec( inArray.size, inArray );
+	}
+	*massEditValue { |inArray|
+		^inArray
+	}
+	*massEdit { |inArray, params|
+		^params;
+	}
+	
 	*findKey {
 		^Spec.specs.findKeyForValue(this);
+	}
+	
+}
+
+URandSeedMassEditSpec : Spec {
+	
+	var size = 1, <>default;
+
+	*new { |size, default|
+		^super.newCopyArgs( size, default );
+	}
+
+	asSpec { ^this }
+	constrain { |values| 
+		^values.collect({ |value| URandSeed.constrain( value ) }); 
 	}
 	
 }
