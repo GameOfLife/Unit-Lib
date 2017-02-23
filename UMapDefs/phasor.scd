@@ -21,7 +21,10 @@ UMapDef( \phasor, { |speed = 0.1, up = 1, startPos = 0, range = #[0.0,1.0]|
 	var trigger;
 	trigger = \trigger.utr + Impulse.kr(0);
 	sig = Phasor.kr(trigger, speed * up.linlin(0,1,-1,1) / ControlRate.ir, 
-		range[0], range[1], startPos );
+		range[0], range[1], (startPos + (
+			DC.kr( \u_startPos.ir * speed * (range[1] - range[0]) )
+		)).wrap( *range ) 
+	);
 	UMapOut.kr(sig);
 })
 	.setSpec( \up, BoolSpec(true) )
