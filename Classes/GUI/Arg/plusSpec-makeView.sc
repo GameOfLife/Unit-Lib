@@ -2314,7 +2314,6 @@
 		
 		vws[ \setValue ] = { |vwx, value|
 			var min, max;
-			value.postln;
 			if( vws[ \val ] != value ) {
 				vws[ \val ] = value;
 				case { 
