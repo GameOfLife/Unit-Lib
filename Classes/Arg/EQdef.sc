@@ -34,11 +34,11 @@ EQdef {
 		all = IdentityDictionary[];
 		
 		specDict = (
-			\freq: [ 20, 20000, \exp, 0, 440 ].asSpec,
+			\freq: FreqSpec( 20, 20000, \exp, 0, 440 ).asSpec,
 			\rq: [ 0.001, 10, \exp, 0.01, 0.707 ].asSpec,
 			\rs: [ 0.6, 10, \exp, 0.1, 1 ].asSpec,
 			\bw: [ 0.01, 10, \exp, 0.1, 1 ].asSpec,
-			\db: [ -36, 36, \lin, 0.25, 0 ].asSpec,
+			\db: [ -24, 24, \lin, 0.25, 0 ].asSpec,
 			\a0: [-1,1,\lin, 0.001, 0 ].asSpec,
 			\a1: [-1,1,\lin, 0.001, 0 ].asSpec,
 			\a2: [-1,1,\lin, 0.001, 0 ].asSpec,
