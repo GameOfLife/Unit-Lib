@@ -170,6 +170,7 @@
 		bounds.isNil.if{bounds= 350@20};
 		
 		view = EZCompositeView( parent, bounds, gap: 2@2 );
+		view.asView.resize_( resize );
 		bounds = view.asView.bounds;
 		width = bounds.width;
 				
