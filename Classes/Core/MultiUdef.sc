@@ -143,6 +143,12 @@ MultiUdef : Udef {
 		};
 	}
 	
+	shouldPlayOn { |unit, server| // returns nil if no func
+		^shouldPlayOnFunc !? 
+		{ shouldPlayOnFunc.value( unit, server ); } ??
+		{ this.findUdefFor( unit ).shouldPlayOn( unit, server ) };
+	}
+	
 	setSynth { |unit ...keyValuePairs|
 		this.chooseDef( unit ); // change def based on chooseFunc if needed
 		if( keyValuePairs.includes( this.defNameKey ) ) {
