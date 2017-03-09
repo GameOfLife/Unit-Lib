@@ -25,7 +25,7 @@ UMapDef( \rho_theta, { |rho = 0.5, theta = 0|
 		unit.def = \polar.asUdef( UMapDef );
 	})
 	.mappedArgs_( [ \rho ] )
-	.category_( 'point_utility' )
+	.category_( 'private' )
 	.canUseUMapFunc_({ |unit, key, umapdef|
 		unit.getSpec( key ).isKindOf( PointSpec );
 	});
