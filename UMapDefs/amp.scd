@@ -1,9 +1,9 @@
 /*
 \amp
 
-A simple gain stage. Can set a gain in dB and inverse phase.
+A simple amplitude gain stage. Can set an amplitude (multiplier) and inverse phase. Note that this Udef can only make the input signal softer, not louder.
 
-gain: added gain (dB)
+amp: amplitude (0-1)
 inverse: inverse phase (false/true) 
 numChannels: number of channels
 
