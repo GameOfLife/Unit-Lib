@@ -26,6 +26,7 @@ ValueUMapDef : UMapDef {
 			[ \value, 0, ControlSpec(0,1) ], 
 			[ \active, false, BoolSpec(false) ],
 			[ \u_spec, [0,1].asSpec, ControlSpecSpec(), true ],
+			[ \u_useSpec, true, BoolSpec(true), true ],
 		] ++ argSpecs).collect(_.asArgSpec);
 		argSpecs.do(_.mode_( \init ));
 		this.setSpecMode( \value, \nonsynth );
@@ -67,12 +68,19 @@ ValueUMapDef : UMapDef {
 	}
 	
 	value { |unit|
-		if( valueIsMapped ) {
-			^(unit.get( \u_spec ) ?? { [0,1].asSpec }).map( 
-				unit.getSpec( \value ).unmap( unit.value )
+		var out, spec;
+		out = unit.get( \value );
+		if( out.isUMap.not && { this.useMappedArgs && valueIsMapped }) {
+			if( unit.get( \u_useSpec ) == false ) {
+				spec = [0,1].asSpec;
+			} {
+				spec = unit.get( \u_spec ) ?? { [0,1].asSpec };
+			};
+			^spec.map( 
+				unit.getSpec( \value ).unmap( out )
 			);
 		} {
-			^unit.value
+			^out;
 		};
 	}
 	
