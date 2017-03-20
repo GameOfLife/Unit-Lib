@@ -31,14 +31,14 @@ UMixer {
         scoreList = [score];
         soloedTracks  = [];
         font = Font( Font.defaultSansFace, 11 );
-        parent = inParent ? Window("UMixer",Rect(100,1000,800,372)).front;
+        parent = inParent ? Window("UMixer",Rect(100,1000,800,372), scroll: true).front;
         if(parent.respondsTo(\onClose_)){ parent.onClose_({this.remove}) };
         bounds = inBounds ? Rect(0,0,800,372);
 
         this.addCurrentScoreControllers;
         unitControllers = List.new;
-        mainComposite = ScrollView(parent,bounds).resize_(5)
-            .background_( Color.grey(0.8) );
+        mainComposite = parent;
+        mainComposite.asView.background_( Color.grey(0.8) );
         this.makeMixerView
 
      }
@@ -97,7 +97,7 @@ UMixer {
 
     makeScoreListView{
         var listSize = scoreList.size;
-        scoreListView = CompositeView(mainComposite,Rect(0,0,4 + ((60+4)*(listSize-1)) + 4,24));
+        scoreListView = CompositeView(mainComposite,Rect(0,0,4 + ((60+4)*(listSize-1)) + 20,24));
         scoreListView.addFlowLayout;
         scoreList[..(listSize-2)].do{ |score,i|
             SmoothButton(scoreListView,60@16)
