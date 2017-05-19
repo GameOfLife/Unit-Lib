@@ -118,5 +118,21 @@ ExpandUMapDef : UMapDef {
 	}
 	
 	canInsert { ^false }
+	
+	allowedModes { |unit|
+		var modes = [ \sync, \normal ]; // add \init when solution for setting problem is found
+		if( unit.notNil ) {	
+			unit.args.do({ |item|
+				if( item.isUMap ) {
+					modes.copy.do({ |mode|
+						if( item.allowedModes.includes( mode ).not ) {
+							modes.remove( mode );
+						};
+					});
+				};
+			});
+		};
+		^modes;
+	}
 
 }

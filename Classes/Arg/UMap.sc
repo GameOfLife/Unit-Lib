@@ -466,7 +466,8 @@ UMap : U {
 	    preparedServers = [];
 	    this.unit = nil;
 	}
-
+	
+	allowedModes { ^this.def.allowedModes( this ) }
 }
 
 MassEditUMap : MassEditU {
