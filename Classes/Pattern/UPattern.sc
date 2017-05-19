@@ -39,7 +39,7 @@ UPattern : UChain {
 		});
 	}
 	
-	next {
+	next { |duration|
 		var next;
 		next = UChain( *units.deepCopy );
 		next.fadeIn = this.fadeIn;
@@ -48,7 +48,7 @@ UPattern : UChain {
 			this.prPrepareUnit( unit );
 			this.prPatternsToValues( unit );
 		});
-		next.duration = this.getSustain;
+		next.duration = duration ?? { this.getSustain; };
 		^next;
 	}
 	
@@ -68,13 +68,18 @@ UPattern : UChain {
 		^timeToNext.next;
 	}
 	
-	prepareWaitAndStart { |target|
+	isPlaying { ^task.isPlaying }
+	
+	prepareWaitAndStart { |target, startPos = 0|
 		task.stop; // first stop any existing playback task
 		units.do({ |unit| this.prResetStreams( unit ); });
+		this.changed( \start );
 		task = Task({
 			var time = 0, n = 0;
 			var next, timeToNext;
-			while { (time <= duration) && (n < repeats) } {
+			while { ( this.releaseSelf == false or: { (time <= (duration - startPos)) }) 
+					&& (n < repeats) 
+			} {
 				next = this.next;
 				timeToNext = this.getTimeToNext;
 				next.prepareWaitAndStart( target );
@@ -82,24 +87,27 @@ UPattern : UChain {
 				time = time + timeToNext;
 				n = n + 1;
 			};
-			"done playing".postln;
+			this.changed( \end );
+			//"done playing".postln;
 		}).start;
 	}
 	
-	prepareAndStart { |target|
-		this.prepareWaitAndStart( target );
+	prepareAndStart { |target, startPos = 0|
+		this.prepareWaitAndStart( target, startPos );
 	}
 	
-	start { |target|
-		this.prepareWaitAndStart( target );
+	start { |target, startPos = 0|
+		this.prepareWaitAndStart( target, startPos );
 	}
 	
 	stop {
 		task.stop;
+		this.changed( \end );
 	}
 	
 	release {
 		task.stop;
+		this.changed( \end );
 	}
 	
 }
