@@ -6,7 +6,7 @@ RandIDAllocator {
 		server = server ? Server.default;
 		dict = dict ?? { IdentityDictionary() };
 		count = dict[ server ] ? -1;
-		count = (count + 1).wrap(0, server.options.numRGens);
+		count = (count + 1).wrap(0, server.options.numRGens - 1);
 		dict[ server ] = count;
 		^count;
 	}
