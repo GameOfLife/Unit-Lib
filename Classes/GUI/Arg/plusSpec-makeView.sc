@@ -1333,7 +1333,7 @@
 
 + ColorSpec {
 	
-	viewNumLines { ^7 }
+	viewNumLines { ^10 }
 	
 	makeView { |parent, bounds, label, action, resize|
 		var vws, view, labelWidth;
@@ -1347,7 +1347,7 @@
 		
 		font =  (RoundView.skin ? ()).font ?? { Font( Font.defaultSansFace, 10 ); };
 		
-		bounds.isNil.if{bounds= 320@100};
+		bounds.isNil.if{bounds= 320@180};
 		
 		view = EZCompositeView( parent, bounds, gap: 2@2 );
 		bounds = view.asView.bounds;
@@ -1367,7 +1367,7 @@
 			labelWidth = 0;
 		};
 		
-		viewHeight = (bounds.height / 6) - 4;
+		viewHeight = (bounds.height / 8) - 4;
 		viewWidth = bounds.width - (labelWidth + 6);
 		
 		vws[ \colorView ] = UserView( view, viewWidth @ viewHeight )
@@ -1412,17 +1412,45 @@
 			.beginDragAction_({ vws[ \val ] })
 			.resize_(2);
 			
+		vws[ \h ] = EZSmoothSlider(view, viewWidth @ viewHeight, "hue" ).value_(0);
+		vws[ \s ] = EZSmoothSlider(view, viewWidth @ viewHeight, "saturation" ).value_(0);
+		vws[ \v ] = EZSmoothSlider(view, viewWidth @ viewHeight, "value" ).value_(0.5);
 		vws[ \r ] = EZSmoothSlider(view, viewWidth @ viewHeight, "red" ).value_(0.5);
 		vws[ \g ] = EZSmoothSlider(view, viewWidth @ viewHeight, "green" ).value_(0.5);
 		vws[ \b ] = EZSmoothSlider(view, viewWidth @ viewHeight, "blue" ).value_(0.5);
 		vws[ \a ] = EZSmoothSlider(view, viewWidth @ viewHeight, "alpha" ).value_(1);
 		
-		[\r,\g,\b,\a].collect(vws[_]).do({ |item| 
+		[\h,\s,\v,r,\g,\b,\a].collect(vws[_]).do({ |item| 
 			item.sliderView.hiliteColor = nil;
 			item.view.resize_(2);
 		});
+		
+		vws[ \h ].sliderView.background = { |bounds|
+			var left, right, bottom, height, sat, val, res = 1;
+			left = bounds.left;
+			right = bounds.right;
+			bottom = bounds.bottom;
+			height = bounds.height;
+			sat = vws[ \val ].sat;
+			val = vws[ \val ].val;
+			Pen.width = res;
+			((height/res).ceil+1).do({ |i|
+				i = i*res;
+				Pen.color = Color.hsv( (i / height).min( 0.9999999999999999 ), sat, val );
+				Pen.line( left @ (bottom - i), right @ (bottom - i) ).stroke;
+			});
+		};
 
 		vws[ \updateViews ] = {
+			
+			vws[ \s ].sliderView.background = Gradient( 
+					vws[ \val ].copy.sat_(1).alpha_(1), 
+					vws[ \val ].copy.sat_(0).alpha_(1), \v 
+				);
+			vws[ \v ].sliderView.background = Gradient( 
+					vws[ \val ].copy.val_(1).alpha_(1), 
+					vws[ \val ].copy.val_(0).alpha_(1), \v 
+				);
 			vws[ \r ].sliderView.background = Gradient( 
 					vws[ \val ].copy.red_(1).alpha_(1), 
 					vws[ \val ].copy.red_(0).alpha_(1), \v 
@@ -1438,6 +1466,10 @@
 			vws[ \a ].sliderView.background = Gradient( 
 				vws[ \val ].copy.alpha_(1), vws[ \val ].copy.alpha_(0), \v 
 			);
+				
+			vws[ \h ].value = vws[ \val ].hue;
+			vws[ \s ].value = vws[ \val ].sat;
+			vws[ \v ].value = vws[ \val ].val;
 			vws[ \r ].value = vws[ \val ].red;
 			vws[ \g ].value = vws[ \val ].green;
 			vws[ \b ].value = vws[ \val ].blue;
@@ -1447,21 +1479,28 @@
 		
 		vws[ \updateViews ].value;
 	
-		editAction = { 
-			vws[ \val ]
-				.red_( vws[ \r ].value )
-				.green_( vws[ \g ].value )
-				.blue_( vws[ \b ].value )
-				.alpha_( vws[ \a ].value );
+		editAction = { |perform = \red_ |
+			{ |sl|
+				vws[ \val ].perform( perform, sl.value );
+				vws[ \updateViews ].value;
+				action.value( vws, vws[ \val ] );
+			};
+		};
+		
+		// vws[ \h ].action = editAction.( \hue_ );
+		vws[ \s ].action = editAction.( \sat_ );
+		vws[ \v ].action = editAction.( \val_ );
+		vws[ \r ].action = editAction.( \red_ );
+		vws[ \g ].action = editAction.( \green_ );
+		vws[ \b ].action = editAction.( \blue_ );
+		vws[ \a ].action = editAction.( \alpha_ );
+		
+		vws[ \h ].action = { |sl|
+			vws[ \val ].hue_( sl.value.min( 0.9999999999999999 ) );
 			vws[ \updateViews ].value;
 			action.value( vws, vws[ \val ] );
 		};
-		
-		vws[ \r ].action = editAction;
-		vws[ \g ].action = editAction;
-		vws[ \b ].action = editAction;
-		vws[ \a ].action = editAction;
-		
+				
 		vws[ \presetManager ] = PresetManagerGUI( 
 			view, viewWidth @ viewHeight, presetManager, vws[ \val ] 
 		).action_({ |pm|
