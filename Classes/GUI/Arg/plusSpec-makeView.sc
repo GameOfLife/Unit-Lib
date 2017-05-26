@@ -1420,7 +1420,7 @@
 		vws[ \b ] = EZSmoothSlider(view, viewWidth @ viewHeight, "blue" ).value_(0.5);
 		vws[ \a ] = EZSmoothSlider(view, viewWidth @ viewHeight, "alpha" ).value_(1);
 		
-		[\h,\s,\v,r,\g,\b,\a].collect(vws[_]).do({ |item| 
+		[\h,\s,\v,\r,\g,\b,\a].collect(vws[_]).do({ |item| 
 			item.sliderView.hiliteColor = nil;
 			item.view.resize_(2);
 		});
