@@ -3,6 +3,7 @@ UPattern : UChain {
 	var <>repeats = inf;
 	var <>sustain = 1;
 	var <>timeToNext = 1;
+	var <>maxSimultaneousStarts = 100;
 	var task;
 	
 	prPrepareUnit { |unit|
@@ -76,15 +77,21 @@ UPattern : UChain {
 		this.changed( \start );
 		task = Task({
 			var time = 0, n = 0;
+			var zeroCount = 0;
 			var next, timeToNext;
 			while { ( this.releaseSelf == false or: { (time <= (duration - startPos)) }) 
-					&& (n < repeats) 
+					&& { n < repeats } && { zeroCount < maxSimultaneousStarts }
 			} {
 				next = this.next;
 				timeToNext = this.getTimeToNext;
 				next.prepareWaitAndStart( target );
 				timeToNext.wait;
 				time = time + timeToNext;
+				if( timeToNext == 0 ) { zeroCount = zeroCount + 1 } { zeroCount = 0 };
+				if( zeroCount >= maxSimultaneousStarts ) {
+					"UPattern ending; maxSimultaneousStarts (%) reached\n"
+						.postf( zeroCount )
+				};
 				n = n + 1;
 			};
 			this.changed( \end );
