@@ -50,6 +50,7 @@ UPattern : UChain {
 			this.prPatternsToValues( unit );
 		});
 		next.duration = duration ?? { this.getSustain; };
+		next.parent = this;
 		^next;
 	}
 	

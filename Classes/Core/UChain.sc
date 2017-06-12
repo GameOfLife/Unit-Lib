@@ -47,6 +47,8 @@ UChain : UEvent {
 	var <lastTarget;
 	
 	var <>serverName; // name of a server to match for playback
+	
+	var <>parent;
 
 	*initClass {
 		
