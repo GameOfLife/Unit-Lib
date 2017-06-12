@@ -34,12 +34,12 @@ defs = [
 		order = \order.kr(2);
 		lag = \lag.kr(0);
 		in = UIn.ar(0,1);
-		if( lowFreq.notNil ) { in = BLowCut.ar( in, lowFreq.lag(lag).clip(20,20000), order, 4 ); };
-		if( highFreq.notNil ) { in = BHiCut.ar( in, highFreq.lag(lag).clip(20,20000), order, 4 ); };
+		if( lowFreq.notNil ) { in = BLowCut.ar( in, lowFreq.lag(lag).clip(20,20000), order ); };
+		if( highFreq.notNil ) { in = BHiCut.ar( in, highFreq.lag(lag).clip(20,20000), order ); };
 		UOut.ar( 0, in );
 	}, addToAll: false, extraPrefix: \cutFilter_ )
 		.setSpec( \freq, spec )
-		.setSpec( \order, [ 0, 4, \lin, 1, 2 ].asSpec )
+		.setSpec( \order, [ 0, 5, \lin, 1, 2 ].asSpec )
 		.setSpec( \lag, [0,1,\lin].asSpec );
 });
 
