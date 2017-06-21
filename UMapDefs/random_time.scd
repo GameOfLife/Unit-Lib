@@ -22,7 +22,7 @@ FuncUMapDef( \random_time, { |unit, min = 0, max = 60|
 	.mappedArgs_( [] )
 	.setSpec( \min, SMPTESpec() )
 	.setSpec( \max, SMPTESpec() )
-	.setSpec( \value, SMPTESpec() )
+	.setSpec( \value, DisplaySpec( SMPTESpec(), _.asSMPTEString(1000) ) )
 	.canUseUMapFunc_({ |unit, key, umapdef|
 		unit.getSpec( key ).isKindOf( SMPTESpec );
 	})
