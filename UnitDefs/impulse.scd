@@ -16,7 +16,7 @@ part of the Unit lib default Udefs set
 Udef( \impulse, { |freq = 440, scale = 1, numSamples = 1, amp = 0.1|
 	var sig;
 	sig = Impulse.ar( freq * scale ) * amp;
-	sig = Trig1.ar( sig, numSamples / SampleRate.ir );
+	sig = Trig.ar( sig, numSamples / SampleRate.ir );
 	UMixOut.ar( 0, sig, 0, true ) 
 } ).category_( \oscillator )
 	.setSpec( \freq, FreqSpec( 2, 20000 ) )
