@@ -103,12 +103,6 @@ UPattern : UChain {
 		})
 	}
 	
-	makePrepareFunc { |routine, action|
-		var multiAction;
-
-		
-	}
-	
 	prepare { |target, startPos = 0, action|
 		var waitTime, firstEvent = true;
 		var multiAction, firstAction;
