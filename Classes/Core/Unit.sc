@@ -1180,7 +1180,7 @@ U : ObjectWithArgs {
 	}
 	
 	prepare { |target, startPos = 0, action|
-		var valuesToPrepare, act, servers;
+		var valuesToPrepare, act, firstAct, servers;
 		
 		parentChain = UChain.nowPreparingChain;
 		
@@ -1198,10 +1198,12 @@ U : ObjectWithArgs {
 		    valuesToPrepare = this.valuesToPrepare;
 		    if( valuesToPrepare.size > 0  ) {
 			    act = MultiActionFunc( act );
+			    firstAct = act.getAction;
 			    valuesToPrepare.do({ |val|
 				     val.prepare(servers, startPos, action: act.getAction)
 			    });
-			    this.def.prepare(servers, this, act.getAction, startPos)
+			    this.def.prepare(servers, this, act.getAction, startPos);
+			    firstAct.value;
 		    } {
 			    this.def.prepare(servers, this, act, startPos);
 		    };

@@ -702,7 +702,7 @@ UChain : UEvent {
 	}
 
 	prepare { |target, startPos = 0, action|
-		var cpu;
+		var cpu, firstAction;
 		
 		nowPreparingChain = this;
 		
@@ -745,8 +745,9 @@ UChain : UEvent {
 		});
 		preparedServers = target;
 		this.updateDur;
+		firstAction = action.getAction;
 		units.do( _.prepare(target, startPos, action.getAction ) );
-	     action.getAction.value; // fire action at least once
+	     firstAction.value; // fire action at least once
 	     
 	     if( verbose ) { "% preparing for %".format( this, preparedServers ).postln; };
 	     
