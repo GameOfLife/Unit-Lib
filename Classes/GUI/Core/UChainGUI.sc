@@ -361,7 +361,7 @@ UChainGUI {
 				this.class.singleWindow = bt.value.booleanValue;
 			});
 		
-		if( chain.groups.size > 0 ) {
+		if( chain.isPlaying ) {
 			views[ \startButton ].value = 1;
 		};
 			
