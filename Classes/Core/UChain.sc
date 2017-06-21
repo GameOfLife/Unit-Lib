@@ -777,12 +777,13 @@ UChain : UEvent {
 	
 	waitTime { ^this.units.collect(_.waitTime).sum }
 	
-	prepareWaitAndStart { |target, startPos = 0|
+	prepareWaitAndStart { |target, startPos = 0, startAction|
 		var task;
 		task = fork { 
 			target = this.prepare( target, startPos );
 			this.waitTime.wait; // doesn't care if prepare is done
 	       	this.start(target, startPos);
+	       	startAction.value( this );
 	       	prepareTasks.remove(task);
 		};
 	    prepareTasks = prepareTasks.add( task );
