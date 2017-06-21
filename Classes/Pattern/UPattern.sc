@@ -9,13 +9,15 @@ UPattern : UChain {
 	prPrepareUnit { |unit|
 		var prepareThese;
 		prepareThese = unit.valuesToPrepare.select({ |item|
-			item.isKindOf( UMap ) && { item.def.isKindOf( FuncUMapDef ) };
+			item.isKindOf( UMap );
 		});
 		prepareThese.do({ |umap|
 			this.prPrepareUnit( umap );
 		});
 		prepareThese.do({ |umap|
-			umap.def.doFunc( umap );
+			 if( umap.def.isKindOf( FuncUMapDef ) ) {
+				umap.def.doFunc( umap );
+			 };
 		});
 	}
 	
