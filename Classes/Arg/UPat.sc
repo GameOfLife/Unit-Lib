@@ -2,6 +2,7 @@ UPatDef : FuncUMapDef {
 	
 	classvar <>defaultCanUseUMapFunc;
 	classvar <>currentUnit;
+	classvar <>valueIsPrivate = true;
 	
 	*defaultGUIColor { ^Color.green.blend( Color.white, 0.8 ).alpha_(0.4); }
 	

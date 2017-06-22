@@ -7,12 +7,14 @@ FuncUMapDef : UMapDef {
 	} 
 	*/
 	
+	classvar <>valueIsPrivate = false;
+	
 	var <>valueIsMapped = true;
 	var <>dontStoreValue = false;
 	
-	*new { |name, func, args, valueIsPrivate = false, category, addToAll=true|
+	*new { |name, func, args, valueIsPrivate, category, addToAll=true|
 		^this.basicNew( name, args ? [], addToAll )
-			.initFunc( func, valueIsPrivate ).category_( category ? \default ); 
+			.initFunc( func, valueIsPrivate ? this.valueIsPrivate ).category_( category ? \default ); 
 	}
 	
 	initFunc { |inFunc, valueIsPrivate|
