@@ -29,7 +29,7 @@ UPattern : UChain {
 	prPatternsToValues { |unit|
 		unit.args.pairsDo({ |key, item|
 			if( item.isKindOf( UMap ) ) {
-				if( item.def.isKindOf( UPatDef ) ) {
+				if( [ UPatDef, ValueUMapDef ].any({ |def| item.def.isKindOf( def ) }) ) {
 					unit.set( key, item.value );
 				} {
 					this.prPatternsToValues( item );
