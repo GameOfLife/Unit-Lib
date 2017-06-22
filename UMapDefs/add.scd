@@ -23,4 +23,5 @@ UMapDef( \add, { |value = 0.0, add = 0.0, factor = 1|
 })
 	.mappedArgs_([ \value, \add ])
 	.setSpec( \factor, [-1,1,\lin,0,0].asSpec )
+	.setSpec( \value, UAdaptSpec() )
 	.category_( 'operator' )

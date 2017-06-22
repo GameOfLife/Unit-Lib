@@ -17,4 +17,6 @@ UMapDef( \min, { |a = 0.5, b = 0.5|
 	UMapOut.kr( a.min(b) );
 })
 .mappedArgs_([ \a, \b ])
+.setSpec( \a, UAdaptSpec() )
+.setSpec( \b, UAdaptSpec() )
 .category_( 'operator' )
