@@ -226,6 +226,7 @@ UMap : U {
 		super.init( in, inArgs ? [], inMod );
 		this.setunmappedKeys( inArgs );
 		this.mapUnmappedArgs;
+		if( this.def.isKindOf( UPatDef ) ) { this.makeStream };
 	}
 	
 	setunmappedKeys { |args|
