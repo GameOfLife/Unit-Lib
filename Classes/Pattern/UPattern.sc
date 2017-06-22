@@ -8,7 +8,7 @@ UPattern : UChain {
 	var <>routine;
 	var <>preparedEventsRoutine; // for prepared events
 	var <>preparedEvents;
-	var <isPlaying = false;
+	var isPlaying = false;
 	var task;
 	
 	prPrepareUnit { |unit|
@@ -76,6 +76,8 @@ UPattern : UChain {
 		};
 		^timeToNext.next;
 	}
+	
+	isPlaying { ^isPlaying ? false }
 	
 	makeRoutine { |target, startPos = 0, action|
 		^Routine({
