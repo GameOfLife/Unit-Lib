@@ -8,6 +8,7 @@ UPattern : UChain {
 	var <>routine;
 	var <>preparedEventsRoutine; // for prepared events
 	var <>preparedEvents;
+	var <isPlaying = false;
 	var task;
 	
 	prPrepareUnit { |unit|
@@ -76,8 +77,6 @@ UPattern : UChain {
 		^timeToNext.next;
 	}
 	
-	isPlaying { ^task.isPlaying }
-	
 	makeRoutine { |target, startPos = 0, action|
 		^Routine({
 			var time = 0, n = 0;
@@ -99,13 +98,14 @@ UPattern : UChain {
 				};
 				n = n + 1;
 			};
+			isPlaying = false;
 			this.changed( \end );
 		})
 	}
 	
 	prepare { |target, startPos = 0, action|
 		var waitTime, firstEvent = true;
-		var multiAction, firstAction;
+		var multiAction, firstAction, preparedEventsRoutineShouldEnd = false;
 		var i = 0;
 		this.stop;
 		waitTime = this.waitTime; // fixed waitTime for all events
@@ -114,6 +114,7 @@ UPattern : UChain {
 		if( waitTime > 0 ) {
 			multiAction = MultiActionFunc( action );
 			firstAction = multiAction.getAction;
+			isPlaying = nil;
 			routine = this.makeRoutine( target, startPos, { |chain, target, time| 
 				if( time < waitTime ) {
 					// "preparing %\n".postf( time.asSMPTEString );
@@ -133,6 +134,7 @@ UPattern : UChain {
 				};
 			} );
 			while { routine.next.notNil; } { i = i+1 };
+			if( isPlaying == false ) { preparedEventsRoutineShouldEnd = true };
 			// "% events prepared\n".postf( i );
 			preparedEventsRoutine = Task({
 				var waitTime, time = 0;
@@ -142,6 +144,10 @@ UPattern : UChain {
 					chain.start;
 					preparedEvents.remove( chain );
 				});
+				if( preparedEventsRoutineShouldEnd ) { 
+					isPlaying = false;
+					this.changed( \end );
+				};
 			});
 			firstAction.value;
 		} {
@@ -156,6 +162,7 @@ UPattern : UChain {
 	start { |target, startPos = 0|
 		task.stop; // first stop any existing playback task
 		preparedEventsRoutine.stop;
+		isPlaying = true;
 		this.changed( \start );
 		routine = routine ?? { this.makeRoutine( target, startPos, { |chain, target, time| 
 			chain.prepareWaitAndStart( target ); 
@@ -173,6 +180,7 @@ UPattern : UChain {
 	prepareWaitAndStart { |target, startPos = 0|
 		this.stop;
 		units.do({ |unit| this.prResetStreams( unit ); });
+		isPlaying = true;
 		this.changed( \start );
 		task = PauseStream( this.makeRoutine( target, startPos, { |chain, target, time| 
 			chain.prepareWaitAndStart( target ); 
@@ -186,6 +194,7 @@ UPattern : UChain {
 			chain.stop;
 			chain.dispose;
 		});
+		isPlaying = false;
 		this.changed( \end );
 	}
 	
