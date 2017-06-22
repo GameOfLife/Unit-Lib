@@ -229,4 +229,29 @@ UPattern : UChain {
 	currentChains { ^groupDict.keys.select({ |item| item.parent === this }) }
 	
 	stopChains { |releaseTime| this.currentChains.do(_.release( releaseTime ) ) }
+	
+	storeModifiersOn { |stream|
+		this.storeTags( stream );
+		this.storeDisplayColor( stream );
+		this.storeDisabledStateOn( stream );
+		if( this.sustain != 1 ) {
+			stream << ".sustain_(" <<< this.sustain << ")";
+		};
+		if( this.timeToNext != 1 ) {
+			stream << ".timeToNext_(" <<< this.timeToNext << ")";
+		};
+		if( ugroup.notNil ) {
+			stream << ".ugroup_(" <<< ugroup << ")";
+		};
+		if( serverName.notNil ) {
+			stream << ".serverName_(" <<< serverName << ")";
+		};
+		if( addAction != \addToHead ) {
+			stream << ".addAction_(" <<< addAction << ")";
+		};
+		if( global != false ) {
+			stream << ".global_(" <<< global << ")";
+		};
+		
+	}
 }
