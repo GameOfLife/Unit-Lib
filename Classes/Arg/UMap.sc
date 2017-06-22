@@ -10,7 +10,7 @@ UMapDef : Udef {
 	var <>allowedModes = #[ sync, normal ];
 	var <>canUseUMapFunc;
 	var <>apxCPU = 0;
-	var <>guiColor;
+	var >guiColor;
 	
 	*initClass{
 		this.defsFolders = [ 
@@ -190,6 +190,10 @@ UMapDef : Udef {
 	argNeedsUnmappedInput { |key|
 		^useMappedArgs && { this.isMappedArg( key ) } 
 	}
+	
+	*defaultGUIColor { ^Color.blue.blend( Color.white, 0.8 ).alpha_(0.4); }
+	
+	guiColor { ^guiColor ? (this.class.defaultGUIColor) }
 }
 
 UMap : U {

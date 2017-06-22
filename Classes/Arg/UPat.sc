@@ -3,6 +3,8 @@ UPatDef : FuncUMapDef {
 	classvar <>defaultCanUseUMapFunc;
 	classvar <>currentUnit;
 	
+	*defaultGUIColor { ^Color.green.blend( Color.white, 0.8 ).alpha_(0.4); }
+	
 	*initClass{
 		defaultCanUseUMapFunc = { |unit, key, upatdef|
 			unit.getSpec( key ).respondsTo( \asControlSpec ) && {
