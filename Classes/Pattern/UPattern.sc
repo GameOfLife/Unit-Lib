@@ -191,6 +191,30 @@ UPattern : UChain {
 	
 	release { this.stop }
 	
+	asUScore { |infDur = 60|
+		var score, originalDur, track = 0, track0time = 0;
+		this.stop;
+		units.do({ |unit| this.prResetStreams( unit ); });
+		score = UScore().startTime_( this.startTime ).track_( this.track );
+		originalDur = duration;
+		if( duration == inf ) {
+			duration = infDur;
+		};
+		routine = this.makeRoutine( nil, 0, { |chain, target, time|
+			if( time > track0time ) { track = 0 };
+			chain.startTime_( time );
+			if( track == 0 ) {
+				track0time = time + (chain.duration * 2);
+			};
+			chain.track = track;
+			score.add( chain );
+			track = track + 1;
+		});
+		while { routine.next.notNil; } { };
+		duration = originalDur;
+		^score;
+	}
+	
 	currentChains { ^groupDict.keys.select({ |item| item.parent === this }) }
 	
 	stopChains { |releaseTime| this.currentChains.do(_.release( releaseTime ) ) }
