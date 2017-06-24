@@ -22,5 +22,7 @@ FuncUMapDef( \uchain_duration, { |unit|
 	.mappedArgs_( [] )
 	.setSpec( \value, DisplaySpec( SMPTESpec(), _.asSMPTEString(1000) ), private: true )
 	.canUseUMapFunc_({ |unit, key, umapdef|
-		unit.getSpec( key ).isKindOf( SMPTESpec );
+		var spec;
+		spec = unit.getSpec( key );
+		[ SMPTESpec, UAdaptSpec ].any({ |item| spec.isKindOf( item ) });
 	})
