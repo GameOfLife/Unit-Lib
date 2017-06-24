@@ -20,7 +20,7 @@ UPatDef : FuncUMapDef {
 		this.class.currentUnit = unit;
 		res = unit.stream.next;
 		this.class.currentUnit = nil;
-		if( valueIsMapped ) {
+		if( this.useMappedArgs && valueIsMapped && (unit.get( \u_useSpec ) != false) ) {
 			unit.setArg( \value, unit.getSpec( \value ).map( res ) );
 		} {
 			unit.setArg( \value, res );
@@ -48,6 +48,19 @@ UPatDef : FuncUMapDef {
 		});
 	}
 	
+	getControlInput { |unit|
+		var out;
+		if( unit.get( \u_prepared ) == false ) {
+			this.doFunc( unit );
+			unit.setArg( \u_prepared, true );
+		};
+		out = unit.get( \value );
+		if( out.isUMap ) {
+			out = out.asControlInput( unit );
+		};
+		^out;
+	}
+	
 	setSynth { |unit ...keyValuePairs|
 		keyValuePairs.clump(2).do({ |item|
 			if( [ \u_spec, \u_prepared ].includes( item[0] ).not ) {
@@ -56,6 +69,9 @@ UPatDef : FuncUMapDef {
 		});
 	}
 
+	canInsert {
+		^(canInsert != false) && { this.insertArgName.notNil; };
+	}
 }
 
 UPatArg {

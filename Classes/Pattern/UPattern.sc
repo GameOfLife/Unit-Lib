@@ -1,8 +1,8 @@
 UPattern : UChain {
 	
-	var <>repeats = inf;
-	var <>sustain = 1;
-	var <>timeToNext = 1;
+	var <repeats = inf;
+	var <sustain = 1;
+	var <timeToNext = 1;
 	var <>maxSimultaneousStarts = 100;
 	var <>localPos = 0;
 	var <>routine;
@@ -17,7 +17,9 @@ UPattern : UChain {
 			item.isKindOf( UMap );
 		});
 		prepareThese.do({ |umap|
-			this.prPrepareUnit( umap );
+			if( umap.def.isKindOf( UPatDef ).not ) {
+				this.prPrepareUnit( umap );
+			};
 		});
 		prepareThese.do({ |umap|
 			 if( umap.def.isKindOf( FuncUMapDef ) ) {
@@ -47,6 +49,106 @@ UPattern : UChain {
 		});
 	}
 	
+	getTypeColor {
+		^case {
+	        this.displayColor.notNil;
+        } {
+	        this.displayColor;
+        } { 
+	        this.duration == inf 
+	   } {
+	        Color(0.6, 0.6, 0.8)
+        } {
+	       this.releaseSelf == true;
+        } {
+	        Color(0.768, 0.55,0.768);
+        } {
+	        Color(0.48, 0.6, 0.6);
+        };
+	}
+	
+	argSpecsForDisplay { 
+		^[
+			ArgSpec( 'sustain', 1, SMPTESpec(0.001), false, \init ),
+			ArgSpec( 'timeToNext', 1, SMPTESpec(), false, \init )
+		]
+	}
+	
+	canUseUMap { |key, umapdef|
+		^umapdef.allowedModes.includes( 'init' ) && {
+			umapdef.unitCanUseUMap( this, key );	
+		};
+	}
+	
+	set { |key, value|
+		this.perform( key.asSetter, value );
+	}
+	
+	get { |key|
+		^this.perform( key );
+	}
+	
+	insertUMap { |key, umapdef, args|
+		var item, umap;
+		if( umapdef.isKindOf( UMap ) ) {
+			umap = umapdef;
+			umapdef = umap.def;
+		} {
+			umapdef = umapdef.asUdef( UMapDef );
+			if( umapdef.notNil ) {
+				umap = UMap( umapdef,  args );
+			};
+		};
+		if( umap.notNil ) {
+			if( umap.def.canInsert ) {
+				item = this[ key ];
+				if( item.isUMap ) {
+					this.set( key, umap );
+					this.get( key ).set( umapdef.insertArgName, item );
+				} {
+					item = this.mapGet( key );
+					this.set( key, umap );
+					this.get( key ).mapSet( umapdef.insertArgName, item );
+				};
+			} {
+				this.set( key, umap );
+			};
+		};
+	}
+	
+	getSpec { |key|
+		^switch( key,
+			'sustain', { SMPTESpec(0.001) },
+			'timeToNext', { SMPTESpec() },
+		);
+	}
+	
+	getDefault { |key|
+		^switch( key,
+			'sustain', { 1 },
+			'timeToNext', { 1 },
+		);
+	}
+	
+	removeUMap { |key|
+		switch( key,
+			'sustain', { this.sustain = 1 },
+			'timeToNext', { this.timeToNext = 1 },
+		);
+	}
+	
+	defName { ^'UPattern' }
+	
+	args { ^[ \sustain, this.sustain, \timeToNext, this.timeToNext ] }
+	
+	at { |index|
+		^switch( index,
+			\sustain, { this.sustain },
+			\timeToNext, { this.timeToNext },
+			{ units[ index ] }
+		);
+	}
+	
 	next { |duration|
 		var next;
 		next = UChain( *units.deepCopy );
@@ -59,6 +161,23 @@ UPattern : UChain {
 		next.duration = duration ?? { this.getSustain; };
 		next.parent = this;
 		^next;
+	}
+	
+	repeats_ { |newRepeats|
+		repeats = newRepeats ? inf;
+		this.changed( \repeats, repeats );
+	}
+	
+	sustain_ { |newSustain|
+		sustain = newSustain ? 1;
+		if( sustain.isUMap ) { sustain.unitArgName = \sustain };
+		this.changed( \sustain, sustain );
+	}
+	
+	timeToNext_ { |newTimeToNext|
+		timeToNext = newTimeToNext ? 1;
+		if( timeToNext.isUMap ) { timeToNext.unitArgName = \timeToNext };
+		this.changed( \timeToNext, timeToNext );
 	}
 	
 	getSustain {
@@ -226,6 +345,14 @@ UPattern : UChain {
 		^score;
 	}
 	
+	collectOSCBundleFuncs { |server, startOffset = 0, infdur = 60|
+		^this.asUScore( infdur ).collectOSCBundleFuncs( server, startOffset, infdur );
+	}
+	
+	collectOSCBundles { |server, startOffset = 0, infdur = 60|
+		^this.asUScore( infdur ).collectOSCBundles( server, startOffset, infdur );
+	}
+	
 	currentChains { ^groupDict.keys.select({ |item| item.parent === this }) }
 	
 	stopChains { |releaseTime| this.currentChains.do(_.release( releaseTime ) ) }
@@ -234,6 +361,9 @@ UPattern : UChain {
 		this.storeTags( stream );
 		this.storeDisplayColor( stream );
 		this.storeDisabledStateOn( stream );
+		if( this.repeats != inf ) {
+			stream << ".repeats_(" <<< this.repeats << ")";
+		};
 		if( this.sustain != 1 ) {
 			stream << ".sustain_(" <<< this.sustain << ")";
 		};

@@ -226,7 +226,7 @@ UMap : U {
 		super.init( in, inArgs ? [], inMod );
 		this.setunmappedKeys( inArgs );
 		this.mapUnmappedArgs;
-		if( this.def.isKindOf( UPatDef ) ) { this.makeStream };
+		if( this.def.isKindOf( UPatDef ) && { spec.notNil } ) { this.makeStream };
 	}
 	
 	setunmappedKeys { |args|
@@ -448,7 +448,7 @@ UMap : U {
 	}
 
 	resetStream {
-		this.stream.reset;
+		this.stream = nil;
 	}
 
 	next { ^this.asControlInput }
