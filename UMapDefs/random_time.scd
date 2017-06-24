@@ -14,7 +14,7 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-FuncUMapDef( \random_time, { |unit, min = 0, max = 60|
+FuncUMapDef( \random_time, { |unit, min = 0, max = 1|
 	min rrand: max; // result sets \value arg
 })
 	.category_( 'function' )
