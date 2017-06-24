@@ -29,7 +29,7 @@ UChainGUI {
 	classvar <>durationMode = \duration; // \duration, \endTime, \endBar
 	classvar <>nowBuildingChain;
 	
-	var <chain, <score;
+	var <chain, <score, <parentScore;
 	
 	var <parent, <composite, <views, <startButton, <uguis;
 	var <>presetView;
@@ -77,7 +77,9 @@ UChainGUI {
 		
 		packUnits = if( chain.isKindOf( MassEditUChain ) ) { false; } { packUnitsDefault; };
 		
-		tempoMap = UScore.current !? _.tempoMap ?? { TempoMap() };
+		parentScore = UScore.current;
+		
+		tempoMap = parentScore !? _.tempoMap ?? { TempoMap() };
 		
 		if( skin.font.class != Font.implClass ) { // quick hack to make sure font is correct
 			skin.font = Font( Font.defaultSansFace, 10 );
@@ -256,8 +258,50 @@ UChainGUI {
 					chain.release 
 				} ]
 		 	);
-		
-		composite.decorator.shift( bounds.width - 14 - 80 - 32, 0 );
+		 	
+		 if( chain.isKindOf( MassEditUChain ).not ) {
+			 views[ \pattern ] = SmoothButton( composite, 74 @ 14 )
+			 	.label_( [ "pattern", "pattern" ] )
+			 	.border_( 1 )
+				.hiliteColor_( Color.green )
+				.value_( chain.isKindOf( UPattern ).binaryValue )
+				.action_({ |bt|
+					var new;
+					{	
+						switch( bt.value,
+							0, { 
+								if( chain.isKindOf( UPattern ) ) {
+									new = UChain( *chain.units )
+										.startTime_( chain.startTime )
+										.duration_( chain.duration )
+										.track_( chain.track )
+										.releaseSelf_( chain.releaseSelf );
+								};
+							},
+							1, {
+								if( chain.isKindOf( UChain ) ) {
+									new = UPattern( *chain.units )
+										.startTime_( chain.startTime )
+										.duration_( chain.duration )
+										.track_( chain.track )
+										.releaseSelf_( chain.releaseSelf );
+								};
+							}
+						);
+						if( parentScore.notNil ) { 
+							parentScore.events[ parentScore.indexOf( chain ) ] = new; 
+							parentScore.changed(\numEventsChanged);
+							parentScore.changed(\events);
+							parentScore.changed(\something); 
+						};
+						new.gui( score: score );
+					}.defer(0.1);
+				});
+			
+			composite.decorator.shift( bounds.width - 14 - 80 - 80 - 32, 0 );
+		 } {
+			 composite.decorator.shift( bounds.width - 14 - 80 - 32, 0 );
+		 };
 
 		if( chain.isKindOf( MassEditUChain ) ) {
 			chain.connect;
@@ -879,6 +923,7 @@ UChainGUI {
 		var scrollerMargin = 16;
 		var realIndex = 0;
 		var massEditWindow;
+		var upatGUI;
 		
 		if( GUI.id == \qt ) { scrollerMargin = 20 };
 		
@@ -935,6 +980,17 @@ UChainGUI {
 						chain.units = [ U( View.currentDrag.asSymbol ) ];
 					};
 			})
+		};
+		
+		if( chain.isKindOf( UPattern ) ) {
+			upatGUI = UGUI( 
+				scrollView, 
+				scrollView.bounds.copy.width_( 
+					scrollView.bounds.width - scrollerMargin - (margin.x * 2) 
+				),
+				chain,
+			);
+			upatGUI.mapSetAction = { chain.changed( \units ) };
 		};
 		
 		ug = units.collect({ |unit, i|
