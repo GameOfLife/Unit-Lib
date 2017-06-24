@@ -342,6 +342,7 @@ UMap : U {
 	
 	// UMap is intended to use as arg for a Unit (or another UMap)
 	asUnitArg { |unit, key|
+		var notMappedArg = true;
 		if( unit.canUseUMap( key, this.def ) ) {
 			this.unitArgName = key;
 			if( key.notNil ) {
@@ -353,10 +354,16 @@ UMap : U {
 						this.set( \u_useSpec, false );
 					};
 				} {
-					this.spec = unit.getSpec( key ).copy;
-					this.useSpec = true;
-					this.set( \u_spec, this.spec );
-					this.set( \u_useSpec, true );
+					
+					if( unit.isKindOf( UMap ) && { unit.def.isMappedArg( key ) } ) {
+						notMappedArg = false;
+					};
+					
+					if( ( notMappedArg == true ) or: { unit.spec.notNil } ) {						this.spec = unit.getSpec( key ).copy;
+						this.useSpec = true;
+						this.set( \u_spec, this.spec );
+						this.set( \u_useSpec, true );
+					};
 				};
 				this.def.activateUnit( this, unit );
 				this.valuesAsUnitArg
