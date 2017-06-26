@@ -26,6 +26,7 @@ UPatDef( \p_step, { |unit, lo = 0.0, hi = 1.0, steps = 12, loop = \loop|
 			current = (current + ((direction/steps.next).clip2( 1.0e12 )));
 			switch( loop.next,
 				\loop, { current = current.wrap( 0.0, 1.0 ); direction = 1; },
+				\backwards, { current = current.wrap( 0.0, 1.0 ); direction = -1; },
 				\alternate, { 
 					case { current > 1 } {
 						current = current.fold(0.0,1.0);
@@ -42,5 +43,5 @@ UPatDef( \p_step, { |unit, lo = 0.0, hi = 1.0, steps = 12, loop = \loop|
 	}.r;
 }).mappedArgs_([\lo, \hi])
 .setSpec( \steps, [-100,100,\lin].asSpec )
-.setSpec( \loop, ListSpec( [ \off, \loop, \alternate ], 1 ) )
+.setSpec( \loop, ListSpec( [ \off, \loop, \backwards, \alternate ], 1 ) )
 .category_( 'pattern' );
