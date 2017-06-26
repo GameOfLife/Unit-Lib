@@ -260,6 +260,7 @@ UChainGUI {
 		 	);
 		 	
 		 if( chain.isKindOf( MassEditUChain ).not ) {
+			 composite.decorator.shift( 65, 0 );
 			 views[ \pattern ] = SmoothButton( composite, 74 @ 14 )
 			 	.label_( [ "pattern", "pattern" ] )
 			 	.border_( 1 )
@@ -298,7 +299,7 @@ UChainGUI {
 					}.defer(0.1);
 				});
 			
-			composite.decorator.shift( bounds.width - 14 - 80 - 80 - 32, 0 );
+			composite.decorator.shift( bounds.width - 14 - 80 - 65 - 80 - 32, 0 );
 		 } {
 			 composite.decorator.shift( bounds.width - 14 - 80 - 32, 0 );
 		 };
