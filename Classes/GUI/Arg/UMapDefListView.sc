@@ -124,7 +124,10 @@ UMapDefListView {
 		};
 
 		g = { |cat, udefs|
+		   var color;
             if( cat !== \private ) {
+	            
+	       color = Color( *udefs.collect({ |x| x.guiColor.asArray }).mean );
             
             views[ cat ] = ExpandView( views[ \scrollview ],
                 (bounds.width - (scrollerMargin+6))@( (udefs.size + 1) * 22 ),
@@ -132,11 +135,11 @@ UMapDefListView {
                 collapsed[ cat ] ? true
             );
             
-            views[ cat ].background = UMap.guiColor;
+            views[ cat ].background = color;
             
             // temporary hack to make point and trigger sub-categories stick out
             if( cat.asString.find("point").notNil or: { cat.asString.find("trigger").notNil } ) {
-	            views[ cat ].background = UMap.guiColor.blend( Color.gray(0.5,0.75), 0.33 );
+	            views[ cat ].background = color.blend( Color.gray(0.5,0.75), 0.33 );
             };
             
             views[ cat ].button.background = nil;
@@ -164,6 +167,7 @@ UMapDefListView {
 		               }.defer(0.1);
 	                    vw.object;
                     })
+                    .background_( udef.guiColor )
                     .string_( " " ++ udef.name.asString )
                     .applySkin( RoundView.skin ? () );
                   
