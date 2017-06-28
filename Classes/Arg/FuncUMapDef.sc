@@ -12,6 +12,10 @@ FuncUMapDef : UMapDef {
 	var <>valueIsMapped = true;
 	var <>dontStoreValue = false;
 	
+	*defaultGUIColor { ^Color(0.67843137254902, 0.84705882352941, 0.90196078431373)
+		.blend( Color.white, 0.5 ).alpha_(0.4); 
+	}
+	
 	*new { |name, func, args, valueIsPrivate, category, addToAll=true|
 		^this.basicNew( name, args ? [], addToAll )
 			.initFunc( func, valueIsPrivate ? this.valueIsPrivate ).category_( category ? \default ); 
