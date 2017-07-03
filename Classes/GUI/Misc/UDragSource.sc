@@ -25,16 +25,18 @@ UDragSource {
 	init {
 		if( GUI.id == \cocoa ) {
 			view.beginDragAction_({ |vw|
-				mouseSynth = Synth( 'UDragSource_mouseState' ).onFree({
-					{ 
-						if( View.currentDrag.notNil ) {
-							View.currentDrag = nil; 
-							UChainGUI.all.do({ |x| x.view.refresh });
-				              UGlobalControlGUI.current !? {|x| x.view.view.refresh };
-						};
-					}.defer(0.1);
-					mouseSynth = nil;
-				});
+				if( Server.default.isLocal ) {	
+					mouseSynth = Synth( 'UDragSource_mouseState' ).onFree({
+						{ 
+							if( View.currentDrag.notNil ) {
+								View.currentDrag = nil; 
+								UChainGUI.all.do({ |x| x.view.refresh });
+					              UGlobalControlGUI.current !? {|x| x.view.view.refresh };
+							};
+						}.defer(0.1);
+						mouseSynth = nil;
+					});
+				};
 				this.beginDragAction.value( vw );
 			});
 		} {
