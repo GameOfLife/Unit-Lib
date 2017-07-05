@@ -165,6 +165,7 @@ UPattern : UChain {
 		next = UChain( *units.deepCopy );
 		next.fadeIn = this.fadeIn;
 		next.fadeOut = this.fadeOut;
+		next.displayColor = this.getTypeColor;
 		next.units.do({ |unit|
 			this.prPrepareUnit( unit );
 			this.prPatternsToValues( unit );
