@@ -26,6 +26,6 @@ UMapDef( \note_freq, { |note = 64, round = 1, detune = 0, transpose = 0|
 	.canUseUMapFunc_({ |unit, key, umapdef|
 		var spec;
 		spec = unit.getSpec( key );
-		spec.isKindOf( ControlSpec ) && { spec.warp.isKindOf( ExponentialWarp ) };
+		spec.isKindOf( ControlSpec ) && { (spec.minval > 0) && { spec.maxval < inf } };
 	})
 	.category_( 'convert' )

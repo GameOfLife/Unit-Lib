@@ -16,7 +16,7 @@ UMapDef( \time_freq, { |time = 0.002, factor = 1|
 	UMapOut.kr( factor / time.max(1.0e-12) );
 })
 	.setSpec( \time, UAdaptSpec({ |spec|
-		SMPTESpec( 1/(spec.minval.max(1.0e-12)), 1/spec.maxval );
+		SMPTESpec( 1/spec.maxval, 1/(spec.minval.max(1.0e-12)) );
 	}) )
 	.setSpec( \factor, [ 0.1, 10, \exp ].asSpec )
 	.canUseUMapFunc_({ |unit, key, umapdef|
