@@ -88,6 +88,15 @@ UPattern : UChain {
 		^this.perform( key );
 	}
 	
+	mapGet { |key|
+		var spec = this.getSpec(key);
+		^if( spec.notNil ) {
+		    spec.unmap( this.get(key) )
+		} {
+		    this.get(key)
+		}
+	}
+	
 	insertUMap { |key, umapdef, args|
 		var item, umap;
 		if( umapdef.isKindOf( UMap ) ) {
@@ -115,6 +124,8 @@ UPattern : UChain {
 			};
 		};
 	}
+	
+	argNeedsUnmappedInput { ^false }
 	
 	getSpec { |key|
 		^switch( key,
@@ -169,14 +180,12 @@ UPattern : UChain {
 	}
 	
 	sustain_ { |newSustain|
-		sustain = newSustain ? 1;
-		if( sustain.isUMap ) { sustain.unitArgName = \sustain };
+		sustain = newSustain.asUnitArg( this, \sustain );
 		this.changed( \sustain, sustain );
 	}
 	
 	timeToNext_ { |newTimeToNext|
-		timeToNext = newTimeToNext ? 1;
-		if( timeToNext.isUMap ) { timeToNext.unitArgName = \timeToNext };
+		timeToNext = newTimeToNext.asUnitArg( this, \timeToNext );
 		this.changed( \timeToNext, timeToNext );
 	}
 	

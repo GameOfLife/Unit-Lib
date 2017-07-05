@@ -48,6 +48,8 @@ UPatDef : FuncUMapDef {
 		});
 	}
 	
+	useMappedArgs_ { |bool = true| useMappedArgs = bool }
+	
 	getControlInput { |unit|
 		var out;
 		if( unit.get( \u_prepared ) == false ) {
