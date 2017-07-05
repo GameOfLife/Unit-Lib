@@ -45,6 +45,14 @@ MultiActionFunc {
 		^super.newCopyArgs( action ); 
 	}
 	
+	*use { |action, func, alwaysFire = true|
+		var maf, first;
+		maf = this.new( action );
+		if( alwaysFire ) { first = maf.getAction };
+		func.value( maf );
+		first.value;
+	}
+	
 	getAction {
 		n = n + 1;
 		^{ |...args|

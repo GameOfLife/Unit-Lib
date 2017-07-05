@@ -106,8 +106,6 @@ AbstractRichBuffer {
 			};
 			this.removeBuffer( buf );
 		} {
-			 "%:freeBuffer - no buffer to be freed"
-		    		.format( this.class ).warn;
 		    	action.value;
 		};
 	}
@@ -484,7 +482,12 @@ AbstractSndFile : AbstractRichBuffer {
 
 BufSndFile : AbstractSndFile {
 
+    classvar <>global;
+    classvar <>globalServers;
+    
     var <useChannels, <>useStartPosForBuf = false;
+    
+    *initClass { global = (); }
 
 	*new{ |path, startFrame = 0, endFrame, rate = 1, loop = false, useChannels | 
 		// path of existing file or SoundFile
@@ -498,6 +501,47 @@ BufSndFile : AbstractSndFile {
 	}
 	
 	asBufSndFile { ^this }
+	
+	id { ^[ this.path, this.startFrame, this.endFrame ].join( $_ ).asSymbol }
+	
+	prepare { |servers, startPos = 0, action|
+	    if( this.hasGlobal ) {
+		     action.value;
+	    } {
+	    		action = MultiActionFunc( action );
+	    		servers.do({ |server| this.makeBuffer(server, startPos, action: action.getAction) })
+	    };
+	}
+	
+	loadGlobal { |action|
+		MultiActionFunc.use( action, { |act|
+			global[ this.id ] = (globalServers ?? ULib.allServers).collect({ |srv|
+				this.makeBuffer( srv, 0, act.getAction, add: false );
+			});
+		});
+	}
+	
+	disposeGlobal { |action|
+		MultiActionFunc.use( action, { |act|
+			global[ this.id ].do({ |buf|
+				this.freeBuffer( buf, act.getAction );
+			}); 
+			global[ this.id ] = nil;
+		});
+	}
+	
+	*disposeAllGlobal {
+		global.do({ |item|
+			item.do(_.free)
+		});
+		global = ();
+	}
+	
+	findGlobal { |server|
+		^global[ this.id ].detect({ |buf| buf.server === server });
+	}
+	
+	hasGlobal { ^global[ this.id ].notNil }
 	
 	asMonoBufSndFile { 
 		^MonoBufSndFile.newCopyVars( this ); 
@@ -520,7 +564,10 @@ BufSndFile : AbstractSndFile {
     }
     
     asControlInputFor { |server, startPos = 0| 
-	    ^[ this.currentBuffer(server, startPos), rate, loop.binaryValue ] 
+	    ^[ 
+	    		this.findGlobal( server ) ?? { this.currentBuffer(server, startPos) }, 
+	    		rate, loop.binaryValue 
+	    	] 
 	   }
 	   
 	// not used by Unit:
@@ -530,7 +577,7 @@ BufSndFile : AbstractSndFile {
 	
 	asOSCArgEmbeddedArray { | array| ^this.asControlInput.asOSCArgEmbeddedArray(array) }
 
-    makeBuffer { |server, startPos = 0, action, bufnum|
+    makeBuffer { |server, startPos = 0, action, bufnum, add = true|
 		var buf, addStartFrame = 0, localUsedFrames;
 		
 		localUsedFrames = this.usedFrames;
@@ -549,13 +596,13 @@ BufSndFile : AbstractSndFile {
 			buf = Buffer.read( server, path.getGPath,
 					startFrame + addStartFrame, localUsedFrames, action, bufnum );
 		};
-		this.addBuffer( buf );
+		if( add ) { this.addBuffer( buf ); };
 		^buf;
 	}
 
     unitNamePrefix{ ^"buf" }
     
-    u_waitTime { ^5 }
+    u_waitTime { ^if( this.hasGlobal ) { 0 } { 5 } }
     
     storeOn { arg stream;
 		stream << this.class.name << ".newBasic(" <<* [ // use newBasic to prevent file reading
