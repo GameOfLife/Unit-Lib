@@ -20,7 +20,7 @@ UPatDef : FuncUMapDef {
 		this.class.currentUnit = unit;
 		res = unit.stream.next;
 		this.class.currentUnit = nil;
-		if( this.useMappedArgs && valueIsMapped && (unit.get( \u_useSpec ) != false) ) {
+		if( this.useMappedArgs && valueIsMapped ) {
 			unit.setArg( \value, unit.getSpec( \value ).map( res ) );
 		} {
 			unit.setArg( \value, res );
@@ -40,7 +40,7 @@ UPatDef : FuncUMapDef {
 	
 	getStreamArgs { |unit|
 		^unit.argSpecs.collect({ |item| 
-			if( this.isMappedArg( item.name ) ) { 
+			if( useMappedArgs && { this.isMappedArg( item.name ) } ) { 
 				UPatArg( unit, item.name, item.spec ); 
 			} {
 				UPatArg( unit, item.name );
@@ -57,6 +57,9 @@ UPatDef : FuncUMapDef {
 			unit.setArg( \u_prepared, true );
 		};
 		out = unit.get( \value );
+		if( unit.get( \u_useSpec ) == false ) {
+			out = unit.getSpec( \value ).unmap( out );
+		};
 		if( out.isUMap ) {
 			out = out.asControlInput( unit );
 		};

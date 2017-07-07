@@ -66,7 +66,7 @@ FuncUMapDef : UMapDef {
 		res = func.value( unit, 
 			*this.asUnmappedArgsArray( unit, unit.args ).clump(2).flop[1]
 		);
-		if( this.useMappedArgs && valueIsMapped && (unit.get( \u_useSpec ) != false) ) {
+		if( this.useMappedArgs && valueIsMapped ) {
 			unit.setArg( \value, unit.getSpec( \value ).map( res ) );
 		} {
 			unit.setArg( \value, res );
@@ -125,7 +125,14 @@ FuncUMapDef : UMapDef {
 	
 	getControlInput { |unit|
 		var out;
+		if( unit.get( \u_prepared ) == false ) {
+			this.doFunc( unit );
+			unit.setArg( \u_prepared, true );
+		};
 		out = unit.get( \value );
+		if( unit.get( \u_useSpec ) == false ) {
+			out = unit.getSpec( \value ).unmap( out );
+		};
 		if( out.isUMap ) {
 			out = out.asControlInput( unit );
 		};
