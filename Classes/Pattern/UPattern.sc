@@ -23,7 +23,7 @@ UPattern : UChain {
 		});
 		prepareThese.do({ |umap|
 			 if( umap.def.isKindOf( FuncUMapDef ) ) {
-				umap.def.doFunc( umap );
+				umap.next;
 			 };
 		});
 	}
