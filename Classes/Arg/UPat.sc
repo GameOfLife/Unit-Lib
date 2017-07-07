@@ -15,11 +15,12 @@ UPatDef : FuncUMapDef {
 	}
 	
 	doFunc { |unit|
-		var res;
+		var res, was;
 		if( unit.stream.isNil ) { this.makeStream( unit ) };
+		was = this.class.currentUnit;
 		this.class.currentUnit = unit;
 		res = unit.stream.next;
-		this.class.currentUnit = nil;
+		this.class.currentUnit = was;
 		if( this.useMappedArgs && valueIsMapped ) {
 			unit.setArg( \value, unit.getSpec( \value ).map( res ) );
 		} {
