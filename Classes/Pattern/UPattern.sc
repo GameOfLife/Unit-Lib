@@ -31,7 +31,7 @@ UPattern : UChain {
 	prPatternsToValues { |unit|
 		unit.args.pairsDo({ |key, item|
 			if( item.isKindOf( UMap ) ) {
-				if( [ UPatDef, ValueUMapDef ].any({ |def| item.def.isKindOf( def ) }) ) {
+				if( [ FuncUMapDef, ValueUMapDef ].any({ |def| item.def.isKindOf( def ) }) ) {
 					unit.set( key, item.value );
 				} {
 					this.prPatternsToValues( item );
@@ -161,16 +161,19 @@ UPattern : UChain {
 	}
 	
 	next { |duration|
-		var next;
+		var next, was;
 		next = UChain( *units.deepCopy );
 		next.fadeIn = this.fadeIn;
 		next.fadeOut = this.fadeOut;
 		next.displayColor = this.getTypeColor;
+		next.duration = duration ?? { this.getSustain; };
+		was = UChain.nowPreparingChain;
+		UChain.nowPreparingChain = next;
 		next.units.do({ |unit|
 			this.prPrepareUnit( unit );
 			this.prPatternsToValues( unit );
 		});
-		next.duration = duration ?? { this.getSustain; };
+		UChain.nowPreparingChain = was;
 		next.parent = this;
 		^next;
 	}
