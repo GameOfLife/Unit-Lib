@@ -193,18 +193,29 @@ UPattern : UChain {
 		this.changed( \timeToNext, timeToNext );
 	}
 	
+	prUnPrepare { |unit|
+		if( unit.isKindOf( UMap ) ) {
+			if( unit.def.isKindOf( FuncUMapDef ) ) {
+				unit.u_prepared = false;
+			};
+			unit.values.do({ |val|
+				this.prUnPrepare( val );
+			});
+		};
+	}
+	
 	getSustain {
 		if( sustain.isKindOf( UMap ) && { sustain.def.isKindOf( FuncUMapDef ) } ) {
+			this.prUnPrepare( sustain );
 			this.prPrepareUnit( sustain );
-			sustain.def.doFunc( sustain );
 		};
 		^sustain.next;
 	}
 	
 	getTimeToNext {
 		if( timeToNext.isKindOf( UMap ) && { timeToNext.def.isKindOf( FuncUMapDef ) } ) {
+			this.prUnPrepare( timeToNext );
 			this.prPrepareUnit( timeToNext );
-			timeToNext.def.doFunc( timeToNext );
 		};
 		^timeToNext.next;
 	}
