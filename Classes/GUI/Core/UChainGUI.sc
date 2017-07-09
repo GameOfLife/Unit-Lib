@@ -924,7 +924,7 @@ UChainGUI {
 		var scrollerMargin = 16;
 		var realIndex = 0;
 		var massEditWindow;
-		var upatGUI;
+		var upatGUI, upatCtrls, upatHeader;
 		
 		if( GUI.id == \qt ) { scrollerMargin = 20 };
 		
@@ -984,6 +984,17 @@ UChainGUI {
 		};
 		
 		if( chain.isKindOf( UPattern ) ) {
+			
+			upatHeader = StaticText( scrollView, width @ 14 )
+				.applySkin( RoundView.skin )
+				.string_( " UPattern" )
+				.background_( Color.white.blend( Color.green, 0.22 ).alpha_(0.5) )
+				.resize_(2)
+				.font_( 
+					(RoundView.skin.tryPerform( \at, \font ) ?? 
+						{ Font( Font.defaultSansFace, 12) }).boldVariant 
+				);
+				
 			upatGUI = UGUI( 
 				scrollView, 
 				scrollView.bounds.copy.width_( 
@@ -992,6 +1003,23 @@ UChainGUI {
 				chain,
 			);
 			upatGUI.mapSetAction = { chain.changed( \units ) };
+			
+			[ \sustain, \timeToNext ].do({ |key|
+				var item;
+				item = chain.perform( key );
+				if( item.isUMap ) {
+					upatCtrls = upatCtrls.add( SimpleController( item ).put( \init, { chain.changed( \units ) }) );
+					upatCtrls = upatCtrls.addAll( 
+						item.getAllUMaps.collect({ |umap|
+							SimpleController( umap ).put( \init, { chain.changed( \units ) });
+						})
+					);
+				};
+			});
+			
+			upatHeader.onClose_({ 
+				upatCtrls.do(_.remove);
+			});
 		};
 		
 		ug = units.collect({ |unit, i|
