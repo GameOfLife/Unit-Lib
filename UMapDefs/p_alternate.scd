@@ -20,6 +20,7 @@ UPatDef( \p_alternate, { |unit, a = 0.0, b = 1.0|
 		};
 	}.r;
 }).mappedArgs_([\a, \b])
+.useMappedArgs_( false )
 .setSpec( \a, UAdaptSpec() )
 .setSpec( \b, UAdaptSpec() )
 .category_( 'pattern' );
