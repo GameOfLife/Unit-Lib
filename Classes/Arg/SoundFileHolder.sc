@@ -502,7 +502,7 @@ BufSndFile : AbstractSndFile {
 	
 	asBufSndFile { ^this }
 	
-	id { ^[ this.path, this.startFrame, this.endFrame ].join( $_ ).asSymbol }
+	id { ^[ this.path, this.startFrame, this.endFrame, this.numChannels ].join( $_ ).asSymbol }
 	
 	prepare { |servers, startPos = 0, action|
 	    if( this.hasGlobal ) {
@@ -513,35 +513,57 @@ BufSndFile : AbstractSndFile {
 	    };
 	}
 	
-	loadGlobal { |action|
+	loadGlobal { |action, replace = true|
+		var id;
+		id = this.id;
+		if( replace ) {
+			global[ id ].do({ |buf|
+				this.freeBuffer( buf );
+			});
+		};
 		MultiActionFunc.use( action, { |act|
-			global[ this.id ] = (globalServers ?? ULib.allServers).collect({ |srv|
+			global[ id ] = (globalServers ?? ULib.allServers).collect({ |srv|
 				this.makeBuffer( srv, 0, act.getAction, add: false );
 			});
+			global.changed( id );
 		});
 	}
 	
 	disposeGlobal { |action|
+		var id;
+		id = this.id;
 		MultiActionFunc.use( action, { |act|
-			global[ this.id ].do({ |buf|
+			global[ id ].do({ |buf|
 				this.freeBuffer( buf, act.getAction );
 			}); 
-			global[ this.id ] = nil;
+			global[ id ] = nil;
+			global.changed( id );
 		});
 	}
 	
 	*disposeAllGlobal {
-		global.do({ |item|
-			item.do(_.free)
+		global.keys.as(Array).do({ |key|
+			global[ key ].do(_.free);
+			global[ key ] = nil;
+			global.changed( key );
 		});
-		global = ();
 	}
 	
 	findGlobal { |server|
-		^global[ this.id ].detect({ |buf| buf.server === server });
+		if( UEvent.nrtMode != true ) {
+			^global[ this.id ].detect({ |buf| buf.server === server });
+		} {
+			^nil;
+		};
 	}
 	
-	hasGlobal { ^global[ this.id ].notNil }
+	hasGlobal { 
+		if( UEvent.nrtMode != true ) {
+			^global[ this.id ].notNil;
+		} {
+			^false;
+		};
+	}
 	
 	asMonoBufSndFile { 
 		^MonoBufSndFile.newCopyVars( this ); 
