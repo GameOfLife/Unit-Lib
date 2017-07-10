@@ -84,6 +84,13 @@ BufSndFileView {
 		views[ \path ].value = inSndFile.path;
 		views[ \path ].stringColor = if( inSndFile.exists ) { Color.black; } { Color.red(0.66); };
 		
+		if( inSndFile.respondsTo( \hasGlobal ) ) {
+			{ views[ \hasGlobal ].visible = true; }.defer;
+			views[ \hasGlobal ].value = inSndFile.hasGlobal.binaryValue;
+		} {
+			{ views[ \hasGlobal ].visible = false; }.defer;
+		};
+		
 		views[ \startFrame ].value = inSndFile.startFrame;
 		views[ \startFrame ].clipHi = inSndFile.numFrames ? inf;
 		
@@ -184,6 +191,7 @@ BufSndFileView {
 	*viewNumLines { ^6 }
 	
 	makeView { |parent, bounds, resize|
+		var globalDepFunc, updGlobal;
 		
 		if( bounds.isNil ) { bounds= 350 @ (this.class.viewNumLines * (viewHeight + 4)) };
 		
@@ -289,7 +297,6 @@ BufSndFileView {
 		views[ \plot ] = SmoothButton( view, 40 @ viewHeight )
 			.radius_( 3 )
 			.border_( 1 )
-			.resize_( 3 )
 			.label_( "plot" )
 			.action_({ |bt|
 				
@@ -331,9 +338,29 @@ BufSndFileView {
 					
 			});
 			
-		views[ \numChannels ] = StaticText( view, 60 @ viewHeight )
+		views[ \numChannels ] = StaticText( view, 62 @ viewHeight )
 			.applySkin( RoundView.skin ? () )
 			.string_( "" );
+		
+		views[ \hasGlobal ] = SmoothButton( view, 40 @ viewHeight )
+				.radius_( 3 )
+				.border_( 1 )
+				.label_( ["global", "global"] )
+				.hiliteColor_( Color.green )
+				.action_({ |bt|
+					switch( bt.value,
+						1, { this.performSndFile( \loadGlobal ) },
+						0, { this.performSndFile( \disposeGlobal ) }
+					);
+				});
+		updGlobal = { 
+			views[ \hasGlobal ].value = this.performSndFile( \hasGlobal ).binaryValue;
+		};
+		
+		BufSndFile.global.addDependant( updGlobal );
+		views[ \hasGlobal ].onClose_({
+			BufSndFile.global.removeDependant( updGlobal );
+		});
 			
 		view.view.decorator.nextLine;
 					
