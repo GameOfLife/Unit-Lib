@@ -509,6 +509,59 @@ UChainGUI {
 				.action_({ |bt|
 					chain.lockStartTime = bt.value.booleanValue;
 				});
+				
+			composite.decorator.shift( 11, 0 );
+				
+			views[ \global ] = SmoothButton( composite, 45@14 )
+				.border_( 1 )
+				.radius_( 3 )
+				.label_( [ "global", "global" ] )
+				.hiliteColor_( Color.green )
+				.action_({ |bt|
+					chain.global = bt.value.booleanValue;
+				});
+
+			views[ \addAction ] = PopUpMenu( composite, 70@14 )
+				.applySkin( RoundView.skin )
+				.items_( [ "addBefore", "addToHead", "addToTail", "addAfter" ] )
+				.canFocus_( false )
+				.action_({ |pu|
+					chain.addAction = #[ 
+						addBefore, 
+						addToHead, 
+						addToTail, 
+						addAfter, 
+						mixed 
+					][ pu.value ];
+				});
+				
+			if( chain.isKindOf( MassEditUChain ) ) {
+				views[ \setAddAction ] = {
+					var symbol;
+					symbol = this.chain.addAction;
+					if( symbol === \mixed ) {
+						views[ \addAction ].items = [ "addBefore", "addToHead", "addToTail", "addAfter", "mixed"];
+						views[ \addAction ].value = 4;
+					} {
+						views[ \addAction ].items = [ "addBefore", "addToHead", "addToTail", "addAfter" ];
+						views[ \addAction ].value = #[ 
+							addBefore, 
+							addToHead, 
+							addToTail, 
+							addAfter,
+						].indexOf( symbol ) ? 0;
+					};
+				};
+			} {
+				views[ \setAddAction ] = {
+					views[ \addAction ].value = #[ 
+						addBefore, 
+						addToHead, 
+						addToTail, 
+						addAfter,
+					].indexOf( this.chain.addAction ) ? 0;
+				};
+			};
 			
 			composite.decorator.nextLine;
 			
@@ -645,7 +698,7 @@ UChainGUI {
 					.action_({ |nb|
 						chain.fadeOutCurve_( nb.value );
 					});
-	
+				
 				composite.decorator.nextLine;
 			}
 		};
@@ -800,6 +853,12 @@ UChainGUI {
 				.put( \releaseSelf, {  
 					views[ \releaseSelf ].value = chain.releaseSelf.binaryValue;
 					{ views[ \displayColor ].refresh; }.defer; 
+				})
+				.put( \global, {  
+					views[ \global ].value = chain.global.binaryValue;
+				})
+				.put( \addAction, {
+					{ views[ \setAddAction ].value }.defer;
 				});
 			};
 				
@@ -828,6 +887,8 @@ UChainGUI {
 		chain.changed( \fadeInCurve );
 		chain.changed( \fadeOutCurve );
 		chain.changed( \releaseSelf );
+		chain.changed( \global );
+		chain.changed( \addAction );
 		
 		composite.getParents.last.findWindow !? _.toFrontAction_({ 
 			this.makeCurrent;

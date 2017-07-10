@@ -268,6 +268,24 @@ MassEditUChain {
 		uchains.do(_.releaseSelf_(bool));
 	}
 	
+	global { ^uchains.collect(_.global).every(_==true); }
+	global_ { |bool|
+		uchains.do(_.global_(bool));
+	}
+	
+	addAction { 
+		var actions = uchains.collect(_.addAction);
+		var first = actions.first;
+		if( actions.every(_ === first) ) {
+			^first;
+		} {
+			^\mixed;
+		};
+	}
+	addAction_ { |symbol|
+		if( symbol != \mixed ) { uchains.do(_.addAction_(symbol)); };
+	}
+	
 	uchainsOrUMarkers { if( uchains.size > 0 ) { ^uchains } { ^umarkers } }
 	
 	getTypeColor {

@@ -39,8 +39,8 @@ UChain : UEvent {
 	var <>preparedServers;
 	var <muted = false;
 	
-	var <>addAction = \addToHead;
-	var <>global = false;
+	var <addAction = \addToHead;
+	var <global = false;
 	var <>ugroup;
 	var <>handlingUndo = false;
 	
@@ -378,6 +378,9 @@ UChain : UEvent {
 	        Color(0.4, 0.6, 0.6);
         };
 	}
+	
+	global_ { |bool = false| global = bool; this.changed( \global, bool ) }
+	addAction_ { |symbol = 'addToHead'| addAction = symbol; this.changed( \addAction, symbol ); }
 	
 	gain { ^this.getGain }
 	gain_ { |gain = 0| ^this.setGain(gain) }

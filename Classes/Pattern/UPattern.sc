@@ -166,6 +166,8 @@ UPattern : UChain {
 		next.fadeIn = this.fadeIn;
 		next.fadeOut = this.fadeOut;
 		next.displayColor = this.getTypeColor;
+		next.global = this.global;
+		next.addAction = this.addAction;
 		next.duration = duration ?? { this.getSustain; };
 		was = UChain.nowPreparingChain;
 		UChain.nowPreparingChain = next;
