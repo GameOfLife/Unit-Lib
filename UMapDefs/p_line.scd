@@ -42,7 +42,6 @@ UPatDef( \p_line, { |unit, a = 0.0, b = 1.0, time = 10, loop = \loop|
 				},
 				\off, { current = current.clip(0.0,1.0); }
 			);
-			lp = nil;
 			lastTime = UPattern.seconds;
 			current.linlin( 0, 1, a.next, b.next ).yield;
 		};
