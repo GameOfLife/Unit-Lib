@@ -18,7 +18,7 @@ FuncUMapDef( \tempo_time, { |unit, division = 1, tempo = 60|
 	.valueIsMapped_( false )
 	.mappedArgs_( [] )
 	.setSpec( \division, [0.125,8,\exp].asSpec )
-	.setSpec( \tempo, [20,200,\exp,0,60].asSpec )
+	.setSpec( \tempo, [10,300,\exp,0,60].asSpec )
 	.setSpec( \value, DisplaySpec( SMPTESpec(), _.asSMPTEString(1000) ), private: true )
 	.canUseUMapFunc_({ |unit, key, umapdef|
 		unit.getSpec( key ).isKindOf( SMPTESpec );
