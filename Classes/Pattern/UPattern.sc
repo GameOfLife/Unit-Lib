@@ -1,5 +1,8 @@
 UPattern : UChain {
 	
+	classvar >seconds;
+	classvar <>preparedThreads, <>expectedTimes, <>preparing = false;
+	
 	var <repeats = inf;
 	var <sustain = 1;
 	var <timeToNext = 1;
@@ -239,7 +242,7 @@ UPattern : UChain {
 				sustain = this.getSustain;
 				next = this.next( sustain );
 				this.localPos = time;
-				action.value( next, target, time );
+				action.value( next, target, time, timeToNext );
 				timeToNext.wait;
 				time = time + timeToNext;
 				if( timeToNext == 0 ) { zeroCount = zeroCount + 1 } { zeroCount = 0 };
@@ -257,7 +260,7 @@ UPattern : UChain {
 	prepare { |target, startPos = 0, action|
 		var waitTime, firstEvent = true;
 		var multiAction, firstAction, preparedEventsRoutineShouldEnd = false;
-		var i = 0;
+		var i = 0, nextTime, startedPreparingTime;
 		this.stop;
 		waitTime = this.waitTime; // fixed waitTime for all events
 		units.do({ |unit| this.prResetStreams( unit ); });
@@ -268,13 +271,16 @@ UPattern : UChain {
 			multiAction = MultiActionFunc( action );
 			firstAction = multiAction.getAction;
 			isPlaying = nil;
-			routine = this.makeRoutine( target, startPos, { |chain, target, time| 
+			startedPreparingTime = thisThread.seconds;
+			UPattern.preparing = true;
+			routine = this.makeRoutine( target, startPos, { |chain, target, time, timeToNext| 
 				if( time < waitTime ) {
 					// "preparing %\n".postf( time.asSMPTEString );
 					chain.prepare( target, action: multiAction.getAction );
 					preparedEvents = preparedEvents.add( chain.startTime_( time ) );
 				} {
 					if( firstEvent ) {
+						UPattern.expectedNext = startedPreparingTime + (time - waitTime) + timeToNext;
 						nil.yield;
 						(time - waitTime).wait;
 						firstEvent = false;
@@ -286,7 +292,14 @@ UPattern : UChain {
 					);
 				};
 			} );
-			while { routine.next.notNil; } { i = i+1 };
+			UPattern.seconds = startedPreparingTime - waitTime;
+			while { (nextTime = routine.next).notNil; } { 
+				i = i+1;
+				UPattern.seconds = seconds + nextTime;
+			};
+			UPattern.seconds = nil;
+			UPattern.preparedThreads = nil;
+			UPattern.preparing = false;
 			if( isPlaying == false ) { preparedEventsRoutineShouldEnd = true };
 			// "% events prepared\n".postf( i );
 			preparedEventsRoutine = Task({
@@ -354,7 +367,7 @@ UPattern : UChain {
 	release { this.stop }
 	
 	asUScore { |infDur = 60|
-		var score, originalDur, track = 0, track0time = 0;
+		var score, originalDur, track = 0, track0time = 0, nextTime;
 		this.stop;
 		units.do({ |unit| this.prResetStreams( unit ); });
 		score = UScore().startTime_( this.startTime ).track_( this.track );
@@ -362,6 +375,7 @@ UPattern : UChain {
 		if( duration == inf ) {
 			duration = infDur;
 		};
+		UPattern.seconds = thisThread.seconds;
 		routine = this.makeRoutine( nil, 0, { |chain, target, time|
 			if( time > track0time ) { track = 0 };
 			chain.startTime_( time );
@@ -372,9 +386,36 @@ UPattern : UChain {
 			score.add( chain );
 			track = track + 1;
 		});
-		while { routine.next.notNil; } { };
+		while { (nextTime = routine.next).notNil; } { 
+			UPattern.seconds = seconds + nextTime;
+		};
 		duration = originalDur;
+		UPattern.seconds = nil;
 		^score;
+	}
+	
+	*expectedNext_ { |time|
+		if( seconds.notNil && preparedThreads.notNil ) {
+			expectedTimes = expectedTimes ?? {()};
+			preparedThreads.do({ |key|
+				expectedTimes[ key ] = time;
+			});
+			preparedThreads = Set();
+		};
+	}
+	
+	*seconds { |returnExpected = false|
+		if( preparing && { seconds.notNil }) {
+			preparedThreads = preparedThreads ?? { Set() };
+			preparedThreads.add( thisThread );
+		};
+		^seconds ?? { 
+			if( returnExpected && { expectedTimes.size > 0 }) {
+				expectedTimes.removeAt( thisThread ) ?? { thisThread.seconds; };
+			} {
+				thisThread.seconds;
+			};
+		} 
 	}
 	
 	collectOSCBundleFuncs { |server, startOffset = 0, infdur = 60|
