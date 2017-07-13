@@ -128,6 +128,8 @@ UMapDef : Udef {
 	
 	isUdef { ^false }
 	
+	needsStream { ^false }
+	
 	getControlInput { |unit|
 		if( this.hasBus ) {
 			if( this.numChannels > 1 ) {
@@ -429,8 +431,14 @@ UMap : U {
 	}
 	
 	stream_ { |stream|
-		this.makeStreamID;
-		allStreams[ streamID ] = stream;
+		if( stream.isNil ) {
+			if( streamID.notNil ) {
+				allStreams.removeAt( streamID );
+			};
+		} {	
+			this.makeStreamID;
+			allStreams[ streamID ] = stream;
+		};
 	}
 	
 	*nextStreamID {
@@ -448,7 +456,10 @@ UMap : U {
 	}
 
 	resetStream {
-		this.stream = nil;
+		if( this.def.needsStream ) {
+			this.stream = nil;
+			this.makeStreamID( true );
+		};
 	}
 
 	next { ^this.asControlInput }

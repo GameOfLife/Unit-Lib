@@ -41,6 +41,9 @@ UPattern : UChain {
 	}
 	
 	prResetStreams { |unit|
+		if( unit.isKindOf( UMap ) ) {
+			unit.resetStream;
+		};
 		unit.args.pairsDo({ |key, item|
 			if( item.isKindOf( UMap ) ) {
 				item.resetStream;
@@ -257,6 +260,8 @@ UPattern : UChain {
 		this.stop;
 		waitTime = this.waitTime; // fixed waitTime for all events
 		units.do({ |unit| this.prResetStreams( unit ); });
+		if( this.sustain.isKindOf( UMap ) ) { this.prResetStreams( this.sustain ); };
+		if( this.timeToNext.isKindOf( UMap ) ) { this.prResetStreams( this.timeToNext ); };
 		preparedEvents = Array(512);
 		if( waitTime > 0 ) {
 			multiAction = MultiActionFunc( action );

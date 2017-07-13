@@ -78,6 +78,8 @@ UPatDef : FuncUMapDef {
 	canInsert {
 		^(canInsert != false) && { this.insertArgName.notNil; };
 	}
+	
+	needsStream { ^true }
 }
 
 UPatArg {
