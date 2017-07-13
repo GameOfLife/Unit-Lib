@@ -231,12 +231,13 @@ UPattern : UChain {
 		^Routine({
 			var time = 0, n = 0;
 			var zeroCount = 0;
-			var next, timeToNext;
+			var next, sustain, timeToNext;
 			while { ( this.releaseSelf == false or: { (time <= (duration - startPos)) }) 
 					&& { n < repeats } && { zeroCount < maxSimultaneousStarts }
 			} {
-				next = this.next;
 				timeToNext = this.getTimeToNext;
+				sustain = this.getSustain;
+				next = this.next( sustain );
 				this.localPos = time;
 				action.value( next, target, time );
 				timeToNext.wait;
