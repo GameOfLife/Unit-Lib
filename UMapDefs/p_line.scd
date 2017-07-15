@@ -21,13 +21,12 @@ part of the Unit lib default UMapDefs set
 
 UPatDef( \p_line, { |unit, a = 0.0, b = 1.0, time = 10, loop = \loop|
 	{
-		var current = 0, direction = 1, delta;
-		var lastTime = UPattern.seconds;
+		var current = 0, direction = 1;
+		var timer = UPattern.deltaTimer;
 		if( loop.next === \backwards ) { direction = -1; };
 		current.linlin( 0, 1, a.next, b.next ).yield;
 		inf.do { |i|
-			delta = (UPattern.seconds( true ) - lastTime);
-			current = (current + ((direction * delta/time.next).clip2( 1.0e12 )));
+			current = (current + ((direction * timer.value/time.next).clip2( 1.0e12 )));
 			switch( loop.next,
 				\loop, { current = current.wrap( 0.0, 1.0 );  direction = 1 },
 				\backwards, { current = current.wrap( 0.0, 1.0 );  direction = -1; },
@@ -42,7 +41,6 @@ UPatDef( \p_line, { |unit, a = 0.0, b = 1.0, time = 10, loop = \loop|
 				},
 				\off, { current = current.clip(0.0,1.0); }
 			);
-			lastTime = UPattern.seconds;
 			current.linlin( 0, 1, a.next, b.next ).yield;
 		};
 	}.r;

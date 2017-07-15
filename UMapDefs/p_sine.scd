@@ -22,22 +22,17 @@ UPatDef( \p_sine, { |unit,
 		timeBase = \seconds|
 	{	
 		var i = 0;
-		var lastTime = UPattern.seconds;
-		var spd, delta;
+		var timer = UPattern.deltaTimer;
 		loop {
 			(((i % 1) * 2pi) + phase.next).sin.linlin(-1,1,min.next,max.next).yield;
-			spd = freq.next;
 			switch( timeBase.next, 
-				\events, { i = i + spd }, 
-				\seconds, {
-					delta = (UPattern.seconds( true ) - lastTime);
-					i = i + (spd * delta);
-				},
+				\events, { i = i + freq.next; }, 
+				\seconds, { i = i + (freq.next * timer.value); },
 			);
-			lastTime = UPattern.seconds;
 		};
 	}.r
 }).category_( 'pattern' )
+	.mappedArgs_( [ \min, \max ] )
 	.setSpec( \phase, AngleSpec() )
 	.setSpec( \freq, FreqSpec(0.01,300, default: 2) )
 	.setSpec( \timeBase, ListSpec( [ 'events', 'seconds' ] ) );

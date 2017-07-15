@@ -19,14 +19,13 @@ part of the Unit lib default UMapDefs set
 UPatDef( \p_envelope, { |unit, env, loop = \loop|
 	{
 		var current = 0, direction = 1, delta;
-		var lastTime = UPattern.seconds;
+		var timer = UPattern.deltaTimer;
 		var envx;
 		if( loop.next === \backwards ) { direction = -1; };
 		envx = env.next;
 		envx.at( 0 ).yield;
 		inf.do { |i|
-			delta = (UPattern.seconds( true ) - lastTime);
-			current = (current + ((direction * delta).clip2( 1.0e12 )));
+			current = (current + ((direction * timer.value).clip2( 1.0e12 )));
 			envx = env.next;
 			switch( loop.next,
 				\loop, { current = current.wrap( 0.0, env.duration );  direction = 1 },
@@ -41,7 +40,6 @@ UPatDef( \p_envelope, { |unit, env, loop = \loop|
 				},
 				\off, { current = current.clip(0.0,env.duration); }
 			);
-			lastTime = UPattern.seconds;
 			envx[ current ].yield;
 		};
 	}.r;

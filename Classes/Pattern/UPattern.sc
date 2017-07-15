@@ -419,6 +419,24 @@ UPattern : UChain {
 		} 
 	}
 	
+	*timer {
+		var lastTime = this.seconds, time = 0;
+		^{
+			time = time + (this.seconds( true ) - lastTime);
+			lastTime = this.seconds;
+			time;
+		};
+	}
+	
+	*deltaTimer {
+		var lastTime = this.seconds;
+		^{
+			var out = this.seconds( true ) - lastTime;
+			lastTime = this.seconds;
+			out;
+		};
+	}
+	
 	collectOSCBundleFuncs { |server, startOffset = 0, infdur = 60|
 		^this.asUScore( infdur ).collectOSCBundleFuncs( server, startOffset, infdur );
 	}
