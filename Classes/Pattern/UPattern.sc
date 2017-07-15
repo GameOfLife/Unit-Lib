@@ -179,12 +179,12 @@ UPattern : UChain {
 		next.track = track;
 		was = UChain.nowPreparingChain;
 		UChain.nowPreparingChain = next;
+		next.parent = this;
 		next.units.do({ |unit|
 			this.prPrepareUnit( unit );
 			this.prPatternsToValues( unit );
 		});
 		UChain.nowPreparingChain = was;
-		next.parent = this;
 		^next;
 	}
 	
