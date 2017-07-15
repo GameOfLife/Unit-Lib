@@ -166,7 +166,7 @@ UPattern : UChain {
 		);
 	}
 	
-	next { |duration|
+	next { |duration, startTime = 0, track = 0|
 		var next, was;
 		next = UChain( *units.deepCopy );
 		next.fadeIn = this.fadeIn;
@@ -175,6 +175,8 @@ UPattern : UChain {
 		next.global = this.global;
 		next.addAction = this.addAction;
 		next.duration = duration ?? { this.getSustain; };
+		next.startTime = startTime;
+		next.track = track;
 		was = UChain.nowPreparingChain;
 		UChain.nowPreparingChain = next;
 		next.units.do({ |unit|
@@ -235,12 +237,16 @@ UPattern : UChain {
 			var time = 0, n = 0;
 			var zeroCount = 0;
 			var next, sustain, timeToNext;
+			var track = 0, track0time = 0;
 			while { ( this.releaseSelf == false or: { (time <= (duration - startPos)) }) 
 					&& { n < repeats } && { zeroCount < maxSimultaneousStarts }
 			} {
 				timeToNext = this.getTimeToNext;
 				sustain = this.getSustain;
-				next = this.next( sustain );
+				if( time > track0time ) { track = 0 };
+				if( track == 0 ) { track0time = time + (sustain * 2); };
+				next = this.next( sustain, time, track );
+				track = track + 1;
 				this.localPos = time;
 				action.value( next, target, time, timeToNext );
 				timeToNext.wait;
@@ -277,7 +283,7 @@ UPattern : UChain {
 				if( time < waitTime ) {
 					// "preparing %\n".postf( time.asSMPTEString );
 					chain.prepare( target, action: multiAction.getAction );
-					preparedEvents = preparedEvents.add( chain.startTime_( time ) );
+					preparedEvents = preparedEvents.add( chain );
 				} {
 					if( firstEvent ) {
 						UPattern.expectedNext = startedPreparingTime + (time - waitTime) + timeToNext;
@@ -286,7 +292,7 @@ UPattern : UChain {
 						firstEvent = false;
 					};
 					preparedEvents = preparedEvents.add(
-						chain.startTime_( time ).prepareWaitAndStart( target, startAction: {
+						chain.prepareWaitAndStart( target, startAction: {
 							preparedEvents.remove( chain );
 						} );
 					);
@@ -377,14 +383,7 @@ UPattern : UChain {
 		};
 		UPattern.seconds = thisThread.seconds;
 		routine = this.makeRoutine( nil, 0, { |chain, target, time|
-			if( time > track0time ) { track = 0 };
-			chain.startTime_( time );
-			if( track == 0 ) {
-				track0time = time + (chain.duration * 2);
-			};
-			chain.track = track;
 			score.add( chain );
-			track = track + 1;
 		});
 		while { (nextTime = routine.next).notNil; } { 
 			UPattern.seconds = seconds + nextTime;
