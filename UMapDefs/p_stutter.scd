@@ -18,4 +18,5 @@ UPatDef( \p_stutter, { |unit, input = 0, n = 1|
 })
 	.setSpec( \input, UAdaptSpec() )
 	.setSpec( \n, IntegerSpec(1, 1,((2**31) - 1).asInt) )
+	.useMappedArgs_( false )
 	.mappedArgs_([ \input ]).category_( 'pattern' );
