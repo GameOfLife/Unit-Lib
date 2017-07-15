@@ -89,18 +89,31 @@ UPatArg {
 		^super.newCopyArgs( unit, key, spec );	
 	}
 	
-	next {
-		var value;
+	prUnPrepare { |unit|
+		if( unit.isKindOf( UMap ) ) {
+			if( unit.def.isKindOf( FuncUMapDef ) ) {
+				unit.u_prepared = false;
+			};
+			unit.values.do({ |val|
+				this.prUnPrepare( val );
+			});
+		};
+	}
+	
+	next { |unPrepare = false|
+		var value, out;
 		if( UPatDef.currentUnit.notNil && { unit !== UPatDef.currentUnit }) {
 			value = UPatDef.currentUnit.get( key );
 		} {
 			value = unit.get( key );
 		};
 		if( value.isUMap.not && { spec.notNil } ) {
-			^spec.unmap( value.next );
+			out = spec.unmap( value.next );
 		} {
-			^value.next;
+			out = value.next;
 		};
+		if( unPrepare == true ) { this.prUnPrepare( value ) };
+		^out;
 	}
 	
 	doesNotUnderstand { |selector ...args|
