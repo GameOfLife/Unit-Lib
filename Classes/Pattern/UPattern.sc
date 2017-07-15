@@ -373,7 +373,7 @@ UPattern : UChain {
 	release { this.stop }
 	
 	asUScore { |infDur = 60|
-		var score, originalDur, track = 0, track0time = 0, nextTime;
+		var score, events, originalDur, track = 0, track0time = 0, nextTime;
 		this.stop;
 		units.do({ |unit| this.prResetStreams( unit ); });
 		score = UScore().startTime_( this.startTime ).track_( this.track );
@@ -382,14 +382,16 @@ UPattern : UChain {
 			duration = infDur;
 		};
 		UPattern.seconds = thisThread.seconds;
+		events = Array( 2**13 );
 		routine = this.makeRoutine( nil, 0, { |chain, target, time|
-			score.add( chain );
+			events = events.add( chain );
 		});
 		while { (nextTime = routine.next).notNil; } { 
 			UPattern.seconds = seconds + nextTime;
 		};
 		duration = originalDur;
 		UPattern.seconds = nil;
+		score.events = events;
 		^score;
 	}
 	
