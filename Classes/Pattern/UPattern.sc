@@ -75,8 +75,8 @@ UPattern : UChain {
 	
 	argSpecsForDisplay { 
 		^[
-			ArgSpec( 'sustain', 1, SMPTESpec(0.001), false, \init ),
-			ArgSpec( 'timeToNext', 1, SMPTESpec(), false, \init )
+			ArgSpec( 'sustain', 1, SMPTESpec(0.001, 3600), false, \init ),
+			ArgSpec( 'timeToNext', 1, SMPTESpec(0.01, 3600), false, \init )
 		]
 	}
 	
@@ -135,8 +135,8 @@ UPattern : UChain {
 	
 	getSpec { |key|
 		^switch( key,
-			'sustain', { SMPTESpec(0.001) },
-			'timeToNext', { SMPTESpec() },
+			'sustain', { SMPTESpec(0.001, 3600) },
+			'timeToNext', { SMPTESpec(0.01, 3600) },
 		);
 	}
 	
