@@ -270,22 +270,24 @@ Udef : GenericDef {
 			};
 			*/
 			synth = this.createSynth( unit, target, startPos );
-			synth.startAction_({ |synth|
-				unit.changed( \go, synth );
-				started = true;
-			});
-			synth.freeAction_({ |synth|
-				if( started == false ) { synth.changed( \n_go ) };
-				unit.removeSynth( synth );
-				synth.server.loadBalancerAddLoad( this.apxCPU.neg );
-				unit.changed( \end, synth );
-				if(unit.disposeOnFree) {
-					unit.disposeArgsFor(synth.server)
-				}
-			});
-			unit.changed( \start, synth );
-			synthAction.value( synth );
-			unit.addSynth(synth);
+			if( synth.notNil ) {
+				synth.startAction_({ |synth|
+					unit.changed( \go, synth );
+					started = true;
+				});
+				synth.freeAction_({ |synth|
+					if( started == false ) { synth.changed( \n_go ) };
+					unit.removeSynth( synth );
+					synth.server.loadBalancerAddLoad( this.apxCPU.neg );
+					unit.changed( \end, synth );
+					if(unit.disposeOnFree) {
+						unit.disposeArgsFor(synth.server)
+					}
+				});
+				unit.changed( \start, synth );
+				synthAction.value( synth );
+				unit.addSynth(synth);
+			};
 		};
 		^synth;
 	}
