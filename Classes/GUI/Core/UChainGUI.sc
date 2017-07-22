@@ -238,22 +238,7 @@ UChainGUI {
 			.border_(1)
 			.hiliteColor_( Color.green )
 			.action_( [ { 
-					var startAction;
-					releaseTask.stop;
-					if( chain.releaseSelf or: (chain.dur == inf) ) {
-						chain.prepareAndStart;
-					} {
-						startAction = { 
-							chain.start;
-							releaseTask = {
-								(chain.dur - chain.fadeOut).max(0).wait;
-								chain.release;
-							}.fork;
-						};
-						chain.prepare( action: startAction );
-							
-					};
-				}, { 
+					chain.prepareAndStart;							}, { 
 					releaseTask.stop;
 					chain.release 
 				} ]
