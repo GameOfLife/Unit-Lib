@@ -497,7 +497,7 @@ UChainGUI {
 				
 			composite.decorator.shift( 11, 0 );
 				
-			views[ \global ] = SmoothButton( composite, 45@14 )
+			views[ \global ] = SmoothButton( composite, 40@14 )
 				.border_( 1 )
 				.radius_( 3 )
 				.label_( [ "global", "global" ] )
@@ -624,34 +624,13 @@ UChainGUI {
 						);
 				});
 		
-				views[ \fromSoundFile ] = SmoothButton( composite, 90@14 )
+				views[ \fromSoundFile ] = SmoothButton( composite, 40@14 )
 					.border_( 1 )
 					.radius_( 3 )
-					.label_( "from soundFile" )
+					.label_( "auto" )
 					.action_({ chain.useSndFileDur });
 					
-				composite.decorator.nextLine;
-				
-				// fadeTimes
-				StaticText( composite, labelWidth@14 )
-					.applySkin( RoundView.skin )
-					.string_( "fadeTimes" )
-					.align_( \right );
-				
-				views[ \fadeIn ] = SmoothNumberBox( composite, 40@14 )
-					.clipLo_(0)
-					.scroll_step_(0.1)
-					.action_({ |nb|
-						chain.fadeIn_( nb.value );
-					});
-					
-				views[ \fadeOut ] = SmoothNumberBox( composite, 40@14 )
-					.clipLo_(0)
-					.scroll_step_(0.1)
-					.action_({ |nb|
-						chain.fadeOut_( nb.value );
-					});
-					
+									
 				views[ \releaseSelf ] = SmoothButton( composite, 70@14 )
 					.border_( 1 )
 					.radius_( 3 )
@@ -662,28 +641,89 @@ UChainGUI {
 					});
 					
 				composite.decorator.nextLine;
-	
+				
+				// fadeTimes
 				StaticText( composite, labelWidth@14 )
 					.applySkin( RoundView.skin )
-					.string_( "fade curves" )
+					.string_( "fades" )
 					.align_( \right );
-	
-				views[ \fadeInCurve ] = SmoothNumberBox( composite, 40@14 )
+				
+				views[ \fadeIn ] = SmoothNumberBox( composite, 40@14 )
+					.clipLo_(0)
+					.scroll_step_(0.1)
+					.formatFunc_( { |value| [ value.round(0.01), "s" ].join(" ") } )
+					.background_( { |rect|
+						Pen.use({
+							var values;
+							Pen.roundedRect( rect, 2 ).clip;
+							Pen.color = Color(1.0, 1.0, 1.0, 0.5);
+							Pen.fillRect( rect );
+							values = (rect.width.asInt + 1).collect({ |i|
+								i.lincurve(0, rect.width, rect.bottom, rect.top, chain.fadeInCurve )
+							});
+							Pen.moveTo( rect.leftBottom );
+							values.do({ |item, i|
+								Pen.lineTo( (rect.left + i) @ item );
+							});
+							Pen.lineTo( rect.rightBottom );
+							Pen.lineTo( rect.leftBottom );
+							Pen.color = Color(0.5,0.5,0.5, if( chain.fadeIn > 0 ) { 0.5 } { 0.125 } );
+							Pen.fill;
+						});
+					})
+					.action_({ |nb|
+						chain.fadeIn_( nb.value );
+					});
+					
+				views[ \fadeInCurve ] = SmoothNumberBox( composite, 30@14 )
 					.clipLo_(-20)
 				    .clipHi_(20)
 					.scroll_step_(0.1)
+					.formatFunc_( { |value| value.round(0.1).asString } )
 					.action_({ |nb|
 						chain.fadeInCurve_( nb.value );
 					});
+					
+				composite.decorator.shift( 10, 0 );
+					
+				views[ \fadeOut ] = SmoothNumberBox( composite, 40@14 )
+					.clipLo_(0)
+					.scroll_step_(0.1)
+					.formatFunc_( { |value| [ value.round(0.01), "s" ].join(" ") } )
+					.background_( { |rect|
+						Pen.use({
+							var values;
+							Pen.roundedRect( rect, 2 ).clip;
+							Pen.color = Color(1.0, 1.0, 1.0, 0.5);
+							Pen.fillRect( rect );
+							values = (rect.width.asInt + 1).collect({ |i|
+								i.lincurve(0, rect.width, rect.top, rect.bottom, chain.fadeOutCurve )
+							});
+							Pen.moveTo( rect.leftBottom );
+							values.do({ |item, i|
+								Pen.lineTo( (rect.left + i) @ item );
+							});
+							Pen.lineTo( rect.rightBottom );
+							Pen.lineTo( rect.leftBottom );
+							Pen.color = Color(0.5,0.5,0.5, if( chain.fadeOut > 0 ) { 0.5 } { 0.125 } );
+							Pen.fill;
+						});
+					})
+					.action_({ |nb|
+						chain.fadeOut_( nb.value );
+					});
 	
-				views[ \fadeOutCurve ] = SmoothNumberBox( composite, 40@14 )
+				views[ \fadeOutCurve ] = SmoothNumberBox( composite, 30@14 )
 					.clipLo_(-20)
 				    .clipHi_(20)
 					.scroll_step_(0.1)
+					.formatFunc_( { |value| value.round(0.1).asString } )
 					.action_({ |nb|
 						chain.fadeOutCurve_( nb.value );
 					});
-				
+					
+				composite.decorator.shift( 10, 0 );	
+					
 				composite.decorator.nextLine;
 			}
 		};
@@ -833,8 +873,14 @@ UChainGUI {
 				})
 				.put( \fadeIn, { views[ \fadeIn ].value = chain.fadeIn })
 				.put( \fadeOut, { views[ \fadeOut ].value = chain.fadeOut })
-				.put( \fadeInCurve, { views[ \fadeInCurve ].value = chain.fadeInCurve })
-				.put( \fadeOutCurve, { views[ \fadeOutCurve ].value = chain.fadeOutCurve })
+				.put( \fadeInCurve, { 
+					views[ \fadeInCurve ].value = chain.fadeInCurve;
+					{ views[ \fadeIn ].refresh }.defer;
+				})
+				.put( \fadeOutCurve, { 
+					views[ \fadeOutCurve ].value = chain.fadeOutCurve;
+					{ views[ \fadeOut ].refresh }.defer;
+				})
 				.put( \releaseSelf, {  
 					views[ \releaseSelf ].value = chain.releaseSelf.binaryValue;
 					{ views[ \displayColor ].refresh; }.defer; 
