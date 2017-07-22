@@ -43,6 +43,8 @@ MultiChannelUdef( \trigSoundFile, {
 			numChannels, bufnum, rate, trigger, pos * BufFrames.ir( bufnum ),
 			loop, crossfade, 4 // 4 voices
 		);
+		
+		sig = sig * Peak.kr( trigger );
 	
 		UMixOut.ar( 0, sig * \level.ukr( 1, \amp ), 0, true );
 		
