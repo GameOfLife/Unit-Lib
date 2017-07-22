@@ -101,6 +101,18 @@ StringSpec : Spec {
 	
 }
 
+SymbolSpec : StringSpec {
+	
+	var <>default = '';
+	
+	constrain { |value| ^(value ? default).asSymbol }
+	
+	*testObject { |obj|
+		^obj.isKindOf( Symbol )
+	}
+	
+}
+
 MapSpec : Spec {
 	
 	var <>default = 'c0';
