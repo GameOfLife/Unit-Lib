@@ -20,15 +20,24 @@
 UMapDefListView {
 	
 	classvar <>current;
+	classvar <>filters;
 	
 	var <view, <views;
+	var <>filter;
 	var <collapsed;
 	
-	*new { |parent, bounds, makeCurrent = true|
+	*initClass {
+		filters = (
+			\dynamic: { |udef| [ UMapDef, ValueUMapDef, ExpandUMapDef ].includes( udef.class ) },
+			\static: { |udef| [ UMapDef, ValueUMapDef, ExpandUMapDef ].includes( udef.class ).not },
+		);
+	}
+	
+	*new { |parent, bounds, makeCurrent = true, filter|
 		if( parent.isNil && { current.notNil && { current.view.isClosed.not } } ) {
 			^current.rebuild.front;
 		} {
-			^super.new.init( parent, bounds ).makeCurrent( makeCurrent );
+			^super.new.init( parent, bounds, filter ).makeCurrent( makeCurrent );
 		};
 	}
 	
@@ -41,7 +50,7 @@ UMapDefListView {
 			cx = true;
 		};
 		parent.children.do(_.remove);
-		this.init( parent );
+		this.init( parent, inFilter: filter );
 		this.makeCurrent( cx );
 	}
 	
@@ -73,12 +82,15 @@ UMapDefListView {
 	
 	front { view.findWindow.front }
 	
-	init { |parent, bounds|
+	init { |parent, bounds, inFilter|
 		
 		var categories, names, rackCategories, g;
 		var scrollerMargin = 12;
 		var refreshFunc;
 		var controller;
+		var filterName;
+		
+		filter = filters[ inFilter ] ? inFilter;
 		
 		refreshFunc = ActionFunc( \delay, { { this.rebuild }.defer( 0.01 ); }, 0.1 );
 		
@@ -112,14 +124,16 @@ UMapDefListView {
 		
 		UMapDef.all !? { |all| all.keys.asArray.sort.do({ |key|
                 var category, index, udef;
-                udef = all[ key ];
-                category = udef.category;
-                index = categories.indexOf( category );
-                if( index.isNil ) {
-                    categories = categories ++ [ category, [ udef ] ];
-                } {
-                    categories[ index + 1 ] = categories[ index + 1 ].add( udef );
-                };
+	           udef = all[ key ];
+	           if( filter.isNil or: { filter.value( udef ) == true }) {
+	                category = udef.category;
+	                index = categories.indexOf( category );
+	                if( index.isNil ) {
+	                    categories = categories ++ [ category, [ udef ] ];
+	                } {
+	                    categories[ index + 1 ] = categories[ index + 1 ].add( udef );
+	                };
+	           };
             })
 		};
 
@@ -255,7 +269,9 @@ UMapDefListView {
 					});
 				});
 				
-			StaticText(views[ \scrollview],100@25).string_("UMapDefs");
+			if( filter.notNil ) { filterName = filters.findKeyForValue( filter ) ? "filtered" };
+				
+			StaticText(views[ \scrollview],150@25).string_("UMapDefs" ++ if( filterName.notNil ) { " : " ++ filterName } { "" } );
 			views[ \scrollview].decorator.nextLine;
 			categories = categories.clump(2).sort({ |a,b| a[0] <= b[0] }).flatten(1);
 			categories.pairsDo(g);
