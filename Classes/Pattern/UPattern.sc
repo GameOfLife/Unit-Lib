@@ -176,6 +176,7 @@ UPattern : UChain {
 		next.fadeTimes = this.fadeTimes;
 		next.startTime = startTime;
 		next.track = track;
+		next.ugroup = ugroup;
 		was = UChain.nowPreparingChain;
 		UChain.nowPreparingChain = next;
 		next.parent = this;
