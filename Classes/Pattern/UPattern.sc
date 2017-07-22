@@ -169,12 +169,11 @@ UPattern : UChain {
 	next { |duration, startTime = 0, track = 0|
 		var next, was;
 		next = UChain( *units.deepCopy );
-		next.fadeIn = this.fadeIn;
-		next.fadeOut = this.fadeOut;
 		next.displayColor = this.getTypeColor;
 		next.global = this.global;
 		next.addAction = this.addAction;
 		next.duration = duration ?? { this.getSustain; };
+		next.fadeTimes = this.fadeTimes;
 		next.startTime = startTime;
 		next.track = track;
 		was = UChain.nowPreparingChain;

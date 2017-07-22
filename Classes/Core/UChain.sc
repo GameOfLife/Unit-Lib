@@ -249,6 +249,25 @@ UChain : UEvent {
 
 	fadeTimes { ^[this.fadeIn, this.fadeOut] }
 	
+	fadeTimes_ { |fadeTimes = #[0,0]|
+		
+		fadeTimes = fadeTimes.asCollection.wrapExtend(2);
+		
+		if( fadeTimes.sum > duration.max(1.0e-12) ) {
+			fadeTimes = fadeTimes.normalizeSum * duration;
+		};
+
+		units.do({ |unit|
+		    //each unit might have a different dur and fadeIn
+			if( unit.canFreeSynth ) {
+				unit.set( \u_fadeIn, fadeTimes[0] );
+				unit.set( \u_fadeOut, fadeTimes[1] );
+			};
+		});
+		this.changed( \fadeIn );
+		this.changed( \fadeOut );
+	}
+	
 	fadeInCurve_{ |curve = 0|
 		this.prSetCanFreeSynths(\u_fadeInCurve, curve);
     this.changed( \fadeInCurve );
