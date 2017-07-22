@@ -152,7 +152,10 @@ SMPTESpec : Spec {
 		^super.newCopyArgs.minval_( minval ).maxval_( maxval ).fps_( fps ).default_( default );
 	}
 	
-	constrain { |value| ^value.clip( minval, maxval ); }
+	constrain { |value| 
+		if( value.isNumber.not ) { value = default };
+		^value.clip( minval, maxval ); 
+	}
 	
 	map { |value| ^value }
 	unmap { |value| ^value }
