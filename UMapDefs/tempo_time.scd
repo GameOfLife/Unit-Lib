@@ -14,7 +14,7 @@ part of the Unit lib default UMapDefs set
 FuncUMapDef( \tempo_time, { |unit, division = 1, tempo = 60|
 	 division / tempo * 60
 })
-	.category_( 'function' )
+	.category_( 'convert' )
 	.valueIsMapped_( false )
 	.mappedArgs_( [] )
 	.setSpec( \division, [0.125,8,\exp].asSpec )

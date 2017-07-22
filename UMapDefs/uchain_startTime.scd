@@ -17,7 +17,7 @@ FuncUMapDef( \uchain_startTime, { |unit|
 		1;
 	};
 })
-	.category_( 'function' )
+	.category_( 'uchain_info' )
 	.valueIsMapped_( false )
 	.mappedArgs_( [] )
 	.setSpec( \value, DisplaySpec( SMPTESpec(), _.asSMPTEString(1000) ), private: true )

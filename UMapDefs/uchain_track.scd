@@ -22,7 +22,7 @@ FuncUMapDef( \uchain_track, { |unit, max = 16, range = #[0.0,1.0]|
 	};
 	out.linlin(0,max,*range);
 })
-	.category_( 'function' )
+	.category_( 'uchain_info' )
 	.mappedArgs_( [ \range ] )
 	.setSpec( \max, IntegerSpec(16,0, inf) )
 	.setSpec( \value, private: true );

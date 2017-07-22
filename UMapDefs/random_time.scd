@@ -17,7 +17,7 @@ part of the Unit lib default UMapDefs set
 FuncUMapDef( \random_time, { |unit, min = 0, max = 1|
 	min rrand: max; // result sets \value arg
 })
-	.category_( 'function' )
+	.category_( 'random' )
 	.valueIsMapped_( false )
 	.mappedArgs_( [] )
 	.setSpec( \min, SMPTESpec() )
