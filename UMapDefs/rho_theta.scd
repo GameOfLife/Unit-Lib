@@ -22,7 +22,19 @@ UMapDef( \rho_theta, { |rho = 0.5, theta = 0|
 })
 	.setSpec( \theta, AngleSpec() )
 	.uchainInitFunc_({ |unit, chain|
-		unit.def = \polar.asUdef( UMapDef );
+		var rho;
+		rho = unit.rho;
+		unit.def = \map_polar.asUdef( UMapDef );
+		if( unit.rho.isKindOf( UMap ).not ) {
+			if( rho.inclusivelyBetween(-10,10) ) {
+				unit.rho = rho.linlin(-10,10,-1,1);
+			} {
+				unit.rho = rho.linlin(-200,200,-1,1);
+				unit.radius = 200@200;
+			};
+		} {
+			unit.radius = 200@200;
+		};
 	})
 	.mappedArgs_( [ \rho ] )
 	.category_( 'private' )
