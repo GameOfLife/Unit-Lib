@@ -453,7 +453,7 @@
 		)	.resize_(2)
 			.applySkin( RoundView.skin ? () )
 			.action_({ |tf|
-				action.value( vws, tf.value );
+				action.value( vws, this.constrain( tf.value ) );
 			});
 
 		if( resize.notNil ) { vws[ \view ].resize = resize };
@@ -461,7 +461,7 @@
 	}
 	
 	setView { |view, value, active = false|
-		{ view[ \string ].value = this.constrain( value ); }.defer;
+		{ view[ \string ].value = this.constrain( value ).asString; }.defer;
 		if( active ) { view[ \string ].doAction };
 	}
 
