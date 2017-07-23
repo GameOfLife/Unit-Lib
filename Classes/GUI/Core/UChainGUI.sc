@@ -195,6 +195,7 @@ UChainGUI {
 		var controller;
 		var udefController;
 		var scoreController;
+		var ugroupCtrl;
 		// var unitInitFunc;
 		
 		nowBuildingChain = chain;
@@ -632,7 +633,6 @@ UChainGUI {
 					});
 					
 				// ugroup
-				/*
 				StaticText( composite, (labelWidth-2)@14 )
 					.applySkin( RoundView.skin )
 					.string_( "ugroup" )
@@ -643,8 +643,42 @@ UChainGUI {
 					.items_( [ "-", "new..." ] )
 					.canFocus_( false )
 					.action_({ |pu|
+						case { pu.value == 0 } {
+							chain.ugroup = nil;
+						} { pu.value == (pu.items.size-1) } {
+							chain.changed( \ugroup );
+							SCRequestString( "default", "Please enter a unique name for a new UGroup", 
+							{ |string|
+								string = string.asSymbol;
+								if( UGroup.all.collect(_.id) !? { |x| x.includes( string ).not } ? true ) {
+									UGroup( string );
+									chain.ugroup = string;
+								} {
+									"UGroup '%' already exists".postln;
+									chain.ugroup = string;
+								};
+							})
+						} {
+							chain.ugroup = pu.item;
+						};
 					});
-				*/
+					
+				ugroupCtrl = SimpleController( UGroup )
+					.put( \all, {
+						{
+							var groups;
+							 groups = UGroup.all.collect(_.id) ? [];
+							 if( chain.ugroup.notNil && { groups.includes(chain.ugroup).not }) { 
+								 groups = groups ++ [ chain.ugroup ] 
+							};
+							views[ \ugroup ].items = [ "-" ] ++ groups ++ [ "new..." ];
+							views[ \ugroup ].value = views[ \ugroup ].items.indexOf( chain.ugroup ) ? 0;
+						}.defer;
+					});
+					
+				views[ \ugroup ].onClose_({ ugroupCtrl.remove });
+				
+				UGroup.changed( \all );
 					
 				composite.decorator.nextLine;
 				
@@ -905,6 +939,18 @@ UChainGUI {
 				.put( \releaseSelf, {  
 					views[ \releaseSelf ].value = chain.releaseSelf.binaryValue;
 					{ views[ \displayColor ].refresh; }.defer; 
+				})
+				.put( \ugroup, {
+					var groups;
+					{
+						if( chain.ugroup.notNil ) {
+							if( chain.ugroup !== \mixed && { 
+								UGroup.all !? { |x| x.collect(_.id).includes( chain.ugroup ).not };
+							} ) { UGroup( chain.ugroup ); } { UGroup.changed( \all ) };
+						} {
+							views[ \ugroup ].value = 0;
+						};
+					}.defer;
 				})
 				.put( \global, {  
 					views[ \global ].value = chain.global.binaryValue;

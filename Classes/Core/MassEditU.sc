@@ -286,6 +286,18 @@ MassEditUChain {
 		if( symbol != \mixed ) { uchains.do(_.addAction_(symbol)); };
 	}
 	
+	ugroup {
+		var first;
+		first = uchains.first.ugroup;
+		if( uchains[1..].any({ |item| item.ugroup != first }) ) { ^\mixed } { ^first };
+	}
+	
+	ugroup_ { |ugroup|
+		if( ugroup !== \mixed ) {
+			uchains.do(_.ugroup_( ugroup ));
+		};
+	}
+	
 	uchainsOrUMarkers { if( uchains.size > 0 ) { ^uchains } { ^umarkers } }
 	
 	getTypeColor {

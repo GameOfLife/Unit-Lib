@@ -41,7 +41,7 @@ UChain : UEvent {
 	
 	var <addAction = \addToHead;
 	var <global = false;
-	var <>ugroup;
+	var <ugroup;
 	var <>handlingUndo = false;
 	
 	var <lastTarget;
@@ -400,6 +400,7 @@ UChain : UEvent {
 	
 	global_ { |bool = false| global = bool; this.changed( \global, bool ) }
 	addAction_ { |symbol = 'addToHead'| addAction = symbol; this.changed( \addAction, symbol ); }
+	ugroup_ { |symbol| ugroup = symbol; this.changed( \ugroup, symbol ); }
 	
 	gain { ^this.getGain }
 	gain_ { |gain = 0| ^this.setGain(gain) }
