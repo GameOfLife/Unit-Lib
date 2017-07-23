@@ -131,6 +131,14 @@ MultiUdef : Udef {
 		^this.findUdefFor( unit ).inputIsEndPoint( unit );
 	}
 	
+	prepare { |servers, unit, action, startPos|
+ 		^this.findUdefFor( unit ).prepare( servers, unit, action, startPos ) 
+ 	}
+ 	
+ 	doPrepareFunc { |servers, unit, action, startPos|
+ 		^this.findUdefFor( unit ).doPrepareFunc( servers, unit, action, startPos ) 
+ 	}
+	
 	canFreeSynth { |unit| ^this.findUdefFor( unit ).canFreeSynth( unit ) }
 	
 	chooseDef { |unit|

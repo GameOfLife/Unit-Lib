@@ -96,6 +96,7 @@ Udef : GenericDef {
 	var <>canUseUMap = true;
 	var <>showOnCollapse = #[ value ];
 	var <>prepareArgsFunc;
+	var <>prepareFunc;
 	var <>uchainInitFunc;
 	var <>inputIsEndPoint = false;
 	var <>dontStoreArgNames;
@@ -242,8 +243,12 @@ Udef : GenericDef {
 		this.synthDef.asCollection( _.writeDefFile )
 	}
 
-	prepare { |servers, unit, action|
-	    action.value;
+	prepare { |servers, unit, action, startPos|
+		prepareFunc !? _.value( servers, unit, action, startPos ) ?? { action.value };
+	}
+	
+	doPrepareFunc { |servers, unit, action, startPos|
+		prepareFunc !? _.value( servers, unit, action, startPos ) ?? { action.value };
 	}
 	
 	needsPrepare { ^false }
@@ -1211,7 +1216,7 @@ U : ObjectWithArgs {
 			    this.def.prepare(servers, this, act, startPos);
 		    };
 		} {
-			action.value;
+			this.def.doPrepareFunc( servers, this, act, startPos);
 		};
 		this.modPerform( \prepare, startPos );
 		this.setUMapBuses;
