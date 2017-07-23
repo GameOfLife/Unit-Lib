@@ -494,59 +494,6 @@ UChainGUI {
 				.action_({ |bt|
 					chain.lockStartTime = bt.value.booleanValue;
 				});
-				
-			composite.decorator.shift( 11, 0 );
-				
-			views[ \global ] = SmoothButton( composite, 40@14 )
-				.border_( 1 )
-				.radius_( 3 )
-				.label_( [ "global", "global" ] )
-				.hiliteColor_( Color.green )
-				.action_({ |bt|
-					chain.global = bt.value.booleanValue;
-				});
-
-			views[ \addAction ] = PopUpMenu( composite, 70@14 )
-				.applySkin( RoundView.skin )
-				.items_( [ "addBefore", "addToHead", "addToTail", "addAfter" ] )
-				.canFocus_( false )
-				.action_({ |pu|
-					chain.addAction = #[ 
-						addBefore, 
-						addToHead, 
-						addToTail, 
-						addAfter, 
-						mixed 
-					][ pu.value ];
-				});
-				
-			if( chain.isKindOf( MassEditUChain ) ) {
-				views[ \setAddAction ] = {
-					var symbol;
-					symbol = this.chain.addAction;
-					if( symbol === \mixed ) {
-						views[ \addAction ].items = [ "addBefore", "addToHead", "addToTail", "addAfter", "mixed"];
-						views[ \addAction ].value = 4;
-					} {
-						views[ \addAction ].items = [ "addBefore", "addToHead", "addToTail", "addAfter" ];
-						views[ \addAction ].value = #[ 
-							addBefore, 
-							addToHead, 
-							addToTail, 
-							addAfter,
-						].indexOf( symbol ) ? 0;
-					};
-				};
-			} {
-				views[ \setAddAction ] = {
-					views[ \addAction ].value = #[ 
-						addBefore, 
-						addToHead, 
-						addToTail, 
-						addAfter,
-					].indexOf( this.chain.addAction ) ? 0;
-				};
-			};
 			
 			composite.decorator.nextLine;
 			
@@ -645,7 +592,7 @@ UChainGUI {
 				// fadeTimes
 				StaticText( composite, labelWidth@14 )
 					.applySkin( RoundView.skin )
-					.string_( "fades" )
+					.string_( "fadeIn" )
 					.align_( \right );
 				
 				views[ \fadeIn ] = SmoothNumberBox( composite, 40@14 )
@@ -684,7 +631,28 @@ UChainGUI {
 						chain.fadeInCurve_( nb.value );
 					});
 					
-				composite.decorator.shift( 10, 0 );
+				// ugroup
+				/*
+				StaticText( composite, (labelWidth-2)@14 )
+					.applySkin( RoundView.skin )
+					.string_( "ugroup" )
+					.align_( \right );
+					
+				views[ \ugroup ] = PopUpMenu( composite, 70@14 )
+					.applySkin( RoundView.skin )
+					.items_( [ "-", "new..." ] )
+					.canFocus_( false )
+					.action_({ |pu|
+					});
+				*/
+					
+				composite.decorator.nextLine;
+				
+				// fadeTimes
+				StaticText( composite, labelWidth@14 )
+					.applySkin( RoundView.skin )
+					.string_( "fadeOut" )
+					.align_( \right );
 					
 				views[ \fadeOut ] = SmoothNumberBox( composite, 40@14 )
 					.clipLo_(0)
@@ -722,7 +690,60 @@ UChainGUI {
 						chain.fadeOutCurve_( nb.value );
 					});
 					
-				composite.decorator.shift( 10, 0 );	
+				composite.decorator.shift( 38, 0 );
+				
+				// global
+				
+				views[ \global ] = SmoothButton( composite, 40@14 )
+					.border_( 1 )
+					.radius_( 3 )
+					.label_( [ "global", "global" ] )
+					.hiliteColor_( Color.green )
+					.action_({ |bt|
+						chain.global = bt.value.booleanValue;
+					});
+	
+				views[ \addAction ] = PopUpMenu( composite, 70@14 )
+					.applySkin( RoundView.skin )
+					.items_( [ "addBefore", "addToHead", "addToTail", "addAfter" ] )
+					.canFocus_( false )
+					.action_({ |pu|
+						chain.addAction = #[ 
+							addBefore, 
+							addToHead, 
+							addToTail, 
+							addAfter, 
+							mixed 
+						][ pu.value ];
+					});
+					
+				if( chain.isKindOf( MassEditUChain ) ) {
+					views[ \setAddAction ] = {
+						var symbol;
+						symbol = this.chain.addAction;
+						if( symbol === \mixed ) {
+							views[ \addAction ].items = [ "addBefore", "addToHead", "addToTail", "addAfter", "mixed"];
+							views[ \addAction ].value = 4;
+						} {
+							views[ \addAction ].items = [ "addBefore", "addToHead", "addToTail", "addAfter" ];
+							views[ \addAction ].value = #[ 
+								addBefore, 
+								addToHead, 
+								addToTail, 
+								addAfter,
+							].indexOf( symbol ) ? 0;
+						};
+					};
+				} {
+					views[ \setAddAction ] = {
+						views[ \addAction ].value = #[ 
+							addBefore, 
+							addToHead, 
+							addToTail, 
+							addAfter,
+						].indexOf( this.chain.addAction ) ? 0;
+					};
+				};
 					
 				composite.decorator.nextLine;
 			}
