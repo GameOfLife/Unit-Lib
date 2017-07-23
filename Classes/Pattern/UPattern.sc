@@ -75,7 +75,7 @@ UPattern : UChain {
 	
 	argSpecsForDisplay { 
 		^[
-			ArgSpec( 'sustain', 1, SMPTESpec(0.001, 3600), false, \init ),
+			ArgSpec( 'sustain', 1, SMPTESpec(0, 3600), false, \init ),
 			ArgSpec( 'timeToNext', 1, SMPTESpec(0.01, 3600), false, \init )
 		]
 	}
@@ -135,7 +135,7 @@ UPattern : UChain {
 	
 	getSpec { |key|
 		^switch( key,
-			'sustain', { SMPTESpec(0.001, 3600) },
+			'sustain', { SMPTESpec(0, 3600) },
 			'timeToNext', { SMPTESpec(0.01, 3600) },
 		);
 	}
@@ -168,23 +168,26 @@ UPattern : UChain {
 	
 	next { |duration, startTime = 0, track = 0|
 		var next, was;
-		next = UChain( *units.deepCopy );
-		next.displayColor = this.getTypeColor;
-		next.global = this.global;
-		next.addAction = this.addAction;
-		next.duration = duration ?? { this.getSustain; };
-		next.fadeTimes = this.fadeTimes;
-		next.startTime = startTime;
-		next.track = track;
-		next.ugroup = ugroup;
-		was = UChain.nowPreparingChain;
-		UChain.nowPreparingChain = next;
-		next.parent = this;
-		next.units.do({ |unit|
-			this.prPrepareUnit( unit );
-			this.prPatternsToValues( unit );
-		});
-		UChain.nowPreparingChain = was;
+		duration = duration ?? { this.getSustain; };
+		if( duration > 0 ) {	
+			next = UChain( *units.deepCopy );
+			next.displayColor = this.getTypeColor;
+			next.global = this.global;
+			next.addAction = this.addAction;
+			next.duration = duration ?? { this.getSustain; };
+			next.fadeTimes = this.fadeTimes;
+			next.startTime = startTime;
+			next.track = track;
+			next.ugroup = ugroup;
+			was = UChain.nowPreparingChain;
+			UChain.nowPreparingChain = next;
+			next.parent = this;
+			next.units.do({ |unit|
+				this.prPrepareUnit( unit );
+				this.prPatternsToValues( unit );
+			});
+			UChain.nowPreparingChain = was;
+		};
 		^next;
 	}
 	
@@ -246,9 +249,11 @@ UPattern : UChain {
 				if( time > track0time ) { track = 0 };
 				if( track == 0 ) { track0time = time + (sustain * 2); };
 				next = this.next( sustain, time, track );
-				track = track + 1;
 				this.localPos = time;
-				action.value( next, target, time, timeToNext );
+				if( next.notNil ) { 
+					track = track + 1; 
+					action.value( next, target, time, timeToNext );
+				};
 				timeToNext.wait;
 				time = time + timeToNext;
 				if( timeToNext == 0 ) { zeroCount = zeroCount + 1 } { zeroCount = 0 };
