@@ -607,7 +607,8 @@ UChain : UEvent {
 	    var group;
 	    var started = false;
 	    if( this.shouldPlayOn( target ) != false ) {
-	    		group = Group( target, addAction )
+		    if( units.any({ |unit| unit.def.createsSynth == true }) ) {
+			    group = Group( target, addAction )
 	                .startAction_({ |group|
 	                    // only add if started (in case this is a bundle)
 	                    this.changed( \go, group );
@@ -619,10 +620,14 @@ UChain : UEvent {
 	                    UGroup.end( this );
 	                    this.changed( \end, group );
 	                });
-	        
-	        units.do( _.makeSynth(group, startPos) );
-	        this.addGroup( group );
-	        this.changed( \start, group );
+	        		units.do( _.makeSynth(group, startPos) );
+	        		this.addGroup( group );
+	        		this.changed( \start, group );
+		    } {
+			    units.do( _.makeSynth(group, startPos) );
+			    this.changed( \start, group );
+			    this.changed( \end, group );
+		    };
 	    };
 	}
 

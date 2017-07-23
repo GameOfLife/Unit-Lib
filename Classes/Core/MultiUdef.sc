@@ -79,6 +79,8 @@ MultiUdef : Udef {
 		};
 	}
 	
+	createsSynth { ^udefs.any(_.createsSynth) }
+	
 	findUdefFor { |unit|
 		^tempDef ?? { this.findUdef( unit.get( this.defNameKey ) ); };
 	}

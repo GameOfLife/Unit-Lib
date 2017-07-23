@@ -34,6 +34,7 @@ FreeUdef : Udef {
 	
 	var <>createSynthDefFunc; // optional, called at load or send
 	var <>synthsForUMapFunc;
+	var <>createsSynth = true;
 	
 	*new { |name, args, canFreeSynth = false, category|
 		^super.basicNew( name, args ? [], category ).initFree( canFreeSynth ); 
@@ -160,7 +161,11 @@ FreeUdef : Udef {
 			server = server ? Server.default;
 			^createSynthFunc.value( unit, server, startPos );
 		} {
-			^super.createSynth( unit, server, startPos );
+			if( createsSynth != false ) {
+				^super.createSynth( unit, server, startPos );
+			} {
+				^nil;
+			}
 		};
 	} 
 	

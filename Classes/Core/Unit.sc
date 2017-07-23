@@ -188,6 +188,7 @@ Udef : GenericDef {
 	
 	argNamesFor { |unit| ^this.argNames }
 	
+	createsSynth { ^true }
 	
 	// this may change 
 	// temp override to send instead of load (remote servers can't load!!)
