@@ -244,11 +244,19 @@ Udef : GenericDef {
 	}
 
 	prepare { |servers, unit, action, startPos|
-		prepareFunc !? _.value( servers, unit, action, startPos ) ?? { action.value };
+		if( prepareFunc.notNil ) {
+			prepareFunc.value( servers, unit, action, startPos );
+		} {
+			action.value
+		};
 	}
 	
 	doPrepareFunc { |servers, unit, action, startPos|
-		prepareFunc !? _.value( servers, unit, action, startPos ) ?? { action.value };
+		if( prepareFunc.notNil ) {
+			prepareFunc.value( servers, unit, action, startPos );
+		} {
+			action.value
+		};
 	}
 	
 	needsPrepare { ^false }
