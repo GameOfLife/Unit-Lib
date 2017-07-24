@@ -37,6 +37,6 @@ ValueUMapDef( \envir_get, { |unit, ctrl|
 	ctrl.remove;
 	nil;
 },[
-	[ \key, \a, SymbolSpec("") ]
+	[ \key, \a, EnvirSpec('a') ]
 ], \control )
-	.category_( 'control' );
+	.category_( 'envir' );

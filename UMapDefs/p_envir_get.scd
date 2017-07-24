@@ -36,6 +36,6 @@ UPatDef( \p_envir_get, { |unit, key = 'a'|
 		};
 	}.r
 })	
-	.setSpec( \key, SymbolSpec() )
+	.setSpec( \key, EnvirSpec() )
 	.mappedArgs_([])
-	.category_( 'pattern' );
+	.category_( 'pattern_envir' );

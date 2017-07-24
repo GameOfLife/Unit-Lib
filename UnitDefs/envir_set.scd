@@ -28,7 +28,7 @@ defs = [
 	spec = spec.asSpec;
 	HiddenFreeUdef( type, [
 		[ \value, 0, spec, false, \init ],
-		[ \key, \a, SymbolSpec() ],
+		[ \key, \a, EnvirSpec() ],
 	])
 	.apxCPU_( 0 )
 	.prepareFunc_({ |server, unit, action, startPos|
