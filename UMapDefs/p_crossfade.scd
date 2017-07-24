@@ -30,4 +30,4 @@ UPatDef( \p_crossfade, { |unit, a = 0.0, b = 1.0, crossfade = 0.5|
 .useMappedArgs_( false )
 .setSpec( \a, UAdaptSpec() )
 .setSpec( \b, UAdaptSpec() )
-.category_( 'pattern' );
+.category_( 'pattern_choice' );

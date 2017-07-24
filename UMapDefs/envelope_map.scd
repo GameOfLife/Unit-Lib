@@ -17,5 +17,5 @@ part of the Unit lib default UMapDefs set
 UMapDef( \envelope_map, { |index = 0.0|
 	UMapOut.kr( UIEnvGen.kr( \env, nil, index ) );
 })
-	.category_( 'utility' )
+	.category_( 'automation' )
 	.mappedArgs_( [ \env ] );

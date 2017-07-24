@@ -20,4 +20,4 @@ UPatDef( \p_post, { |unit, input = 0|
 	.setSpec( \input, UAdaptSpec() )
 	.useMappedArgs_( false )
 	.mappedArgs_([ \input ])
-	.category_( 'pattern' );
+	.category_( 'pattern_utility' );

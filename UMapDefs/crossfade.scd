@@ -17,5 +17,5 @@ part of the Unit lib default UMapDefs set
 UMapDef( \crossfade, { |a = 0.0, b = 1.0, crossfade = 0.5, lag = 0.0|
 	UMapOut.kr( (a * (1-crossfade)) + (b * crossfade) );
 })
-	.category_( 'utility' )
+	.category_( 'choice' )
 	.mappedArgs_( [ \a, \b ] );

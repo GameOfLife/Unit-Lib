@@ -25,6 +25,6 @@ UMapDef( \select_16, {
 	phase = (phase.floor * (1-smooth)) + (phase * smooth);
 	sig = LinSelectX.kr( phase, values );
 	UMapOut.kr( sig );
-}).category_( \utility )
+}).category_( \choice )
 	.setSpec( \index, [0,15].asSpec )
 	.mappedArgs_( 16.collect({ |i| ("value"++i).asSymbol }) );

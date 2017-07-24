@@ -16,4 +16,4 @@ part of the Unit lib default UMapDefs set
 
 UPatDef( \p_brown, { |unit, lo = 0.0, hi = 1.0, step = 0.125|
 	Pbrown( lo, hi, step, inf ).asStream;
-}).mappedArgs_([\lo, \hi ]).category_( 'pattern' );
+}).mappedArgs_([\lo, \hi ]).category_( 'pattern_random' );
