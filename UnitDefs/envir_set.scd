@@ -32,13 +32,9 @@ defs = [
 	])
 	.apxCPU_( 0 )
 	.prepareFunc_({ |server, unit, action, startPos|
-		var key, value;
-		key = unit.get( \key ).asSymbol;
+		var value;
 		value = unit.get( \value );
-		currentEnvironment.put( key, value.value );
-		currentEnvironment[ \u_specs ] = currentEnvironment[ \u_specs ] ?? {()};
-		currentEnvironment[ \u_specs ].put( key, spec );
-		currentEnvironment.changed( key );
+		unit.get( \key ).asSymbol.uEnvirPut( value.value, spec );
 		if( value.isKindOf( UMap ) ) { 
 			value.start
 		};
@@ -46,13 +42,7 @@ defs = [
 	})
 	.createsSynth_( false )
 	.setSynthFunc_({ |unit ...keyValuePairs|
-		var key, value;
-		key = unit.get( \key ).asSymbol;
-		value = unit.get( \value );
-		currentEnvironment.put( key, value.value );
-		currentEnvironment[ \u_specs ] = currentEnvironment[ \u_specs ] ?? {()};
-		currentEnvironment[ \u_specs ].put( key, spec );
-		currentEnvironment.changed( key );
+		unit.get( \key ).asSymbol.uEnvirPut( unit.get( \value ).value, spec );
 	});
 });
 
