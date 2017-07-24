@@ -7,7 +7,7 @@ FuncUMapDef : UMapDef {
 	} 
 	*/
 	
-	classvar <>valueIsPrivate = false;
+	classvar <>valueIsPrivate = true;
 	
 	var <>valueIsMapped = true;
 	var <>dontStoreValue = false;
