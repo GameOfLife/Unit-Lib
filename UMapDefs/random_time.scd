@@ -19,9 +19,9 @@ FuncUMapDef( \random_time, { |unit, min = 0, max = 1|
 })
 	.category_( 'random' )
 	.valueIsMapped_( false )
-	.mappedArgs_( [] )
-	.setSpec( \min, SMPTESpec() )
-	.setSpec( \max, SMPTESpec() )
+	.mappedArgs_( [\min, \max] )
+	.setSpec( \min, UAdaptSpec() )
+	.setSpec( \max, UAdaptSpec() )
 	.setSpec( \value, DisplaySpec( SMPTESpec(), _.asSMPTEString(1000) ) )
 	.canUseUMapFunc_({ |unit, key, umapdef|
 		unit.getSpec( key ).isKindOf( SMPTESpec );
