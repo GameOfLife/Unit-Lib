@@ -20,6 +20,9 @@ FuncUMapDef( \tempo_time, { |unit, factor = 1, tempo = 60|
 	.setSpec( \factor, [0.125,8,\exp].asSpec )
 	.setSpec( \tempo, [10,300,\exp,0,60].asSpec )
 	.setSpec( \value, DisplaySpec( SMPTESpec(), _.asSMPTEString(1000) ), private: true )
+	.prepareArgsFunc_( { |args|
+		args.replace( \division, \factor );
+	} )
 	.canUseUMapFunc_({ |unit, key, umapdef|
 		unit.getSpec( key ).isKindOf( SMPTESpec );
 	})
