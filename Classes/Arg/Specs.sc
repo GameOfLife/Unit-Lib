@@ -113,6 +113,9 @@ SymbolSpec : StringSpec {
 	
 }
 
+EnvirSpec : SymbolSpec {
+}
+
 MapSpec : Spec {
 	
 	var <>default = 'c0';

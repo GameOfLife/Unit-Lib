@@ -467,6 +467,111 @@
 
 }
 
++ EnvirSpec {
+	
+	makeView { |parent, bounds, label, action, resize| 
+		var vws, view, labelWidth;
+		var ctrl, strWidth;
+		vws = ();
+		
+		// this is basically an EZButton
+		
+		bounds.isNil.if{bounds= 320@20};
+		
+		#view, bounds = EZGui().prMakeMarginGap.prMakeView( parent, bounds );
+		 vws[ \view ] = view;
+		 		
+		if( label.notNil ) {
+			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
+			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ bounds.height )
+				.string_( label.asString ++ " " )
+				.align_( \right )
+				.resize_( 4 )
+				.applySkin( RoundView.skin );
+		} {
+			labelWidth = 0;
+		};
+		
+		StaticText( view, Rect( labelWidth + 2, 0, 10, bounds.height ) )
+			.applySkin( RoundView.skin ? () )
+			.string_( "~" )
+			.align_( \right );
+			
+		strWidth = bounds.width-(labelWidth+2+12+62);
+		
+		vws[ \string ] = TextField( view, 
+			Rect( labelWidth + 2 + 12, 0, strWidth, bounds.height )
+		)	.resize_(2)
+			.applySkin( RoundView.skin ? () )
+			.action_({ |tf|
+				if( tf.value != "" ) {
+					action.value( vws, this.constrain( tf.value ) );
+					vws[ \menu ].value = vws[ \menu ].items.indexOfEqual( "~" ++ (tf.value) ) ? 0;
+					vws[ \setColor ].value;
+				};
+			});
+			
+		vws[ \setColor ] = {
+			var hash;
+			hash = vws[ \string ].value.hash;
+			
+			vws[ \string ].background = Color.new255(
+				(hash & 16711680) / 65536,
+				(hash & 65280) / 256,
+				hash & 255,
+				128
+			).blend( Color.white, 2/3 );
+		};
+			
+		vws[ \menu ] = PopUpMenu( view, 
+			Rect( labelWidth + 2 + 12 + strWidth + 2, 0, 60, bounds.height )
+		)	.resize_(3)
+			.applySkin( RoundView.skin ? () )
+			.items_( [ "" ] )
+			.action_({ |pu|
+				var item;
+				if( pu.value > 0 ) {
+					item = pu.item.asString[1..];
+					vws[ \string ].string = item;
+					action.value( vws, this.constrain( item ) );
+				} {
+					vws[ \menu ].value = vws[ \menu ].items.indexOfEqual( "~" ++ (vws[ \string ].value) ) ? 0;
+				};
+			});
+			
+		ctrl = {
+			var currentKeys;
+			currentKeys = [ "" ] ++ (currentEnvironment[ \u_specs ] !? _.keys).asArray.sort.collect({ |item| "~" ++ item });
+			{
+				if( vws[ \menu ].items != currentKeys ) {
+					vws[ \menu ].items = currentKeys;
+					vws[ \menu ].value = vws[ \menu ].items.indexOfEqual( "~" ++ (vws[ \string ].value) ) ? 0;
+				};
+			}.defer;
+		};
+		
+		currentEnvironment.addDependant( ctrl );
+		
+		ctrl.value;
+		
+		vws[ \menu ].onClose_( { currentEnvironment.removeDependant( ctrl ); } );
+
+		if( resize.notNil ) { vws[ \view ].resize = resize };
+		^vws;
+	}
+	
+	setView { |view, value, active = false|
+		value = this.constrain( value );
+		{ 
+			view[ \string ].value = value.asString; 
+			view[ \setColor ].value;
+			view[ \menu ].value = view[ \menu ].items.indexOfEqual( "~" ++ value ) ? 0;
+		}.defer;
+		if( active ) { view[ \string ].doAction };
+	}
+
+}
+
 + SMPTESpec {
 
 	makeView { |parent, bounds, label, action, resize|
