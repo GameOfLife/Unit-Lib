@@ -24,7 +24,7 @@ UPatDef( \p_time_humanize, { |unit, time = 1, amount = 0|
 			random = aamt.rand;
 			qtime = (logical + (random - ((aamt/2).min(ttime) ))) - actual;
 			if( qtime <= 0 ) { qtime = random / 2 };
-			actual = actual + qtime.postln;
+			actual = actual + qtime;
 			qtime.yield;
 		};
 	}.r;
