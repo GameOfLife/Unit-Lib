@@ -29,7 +29,7 @@ UMapDefListView {
 	*initClass {
 		filters = (
 			\dynamic: { |udef| [ UMapDef, ValueUMapDef, ExpandUMapDef ].includes( udef.class ) },
-			\static: { |udef| [ UMapDef, ValueUMapDef, ExpandUMapDef ].includes( udef.class ).not },
+			\single_value: { |udef| [ UMapDef, ValueUMapDef, ExpandUMapDef ].includes( udef.class ).not },
 		);
 	}
 	

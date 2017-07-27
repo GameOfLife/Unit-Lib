@@ -39,6 +39,6 @@ UdefsGUI {
 		
 		udefView = UdefListView( composites[0] );
 		umapDefView1 = UMapDefListView( composites[1], filter: \dynamic );
-		umapDefView2 = UMapDefListView( composites[2], filter: \static );
+		umapDefView2 = UMapDefListView( composites[2], filter: \single_value );
 	}
 }
