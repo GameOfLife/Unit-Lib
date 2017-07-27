@@ -484,6 +484,8 @@ BufSndFile : AbstractSndFile {
 
     classvar <>global;
     classvar <>globalServers;
+    classvar <>globalLoading;
+    classvar <>autoLoadGlobal = true;
     
     var <useChannels, <>useStartPosForBuf = false;
     
@@ -520,13 +522,18 @@ BufSndFile : AbstractSndFile {
 			global[ id ].do({ |buf|
 				this.freeBuffer( buf );
 			});
+			global[ id ] = nil;
 		};
-		MultiActionFunc.use( action, { |act|
-			global[ id ] = (globalServers ?? ULib.allServers).collect({ |srv|
-				this.makeBuffer( srv, 0, act.getAction, add: false );
+		if( global[ id ].isNil ) {
+			MultiActionFunc.use( action, { |act|
+				global[ id ] = (globalServers ?? ULib.allServers).collect({ |srv|
+					this.makeBuffer( srv, 0, act.getAction, add: false );
+				});
+				global.changed( id );
 			});
+		} {
 			global.changed( id );
-		});
+		};
 	}
 	
 	disposeGlobal { |action|
@@ -563,6 +570,10 @@ BufSndFile : AbstractSndFile {
 		} {
 			^false;
 		};
+	}
+	
+	hasGlobal_ { |bool = true|
+		if( bool && autoLoadGlobal ) { this.loadGlobal( false ); };
 	}
 	
 	asMonoBufSndFile { 
@@ -630,7 +641,10 @@ BufSndFile : AbstractSndFile {
 		stream << this.class.name << ".newBasic(" <<* [ // use newBasic to prevent file reading
 		    path.formatGPath.quote, numFrames, numChannels, sampleRate,
              startFrame, endFrame, rate, loop
-		]  << ")" << if( this.useChannels.notNil ) { ".useChannels_(%)".format( useChannels ) } { "" };
+		]  << ")" << 
+		if( this.useChannels.notNil ) { ".useChannels_(%)".format( useChannels ) } { "" } <<
+		if( this.hasGlobal == true ) { ".hasGlobal_(true)" } { "" };
+		
 	}
 	
 	cutStart { |time=0|
