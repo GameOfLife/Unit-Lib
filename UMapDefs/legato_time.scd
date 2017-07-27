@@ -1,5 +1,5 @@
 /*
-\tempo_time
+\legato_time
 
 This UMap is intended for use on the 'pattern' value of an UPattern. It allows the sustain value of the pattern to be set relative to the timeToNext.
 
