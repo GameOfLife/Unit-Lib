@@ -21,6 +21,7 @@ part of the Unit lib default UMapDefs set
 UPatDef( \p_step, { |unit, lo = 0.0, hi = 1.0, steps = 12, loop = \loop|
 	{
 		var current = 0, direction = 1;
+		if( loop.next == \backwards ) { current = 1; direction = -1 };
 		current.linlin( 0, 1, lo.next, hi.next ).yield;
 		inf.do { |i|
 			current = (current + ((direction/steps.next).clip2( 1.0e12 )));
