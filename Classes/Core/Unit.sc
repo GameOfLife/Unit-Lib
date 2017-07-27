@@ -1155,6 +1155,16 @@ U : ObjectWithArgs {
 		};
 	}
 	
+	getSetArgs {
+		var storeArgs;
+		storeArgs = this.storeArgs;
+		if( storeArgs.size == 1 ) {
+			^storeArgs[0];
+		} {
+			^storeArgs;
+		};
+	}
+	
 	asUnit { ^this }
 
 	prSyncCollection { |targets|

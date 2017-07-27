@@ -1035,14 +1035,7 @@ UChain : UEvent {
 		};
 		
 		^([ startTime, track, duration, releaseSelf ][..numPreArgs]) ++ 
-			units.collect({ |item| 
-				item = item.storeArgs;
-				if( item.size == 1 ) {
-					item[0] 
-				} {
-					item
-				};
-			});
+			units.collect(_.getSetArgs);
 	}
 	
 	storeArgs { ^this.getInitArgs }
