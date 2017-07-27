@@ -33,7 +33,9 @@ UPatDef( \p_time_humanize, { |unit, time = 1, amount = 0|
 	.setSpec( \amount, [0.0,1,9.squared.log,0,0].asSpec )
 	.canUseUMapFunc_({ |unit, key, umapdef|
 		key == \timeToNext or: {
-			unit.getSpec( key ).isKindOf( SMPTESpec );
+			unit.getSpec( key ).isKindOf( SMPTESpec ) or: {
+				unit.getSpec( key ).isKindOf( UAdaptSpec )
+			}
 		}
 	})
 	.useMappedArgs_( false )

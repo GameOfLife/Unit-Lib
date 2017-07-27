@@ -29,8 +29,10 @@ UPatDef( \p_time_step, { |unit, time = 0, n = 1, spread = 0.0|
 	.setSpec( \time, UAdaptSpec() )
 	.setSpec( \n, IntegerSpec(1, 1, 99 ) )
 	.canUseUMapFunc_({ |unit, key, umapdef|
-		(key == \timeToNext) or:
-		unit.getSpec( key ).isKindOf( SMPTESpec );
+		(key == \timeToNext) or: {
+		unit.getSpec( key ).isKindOf( SMPTESpec ) or: {
+			unit.getSpec( key ).isKindOf( UAdaptSpec )
+		} }
 	})
 	.useMappedArgs_( false )
 	.mappedArgs_([ \time ]).category_( 'pattern_time' );

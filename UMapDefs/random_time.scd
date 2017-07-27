@@ -24,5 +24,7 @@ FuncUMapDef( \random_time, { |unit, min = 0, max = 1|
 	.setSpec( \max, UAdaptSpec() )
 	.setSpec( \value, DisplaySpec( SMPTESpec(), _.asSMPTEString(1000) ) )
 	.canUseUMapFunc_({ |unit, key, umapdef|
-		unit.getSpec( key ).isKindOf( SMPTESpec );
+		unit.getSpec( key ).isKindOf( SMPTESpec ) or: {
+			unit.getSpec( key ).isKindOf( UAdaptSpec )
+		}
 	})

@@ -24,5 +24,7 @@ FuncUMapDef( \tempo_time, { |unit, factor = 1, tempo = 60|
 		args.replace( \division, \factor );
 	} )
 	.canUseUMapFunc_({ |unit, key, umapdef|
-		unit.getSpec( key ).isKindOf( SMPTESpec );
+		unit.getSpec( key ).isKindOf( SMPTESpec ) or: {
+			unit.getSpec( key ).isKindOf( UAdaptSpec )
+		}
 	})

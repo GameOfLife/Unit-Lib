@@ -32,7 +32,9 @@ UPatDef( \p_time_quantize, { |unit, time = 1, factor = 1, tempo = 60|
 	.setSpec( \factor, [0.125,8,\exp].asSpec )
 	.setSpec( \tempo, [10,300,\exp,0,60].asSpec )
 	.canUseUMapFunc_({ |unit, key, umapdef|
-		unit.getSpec( key ).isKindOf( SMPTESpec );
+		unit.getSpec( key ).isKindOf( SMPTESpec ) or: {
+			unit.getSpec( key ).isKindOf( UAdaptSpec )
+		}
 	})
 	.useMappedArgs_( false )
 	.mappedArgs_([ \time ]).category_( 'pattern_time' );
