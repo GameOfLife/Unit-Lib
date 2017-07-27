@@ -81,6 +81,10 @@ URandSeed {
 	value { ^seed }
 	next { seed = 16777216.rand; this.changed( \seed ); }
 	
+	doesNotUnderstand { |selector ... args| // dirty maybe, but any reason not to do this?
+		^seed.perform( selector, *args );
+	}
+	
 	prepare { |target, startPos, action| 
 		this.next;
 		action.value( this );
@@ -99,6 +103,9 @@ URandSeed {
 	}
 	
 	*default { ^URandSeed() }
+	*map { |value| ^value }
+	*unmap { |value| ^value }
+	
 	*massEditSpec { |inArray|
 		^URandSeedMassEditSpec( inArray.size, inArray );
 	}
