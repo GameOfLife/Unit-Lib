@@ -4,8 +4,7 @@ UPattern : UChain {
 	classvar <>preparedThreads, <>expectedTimes, <>preparing = false;
 	
 	var <repeats = inf;
-	var <sustain = 1;
-	var <timeToNext = 1;
+	var <pattern = #[1,1];
 	var <>maxSimultaneousStarts = 100;
 	var <>localPos = 0;
 	var <>routine;
@@ -13,6 +12,11 @@ UPattern : UChain {
 	var <>preparedEvents;
 	var isPlaying = false;
 	var task;
+	
+	init { |args|
+		this.pattern = \sustain_time;
+		super.init( args );
+	}
 	
 	prPrepareUnit { |unit|
 		var prepareThese;
@@ -75,8 +79,7 @@ UPattern : UChain {
 	
 	argSpecsForDisplay { 
 		^[
-			ArgSpec( 'sustain', 1, SMPTESpec(0, 3600), false, \init ),
-			ArgSpec( 'timeToNext', 1, SMPTESpec(0.01, 3600), false, \init )
+			ArgSpec( 'pattern', [1,1], UPatternSpec(), false, \init )
 		]
 	}
 	
@@ -135,33 +138,31 @@ UPattern : UChain {
 	
 	getSpec { |key|
 		^switch( key,
-			'sustain', { SMPTESpec(0, 3600) },
-			'timeToNext', { SMPTESpec(0.01, 3600) },
+			'pattern', { UPatternSpec() },
 		);
 	}
 	
 	getDefault { |key|
 		^switch( key,
-			'sustain', { 1 },
-			'timeToNext', { 1 },
+			'pattern', { [1,1] },
 		);
 	}
 	
 	removeUMap { |key|
 		switch( key,
-			'sustain', { this.sustain = 1 },
-			'timeToNext', { this.timeToNext = 1 },
+			'pattern', { this.pattern = [1,1] },
 		);
 	}
 	
 	defName { ^'UPattern' }
 	
-	args { ^[ \sustain, this.sustain, \timeToNext, this.timeToNext ] }
+	args { ^[ \pattern, this.pattern ] }
 	
 	at { |index|
 		^switch( index,
-			\sustain, { this.sustain },
-			\timeToNext, { this.timeToNext },
+			\pattern, { this.pattern },
+			\sustain, { this.pattern.value[0] },
+			\timeToNext, { this.timeToNext.value[1] },
 			{ units[ index ] }
 		);
 	}
@@ -174,7 +175,7 @@ UPattern : UChain {
 			next.displayColor = this.getTypeColor;
 			next.global = this.global;
 			next.addAction = this.addAction;
-			next.duration = duration ?? { this.getSustain; };
+			next.duration = duration;
 			next.fadeTimes = this.fadeTimes;
 			next.startTime = startTime;
 			next.track = track;
@@ -197,13 +198,54 @@ UPattern : UChain {
 	}
 	
 	sustain_ { |newSustain|
-		sustain = newSustain.asUnitArg( this, \sustain );
-		this.changed( \sustain, sustain );
+		if( this.pattern.isKindOf( UMap ) ) {
+			this.pattern.set( \sustain, newSustain );
+			this.changed( \pattern, pattern );
+		} {
+			if( newSustain.isNumber ) {
+				this.pattern = [ newSustain, this.pattern[1] ];
+			} {
+				this.pattern = [ \sustain_time, 
+					[ \sustain, newSustain, \timeToNext, this.timeToNext ]
+				];
+			};
+		};
 	}
 	
 	timeToNext_ { |newTimeToNext|
-		timeToNext = newTimeToNext.asUnitArg( this, \timeToNext );
-		this.changed( \timeToNext, timeToNext );
+		if( this.pattern.isKindOf( UMap ) ) {
+			this.pattern.set( \timeToNext, newTimeToNext );
+			this.changed( \pattern, pattern );
+		} {
+			if( newTimeToNext.isNumber ) {
+				this.pattern = [ this.pattern[0], newTimeToNext ];
+			} {
+				this.pattern = [ \sustain_time, 
+					[ \sustain, this.sustain, \timeToNext, newTimeToNext ]
+				];
+			};
+		};
+	}
+	
+	sustain { 
+		if( pattern.isKindOf( UMap ) ) {
+			^pattern.sustain;
+		} {
+			^pattern[0];
+		};
+	}
+	
+	timeToNext { 
+		if( pattern.isKindOf( UMap ) ) {
+			^pattern.timeToNext;
+		} {
+			^pattern[1];
+		};
+	}
+	
+	pattern_ { |newPattern|
+		pattern = newPattern.asUnitArg( this, \pattern );
+		this.changed( \pattern, pattern );
 	}
 	
 	prUnPrepare { |unit|
@@ -217,20 +259,12 @@ UPattern : UChain {
 		};
 	}
 	
-	getSustain {
-		if( sustain.isKindOf( UMap ) && { sustain.def.isKindOf( FuncUMapDef ) } ) {
-			this.prUnPrepare( sustain );
-			this.prPrepareUnit( sustain );
+	getPattern { // returns new sustain and timeToNext
+		if( pattern.isKindOf( UMap ) && { pattern.def.isKindOf( FuncUMapDef ) } ) {
+			this.prUnPrepare( pattern );
+			this.prPrepareUnit( pattern );
 		};
-		^sustain.next;
-	}
-	
-	getTimeToNext {
-		if( timeToNext.isKindOf( UMap ) && { timeToNext.def.isKindOf( FuncUMapDef ) } ) {
-			this.prUnPrepare( timeToNext );
-			this.prPrepareUnit( timeToNext );
-		};
-		^timeToNext.next;
+		^pattern.next;
 	}
 	
 	isPlaying { ^isPlaying ? false }
@@ -244,8 +278,7 @@ UPattern : UChain {
 			while { ( this.releaseSelf == false or: { (time <= (duration - startPos)) }) 
 					&& { n < repeats } && { zeroCount < maxSimultaneousStarts }
 			} {
-				timeToNext = this.getTimeToNext;
-				sustain = this.getSustain;
+				#sustain, timeToNext = this.getPattern;
 				if( time > track0time ) { track = 0 };
 				if( track == 0 ) { track0time = time + (sustain * 2); };
 				next = this.next( sustain, time, track );
@@ -275,8 +308,7 @@ UPattern : UChain {
 		this.stop;
 		waitTime = this.waitTime; // fixed waitTime for all events
 		units.do({ |unit| this.prResetStreams( unit ); });
-		if( this.sustain.isKindOf( UMap ) ) { this.prResetStreams( this.sustain ); };
-		if( this.timeToNext.isKindOf( UMap ) ) { this.prResetStreams( this.timeToNext ); };
+		if( this.pattern.isKindOf( UMap ) ) { this.prResetStreams( this.pattern ); };
 		preparedEvents = Array(512);
 		if( waitTime > 0 ) {
 			multiAction = MultiActionFunc( action );
@@ -455,17 +487,19 @@ UPattern : UChain {
 	stopChains { |releaseTime| this.currentChains.do(_.release( releaseTime ) ) }
 	
 	storeModifiersOn { |stream|
+		var patArgs;
 		this.storeTags( stream );
 		this.storeDisplayColor( stream );
 		this.storeDisabledStateOn( stream );
 		if( this.repeats != inf ) {
 			stream << ".repeats_(" <<< this.repeats << ")";
 		};
-		if( this.sustain != 1 ) {
-			stream << ".sustain_(" <<< this.sustain << ")";
-		};
-		if( this.timeToNext != 1 ) {
-			stream << ".timeToNext_(" <<< this.timeToNext << ")";
+		if( (this.sustain != 1) or: { this.timeToNext != 1 } ) {
+			if( this.pattern.isKindOf( UMap ) ) {
+				stream << ".pattern_(" <<< this.pattern.getSetArgs << ")";
+			} {
+				stream << ".pattern_(" <<< this.pattern << ")";
+			}
 		};
 		if( ugroup.notNil ) {
 			stream << ".ugroup_(" <<< ugroup << ")";

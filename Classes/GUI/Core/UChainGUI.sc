@@ -1163,7 +1163,7 @@ UChainGUI {
 			);
 			upatGUI.mapSetAction = { chain.changed( \units ) };
 			
-			[ \sustain, \timeToNext ].do({ |key|
+			[ \pattern ].do({ |key|
 				var item;
 				item = chain.perform( key );
 				if( item.isUMap ) {
