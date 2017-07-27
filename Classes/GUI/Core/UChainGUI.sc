@@ -868,7 +868,7 @@ UChainGUI {
 						this.makeViews( originalBounds );
 						this.makeCurrent;
 						this.addToAll;
-					}.defer(0.01);
+					}.defer(0.05);
 				};
 			});
 			
