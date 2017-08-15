@@ -1888,6 +1888,29 @@
 			};
 		};
 			
+		view.view.decorator.left = view.bounds.width - 40;
+			
+		vws[ \global ] = SmoothButton( view, 40 @ viewHeight )
+			.label_( ["global", "global" ] )
+			.border_( 1 )
+			.radius_( 2 )
+			.hiliteColor_( Color.green )
+			.font_( font )
+			.action_({ |bt|
+				switch( bt.value,
+					1, { vws[ \val ].do(_.loadGlobal) },
+					0, { vws[ \val ].do(_.disposeGlobal) },
+				);
+			});
+			
+		vws[ \setGlobal ] = { |evt, value|
+			if( value.every(_.hasGlobal) ) {
+				vws[ \global ].value = 1;
+			} {
+				vws[ \global ].value = 0;
+			};
+		};
+			
 		view.view.decorator.nextLine;
 		view.view.decorator.shift( labelWidth, 0 );
 		
@@ -1943,6 +1966,7 @@
 		view[ \val ] = value;
 		view.setLoop( value );
 		view.setRate( value );
+		view.setGlobal( value );
 		view.setAmount( value );
 	}
 }
