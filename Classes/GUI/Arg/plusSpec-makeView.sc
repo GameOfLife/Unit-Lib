@@ -1832,8 +1832,10 @@
 			.label_( 'folder' )
 			.border_( 1 )
 			.radius_( 2 )
-			.font_( font )
-			.action_({
+			.font_( font );
+		
+		if( fixedAmount == true ) {
+			vws[ \browse ].action_({
 				var paths;
 				Dialog.openPanel({ |paths|
 					case { paths.size >= vws[ \val ].size } {
@@ -1865,6 +1867,26 @@
 					};
 				}, {}, true);
 			});
+		} {
+			vws[ \browse ].action_({
+				var paths;
+				Dialog.openPanel({ |paths|
+					action.value( vws, paths.collect({ |path| sndFileClass.new( path ) }) )
+				}, {}, true);
+			});
+		};
+		
+		vws[ \amount ] = StaticText( view, 60 @ viewHeight )
+			.applySkin( RoundView.skin )
+			.font_( font );
+		
+		if( fixedAmount ) { 
+			vws[ \amount ].string = " % files".format( default.size ); 
+		} {
+			vws[ \setAmount ] = { |vws, value|
+				{ vws[ \amount ].string = " % files".format( value.size ); }.defer;
+			};
+		};
 			
 		view.view.decorator.nextLine;
 		view.view.decorator.shift( labelWidth, 0 );
@@ -1921,6 +1943,7 @@
 		view[ \val ] = value;
 		view.setLoop( value );
 		view.setRate( value );
+		view.setAmount( value );
 	}
 }
 

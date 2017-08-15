@@ -882,10 +882,14 @@ MultiSndFileSpec : Spec {
 	
 	// array of points instead of a single point
 	
-	var <>default;
+	var <>default, <>fixedAmount = false, <>sndFileClass;
 	
-	*new { |default|
-		^super.new.default_( default );
+	*new { |default, fixedAmount = false, sndFileClass|
+		^super.new
+			.default_( default )
+			.fixedAmount_( fixedAmount )
+			.sndFileClass_( sndFileClass ? BufSndFile )
+			;
 	}
 	
 	*testObject { |obj|

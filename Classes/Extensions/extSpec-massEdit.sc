@@ -187,7 +187,7 @@
 + BufSndFileSpec {
 	
 	massEditSpec { |inArray|
-		^MultiSndFileSpec(inArray); 
+		^MultiSndFileSpec(inArray, true, this.class ); 
 	}
 	
 	massEditValue { |inArray|
@@ -204,7 +204,7 @@
 + DiskSndFileSpec {
 	
 	massEditSpec { |inArray|
-		^MultiSndFileSpec(inArray); 
+		^MultiSndFileSpec(inArray, true, this.class ); 
 	}
 	
 	massEditValue { |inArray|
