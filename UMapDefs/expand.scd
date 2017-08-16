@@ -29,7 +29,12 @@ part of the Unit lib default UMapDefs set
 */
 
 ExpandUMapDef( \expand, { |unit|
-	unit.spec.expandArgSpecs;
+	var specs;
+	specs = unit.spec.expandArgSpecs;
+	if( unit.unitArgMode.notNil ) {
+		specs.do({ |spec| spec.mode = unit.unitArgMode })
+	};
+	specs;
 }, \convert )
 	.guiColor_( Color.white.alpha_(0.5) )
 	.canUseUMapFunc_({ |unit, key, umapdef|

@@ -63,6 +63,8 @@ ExpandUMapDef : UMapDef {
 		if( asp.notNil ) { ^asp.spec } { ^nil };
 	}
 	
+	getValue { |unit| ^unit.values.collect(_.value) }
+	
 	getDefault { |name, unit|
 		var asp;
 		asp = this.getArgSpec(name, unit);
@@ -120,7 +122,7 @@ ExpandUMapDef : UMapDef {
 	canInsert { ^false }
 	
 	allowedModes { |unit|
-		var modes = [ \sync, \normal ]; // add \init when solution for setting problem is found
+		var modes = [ \init, \sync, \normal ]; // add \init when solution for setting problem is found
 		if( unit.notNil ) {	
 			unit.args.do({ |item|
 				if( item.isUMap ) {
