@@ -149,6 +149,10 @@ UMapDef : Udef {
 		^unit !? {|x| x.spec.default } ? 0;
 	}
 	
+	getValue { |unit|
+		 ^unit.get( \value ) ? unit 
+	}
+	
 	getBus { |unit|
 		^unit.get(\u_mapbus) ? 0
 	}
@@ -216,6 +220,7 @@ UMap : U {
 	var <spec;
 	var <>useSpec;
 	var <>unitArgName;
+	var <>unitArgMode;
 	var <>unmappedKeys;
 	var <>streamID;
 	
@@ -348,6 +353,7 @@ UMap : U {
 		if( unit.canUseUMap( key, this.def ) ) {
 			this.unitArgName = key;
 			if( key.notNil ) {
+				this.unitArgMode = unit.getSpecMode( key );
 				if( unit.argNeedsUnmappedInput( key ) ) {
 					if( unit.spec.notNil ) {
 						this.spec = unit.getSpec( key ).copy;
@@ -422,7 +428,7 @@ UMap : U {
 			.flatten(1);
 	}
 	
-	value { ^this.get( \value ) ? this }
+	value { ^this.def.getValue( this ) }
 	
 	/// UPat
 	
