@@ -19,7 +19,8 @@ part of the Unit lib default Udefs set
 */
 
 MultiChannelUdef( \bufSoundFile, {
-		UMixOut.ar( 0, BufSndFilePlayer.ar( Udef.numChannels ) * \level.ukr( 1, \amp ), 0, true );
+		UMixOut.ar( 0, BufSndFilePlayer.ar( Udef.numChannels, \soundFile, \trigger.utr(1) ) 
+			* \level.ukr( 1, \amp ), 0, true );
 	}, [ [ \soundFile, nil, BufSndFileSpec(nil) ] ], \soundFile, true )
 	.chooseFunc_({ |args|
 		var sf, numChannels;
