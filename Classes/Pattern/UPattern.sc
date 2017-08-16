@@ -285,8 +285,8 @@ UPattern : UChain {
 				this.localPos = time;
 				if( next.notNil ) { 
 					track = track + 1; 
-					action.value( next, target, time, timeToNext );
 				};
+				action.value( next, target, time, timeToNext );
 				timeToNext.wait;
 				time = time + timeToNext;
 				if( timeToNext == 0 ) { zeroCount = zeroCount + 1 } { zeroCount = 0 };
@@ -319,8 +319,10 @@ UPattern : UChain {
 			routine = this.makeRoutine( target, startPos, { |chain, target, time, timeToNext| 
 				if( time < waitTime ) {
 					// "preparing %\n".postf( time.asSMPTEString );
-					chain.prepare( target, action: multiAction.getAction );
-					preparedEvents = preparedEvents.add( chain );
+					if( chain.notNil ) {
+						chain.prepare( target, action: multiAction.getAction );
+						preparedEvents = preparedEvents.add( chain );
+					};
 				} {
 					if( firstEvent ) {
 						UPattern.expectedNext = startedPreparingTime + (time - waitTime) + timeToNext;
@@ -328,11 +330,13 @@ UPattern : UChain {
 						(time - waitTime).wait;
 						firstEvent = false;
 					};
-					preparedEvents = preparedEvents.add(
-						chain.prepareWaitAndStart( target, startAction: {
-							preparedEvents.remove( chain );
-						} );
-					);
+					if( chain.notNil ) {
+						preparedEvents = preparedEvents.add(
+							chain.prepareWaitAndStart( target, startAction: {
+								preparedEvents.remove( chain );
+							} );
+						);
+					};
 				};
 			} );
 			UPattern.seconds = startedPreparingTime - waitTime;
@@ -361,7 +365,7 @@ UPattern : UChain {
 			firstAction.value;
 		} {
 			routine = this.makeRoutine( target, startPos, { |chain, target, time| 
-				chain.prepareWaitAndStart( target ); 
+				chain !? _.prepareWaitAndStart( target ); 
 			} );
 			preparedEventsRoutine = nil;
 			action.value;
@@ -374,7 +378,7 @@ UPattern : UChain {
 		isPlaying = true;
 		this.changed( \start );
 		routine = routine ?? { this.makeRoutine( target, startPos, { |chain, target, time| 
-			chain.prepareWaitAndStart( target ); 
+			chain !? _.prepareWaitAndStart( target ); 
 		} ); };
 		task = PauseStream( routine ).play;
 		preparedEventsRoutine.play;
@@ -392,7 +396,7 @@ UPattern : UChain {
 		isPlaying = true;
 		this.changed( \start );
 		task = PauseStream( this.makeRoutine( target, startPos, { |chain, target, time| 
-			chain.prepareWaitAndStart( target ); 
+			chain !? _.prepareWaitAndStart( target ); 
 		} ) ).play;
 	}
 	
@@ -421,7 +425,7 @@ UPattern : UChain {
 		UPattern.seconds = thisThread.seconds;
 		events = Array( 2**13 );
 		routine = this.makeRoutine( nil, 0, { |chain, target, time|
-			events = events.add( chain );
+			if( chain.notNil ) { events = events.add( chain ); };
 		});
 		while { (nextTime = routine.next).notNil; } { 
 			UPattern.seconds = seconds + nextTime;
