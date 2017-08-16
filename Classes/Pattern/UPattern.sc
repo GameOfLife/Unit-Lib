@@ -2,6 +2,7 @@ UPattern : UChain {
 	
 	classvar >seconds;
 	classvar <>preparedThreads, <>expectedTimes, <>preparing = false;
+	classvar <>argSpecs;
 	
 	var <repeats = inf;
 	var <pattern = #[1,1];
@@ -12,6 +13,10 @@ UPattern : UChain {
 	var <>preparedEvents;
 	var isPlaying = false;
 	var task;
+	
+	*initClass {
+		argSpecs = [ ArgSpec( 'pattern', [1,1], UPatternSpec(), false, \init ) ];
+	}
 	
 	init { |args|
 		this.pattern = \sustain_time;
@@ -77,11 +82,7 @@ UPattern : UChain {
         };
 	}
 	
-	argSpecsForDisplay { 
-		^[
-			ArgSpec( 'pattern', [1,1], UPatternSpec(), false, \init )
-		]
-	}
+	argSpecsForDisplay { ^argSpecs }
 	
 	canUseUMap { |key, umapdef|
 		^umapdef.allowedModes.includes( 'init' ) && {
@@ -136,21 +137,15 @@ UPattern : UChain {
 	
 	argNeedsUnmappedInput { ^false }
 	
-	getSpec { |key|
-		^switch( key,
-			'pattern', { UPatternSpec() },
-		);
-	}
-	
-	getDefault { |key|
-		^switch( key,
-			'pattern', { [1,1] },
-		);
-	}
+	argSpecs { ^argSpecs }
+	getArgSpec { |key| ^if( key === \pattern ) { argSpecs[0] } }
+	getSpec { |key| ^if( key === \pattern ) { argSpecs[0].spec } }
+	getSpecMode { |key| ^if( key === \pattern ) { argSpecs[0].mode } }
+	getDefault { |key| ^if( key === \pattern ) { argSpecs[0].default } }
 	
 	removeUMap { |key|
 		switch( key,
-			'pattern', { this.pattern = [1,1] },
+			'pattern', { this.pattern = this.getDefault( \pattern ) },
 		);
 	}
 	
