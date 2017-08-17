@@ -34,7 +34,7 @@ UMapDef( \sequencer_32, {
 	phase = (phase.floor * (1-smooth)) + (phase * smooth);
 	sig = LinSelectX.kr( phase, values );
 	UMapOut.kr( sig );
-}).category_( \modulation )
+}).category_( \choice )
 	.setSpec( \speed, [0,300, 4,0,10].asSpec )
 	.setSpec( \reverse, BoolSpec(false) )
 	.setSpec( \range, [0,31,\lin,1].asSpec.asRangeSpec )

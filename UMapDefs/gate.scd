@@ -21,4 +21,4 @@ UMapDef( \gate, {
 })
 .mappedArgs_([ \value ])
 .setSpec( \gate, BoolSpec( true ) )
-.category_( 'utility' )
+.category_( 'choice' )

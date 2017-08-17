@@ -25,6 +25,6 @@ UMapDef( \linear, { |value = 0.5|
 			spec.respondsTo( \warp_ ) && { spec.warp.isKindOf( LinearWarp ).not };
 		};
 	})
-	.category_( 'convert' )
+	.category_( 'map' )
 
 

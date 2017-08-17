@@ -47,4 +47,4 @@ UMapDef( \clip_scale, { |value = 0.0, fromRange = #[0.0, 1.0], toRange = #[0.0, 
 	.setSpec( \clipSoftness, [0,1,\lin,0,0.1].asSpec )
 	.setSpec( \curve, [-16,16,\lin,0,0].asSpec )
 	.setSpec( \invert, BoolSpec(false) )
-	.category_( 'utility' )
+	.category_( 'map' )

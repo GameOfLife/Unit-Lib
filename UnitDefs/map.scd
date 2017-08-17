@@ -51,6 +51,6 @@ d = UMapDef( \map, { |value = 0.5, min = 0, max = 1, warp = -1, curve = 0|
 	})
 	)
 	.setSpec( \curve, [-16,16,\lin,0,0] )
-	.category_( 'convert' )
+	.category_( 'map' )
 
 
