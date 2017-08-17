@@ -73,6 +73,7 @@ UChainGUI {
 	}
 	
 	init { |inParent, bounds|
+		var oldBounds, oldTitle;
 		parent = inParent;
 		
 		packUnits = if( chain.isKindOf( MassEditUChain ) ) { false; } { packUnitsDefault; };
@@ -91,12 +92,17 @@ UChainGUI {
 		if( parent.class == String ) {
 			if( singleWindow && current.notNil && { current.window.class == Window.implClass } ) {
 				parent = current.parent.asView.findWindow;
-				current.views.singleWindow.focus;
-				current.remove;
+				oldBounds = parent.bounds;
+				oldTitle = parent.name;
+				parent.close;
+				parent = Window(
+					oldTitle, 
+					oldBounds,
+					scroll: false
+				).front;
 				this.makeViews( bounds );
 				this.makeCurrent;
 				this.addToAll;
-				parent.front;
 			} {
 				parent = Window(
 					parent, 
@@ -835,11 +841,18 @@ UChainGUI {
 				};
 			} )
 			.put( \units, { 
+				var bounds, title;
 				if( composite.isClosed.not ) {
 					{
 						scrollViewOrigin = this.scrollView.visibleOrigin;
-						composite.children[0].focus; // this seems to prevent a crash..
-						composite.remove;
+						bounds = parent.bounds;
+						title = parent.name;
+						parent.close;
+						parent = Window(
+							title, 
+							bounds,
+							scroll: false
+						).front;
 						if( chain.class == MassEditUChain ) {
 							chain.init;
 						};
@@ -856,19 +869,26 @@ UChainGUI {
 							chain.prepareAndStart(chain.lastTarget)
 						}
 					}
-					}.defer(0.01);
+					}.defer;
 				};
 			})
 			.put( \init, { 
+				var bounds, title;
 				if( composite.isClosed.not ) {
 					{
 						scrollViewOrigin = this.scrollView.visibleOrigin;
-						composite.children[0].focus; // this seems to prevent a crash..
-						composite.remove;
+						bounds = parent.bounds;
+						title = parent.name;
+						parent.close;
+						parent = Window(
+							title, 
+							bounds,
+							scroll: false
+						).front;
 						this.makeViews( originalBounds );
 						this.makeCurrent;
 						this.addToAll;
-					}.defer(0.05);
+					}.defer;
 				};
 			});
 			
