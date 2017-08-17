@@ -28,8 +28,11 @@ UMapDefListView {
 	
 	*initClass {
 		filters = (
-			\dynamic: { |udef| [ UMapDef, ValueUMapDef, ExpandUMapDef ].includes( udef.class ) },
-			\single_value: { |udef| [ UMapDef, ValueUMapDef, ExpandUMapDef ].includes( udef.class ).not },
+			\dynamic: { |udef| [ UMapDef, ExpandUMapDef ].includes( udef.class ) },
+			\control: { |udef| [ ValueUMapDef, TaskUMapDef ].includes( udef.class ) },
+			\value: { |udef| [ FuncUMapDef ].includes( udef.class ) },
+			\pattern: { |udef| [ UPatDef, StreamUMapDef ].includes( udef.class ) },
+			\all: { true }
 		);
 	}
 	
@@ -84,13 +87,24 @@ UMapDefListView {
 	
 	init { |parent, bounds, inFilter|
 		
-		var categories, names, rackCategories, g;
+		var g;
+		var dict;
 		var scrollerMargin = 12;
 		var refreshFunc;
 		var controller;
-		var filterName;
+		var filterNames;
 		
-		filter = filters[ inFilter ] ? inFilter;
+		if( inFilter.isArray ) {
+			filter = inFilter.collect({ |item| filters[item] ? item });
+		} {
+			filter = filters[ inFilter ] ? inFilter ? filters[ \all ];
+		};
+		
+		filterNames = filter.asArray.collect({ |filter|
+			if( filter.notNil ) { 
+				filters.findKeyForValue( filter ) ? 'filtered' 
+			};
+		});
 		
 		refreshFunc = ActionFunc( \delay, { { this.rebuild }.defer( 0.01 ); }, 0.1 );
 		
@@ -120,23 +134,29 @@ UMapDefListView {
 		views[ \scrollview ].addFlowLayout;
 		views[ \scrollview ].hasBorder = false;
 		
-		categories = [];
+		dict = ();
 		
-		UMapDef.all !? { |all| all.keys.asArray.sort.do({ |key|
-                var category, index, udef;
-	           udef = all[ key ];
-	           if( filter.isNil or: { filter.value( udef ) == true }) {
-	                category = udef.category;
-	                index = categories.indexOf( category );
-	                if( index.isNil ) {
-	                    categories = categories ++ [ category, [ udef ] ];
-	                } {
-	                    categories[ index + 1 ] = categories[ index + 1 ].add( udef );
-	                };
-	           };
-            })
-		};
-
+		filter.asArray.do({ |filter, i|
+			var categories = [];
+			
+			UMapDef.all !? { |all| all.keys.asArray.sort.do({ |key|
+	                var category, index, udef;
+		           udef = all[ key ];
+		           if( filter.isNil or: { filter.value( udef ) == true }) {
+		                category = udef.category;
+		                index = categories.indexOf( category );
+		                if( index.isNil ) {
+		                    categories = categories ++ [ category, [ udef ] ];
+		                } {
+		                    categories[ index + 1 ] = categories[ index + 1 ].add( udef );
+		                };
+		           };
+	            })
+			};
+						
+			dict[ filterNames[i] ] = categories;
+		});
+		
 		g = { |cat, udefs|
 		   var color;
             if( cat !== \private ) {
@@ -269,12 +289,11 @@ UMapDefListView {
 					});
 				});
 				
-			if( filter.notNil ) { filterName = filters.findKeyForValue( filter ) ? "filtered" };
-				
-			StaticText(views[ \scrollview],150@25).string_("UMapDefs" ++ if( filterName.notNil ) { " : " ++ filterName } { "" } );
-			views[ \scrollview].decorator.nextLine;
-			categories = categories.clump(2).sort({ |a,b| a[0] <= b[0] }).flatten(1);
-			categories.pairsDo(g);
+			filterNames.do({ |filterName|
+				StaticText(views[ \scrollview],150@25).string_("UMapDefs" ++ if( filterName.notNil ) { " : " ++ filterName } { "" } );
+				views[ \scrollview].decorator.nextLine;
+				dict[ filterName ].clump(2).sort({ |a,b| a[0] <= b[0] }).flatten(1).pairsDo(g);
+			});
 		});
 	}
 }
