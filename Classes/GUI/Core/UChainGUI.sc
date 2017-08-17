@@ -1312,7 +1312,7 @@ UChainGUI {
 			if( unit.isKindOf( MassEditU ) ) {
 				massEditWindowButton = SmoothButton( comp, 
 					Rect( comp.bounds.right - 
-						((18 + 2) + if( notMassEdit){12 + 4 + 12}{0}), 
+						((18 + 4) + if( notMassEdit){12 + 4 + 12 + 4 + 12}{0}), 
 						1, 18, 12 ) 
 					)
 					.label_( 'up' )
