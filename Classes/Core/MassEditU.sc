@@ -30,7 +30,7 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 	
 	guiColor { ^units.detect(_.respondsTo(\guiColor)) !? _.guiColor ?? { Color.clear; } }
 	
-	init { |inUnits|
+	init { |inUnits, active = true|
 		var firstDef, defs;
 		var dkey, dval;
 		units = inUnits.asCollection;
@@ -79,15 +79,15 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 				};
 			}).select(_.notNil);	
 			args = argSpecs.collect({ |item| [ item.name, item.default ] }).flatten(1);
-			this.changed( \init );
+			if( active == true ) { this.changed( \init ); };
 		} {
 			"MassEditU:init - not all units are of the same Udef".warn;
 		};
 	}
 	
-	units_ { |inUnits| 
+	units_ { |inUnits, active = true| 
 		this.disconnect;
-		this.init( inUnits ); 
+		this.init( inUnits, active ); 
 	}
 	
 	getArgSpec { |name|
@@ -247,6 +247,14 @@ MassEditUChain {
 		}).select(_.notNil).flatten(1);
 		
 		this.changed( \init );
+	}
+	
+	addDependantToChains { |dependant|
+		uchains.do(_.addDependant(dependant));
+	}
+	
+	removeDependantFromChains { |dependant|
+		uchains.do(_.removeDependant(dependant));
 	}
 	
 	connect {

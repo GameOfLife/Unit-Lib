@@ -130,11 +130,15 @@ UMapGUI : UGUI {
 					};
 				})
 				.receiveDragHandler_({
+					var drg;
 					unit.stop;
 					if( parentUnit.isKindOf( MassEditU ) ) {
+						drg = View.currentDrag;
+						UMapSetChecker.stall = true;
 						parentUnit.units.do({ |subunit|
-							subunit.insertUMap( unit.unitArgName, View.currentDrag );
+							subunit.insertUMap( unit.unitArgName, drg );
 						});
+						UMapSetChecker.stall = false;
 					} {
 						parentUnit.insertUMap( unit.unitArgName, View.currentDrag );					};
 				});

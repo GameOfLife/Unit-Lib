@@ -127,6 +127,25 @@ UChainGUI {
 		
 	}
 	
+	rebuild {
+		{
+			var oldBounds, oldTitle, parentWindow;
+			parentWindow = parent.asView.findWindow;
+			oldBounds = parentWindow.bounds;
+			oldTitle = parentWindow.name;
+			scrollViewOrigin = this.scrollView.visibleOrigin;
+			parentWindow.close;
+			parent = Window(
+				oldTitle, 
+				oldBounds,
+				scroll: false
+			).front;
+			this.makeViews();
+			this.makeCurrent;
+			this.addToAll;
+		}.defer;
+	}
+	
 	makeCurrent { current = this }
 	
 	addToAll { all = all.add( this ) }
@@ -207,6 +226,7 @@ UChainGUI {
 		var controller;
 		var udefController;
 		var scoreController;
+		var massEditController;
 		var ugroupCtrl;
 		// var unitInitFunc;
 		
@@ -231,6 +251,7 @@ UChainGUI {
 				
 		controller = SimpleController( chain );
 		udefController = SimpleController( Udef.all );
+		massEditController = { |...args| chain.update(*args) };
 		
 		composite = CompositeView( parent, bounds ).resize_(5);
 		composite.addFlowLayout( margin, gap );
@@ -238,7 +259,9 @@ UChainGUI {
 			controller.remove; 
 			scoreController.remove;
 			udefController.remove;
-			if( chain.isKindOf( MassEditUChain ) ) { chain.disconnect };
+			if( chain.isKindOf( MassEditUChain ) ) { 
+				chain.removeDependantFromChains( massEditController ); 
+			};
 			this.removeFromAll;
 			if( composite == vw && { current == this } ) { current = nil } 
 		};
@@ -303,7 +326,7 @@ UChainGUI {
 		 };
 
 		if( chain.isKindOf( MassEditUChain ) ) {
-			chain.connect;
+			chain.addDependantToChains( massEditController ); 
 		} {
 			
 			composite.decorator.shift( -34, 0 );
@@ -849,52 +872,19 @@ UChainGUI {
 			.put( \units, { 
 				var bounds, title;
 				if( composite.isClosed.not ) {
-					{
-						scrollViewOrigin = this.scrollView.visibleOrigin;
-						bounds = parent.bounds;
-						title = parent.name;
-						parent.close;
-						parent = Window(
-							title, 
-							bounds,
-							scroll: false
-						).front;
-						if( chain.class == MassEditUChain ) {
-							chain.init;
-						};
-						this.makeViews( originalBounds );
-						this.makeCurrent;
-						this.addToAll;
-					if( autoRestart and: { chain.isPlaying } ) {
-						chain.release(0.5);
-						fork{
-							while( { chain.isPlaying } ) {
-								0.01.wait;
-							};
-							//currently there's no way to know the startpos so it will start from 0
-							chain.prepareAndStart(chain.lastTarget)
-						}
-					}
-					}.defer;
+					if( chain.class == MassEditUChain ) {
+						chain.init;
+					} {	
+						controller.remove;
+						this.rebuild;
+					};
 				};
 			})
 			.put( \init, { 
 				var bounds, title;
 				if( composite.isClosed.not ) {
-					{
-						scrollViewOrigin = this.scrollView.visibleOrigin;
-						bounds = parent.bounds;
-						title = parent.name;
-						parent.close;
-						parent = Window(
-							title, 
-							bounds,
-							scroll: false
-						).front;
-						this.makeViews( originalBounds );
-						this.makeCurrent;
-						this.addToAll;
-					}.defer;
+					controller.remove;
+					this.rebuild;
 				};
 			});
 			
@@ -1001,19 +991,14 @@ UChainGUI {
 			score.changed( \lockStartTime );
 		};
 		
-		chain.changed( \gain );
-		chain.changed( \muted );
-		chain.changed( \startTime );
-		chain.changed( \lockStartTime );
-		chain.changed( \dur );
-		chain.changed( \fadeIn );
-		chain.changed( \fadeOut );
-		chain.changed( \fadeInCurve );
-		chain.changed( \fadeOutCurve );
-		chain.changed( \releaseSelf );
-		chain.changed( \global );
-		chain.changed( \addAction );
-		
+		[ 
+			\gain, \muted, \startTime, \lockStartTime, \dur, 
+			\fadeIn, \fadeOut, \fadeInCurve, \fadeOutCurve, 
+			\releaseSelf,  \global, \addAction 
+		].do({ |item|
+			controller.update(chain, item);
+		});
+				
 		composite.getParents.last.findWindow !? _.toFrontAction_({ 
 			this.makeCurrent;
 		});
@@ -1059,9 +1044,7 @@ UChainGUI {
                 .radius_( 2 )
                 .action_({
                     var parent;
-                    parent = composite.parent;
                     {
-                        composite.remove;
                         UChainIOGUI( parent, originalBounds, chain );
                     }.defer(0.01);
 
@@ -1073,9 +1056,7 @@ UChainGUI {
                 .radius_( 2 )
                 .action_({
                     var parent;
-                    parent = composite.parent;
                     {
-                        composite.remove;
                         UChainCodeGUI( parent, originalBounds, chain );
                     }.defer(0.01);
                 }).resize_(3);
@@ -1187,7 +1168,7 @@ UChainGUI {
 				),
 				chain,
 			);
-			upatGUI.mapSetAction = { chain.changed( \units ) };
+			upatGUI.mapSetAction = { chain.changed( \units ); };
 			
 			[ \pattern ].do({ |key|
 				var item;
@@ -1422,7 +1403,7 @@ UChainGUI {
 					.action_({
 						var copy;
 						if( unit.isKindOf( MassEditU ) ) {
-							unit.units = unit.units.add( unit.units.last.deepCopy.increaseIOs )
+							unit.units_( unit.units.add( unit.units.last.deepCopy.increaseIOs ), false );
 						} {
 							units = units.insert( i+1, unit.deepCopy.increaseIOs );
 						};

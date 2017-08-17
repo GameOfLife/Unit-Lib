@@ -130,11 +130,13 @@ UGUI {
 							umap.units.do({ |item|
 								if( item.isUMap ) { item.stop };
 							});
+							UMapSetChecker.stall = true;
 							unit.units.do({ |item|
 								if( item.get( key ).isUMap ) {
 									item.removeUMap( key );
 								};
 							});
+							UMapSetChecker.stall = false;
 						} {
 							umap.stop;
 							unit.removeUMap( key );
@@ -168,9 +170,13 @@ UGUI {
 						
 						if( unit.isKindOf( MassEditU ) ) {
 							umapdragbin.receiveDragHandler_({
+								var drg;
+								drg = View.currentDrag;
+								UMapSetChecker.stall = true;
 								unit.units.do({ |unit|
-									unit.insertUMap( key, View.currentDrag );
+									unit.insertUMap( key, drg );
 								});
+								UMapSetChecker.stall = false;
 							});
 						} {
 							umapdragbin.receiveDragHandler_({
@@ -214,10 +220,18 @@ UGUI {
 
 UMapSetChecker {
 	
+	classvar <>stallAction;
+	classvar <stall;
+	
 	var unit, <>action, argDict;
 	
 	*new { |unit, action|
 		^super.newCopyArgs( unit, action ).init;
+	}
+	
+	*stall_ { |bool = true|
+		if( bool == false ) { stallAction.value; stallAction = nil; };
+		stall = bool;
 	}
 	
 	init {
@@ -236,12 +250,20 @@ UMapSetChecker {
 		if( value.isUMap ) {
 			if( argDict[ key ] !== value ) {
 				argDict[ key ] = value;
-				action.value( this, key, value );
+				if( stall == true ) {
+					stallAction = action;
+				} {
+					action.value( this, key, value );
+				};
 			};
 		} {
 			if( argDict[ key ].notNil ) {
 				argDict[ key ] = nil;
-				action.value( this, key, value );
+				if( stall == true ) {
+					stallAction = action;
+				} {
+					action.value( this, key, value );
+				};
 			};
 		}	
 	}

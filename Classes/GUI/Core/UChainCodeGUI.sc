@@ -48,9 +48,7 @@ UChainCodeGUI : UChainGUI {
             .radius_( 2 )
             .action_({
                 var parent;
-                parent = composite.parent;
                 {
-                    composite.remove;
                     UChainGUI( parent, originalBounds, chain );
                 }.defer(0.01);
             }).resize_(3);
