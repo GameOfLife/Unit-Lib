@@ -12,15 +12,17 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UMapDef( \note_freq, { |note = 64, round = 1, detune = 0, transpose = 0|
+UMapDef( \note_freq, { |note = 64, round = 1, base = 440, detune = 0, transpose = 0|
 	UMapDef.useMappedArgs = false; // use raw values instead of mapped (0-1)
-	UMapOut.kr( ((note.round(round) + (detune/100)) + transpose).midicps );
+	UMapOut.kr( 
+		base * 2.pow((note.round(round) + (detune/100)) + transpose - 69 / 12) );
 })
 	.mappedArgs_([ \note ])
 	.setSpec( \note, UAdaptSpec({ |spec|
-		ControlSpec( spec.minval.cpsmidi, spec.maxval.cpsmidi, \lin, 0, 64 );
+		ControlSpec( spec.minval.cpsmidi, spec.maxval.cpsmidi, \lin, 0, spec.default.cpsmidi );
 	}) )
 	.setSpec( \round, [0,12,\lin,0,1] )
+	.setSpec( \base, [68.midicps, 70.midicps,\lin,0,440] )
 	.setSpec( \detune, [-50,50,\lin,0,0, " cents"].asSpec )
 	.setSpec( \transpose, [-12,12,\lin,1,0, " semitones"].asSpec )
 	.canUseUMapFunc_({ |unit, key, umapdef|
