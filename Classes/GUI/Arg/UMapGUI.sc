@@ -89,13 +89,11 @@ UMapGUI : UGUI {
 			.string_( ":" + unit.defName );
 			
 		if( unit.isKindOf( MassEditUMap ).not ) {
-			UDragBoth( header, Rect( bounds.width - 12 - 12 - 2, 2, 12, 12 ) )
+			UDragSource( header, Rect( bounds.width - 12 - 12 - 4, 2, 12, 12 ) )
 				.beginDragAction_({
 					{ UChainGUI.current.view.refresh }.defer(0.1);
 					dragging = unit.deepCopy;
 				})
-				.canReceiveDragHandler_({ View.currentDrag === dragging })
-				.receiveDragHandler_({ })
 				.background_( Color.gray(0.8,0.8) )
 				.string_( "" );
 		};

@@ -1307,9 +1307,6 @@ UChainGUI {
 				} {   [ Symbol, String ].includes( View.currentDrag.class )  } {
 					unit.def = View.currentDrag.asSymbol.asUdef;
 				};
-			})
-			.beginDragAction_({ 
-				unit;
 			});
 			
 			if( unit.isKindOf( MassEditU ) ) {
@@ -1380,6 +1377,15 @@ UChainGUI {
 			};
 			
 			if( notMassEdit ) {	
+				
+				UDragSource( comp, Rect( comp.bounds.right - (12 + 4 + 12 + 4 + 12 ), 1, 12, 12 ) )
+					.beginDragAction_({
+						{ UChainGUI.current.view.refresh }.defer(0.1);
+						unit;
+					})
+					.background_( Color.gray(0.8,0.8) )
+					.string_( "" );
+				
 				min = SmoothButton( comp, 
 							Rect( comp.bounds.right - (12 + 4 + 12), 1, 12, 12 ) )
 						.label_( '-' )
@@ -1411,7 +1417,7 @@ UChainGUI {
 					}).resize_(3);
 					
 				if(  unit.isKindOf( MassEditU ).not && { unit.audioOuts.size > 0 } ) {					SmoothButton( comp, 
-						Rect( comp.bounds.right - (45 + 2 + 12 + 4 + 12), 
+						Rect( comp.bounds.right - (45 + 4 + 12 + 4 + 12 + 4 + 12), 
 							1, 45, 12 ) 
 						)
 						.label_( "bounce" )
