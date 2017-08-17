@@ -29,4 +29,4 @@ UMapDef( \pulse_divider, {
 .setSpec( \offset, IntegerSpec(0,0,inf), \init )
 .setDefault( \offset, 0 )
 .setSpec( \trigger, TriggerSpec() )
-.category_( 'trigger_utility' )
+.category_( 'trigger' )
