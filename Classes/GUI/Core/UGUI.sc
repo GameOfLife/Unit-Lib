@@ -126,21 +126,21 @@ UGUI {
 					vw.parentUnit = unit;
 					vw.mapSetAction = { mapSetAction.value( this ) };
 					vw.removeAction = { |umap|
+						UMapSetChecker.stall = true;
 						if( unit.isKindOf( MassEditU ) ) {
 							umap.units.do({ |item|
 								if( item.isUMap ) { item.stop };
 							});
-							UMapSetChecker.stall = true;
 							unit.units.do({ |item|
 								if( item.get( key ).isUMap ) {
 									item.removeUMap( key );
 								};
 							});
-							UMapSetChecker.stall = false;
 						} {
 							umap.stop;
 							unit.removeUMap( key );
 						};
+						UMapSetChecker.stall = false;
 					};
 				} {
 					vw = ObjectView( composite, bounds.width, unit, key, 
@@ -180,7 +180,9 @@ UGUI {
 							});
 						} {
 							umapdragbin.receiveDragHandler_({
+								UMapSetChecker.stall = true;
 								unit.insertUMap( key, View.currentDrag );
+								UMapSetChecker.stall = false;
 							});
 						};
 						composite.decorator.nextLine;

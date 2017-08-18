@@ -1101,7 +1101,7 @@ UChainGUI {
 		
 		unitInitFunc = { |unit, what ...args|
 			if( what === \init ) { // close all views and create new
-				chain.changed( \units );
+				if( UMapSetChecker.stall != true ) { chain.changed( \units ); };
 			};
 		};
 		
