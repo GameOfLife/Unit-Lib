@@ -1255,6 +1255,10 @@ UChainGUI {
 			};
 		
 			comp = CompositeView( scrollView, width@14 )
+				.background_( if( notMassEdit ) 
+					{ Color.white.alpha_(0.5) }
+					{ Color.white.blend( Color.yellow, 0.33 ).alpha_(0.5) }
+				)
 				.resize_(2);
 				
 			SmoothButton( comp, Rect( 2, 0, 12, 12 ) )
@@ -1262,7 +1266,6 @@ UChainGUI {
 				.border_( 0 )
 				.background_( nil )
 				.hiliteColor_( nil )
-				.canFocus_( false )
 				.value_( unit.guiCollapsed.binaryValue )
 				.action_({ |bt|
 					unit.guiCollapsed = bt.value.booleanValue;
@@ -1274,10 +1277,6 @@ UChainGUI {
 					" " ++ indexLabel ++ ": " ++ 
 					if( unit.def.class == LocalUdef ) { "[Local] " } { "" } ++
 					unit.fullDefName
-				)
-				.background_( if( notMassEdit ) 
-					{ Color.white.alpha_(0.5) }
-					{ Color.white.blend( Color.yellow, 0.33 ).alpha_(0.5) }
 				)
 				.resize_(2)
 				.font_( 
