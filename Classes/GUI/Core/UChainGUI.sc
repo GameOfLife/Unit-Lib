@@ -74,11 +74,11 @@ UChainGUI {
 
 	}
 	
-	*new { |parent, bounds, chain, score|
-		^super.newCopyArgs( chain, score ).init( parent, bounds );
+	*new { |parent, bounds, chain, score, replaceCurrent|
+		^super.newCopyArgs( chain, score ).init( parent, bounds, replaceCurrent );
 	}
 	
-	init { |inParent, bounds|
+	init { |inParent, bounds, replaceCurrent|
 		var oldBounds, oldTitle;
 		parent = inParent;
 		
@@ -96,7 +96,7 @@ UChainGUI {
 			parent = chain.class.asString;
 		};
 		if( parent.class == String ) {
-			if( singleWindow && current.notNil && { current.window.class == Window.implClass } ) {
+			if( (singleWindow or: { replaceCurrent == true }) && current.notNil && { current.window.class == Window.implClass } ) {
 				parent = current.parent.asView.findWindow;
 				oldBounds = parent.bounds;
 				oldTitle = parent.name;
@@ -1038,33 +1038,33 @@ UChainGUI {
 				.resize_(2);
 				
 		if( notMassEdit ) {
-            io = SmoothButton( comp, Rect( comp.bounds.right - 60, 1, 60, 12 ) )
+            io = SmoothButton( comp, Rect( comp.bounds.right - 40, 1, 40, 12 ) )
                 .label_( "i/o" )
                 .border_( 1 )
                 .radius_( 2 )
                 .action_({
-                    var parent;
-                    {
-                        UChainIOGUI( parent, originalBounds, chain );
-                    }.defer(0.01);
-
+	                UChainIOGUI( 
+	                	this.window.name, originalBounds, 
+	                	chain, replaceCurrent: true 
+	                );
                 }).resize_(3);
+                
             code = SmoothButton( comp,
-                    Rect( comp.bounds.right - (40 + 4 + 60), 1, 40, 12 ) )
+                    Rect( comp.bounds.right - (40 + 4 + 40), 1, 40, 12 ) )
                 .label_( "code" )
                 .border_( 1 )
                 .radius_( 2 )
                 .action_({
-                    var parent;
-                    {
-                        UChainCodeGUI( parent, originalBounds, chain );
-                    }.defer(0.01);
+	                UChainCodeGUI( 
+	                	this.window.name, originalBounds, 
+	                	chain, replaceCurrent: true 
+	                );
                 }).resize_(3);
 		};
 		
 		defs = SmoothButton( comp, 
 				Rect( comp.bounds.right - (
-					2 + 40 + (notMassEdit.binaryValue * (4 + 60 + 4 + 40))
+					2 + 40 + (notMassEdit.binaryValue * (4 + 40 + 4 + 40))
 					), 1, 42, 12 
 				) 
 			)

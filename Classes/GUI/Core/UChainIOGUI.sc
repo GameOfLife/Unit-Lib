@@ -78,7 +78,7 @@ UChainIOGUI : UChainGUI {
 	}
 	
 	makeUnitHeader { |units, margin, gap|
-		var comp, header,params;
+		var comp, header, code, io;
 		var audio, control;
 		
 		comp = CompositeView( composite, (composite.bounds.width - (margin.x * 2))@16 )
@@ -89,17 +89,30 @@ UChainIOGUI : UChainGUI {
 				.string_( " units" )
 				.align_( \left )
 				.resize_(2);
-	
-		params = SmoothButton( comp, Rect( comp.bounds.right - 60, 1, 60, 12 ) )
-			.label_( "params" )
-			.border_( 1 )
-			.radius_( 2 )
-			.action_({
-				var parent;
-				{
-					UChainGUI( parent, originalBounds, chain );
-				}.defer(0.01);
-			}).resize_(3);
+				
+		io = SmoothButton( comp, Rect( comp.bounds.right - 40, 1, 40, 12 ) )
+                .label_( "i/o" )
+                .border_( 1 )
+                .radius_( 2 )
+                .background_( Color.green )
+                .action_({
+	                UChainGUI( 
+	                	this.window.name, originalBounds, 
+	                	chain, replaceCurrent: true 
+	                );
+                }).resize_(3);
+         
+         code = SmoothButton( comp,
+                    Rect( comp.bounds.right - (40 + 4 + 40), 1, 40, 12 ) )
+                .label_( "code" )
+                .border_( 1 )
+                .radius_( 2 )
+                .action_({
+	                UChainCodeGUI( 
+	                	this.window.name, originalBounds, 
+	                	chain, replaceCurrent: true 
+	                );
+                }).resize_(3);
 						
 		CompositeView( comp, Rect( 0, 14, (composite.bounds.width - (margin.x * 2)), 2 ) )
 			.background_( Color.black.alpha_(0.25) )
