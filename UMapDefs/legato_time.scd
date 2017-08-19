@@ -19,9 +19,6 @@ FuncUMapDef( \legato_time, { |unit, legato = 1, timeToNext = 1|
 	.mappedArgs_( [] )
 	.setSpec( \legato, [0,10,\lin,0,1].asSpec )
 	.setSpec( \timeToNext, SMPTESpec(0.01,3600) )
-	.prepareArgsFunc_( { |args|
-		args.replace( \division, \factor );
-	} )
 	.dontStoreValue_( true )
 	.canUseUMapFunc_({ |unit, key, umapdef|
 		unit.getSpec( key ).isKindOf( UPatternSpec );
