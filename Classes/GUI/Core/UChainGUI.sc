@@ -1017,6 +1017,9 @@ UChainGUI {
 		comp = CompositeView( composite, (composite.bounds.width - (margin.x * 2))@16 )
 			.resize_(2);
 			
+		if( notMassEdit ) {
+		};
+			
 		if( notMassEdit && { this.canPackUnits }) {
 			RoundButton( comp, 13 @ 13 )
 				.border_(0)
@@ -1253,8 +1256,19 @@ UChainGUI {
 		
 			comp = CompositeView( scrollView, width@14 )
 				.resize_(2);
+				
+			SmoothButton( comp, Rect( 2, 0, 12, 12 ) )
+				.label_( ['down', 'play'] )
+				.border_( 0 )
+				.background_( nil )
+				.hiliteColor_( nil )
+				.canFocus_( false )
+				.value_( unit.guiCollapsed.binaryValue )
+				.action_({ |bt|
+					unit.guiCollapsed = bt.value.booleanValue;
+				});
 			
-			header = StaticText( comp, comp.bounds.moveTo(0,0) )
+			header = StaticText( comp, comp.bounds.moveTo(0,0).insetAll( 16,0,0,0) )
 				.applySkin( RoundView.skin )
 				.string_( 
 					" " ++ indexLabel ++ ": " ++ 
@@ -1271,7 +1285,7 @@ UChainGUI {
 						{ Font( Font.defaultSansFace, 12) }).boldVariant 
 				);
 				
-			uview = UDragBin( comp, comp.bounds.moveTo(0,0) );
+			uview = UDragBin( comp, comp.bounds.moveTo(0,0).insetAll( 16,0,0,0) );
 			uview.color_( Color.gray(0.2) );
 			
 			uview.canReceiveDragHandler_({ |sink|
