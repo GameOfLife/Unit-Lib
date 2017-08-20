@@ -31,10 +31,12 @@ ArgSpec : Spec {
 	var <>name, <>default, <>spec;
 	var <>private = false;
 	var <>mode = \sync; // \sync, \normal, \init, \nonsynth
+	var <>width = 1;
 	var >label;
 	
-	*new { |name, default, spec, private, mode|
-		^super.newCopyArgs( name.asSymbol, default, spec, private ? false, mode ? \sync ).init;
+	*new { |name, default, spec, private, mode, width = 1|
+		^super.newCopyArgs( name.asSymbol, default, spec, private ? false, mode ? \sync, 
+			width ? 1 ).init;
 	}
 	
 	init { 

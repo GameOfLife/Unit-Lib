@@ -132,7 +132,7 @@ UGUI {
 						UMapSetChecker.stall = false;
 					};
 				} {
-					vw = ObjectView( composite, bounds.width, unit, key, 
+					vw = ObjectView( composite, bounds.width * argSpec.width, unit, key, 
 						argSpec.spec, controller,
 						switch( argSpec.mode,
 						 	\nonsynth, { key ++ " (l)" },
@@ -143,10 +143,8 @@ UGUI {
 					vw.action = { action.value( this, key, value ); };
 					
 					if( [ \nonsynth ].includes(argSpec.mode).not ) {						viewNumLines = argSpec.spec.viewNumLines;
-						composite.decorator.nextLine;
-						composite.decorator.shift( 0, 
-							((viewHeight + composite.decorator.gap.y) * viewNumLines).neg 
-						);
+						
+						composite.decorator.shift( (bounds.width * argSpec.width.neg) - 3, 0 );
 						
 						umapdragbin = UDragBin( composite, labelWidth @ viewHeight )
 							.canReceiveDragHandler_({ |vw, x,y|
@@ -163,10 +161,7 @@ UGUI {
 							UMapSetChecker.stall = false;
 						});
 						
-						composite.decorator.nextLine;
-						composite.decorator.shift( 0, 
-							((viewHeight + composite.decorator.gap.y) * (viewNumLines - 1))
-						);
+						composite.decorator.shift( (bounds.width * argSpec.width) - (labelWidth + 3), 0 );
 					};
 				};
 				views[ key ] = vw;
