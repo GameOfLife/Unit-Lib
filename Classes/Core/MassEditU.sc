@@ -130,6 +130,20 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 		}
 	}
 	
+	stop { units.do(_.stop) }
+	
+	insertUMap { |key, umapdef, args|
+		units.do({ |unit|
+			unit.insertUMap( key, umapdef, args );
+		});
+	}
+	
+	removeUMap { |key|
+		units.do({ |unit|
+			unit.removeUMap( key )
+		});
+	}
+	
 	set { |...args|
 		var autoUpdateWas, defNameWas;
 		
