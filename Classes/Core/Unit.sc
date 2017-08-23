@@ -844,16 +844,14 @@ U : ObjectWithArgs {
 	
 	release { |releaseTime, doneAction| // only works if def.canFreeSynth == true
 		var args;
-		args = [ 
-			\u_doneAction, doneAction ?? { this.get( \u_doneAction ) }, 
-			\u_gate, 0 
-		];
-		
+		if( doneAction.notNil && { this.get( \u_doneAction ) != doneAction } ) {			args = [ \u_doneAction, doneAction ];
+		};
 		if( releaseTime.notNil ) {
 			args = [ \u_fadeOut, releaseTime ] ++ args;
 		};
  
 		this.prSet( *args );
+		this.set( \u_gate, 0 );
 	}
 	
 	getArgsFor { |server, startPos = 0|
@@ -1101,7 +1099,7 @@ U : ObjectWithArgs {
 		stream << this.class.name << "( " <<* this.argsForPrint  <<" )"
 	}
 	
-	dontStoreArgNames { ^[ 'u_dur', 'u_doneAction' ] 
+	dontStoreArgNames { ^[ 'u_dur', 'u_doneAction', 'u_gate' ] 
 		++ this.def.dontStoreArgNames.value( this );
 	}
 	
@@ -1215,6 +1213,7 @@ U : ObjectWithArgs {
 			this.shouldPlayOn( tg ) != false;
 		});
 		servers = target.collect(_.server);
+		this.set( \u_gate, 1 );
 		if( target.size > 0 ) {
 	   	    act = { preparedServers = preparedServers.addAll( servers ); action.value };
 		    if( loadDef) {

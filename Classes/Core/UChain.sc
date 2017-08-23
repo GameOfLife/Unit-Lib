@@ -794,8 +794,8 @@ UChain : UEvent {
 			target = ULib.servers ? Server.default;
 		};
 		cond = Condition(false);
+		target = this.prepare( target, startPos, { cond.test = true; cond.signal } );
 		task = fork { 
-			target = this.prepare( target, startPos, { cond.test = true; cond.signal } );
 			cond.wait;
 	       	this.start(target, startPos);
 	       	prepareTasks.remove(task);
@@ -807,8 +807,8 @@ UChain : UEvent {
 	
 	prepareWaitAndStart { |target, startPos = 0, startAction|
 		var task;
+		target = this.prepare( target, startPos );
 		task = fork { 
-			target = this.prepare( target, startPos );
 			this.waitTime.wait; // doesn't care if prepare is done
 	       	this.start(target, startPos);
 	       	startAction.value( this );
