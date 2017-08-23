@@ -485,6 +485,16 @@ UPattern : UChain {
 	
 	stopChains { |releaseTime| this.currentChains.do(_.release( releaseTime ) ) }
 	
+	asUChain { 
+		^UChain( *this.units )
+			.startTime_( this.startTime )
+			.duration_( this.duration )
+			.track_( this.track )
+			.releaseSelf_( this.releaseSelf );
+	}
+	
+	asUPattern { ^this }
+	
 	storeModifiersOn { |stream|
 		var patArgs;
 		this.storeTags( stream );
@@ -513,5 +523,18 @@ UPattern : UChain {
 			stream << ".global_(" <<< global << ")";
 		};
 		
+	}
+}
+
++ UChain {
+	
+	asUChain { ^this }
+	
+	asUPattern { 
+		^UPattern( *this.units )
+			.startTime_( this.startTime )
+			.duration_( this.duration )
+			.track_( this.track )
+			.releaseSelf_( this.releaseSelf );
 	}
 }
