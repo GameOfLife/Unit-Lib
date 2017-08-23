@@ -49,6 +49,7 @@ UChain : UEvent {
 	var <>serverName; // name of a server to match for playback
 	
 	var <>parent;
+	var <>voicerNote, <>voicerValue; // UVoicer support
 
 	*initClass {
 		

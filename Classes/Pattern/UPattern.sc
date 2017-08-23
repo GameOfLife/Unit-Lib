@@ -175,6 +175,8 @@ UPattern : UChain {
 			next.startTime = startTime;
 			next.track = track;
 			next.ugroup = ugroup;
+			next.voicerNote = this.voicerNote;
+			next.voicerValue = this.voicerValue;
 			was = UChain.nowPreparingChain;
 			UChain.nowPreparingChain = next;
 			next.parent = this;
