@@ -890,7 +890,7 @@ UChainGUI {
 			
 		udefController.put( \added, { |obj, msg, def| 
 			if( chain.units.any({ |u| u.defName == def.name }) ) {
-				chain.changed( \units );
+				{ chain.changed( \units ); }.defer(0.1);
 			};
 		} );
 			
