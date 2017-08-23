@@ -66,8 +66,8 @@ UChain : UEvent {
 		};
 	}
 	
-	*new { |...args|
-		^super.new.init( args );
+	*new { |startTime, track, duration, releaseSelf ...units|
+		^super.new.init( [startTime,track,duration,releaseSelf] ++ units );
 	}
 	
 	*presets { ^presetManager.presets.as(IdentityDictionary) }
@@ -119,23 +119,27 @@ UChain : UEvent {
 	init { |args|
 		var tempDur;
 		
-		if( args[0].isNumber ) { 
+		if( args[0].isNumber, { 
 			startTime = args[0]; 
-			args = args[1..] 
-		};
-		if( args[0].isNumber ) { 
-			track = args[0]; 
-			args = args[1..] 
-		};
-		if( args[0].isNumber ) { 
-			tempDur = args[0]; 
-			args = args[1..] 
-		};
-		if( args[0].class.superclass == Boolean ) { 
-			releaseSelf = args[0]; args = args[1..] 
-		};
+			args[0] = nil;
+		});
 		
-		units = args.collect(_.asUnit);
+		if( args[1].isNumber, { 
+			track = args[1]; 
+			args[1] = nil;
+		});
+		
+		if( args[2].isNumber, { 
+			tempDur = args[2]; 
+			args[2] = nil;
+		});
+		
+		if( args[3].isKindOf( Boolean ), {
+			releaseSelf = args[3]; 
+			args[3] = nil;
+		});
+		
+		units = args.select(_.notNil).collect(_.asUnit);
 		if( tempDur.notNil ) { this.duration = tempDur };
 		
 		prepareTasks = [];
