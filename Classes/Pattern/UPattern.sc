@@ -300,7 +300,7 @@ UPattern : UChain {
 		var waitTime, firstEvent = true;
 		var multiAction, firstAction, preparedEventsRoutineShouldEnd = false;
 		var i = 0, nextTime, startedPreparingTime;
-		this.stop;
+		if( this.isPlaying ) { this.stop; };
 		waitTime = this.waitTime; // fixed waitTime for all events
 		units.do({ |unit| this.prResetStreams( unit ); });
 		if( this.pattern.isKindOf( UMap ) ) { this.prResetStreams( this.pattern ); };
