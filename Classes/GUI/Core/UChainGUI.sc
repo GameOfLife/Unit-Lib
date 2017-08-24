@@ -288,33 +288,20 @@ UChainGUI {
 				.hiliteColor_( Color.green )
 				.value_( chain.isKindOf( UPattern ).binaryValue )
 				.action_({ |bt|
-					var new;
+					var new, index;
 					{	
 						switch( bt.value,
-							0, { 
-								if( chain.isKindOf( UPattern ) ) {
-									new = UChain( *chain.units )
-										.startTime_( chain.startTime )
-										.duration_( chain.duration )
-										.track_( chain.track )
-										.releaseSelf_( chain.releaseSelf );
-								};
-							},
-							1, {
-								if( chain.isKindOf( UChain ) ) {
-									new = UPattern( *chain.units )
-										.startTime_( chain.startTime )
-										.duration_( chain.duration )
-										.track_( chain.track )
-										.releaseSelf_( chain.releaseSelf );
-								};
-							}
+							0, { new = chain.asUChain; },
+							1, { new = chain.asUPattern; }
 						);
 						if( parentScore.notNil ) { 
-							parentScore.events[ parentScore.indexOf( chain ) ] = new; 
-							parentScore.changed(\numEventsChanged);
-							parentScore.changed(\events);
-							parentScore.changed(\something); 
+							index = parentScore.indexOf( chain );
+							if( index.notNil ) {	
+								parentScore.events[ index ] = new; 
+								parentScore.changed(\numEventsChanged);
+								parentScore.changed(\events);
+								parentScore.changed(\something); 
+							};
 						};
 						new.gui( score: score );
 					}.defer(0.1);
