@@ -45,6 +45,16 @@ UPatDef( \p_line, { |unit, a = 0.0, b = 1.0, time = 10, loop = \loop|
 		};
 	}.r;
 }).mappedArgs_([\a, \b])
+.useMappedArgs_( false )
 .setSpec( \time, SMPTESpec() )
+.setSpec( \a, UAdaptSpec() )
+.setSpec( \b, UAdaptSpec() )
+.canUseUMapFunc_({ |unit, key, umapdef|
+	unit.isKindOf( UPattern ).not && {
+		[ SimpleNumber, Array, Point ].any({ |class|
+			unit.getDefault( key ).isKindOf( class )
+		});
+	};
+})
 .setSpec( \loop, ListSpec( [ \off, \loop, \backwards, \alternate ], 1 ) )
 .category_( 'pattern' );

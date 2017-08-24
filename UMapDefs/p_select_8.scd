@@ -32,6 +32,13 @@ def = UPatDef( \p_select_8, { |unit,
 	}.r;
 }).mappedArgs_( values )
 .useMappedArgs_( false )
+.canUseUMapFunc_({ |unit, key, umapdef|
+	unit.isKindOf( UPattern ).not && {	
+		[ Point, SimpleNumber, Array, Symbol ].any({ |class|
+			unit.getDefault( key ).isKindOf( class )
+		});
+	};
+})
 .setSpec( \index, IntegerSpec(0,0,7) )
 .category_( 'pattern_choice' );
 

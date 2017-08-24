@@ -44,6 +44,7 @@ UPatDef( \p_choose_8, { |unit,
 .setSpec( \value6, UAdaptSpec() )
 .setSpec( \value7, UAdaptSpec() )
 .setSpec( \histSize, IntegerSpec(0,0,7) )
+.canUseUMapFunc_({ |unit, key, umapdef| unit.isKindOf( UPattern ).not; })
 .setSpec( \seed, URandSeed )
 .setDefault( \seed, URandSeed() )
 .category_( 'pattern_random' );

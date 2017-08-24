@@ -18,5 +18,12 @@ UPatDef( \p_stutter, { |unit, input = 0, n = 1|
 })
 	.setSpec( \input, UAdaptSpec() )
 	.setSpec( \n, IntegerSpec(1, 1,((2**31) - 1).asInt) )
+	.canUseUMapFunc_({ |unit, key, umapdef|
+		unit.isKindOf( UPattern ).not && {
+			[ Point, SimpleNumber, Array, Symbol ].any({ |class|
+				unit.getDefault( key ).isKindOf( class )
+			});
+		};
+	})
 	.useMappedArgs_( false )
 	.mappedArgs_([ \input ]).category_( 'pattern' );

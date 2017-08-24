@@ -32,6 +32,7 @@ UPatDef( \p_wchoose_8, { |unit,
 	}.r;
 }).mappedArgs_([ \value0, \value1, \value2, \value3, \value4, \value5, \value6, \value7 ])
 .useMappedArgs_( false )
+.canUseUMapFunc_({ |unit, key, umapdef| unit.isKindOf( UPattern ).not })
 .setSpec( \value0, UAdaptSpec() )
 .setSpec( \value1, UAdaptSpec() )
 .setSpec( \value2, UAdaptSpec() )

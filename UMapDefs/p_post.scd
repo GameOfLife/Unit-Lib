@@ -18,6 +18,7 @@ UPatDef( \p_post, { |unit, input = 0|
 	}.r
 })	
 	.setSpec( \input, UAdaptSpec() )
+	.canUseUMapFunc_({ |unit, key, umapdef| unit.isKindOf( UPattern ).not })
 	.useMappedArgs_( false )
 	.mappedArgs_([ \input ])
 	.category_( 'pattern_utility' );
