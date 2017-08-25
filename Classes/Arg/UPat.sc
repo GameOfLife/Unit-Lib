@@ -91,12 +91,21 @@ UPatArg {
 	
 	prUnPrepare { |unit|
 		if( unit.isKindOf( UMap ) ) {
-			if( unit.def.isKindOf( FuncUMapDef ) ) {
+			if( unit.subDef.isKindOf( FuncUMapDef ) ) {
 				unit.u_prepared = false;
 			};
 			unit.values.do({ |val|
 				this.prUnPrepare( val );
 			});
+		};
+	}
+	
+	prNextValFuncUMapDef { |unit|
+		if( unit.isUMap && { unit.subDef.isKindOf( FuncUMapDef ) } ) {
+			unit.values.do({ |item|
+				this.prNextValFuncUMapDef( item );
+			});
+			unit.next;
 		};
 	}
 	
@@ -110,6 +119,7 @@ UPatArg {
 		if( value.isUMap.not && { spec.notNil } ) {
 			out = spec.unmap( value.next );
 		} {
+			this.prNextValFuncUMapDef( value );
 			out = value.next;
 		};
 		if( unPrepare == true ) { this.prUnPrepare( value ) };

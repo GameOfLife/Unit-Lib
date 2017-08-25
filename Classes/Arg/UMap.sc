@@ -301,7 +301,7 @@ UMap : U {
 	
 	isUMap { ^true }
 	
-	hasBus { ^this.def.hasBus }
+	hasBus { ^this.def.hasBus( this ) }
 	
 	setUMapBuses { } // this is done by the U for all (nested) UMaps
 	
@@ -373,7 +373,7 @@ UMap : U {
 						this.set( \u_useSpec, true );
 					};
 				};
-				this.def.activateUnit( this, unit );
+				this.subDef.activateUnit( this, unit );
 				this.valuesAsUnitArg
 			};
 			^this;
@@ -473,9 +473,9 @@ UMap : U {
 	disposeFor {
 		if( this.unit.notNil && { this.unit.synths.select(_.isKindOf( Synth ) ).size == 0 }) {
 			this.unit = nil;
-			if( this.def.isKindOf( TaskUMapDef ) ) { this.free; };
+			if( this.subDef.isKindOf( TaskUMapDef ) ) { this.free; };
 		};
-		if( this.def.isKindOf( FuncUMapDef ) or: this.def.isKindOf( TaskUMapDef ) ) {
+		if( this.subDef.isKindOf( FuncUMapDef ) or: this.subDef.isKindOf( TaskUMapDef ) ) {
 			this.values.do{ |val|
 	       	 if(val.respondsTo(\disposeFor)) {
 		            val.disposeFor( *args );

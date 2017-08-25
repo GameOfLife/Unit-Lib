@@ -29,12 +29,12 @@ UPattern : UChain {
 			item.isKindOf( UMap );
 		});
 		prepareThese.do({ |umap|
-			if( umap.def.isKindOf( UPatDef ).not ) {
+			if( umap.subDef.isKindOf( UPatDef ).not ) {
 				this.prPrepareUnit( umap );
 			};
 		});
 		prepareThese.do({ |umap|
-			 if( umap.def.isKindOf( FuncUMapDef ) ) {
+			 if( umap.subDef.isKindOf( FuncUMapDef ) ) {
 				umap.next;
 			 };
 		});
@@ -43,7 +43,7 @@ UPattern : UChain {
 	prPatternsToValues { |unit|
 		unit.args.pairsDo({ |key, item|
 			if( item.isKindOf( UMap ) ) {
-				if( [ FuncUMapDef, ValueUMapDef ].any({ |def| item.def.isKindOf( def ) }) ) {
+				if( [ FuncUMapDef, ValueUMapDef ].any({ |def| item.subDef.isKindOf( def ) }) ) {
 					unit.set( key, item.value );
 				} {
 					this.prPatternsToValues( item );
@@ -247,7 +247,7 @@ UPattern : UChain {
 	
 	prUnPrepare { |unit|
 		if( unit.isKindOf( UMap ) ) {
-			if( unit.def.isKindOf( FuncUMapDef ) ) {
+			if( unit.subDef.isKindOf( FuncUMapDef ) ) {
 				unit.u_prepared = false;
 			};
 			unit.values.do({ |val|
@@ -257,7 +257,7 @@ UPattern : UChain {
 	}
 	
 	getPattern { // returns new sustain and timeToNext
-		if( pattern.isKindOf( UMap ) && { pattern.def.isKindOf( FuncUMapDef ) } ) {
+		if( pattern.isKindOf( UMap ) && { pattern.subDef.isKindOf( FuncUMapDef ) } ) {
 			this.prUnPrepare( pattern );
 			this.prPrepareUnit( pattern );
 		};

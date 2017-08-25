@@ -1191,7 +1191,7 @@ U : ObjectWithArgs {
 	
 	needsPrepare {
 		^this.valuesToPrepare.size > 0 or: { 
-			this.def.needsPrepare; 
+			this.subDef.needsPrepare; 
 		};
 	}
 	
