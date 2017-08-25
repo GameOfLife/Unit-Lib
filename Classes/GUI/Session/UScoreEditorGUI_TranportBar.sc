@@ -345,7 +345,40 @@ UScoreEditorGui_TransportBar {
 				views[\tempoEditor ] = UScoreTempoMapGUI( score: scoreView.currentScore );
 			});
 	    
-        view.decorator.shift( view.decorator.indentedRemaining.width - 121, 0 );
+        view.decorator.shift( view.decorator.indentedRemaining.width - 161, 0 );
+        
+        views[\active] = SmoothButton( view, 39@size )
+            .label_( [ "active", "active" ] )
+            .hiliteColor_( Color.green.alpha_(0.5) )
+            .value_( scoreView.followPos.binaryValue )
+            .radius_( bounds.height / 8 )
+            .action_({ |bt| 
+	            var f, active;
+	            active = bt.value.booleanValue;
+	            f = { |unit, mode = true|
+		            unit.values.do({ |value|
+			            if( value.isUMap ) {
+				            if( value.def.isKindOf( ValueUMapDef ) ) {
+					            value.set( \active, mode );
+					       } {
+						       f.( value, mode );
+						  };
+						};
+				});
+			};
+			this.score.events.do({ |evt|
+				evt.units.do({ |unit|
+					f.( unit, active );
+				});
+				if( evt.isKindOf( UPattern ) ) {
+					if( evt.pattern.isUMap ) {
+						f.( evt.pattern, active );
+					}
+				}
+			});
+		})
+            .resize_(3)
+            .canFocus_(false);
         
         views[\follow] = SmoothButton( view, 39@size )
             .label_( [ "follow", "follow" ] )
