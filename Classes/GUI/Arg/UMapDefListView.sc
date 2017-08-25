@@ -28,7 +28,8 @@ UMapDefListView {
 	
 	*initClass {
 		filters = (
-			\dynamic: { |udef| [ UMapDef, ExpandUMapDef ].includes( udef.class ) },
+			\dynamic: { |udef| [ UMapDef ].includes( udef.class ) },
+			\hybrid: { |udef| [ ExpandUMapDef, MultiUMapDef ].includes( udef.class ) },
 			\control: { |udef| [ ValueUMapDef, TaskUMapDef ].includes( udef.class ) },
 			\value: { |udef| [ FuncUMapDef ].includes( udef.class ) },
 			\pattern: { |udef| [ UPatDef, StreamUMapDef ].includes( udef.class ) },
