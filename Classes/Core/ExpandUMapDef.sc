@@ -11,7 +11,9 @@ ExpandUMapDef : UMapDef {
 				.category_( category ? \default ).changed( \init ); 
 		};
 	}
-		
+	
+	*defaultGUIColor { ^Color.white.alpha_(0.66) }
+	
 	isMappedArg { |name|
 		^false
 	}

@@ -36,7 +36,6 @@ ExpandUMapDef( \expand, { |unit|
 	};
 	specs;
 }, \map )
-	.guiColor_( Color.white.alpha_(0.5) )
 	.canUseUMapFunc_({ |unit, key, umapdef|
 		unit.getSpec( key ).respondsTo( \expandArgSpecs );
 	});
