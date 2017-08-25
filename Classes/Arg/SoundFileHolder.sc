@@ -23,6 +23,7 @@ AbstractRichBuffer {
 	classvar <>allUnits;
 	
 	classvar <>useCheckFree = true; // safer in high-traffic situations, but not for NRT
+	classvar <>checkExists = true;
 	
     var <numFrames, <numChannels, <sampleRate;
     var <>unitArgName;
@@ -257,6 +258,11 @@ AbstractSndFile : AbstractRichBuffer {
 
 	initAbstractSndFile { |inPath, inStartFrame, inEndFrame, inRate, inLoop|
 		 path = inPath.formatGPath;
+		 if( this.class.checkExists ) {
+			 if( this.exists.not ) {
+				 "% : SoundFile not found:\n\t%".format( this.class, path.quote ).warn;
+			 };
+		 };
 		 startFrame = inStartFrame;
 		 endFrame = inEndFrame;
 		 rate = inRate;
@@ -695,7 +701,8 @@ MonoBufSndFile : BufSndFile {
 		stream << this.class.name << ".newBasic(" <<* [ // use newBasic to prevent file reading
 		    path.formatGPath.quote, numFrames, numChannels, sampleRate,
              startFrame, endFrame, rate, loop
-		]  << ")" << if( this.channel != 0 ) { ".channel_(%)".format( this.channel ) } { "" };
+		]  << ")" << if( this.channel != 0 ) { ".channel_(%)".format( this.channel ) } { "" } <<
+		if( this.hasGlobal == true ) { ".hasGlobal_(true)" } { "" };
 	}
 	
 }
