@@ -17,7 +17,7 @@ FuncUMapDef : UMapDef {
 	}
 	
 	*new { |name, func, args, valueIsPrivate, category, addToAll=true|
-		^this.basicNew( name, args ? [], addToAll )
+		^this.basicNew( name, args ? [], category, addToAll )
 			.initFunc( func, valueIsPrivate ? this.valueIsPrivate ).category_( category ? \default ); 
 	}
 	
