@@ -38,7 +38,7 @@ UdefsGUI {
 		});
 		
 		udefView = UdefListView( composites[0] );
-		umapDefView1 = UMapDefListView( composites[1], filter: [\dynamic, \hybrid, \control] );
-		umapDefView2 = UMapDefListView( composites[2], filter: [\value, \pattern] );
+		umapDefView1 = UMapDefListView( composites[1], filter: [\dynamic, \control] );
+		umapDefView2 = UMapDefListView( composites[2], filter: [\hybrid, \value, \pattern] );
 	}
 }
