@@ -14,6 +14,8 @@ UPatDef : FuncUMapDef {
 		};
 	}
 	
+	defType { ^\pattern }
+	
 	doFunc { |unit|
 		var res, was;
 		if( unit.stream.isNil ) { this.makeStream( unit ) };

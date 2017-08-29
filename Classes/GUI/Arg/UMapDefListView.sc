@@ -28,11 +28,11 @@ UMapDefListView {
 	
 	*initClass {
 		filters = (
-			\dynamic: { |udef| [ UMapDef ].includes( udef.class ) },
-			\hybrid: { |udef| [ ExpandUMapDef, MultiUMapDef ].includes( udef.class ) },
-			\control: { |udef| [ ValueUMapDef, TaskUMapDef ].includes( udef.class ) },
-			\value: { |udef| [ FuncUMapDef ].includes( udef.class ) },
-			\pattern: { |udef| [ UPatDef, StreamUMapDef ].includes( udef.class ) },
+			\dynamic: { |udef| udef.defType === \dynamic; },
+			\hybrid: { |udef| udef.defType === \mixed; },
+			\control: { |udef| udef.defType === \control; },
+			\value: { |udef|  udef.defType === \value;  },
+			\pattern: { |udef|  udef.defType === \pattern;  },
 			\all: { true }
 		);
 	}

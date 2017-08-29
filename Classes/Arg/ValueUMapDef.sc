@@ -7,6 +7,8 @@ ValueUMapDef : UMapDef {
 	
 	*defaultGUIColor { ^Color.yellow.blend( Color.white, 0.8 ).alpha_(0.4); }
 	
+	defType { ^\control }
+	
 	*initClass {
 		activeUnits = IdentityDictionary();
 		CmdPeriod.add( this );

@@ -27,6 +27,16 @@ MultiUMapDef : UMapDef {
 	*defNameKey { ^\u_defName }
 	defNameKey { ^defNameKey ? this.class.defNameKey }
 	
+	defType {
+		var first;
+		first = udefs.first.defType;
+		^if( udefs.every({ |def| def.defType == first }) ) {
+			first;
+		} {
+			\mixed
+		};
+	}
+	
 	*defaultGUIColor { ^Color.white.alpha_(0.66) }
 	
 	*new { |name, udefs, category, setter, setterIsPrivate = true| // first udef in list is default

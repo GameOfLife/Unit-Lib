@@ -16,6 +16,8 @@ FuncUMapDef : UMapDef {
 		.blend( Color.white, 0.5 ).alpha_(0.4); 
 	}
 	
+	defType { ^\value }
+	
 	*new { |name, func, args, valueIsPrivate, category, addToAll=true|
 		^this.basicNew( name, args ? [], category, addToAll )
 			.initFunc( func, valueIsPrivate ? this.valueIsPrivate ).category_( category ? \default ); 

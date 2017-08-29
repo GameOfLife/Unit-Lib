@@ -24,6 +24,8 @@ UMapDef : Udef {
 		};
 	}
 	
+	defType { ^\dynamic }
+	
 	*prefix { ^"umap_" } // synthdefs get another prefix to avoid overwriting
 	
 	*from { |item| ^item.asUDef( this ) }

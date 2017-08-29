@@ -14,6 +14,8 @@ ExpandUMapDef : UMapDef {
 	
 	*defaultGUIColor { ^Color.white.alpha_(0.66) }
 	
+	defType { ^\mixed }
+	
 	isMappedArg { |name|
 		^false
 	}
