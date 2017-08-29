@@ -48,11 +48,11 @@ MultiUMapDef : UMapDef {
 	
 	*defaultGUIColor { ^Color.white.alpha_(0.66) }
 	
-	*new { |name, udefs, category, setter, setterIsPrivate = true| // first udef in list is default
+	*new { |name, udefs, category, setter, setterIsPrivate = true, addToAll = true| // first udef in list is default
 		^super.basicNew( name, [ 
 			ArgSpec( setter ? this.defNameKey, 
 				udefs[0].name, ListSpec( udefs.collect(_.name) ), setterIsPrivate, \nonsynth )
-		], category )
+		], category, addToAll )
 			.defNameKey_( setter )
 			.useMappedArgs_( udefs.first.useMappedArgs )
 			.udefs_( udefs );
