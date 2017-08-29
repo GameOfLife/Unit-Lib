@@ -62,7 +62,7 @@ UMapDef : Udef {
 	}
 	
 	isMappedArg { |name|
-		^mappedArgs.notNil && { mappedArgs.includes( name ) };
+		^this.mappedArgs.notNil && { this.mappedArgs.includes( name ) };
 	}
 	
 	argSpecs { |unit|

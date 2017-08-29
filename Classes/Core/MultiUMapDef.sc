@@ -54,8 +54,11 @@ MultiUMapDef : UMapDef {
 				udefs[0].name, ListSpec( udefs.collect(_.name) ), setterIsPrivate, \nonsynth )
 		], category )
 			.defNameKey_( setter )
+			.useMappedArgs_( udefs.first.useMappedArgs )
 			.udefs_( udefs );
 	}
+	
+	useMappedArgs_ { |bool| useMappedArgs = bool }
 	
 	findUdef{ |name|
 		^udefs.detect({ |item| item.name == name }) ? udefs[0];
