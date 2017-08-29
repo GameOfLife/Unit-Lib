@@ -229,7 +229,7 @@ UMap : U {
 	*busOffset { ^1500 }
 	
 	*guiColor { ^guiColor ?? { guiColor = Color.blue.blend( Color.white, 0.8 ).alpha_(0.4) }; }
-	guiColor { ^this.def !? _.guiColor ? this.class.guiColor }
+	guiColor { ^this.subDef !? _.guiColor ? this.class.guiColor }
 	
 	init { |in, inArgs, inMod|
 		super.init( in, inArgs ? [], inMod );

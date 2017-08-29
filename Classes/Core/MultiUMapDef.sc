@@ -37,6 +37,15 @@ MultiUMapDef : UMapDef {
 		};
 	}
 	
+	guiColor { ^guiColor ?? {	 
+			if( this.defType === \mixed ) { 
+				this.class.defaultGUIColor 
+			} {
+				udefs.first.guiColor;
+			}
+		}
+	}
+	
 	*defaultGUIColor { ^Color.white.alpha_(0.66) }
 	
 	*new { |name, udefs, category, setter, setterIsPrivate = true| // first udef in list is default
