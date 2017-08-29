@@ -103,7 +103,10 @@ UPatArg {
 	}
 	
 	prNextValFuncUMapDef { |unit|
-		if( unit.isUMap && { unit.subDef.isKindOf( FuncUMapDef ) } ) {
+		if( unit.isUMap && { 
+			unit.subDef.isKindOf( FuncUMapDef ) or:
+			{ unit.subDef.isKindOf( ExpandUMapDef ) }
+		} ) {
 			unit.values.do({ |item|
 				this.prNextValFuncUMapDef( item );
 			});
@@ -111,13 +114,8 @@ UPatArg {
 		};
 	}
 	
-	next { |unPrepare = false|
-		var value, out;
-		if( UPatDef.currentUnit.notNil && { unit !== UPatDef.currentUnit }) {
-			value = UPatDef.currentUnit.get( key );
-		} {
-			value = unit.get( key );
-		};
+	prNext { |value, unPrepare = false|
+		var out;
 		if( value.isUMap.not && { spec.notNil } ) {
 			out = spec.unmap( value.next );
 		} {
@@ -126,6 +124,28 @@ UPatArg {
 		};
 		if( unPrepare == true ) { this.prUnPrepare( value ) };
 		^out;
+	}
+	
+	prValue {
+		^if( UPatDef.currentUnit.notNil && { unit !== UPatDef.currentUnit }) {
+			UPatDef.currentUnit.get( key );
+		} {
+			unit.get( key );
+		};
+	}
+	
+	at { |index|
+		var value;
+		value = this.prValue;
+		if( value.isKindOf( UMap ) && { value.subDef.isKindOf( ExpandUMapDef ) } ) {
+			^this.prNext( value.values.at( index ) );
+		} {
+			^this.prNext( value ).at( index );
+		};
+	}
+	
+	next { |unPrepare = false|
+		^this.prNext( this.prValue, unPrepare );
 	}
 	
 	doesNotUnderstand { |selector ...args|
