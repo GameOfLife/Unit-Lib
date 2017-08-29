@@ -11,15 +11,16 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-FuncUMapDef( \tempo_time, { |unit, factor = 1, tempo = 60|
+HybridUMapDef( \tempo_time, { |factor = 1, tempo = 60|
+	UMapDef.useMappedArgs = false; 
+	UMapOut.kr( factor / tempo * 60, false );
+}, { |unit, factor = 1, tempo = 60|
 	 factor / tempo * 60
 })
 	.category_( 'convert' )
 	.valueIsMapped_( false )
-	.mappedArgs_( [] )
 	.setSpec( \factor, [0.125,8,\exp].asSpec )
 	.setSpec( \tempo, [10,300,\exp,0,60].asSpec )
-	.setSpec( \value, DisplaySpec( SMPTESpec(), _.asSMPTEString(1000) ), private: true )
 	.prepareArgsFunc_( { |args|
 		args.replace( \division, \factor );
 	} )

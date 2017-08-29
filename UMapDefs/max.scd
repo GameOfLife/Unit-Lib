@@ -13,8 +13,10 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UMapDef( \max, { |a = 0.5, b = 0.5|
+HybridUMapDef( \max, { |a = 0.5, b = 0.5|
 	UMapOut.kr( a.max(b) );
+}, { |unit, a = 0.5, b = 0.5|
+	a.max(b);
 })
 .mappedArgs_([ \a, \b ])
 .setSpec( \a, UAdaptSpec() )

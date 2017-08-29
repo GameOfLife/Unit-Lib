@@ -3,19 +3,23 @@
 
 Creates an UMap for converting diatonic mini-note values to a frequency, in semitones where 69 == 440Hz.
 
-note: a midi note value 
+note: a midi note value (can be in between semitones as well)
 round: rounding factor (0 - 12)
+base: frequency of note 69 (A)
 detune: detune amount in cents (-50 - 50)
+transpose: transposition in semitones
 
 --
 this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UMapDef( \note_freq, { |note = 64, round = 1, base = 440, detune = 0, transpose = 0|
+HybridUMapDef( \note_freq, { |note = 64, round = 1, base = 440, detune = 0, transpose = 0|
 	UMapDef.useMappedArgs = false; // use raw values instead of mapped (0-1)
 	UMapOut.kr( 
 		base * 2.pow((note.round(round) + (detune/100)) + transpose - 69 / 12) );
+}, { |unit, note = 64, round = 1, base = 440, detune = 0, transpose = 0|
+	base * 2.pow((note.round(round) + (detune/100)) + transpose - 69 / 12);
 })
 	.mappedArgs_([ \note ])
 	.setSpec( \note, UAdaptSpec({ |spec|

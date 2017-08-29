@@ -13,8 +13,10 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UMapDef( \min, { |a = 0.5, b = 0.5|
+HybridUMapDef( \min, { |a = 0.5, b = 0.5|
 	UMapOut.kr( a.min(b) );
+}, { |unit, a = 0.5, b = 0.5|
+	a.min(b);
 })
 .mappedArgs_([ \a, \b ])
 .setSpec( \a, UAdaptSpec() )

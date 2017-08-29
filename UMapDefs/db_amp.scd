@@ -11,10 +11,13 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UMapDef( \db_amp, { |db = 64, mute = 0|
+HybridUMapDef( \db_amp, { |db = 64, mute = 0|
 	UMapDef.useMappedArgs = false; // use raw values instead of mapped (0-1)
 	UMapOut.kr( db.dbamp * (1-mute) );
-})
+}, { |unit, db = 64, mute = 0|
+	 db.dbamp * (1-mute.binaryValue) 
+}
+)
 	.mappedArgs_([ \db ])
 	.setSpec( \db, UAdaptSpec({ |spec|
 		ControlSpec( spec.minval.max(-96.dbamp).ampdb, spec.maxval.max(-96.dbamp).ampdb, \lin, 0, 0 );

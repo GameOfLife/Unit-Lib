@@ -10,9 +10,11 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UMapDef( \deg_rad, { |deg = 0|
+HybridUMapDef( \deg_rad, { |deg = 0|
 	UMapDef.useMappedArgs = false; // use raw values instead of mapped (0-1)
 	UMapOut.kr( deg * pi / 180 );
+}, { |unit, deg = 0|
+	 deg * pi / 180;
 })
 	.setSpec( \deg, [-180, 180, \lin, 0, 1 ] )
 	.canUseUMapFunc_({ |unit, key, umapdef|

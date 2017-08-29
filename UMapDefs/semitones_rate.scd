@@ -10,9 +10,11 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UMapDef( \semitones_rate, { |semitones = 0|
+HybridUMapDef( \semitones_rate, { |semitones = 0|
 	UMapDef.useMappedArgs = false; // use raw values instead of mapped (0-1)
 	UMapOut.kr( semitones.midiratio );
+}, { |unit, semitones = 0|
+	semitones.midiratio;
 })
 	.mappedArgs_([ \semitones ])
 	.setSpec( \semitones, UAdaptSpec({ |spec|
