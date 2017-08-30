@@ -77,6 +77,7 @@ ListSpec : Spec {
 
 ArrayControlSpec : ControlSpec {
 	// spec for an array of values
+	var <>size;
 	
 	asRangeSpec {  
 		^RangeSpec.newFrom( this ).default_( this.default.asCollection.wrapAt([0,1]) );  
@@ -84,7 +85,17 @@ ArrayControlSpec : ControlSpec {
 	asControlSpec { ^ControlSpec.newFrom( this ).default_( this.default.asCollection[0] ); }
 	asArrayControlSpec { ^this }
 	
-	uconstrain { |value| ^value.collect{ |x| this.constrain(x) } }
+	constrain { |value| 
+		var ctrlSpec = this.asControlSpec;
+		if( size.notNil ) {
+			^value.collect({ |x| ctrlSpec.constrain(x) })
+				.wrapExtend( size );
+		} {
+			^value.collect{ |x| ctrlSpec.constrain(x) } 
+		}
+	}
+	
+	uconstrain { |value| ^this.constrain( value ? this.default ); }
 
 	*testObject { |obj| ^obj.isArray && { obj.every(_.isNumber) } }
 }

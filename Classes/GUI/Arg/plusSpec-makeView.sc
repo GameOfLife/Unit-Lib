@@ -292,7 +292,7 @@
 		};
 		
 		vws[ \rangeSlider ] = EZSmoothRanger( view, (width - 84) @ (bounds.height),
-			nil, this, { |sl| 
+			nil, this.asControlSpec, { |sl| 
 				var values, min, max;
 				values = this.unmap( vws[ \val ] );
 				vws[ \range ] = sl.value;

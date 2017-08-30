@@ -35,6 +35,23 @@ UAdaptSpec : ControlSpec {
 	
 }
 
++ ArrayControlSpec {
+	
+	adaptToSpec { |spec|
+		var res = this, class = this.class;
+		if ( spec.respondsTo(\asControlSpec) ) {
+			spec = spec.asControlSpec;
+			res = class.newFrom( spec ).size_( size );
+			res.minval = res.minval.max( (2**24).neg );
+			res.maxval = res.maxval.min( 2**24 );
+			res.default_( res.map( this.default ) );
+		};
+		^res;
+	}
+	
+}
+
+
 + PointSpec {
 	
 	adaptToSpec { |spec|
