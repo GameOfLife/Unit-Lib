@@ -1325,7 +1325,9 @@ U : ObjectWithArgs {
 	asUdef { |defClass| ^(defClass ? Udef).fromName( this ); }
 	asUnitArg { |unit, key|
 		var umapdef, umap;
-		if( unit.getSpec( key ).default.isMemberOf( Symbol ).not ) {
+		if( unit.getSpec( key ).isNil or: { 
+			unit.getSpec( key ).default.isMemberOf( Symbol ).not 
+		}) {
 			umapdef = this.asUdef( UMapDef );
 			if( unit.canUseUMap( key, umapdef ) ) {
 				^UMap( this ).asUnitArg( unit, key );
