@@ -613,6 +613,18 @@ U : ObjectWithArgs {
 	    };
     }
     
+    constrainArgs { |exclude|
+	    	this.argSpecs.do({ |argSpec|
+		    	var val;
+		    	if( argSpec.private.not ) {
+			    	val = this.get( argSpec.name );
+			    	if( val.isUMap.not ) {
+				    	this.setArg( argSpec.name, argSpec.spec.uconstrain( val ) );
+			    	};
+		    	}
+		});
+    }
+    
     name {
 	    if( this.def.respondsTo( \nameFunc ) && { this.def.nameFunc.notNil } ) {
 		    ^this.def.nameFunc.value( this );

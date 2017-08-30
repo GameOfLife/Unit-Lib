@@ -146,6 +146,7 @@ MultiUMapDef : UMapDef {
 			if( currentDefName != newDefName ) {
 				unit.setArg( this.defNameKey, newDefName );
 				unit.init( unit.def, unit.args );
+				unit.constrainArgs;
 			};
 		};
 	}
@@ -162,6 +163,7 @@ MultiUMapDef : UMapDef {
 		this.chooseDef( unit ); // change def based on chooseFunc if needed
 		if( keyValuePairs.includes( this.defNameKey ) ) {
 			unit.init( unit.def, unit.args );
+			unit.constrainArgs;
 		} {
 			^this.findUdefFor( unit ).setSynth( unit, *keyValuePairs );
 		};
