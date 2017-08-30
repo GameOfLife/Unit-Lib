@@ -21,6 +21,7 @@ part of the Unit lib default UMapDefs set
 
 UMapDef( \line_rel, { |a = 0.0, b = 1.0, curve = 0|
 	var sig;
+	Udef.buildUdef.dontStoreSynthDef = true;
 	sig = ULineRel.kr( 0, 1, \timeScale, \loop, \delay, \trigger );
 	sig = Select.kr( curve.inRange(-0.001,0.001), [
 		sig.lincurve(0,1, a, b, curve ),
@@ -30,5 +31,19 @@ UMapDef( \line_rel, { |a = 0.0, b = 1.0, curve = 0|
 })
 	.setSpec( \curve, [-16,16,\lin,0,0].asSpec )
 	.setSpec( \timeScale, [0.25,4,\exp,0,1].asSpec, \init )
-	.category_( 'automation' )
+	.uchainInitFunc_({ |unit, chain|
+		var timeScale;
+		timeScale = unit.timeScale;
+		unit.def = \line;
+		if( timeScale != 1 ) {
+			unit.duration = [ \scale_time, [ 
+					\time, \uchain_duration, 
+					\factor, timeScale
+				]
+			];
+		} {
+			unit.duration = \uchain_duration;
+		};
+	})
+	.category_( 'private' )
 	.mappedArgs_( [ \a, \b ] );
