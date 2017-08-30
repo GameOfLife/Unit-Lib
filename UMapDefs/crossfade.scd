@@ -14,8 +14,10 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UMapDef( \crossfade, { |a = 0.0, b = 1.0, crossfade = 0.5, lag = 0.0|
+HybridUMapDef( \crossfade, { |a = 0.0, b = 1.0, crossfade = 0.5|
 	UMapOut.kr( (a * (1-crossfade)) + (b * crossfade) );
+}, { |unit, a = 0.0, b = 1.0, crossfade = 0.5|
+	 (a * (1-crossfade)) + (b * crossfade) 
 })
 	.category_( 'choice' )
 	.mappedArgs_( [ \a, \b ] );
