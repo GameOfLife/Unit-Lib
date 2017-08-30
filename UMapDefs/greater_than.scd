@@ -15,11 +15,16 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UMapDef( \greater_than, { |a = 0.0, b = 0.5, trueValue = 1.0, falseValue = 0.0|
+HybridUMapDef( \greater_than, { |a = 0.0, b = 0.5, trueValue = 1.0, falseValue = 0.0|
 	var index, output;
+	UMapDef.useMappedArgs_( false );
 	index = a > b;
 	output = Select.kr( index, [ falseValue, trueValue ] );
 	UMapOut.kr( output );
+}, { |unit, a = 0.0, b = 0.5, trueValue = 1.0, falseValue = 0.0|
+	if( a > b ) { trueValue } { falseValue };
 })
+.setSpec( \trueValue, UAdaptSpec() )
+.setSpec( \falseValue, UAdaptSpec() )
 .mappedArgs_([ \trueValue, \falseValue ])
-.category_( 'trigger_test' )
+.category_( 'if' )
