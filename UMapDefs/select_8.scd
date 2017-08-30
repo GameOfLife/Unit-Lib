@@ -17,6 +17,7 @@ part of the Unit lib default UMapDefs set
 UMapDef( \select_8, {
 	var values, smooth;
 	var phase, step, resetPos, sig;
+	Udef.buildUdef.dontStoreSynthDef = true;
 	phase = \index.kr(0);
 	smooth = \smooth.kr(0.0);
 	values = 8.collect({ |i|
@@ -25,6 +26,22 @@ UMapDef( \select_8, {
 	phase = (phase.floor * (1-smooth)) + (phase * smooth);
 	sig = LinSelectX.kr( phase, values );
 	UMapOut.kr( sig );
-}).category_( \choice )
+}).category_( \private )
+	.uchainInitFunc_({ |unit, chain|
+		var values, smooth;
+		values = 8.collect({ |i| unit.get( ("value"++i).asSymbol ) });
+		smooth = unit.smooth;
+		unit.def = \select;
+		unit.interpolate = smooth.booleanValue;
+		unit.n = values.size;
+		if( values.any( _.isKindOf( UMap ) ) ) {
+			unit.vals = [ \expand,  
+				8.collect({ |i| [ ("value"++i).asSymbol, values[i] ] }).flatten(1);
+			];
+		} {
+			unit.vals = values;
+		};
+		unit
+	})
 	.setSpec( \index, [0,7].asSpec )
 	.mappedArgs_( 8.collect({ |i| ("value"++i).asSymbol }) );

@@ -22,6 +22,7 @@ UMapDef( \trig_select_16, {
 	var trigger, reset;
 	var step, range, lag;
 	var index, values, sig;
+	Udef.buildUdef.dontStoreSynthDef = true;
 	trigger = \trigger.tr;
 	reset = \reset.tr;
 	step = \step.kr(1) * \reverse.kr(0).linlin(0,1,1,-1);
@@ -33,7 +34,23 @@ UMapDef( \trig_select_16, {
 	});
 	sig = SelectCF.kr( index, values, lag, 0 ).linlin(-1,1,0,1);
 	UMapOut.kr( sig );
-}).category_( \trigger_to_value )
+}).category_( \private )
+	.uchainInitFunc_({ |unit, chain|
+		var values, range;
+		values = 16.collect({ |i| unit.get( ("value"++i).asSymbol ) });
+		range = unit.range;
+		unit.def = \trig_select;
+		unit.n = values.size;
+		unit.range = range;
+		if( values.any( _.isKindOf( UMap ) ) ) {
+			unit.vals = [ \expand,  
+				16.collect({ |i| [ ("value"++i).asSymbol, values[i] ] }).flatten(1);
+			];
+		} {
+			unit.vals = values;
+		};
+		unit
+	})
 	.setSpec( \trigger, TriggerSpec() )
 	.setSpec( \reset, TriggerSpec() )
 	.setSpec( \step, [1,16,\lin,1,1].asSpec )

@@ -19,6 +19,7 @@ part of the Unit lib default UMapDefs set
 UMapDef( \sequencer_8, {
 	var values, speed, reverse, range, smooth;
 	var phase, step, resetPos, sig;
+	Udef.buildUdef.dontStoreSynthDef = true;
 	speed = \speed.kr(10);
 	reverse = \reverse.kr(0);
 	range =\range.kr([0,7]);
@@ -34,7 +35,25 @@ UMapDef( \sequencer_8, {
 	phase = (phase.floor * (1-smooth)) + (phase * smooth);
 	sig = LinSelectX.kr( phase, values );
 	UMapOut.kr( sig );
-}).category_( \choice )
+}).category_( \private )
+	.uchainInitFunc_({ |unit, chain|
+		var values, smooth, range;
+		values = 8.collect({ |i| unit.get( ("value"++i).asSymbol ) });
+		range = unit.range;
+		smooth = unit.smooth;
+		unit.def = \sequencer;
+		unit.interpolate = smooth.booleanValue;
+		unit.n = values.size;
+		unit.range = range;
+		if( values.any( _.isKindOf( UMap ) ) ) {
+			unit.vals = [ \expand,  
+				8.collect({ |i| [ ("value"++i).asSymbol, values[i] ] }).flatten(1);
+			];
+		} {
+			unit.vals = values;
+		};
+		unit
+	})
 	.setSpec( \speed, [0,300, 4,0,10].asSpec )
 	.setSpec( \reverse, BoolSpec(false) )
 	.setSpec( \range, [0,7,\lin,1].asSpec.asRangeSpec )
