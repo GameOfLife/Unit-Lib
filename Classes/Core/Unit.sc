@@ -100,6 +100,7 @@ Udef : GenericDef {
 	var <>uchainInitFunc;
 	var <>inputIsEndPoint = false;
 	var <>dontStoreArgNames;
+	var <>dontStoreSynthDef = false;
 	
 	*initClass{
 		defsFolders = [ 
@@ -159,6 +160,8 @@ Udef : GenericDef {
 		this.class.buildArgSpecs = nil;
 
 		this.initArgs;
+		
+		if( this.dontStoreSynthDef ) { this.synthDef = nil };
 		if( loadOnInit ) { this.loadSynthDef };
 		this.changed( \init );
 	}
