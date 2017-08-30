@@ -21,6 +21,14 @@ HybridUMapDef( \round, { |input = 0.5, round = 0|
 		input.round( round ).clip( *[unit.spec.minval, unit.spec.maxval] );
 	}, \operator
 )
+	.prepareArgsFunc_({ |args|
+		var index;
+		index = args.indexOf( \value );
+		if( index.notNil && { index.even }) {
+			args[index] = \input;
+		};
+		args;
+	})
 	.valueIsMapped_( false )
 	.setSpec( \round, UAdaptSpec( { |spec| 
 		var center;
