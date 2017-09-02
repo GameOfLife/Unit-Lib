@@ -14,8 +14,13 @@ part of the Unit lib default UMapDefs set
 */
 
 UMapDef( \lag_lpf, { |value = 0.0, time = 0.0|
+	Udef.buildUdef.dontStoreSynthDef = true;
 	UMapOut.kr( LPFLag.kr( value, time).clip(0,1) );
+})
+.uchainInitFunc_({ |unit, chain|
+	unit.def_( \lag );
+	unit.type = \lpf;
 })
 .setSpec( \time, [0,10,\lin].asSpec )
 .mappedArgs_([ \value ])
-.category_( 'filter' )
+.category_( 'private' )

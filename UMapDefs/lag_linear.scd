@@ -15,9 +15,17 @@ part of the Unit lib default UMapDefs set
 */
 
 UMapDef( \lag_line, { |value = 0.0, time = 0.0, curve = 0.0|
+	Udef.buildUdef.dontStoreSynthDef = true;
 	UMapOut.kr(value.varlag(time, curve));
+})
+.uchainInitFunc_({ |unit, chain|
+	var curve;
+	curve = unit.curve;
+	unit.def_( \lag );
+	unit.type = \linear;
+	if( curve.notNil ) { unit.curve = curve };
 })
 .setSpec( \time, [0,10,\lin].asSpec )
 .setSpec( \curve, [-40,40,\lin].asSpec )
 .mappedArgs_([ \value ])
-.category_( 'filter' )
+.category_( 'private' )
