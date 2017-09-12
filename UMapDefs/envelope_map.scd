@@ -14,8 +14,15 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UMapDef( \envelope_map, { |index = 0.0|
+HybridUMapDef( \envelope_map, { |index = 0.0|
 	UMapOut.kr( UIEnvGen.kr( \env, nil, index ) );
+}, { |unit, index = 0.0, env = 0|
+	if( env.isKindOf( EnvM ) ) {
+		env.at( index.linlin(0,1,0, env.duration) );
+	} {
+		0;
+	};
 })
-	.category_( 'automation' )
+	.setSpec( \env, UEnvSpec( EnvM() ) )
+	.category_( 'map' )
 	.mappedArgs_( [ \env ] );
