@@ -26,8 +26,8 @@ defs = [ 8,12,16,24,32,48,64,128 ].collect({ |n|
 		phase = \index.kr(0);
 		interpolate = \interpolate.kr(0);
 		values = \vals.kr( { |i| i/(n-1) }!n );
-		phase = (phase.floor * (1-interpolate)) + (phase * interpolate);
-		sig = LinSelectX.kr( phase, values );
+		phase = if( interpolate, phase, phase.floor );
+		sig = SelectL.kr( phase, values );
 		UMapOut.kr( sig );
 	}, { |unit, index = 0, interpolate = 0, vals = #[0.5]|
 		var out;
