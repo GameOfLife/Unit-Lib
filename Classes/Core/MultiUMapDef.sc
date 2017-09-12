@@ -151,6 +151,14 @@ MultiUMapDef : UMapDef {
 		};
 	}
 	
+	allowedModes { |unit|
+		if( unit.notNil ) {
+			^this.findUdefFor( unit ).allowedModes( unit )
+		} {
+			^allowedModes
+		};
+	}
+	
 	hasBus { |unit| ^this.findUdefFor( unit ).hasBus( unit ) }
 	
 	shouldPlayOn { |unit, server| // returns nil if no func
