@@ -385,7 +385,7 @@ UMap : U {
 	}
 	
 	argNeedsUnmappedInput { |key|
-		^this.def.argNeedsUnmappedInput( key, this );
+		^this.subDef.argNeedsUnmappedInput( key, this );
 	}
 	
 	unit_ { |aUnit|
