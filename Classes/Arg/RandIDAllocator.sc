@@ -102,6 +102,8 @@ URandSeed {
 		} 
 	}
 	
+	*uconstrain { |value| ^this.constrain( value ) }
+	
 	*default { ^URandSeed() }
 	*map { |value| ^value }
 	*unmap { |value| ^value }
