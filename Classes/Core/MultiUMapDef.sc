@@ -207,6 +207,12 @@ MultiUMapDef : UMapDef {
 		^this.findUdefFor( unit ).getValue( unit );
 	}
 	
+	makeStream { |unit|
+		unit.subDef.makeStream( unit );
+	}
+	
+	needsStream { ^udefs.first.needsStream }
+	
 	useMappedArgs { ^udefs.first.useMappedArgs }
 	
 	findUdefsWithArgName { |key|
