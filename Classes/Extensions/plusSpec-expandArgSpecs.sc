@@ -38,7 +38,7 @@
 + ArrayControlSpec {
 	expandArgSpecs { 
 		^this.default.collect({ |item, i|
-			ArgSpec( ("value" ++ i).asSymbol, item, this.asControlSpec );
+			ArgSpec( ("value" ++ i).asSymbol, item, originalSpec ?? { this.asControlSpec });
 		});
 	}
 	

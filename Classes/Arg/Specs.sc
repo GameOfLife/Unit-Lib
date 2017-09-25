@@ -78,12 +78,17 @@ ListSpec : Spec {
 ArrayControlSpec : ControlSpec {
 	// spec for an array of values
 	var <>size;
+	var <>originalSpec;
 	
 	asRangeSpec {  
 		^RangeSpec.newFrom( this ).default_( this.default.asCollection.wrapAt([0,1]) );  
 	}
 	asControlSpec { ^ControlSpec.newFrom( this ).default_( this.default.asCollection[0] ); }
 	asArrayControlSpec { ^this }
+	
+	copy {
+		^this.class.newFrom(this).originalSpec_( originalSpec.copy );
+	}
 	
 	constrain { |value| 
 		var ctrlSpec = this.asControlSpec;
@@ -1202,7 +1207,7 @@ ControlSpecSpec : Spec {
 + ControlSpec { 
 	asRangeSpec { ^RangeSpec.newFrom( this ) }
 	asControlSpec { ^this }
-	asArrayControlSpec { ^ArrayControlSpec.newFrom( this ) }
+	asArrayControlSpec { ^ArrayControlSpec.newFrom( this ).originalSpec_( this.copy ) }
 	
 	*testObject { |obj| ^obj.isNumber }
 	
