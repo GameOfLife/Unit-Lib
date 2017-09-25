@@ -279,6 +279,8 @@
 			};
 		});
 		
+		vws[ \operations ][ \post ] =  { |values| values.do(_.postln); };
+		
 		if( label.notNil ) {
 			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
 			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ bounds.height )
