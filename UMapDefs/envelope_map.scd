@@ -14,7 +14,9 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-HybridUMapDef( \envelope_map, { |index = 0.0|
+var def;
+
+def = HybridUMapDef( \envelope_map, { |index = 0.0|
 	UMapOut.kr( UIEnvGen.kr( \env, nil, index ) );
 }, { |unit, index = 0.0, env = 0|
 	if( env.isKindOf( EnvM ) ) {
@@ -26,3 +28,7 @@ HybridUMapDef( \envelope_map, { |index = 0.0|
 	.setSpec( \env, UEnvSpec( EnvM() ) )
 	.category_( 'map' )
 	.mappedArgs_( [ \env ] );
+
+def.udefs[1].setDefault( \env, EnvM() );
+
+def;
