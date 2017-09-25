@@ -24,8 +24,8 @@ defs = [ 8,12,16,24,32,48,64,128 ].collect({ |n|
 		var values, speed, reverse, range, interpolate;
 		var phase, step, resetPos, sig;
 		speed = \speed.kr(10);
-		reverse = \reverse.kr(0);
 		range =\range.kr([0,31]);
+		reverse = \reverse.kr(0);
 		interpolate = \interpolate.kr(0.0);
 		values = \vals.kr( { |i| i/(n-1) }!n );
 		step = ((ControlDur.ir + SampleDur.ir) * speed) * reverse.linlin(0,1,1,-1);
