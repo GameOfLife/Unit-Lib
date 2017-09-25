@@ -18,7 +18,7 @@ part of the Unit lib default UMapDefs set
 
 var defs;
 
-defs = [ 8,12,16,24,32,48,64,128 ].collect({ |n|
+defs = [ 4, 8,12,16,24,32,48,64,128 ].collect({ |n|
 	UPatDef( n, { |unit, vals, weights, seed|
 		{	
 			thisThread.randSeed = seed.next.asControlInput;
@@ -37,4 +37,5 @@ defs = [ 8,12,16,24,32,48,64,128 ].collect({ |n|
 	
 MultiUMapDef( \p_wchoose, defs, \pattern_random, \n, false )
 	.mappedArgs_([ \vals ])
+	.defaultDefName_( 8 )
 	.allowedModes_([ \init, \sync, \normal ])

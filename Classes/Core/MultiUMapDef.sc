@@ -23,6 +23,7 @@ MultiUMapDef : UMapDef {
 	var <>chooseFunc;
 	var >defNameKey;
 	var tempDef;
+	var <defaultDefName;
 	
 	*defNameKey { ^\u_defName }
 	defNameKey { ^defNameKey ? this.class.defNameKey }
@@ -58,6 +59,11 @@ MultiUMapDef : UMapDef {
 			.udefs_( udefs );
 	}
 	
+	defaultDefName_ { |name|
+		defaultDefName = name;
+		this.setDefault( defNameKey, defaultDefName );
+	}
+	
 	useMappedArgs_ { |bool| useMappedArgs = bool }
 	
 	findUdef{ |name|
@@ -85,7 +91,7 @@ MultiUMapDef : UMapDef {
 		if( defName.notNil ) {
 			defName = argPairs[ defName + 1 ];
 		} {
-			defName = udefs[0].name;
+			defName = defaultDefName ?? { udefs[0].name; };
 		};
 		tempDef = this.findUdef( defName );
 		argz = tempDef.asArgsArray( argPairs ? [], unit, constrain );
