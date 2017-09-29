@@ -5,6 +5,7 @@ Creates an pattern UMap making a line steps between two values over time. New va
 
 a: the start value
 b: the end value
+curve: a curve value for the line. A 0 (zero) curve creates a linear line, a positive curve value makes the line tend towards the start value, and v.v.
 time: time to it takes from a to b;
 loop: loop mode;
 	\off: no looping (will stay at end value after completing)
@@ -19,7 +20,7 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UPatDef( \p_line, { |unit, a = 0.0, b = 1.0, time = 10, loop = \loop|
+UPatDef( \p_line, { |unit, a = 0.0, b = 1.0, curve = 0, time = 10, loop = \loop|
 	{
 		var current = 0, direction = 1;
 		var timer = UPattern.deltaTimer;
@@ -41,7 +42,7 @@ UPatDef( \p_line, { |unit, a = 0.0, b = 1.0, time = 10, loop = \loop|
 				},
 				\off, { current = current.clip(0.0,1.0); }
 			);
-			current.linlin( 0, 1, a.next, b.next ).yield;
+			current.lincurve( 0, 1, a.next, b.next, curve.next ).yield;
 		};
 	}.r;
 }).mappedArgs_([\a, \b])
@@ -49,6 +50,7 @@ UPatDef( \p_line, { |unit, a = 0.0, b = 1.0, time = 10, loop = \loop|
 .setSpec( \time, SMPTESpec() )
 .setSpec( \a, UAdaptSpec() )
 .setSpec( \b, UAdaptSpec() )
+.setSpec( \curve, [-16,16,\lin,0,0].asSpec )
 .canUseUMapFunc_({ |unit, key, umapdef|
 	unit.isKindOf( UPattern ).not && {
 		[ SimpleNumber, Array, Point ].any({ |class|
