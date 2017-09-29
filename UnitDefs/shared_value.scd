@@ -39,7 +39,10 @@ defs = [
 				sig = \value.kr( spec.default ); 
 				sig = spec.unmap( sig );
 				range = spec.unmap( \range.kr([spec.minval, spec.maxval]) );
-				sig = sig.linlin(*range ++ [0,1,\none]);
+				sig = Select.kr( (range * [-1,1]).sum > 0, [ // prevent nan
+					Select.kr( sig > range[0], [ 0,1 ] ),
+					sig.linlin(*range ++ [0,1,\none])
+				]);
 			}
 		);
 		if( type === \range ) {
