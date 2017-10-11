@@ -512,6 +512,18 @@ BufSndFile : AbstractSndFile {
 	
 	id { ^[ this.path, this.startFrame, this.endFrame, this.numChannels ].join( $_ ).asSymbol }
 	
+	*fromID { |id|
+		var path, startFrame, endFrame, numChannels, obj;
+		id = id.asString.split( $_ ).reverse;
+		path = id[3..].reverse.join( $_ );
+		#numChannels, endFrame, startFrame = id[..2].collect(_.interpret);
+		obj = this.new( path, startFrame, endFrame );
+		if( obj.numChannels != numChannels ) {
+			obj.useChannels = (..numChannels-1);
+		};
+		^obj;
+	}
+	
 	prepare { |servers, startPos = 0, action|
 	    if( this.hasGlobal ) {
 		     action.value;
@@ -579,7 +591,7 @@ BufSndFile : AbstractSndFile {
 	}
 	
 	hasGlobal_ { |bool = true|
-		if( bool && autoLoadGlobal ) { this.loadGlobal( false ); };
+		if( bool && autoLoadGlobal ) { this.loadGlobal( replace: false ); };
 	}
 	
 	asMonoBufSndFile { 
