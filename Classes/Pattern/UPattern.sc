@@ -3,6 +3,7 @@ UPattern : UChain {
 	classvar >seconds;
 	classvar <>preparedThreads, <>expectedTimes, <>preparing = false;
 	classvar <>argSpecs;
+	classvar <>nowCallingPattern;
 	
 	var <repeats = inf;
 	var <pattern = #[1,1];
@@ -257,11 +258,15 @@ UPattern : UChain {
 	}
 	
 	getPattern { // returns new sustain and timeToNext
+		var out;
+		this.class.nowCallingPattern = this;
 		if( pattern.isKindOf( UMap ) && { pattern.subDef.isKindOf( FuncUMapDef ) } ) {
 			this.prUnPrepare( pattern );
 			this.prPrepareUnit( pattern );
 		};
-		^pattern.next;
+		out = pattern.next;
+		this.class.nowCallingPattern = nil;
+		^out;
 	}
 	
 	isPlaying { ^isPlaying ? false }

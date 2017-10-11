@@ -10,7 +10,7 @@ part of the Unit lib default UMapDefs set
 
 FuncUMapDef( \uchain_startTime, { |unit|
 	var chain;
-	chain = UChain.nowPreparingChain;
+	chain = UChain.nowPreparingChain ?? { UPattern.nowCallingPattern };
 	if( chain.notNil ) {
 		chain.startTime;
 	} {

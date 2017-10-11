@@ -14,7 +14,7 @@ part of the Unit lib default UMapDefs set
 
 FuncUMapDef( \uchain_track, { |unit, max = 16, range = #[0.0,1.0]|
 	var chain, out;
-	chain = UChain.nowPreparingChain;
+	chain = UChain.nowPreparingChain ?? { UPattern.nowCallingPattern };
 	out = if( chain.notNil ) {
 		chain.track;
 	} {
