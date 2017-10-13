@@ -35,6 +35,7 @@ FreeUdef : Udef {
 	var <>createSynthDefFunc; // optional, called at load or send
 	var <>synthsForUMapFunc;
 	var <>createsSynth = true;
+	var <>argSpecsFunc;
 	
 	*new { |name, args, canFreeSynth = false, category|
 		^super.basicNew( name, args ? [], category ).initFree( canFreeSynth ); 
@@ -168,6 +169,27 @@ FreeUdef : Udef {
 			}
 		};
 	} 
+	
+	argSpecs { |unit|
+		^argSpecsFunc !? _.value( argSpecs, unit ) ?? { argSpecs }
+	}
+	
+	getArgSpec { |name, unit|
+		name = name.asSymbol;
+		^this.argSpecs( unit ).detect({ |item| item.name == name });
+	}
+	
+	getSpec { |name, unit|
+		var asp;
+		asp = this.getArgSpec(name, unit);
+		if( asp.notNil ) { ^asp.spec } { ^nil };
+	}
+	
+	getDefault { |name, unit|
+		var asp;
+		asp = this.getArgSpec(name, unit);
+		if( asp.notNil ) { ^asp.default } { ^nil };
+	}
 	
 	setSynth { |unit ...keyValuePairs|
 		if( setSynthFunc.notNil ) {
