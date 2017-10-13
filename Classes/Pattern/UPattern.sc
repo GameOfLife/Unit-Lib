@@ -163,7 +163,7 @@ UPattern : UChain {
 		);
 	}
 	
-	next { |duration, startTime = 0, track = 0|
+	next { |duration, startTime = 0, track = 0, score|
 		var next, was;
 		duration = duration ?? { this.getSustain; };
 		if( duration > 0 ) {	
@@ -181,6 +181,7 @@ UPattern : UChain {
 			was = UChain.nowPreparingChain;
 			UChain.nowPreparingChain = next;
 			next.parent = this;
+			next.score = score;
 			next.units.do({ |unit|
 				this.prPrepareUnit( unit );
 				this.prPatternsToValues( unit );
@@ -271,7 +272,7 @@ UPattern : UChain {
 	
 	isPlaying { ^isPlaying ? false }
 	
-	makeRoutine { |target, startPos = 0, action|
+	makeRoutine { |target, startPos = 0, action, score|
 		^Routine({
 			var time = 0, n = 0;
 			var zeroCount = 0;
@@ -283,7 +284,7 @@ UPattern : UChain {
 				#sustain, timeToNext = this.getPattern;
 				if( time > track0time ) { track = 0 };
 				if( track == 0 ) { track0time = time + (sustain * 2); };
-				next = this.next( sustain, time, track );
+				next = this.next( sustain, time, track, score );
 				this.localPos = time;
 				if( next.notNil ) { 
 					track = track + 1; 
@@ -340,7 +341,7 @@ UPattern : UChain {
 						);
 					};
 				};
-			} );
+			}, this.score );
 			UPattern.seconds = startedPreparingTime - waitTime;
 			while { (nextTime = routine.next).notNil; } { 
 				i = i+1;
@@ -368,7 +369,7 @@ UPattern : UChain {
 		} {
 			routine = this.makeRoutine( target, startPos, { |chain, target, time| 
 				chain !? _.prepareWaitAndStart( target ); 
-			} );
+			}, this.score );
 			preparedEventsRoutine = nil;
 			action.value;
 		};
@@ -381,9 +382,10 @@ UPattern : UChain {
 		this.changed( \start );
 		routine = routine ?? { this.makeRoutine( target, startPos, { |chain, target, time| 
 			chain !? _.prepareWaitAndStart( target ); 
-		} ); };
+		}, this.score ); };
 		task = PauseStream( routine ).play;
 		preparedEventsRoutine.play;
+		this.score = nil;
 	}
 	
 	prepareAndStart { |target, startPos = 0|
@@ -399,7 +401,7 @@ UPattern : UChain {
 		this.changed( \start );
 		task = PauseStream( this.makeRoutine( target, startPos, { |chain, target, time| 
 			chain !? _.prepareWaitAndStart( target ); 
-		} ) ).play;
+		}, this.score ) ).play;
 	}
 	
 	stop {

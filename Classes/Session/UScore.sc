@@ -510,6 +510,7 @@ UScore : UEvent {
 			this.playState_(\preparing);
 			actions = eventsToPrepareNow.collect{ multiAction.getAction };
 			eventsToPrepareNow.do({ |item, i|
+				item.score = this;
 			    item.prepare( targets, (startPos - item.startTime).max(0), action:actions[i] );
 			});
 	    } {

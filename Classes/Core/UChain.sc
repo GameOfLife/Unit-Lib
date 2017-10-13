@@ -50,6 +50,8 @@ UChain : UEvent {
 	
 	var <>parent;
 	var <>voicerNote, <>voicerValue; // UVoicer support
+	
+	var <>score;
 
 	*initClass {
 		
@@ -660,6 +662,7 @@ UChain : UEvent {
         startPos = startPos ? 0;
         target = preparedServers ? target ? ULib.servers ? Server.default;
         preparedServers = nil;
+        this.score = nil;
         targets = target.asCollection;
          if( verbose ) { "% starting on %".format( this, targets ).postln; };
         latency = latency ?? { Server.default.latency; };
@@ -824,6 +827,7 @@ UChain : UEvent {
 			srv.asTarget.server.loadBalancerAddLoad( this.apxCPU.neg );
 		});
 		preparedServers = [];
+		this.score = nil;
 	}
 	
 	disposeSynths {
