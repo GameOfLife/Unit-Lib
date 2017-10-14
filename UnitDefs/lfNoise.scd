@@ -10,8 +10,6 @@ type: the type of noise:
 	1: linear interpolated noise
 	2: cubic interpolated noise
 	3: clip noise
-	- settings in between these types are also possible, effectively crossfading between them.
-seed: random seed (positive whole number). The same seed will always result in exactly the same noise on any computer. If you want decorrelated noise from multiple sources, change the seed on each source to a different number.
 
 --
 this is an Udef definition file
@@ -30,5 +28,5 @@ Udef( \lfNoise, { |freq = 440, amp = 0.1, type = 0|
 	sig = SelectX.ar( type, sig );
 	UMixOut.ar( 0, sig, 0, true )
 } ).category_( \noise )
-	.setSpec( \type, [0,3,\lin,0,0].asSpec )
+	.setSpec( \type, ListSpec( [0,1,2,3], 0, ['step', 'linear', 'cubic', 'clip'] ) )
 	.setSpec( \freq, FreqSpec(2, 20000, default: 440) )
