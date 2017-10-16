@@ -1146,6 +1146,15 @@ AngleSpec : ControlSpec {
 
 AngleArraySpec : ArrayControlSpec { }
 
+FactorSpec : ControlSpec {
+	
+	*new { arg minval= 0.0625, maxval= 16, warp='exp', step=0.0, default = 1, units, grid;
+		^super.newCopyArgs(minval, maxval, warp, step,
+				default ? minval, units ? "", grid
+			).init
+	}
+}
+
 DisplaySpec : Spec { // a spec for displaying a value that should not be user-edited
 	var <>spec;
 	var <>formatFunc;

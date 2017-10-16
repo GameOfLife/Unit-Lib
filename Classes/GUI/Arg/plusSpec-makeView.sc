@@ -2407,6 +2407,71 @@
 
 }
 
++ FactorSpec {
+
+	makeView { |parent, bounds, label, action, resize|
+		var vws, view, labelWidth;
+		
+		bounds.isNil.if{bounds= 160 @ 18 };
+		
+		vws = ();
+		#view, bounds = EZGui().prMakeMarginGap.prMakeView( parent, bounds );
+		vws[ \view ] = view;
+		
+		if( label.notNil ) {
+			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
+			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ 14 )
+				.string_( label.asString ++ " " )
+				.align_( \right )
+				.resize_( 4 )
+				.applySkin( RoundView.skin );
+		} {
+			labelWidth = -4;
+		};
+		
+		vws[ \box1 ] = SmoothNumberBox( vws[ \view ], 
+				Rect(labelWidth + 2,0,60,bounds.height)
+			)
+		    .action_({ |vw|
+		        action.value( vw, vws[ \box1 ].value / vws[ \box2 ].value );
+		    } ).resize_(5)
+		    .allowedChars_( "" )
+			.step_( 1 )
+			.scroll_step_( 1 )
+			.alt_scale_( 0.1 )
+			.clipLo_( 1 )
+			.clipHi_( 32 );
+			
+		vws[ \box2 ] = SmoothNumberBox( vws[ \view ], 
+				Rect(labelWidth + 2 + 60 + 10,0,60,bounds.height)
+			)
+		    .action_({ |vw|
+		        action.value( vw,  vws[ \box1 ].value / vws[ \box2 ].value );
+		    } ).resize_(5)
+		    .allowedChars_( "" )
+			.step_( 1 )
+			.scroll_step_( 1 )
+			.alt_scale_( 0.1 )
+			.clipLo_( 1 )
+			.clipHi_( 32 );
+		    
+		if( resize.notNil ) { vws[ \view ].resize = resize };
+		^vws;
+	}
+
+	setView { |view, value, active = false|
+		if( value > 1 ) { 
+			view[ \box1 ].value = value;
+			view[ \box2 ].value = 1;
+		} {
+			view[ \box1 ].value = 1;
+			view[ \box2 ].value = 1/value;
+		};
+		if( active ) { view.doAction };
+	}
+
+}
+
 + URandSeed { // is actually a Spec too
 	
 	*viewNumLines { ^1 }
