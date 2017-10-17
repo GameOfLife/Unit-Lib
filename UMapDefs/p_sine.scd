@@ -23,6 +23,9 @@ UPatDef( \p_sine, { |unit,
 	{	
 		var i = 0;
 		var timer = UPattern.deltaTimer;
+		if( timeBase.next === \seconds ) {
+			i = freq.next * UPattern.startPos; 
+		};
 		loop {
 			(((i % 1) * 2pi) + phase.next).sin.linlin(-1,1,min.next,max.next).yield;
 			switch( timeBase.next, 

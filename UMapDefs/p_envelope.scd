@@ -18,14 +18,10 @@ part of the Unit lib default UMapDefs set
 
 UPatDef( \p_envelope, { |unit, env, loop = \loop|
 	{
-		var current = 0, direction = 1, delta;
+		var current = UPattern.startPos, direction = 1, delta;
 		var timer = UPattern.deltaTimer;
 		var envx;
-		if( loop.next === \backwards ) { direction = -1; };
-		envx = env.next;
-		envx.at( 0 ).yield;
 		inf.do { |i|
-			current = (current + ((direction * timer.value).clip2( 1.0e12 )));
 			envx = env.next;
 			switch( loop.next,
 				\loop, { current = current.wrap( 0.0, env.duration );  direction = 1 },
@@ -41,6 +37,7 @@ UPatDef( \p_envelope, { |unit, env, loop = \loop|
 				\off, { current = current.clip(0.0,env.duration); }
 			);
 			envx[ current ].yield;
+			current = (current + ((direction * timer.value).clip2( 1.0e12 )));
 		};
 	}.r;
 }).mappedArgs_([\env])

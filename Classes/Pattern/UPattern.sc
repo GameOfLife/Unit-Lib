@@ -9,6 +9,7 @@ UPattern : UChain {
 	var <pattern = #[1,1];
 	var <>maxSimultaneousStarts = 100;
 	var <>localPos = 0;
+	var <>startPos = 0;
 	var <>routine;
 	var <>preparedEventsRoutine; // for prepared events
 	var <>preparedEvents;
@@ -273,6 +274,7 @@ UPattern : UChain {
 	isPlaying { ^isPlaying ? false }
 	
 	makeRoutine { |target, startPos = 0, action, score|
+		this.startPos = startPos;
 		^Routine({
 			var time = 0, n = 0;
 			var zeroCount = 0;
@@ -390,7 +392,7 @@ UPattern : UChain {
 	
 	prepareAndStart { |target, startPos = 0|
 		this.prepare( target, startPos, {
-			this.start;
+			this.start( startPos: startPos );
 		});
 	}
 		
@@ -438,6 +440,19 @@ UPattern : UChain {
 		UPattern.seconds = nil;
 		score.events = events;
 		^score;
+	}
+	
+	*startPos {
+		var upat;
+		upat = UChain.nowPreparingChain !? _.parent;
+		if( upat.isKindOf( UPattern ).not ) {
+			upat = UPattern.nowCallingPattern;
+		};
+		if( upat.isKindOf( UPattern ) ) {
+			^upat.startPos;
+		} {
+			^0
+		};
 	}
 	
 	*expectedNext_ { |time|
