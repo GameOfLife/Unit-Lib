@@ -574,6 +574,13 @@ BufSndFile : AbstractSndFile {
 		});
 	}
 	
+	*reloadAllGlobal {
+		var keys;		
+		keys = global.keys.asArray;
+		this.disposeAllGlobal;
+		keys.do({ |key| this.fromID( key ).loadGlobal( replace: true ); });
+	}
+	
 	findGlobal { |server|
 		if( UEvent.nrtMode != true ) {
 			^global[ this.id ].detect({ |buf| buf.server === server });
