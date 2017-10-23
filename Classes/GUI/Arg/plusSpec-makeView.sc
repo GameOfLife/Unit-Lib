@@ -2184,7 +2184,7 @@
 			.items_([ 'hz', 'midi', 'note' ])
 			.action_({ |pu|
 				mode = pu.item;
-				this.setMode( vws, mode );
+				this.class.changed( \mode );
 			});
 		
 		// hz mode
@@ -2234,6 +2234,13 @@
 			.visible_( false );
 		
 		vws[ \cents ].sliderView.centered_(true);
+		
+		vws[ \ctrl ] = SimpleController( this.class )
+			.put( \mode, {
+				this.setMode( vws, mode );
+			});
+			
+		vws[ \mode ].onClose_({ vws[ \ctrl ].remove });
 			
 		this.setMode( vws, mode );
 	
@@ -2244,6 +2251,7 @@
 		[ \hz, \midi, \note ].do({ |item|
 			view[ item ].visible = (item == newMode)	
 		});
+		view[ \mode ].value = view[ \mode ].items.indexOf( mode ) ? 0; 
 		view[ \cents ].visible = (newMode == \note);
 	}
 	
@@ -2254,7 +2262,6 @@
 		view[ \cents ].value = (value.cpsmidi - (view[ \note ].value)) * 100;
 		{ 
 			this.setMode( view, mode );
-			view[ \mode ].value = view[ \mode ].items.indexOf( mode ) ? 0; 
 		}.defer;
 		if( active ) { view[ \hz ].doAction };
 	}

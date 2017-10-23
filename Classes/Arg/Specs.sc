@@ -1119,7 +1119,7 @@ PositiveRealSpec : Spec {
 
 FreqSpec : ControlSpec {
 	
-	var <>mode = 'hz'; // \hz, \midi, \note - gui only
+	classvar <>mode = 'hz'; // \hz, \midi, \note - gui only
 	
 	*new { arg minval=20, maxval=20000, warp='exp', step=0.0, default = 440, units = " Hz", grid;
 		^super.newCopyArgs(minval, maxval, warp, step,
