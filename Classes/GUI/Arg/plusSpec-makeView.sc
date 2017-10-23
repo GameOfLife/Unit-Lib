@@ -2431,7 +2431,7 @@
 		};
 		
 		vws[ \box1 ] = SmoothNumberBox( vws[ \view ], 
-				Rect(labelWidth + 2,0,60,bounds.height)
+				Rect(labelWidth + 2,0,40,bounds.height)
 			)
 		    .action_({ |vw|
 		        action.value( vw, vws[ \box1 ].value / vws[ \box2 ].value );
@@ -2443,8 +2443,12 @@
 			.clipLo_( 1 )
 			.clipHi_( 32 );
 			
+		StaticText( vws[ \view ], Rect(labelWidth + 2 + 40,0,60,bounds.height) )
+			.string_( " /" )
+			.applySkin( RoundView.skin );
+			
 		vws[ \box2 ] = SmoothNumberBox( vws[ \view ], 
-				Rect(labelWidth + 2 + 60 + 10,0,60,bounds.height)
+				Rect(labelWidth + 2 + 40 + 2 + 20,0,60,bounds.height)
 			)
 		    .action_({ |vw|
 		        action.value( vw,  vws[ \box1 ].value / vws[ \box2 ].value );
