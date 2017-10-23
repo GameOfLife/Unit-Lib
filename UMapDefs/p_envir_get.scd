@@ -28,6 +28,9 @@ UPatDef( \p_envir_get, { |unit, key = 'a'|
 					fromSpec = fromSpec.asControlSpec;
 					if( val.isKindOf( Point ) ) { val = val.x };
 				};
+				if( fromSpec.isKindOf( SMPTESpec ) && { spec.isKindOf( SMPTESpec ) } ) {
+					fromSpec = spec.asControlSpec;
+				};
 				val = fromSpec.unmap( val );
 			} {
 				val = spec.unmap( spec.default );
