@@ -1,7 +1,7 @@
 /*
 \auxIn
 
-Read sound from one of the 32 internal 'aux' buses. The signal can be sent from a different UChain using 'auxOut'. For this to work on every system, set the receiving UChain's addAction to \addToTail or \addAfter, and enable 'global'.
+Read sound from one of the 32 internal 'aux' buses. The signal can be sent from a different UChain using 'auxOut'. For this to work on every system, set the receiving UChain's addAction to \addToTail or \addAfter, and enable 'global'. As an alternative to 'global', it is also possible to use an ugroup; In that case, make sure that the sending ('auxOut') unit is in the same ugroup as the receiving one ('auxIn').
 
 bus: the aux bus to read from (0-31)
 
