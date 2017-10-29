@@ -31,6 +31,9 @@ UPatDef( \p_envir_get, { |unit, key = 'a'|
 				if( fromSpec.isKindOf( SMPTESpec ) && { spec.isKindOf( SMPTESpec ) } ) {
 					fromSpec = spec.asControlSpec;
 				};
+				if( fromSpec.isKindOf( IntegerSpec ) ) {
+					fromSpec = spec.asControlSpec;
+				};
 				val = fromSpec.unmap( val );
 			} {
 				val = spec.unmap( spec.default );

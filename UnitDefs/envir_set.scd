@@ -20,6 +20,7 @@ defs = [
 	\value, [ 0, 1 ], 
 	\freq, FreqSpec(2,20000), 
 	\amp, \amp,
+	\integer, IntegerSpec(),
 	\boolean, BoolSpec(),
 	\time, SMPTESpec(),
 ].clump(2).collect({ |args|

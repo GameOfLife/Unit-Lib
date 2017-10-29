@@ -32,6 +32,9 @@ ValueUMapDef( \envir_get, { |unit, ctrl|
 			if( fromSpec.isKindOf( SMPTESpec ) && { spec.isKindOf( SMPTESpec ) } ) {
 				fromSpec = spec.asControlSpec;
 			};
+			if( fromSpec.isKindOf( IntegerSpec ) ) {
+				fromSpec = spec.asControlSpec;
+			};
 			unit.mapSet( \value, fromSpec.unmap( val ) );
 		});
 	currentEnvironment.changed( kkey );
