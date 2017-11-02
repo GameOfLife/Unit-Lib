@@ -21,6 +21,7 @@ UScore : UEvent {
 	
 	classvar <>activeScores;
 	classvar <>openFunc;
+	classvar <>updateWaitTime = 0.1;
 
 	/*
 	*   events: Array[UEvent]
@@ -597,11 +598,10 @@ UScore : UEvent {
         updatePosFunc = {
             if( updatePosition ) {
                 updatePosTask = Task({
-                    var waitTime = 0.1;
                     var w = (startPos - preparePos);
                     if(w == inf){ waitError.warn; updatePosFunc.stop; }{w.wait};
                     while({playState == \playing}, {
-                        waitTime.wait;
+                        updateWaitTime.wait;
                         if(updatePos) {
                             this.changed(\pos);
                         }
