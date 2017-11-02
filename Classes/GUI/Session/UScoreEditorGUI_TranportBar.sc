@@ -353,13 +353,14 @@ UScoreEditorGui_TransportBar {
             .value_( scoreView.followPos.binaryValue )
             .radius_( bounds.height / 8 )
             .action_({ |bt| 
-	            var f, active;
+	            var f, active, count = 0;
 	            active = bt.value.booleanValue;
 	            f = { |unit, mode = true|
 		            unit.values.do({ |value|
 			            if( value.isUMap ) {
 				            if( value.def.isKindOf( ValueUMapDef ) ) {
 					            value.set( \active, mode );
+					            count = count + 1;
 					       } {
 						       f.( value, mode );
 						  };
@@ -376,6 +377,11 @@ UScoreEditorGui_TransportBar {
 					}
 				}
 			});
+			if( count > 0 ) {
+				"% UMaps set to 'active' = %\n".postf( count, active );
+			} {
+				"no UMaps to activate in this UScore".postln;
+			};
 		})
             .resize_(3)
             .canFocus_(false);
