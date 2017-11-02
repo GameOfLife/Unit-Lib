@@ -3,6 +3,7 @@ UMarker : UEvent {
 	classvar <>defaultAction;
 	classvar <>presetManager;
 	classvar <>current;
+	classvar <umarkerIndex = 0;
 	
 	var <name = "marker";
 	var <>score; // set at playback from score
@@ -93,7 +94,11 @@ UMarker : UEvent {
 					startTime > (this.score.startedAt[0] + 0.125) 
 				}) { 
 					this.score.pause; 
+				} {
+					this.class.umarkerIndexIncrease;
 				};
+			} {
+				this.class.umarkerIndexIncrease;
 			};
 			old = current;
 			current = this;
@@ -102,6 +107,18 @@ UMarker : UEvent {
 			action.value( this, this.score ); 
 			this.score = nil; 
 		}
+	}
+	
+	*umarkerIndex_ { |newIndex = 0|
+		umarkerIndex = newIndex;
+		ULib.allServers.do(
+			_.sendSyncedBundle( Server.default.latency, nil, [\n_set, 0, \u_markerIndex, umarkerIndex ] )
+		);
+		this.changed( \umarkerIndex );
+	}
+	
+	*umarkerIndexIncrease { |newIndex = 0|
+		this.umarkerIndex = (umarkerIndex + 1).wrap(1,2**24);
 	}
 	
 	prepare { |target, startPos = 0, action| action.value( this ) }
