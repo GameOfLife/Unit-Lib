@@ -326,6 +326,8 @@ UChainEventView : UEventView {
 				this.drawShape(scaledRect);
 				Pen.stroke;
 			};
+			
+		   if( UScoreView.hideUChains.not ) {
 	
 	        Pen.use({
 	            var fadeinScaled, fadeoutScaled, fades;
@@ -400,7 +402,7 @@ UChainEventView : UEventView {
 		       };
 		       
 		       //draw name
-		       if( scaledRect.height > 4 ) {
+		       if( UScoreView.showUChainNames && {scaledRect.height > 4} ) {
 			       Pen.color = Color.black.alpha_( lineAlpha  );
 			       if( event.lockStartTime ) {
 				       DrawIcon( \lock, Rect( scaledRect.left + 2, scaledRect.top, 14, 14 ) );
@@ -412,6 +414,8 @@ UChainEventView : UEventView {
 			       );
 		       };
 	        });
+	        
+		   };
 	    };
 
         //draw name

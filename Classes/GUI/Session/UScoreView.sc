@@ -26,6 +26,9 @@
 UScoreView {
 	
 	classvar <spaceBarPlayAnyway = false;
+	classvar <>showGrid = true;
+	classvar <>showUChainNames = true;
+	classvar <>hideUChains = false;
 
      var <scoreEditorsList;
      var <usessionMouseEventsManager;
@@ -600,11 +603,13 @@ UScoreView {
 				var viewRect, pixelScale, l, n, l60, r, lr, bnds, scaleAmt;
 				var top, bottom;
 				
-				// grid lines
-				if( showTempoMap ) {
-					v.drawTempoGrid( score.tempoMap );
-				} {
-					v.drawTimeGrid;
+				if( showGrid ) {	
+					// grid lines
+					if( showTempoMap ) {
+						v.drawTempoGrid( score.tempoMap );
+					} {
+						v.drawTimeGrid;
+					};
 				};
 			})
 			.unscaledDrawFunc_( { |v|
