@@ -82,7 +82,7 @@ UEventView {
 
 	drawShape { |rectToDraw|
 		var radius = 5;
-
+/*
 		radius = radius.min( rectToDraw.width*0.5 ).min( rectToDraw.height*0.5 );
 		Pen.moveTo(rectToDraw.rightTop - Point(rectToDraw.width*0.5,0));
 		Pen.arcTo(rectToDraw.rightTop,rectToDraw.rightBottom,radius);
@@ -90,6 +90,8 @@ UEventView {
 		Pen.lineTo(rectToDraw.leftBottom);
 		Pen.arcTo(rectToDraw.leftTop,rectToDraw.leftTop + Point(rectToDraw.width*0.5,0),radius);
 		Pen.lineTo(rectToDraw.leftTop +  Point(rectToDraw.width*0.5,0));
+*/
+	Pen.addRect( rectToDraw );
 
 	}
 
