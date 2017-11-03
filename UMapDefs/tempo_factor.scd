@@ -22,6 +22,7 @@ FuncUMapDef( \tempo_factor, { |unit, sustain = 1, timeToNext = 1, tempo = 60|
 	.setSpec( \timeToNext, [0.125,8,\exp].asSpec )
 	.setSpec( \tempo, [10,300,\exp,0,60].asSpec )
 	.setSpec( \value, DisplaySpec( SMPTESpec(), _.asSMPTEString(1000) ), private: true )
+	.dontStoreValue_( true )
 	.canUseUMapFunc_({ |unit, key, umapdef|
 		unit.getSpec( key ).isKindOf( UPatternSpec );
 	})

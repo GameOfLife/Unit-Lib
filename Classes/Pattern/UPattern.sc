@@ -527,7 +527,7 @@ UPattern : UChain {
 		if( this.repeats != inf ) {
 			stream << ".repeats_(" <<< this.repeats << ")";
 		};
-		if( (this.sustain != 1) or: { this.timeToNext != 1 } ) {
+		if( (this.sustain != 1) or: { this.timeToNext != 1 } or: { this.pattern.isKindOf( UMap ).not } or: { this.pattern.defName != 'sustain_time' }) {
 			if( this.pattern.isKindOf( UMap ) ) {
 				stream << ".pattern_(" <<< this.pattern.getSetArgs << ")";
 			} {
