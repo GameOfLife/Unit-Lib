@@ -361,6 +361,7 @@ UChainEventView : UEventView {
 		            
 		            // fade in
 		            Pen.moveTo(innerRect.leftBottom);
+		            /*
 		            if( event.fadeInCurve != 0 ) {
 			            ((..7)/8).do({	 |item|
 				            Pen.lineTo(
@@ -369,12 +370,14 @@ UChainEventView : UEventView {
 				            );
 			            });
 		            };
+		            */
 		            Pen.lineTo(fadeinScaled @ (innerRect.top) );
 		            Pen.lineTo(innerRect.leftTop);
 		            Pen.lineTo(innerRect.leftBottom);
 		           
 		            // fade out
 		            Pen.lineTo(innerRect.rightBottom);
+		            /*
 		            if( event.fadeOutCurve != 0 ) {
 			            ((..7)/8).do({	 |item|
 				            Pen.lineTo(
@@ -383,6 +386,7 @@ UChainEventView : UEventView {
 				            );
 			            });
 		            };
+		            */
 		            Pen.lineTo(fadeoutScaled @ (innerRect.top));
 		            Pen.lineTo(innerRect.rightTop);
 		            Pen.lineTo(innerRect.rightBottom);
