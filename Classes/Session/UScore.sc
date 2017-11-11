@@ -852,10 +852,12 @@ UScore : UEvent {
 	}
 	
 	jumpTo { |pos = 0|
-		if( this.isPlaying ) {
+		case { this.isPlaying } {
 			this.stop;
 			this.pos = pos;
 			this.prepareAndStart( startPos: pos );
+		} { this.isPaused } {
+			// don't jump
 		} {
 			this.pos = pos;
 		};
