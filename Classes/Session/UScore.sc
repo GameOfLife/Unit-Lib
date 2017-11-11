@@ -33,6 +33,7 @@ UScore : UEvent {
 	var <playState = \stopped, <updatePos = true;
 	var <soloed, <softMuted;
 	var <>tempoMap;
+	var <>pausedByUMarker = false;
 
 
 	/* playState is a finite state machine. The transitions graph:
@@ -610,6 +611,11 @@ UScore : UEvent {
                 }).start;
             };
         };
+        
+        if( pausedByUMarker ) { 
+	        UMarker.umarkerIndexIncrease; 
+	        pausedByUMarker = false; 
+	    };
 
         //if there is some time between preparing and starting to play
         //then wait before declaring that the score has started to play.
@@ -682,6 +688,7 @@ UScore : UEvent {
 
 	//stop just the spawning and releasing of events
 	stopScore {
+		pausedByUMarker = false;
 		[playTask, updatePosTask ].do(_.stop);
 	}
 

@@ -94,8 +94,7 @@ UMarker : UEvent {
 					startTime > (this.score.startedAt[0] + 0.125) 
 				}) { 
 					this.score.pause; 
-				} {
-					this.class.umarkerIndexIncrease;
+					this.score.pausedByUMarker = true;
 				};
 			} {
 				this.class.umarkerIndexIncrease;
