@@ -29,6 +29,7 @@ UScoreView {
 	classvar <>showGrid = true;
 	classvar <>showUChainNames = true;
 	classvar <>hideUChains = false;
+	classvar <>showFadeCurves = true;
 
      var <scoreEditorsList;
      var <usessionMouseEventsManager;
