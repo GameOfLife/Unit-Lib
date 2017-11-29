@@ -11,10 +11,11 @@ part of the Unit lib default Udefs set
 */
 
 Udef( \pitchShift, { |semitones = 0, pitchDisp = 0.0, timeDisp = 0.0|
-	var sig;
-	URandSeed.ir(12345);
+	var sig, windowSize;
+	windowSize = \windowSize.ir(0.2);
+	URandSeed.ir();
 	sig = UIn.ar( 0, 1 );
-	sig = PitchShift.ar( sig, \windowSize.ir(0.2), semitones.midiratio, pitchDisp * 4, timeDisp * 0.2 );
+	sig = PitchShift.ar( sig, windowSize, semitones.midiratio, pitchDisp * 4, timeDisp * 0.2 );
 	UOut.ar(0, sig );
 })	
 	.category_( \effect )
