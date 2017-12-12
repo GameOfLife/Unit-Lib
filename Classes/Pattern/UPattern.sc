@@ -420,13 +420,17 @@ UPattern : UChain {
 	release { this.stop }
 	
 	asUScore { |infDur = 60|
-		var score, events, originalDur, track = 0, track0time = 0, nextTime;
+		var score, events, originalDur, rlseSelf, track = 0, track0time = 0, nextTime;
 		this.stop;
 		units.do({ |unit| this.prResetStreams( unit ); });
 		score = UScore().startTime_( this.startTime ).track_( this.track );
 		originalDur = duration;
 		if( duration == inf ) {
 			duration = infDur;
+		};
+		rlseSelf = this.releaseSelf;
+		if( rlseSelf == false ) {
+			releaseSelf = true;
 		};
 		UPattern.seconds = thisThread.seconds;
 		events = Array( 2**13 );
@@ -437,6 +441,7 @@ UPattern : UChain {
 			UPattern.seconds = seconds + nextTime;
 		};
 		duration = originalDur;
+		releaseSelf = rlseSelf;
 		UPattern.seconds = nil;
 		score.events = events;
 		^score;
