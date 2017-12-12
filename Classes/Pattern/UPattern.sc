@@ -444,6 +444,7 @@ UPattern : UChain {
 		releaseSelf = rlseSelf;
 		UPattern.seconds = nil;
 		score.events = events;
+		score.disabled = this.disabled;
 		^score;
 	}
 	
