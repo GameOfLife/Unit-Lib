@@ -23,7 +23,7 @@ defs = [
 	var type, spec;
 	#type, spec = args;
 	spec = spec.asSpec;
-	Udef( type, {
+	MultiChannelUdef( type, {
 		var in, lowFreq, highFreq;
 		var order, lag;
 		switch( type,
@@ -33,7 +33,7 @@ defs = [
 		);
 		order = \order.kr(2);
 		lag = \lag.kr(0);
-		in = UIn.ar(0,1);
+		in = UIn.ar(0, Udef.numChannels );
 		if( lowFreq.notNil ) { in = BLowCut.ar( in, lowFreq.lag(lag).clip(20,20000), order ); };
 		if( highFreq.notNil ) { in = BHiCut.ar( in, highFreq.lag(lag).clip(20,20000), order ); };
 		UOut.ar( 0, in );
