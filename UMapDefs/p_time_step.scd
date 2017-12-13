@@ -29,7 +29,7 @@ UPatDef( \p_time_step, { |unit, time = 0, n = 1, spread = 0.0|
 	.setSpec( \time, UAdaptSpec() )
 	.setSpec( \n, IntegerSpec(1, 1, 99 ) )
 	.canUseUMapFunc_({ |unit, key, umapdef|
-		(key == \timeToNext) or: {
+		([\time, \timeToNext].includes( key ) ) or: {
 		unit.getSpec( key ).isKindOf( SMPTESpec ) or: {
 			unit.getSpec( key ).isKindOf( UAdaptSpec )
 		} }
