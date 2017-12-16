@@ -133,9 +133,15 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 	stop { units.do(_.stop) }
 	
 	insertUMap { |key, umapdef, args|
-		units.do({ |unit|
-			unit.insertUMap( key, umapdef, args );
-		});
+		if( umapdef.isKindOf( UMap ) ) {
+			units.do({ |unit|
+				unit.insertUMap( key, umapdef.deepCopy, args );
+			});
+		} {	
+			units.do({ |unit|
+				unit.insertUMap( key, umapdef, args );
+			});
+		};
 	}
 	
 	removeUMap { |key|
