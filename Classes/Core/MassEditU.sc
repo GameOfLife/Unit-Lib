@@ -508,20 +508,22 @@ MassEditUChain {
 		uchains.do( _.release( time ) );
 	}
 
-	prepare { |target, loadDef = true, action|
+	prepare { |target, startPos = 0, action|
+		var firstAction;
 		action = MultiActionFunc( action );
-	     uchains.do( _.prepare(target, loadDef, action.getAction ) );
-	     action.getAction.value; // fire action at least once
+		firstAction = action.getAction;
+	     uchains.do( _.prepare(target, startPos, action.getAction ) );
+	     firstAction.value; // fire action at least once
 	     ^target; // return array of actually prepared servers
 	}
 
-	prepareAndStart{ |target, loadDef = true|
+	prepareAndStart{ |target, startPos = 0|
 		var task, cond;
 		cond = Condition(false);
 		task = fork { 
 			var action;
 			action = { cond.test = true; cond.signal };
-			target = this.prepare( target, loadDef, action );
+			target = this.prepare( target, startPos, action );
 			cond.wait;
 	       	this.start(target);
 		};
@@ -529,10 +531,10 @@ MassEditUChain {
 	
 	waitTime { ^this.units.collect(_.waitTime).sum }
 	
-	prepareWaitAndStart { |target, loadDef = true|
+	prepareWaitAndStart { |target, startPos = 0|
 		var task;
 		task = fork { 
-			this.prepare( target, loadDef );
+			this.prepare( target, startPos );
 			this.waitTime.wait; // doesn't care if prepare is done
 	       	this.start(target);
 	       	prepareTasks.remove(task);
