@@ -222,7 +222,7 @@ UChainGUI {
 	prMakeViews { |bounds|
 		var margin = 0@0, gap = 4@4;
 		var heights, units;
-		var labelWidth, releaseTask;
+		var labelWidth;
 		var controller;
 		var udefController;
 		var scoreController;
@@ -275,7 +275,6 @@ UChainGUI {
 			.hiliteColor_( Color.green )
 			.action_( [ { 
 					chain.prepareAndStart;							}, { 
-					releaseTask.stop;
 					chain.release 
 				} ]
 		 	);
@@ -853,7 +852,6 @@ UChainGUI {
 			.put( \end, { 
 				if( units.every({ |unit| unit.synths.size == 0 }) ) {
 					views[ \startButton ].value = 0;
-					releaseTask.stop;
 				};
 			} )
 			.put( \units, { 
