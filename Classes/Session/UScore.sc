@@ -126,6 +126,11 @@ UScore : UEvent {
 		this.changed(\loop);
 	}
 	
+	allowPause_ { |bool = false|
+		allowPause = bool;
+		this.changed( \allowPause, bool );
+	}
+	
 	releaseSelf { ^true }
 	releaseSelf_ { "%:releaseSelf - can't use releaseSelf\n".postf( this.class ) }
 
@@ -723,7 +728,7 @@ UScore : UEvent {
 	pause {
 	    if(playState == \playing){
 		    this.stopScore;
-		    events.select(_.isFolder).do(_.pause);
+		    events.select(_.allowPause).do(_.pause);
 		    pos = this.pos - 1e-12;
 		    pausedAt = pos;
 		    startedAt = nil;

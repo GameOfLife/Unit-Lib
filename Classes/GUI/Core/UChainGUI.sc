@@ -433,6 +433,15 @@ UChainGUI {
 					score.name_( tf.string );
 				});
 				
+			views[ \allowPause ] = SmoothButton( composite, 80@14 )
+				.border_( 1 )
+				.radius_( 3 )
+				.label_( [ "allowPause", "allowPause" ] )
+				.hiliteColor_( Color.green )
+				.action_({ |bt|
+					score.allowPause = bt.value.booleanValue;
+				});
+				
 			composite.decorator.nextLine;
 			
 			// startTime
@@ -965,6 +974,7 @@ UChainGUI {
 			scoreController = SimpleController( score );
 			scoreController
 				.put( \displayColor, { { views[ \displayColor ].refresh; }.defer; } )
+				.put( \allowPause, { views[ \allowPause ].value = score.allowPause.binaryValue } )
 				.put( \startTime, { 
 					views[ \startTime ].value = score.startTime ? 0; 
 					views[ \startBar ].value = score.startTime ? 0;

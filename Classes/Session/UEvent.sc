@@ -32,6 +32,7 @@ UEvent : UArchivable {
     var <displayColor;
     var <lockStartTime = false;
 	var <>hideInGUI = false;
+	var <allowPause = false;
 
     /*
     If 'releaseSelf' is set to false, then uchains will not free themselves automatically when the events stop playing.
@@ -65,6 +66,14 @@ UEvent : UArchivable {
     finiteDuration { |addInf = 10|
 	    if( this.isFinite ) { ^this.duration } { ^addInf };
     }
+    
+    allowPause_ { |bool = false|
+	    if( bool == true ) { 
+		    "allowPause_( true ) not (yet) supported for %\n".postf( this.class ); 
+		};
+    }
+    
+    resume { }
     
     renderNumChannels { ^renderNumChannels.value }
     
