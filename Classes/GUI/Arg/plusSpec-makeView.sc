@@ -1917,29 +1917,7 @@
 		view.view.decorator.nextLine;
 		view.view.decorator.shift( labelWidth, 0 );
 		
-		RoundView.pushSkin( (RoundView.skin.deepCopy ? ()).labelWidth_(35) );
-		
-		vws[ \loop ] = loopSpec.makeView( view, (view.bounds.width - labelWidth) @ viewHeight,
-			" loop", { |vw, val| 
-				var size;
-				vws[ \updateLoop ] = false;
-				size = val.size - 1;
-				val.do({ |item, i|
-					if( i == size ) { vws[ \updateLoop ] = true };
-					vws[ \val ][ i ].loop = item;
-				});
-			}, 2 );
-			
-		vws[ \loop ].labelView.align_( \left );
-			
-		vws[ \setLoop ] = { |evt, value|
-			if( evt.updateLoop != false ) {
-				loopSpec.setView( evt[ \loop ], value.collect(_.loop) );
-			};
-		};
-			
-		view.view.decorator.nextLine;
-		view.view.decorator.shift( labelWidth, 0 );
+		RoundView.pushSkin( (RoundView.skin.deepCopy ? ()).labelWidth_(30) );
 		
 		vws[ \rate ] = rateSpec.makeView( view, (view.bounds.width - labelWidth) @ viewHeight,
 			" rate", { |vw, val| 
@@ -1957,6 +1935,28 @@
 		vws[ \setRate ] = { |evt, value|
 			if( evt.updateRate != false ) {
 				rateSpec.setView( evt[ \rate ], value.collect({|x| x.rate.ratiomidi }) );
+			};
+		};
+		
+		view.view.decorator.nextLine;
+		view.view.decorator.shift( labelWidth, 0 );
+		
+		vws[ \loop ] = loopSpec.makeView( view, (view.bounds.width - labelWidth) @ viewHeight,
+			" loop", { |vw, val| 
+				var size;
+				vws[ \updateLoop ] = false;
+				size = val.size - 1;
+				val.do({ |item, i|
+					if( i == size ) { vws[ \updateLoop ] = true };
+					vws[ \val ][ i ].loop = item;
+				});
+			}, 2 );
+			
+		vws[ \loop ].labelView.align_( \left );
+			
+		vws[ \setLoop ] = { |evt, value|
+			if( evt.updateLoop != false ) {
+				loopSpec.setView( evt[ \loop ], value.collect(_.loop) );
 			};
 		};
 		

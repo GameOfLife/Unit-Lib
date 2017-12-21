@@ -159,7 +159,7 @@ BufSndFileView {
 		{
 			views[ \startLabel ].font = font;
 			views[ \timeMode ].font = font;
-			views[ \endLabel ].font = font;
+			views[ \loopLabel ].font = font;
 			views[ \rateLabel ].font = font;
 			views[ \rateMode ].font = font;
 		}.defer;
@@ -342,6 +342,8 @@ BufSndFileView {
 			.applySkin( RoundView.skin ? () )
 			.string_( "" );
 		
+		view.view.decorator.shift( (bounds.width - 44) - 190, 0 );
+		
 		views[ \hasGlobal ] = SmoothButton( view, 40 @ viewHeight )
 				.radius_( 3 )
 				.border_( 1 )
@@ -364,11 +366,11 @@ BufSndFileView {
 			
 		view.view.decorator.nextLine;
 					
-		views[ \startLabel ] = StaticText( view, 30 @ viewHeight )
+		views[ \startLabel ] = StaticText( view, 25 @ viewHeight )
 			.applySkin( RoundView.skin ? () )
-			.string_( "start" );
+			.string_( "trim" );
 		
-		views[ \startComp ] = CompositeView( view, (bounds.width - 78) @ viewHeight )
+		views[ \startComp ] = CompositeView( view, (((bounds.width - 73)/2)-2) @ viewHeight )
 			.resize_( 2 );
 		
 		views[ \startSecond ] = SMPTEBox( views[ \startComp ], 
@@ -390,20 +392,8 @@ BufSndFileView {
 				action.value( this );
 			})
 			.visible_( false );
-		
-		views[ \timeMode ] = PopUpMenu( view, 40 @ viewHeight )
-			.applySkin( RoundView.skin ? ())
-			.items_( [ "s", "smp" ] )
-			.resize_( 3 )
-			.action_({ |pu|
-				this.class.timeMode = [ \seconds, \frames ][ pu.value ];
-			});
 			
-		views[ \endLabel ] = StaticText( view, 30 @ viewHeight )
-			.applySkin( RoundView.skin )
-			.string_( "end" );
-		
-		views[ \endComp ] = CompositeView( view, (bounds.width - 78) @ viewHeight )
+		views[ \endComp ] = CompositeView( view, (((bounds.width - 73)/2)-2) @ viewHeight )
 			.resize_( 2 );
 		
 		views[ \endSecond ] = SMPTEBox( views[ \endComp ], 
@@ -426,22 +416,19 @@ BufSndFileView {
 			})
 			.visible_( false );
 		
-		views[ \loop ] = SmoothButton( view, 40 @ viewHeight )
-			.radius_( 3 )
-			.border_( 1 )
+		views[ \timeMode ] = PopUpMenu( view, 40 @ viewHeight )
+			.applySkin( RoundView.skin ? ())
+			.items_( [ "s", "smp" ] )
 			.resize_( 3 )
-			.label_( [ "loop", "loop" ] )
-			.hiliteColor_( Color.green )
-			.action_({ |bt|
-				this.performSndFile( \loop_ , bt.value.booleanValue );
-				action.value( this );
+			.action_({ |pu|
+				this.class.timeMode = [ \seconds, \frames ][ pu.value ];
 			});
 			
-		views[ \rateLabel ] = StaticText( view, 30 @ viewHeight )
+		views[ \rateLabel ] = StaticText( view, 25 @ viewHeight )
 			.applySkin( RoundView.skin ? () )
 			.string_( "rate" );
 			
-		views[ \rateComp ] = CompositeView( view, (bounds.width - 118) @ viewHeight )
+		views[ \rateComp ] = CompositeView( view, (bounds.width - 113) @ viewHeight )
 			.resize_( 2 );
 		
 		views[ \rateRatio ] = SmoothNumberBox( views[ \rateComp ], 
@@ -470,6 +457,20 @@ BufSndFileView {
 			.resize_( 3 )
 			.action_({ |pu|
 				this.class.rateMode = [ \ratio, \semitones ][ pu.value ];
+			});
+			
+		views[ \loopLabel ] = StaticText( view, 25 @ viewHeight )
+			.applySkin( RoundView.skin )
+			.string_( "loop" );
+		
+		views[ \loop ] = SmoothButton( view, viewHeight @ viewHeight )
+			.radius_( 3 )
+			.border_( 1 )
+			.resize_( 3 )
+			.label_( [ "", 'x' ] )
+			.action_({ |bt|
+				this.performSndFile( \loop_ , bt.value.booleanValue );
+				action.value( this );
 			});
 			
 		this.setFont;
