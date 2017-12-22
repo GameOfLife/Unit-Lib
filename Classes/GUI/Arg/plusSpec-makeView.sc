@@ -2713,6 +2713,109 @@
 	mapSetView { |view, value, active = false|
 		this.setView( view, this.map( value ), active );
 	}
+	
+}
+
++ UMIDIFileSpec {
+	
+	makeView { |parent, bounds, label, action, resize| 
+		var vws, view, labelWidth;
+		var ctrl, strWidth;
+		vws = ( 
+			menuPaths: [ nil ], 
+			doAction: { |evt| 
+				action.value( vws, vws[ \obj ] ) 
+			} 
+		);
+		
+		// this is basically an EZButton
+		
+		bounds.isNil.if{bounds= 320@20};
+		
+		#view, bounds = EZGui().prMakeMarginGap.prMakeView( parent, bounds );
+		 vws[ \view ] = view;
+		 		
+		if( label.notNil ) {
+			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
+			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ bounds.height )
+				.string_( label.asString ++ " " )
+				.align_( \right )
+				.resize_( 4 )
+				.applySkin( RoundView.skin );
+		} {
+			labelWidth = 0;
+		};
+			
+		vws[ \menu ] = PopUpMenu( view, 
+			Rect( labelWidth + 2, 0, bounds.width - (40 + labelWidth + 2), bounds.height )
+		)	.resize_(3)
+			.applySkin( RoundView.skin ? () )
+			.items_( [ "" ] )
+			.action_({ |pu|
+				if( vws[ \menuPaths ].size > 1 ) {
+					if( pu.value > 0 ) {
+						vws[ \obj ] !? _.path_( vws[ \menuPaths ][ pu.value ].asString ) 
+						?? { vws[ \obj ] = UMIDIFile( vws[ \menuPaths ][ pu.value ].asString ) };
+					} {
+						vws[ \obj ] !? _.path_( nil ) ?? { vws[ \obj ] = UMIDIFile() };
+					};
+					vws.doAction;
+				};
+			});
+			
+		ctrl = {
+			var menuItems;
+			vws[ \menuPaths ] = [ nil ] ++ UMIDIFile.all.keys.asArray.sort;
+			menuItems = [ "" ] ++ vws[ \menuPaths ][1..].collect({ |item| item.asString.basename });
+			{
+				if( vws[ \menu ].items != menuItems ) {
+					vws[ \menu ].items = menuItems;
+				};
+				vws[ \menu ].value = vws[ \menuPaths ].indexOf( vws[\obj] !? { |x| x.key } ) ? 0;
+			}.defer;
+		};
+		
+		UMIDIFile.addDependant( ctrl );
+		
+		ctrl.value;
+		
+		vws[ \browse ] = SmoothButton( view, Rect( bounds.width - 36, 0, 16, bounds.height ) )
+			.radius_( 0 )
+			.border_(1)
+			.resize_( 3 )
+			.label_( 'folder' )
+			.action_({
+				Dialog.getPaths( { |paths|
+				  vws[ \obj ] !? { |x| x.path_( paths[0] ); x.reload; }
+				  ?? { vws[ \obj ] = UMIDIFile( paths[0], true ) };
+				  vws.doAction;
+				});
+			});
+			
+		vws[ \refresh ] = SmoothButton( view, Rect( bounds.width - 16, 0, 16, bounds.height ) )
+			.radius_( 0 )
+			.border_(1)
+			.resize_( 3 )
+			.label_( 'roundArrow' )
+			.action_({
+				vws[ \obj ] !? _.reload;
+			});
+		
+		vws[ \menu ].onClose_( { UMIDIFile.removeDependant( ctrl ); } );
+
+		if( resize.notNil ) { vws[ \view ].resize = resize };
+		^vws;
+	}
+	
+	setView { |view, value, active = false|
+		value = this.constrain( value );
+		view[ \obj ] = value;
+		{
+			view[ \menu ].value = view[ \menuPaths ].indexOf( view[ \obj ] !? { |x| x.key } ) ? 0;
+		}.defer;
+		if( active ) { view.doAction };
+	}
+
 }
 
 

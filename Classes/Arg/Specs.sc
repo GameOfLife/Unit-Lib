@@ -946,6 +946,29 @@ PartConvBufferSpec : RichBufferSpec {
 	
 }
 
+UMIDIFileSpec : Spec {
+	
+	*testObject { |obj|
+		^obj.isKindOf( UMIDIFile );
+	}
+	
+	constrain { |value|
+		value = value.asUMIDIFile;
+		^value;
+	}
+	
+	map { |in| ^this.constrain( in ) }
+	unmap { |in| ^in }
+	
+	default { 
+		^nil.asUMIDIFile;
+	}
+	
+	*newFromObject { |obj|
+		^this.new( );
+	}
+}
+
 MultiSpec : Spec {
 	
 	// an ordered and named collection of specs, with the option to re-map to another spec
