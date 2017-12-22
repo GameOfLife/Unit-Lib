@@ -423,6 +423,7 @@ UPattern : UChain {
 		var score, events, originalDur, rlseSelf, track = 0, track0time = 0, nextTime;
 		this.stop;
 		units.do({ |unit| this.prResetStreams( unit ); });
+		if( this.pattern.isKindOf( UMap ) ) { this.prResetStreams( this.pattern ); };
 		score = UScore().startTime_( this.startTime ).track_( this.track );
 		originalDur = duration;
 		if( duration == inf ) {
