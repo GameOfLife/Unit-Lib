@@ -81,4 +81,4 @@ UPatDef( \p_midiFile_times, { |unit, midifile, channel = nil, type = \timeToNext
 .setSpec( \scale, [0.1,10,\exp,0,1].asSpec )
 .setSpec( \add, SMPTESpec() )
 .setDefault( \channel, nil )
-.category_( 'pattern_time' );
+.category_( 'pattern_midiFile' );

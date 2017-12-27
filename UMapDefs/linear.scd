@@ -35,6 +35,6 @@ HybridUMapDef( \linear, { |input = 0.5|
 			spec.respondsTo( \warp_ ) && { spec.warp.isKindOf( LinearWarp ).not };
 		};
 	})
-	.category_( 'map' )
+	.category_( 'convert' )
 
 

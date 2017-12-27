@@ -26,4 +26,4 @@ UPatDef( \p_stutter, { |unit, input = 0, n = 1|
 		};
 	})
 	.useMappedArgs_( false )
-	.mappedArgs_([ \input ]).category_( 'pattern' );
+	.mappedArgs_([ \input ]).category_( 'pattern_filter' );

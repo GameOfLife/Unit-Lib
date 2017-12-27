@@ -41,4 +41,4 @@ UPatDef( \p_wchoose_8, { |unit,
 .setSpec( \value5, UAdaptSpec() )
 .setSpec( \value6, UAdaptSpec() )
 .setSpec( \value7, UAdaptSpec() )
-.category_( 'pattern_random' );
+.category_( 'private' );

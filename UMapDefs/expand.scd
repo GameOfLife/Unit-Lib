@@ -35,7 +35,7 @@ ExpandUMapDef( \expand, { |unit|
 		specs.do({ |spec| spec.mode = unit.unitArgMode })
 	};
 	specs;
-}, \map )
+}, \convert )
 	.canUseUMapFunc_({ |unit, key, umapdef|
 		unit.getSpec( key ).respondsTo( \expandArgSpecs );
 	});

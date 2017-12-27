@@ -219,7 +219,7 @@ defs = [
 			
 	];
 
-MultiUMapDef( \p_midiFile, defs, \pattern, \type, false )
+MultiUMapDef( \p_midiFile, defs, \pattern_midiFile, \type, false )
 	.mappedArgs_([ \toRange ])
 	.defaultDefName_( \note )
 	.allowedModes_([ \init, \sync, \normal ])
