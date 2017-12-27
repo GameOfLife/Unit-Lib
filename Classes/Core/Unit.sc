@@ -323,9 +323,9 @@ Udef : GenericDef {
 		] ++ extra).join( "_" );
 	}
 	
-	prIOspecs { |mode = \in, rate = \audio, key|
+	prIOspecs { |mode = \in, rate = \audio, key, unit|
 		key = key ?? { this.prGetIOKey( mode, rate ); };
-		^argSpecs.select({ |item|
+		^this.argSpecs( unit ).select({ |item|
 			var name;
 			name = item.name.asString;
 			name[..key.size-1] == key &&
@@ -336,7 +336,7 @@ Udef : GenericDef {
 	prIOids { |mode = \in, rate = \audio, unit|
 		var key;
 		key = this.prGetIOKey( mode, rate );
-		^this.prIOspecs( mode, rate, key ).collect({ |item|
+		^this.prIOspecs( mode, rate, key, unit ).collect({ |item|
 			item.name.asString[key.size+1..].split( $_ )[0].interpret;
 		});
 	}
