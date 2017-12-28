@@ -62,6 +62,10 @@ UEnv : UIn {
 
 		var fadeInCurve = this.getControl( \kr, name, 'fadeInCurve', 0 );
 		var fadeOutCurve = this.getControl( \kr, name, 'fadeOutCurve', 0 );
+		
+		if( UGen.buildSynthDef.controlNames.any({ |cn| cn.name == \u_index }) ) {
+			doneAction = doneAction * (1 - \u_index.ir(0).min(1) );
+		};
 
 		gain = this.getControl( \kr, name, 'gain', gain, 0.5 ); // 0.5s lag time
 		if( ignoreFadeIn != true ) {

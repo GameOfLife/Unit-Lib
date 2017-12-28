@@ -1,4 +1,4 @@
-UMultiIn : UIn { // overwrites bus (ReplaceOut)
+UMultiMonoIn : UIn { // overwrites bus (ReplaceOut)
 	
 	*ar { |endPoint = false|
 		^this.new1( \ar, 0, endPoint );
@@ -33,7 +33,7 @@ UMultiIn : UIn { // overwrites bus (ReplaceOut)
 	}
 }
 
-UMultiOut : UMultiIn { // overwrites bus (ReplaceOut)
+UMultiMonoOut : UMultiMonoIn { // overwrites bus (ReplaceOut)
 	
 	*ar { |input, offset = false|
 		^this.new1( \ar, input, offset );

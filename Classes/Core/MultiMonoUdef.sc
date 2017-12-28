@@ -103,16 +103,17 @@ MultiMonoUdef : Udef {
 	}
 	
 	createSynth { |unit, target, startPos = 0| // create A single synth based on server
-		var group;
+		var group, numChannels;
 		target = target ? Server.default;
-		if( unit.get( \numChannels ) > 1 ) {
+		numChannels =  unit.get( \numChannels );
+		if ( numChannels > 1 ) {
 			group = Group( target, \addToTail );
-			unit.get( \numChannels ).asInt.do({ |i|
-				Synth( this.synthDefName, unit.getArgsFor( target, startPos ) ++ [ \u_index, i ], group, \addToTail );
+			(numChannels-1).asInt.do({ |i|
+				Synth( this.synthDefName, unit.getArgsFor( target, startPos ) ++ [ \u_index, i+1 ], group, \addToTail );
 			});
-			^group;
-		} {
-			^Synth( this.synthDefName, unit.getArgsFor( target, startPos ), target, \addToTail );
-		}
+			group.freeAction_({ |synth| unit.removeSynth( synth ); });
+			unit.synths = unit.synths.add( group );
+		};
+		^Synth( this.synthDefName, unit.getArgsFor( target, startPos ), target, \addToTail );
 	}
 }
