@@ -585,7 +585,7 @@ UChainGUI {
 						};
 					});
 					
-				views[ \infDur ] = SmoothButton( composite, 25@14 )
+				views[ \infDur ] = SmoothButton( composite, 34@14 )
 					.border_( 1 )
 					.radius_( 3 )
 					.label_( [ "inf", "inf" ] )
@@ -623,7 +623,7 @@ UChainGUI {
 				// fadeTimes
 				StaticText( composite, labelWidth@14 )
 					.applySkin( RoundView.skin )
-					.string_( "fadeIn" )
+					.string_( "fadeTimes" )
 					.align_( \right );
 				
 				views[ \fadeIn ] = SmoothNumberBox( composite, 40@14 )
@@ -653,13 +653,31 @@ UChainGUI {
 						chain.fadeIn_( nb.value );
 					});
 					
-				views[ \fadeInCurve ] = SmoothNumberBox( composite, 30@14 )
-					.clipLo_(-20)
-				    .clipHi_(20)
+				views[ \fadeOut ] = SmoothNumberBox( composite, 40@14 )
+					.clipLo_(0)
 					.scroll_step_(0.1)
-					.formatFunc_( { |value| value.round(0.1).asString } )
+					.formatFunc_( { |value| [ value.round(0.01), "s" ].join(" ") } )
+					.background_( { |rect|
+						Pen.use({
+							var values;
+							Pen.roundedRect( rect, 2 ).clip;
+							Pen.color = Color(1.0, 1.0, 1.0, 0.5);
+							Pen.fillRect( rect );
+							values = (rect.width.asInt + 1).collect({ |i|
+								i.lincurve(0, rect.width, rect.top, rect.bottom, chain.fadeOutCurve )
+							});
+							Pen.moveTo( rect.leftBottom );
+							values.do({ |item, i|
+								Pen.lineTo( (rect.left + i) @ item );
+							});
+							Pen.lineTo( rect.rightBottom );
+							Pen.lineTo( rect.leftBottom );
+							Pen.color = Color(0.5,0.5,0.5, if( chain.fadeOut > 0 ) { 0.5 } { 0.125 } );
+							Pen.fill;
+						});
+					})
 					.action_({ |nb|
-						chain.fadeInCurve_( nb.value );
+						chain.fadeOut_( nb.value );
 					});
 					
 				// ugroup
@@ -715,37 +733,19 @@ UChainGUI {
 				// fadeTimes
 				StaticText( composite, labelWidth@14 )
 					.applySkin( RoundView.skin )
-					.string_( "fadeOut" )
+					.string_( "fadeCurves" )
 					.align_( \right );
-					
-				views[ \fadeOut ] = SmoothNumberBox( composite, 40@14 )
-					.clipLo_(0)
+									
+				views[ \fadeInCurve ] = SmoothNumberBox( composite, 40@14 )
+					.clipLo_(-20)
+				    .clipHi_(20)
 					.scroll_step_(0.1)
-					.formatFunc_( { |value| [ value.round(0.01), "s" ].join(" ") } )
-					.background_( { |rect|
-						Pen.use({
-							var values;
-							Pen.roundedRect( rect, 2 ).clip;
-							Pen.color = Color(1.0, 1.0, 1.0, 0.5);
-							Pen.fillRect( rect );
-							values = (rect.width.asInt + 1).collect({ |i|
-								i.lincurve(0, rect.width, rect.top, rect.bottom, chain.fadeOutCurve )
-							});
-							Pen.moveTo( rect.leftBottom );
-							values.do({ |item, i|
-								Pen.lineTo( (rect.left + i) @ item );
-							});
-							Pen.lineTo( rect.rightBottom );
-							Pen.lineTo( rect.leftBottom );
-							Pen.color = Color(0.5,0.5,0.5, if( chain.fadeOut > 0 ) { 0.5 } { 0.125 } );
-							Pen.fill;
-						});
-					})
+					.formatFunc_( { |value| value.round(0.1).asString } )
 					.action_({ |nb|
-						chain.fadeOut_( nb.value );
+						chain.fadeInCurve_( nb.value );
 					});
 	
-				views[ \fadeOutCurve ] = SmoothNumberBox( composite, 30@14 )
+				views[ \fadeOutCurve ] = SmoothNumberBox( composite, 40@14 )
 					.clipLo_(-20)
 				    .clipHi_(20)
 					.scroll_step_(0.1)
