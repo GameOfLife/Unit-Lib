@@ -506,6 +506,13 @@ UPattern : UChain {
 		};
 	}
 	
+	*duration { // returns duration of current UPattern
+		var upat;
+		upat = UChain.nowPreparingChain !? _.parent;
+		if( upat.isKindOf( UPattern ).not ) { upat = UPattern.nowCallingPattern };
+		^if( upat.notNil ) { upat.duration; };
+	}
+	
 	collectOSCBundleFuncs { |server, startOffset = 0, infdur = 60|
 		^this.asUScore( infdur ).collectOSCBundleFuncs( server, startOffset, infdur );
 	}

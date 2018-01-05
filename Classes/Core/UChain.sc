@@ -1025,6 +1025,12 @@ UChain : UEvent {
 		stream << this.class.name << "( " <<* units.collect(_.defName)  << " )"
 	}
 	
+	*duration { // returns duration of current UPattern
+		var chain;
+		chain = UChain.nowPreparingChain ?? { UPattern.nowCallingPattern };
+		^if( chain.notNil ) { chain.duration };
+	}
+	
 	getInitArgs {
 		var numPreArgs = -1;
 		if( releaseSelf != true ) { 

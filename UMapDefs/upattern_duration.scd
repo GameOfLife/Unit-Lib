@@ -1,7 +1,7 @@
 /*
-\uchain_duration
+\upattern_duration
 
-Creates an UMap that passes on the duration of the current UChain. If applied in a 'pattern' arg of an UPattern, the duration of the UPattern is used instead.
+Creates an UMap that passes on the duration of the current UPattern. It can only be applied to SMPTESpec arguments (i.e. time arguments).
 
 factor: a multiplication factor for the returned duration (0.1-10)
 
@@ -10,8 +10,8 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-FuncUMapDef( \uchain_duration, { |unit, factor = 1|
-	(UChain.duration ? 1) * factor
+FuncUMapDef( \upattern_duration, { |unit, factor = 1.0|
+	(UPattern.duration ? 1) * factor;
 })
 	.category_( 'uchain_info' )
 	.valueIsMapped_( false )
