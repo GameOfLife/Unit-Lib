@@ -16,7 +16,7 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UPatDef( \p_envelope, { |unit, env, loop = \loop|
+UPatDef( \p_envelope, { |unit, env, timeScale = 1, loop = \loop|
 	{
 		var current = UPattern.startPos, direction = 1, delta;
 		var timer = UPattern.deltaTimer;
@@ -37,11 +37,12 @@ UPatDef( \p_envelope, { |unit, env, loop = \loop|
 				\off, { current = current.clip(0.0,env.duration); }
 			);
 			envx[ current ].yield;
-			current = (current + ((direction * timer.value).clip2( 1.0e12 )));
+			current = (current + ((direction / timeScale.next * timer.value).clip2( 1.0e12 )));
 		};
 	}.r;
 }).mappedArgs_([\env])
 .setSpec( \env, UEnvSpec( EnvM() ) )
 .setDefault( \env, EnvM() )
+.setSpec( \timeScale, [ 0.1, 10, \exp].asSpec )
 .setSpec( \loop, ListSpec( [ \off, \loop, \backwards, \alternate ], 1 ) )
 .category_( 'pattern' );
