@@ -19,7 +19,7 @@ FuncUMapDef( \density_overlap, { |unit, density = 10, variation = 0.0, overlap =
 	.category_( 'upattern' )
 	.valueIsMapped_( false )
 	.mappedArgs_( [] )
-	.setSpec( \density, [1,100,\exp,0,10].asSpec )
+	.setSpec( \density, [0.1,100,\exp,0,10].asSpec )
 	.setSpec( \overlap, [0,16,((4/16).reciprocal-1).squared.log,0,1].asSpec )
 	.dontStoreValue_( true )
 	.canUseUMapFunc_({ |unit, key, umapdef|
