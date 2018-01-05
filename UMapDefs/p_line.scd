@@ -12,6 +12,8 @@ loop: loop mode;
 	\loop: (default) wrap around between lo and hi
 	\backwards: loop backwards
 	\alternate: move back and forth between lo and hi
+	\back_at_end: move back at the end of the current UPattern (depending on its duration)
+delay: a delay time before the line starts
 
 The 'lo' and 'hi' arg ranges are mapped to that of the parameter to which the UMap is connected
 
@@ -20,29 +22,57 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UPatDef( \p_line, { |unit, a = 0.0, b = 1.0, curve = 0, time = 10, loop = \loop|
+UPatDef( \p_line, { |unit, a = 0.0, b = 1.0, curve = 0, time = 10, loop = \loop, delay = 0|
 	{
-		var current = 0, direction = 1;
-		var timer = UPattern.deltaTimer;
-		if( loop.next === \backwards ) { direction = -1; };
-		current = (direction * (UPattern.startPos / time.next)).clip2( 1.0e12 );
+		var current = 0, direction = 1, ttime, ddelay;
+		var timer = UPattern.deltaTimer, now, endDur;
+		current = UPattern.startPos;
+		now = current;
+		ddelay = delay.next;
+		while { current < ddelay } {
+			if( loop.next === \backwards ) { 
+				direction = -1; 
+				b.next.yield;
+			} {
+				direction = 1;
+				a.next.yield;
+			};
+			current = current + timer.value;
+			ddelay = delay.next;
+		};
+		current = current - ddelay;
+		ttime = time.next;
+		now = current;
+		if( direction == -1 ) {
+			current = ttime - current;
+		};
 		inf.do { |i|
 			switch( loop.next,
-				\loop, { current = current.wrap( 0.0, 1.0 );  direction = 1 },
-				\backwards, { current = current.wrap( 0.0, 1.0 );  direction = -1; },
+				\loop, { current = current.wrap( 0.0, ttime );  direction = 1 },
+				\backwards, { current = current.wrap( 0.0, ttime );  direction = -1; },
 				\alternate, { 
-					case { current > 1 } {
-						current = current.fold(0.0,1.0);
+					case { current > ttime } {
+						current = current.fold(0.0, ttime);
 						direction = -1;
 					} { current < 0 } {
-						current = current.fold(0.0,1.0);
+						current = current.fold(0.0, ttime);
 						direction = 1;
 					};
 				},
-				\off, { current = current.clip(0.0,1.0); }
+				\back_at_end, {
+					current = current.clip(0.0, ttime);
+					if( (UPattern.duration - (ttime + delay.next)) <= now ) {
+						direction = -1;
+					} {
+						direction = 1;
+					};
+					
+				},
+				\off, { current = current.clip(0.0, ttime); }
 			);
-			current.lincurve( 0, 1, a.next, b.next, curve.next ).yield;
-			current = (current + ((direction * timer.value/time.next).clip2( 1.0e12 )));
+			current.lincurve( 0, ttime, a.next, b.next, curve.next ).yield;
+			#now, current = [now,current] + ([1,direction] * timer.value);
+			ttime = time.next;
 		};
 	}.r;
 }).mappedArgs_([\a, \b])
@@ -51,6 +81,7 @@ UPatDef( \p_line, { |unit, a = 0.0, b = 1.0, curve = 0, time = 10, loop = \loop|
 .setSpec( \a, UAdaptSpec() )
 .setSpec( \b, UAdaptSpec() )
 .setSpec( \curve, [-16,16,\lin,0,0].asSpec )
+.setSpec( \delay, SMPTESpec() )
 .canUseUMapFunc_({ |unit, key, umapdef|
 	unit.isKindOf( UPattern ).not && {
 		[ SimpleNumber, Array, Point ].any({ |class|
@@ -58,5 +89,5 @@ UPatDef( \p_line, { |unit, a = 0.0, b = 1.0, curve = 0, time = 10, loop = \loop|
 		});
 	};
 })
-.setSpec( \loop, ListSpec( [ \off, \loop, \backwards, \alternate ], 1 ) )
+.setSpec( \loop, ListSpec( [ \off, \loop, \backwards, \alternate, \back_at_end ], 1 ) )
 .category_( 'pattern' );
