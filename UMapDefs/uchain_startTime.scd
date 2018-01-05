@@ -1,7 +1,7 @@
 /*
 \uchain_startTime
 
-Creates an UMap that passes on the startTime of the current UChain. It has no parameters, and can only be applied to SMPTESpec arguments (i.e. time arguments).
+Creates an UMap that passes on the startTime of the current UChain. When used inside an UPattern this returns the elapsed time since the pattern has started. It has no parameters, and can only be applied to SMPTESpec arguments (i.e. time arguments).
 
 --
 this is an UMapDef definition file
