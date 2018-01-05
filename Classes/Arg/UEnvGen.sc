@@ -92,7 +92,7 @@ UEnvGen {
 	*getTimeScale { |timeScale = 1|
 		if( timeScale.class == Symbol ) {
 			Udef.addBuildSpec(
-				ArgSpec( timeScale, 1, [0.25,4,\exp,0,1].asSpec )
+				ArgSpec( timeScale, 1, [0.1,10,\exp,0,1].asSpec )
 			);
 			^timeScale.kr( 1 );
 		} {
