@@ -3,7 +3,7 @@ UPattern : UChain {
 	classvar >seconds;
 	classvar <>preparedThreads, <>expectedTimes, <>preparing = false;
 	classvar <>argSpecs;
-	classvar <>nowCallingPattern;
+	classvar <>nowCallingPattern, <>currentSustain;
 	
 	var <repeats = inf;
 	var <pattern = #[1,1];
@@ -167,6 +167,7 @@ UPattern : UChain {
 	next { |duration, startTime = 0, track = 0, score|
 		var next, was;
 		duration = duration ?? { this.getSustain; };
+		this.class.currentSustain = duration;
 		if( duration > 0 ) {	
 			next = UChain( *units.deepCopy );
 			next.displayColor = this.getTypeColor;
@@ -189,6 +190,7 @@ UPattern : UChain {
 			});
 			UChain.nowPreparingChain = was;
 		};
+		this.class.currentSustain = nil;
 		^next;
 	}
 	
