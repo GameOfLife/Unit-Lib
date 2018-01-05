@@ -37,5 +37,5 @@ UPatDef( \p_sine, { |unit,
 }).category_( 'pattern' )
 	.mappedArgs_( [ \min, \max ] )
 	.setSpec( \phase, AngleSpec() )
-	.setSpec( \freq, FreqSpec(0.01,300, default: 2) )
+	.setSpec( \freq, FreqSpec(0.001,300, default: 2) )
 	.setSpec( \timeBase, ListSpec( [ 'events', 'seconds' ] ) );
