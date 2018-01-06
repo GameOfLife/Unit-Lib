@@ -13,9 +13,10 @@ loop: loop mode;
 	\backwards: loop backwards
 	\alternate: move back and forth between lo and hi
 	\back_at_end: move back at the end of the current UPattern (depending on its duration)
+	\hold: keep line at current value
 delay: a delay time before the line starts
 
-The 'lo' and 'hi' arg ranges are mapped to that of the parameter to which the UMap is connected
+The 'a' and 'b' arg ranges are mapped to that of the parameter to which the UMap is connected
 
 --
 this is an UMapDef definition file
@@ -68,6 +69,10 @@ UPatDef( \p_line, { |unit, a = 0.0, b = 1.0, curve = 0, time = 10, loop = \loop,
 					};
 					
 				},
+				\hold, {
+					current = current.clip(0.0, ttime);
+					direction = 0;
+				},
 				\off, { current = current.clip(0.0, ttime); }
 			);
 			current.lincurve( 0, ttime, a.next, b.next, curve.next ).yield;
@@ -89,5 +94,5 @@ UPatDef( \p_line, { |unit, a = 0.0, b = 1.0, curve = 0, time = 10, loop = \loop,
 		});
 	};
 })
-.setSpec( \loop, ListSpec( [ \off, \loop, \backwards, \alternate, \back_at_end ], 1 ) )
+.setSpec( \loop, ListSpec( [ \off, \loop, \backwards, \alternate, \back_at_end, \hold ], 1 ) )
 .category_( 'pattern' );
