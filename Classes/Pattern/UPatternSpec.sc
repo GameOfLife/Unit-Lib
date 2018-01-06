@@ -57,12 +57,13 @@ UPatternSpec : Spec {
 		halfHeight = (bounds.height/2);
 		
 		vws[ \specViews ] = specs.collect({ |argSpec, i|
-			argSpec.makeView( 
+			var view;
+			view = argSpec.makeView( 
 				vws[ \view ], 
 				Rect(
 					labelWidth + 2, 
 					i * halfHeight, 
-					bounds.width-(labelWidth + 2), 
+					bounds.width-(labelWidth + 2 + halfHeight + 2), 
 					halfHeight-2
 				),
 				nil,
@@ -71,6 +72,15 @@ UPatternSpec : Spec {
 					action.value( vws, vws[ \val ] );
 				}
 			);
+			if( i == 0 ) {
+				vws[ \expand ] = SmoothButton( vws[ \view ], 
+					Rect( bounds.width - (halfHeight - 2), 0, halfHeight - 4, halfHeight - 4 ) )
+				.label_( '+' )
+				.action_({
+					action.value( vws, UMap( \sustain_time ) )
+				});
+			};
+			view;
 		});
 		
 		vws[ \doAction ] = { action.value( vws, vws[ \val ] ); };
