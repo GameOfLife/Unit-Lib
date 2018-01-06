@@ -645,7 +645,7 @@ UChainGUI {
 							});
 							Pen.lineTo( rect.rightBottom );
 							Pen.lineTo( rect.leftBottom );
-							Pen.color = Color(0.5,0.5,0.5, if( chain.fadeIn > 0 ) { 0.5 } { 0.125 } );
+							Pen.color = Color(0.5,0.5,0.5, if( chain.fadeInTime > 0 ) { 0.5 } { 0.125 } );
 							Pen.fill;
 						});
 					})
@@ -672,7 +672,7 @@ UChainGUI {
 							});
 							Pen.lineTo( rect.rightBottom );
 							Pen.lineTo( rect.leftBottom );
-							Pen.color = Color(0.5,0.5,0.5, if( chain.fadeOut > 0 ) { 0.5 } { 0.125 } );
+							Pen.color = Color(0.5,0.5,0.5, if( chain.fadeOutTime > 0 ) { 0.5 } { 0.125 } );
 							Pen.fill;
 						});
 					})
@@ -680,8 +680,29 @@ UChainGUI {
 						chain.fadeOut_( nb.value );
 					});
 					
+				views[ \expandFades ] = SmoothButton( composite, 12@12 )
+					.label_( '+' )
+					.action_({
+						chain.fadeTimes = UMap( \expand, [ \fadeIn, chain.fadeInTime, \fadeOut, chain.fadeOutTime ] );
+					});
+
+					
+				if( chain.isKindOf( UPattern ) ) { 
+					if( chain.fadeTimes.isKindOf( UMap ) ) {
+						views[ \fadeIn ].enabled_( false ); 
+						views[ \fadeOut ].enabled_( false ); 
+						views[ \expandFades ].enabled_( false ); 
+					} {
+						views[ \fadeIn ].enabled_( true ); 
+						views[ \fadeOut ].enabled_( true ); 
+						views[ \expandFades ].enabled_( true ); 
+					};
+				} {
+					views[ \expandFades ].visible_( false ); 
+				};
+					
 				// ugroup
-				StaticText( composite, (labelWidth-2)@14 )
+				StaticText( composite, (labelWidth-2-14)@14 )
 					.applySkin( RoundView.skin )
 					.string_( "ugroup" )
 					.align_( \right );
@@ -936,8 +957,8 @@ UChainGUI {
 					};
 					{ views[ \displayColor ].refresh; }.defer;
 				})
-				.put( \fadeIn, { views[ \fadeIn ].value = chain.fadeIn })
-				.put( \fadeOut, { views[ \fadeOut ].value = chain.fadeOut })
+				.put( \fadeIn, { views[ \fadeIn ].value = chain.fadeInTime })
+				.put( \fadeOut, { views[ \fadeOut ].value = chain.fadeOutTime })
 				.put( \fadeInCurve, { 
 					views[ \fadeInCurve ].value = chain.fadeInCurve;
 					{ views[ \fadeIn ].refresh }.defer;
@@ -1168,7 +1189,7 @@ UChainGUI {
 			);
 			upatGUI.mapSetAction = { chain.changed( \units ); };
 			
-			[ \pattern ].do({ |key|
+			[ \pattern, \fadeTimes ].do({ |key|
 				var item;
 				item = chain.perform( key );
 				if( item.isUMap ) {

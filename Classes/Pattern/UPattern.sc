@@ -7,6 +7,7 @@ UPattern : UChain {
 	
 	var <repeats = inf;
 	var <pattern = #[1,1];
+	var fadeTimes;
 	var <>maxSimultaneousStarts = 100;
 	var <>localPos = 0;
 	var <>startPos = 0;
@@ -17,7 +18,10 @@ UPattern : UChain {
 	var task;
 	
 	*initClass {
-		argSpecs = [ ArgSpec( 'pattern', [1,1], UPatternSpec(), false, \init ) ];
+		argSpecs = [ 
+			ArgSpec( 'pattern', [1,1], UPatternSpec(), false, \init ),
+			ArgSpec( 'fadeTimes', [0,0], UFadeTimesSpec(), false, \init )
+		];
 	}
 	
 	init { |args|
@@ -84,7 +88,7 @@ UPattern : UChain {
         };
 	}
 	
-	argSpecsForDisplay { ^argSpecs }
+	argSpecsForDisplay { ^if( fadeTimes.isKindOf( UMap ) ) { argSpecs } { [ argSpecs[0] ] } }
 	
 	canUseUMap { |key, umapdef|
 		^umapdef.allowedModes.includes( 'init' ) && {
@@ -140,24 +144,26 @@ UPattern : UChain {
 	argNeedsUnmappedInput { ^false }
 	
 	argSpecs { ^argSpecs }
-	getArgSpec { |key| ^if( key === \pattern ) { argSpecs[0] } }
-	getSpec { |key| ^if( key === \pattern ) { argSpecs[0].spec } }
-	getSpecMode { |key| ^if( key === \pattern ) { argSpecs[0].mode } }
-	getDefault { |key| ^if( key === \pattern ) { argSpecs[0].default } }
+	getArgSpec { |key| ^argSpecs.detect({ |asp| asp.name === key }) }
+	getSpec { |key| ^this.getArgSpec( key ) !? _.spec }
+	getSpecMode { |key| ^this.getArgSpec( key ) !? _.mode }
+	getDefault { |key| ^this.getArgSpec( key ) !? _.default }
 	
 	removeUMap { |key|
 		switch( key,
 			'pattern', { this.pattern = this.getDefault( \pattern ) },
+			'fadeTimes', { this.fadeTimes = this.getDefault( \fadeTimes ) },
 		);
 	}
 	
 	defName { ^'UPattern' }
 	
-	args { ^[ \pattern, this.pattern ] }
+	args { ^[ \pattern, this.pattern, \fadeTimes, this.fadeTimes ] }
 	
 	at { |index|
 		^switch( index,
 			\pattern, { this.pattern },
+			\fadeTimes, { this.fadeTimes },
 			\sustain, { this.pattern.value[0] },
 			\timeToNext, { this.timeToNext.value[1] },
 			{ units[ index ] }
@@ -174,7 +180,6 @@ UPattern : UChain {
 			next.global = this.global;
 			next.addAction = this.addAction;
 			next.duration = duration;
-			next.fadeTimes = this.fadeTimes;
 			next.startTime = startTime;
 			next.track = track;
 			next.ugroup = ugroup;
@@ -184,6 +189,7 @@ UPattern : UChain {
 			UChain.nowPreparingChain = next;
 			next.parent = this;
 			next.score = score;
+			next.fadeTimes = this.getFadeTimes;
 			next.units.do({ |unit|
 				this.prPrepareUnit( unit );
 				this.prPatternsToValues( unit );
@@ -197,6 +203,17 @@ UPattern : UChain {
 	repeats_ { |newRepeats|
 		repeats = newRepeats ? inf;
 		this.changed( \repeats, repeats );
+	}
+	
+	synths { ^[] }
+	
+	prSetChainsDur { |dur = inf| //
+		units.do(_.setDur(dur));
+		if( releaseSelf ) {
+			this.prSetCanFreeSynths( \u_doneAction, 14 );
+		} {
+			this.prSetCanFreeSynths( \u_doneAction, 14, \u_dur, inf );
+		};
 	}
 	
 	sustain_ { |newSustain|
@@ -250,6 +267,78 @@ UPattern : UChain {
 		this.changed( \pattern, pattern );
 	}
 	
+	getFadeTimesFromChain {
+		^[
+			this.prGetCanFreeSynths.collect({ |item| item.get( \u_fadeIn ) }).maxItem ? 0,
+			this.prGetCanFreeSynths.collect({ |item| item.get( \u_fadeOut ) }).maxItem ? 0
+		];
+	}
+	
+	fadeTimes { ^fadeTimes ?? { this.getFadeTimesFromChain } }
+	
+	fadeIn { 
+		if( fadeTimes.isNil ) {
+			fadeTimes = this.getFadeTimesFromChain;
+		};
+		if( fadeTimes.isKindOf( UMap ) ) {
+			^fadeTimes.fadeIn ? 0;
+		} {
+			^fadeTimes[0];
+		};
+	}
+	
+	fadeOut { 
+		if( fadeTimes.isNil ) {
+			fadeTimes = this.getFadeTimesFromChain;
+		};
+		if( fadeTimes.isKindOf( UMap ) ) {
+			^fadeTimes.fadeOut ? 0;
+		} {
+			^fadeTimes[1];
+		};
+	}
+		
+	fadeIn_ { |fadeIn = 0|
+		if( fadeTimes.isNil ) {
+			fadeTimes = this.getFadeTimesFromChain;
+		};
+		if( fadeTimes.isKindOf( UMap ).not ) {
+			if( fadeTimes.mutable.not ) { fadeTimes = fadeTimes.copy };
+			fadeTimes[0] = fadeIn;
+			this.changed( \fadeTimes, fadeTimes );
+			this.changed( \fadeIn );
+		} {
+			if( fadeTimes.keys.includes( \fadeIn ) ) {
+				fadeTimes.set( \fadeIn, fadeIn );
+			};
+		};
+	}
+	
+	fadeOut_ { |fadeOut = 0|
+		if( fadeTimes.isNil ) {
+			fadeTimes = this.getFadeTimesFromChain;
+		};
+		if( fadeTimes.isKindOf( UMap ).not ) {
+			if( fadeTimes.mutable.not ) { fadeTimes = fadeTimes.copy };
+			fadeTimes[1] = fadeOut;
+			this.changed( \fadeTimes, fadeTimes );
+			this.changed( \fadeOut );
+		} {
+			if( fadeTimes.keys.includes( \fadeOut ) ) {
+				fadeTimes.set( \fadeOut, fadeOut );
+			};
+		};
+	}
+	
+	fadeTimes_ { |newFadeTimes|
+		fadeTimes = newFadeTimes.asUnitArg( this, \fadeTimes );
+		this.changed( \fadeTimes, fadeTimes );
+		this.changed( \fadeIn );
+		this.changed( \fadeOut );
+	}
+	
+	eventSustain { ^duration - this.fadeOutTime; }
+		
 	prUnPrepare { |unit|
 		if( unit.isKindOf( UMap ) ) {
 			if( unit.subDef.isKindOf( FuncUMapDef ) ) {
@@ -270,6 +359,20 @@ UPattern : UChain {
 		};
 		out = pattern.next;
 		this.class.nowCallingPattern = nil;
+		^out;
+	}
+	
+	getFadeTimes { // returns next fadeIn and fadeOut
+		var out;
+		if( fadeTimes.isKindOf( UMap ) && { 
+			[ ExpandUMapDef, FuncUMapDef ].any({ |item|
+				fadeTimes.subDef.isKindOf( item ) 
+			})
+		} ) {
+			this.prUnPrepare( fadeTimes );
+			this.prPrepareUnit( fadeTimes );
+		};
+		out = fadeTimes.next;
 		^out;
 	}
 	
@@ -549,6 +652,13 @@ UPattern : UChain {
 			} {
 				stream << ".pattern_(" <<< this.pattern << ")";
 			}
+		};
+		if( fadeTimes != [0,0] && { fadeTimes.notNil }) {
+			if( this.fadeTimes.isKindOf( UMap ) ) {
+				stream << ".fadeTimes_(" <<< this.fadeTimes.getSetArgs << ")";
+			} {
+				stream << ".fadeTimes_(" <<< this.fadeTimes << ")";
+			};
 		};
 		if( ugroup.notNil ) {
 			stream << ".ugroup_(" <<< ugroup << ")";

@@ -347,27 +347,35 @@ MassEditUChain {
 	}
 	
 	fadeIn_ { |fadeIn = 0|
-		var add = fadeIn - this.fadeIn;
+		var add = fadeIn - this.fadeInTime;
 		
 		uchains.do({ |item|
-			item.fadeIn_( item.fadeIn + add );
+			item.fadeIn_( item.fadeInTime + add );
 		});	
 	}
 	
 	fadeOut_ { |fadeOut = 0|
-		var add = fadeOut - this.fadeOut;
+		var add = fadeOut - this.fadeOutTime;
 		
 		uchains.do({ |item|
-			item.fadeOut_( item.fadeOut + add );
+			item.fadeOut_( item.fadeOutTime + add );
 		});	
 	}
 	
 	fadeOut {
-		^uchains.collect({ |item| item.fadeOut }).maxItem ? 0;
+		^uchains.collect({ |item| item.fadeOutTime }).maxItem ? 0;
 	}
 	
 	fadeIn {
-		^uchains.collect({ |item| item.fadeIn }).maxItem ? 0;
+		^uchains.collect({ |item| item.fadeInTime }).maxItem ? 0;
+	}
+	
+	fadeOutTime {
+		^uchains.collect({ |item| item.fadeOutTime }).maxItem ? 0;
+	}
+	
+	fadeInTime {
+		^uchains.collect({ |item| item.fadeInTime }).maxItem ? 0;
 	}
 	
 	fadeInCurve_ { |curve = 0|

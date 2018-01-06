@@ -71,7 +71,7 @@ UChainEventView : UEventView {
 	     var fadeInDetectArea;
 
 	     if(fadeInAreaBiggerThen10Pixels) {
-            fadeInDetectArea = rect.copy.width_(px10Scaled).left_(rect.left + event.fadeIn - px5Scaled);
+            fadeInDetectArea = rect.copy.width_(px10Scaled).left_(rect.left + event.fadeInTime - px5Scaled);
         } {
             fadeInDetectArea = rect.copy.width_(px5Scaled).height_(fadeAreaHeight);
         };
@@ -86,7 +86,7 @@ UChainEventView : UEventView {
 	ifIsInFadeOutArea{ |mousePos, fadeOutAreaBiggerThen10Pixels,yesAction,noAction|
 	    var fadeOutDetectArea;
 	    if(fadeOutAreaBiggerThen10Pixels) {
-            fadeOutDetectArea = rect.copy.width_(px10Scaled).left_((rect.right - event.fadeOut - px5Scaled))
+            fadeOutDetectArea = rect.copy.width_(px10Scaled).left_((rect.right - event.fadeOutTime - px5Scaled))
         } {
             fadeOutDetectArea = rect.copy.width_(px5Scaled).left_((rect.right - px5Scaled)).height_(fadeAreaHeight);
         };
@@ -114,14 +114,14 @@ UChainEventView : UEventView {
 
         this.ifIsInsideRect( mousePos, {
 
-            var fadeInAreaBiggerThen10Pixels = event.fadeIn > px10Scaled;
+            var fadeInAreaBiggerThen10Pixels = event.fadeInTime > px10Scaled;
             //resize front
             this.ifIsInResizeFrontArea( mousePos, fadeInAreaBiggerThen10Pixels, {
                 state = \resizingFront;
                 originalStartTime = event.startTime;
                 //event.wfsSynth.checkSoundFile;
             },{
-                var fadeOutAreaBiggerThen10Pixels = event.fadeOut > px10Scaled;
+                var fadeOutAreaBiggerThen10Pixels = event.fadeOutTime > px10Scaled;
                 //resize back
                 this.ifIsInResizeBackArea( mousePos, fadeOutAreaBiggerThen10Pixels, {
                     state = \resizingBack;
@@ -130,12 +130,12 @@ UChainEventView : UEventView {
                 }, {//fade in
                     this.ifIsInFadeInArea( mousePos,fadeInAreaBiggerThen10Pixels, {
                         state = \fadeIn;
-                        originalFades = event.fadeTimes.copy;
+                        originalFades = event.fadeTimeValues.copy;
                     },{ //fade out
                         this.ifIsInFadeOutArea( mousePos, fadeOutAreaBiggerThen10Pixels, {
                             "fade out";
                             state = \fadeOut;
-                            originalFades = event.fadeTimes.copy;
+                            originalFades = event.fadeTimeValues.copy;
                         }, {//moving
                             state = \moving;
                             originalTrack = event.track;
@@ -149,7 +149,7 @@ UChainEventView : UEventView {
             if(selected) {
                 originalStartTime = event.startTime;
                 originalEndTime = event.endTime;
-                originalFades = event.fadeTimes.copy;
+                originalFades = event.fadeTimeValues.copy;
                 originalTrack = event.track;
                 //event.wfsSynth.checkSoundFile;
             }
@@ -174,7 +174,7 @@ UChainEventView : UEventView {
             if(selected) {
                 originalStartTime = event.startTime;
                 originalEndTime = event.endTime;
-                originalFades = event.fadeTimes.copy;
+                originalFades = event.fadeTimeValues.copy;
                 originalTrack = event.track;
                 //event.wfsSynth.checkSoundFile;
             }
@@ -191,14 +191,14 @@ UChainEventView : UEventView {
 
         this.ifIsInsideRect( mousePos, {
 
-            var fadeInAreaBiggerThen10Pixels = event.fadeIn > px10Scaled;
+            var fadeInAreaBiggerThen10Pixels = event.fadeInTime > px10Scaled;
             //resize front
             this.ifIsInResizeFrontArea( mousePos, fadeInAreaBiggerThen10Pixels, {
                 state = \resizingFront;
                 originalStartTime = event.startTime;
                 //event.wfsSynth.checkSoundFile;
             },{
-                var fadeOutAreaBiggerThen10Pixels = event.fadeOut > px10Scaled;
+                var fadeOutAreaBiggerThen10Pixels = event.fadeOutTime > px10Scaled;
                 //resize back
                 this.ifIsInResizeBackArea( mousePos, fadeOutAreaBiggerThen10Pixels, {
                     state = \resizingBack;
@@ -225,22 +225,22 @@ UChainEventView : UEventView {
 
         this.ifIsInsideRect( mousePos, {
 
-            var fadeInAreaBiggerThen10Pixels = event.fadeIn > px10Scaled;
-            var fadeOutAreaBiggerThen10Pixels = event.fadeOut > px10Scaled;
+            var fadeInAreaBiggerThen10Pixels = event.fadeInTime > px10Scaled;
+            var fadeOutAreaBiggerThen10Pixels = event.fadeOutTime > px10Scaled;
             //fade in
             this.ifIsInFadeInArea( mousePos,fadeInAreaBiggerThen10Pixels, {
                 state = \fadeIn;
-                originalFades = event.fadeTimes.copy;
+                originalFades = event.fadeTimeValues.copy;
             },{ //fade out
                 this.ifIsInFadeOutArea( mousePos, fadeOutAreaBiggerThen10Pixels, {
                     "fade out";
                     state = \fadeOut;
-                    originalFades = event.fadeTimes.copy;
+                    originalFades = event.fadeTimeValues.copy;
                 })
             })
         }, {
             if(selected) {
-                originalFades = event.fadeTimes.copy;
+                originalFades = event.fadeTimeValues.copy;
                 //event.wfsSynth.checkSoundFile;
             }
         })
@@ -350,7 +350,7 @@ UChainEventView : UEventView {
 		        };
 	            
 	            //draw fades
-	            fades = event.fadeTimes;
+	            fades = event.fadeTimeValues;
 	            
 	            if( fades.any(_!=0) ) { // draw only if needed
 		            

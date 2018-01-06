@@ -253,6 +253,21 @@ UChain : UEvent {
 	fadeIn {
 		^this.prGetCanFreeSynths.collect({ |item| item.get( \u_fadeIn ) }).maxItem ? 0;
 	}
+	
+	// only returns numbers
+	fadeInTime {
+		var out;
+		out = this.fadeIn;
+		^if( out.isKindOf( UMap ) ) { 0 } { out }
+	}
+	
+	fadeOutTime {
+		var out;
+		out = this.fadeOut;
+		^if( out.isKindOf( UMap ) ) { 0 } { out }
+	}
+
+	fadeTimeValues { ^[ this.fadeInTime, this.fadeOutTime ] }
 
 	fadeTimes { ^[this.fadeIn, this.fadeOut] }
 	
