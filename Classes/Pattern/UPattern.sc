@@ -3,7 +3,7 @@ UPattern : UChain {
 	classvar >seconds;
 	classvar <>preparedThreads, <>expectedTimes, <>preparing = false;
 	classvar <>argSpecs;
-	classvar <>nowCallingPattern, <>currentSustain;
+	classvar <>nowCallingPattern, <>currentSustain, <>currentTimeToNext;
 	
 	var <repeats = inf;
 	var <pattern = #[1,1];
@@ -389,6 +389,7 @@ UPattern : UChain {
 					&& { n < repeats } && { zeroCount < maxSimultaneousStarts }
 			} {
 				#sustain, timeToNext = this.getPattern;
+				this.class.currentTimeToNext = timeToNext;
 				if( time > track0time ) { track = 0 };
 				if( track == 0 ) { track0time = time + (sustain * 2); };
 				next = this.next( sustain, time, track, score );
@@ -397,6 +398,7 @@ UPattern : UChain {
 					track = track + 1; 
 				};
 				action.value( next, target, time, timeToNext );
+				this.class.currentTimeToNext = nil;
 				timeToNext.wait;
 				time = time + timeToNext;
 				if( timeToNext == 0 ) { zeroCount = zeroCount + 1 } { zeroCount = 0 };
