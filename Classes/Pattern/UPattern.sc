@@ -388,12 +388,12 @@ UPattern : UChain {
 			while { ( this.releaseSelf == false or: { (time <= (duration - startPos)) }) 
 					&& { n < repeats } && { zeroCount < maxSimultaneousStarts }
 			} {
+				this.localPos = time;
 				#sustain, timeToNext = this.getPattern;
 				this.class.currentTimeToNext = timeToNext;
 				if( time > track0time ) { track = 0 };
 				if( track == 0 ) { track0time = time + (sustain * 2); };
 				next = this.next( sustain, time, track, score );
-				this.localPos = time;
 				if( next.notNil ) { 
 					track = track + 1; 
 				};

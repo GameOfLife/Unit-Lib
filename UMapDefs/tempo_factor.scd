@@ -12,8 +12,20 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-FuncUMapDef( \tempo_factor, { |unit, sustain = 1, timeToNext = 1, tempo = 60|
-	 [sustain, timeToNext] / tempo * 60
+FuncUMapDef( \tempo_factor, { |unit, sustain = 1, timeToNext = 1, tempo = 60, quantize = 0.0|
+	var timeCorrection, currentTime;
+	timeToNext = timeToNext / tempo * 60;
+	sustain = sustain / tempo * 60;
+	if( quantize > 0 ) {
+		currentTime = thisThread.seconds;
+		currentTime = currentTime.round( (quantize / tempo * 60).min( timeToNext ) ) - currentTime;
+		if( ((UPattern.nowCallingPattern !? _.localPos) == 0) && { currentTime.abs > 1.0e-10 } ) {
+			sustain = 0; timeToNext = currentTime;
+		} {
+			timeToNext = currentTime + timeToNext;
+		}
+	};	
+	[ sustain, timeToNext ];
 })
 	.category_( 'upattern' )
 	.valueIsMapped_( false )
