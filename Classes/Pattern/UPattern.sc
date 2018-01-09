@@ -337,7 +337,7 @@ UPattern : UChain {
 		this.changed( \fadeOut );
 	}
 	
-	eventSustain { ^duration - this.fadeOutTime; }
+	eventSustain { ^duration }
 		
 	prUnPrepare { |unit|
 		if( unit.isKindOf( UMap ) ) {
