@@ -640,6 +640,29 @@ UPattern : UChain {
 	
 	asUPattern { ^this }
 	
+	makeView{ |i,minWidth,maxWidth| ^UPatternEventView(this,i,minWidth, maxWidth) }
+	
+	name { 
+	    var names = ["p"], last;
+	    units.do({ |unit|
+		    var name;
+		    name = unit.name.asSymbol;
+		    if( last === name ) {
+			    names[ names.size-1 ] = names[ names.size-1 ].add( name );
+		    } {
+			    names = names.add( [ name ] );
+		    };
+		    last = name;
+	    });
+	    ^names.collect({ |item|
+		    if( item.size == 1 ) {
+			    item[0]
+		    } {
+			    item[0] ++ " * " ++ item.size
+		    };
+	    }).asString;
+	}
+	
 	storeModifiersOn { |stream|
 		var patArgs;
 		this.storeTags( stream );
