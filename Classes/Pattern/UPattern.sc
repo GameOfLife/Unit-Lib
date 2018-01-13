@@ -372,7 +372,7 @@ UPattern : UChain {
 			this.prUnPrepare( fadeTimes );
 			this.prPrepareUnit( fadeTimes );
 		};
-		out = fadeTimes.next;
+		out = this.fadeTimes.next;
 		^out;
 	}
 	
