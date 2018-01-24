@@ -24,5 +24,6 @@ UMapDef( \trigger, {
 	UMapOut.kr( output );
 })
 .mappedArgs_([ \range ])
+.setSpec( \time, SMPTESpec(0,3600) )
 .setSpec( \trigger, TriggerSpec() )
 .category_( 'trigger' )
