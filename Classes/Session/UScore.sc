@@ -982,6 +982,9 @@ UScore : UEvent {
 		if( tempoMap != TempoMap.default ) {
 			stream << ".tempoMap_(" <<< tempoMap << ")";
 		};
+		if( loop == true ) {
+			stream << ".loop_(" <<< loop << ")";
+		};
 		this.storeName( stream );
 		this.storeTags( stream );
 		this.storeDisplayColor( stream );
