@@ -140,6 +140,7 @@ UEnvGen {
 		loop = this.getLoopMode( loop );
 		delay = this.getDelay( delay );
 		trigger = this.getTrigger( trigger );
+		start = Select.kr( Peak.kr( trigger ), [ start, 0 ] );
 		phasor = Phasor.kr( trigger, 
 			(ControlDur.ir + SampleDur.ir) / timeScale, 
 			(start - delay) / timeScale, inf, 0 
