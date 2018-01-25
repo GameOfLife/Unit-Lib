@@ -849,7 +849,8 @@ U : ObjectWithArgs {
 	canUseUMap { |key, umapdef|
 		^this.def.canUseUMap == true && 
 		{ umapdef.allowedModes.includes( this.getSpecMode( key ) ) && {
-			umapdef.unitCanUseUMap( this, key );	
+			this.getSpec( key ).isKindOf( UAdaptSpec ) or:
+			{ umapdef.unitCanUseUMap( this, key ); }	
 			};
 		}
 	}
