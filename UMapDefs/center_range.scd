@@ -20,7 +20,7 @@ HybridUMapDef( \center_range, { |center = 0.5, range = 1.0|
 	lo = center - halfRange;
 	hi = center + halfRange;
 	UMapOut.kr([lo,hi]);
-}, { |unit, center = 0.5, range = 1.0, autoScale = 1.0|
+}, { |unit, center = 0.5, range = 1.0|
 	var halfRange;
 	halfRange = range/2;
 	center = center.linlin( 0, 1, halfRange, 1-halfRange );
