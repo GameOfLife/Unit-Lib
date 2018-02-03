@@ -13,13 +13,22 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UMapDef( \center_range, { |center = 0.5, range = 1.0|
+HybridUMapDef( \center_range, { |center = 0.5, range = 1.0|
 	var lo, hi, halfRange;
 	halfRange = range/2;
 	center = center.linlin( 0, 1, halfRange, 1-halfRange );
 	lo = center - halfRange;
 	hi = center + halfRange;
 	UMapOut.kr([lo,hi]);
+}, { |unit, center = 0.5, range = 1.0, autoScale = 1.0|
+	var halfRange;
+	halfRange = range/2;
+	center = center.linlin( 0, 1, halfRange, 1-halfRange );
+	[ center - halfRange, center + halfRange ]
+	
 })
 	.mappedArgs_( [ \center ] )
+	.canUseUMapFunc_({ |unit, key, umapdef|
+		unit.getSpec( key ).isKindOf( RangeSpec );
+	})
 	.category_( 'range' );

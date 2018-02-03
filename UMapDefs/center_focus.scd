@@ -37,12 +37,22 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UMapDef( \center_focus, { |center = 0.5, focus = 0.0, knee = 0.0|
+HybridUMapDef( \center_focus, { |center = 0.5, focus = 0.0, knee = 0.0|
 	var lo, hi;
 	knee = knee * (1-focus);
 	lo = center.linlin( focus.linlin(0,1,0.5,0),1,-1,0,\none).sineclip2(1,knee) + 1;
 	hi = center.linlin( 0, focus.linlin(0,1,0.5,1),0,1,\none).sineclip2(1,knee);
 	UMapOut.kr([lo,hi]);
+}, { |unit, center = 0.5, focus = 0.0, knee = 0.0|
+	var lo, hi;
+	knee = knee * (1-focus);
+	lo = center.linlin( focus.linlin(0,1,0.5,0),1,-1,0,\none).sineclip2(1,knee) + 1;
+	hi = center.linlin( 0, focus.linlin(0,1,0.5,1),0,1,\none).sineclip2(1,knee);
+	[lo, hi]
+	
 })
 	.mappedArgs_([\center])
+	.canUseUMapFunc_({ |unit, key, umapdef|
+		unit.getSpec( key ).isKindOf( RangeSpec );
+	})
 	.category_( 'range' );
