@@ -162,8 +162,11 @@
 		var font;
 		var editAction;
 		var tempVal;
-		var optionsWidth = 40, operationsOffset = 1;
+		var optionsWidth = 33, operationsOffset = 1, editWidth = 40;
+		var isMassEdit;
 		vws = ();
+		
+		isMassEdit = UGUI.nowBuildingUnit.isKindOf( MassEditU );
 		
 		font =  (RoundView.skin ? ()).font ?? { Font( Font.defaultSansFace, 10 ); };
 		
@@ -360,7 +363,19 @@
 		
 		vws[ \setMeanSlider ].value;
 		
-		if( GUI.id === \qt ) { optionsWidth = 80; operationsOffset = 0; };
+		if( GUI.id === \qt ) { 
+			if( isMassEdit ) {
+				optionsWidth = 80; operationsOffset = 0; 
+			} {
+				optionsWidth = 65; operationsOffset = 0; 
+			};
+		} {
+			if( isMassEdit ) {
+				optionsWidth = editWidth = 40;
+			} {
+				optionsWidth = editWidth = 33;
+			};
+		};
 		
 		vws[ \options ] = PopUpMenu( view, optionsWidth @ (bounds.height) )
 			.items_( [ "do", " " ] ++ vws[ \operations ].keys[operationsOffset..] )
@@ -378,7 +393,7 @@
 			});
 			
 		if( GUI.id != \qt ) {	
-			vws[ \edit ] = SmoothButton( view, 40 @ (bounds.height) )
+			vws[ \edit ] = SmoothButton( view, editWidth @ (bounds.height) )
 				.label_( "edit" )
 				.border_( 1 )
 				.radius_( 2 )
@@ -387,6 +402,16 @@
 					vws[ \operations ][ \edit ].value;
 				});
 			vws[ \edit ].resize_(3);
+		};
+		
+		if( isMassEdit.not ) {
+			vws[ \expand ] = SmoothButton( view, 12 @ 12 )
+				.label_( '+' )
+				.border_( 1 )
+				.action_({
+					action.value( vws, UMap( \expand ) );
+				})
+				.resize_(3);
 		};
 			
 		vws[ \setPlotter ] = {
