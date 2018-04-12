@@ -23,8 +23,11 @@ MultiChannelUdef( \soundIn, { |bus = 0|
 	UOut.ar( 0, input );
 } ).setSpec( \bus, PositiveIntegerSpec( 0 ) )
 	.shouldPlayOnFunc_({ |unit, target|
-		// only use first server (usually either the only server, or the master server on
-		// a distributed system such as the Game of Life WFS)
-		target.asTarget.server.isLocal;
+		// only use a local server, unless no local servers are available
+		if( ULib.servers.any(_.isLocal) ) {
+			target.asTarget.server.isLocal;
+		} {
+			true;
+		};
 	})
 	.category_( \io );
