@@ -31,7 +31,7 @@ UMixer {
         scoreList = [score];
         soloedTracks  = [];
         font = Font( Font.defaultSansFace, 11 );
-        parent = inParent ? Window("UMixer",Rect(100,1000,800,372), scroll: true).front;
+        parent = inParent ? Window("UMixer",Rect(100,100,800,372), scroll: true).front;
         if(parent.respondsTo(\onClose_)){ parent.onClose_({this.remove}) };
         bounds = inBounds ? Rect(0,0,800,372);
 
