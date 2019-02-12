@@ -69,7 +69,13 @@ UOSCsetter {
 				item.asSymbol;
 			}
 		}).select(_.notNil);
-		
+		inArgs = inArgs.collect({ |item| 
+			if( [ "nil", 'nil', "", '' ].includesEqual( item ) ) {
+				nil
+			} { 
+				item 
+			};
+		});
 		this.uobject.setOrPerform( path, *inArgs );
 	}
 	
