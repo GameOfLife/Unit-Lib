@@ -120,7 +120,7 @@ UGUI {
 			key = argSpec.name;
 			value = unit.at( key );
 			
-			if( argSpec.notNil ) {
+			if( argSpec.notNil && (argSpec.spec.viewNumLines != 0)) {
 				if( value.isUMap ) {
 					vw = UMapGUI( composite, composite.bounds.insetBy(0,-24), value );
 					vw.parentUnit = unit;
