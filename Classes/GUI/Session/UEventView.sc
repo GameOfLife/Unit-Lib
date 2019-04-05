@@ -18,6 +18,8 @@
 */
 
 UEventView {
+	
+	classvar <>showIndex = true;
 
 	var <>event, <>i, rect, <>selected = false, <>state = \nothing;
 	var <>originalStartTime, <>originalEndTime, <>originalFades, <>originalTrack;
@@ -53,7 +55,13 @@ UEventView {
 
 	getTypeColor { }
 
-	getName { ^i.asString ++": "++event.name }
+	getName { 
+		if( showIndex ) {
+			^i.asString ++": "++event.name 
+		} {
+			^event.name;
+		};
+	}
 
 	getFullName{
 	    ^if( event.muted )
