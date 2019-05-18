@@ -16,7 +16,7 @@ FuncUMapDef( \uchain_duration, { |unit, factor = 1|
 	.category_( 'uchain_info' )
 	.valueIsMapped_( false )
 	.mappedArgs_( [] )
-	.setSpec( \factor, [ 0.1, 10, \exp ].asSpec )
+	.setSpec( \factor, [ 0, 10, 1.calcCurve(0,10) ].asSpec )
 	.setSpec( \value, DisplaySpec( SMPTESpec(), _.asSMPTEString(1000) ), private: true )
 	.canUseUMapFunc_({ |unit, key, umapdef|
 		var spec;
