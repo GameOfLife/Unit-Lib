@@ -11,7 +11,7 @@ part of the Unit lib default UMapDefs set
 */
 
 FuncUMapDef( \spawn, { |unit, sustain = 1|
-	if( UPattern.nowCallingPattern.localPos == 0 ) { sustain = 0 };
+	if( (UPattern.nowCallingPattern !? _.localPos) == 0 ) { sustain = 0 };
 	[ sustain, Condition(false) ]
 })
 	.category_( 'upattern' )
