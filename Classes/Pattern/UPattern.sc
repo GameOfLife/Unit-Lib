@@ -16,6 +16,7 @@ UPattern : UChain {
 	var <>preparedEvents;
 	var isPlaying = false;
 	var task;
+	var <>currentTimeToNext;
 	
 	*initClass {
 		argSpecs = [ 
@@ -384,6 +385,7 @@ UPattern : UChain {
 			var time = 0, n = 0;
 			var zeroCount = 0;
 			var next, sustain, timeToNext;
+			var startTime = thisThread.seconds;
 			var track = 0, track0time = 0;
 			while { ( this.releaseSelf == false or: { (time <= (duration - startPos)) }) 
 					&& { n < repeats } && { zeroCount < maxSimultaneousStarts }
@@ -399,8 +401,13 @@ UPattern : UChain {
 				};
 				action.value( next, target, time, timeToNext );
 				this.class.currentTimeToNext = nil;
+				this.currentTimeToNext = timeToNext;
 				timeToNext.wait;
-				time = time + timeToNext;
+				if( timeToNext.isKindOf( Condition ) ) {
+					time = thisThread.seconds - startTime;
+				} {
+					time = time + timeToNext;
+				};
 				if( timeToNext == 0 ) { zeroCount = zeroCount + 1 } { zeroCount = 0 };
 				if( zeroCount >= maxSimultaneousStarts ) {
 					"UPattern ending; maxSimultaneousStarts (%) reached\n"
@@ -514,6 +521,7 @@ UPattern : UChain {
 	}
 	
 	stop {
+		task !? { |t| t.originalStream.stop; };
 		task.stop;
 		preparedEventsRoutine.stop;
 		preparedEvents.do({ |chain|
@@ -525,6 +533,15 @@ UPattern : UChain {
 	}
 	
 	release { this.stop }
+	
+	spawn { 
+		if( currentTimeToNext.isKindOf( Condition ) ) { 
+			currentTimeToNext.test = true;
+			currentTimeToNext.signal;
+		} {
+			"UPattern:spawn : currentTimeToNext is not a Condition".postln;
+		};
+	}
 	
 	asUScore { |infDur = 60|
 		var score, events, originalDur, rlseSelf, track = 0, track0time = 0, nextTime;
