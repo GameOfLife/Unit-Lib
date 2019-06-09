@@ -53,12 +53,15 @@ UPatDef : FuncUMapDef {
 	
 	useMappedArgs_ { |bool = true| useMappedArgs = bool }
 	
-	getControlInput { |unit|
-		var out;
+	getNext { |unit|
 		if( unit.get( \u_prepared ) == false ) {
 			this.doFunc( unit );
 			unit.setArg( \u_prepared, true );
 		};
+	}
+	
+	getControlInput { |unit|
+		var out;
 		out = unit.get( \value );
 		if( unit.get( \u_useSpec ) == false ) {
 			out = unit.getSpec( \value ).unmap( out );

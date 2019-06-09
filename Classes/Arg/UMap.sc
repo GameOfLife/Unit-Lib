@@ -132,6 +132,8 @@ UMapDef : Udef {
 	
 	needsStream { ^false }
 	
+	getNext { }
+	
 	getControlInput { |unit|
 		if( this.hasBus ) {
 			if( this.numChannels > 1 ) {
@@ -470,7 +472,10 @@ UMap : U {
 		};
 	}
 
-	next { ^this.asControlInput }
+	next { 
+		this.def.getNext( this );
+		^this.asControlInput;
+	}
 	
 	disposeFor {
 		if( this.unit.notNil && { this.unit.synths.select(_.isKindOf( Synth ) ).size == 0 }) {

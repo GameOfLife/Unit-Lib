@@ -140,6 +140,10 @@ MultiUMapDef : UMapDef {
 	
 	canFreeSynth { |unit| ^this.findUdefFor( unit ).canFreeSynth( unit ) }
 	
+	getNext { |unit|
+		^this.findUdefFor( unit ).getNext( unit );
+	}
+	
 	getControlInput { |unit|
 		^this.findUdefFor( unit ).getControlInput( unit );
 	}

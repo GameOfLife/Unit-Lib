@@ -119,6 +119,10 @@ ExpandUMapDef : UMapDef {
 		unit.unitSet;
 	}
 	
+	getNext { |unit|
+		^this.value( unit ).do(_.next);
+	}
+	
 	getControlInput { |unit|
 		^this.value( unit ).collect(_.asControlInput( unit ));
 	}
