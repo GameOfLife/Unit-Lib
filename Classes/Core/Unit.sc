@@ -855,6 +855,14 @@ U : ObjectWithArgs {
 		}
 	}
 	
+	resetStreams {
+		this.args.pairsDo({ |key, item|
+			if( item.isKindOf( UMap ) ) {
+				item.resetStreams;
+			};
+		});
+	}
+	
 	connect { this.modPerform( \connect ); this.changed( \connect ); }
 	disconnect {  this.modPerform( \disconnect ); this.changed( \disconnect ); }
 	

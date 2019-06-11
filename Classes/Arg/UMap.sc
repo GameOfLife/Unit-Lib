@@ -471,6 +471,15 @@ UMap : U {
 			this.makeStreamID( true );
 		};
 	}
+	
+	resetStreams {
+		this.resetStream;
+		this.args.pairsDo({ |key, item|
+			if( item.isKindOf( UMap ) ) {
+				item.resetStreams;
+			};
+		});
+	}
 
 	next { 
 		this.def.getNext( this );

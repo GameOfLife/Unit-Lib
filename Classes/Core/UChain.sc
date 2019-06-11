@@ -939,6 +939,8 @@ UChain : UEvent {
 	
 	resetGroups { this.groups = nil; } // after unexpected server quit
 	
+	resetStreams { this.units.do(_.resetStreams) }
+	
 	// indexing / access
 		
 	at { |index| ^units[ index ] }
