@@ -105,4 +105,10 @@ UVoicer : UEvent {
 	endEvent { |note = 69, releaseTime|
 		events[ note ].do(_.release( releaseTime ));
 	}
+	
+	endAll { |releaseTime|
+		events.do({ |evts| evts.do(_.release( releaseTime )); });
+	}
+	
+	allEvents { ^events.flatten(1) }
 }
