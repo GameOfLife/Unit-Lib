@@ -63,6 +63,11 @@ UScore : UEvent {
 	}
 
 	*current { ^UScoreEditorGUI.current !? { |x| x.score } }
+	
+	*currentSubScore { ^UScoreEditorGUI.current !? { |x| 
+			x.scoreView.scoreList.last;
+		} 
+	}
 
 	*new { |... events| 
 		^super.new.init( events );

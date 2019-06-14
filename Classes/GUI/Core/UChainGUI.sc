@@ -84,7 +84,7 @@ UChainGUI {
 		
 		packUnits = if( chain.isKindOf( MassEditUChain ) ) { false; } { packUnitsDefault; };
 		
-		parentScore = UScore.current;
+		parentScore = UScore.currentSubScore;
 		
 		tempoMap = parentScore !? _.tempoMap ?? { TempoMap() };
 		
