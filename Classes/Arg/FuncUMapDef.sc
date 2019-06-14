@@ -81,6 +81,10 @@ FuncUMapDef : UMapDef {
 		^unit.value;
 	}
 	
+	doPrepareFunc { |servers, unit, action, startPos|
+		this.prepare( servers, unit, action, startPos );
+	}
+	
 	prepare { |servers, unit, action|
 		if( unit.get( \u_prepared ) == false ) {
 			this.doFunc( unit );
@@ -118,7 +122,7 @@ FuncUMapDef : UMapDef {
 	
 	setSynth { |unit ...keyValuePairs|
 		keyValuePairs.clump(2).do({ |item|
-			if( [ \u_spec, \u_prepared ].includes( item[0] ).not ) {
+			if( [ \u_spec, \u_prepared, \u_gate ].includes( item[0] ).not ) {
 				this.doFunc( unit );
 				unit.unitSet;
 			};
