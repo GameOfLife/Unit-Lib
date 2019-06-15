@@ -10,6 +10,7 @@ UPattern : UChain {
 	var fadeTimes;
 	var <>maxSimultaneousStarts = 100;
 	var <>localPos = 0;
+	var <>localCount = 0;
 	var <>startPos = 0;
 	var <>routine;
 	var <>preparedEventsRoutine; // for prepared events
@@ -401,6 +402,7 @@ UPattern : UChain {
 					&& { n < repeats } && { zeroCount < maxSimultaneousStarts }
 			} {
 				this.localPos = time;
+				this.localCount = n;
 				#sustain, timeToNext = this.getPattern;
 				this.class.currentTimeToNext = timeToNext;
 				if( time > track0time ) { track = 0 };
@@ -598,6 +600,32 @@ UPattern : UChain {
 		};
 		if( upat.isKindOf( UPattern ) ) {
 			^upat.startPos;
+		} {
+			^0
+		};
+	}
+	
+	*pos {
+		var upat;
+		upat = UChain.nowPreparingChain !? _.parent;
+		if( upat.isKindOf( UPattern ).not ) {
+			upat = UPattern.nowCallingPattern;
+		};
+		if( upat.isKindOf( UPattern ) ) {
+			^upat.localPos + upat.startPos;
+		} {
+			^0
+		};
+	}
+	
+	*count {
+		var upat;
+		upat = UChain.nowPreparingChain !? _.parent;
+		if( upat.isKindOf( UPattern ).not ) {
+			upat = UPattern.nowCallingPattern;
+		};
+		if( upat.isKindOf( UPattern ) ) {
+			^upat.localCount;
 		} {
 			^0
 		};
