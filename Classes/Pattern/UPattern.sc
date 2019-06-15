@@ -427,7 +427,7 @@ UPattern : UChain {
 					"UPattern ending; maxSimultaneousStarts (%) reached\n"
 						.postf( zeroCount )
 				};
-				n = n + 1;
+				if( sustain > 0 ) { n = n + 1; };
 			};
 			this.releaseRunning;
 			isPlaying = false;
