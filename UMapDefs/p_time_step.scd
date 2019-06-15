@@ -16,11 +16,12 @@ part of the Unit lib default UMapDefs set
 
 UPatDef( \p_time_step, { |unit, time = 0, n = 1, spread = 0.0|
 	{
-		var nn, ttime, sspread;
+		var nn, ttime, tttime, sspread;
 		loop {
 			nn = n.next;
 			ttime = time.next;
-			sspread = (spread.next * ttime) * ((nn-1) / nn);
+			if( ttime == \inf ) { tttime = 1 } { tttime = ttime };
+			sspread = (spread.next * tttime) * ((nn-1) / nn);
 			(nn-1).do({ (sspread/(nn-1)).yield  });
 			(ttime - sspread).yield;
 		};

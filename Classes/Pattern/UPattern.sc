@@ -17,6 +17,7 @@ UPattern : UChain {
 	var isPlaying = false;
 	var task;
 	var <>currentTimeToNext;
+	var <>releaseRunningMin = inf; // by default, only release "inf" duration chains
 	
 	*initClass {
 		argSpecs = [ 
@@ -379,6 +380,15 @@ UPattern : UChain {
 	
 	isPlaying { ^isPlaying ? false }
 	
+	releaseRunning { |min, releaseTime|
+		min = min ? releaseRunningMin;
+		this.currentChains.do({ |ch|
+			if( ch.duration >= min ) {
+				ch.release( releaseTime );
+			};
+		});
+	}
+	
 	makeRoutine { |target, startPos = 0, action, score|
 		this.startPos = startPos;
 		^Routine({
@@ -402,7 +412,11 @@ UPattern : UChain {
 				action.value( next, target, time, timeToNext );
 				this.class.currentTimeToNext = nil;
 				this.currentTimeToNext = timeToNext;
-				timeToNext.wait;
+				if( timeToNext == inf && { this.releaseSelf == true && { duration < inf }} ) {
+					((duration - startPos) - time).wait;
+				} {
+					timeToNext.wait;
+				};
 				if( timeToNext.isKindOf( Condition ) ) {
 					time = thisThread.seconds - startTime;
 				} {
@@ -415,6 +429,7 @@ UPattern : UChain {
 				};
 				n = n + 1;
 			};
+			this.releaseRunning;
 			isPlaying = false;
 			this.changed( \end );
 		})
@@ -477,6 +492,7 @@ UPattern : UChain {
 					preparedEvents.remove( chain );
 				});
 				if( preparedEventsRoutineShouldEnd ) { 
+					this.releaseRunning;
 					isPlaying = false;
 					this.changed( \end );
 				};
@@ -528,6 +544,7 @@ UPattern : UChain {
 			chain.stop;
 			chain.dispose;
 		});
+		this.releaseRunning;
 		isPlaying = false;
 		this.changed( \end );
 	}
