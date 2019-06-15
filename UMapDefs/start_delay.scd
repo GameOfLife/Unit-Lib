@@ -12,11 +12,7 @@ part of the Unit lib default UMapDefs set
 */
 
 FuncUMapDef( \start_delay, { |unit, delay = 0, pattern = #[1,1]|
-	var currentPat, pos = 0;
-	currentPat = UPattern.nowCallingPattern;
-	if( currentPat.notNil ) {
-		pos = currentPat.localPos + currentPat.startPos;
-	};
+	var pos = UPattern.pos;
 	if( pos < delay ) {
 		[ 0, delay - pos ]
 	} {
