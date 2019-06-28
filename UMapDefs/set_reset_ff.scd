@@ -20,7 +20,7 @@ UMapDef( \set_reset_ff, {
 	var index, output;
 	index = SetResetFF.kr( \trigger.tr, \reset.tr );
 	index = Slew.kr(index, 1 / \lag.kr(0.0), 1 / \lag.kr );
-	output = Select.kr( index, [ \value1.kr(0.0), \value2.kr(1.0) ] );
+	output = SelectX.kr( index, [ \value1.kr(0.0), \value2.kr(1.0) ] );
 	UMapOut.kr( output );
 })
 .mappedArgs_([ \value1, \value2 ])
