@@ -1,7 +1,7 @@
 /*
 \note_freq
 
-Creates an UMap for converting diatonic mini-note values to a frequency, in semitones where 69 == 440Hz.
+Creates an UMap for converting chromatic midi-note values to a frequency, in semitones where 69 == 440Hz.
 
 note: a midi note value (can be in between semitones as well)
 round: rounding factor (0 - 12)
