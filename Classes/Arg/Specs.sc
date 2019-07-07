@@ -922,6 +922,34 @@ MultiSndFileSpec : Spec {
 	
 }
 
+URecSndFileSpec : BufSndFileSpec {
+	
+	*testObject { |obj|
+		^obj.isKindOf( URecSndFile );
+	}
+	
+	constrain { |value|
+		//value = value.asDiskSndFile;
+		if( value.isKindOf( URecSndFile ).not ) {
+			value = URecSndFile( "~/Desktop/test.aif", numChannels );
+		} {
+			if( numChannels.notNil ) {
+				value.numChannels = numChannels;
+			};
+		};
+		^value;
+	}
+	
+	default { 
+		^URecSndFile( "~/Desktop/test.aiff", numChannels );
+	}
+	
+	*newFromObject { |obj|
+		^this.new( obj.numChannels );
+	}
+	
+}
+
 PartConvBufferSpec : RichBufferSpec {
 	
 	*new {
