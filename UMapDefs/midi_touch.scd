@@ -51,18 +51,29 @@ ValueUMapDef( \midi_touch, { |unit, midifunc|
 		unit.mapSet( \value, value );
 	};
 	MIDIFunc.touch({ |value, chan, src|
-		var fromRange;
+		var fromRange, endPoint;
+		endPoint = MIDIClient.sources.detect({ |ep| ep.uid == src });
 		if( unit.get( \learn ).booleanValue == true ) {
 			unit.set( \channel, chan );
+			unit.set( \device, endPoint !? _.device ? "" );
+			unit.set( \port, endPoint !? _.name ? "" );
 		};
 		fromRange = unit.get( \fromRange );
-		if( unit.get( \channel ) !? (_ == chan) ? true ) {
-			if( unit.get( \clipMode ) === \ignore ) {
-				if( value.inclusivelyBetween( *fromRange ) ) {
-					func.value( value, fromRange );
+		if( endPoint.isNil or: { unit.get( \device ).size == 0 or: { 
+				endPoint.device.find( unit.get( \device ) ).notNil;
+			}
+		}) { if( endPoint.isNil or: { unit.get( \port ).size == 0 or: { 
+					endPoint.name.find( unit.get( \port ) ).notNil;
+				}
+			}) { if( unit.get( \channel ) !? (_ == chan) ? true ) {
+					if( unit.get( \clipMode ) === \ignore ) {
+						if( value.inclusivelyBetween( *fromRange ) ) {
+							func.value( value, fromRange );
+						};
+					} {
+						func.value( value, fromRange );
+					};
 				};
-			} {
-				func.value( value, fromRange );
 			};
 		};
 	});
@@ -71,6 +82,8 @@ ValueUMapDef( \midi_touch, { |unit, midifunc|
 	nil;
 }, [ 
 	[ \channel, nil, ListSpec( [ nil ] ++ (..15), 0, [ "any" ] ++ (..15).collect(_.asString) ) ],
+	[ \device, "", StringSpec() ],
+	[ \port, "", StringSpec() ],
 	[ \learn, false, BoolSpec( false ) ],
 	[ \fromRange, [0,127], RangeSpec(0,127,step:1) ],
 	[ \toRange, [0,1], RangeSpec(0,1) ], 

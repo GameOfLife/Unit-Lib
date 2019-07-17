@@ -40,14 +40,24 @@ ValueUMapDef( \midi_noteOn_freq, { |unit, midifunc|
 		};
 	};
 	MIDIFunc.noteOn({ |velo, value, chan, src|
-		var range;
-		if( unit.get( \learn ).booleanValue == true ) {
+		var range, endPoint;
+		endPoint = MIDIClient.sources.detect({ |ep| ep.uid == src });		if( unit.get( \learn ).booleanValue == true ) {
 			unit.set( \channel, chan );
+			unit.set( \device, endPoint !? _.device ? "" );
+			unit.set( \port, endPoint !? _.name ? "" );
 		};
 		range = unit.get( \range );
-		if( unit.get( \channel ) !? (_ == chan) ? true ) {
-			if( value.inclusivelyBetween( *range ) ) {
-				func.value( value, range );
+		if( endPoint.isNil or: { unit.get( \device ).size == 0 or: { 
+				endPoint.device.find( unit.get( \device ) ).notNil;
+			}
+		}) { if( endPoint.isNil or: { unit.get( \port ).size == 0 or: { 
+					endPoint.name.find( unit.get( \port ) ).notNil;
+				}
+			}) { if( unit.get( \channel ) !? (_ == chan) ? true ) {
+					if( value.inclusivelyBetween( *range ) ) {
+						func.value( value, range );
+					};
+				};
 			};
 		};
 	});
@@ -56,6 +66,8 @@ ValueUMapDef( \midi_noteOn_freq, { |unit, midifunc|
 	nil;
 }, [ 
 	[ \channel, nil, ListSpec( [ nil ] ++ (..15), 0, [ "any" ] ++ (..15).collect(_.asString) ) ],
+	[ \device, "", StringSpec() ],
+	[ \port, "", StringSpec() ],
 	[ \learn, false, BoolSpec( false ) ],
 	[ \range, [0,127], RangeSpec(0,127,step:1) ],
 	[ \a, 440, FreqSpec(400,480) ],
