@@ -45,6 +45,7 @@ ValueUMapDef( \midi_noteOn_freq, { |unit, midifunc|
 			unit.set( \channel, chan );
 			unit.set( \device, endPoint !? _.device ? "" );
 			unit.set( \port, endPoint !? _.name ? "" );
+			unit.set( \learn, false );
 		};
 		range = unit.get( \range );
 		if( endPoint.isNil or: { unit.get( \device ).size == 0 or: { 

@@ -59,6 +59,7 @@ ValueUMapDef( \midi_cc, { |unit, midifunc|
 			unit.set( \channel, chan );
 			unit.set( \device, endPoint !? _.device ? "" );
 			unit.set( \port, endPoint !? _.name ? "" );
+			unit.set( \learn, false );
 		};
 		fromRange = unit.get( \fromRange );
 		if( endPoint.isNil or: { unit.get( \device ).size == 0 or: { 
