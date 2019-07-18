@@ -475,12 +475,39 @@
 			labelWidth = 0;
 		};
 		
-		vws[ \string ] = TextField( view, 
+		vws[ \setString ] = { |vws, string = ""|
+			vws[ \string ] = string;
+			{ 
+				vws[ \stringView ].value = vws[ \string ];
+				vws[ \stringView ].background = Color.white;
+			}.defer;
+		};
+		
+		vws[ \stringView ] = TextField( view, 
 			Rect( labelWidth + 2, 0, bounds.width-(labelWidth+2), bounds.height )
 		)	.resize_(2)
 			.applySkin( RoundView.skin ? () )
 			.action_({ |tf|
-				action.value( vws, this.constrain( tf.value ) );
+				vws[ \task ].stop;
+				vws.setString( this.constrain( tf.value ) );
+				action.value( vws, vws[ \string ] );
+			})
+			.mouseDownAction_({ |view|
+				vws[ \task ].stop;
+				vws[ \task ] = { 
+					block { |break|
+						loop {
+							0.1.wait; 
+							if( view.isClosed ) { break.value; };
+							if( view.hasFocus.not ) { break.value; };
+							if( view.value != vws[ \string ] ) { 
+								view.background = Color.red.blend( Color.white, 0.5 );
+							} { 
+								view.background = Color.white;
+							};
+						};
+					};
+				}.fork( AppClock );
 			});
 
 		if( resize.notNil ) { vws[ \view ].resize = resize };
@@ -488,7 +515,12 @@
 	}
 	
 	setView { |view, value, active = false|
-		{ view[ \string ].value = this.constrain( value ).asString; }.defer;
+		view.setString( this.constrain( value ).asString );
+		{ 
+			view.setString( this.constrain( value ).asString );
+			view[ \stringView ].value = this.constrain( value ).asString;
+			
+		}.defer;
 		if( active ) { view[ \string ].doAction };
 	}
 
