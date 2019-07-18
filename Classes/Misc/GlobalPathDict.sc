@@ -59,7 +59,9 @@ GlobalPathDict {
 		var relative;
 		
 		dict.keysValuesDo({ |key, value|
-			array = array.add( [ value.standardizePath.withTrailingSlash, key ] );
+			if( key != '_relative' ) {
+				array = array.add( [ value.standardizePath.withTrailingSlash, key ] );
+			};
 		});
 		
 		array = array.sort({ |a,b|
