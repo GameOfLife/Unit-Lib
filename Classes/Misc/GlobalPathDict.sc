@@ -56,8 +56,7 @@ GlobalPathDict {
 	
 	*formatPath { |path|
 		var stPath, array = [], key, i = 0;
-		
-		this.put( '_relative', relativePath ?? { thisProcess.nowExecutingPath !? _.dirname } ); 
+		var relative;
 		
 		dict.keysValuesDo({ |key, value|
 			array = array.add( [ value.standardizePath.withTrailingSlash, key ] );
@@ -66,6 +65,12 @@ GlobalPathDict {
 		array = array.sort({ |a,b|
 			(a[0].size < b[0].size) or: { a[0].size == b[0].size && { a[1] <= b[1] } }
 		}).reverse;
+		
+		relative = relativePath ?? { thisProcess.nowExecutingPath !? _.dirname };
+		if( relative.notNil ) {
+			array = [ [ relative.standardizePath.withTrailingSlash, '_relative' ] ] ++ array;
+			this.put( '_relative', relative );
+		};
 		
 		stPath = this.getPath( path );
 		
