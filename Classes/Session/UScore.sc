@@ -22,6 +22,7 @@ UScore : UEvent {
 	classvar <>activeScores;
 	classvar <>openFunc;
 	classvar <>updateWaitTime = 0.1;
+	classvar <>storeDisplayBounds = true;
 
 	/*
 	*   events: Array[UEvent]
@@ -34,6 +35,7 @@ UScore : UEvent {
 	var <soloed, <softMuted;
 	var <>tempoMap;
 	var <>pausedByUMarker = false;
+	var <>displayBounds;
 
 
 	/* playState is a finite state machine. The transitions graph:
@@ -994,11 +996,18 @@ UScore : UEvent {
 		this.storeTags( stream );
 		this.storeDisplayColor( stream );
 		this.storeDisabledStateOn( stream );
+		this.storeDisplayBoundsOn( stream );
 	}
 	
 	storeName { |stream|
 		if( name != "untitled" ) {
 			stream << ".name_(" <<< name << ")";
+		};
+	}
+	
+	storeDisplayBoundsOn { |stream|
+		if( displayBounds.notNil ) {
+			stream << ".displayBounds_(" <<< displayBounds << ")";
 		};
 	}
 	
