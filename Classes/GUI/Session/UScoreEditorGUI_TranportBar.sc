@@ -352,37 +352,7 @@ UScoreEditorGui_TransportBar {
             .hiliteColor_( Color.green.alpha_(0.5) )
             .value_( scoreView.followPos.binaryValue )
             .radius_( bounds.height / 8 )
-            .action_({ |bt| 
-	            var f, active, count = 0;
-	            active = bt.value.booleanValue;
-	            f = { |unit, mode = true|
-		            unit.values.do({ |value|
-			            if( value.isUMap ) {
-				            if( value.def.isKindOf( ValueUMapDef ) ) {
-					            value.set( \active, mode );
-					            count = count + 1;
-					       } {
-						       f.( value, mode );
-						  };
-						};
-				});
-			};
-			this.score.events.do({ |evt|
-				evt.units.do({ |unit|
-					f.( unit, active );
-				});
-				if( evt.isKindOf( UPattern ) ) {
-					if( evt.pattern.isUMap ) {
-						f.( evt.pattern, active );
-					}
-				}
-			});
-			if( count > 0 ) {
-				"% UMaps set to 'active' = %\n".postf( count, active );
-			} {
-				"no UMaps to activate in this UScore".postln;
-			};
-		})
+            .action_({ |bt| this.score.setUMapsActive( bt.value.booleanValue ) })
             .resize_(3)
             .canFocus_(false);
         

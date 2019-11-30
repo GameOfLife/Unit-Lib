@@ -1032,4 +1032,42 @@ UScore : UEvent {
 		UTagSystem.removeObject( this ); 
 		events.do(_.deepClearTags);
 	}
+	
+	setUMapsActive { |active = true, verbose = true|
+		var f, c, count = 0;
+		f = { |unit, mode = true|
+		      unit.values.do({ |value|
+			      if( value.isUMap ) {
+				     if( value.def.isKindOf( ValueUMapDef ) ) {
+			            value.set( \active, mode );
+			            count = count + 1;
+			       } {
+				       f.( value, mode );
+			       };
+			    };
+			});
+		};
+		c = { |chain, mode = true|
+			if( chain.isKindOf( UScore ) ) {
+				chain.events.do({ |evt| c.( evt, active ) });
+			} {	
+				chain.units.do({ |unit|
+					f.( unit, active );
+				});
+				if( chain.isKindOf( UPattern ) ) {
+					if( chain.pattern.isUMap ) {
+						f.( chain.pattern, active );
+					}
+				}
+			};
+		};
+		c.( this, active );
+		if( verbose ) {
+			if( count > 0 ) {
+				"% UMaps set to 'active' = %\n".postf( count, active );
+			} {
+				"no UMaps to activate in this UScore".postln;
+			};
+		};
+	}
 }
