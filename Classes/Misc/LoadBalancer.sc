@@ -34,6 +34,8 @@ LoadBalancer {
 		^super.newCopyArgs( servers ).init.addToAll;
 	}
 	
+	at { |index = 0| ^servers.at( index ) }
+	
 	init {
 		loads = 0!servers.size;
 	}
