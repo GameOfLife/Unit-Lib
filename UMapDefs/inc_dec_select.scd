@@ -48,6 +48,7 @@ defs = [ 2,3,4,5,6,7,8,10,12,16,24,32,48,64,128 ].collect({ |n|
 		.setSpec( \inc, TriggerSpec() )
 		.setSpec( \dec, TriggerSpec() )
 		.setSpec( \reset, TriggerSpec() )
+		.setSpec( \lag, [0,10,\lin,0,0].asSpec )
 		.setSpec( \resetIndex, IntegerSpec(0, 0, n-1) )
 		.setSpec( \wrap, BoolSpec(false) )
 		.setSpec( \vals, ArrayControlSpec(0,1,\lin,default: { |i| i/(n-1) }!n ).size_(n) )
