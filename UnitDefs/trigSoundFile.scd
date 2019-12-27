@@ -51,6 +51,7 @@ MultiChannelUdef( \trigSoundFile, {
 		
 	}, [ [ \soundFile, nil, BufSndFileSpec(nil) ] ], \soundFile, true )
 	.setSpec( \trigger, TriggerSpec() )
+	.setSpec( \level, \amp.asSpec, \normal )
 	.setSpec( \reverse, BoolSpec(false) )
 	.setSpec( \rateScale,  [0.125,8,\exp,0,1].asSpec )
 	.setSpec( \crossfade, [0,1,\lin,0,0.1," s"].asSpec )

@@ -18,4 +18,5 @@ MultiChannelUdef( \crossfade, { |crossfade = 0.5, level = 1.0|
 	out = XFade2.ar( in1, in2, crossfade.linlin(0,1,-1,1), level);
 	UOut.ar( 0, out );
 }, channels: [1,2,3,4,5,6,7,8,10,12,16])
+	.setSpec( \level, \amp.asSpec, \normal )
 	.category_( \utility )
