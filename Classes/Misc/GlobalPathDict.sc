@@ -24,7 +24,7 @@ GlobalPathDict {
 	
 	*initClass { 
 		dict = IdentityDictionary(); 
-		GlobalPathDict.put( \resources, String.scDir );
+		GlobalPathDict.put( \resources, Platform.resourceDir );
 	}
 	
 	*put { |key, path|

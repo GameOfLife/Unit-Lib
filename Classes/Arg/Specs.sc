@@ -1283,9 +1283,9 @@ ControlSpecSpec : Spec {
 		var range;
 		
 		if( obj.isNegative ) {
-			range = obj.abs.ceil.asInt.nextPowerOfTwo.max(1) * [-1,1];
+			range = obj.abs.ceil.asInteger.nextPowerOfTwo.max(1) * [-1,1];
 		} {
-			range = [ 0, obj.ceil.asInt.nextPowerOfTwo.max(1) ];
+			range = [ 0, obj.ceil.asInteger.nextPowerOfTwo.max(1) ];
 		};
 		
 		if( obj.isFloat ) {

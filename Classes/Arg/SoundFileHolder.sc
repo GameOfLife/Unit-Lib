@@ -825,15 +825,15 @@ DiskSndFile : AbstractSndFile {
 + Object {
 	
 	asBufSndFile { 
-		^BufSndFile.newBasic(String.scDir +/+ "sounds/a11wlk01-44_1.aiff", 107520, 1, 44100, 0, nil, 1, false)
+		^BufSndFile.newBasic(Platform.resourceDir +/+ "sounds/a11wlk01-44_1.aiff", 107520, 1, 44100, 0, nil, 1, false)
 	}
 	
 	asMonoBufSndFile { 
-		^MonoBufSndFile.newBasic(String.scDir +/+ "sounds/a11wlk01-44_1.aiff", 107520, 1, 44100, 0, nil, 1, false)
+		^MonoBufSndFile.newBasic(Platform.resourceDir +/+ "sounds/a11wlk01-44_1.aiff", 107520, 1, 44100, 0, nil, 1, false)
 	}
 	
 	asDiskSndFile {
-		^DiskSndFile.newBasic(String.scDir +/+ "sounds/a11wlk01-44_1.aiff", 107520, 1, 44100, 0, nil, 1, false)
+		^DiskSndFile.newBasic(Platform.resourceDir +/+ "sounds/a11wlk01-44_1.aiff", 107520, 1, 44100, 0, nil, 1, false)
 	}
 }
 

@@ -3,8 +3,8 @@
 	uInfoString {
 		^"CPU: %/%\tS/D: %/%"
 			.format(
-				this.avgCPU !? _.asStringWithFrac(1) ? "avg",  
-				this.peakCPU !? _.asStringWithFrac(1) ? "peak", 
+				this.avgCPU !? { |x| x.floor.asString ++"."++ (x.frac * 10).round(1) } ? "avg",  
+				this.peakCPU !? { |x| x.floor.asString ++"."++ (x.frac * 10).round(1) } ? "peak", 
 				this.numSynths ? "?", 
 				this.numSynthDefs ? "?"
 			);

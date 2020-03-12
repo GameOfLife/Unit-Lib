@@ -40,7 +40,7 @@ BarMap {
 		signature = this.formatSignature(signature);
 		event.put(0, signature[0] );
 		event.put(1, signature[1] );
-		event.put(2, bar.asInt );
+		event.put(2, bar.asInteger );
 		^event;
 	}
 	
