@@ -19,5 +19,5 @@ MultiChannelUdef( \amp, { |amp = 0.1, inverse = 0|
 	UOut.ar( 0, in );
 })
 	.category_( \utility )
-	.setSpec( \amp, \amp.asSpec )
+	.setSpec( \amp, \amp.asSpec, \normal )
 	.setSpec( \inverse, BoolSpec(false) );
