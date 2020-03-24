@@ -14,6 +14,7 @@ part of the Unit lib default UDefs set
 */
 
 Udef( \shared_buffer, { |soundFile = #[0,1,0]|
+	UEnv.kr( extraSilence: 0.2, useGlobalGain: 0 );
 	USharedBufferOut.kr( \id, soundFile[0] );
 })
 	.setSpec( \soundFile, MonoBufSndFileSpec() )

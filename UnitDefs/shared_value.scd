@@ -31,6 +31,7 @@ defs = [
 	spec = spec.asSpec;
 	Udef( type, {
 		var sig, range;
+		UEnv.kr( extraSilence: 0.2, useGlobalGain: 0 );
 		switch( type,
 			\trigger,  { sig = \value.tr( spec.default ); },
 			\boolean, { sig = \value.kr( 1.0 ); },
