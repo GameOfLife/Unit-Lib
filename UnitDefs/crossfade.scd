@@ -4,7 +4,12 @@
 Equal power crossfade between two sources.
 
 crossfade: amount of left/right
-numChannels: number of channels
+level: output level of the signal
+numChannels: number of channels (per source)
+mode:	
+	'equal': equal power crossfade (-3dB at center; cosine curve)
+	'linear': linear crossfade (-6dB at center)
+	'overlap': in center position both sources are at max. loudness
 
 --
 this is an Udef definition file
