@@ -68,7 +68,7 @@ ListSpec : Spec {
 	}
 	
 	map { |value|
-		^list[ value.asInt ] ?? { list[ defaultIndex ] };
+		^list[ value.asInteger ] ?? { list[ defaultIndex ] };
 	}
 
 	storeArgs { ^[list, defaultIndex] }

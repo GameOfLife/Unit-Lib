@@ -869,7 +869,7 @@
 				.radius_( 2 )
 				.font_( font )
 				.action_({ |bt|
-					switch( bt.value.asInt,
+					switch( bt.value.asInteger,
 						2, { vws[ \val ] = vws[ \val ].collect( false ); },
 						1, { vws[ \val ] = vws[ \val ].collect( true ); },
 						0, { vws[ \val ] = vws[ \val ].collect( false ); }
@@ -1764,7 +1764,7 @@
 					)
 					.applySmoothSkin
 				    .action_({ |vw|
-					    vws[ \val ].numFrames = (vw.value * vws[ \val ].sampleRate).asInt;
+					    vws[ \val ].numFrames = (vw.value * vws[ \val ].sampleRate).asInteger;
 				        action.value( vw, vws[ \val ] );
 				    } ).resize_(5)
 				    .fps_( 1000 )
@@ -2100,7 +2100,7 @@
 				Rect(labelWidth + 2,0,bounds.width-(labelWidth + 2),bounds.height)
 			)
 		    .action_({ |vw|
-		        action.value( vw, vw.value.asInt );
+		        action.value( vw, vw.value.asInteger );
 		    } ).resize_(5)
 		    .allowedChars_( "-" )
 			.step_( step )
@@ -2161,7 +2161,7 @@
 				Rect(labelWidth + 2, 0, boxWidth, bounds.height)
 			)
 		    .action_({ |vw|
-		        action.value( vw, vw.value.asInt );
+		        action.value( vw, vw.value.asInteger );
 		        vws.setColor;
 		    } ).resize_(5)
 		    .allowedChars_( "" )
@@ -2593,7 +2593,7 @@
 				Rect(labelWidth + 2,0,boxWidth,bounds.height)
 			)
 		    .action_({ |vw|
-		        action.value( vw, vw.value.asInt );
+		        action.value( vw, vw.value.asInteger );
 		    } ).resize_(5)
 		    .allowedChars_( "" )
 			.step_( 1 )

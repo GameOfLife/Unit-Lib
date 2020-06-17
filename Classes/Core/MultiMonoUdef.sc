@@ -108,7 +108,7 @@ MultiMonoUdef : Udef {
 		numChannels =  unit.get( \numChannels );
 		if ( numChannels > 1 ) {
 			group = Group( target, \addToTail );
-			(numChannels-1).asInt.do({ |i|
+			(numChannels-1).asInteger.do({ |i|
 				Synth( this.synthDefName, unit.getArgsFor( target, startPos ) ++ [ \u_index, i+1 ], group, \addToTail );
 			});
 			group.freeAction_({ |synth| unit.removeSynth( synth ); });

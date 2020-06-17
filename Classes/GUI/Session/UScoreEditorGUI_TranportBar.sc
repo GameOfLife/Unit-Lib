@@ -379,7 +379,7 @@ UScoreEditorGui_TransportBar {
             .hiliteColor_( Color.green.alpha_(0.5) )
             .value_(this.score.oscSetter.notNil.binaryValue )
             .radius_( bounds.height / 8 )
-            .action_({ |bt| switch( bt.value.asInt,
+            .action_({ |bt| switch( bt.value.asInteger,
 	            	1, { this.score.enableOSC },
 	            	0, {  this.score.disableOSC }
 	            )

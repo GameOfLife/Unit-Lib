@@ -320,9 +320,9 @@ EnvPlotView {
 			pts = this.getPoints( bounds );
 			
 			if( selectedLine.notNil ) {
-				slineX = (pts.clipAt(selectedLine).x * res).asInt;
+				slineX = (pts.clipAt(selectedLine).x * res).asInteger;
 				sline = svals
-					[slineX..(pts.clipAt(selectedLine+1).x * res).ceil.asInt-1];
+					[slineX..(pts.clipAt(selectedLine+1).x * res).ceil.asInteger-1];
 				Pen.color = Color.yellow;
 				Pen.width = pscale * 3;
 				Pen.moveTo( slineX.linlin(0,svals.size, 0,bounds.width)@(sline[0]) );

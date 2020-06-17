@@ -155,7 +155,7 @@ EQPlotView {
 				if( selected.notNil ) {
 					eqSetting[ selected, \freq ] =
 						x.linexp( 0, bounds.width, min, max, \minmax );
-					if( eqSetting.argNames[ selected.asInt ].includes( \db ) ) {
+					if( eqSetting.argNames[ selected.asInteger].includes( \db ) ) {
 						eqSetting[ selected, \db ] =
 							y.linlin(bounds.height, 0, range.neg,range, \none)
 								.clip( range.neg, range );

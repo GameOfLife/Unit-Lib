@@ -105,7 +105,7 @@ BarMap {
 		#num, denom, bar, sigStartBeat = this.eventAtBeat(beat);
 		mul = (num/denom) * beatDenom;
 		raw = bar + ((beat - sigStartBeat) / mul);
-		^[ raw.floor.asInt, raw.frac * num ]; // bar, division
+		^[ raw.floor.asInteger, raw.frac * num ]; // bar, division
 	}
 	
 	beatAtBar { |bar = 1, division = 0, clip = false|
@@ -122,7 +122,7 @@ BarMap {
 		num = this.eventAtBar(bar)[0];
 		raw = bar + (division / num);
 		raw = raw.max( events[0][2] );
-		^[ raw.floor.asInt, raw.frac * num ]; // bar, division
+		^[ raw.floor.asInteger, raw.frac * num ]; // bar, division
 	}
 	
 	signatureAtBeat { |beat = 0|
@@ -162,7 +162,7 @@ BarMap {
 	put { |...args| // beat, tempo pairs
 		args.pairsDo({ |bar, signature|
 			var oldEvent;
-			bar = bar.asInt;
+			bar = bar.asInteger;
 			oldEvent = (events.removeAllSuchThat({ |item| item[2] == bar }) ? [])[0];
 			if( signature.notNil ) {
 				events = events.add( this.class.formatEvent( signature, bar, oldEvent ) );

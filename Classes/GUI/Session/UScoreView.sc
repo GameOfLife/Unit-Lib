@@ -498,7 +498,7 @@ UScoreView {
 			} )
 			.keyDownAction_( { |v, a,b,c,keycode,key|
 				var arrowKey = c.getArrowKey ? key.getArrowKey;
-				switch( c.asInt,
+				switch( c.asInteger,
 					8, { this.deleteSelected }, // backspace QT
 					127, { this.deleteSelected }, // backspace Cocoa
 					32, { // space bar
@@ -545,7 +545,7 @@ UScoreView {
 						score.jumpTo( 0 );
 					},
 					{ 
-						if( c.asInt.inclusivelyBetween( 49, 57 ) ) {
+						if( c.asInteger.inclusivelyBetween( 49, 57 ) ) {
 							score.jumpTo( score.markerPositions[ a.asString.interpret - 1 ] 
 								? score.finiteDuration );
 						};

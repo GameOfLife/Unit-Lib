@@ -70,7 +70,7 @@ UGlobalGain {
 					var score;
 					score = UScore.current;
 					if( score.notNil ) {
-						switch( c.asInt,
+						switch( c.asInteger,
 							32, { // space bar
 								if( UScoreView.spaceBarPlayAnyway == true ) {
 									score.playAnyway(  ULib.servers );

@@ -70,7 +70,7 @@ UGlobalSubwooferGain {
 					var score;
 					score = UScore.current;
 					if( score.notNil ) {
-						switch( c.asInt,
+						switch( c.asInteger,
 							32, { // space bar
 								score.togglePlayback( ULib.servers );
 							},

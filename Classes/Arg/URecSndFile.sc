@@ -78,7 +78,7 @@ URecSndFile : AbstractSndFile {
 		var buf, addStartFrame = 0;
 		var actualStartFrame;
 		
-		buf = Buffer.alloc(server, diskBufferSize.asInt, numChannels, { arg buffer;
+		buf = Buffer.alloc(server, diskBufferSize.asInteger, numChannels, { arg buffer;
 			buffer.writeMsg( path.getGPath, headerFormat, sampleFormat, 0, 0, true, { |buf|
 				["/b_query", buf.bufnum]
 			});

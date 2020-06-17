@@ -51,7 +51,7 @@
 				Pen.color = Color.white.alpha_(0.5);
 				Pen.stringAtPoint(
 					SMPTE.global.initSeconds( i+leftRounded ).asMinSec
-						.collect({ |item| item.asInt.asStringToBase(10,2); })
+						.collect({ |item| item.asInteger.asStringToBase(10,2); })
 						.join($:),
 					2@(bnds.height.neg - 1) 
 				);

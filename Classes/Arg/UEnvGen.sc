@@ -152,7 +152,7 @@ UEnvGen {
 				phasor.fold(0,dur)
 			]);
 		} {
-			^switch( loop.asInt,
+			^switch( loop.asInteger,
 				0, { phasor.clip(0,dur); },
 				1, { phasor.wrap(0,dur); },
 				2, { phasor.fold(0,dur); }

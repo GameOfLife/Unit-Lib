@@ -636,7 +636,7 @@ UChainGUI {
 							Pen.roundedRect( rect, 2 ).clip;
 							Pen.color = Color(1.0, 1.0, 1.0, 0.5);
 							Pen.fillRect( rect );
-							values = (rect.width.asInt + 1).collect({ |i|
+							values = (rect.width.asInteger + 1).collect({ |i|
 								i.lincurve(0, rect.width, rect.bottom, rect.top, chain.fadeInCurve )
 							});
 							Pen.moveTo( rect.leftBottom );
@@ -663,7 +663,7 @@ UChainGUI {
 							Pen.roundedRect( rect, 2 ).clip;
 							Pen.color = Color(1.0, 1.0, 1.0, 0.5);
 							Pen.fillRect( rect );
-							values = (rect.width.asInt + 1).collect({ |i|
+							values = (rect.width.asInteger + 1).collect({ |i|
 								i.lincurve(0, rect.width, rect.top, rect.bottom, chain.fadeOutCurve )
 							});
 							Pen.moveTo( rect.leftBottom );

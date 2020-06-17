@@ -211,14 +211,14 @@ UChainIOGUI : UChainGUI {
 			var endPoint;
 			key = unit.getIOKey( mode, \audio, item, "bus" );
 			val = unit.get( key );
-			allBuses = allBuses.add( val.asInt );
+			allBuses = allBuses.add( val.asInteger );
 			allBusesIndex = allBuses.size-1;
 			endPoint = (mode === \in) && { unit.inputIsEndPoint };
 			if( mode == \out ) {
-				usedBuses = usedBuses.add( val.asInt );
+				usedBuses = usedBuses.add( val.asInteger );
 			} {
 				if( endPoint ) {
-					usedBuses = usedBuses.add( (val +1).neg.asInt );
+					usedBuses = usedBuses.add( (val +1).neg.asInteger );
 				};
 			};
 			usedBusesIndex = usedBuses.size-1;
@@ -247,15 +247,15 @@ UChainIOGUI : UChainGUI {
 				var size, bounds;
 				var which;
 				which = usedBuses[..usedBusesIndex];
-				which = (..max.asInt).select({ |item|
+				which = (..max.asInteger).select({ |item|
 					this.prScanForBus( which, item );
 				});
 				size = (1 / sl.step);
 				bounds = sl.sliderBounds;
-				(size.asInt ..0).do({ |i, index|
+				(size.asInteger ..0).do({ |i, index|
 					var y, alpha;
 					if( (sl.value * max).round(1) != index ) {
-						if( which.includes( index.asInt ) ) { 
+						if( which.includes( index.asInteger ) ) { 
 							alpha = 0.75;
 						} { 
 							alpha = 0.1; 
@@ -333,11 +333,11 @@ UChainIOGUI : UChainGUI {
 				val = unit.get( key );
 				nb.value = val;
 				sl.value = val/max;
-				allBuses.put( allBusesIndex, val.asInt );
+				allBuses.put( allBusesIndex, val.asInteger );
 				case { mode == \out } { 
-					usedBuses.put( usedBusesIndex, val.asInt );
+					usedBuses.put( usedBusesIndex, val.asInteger );
 				} { endPoint } { 
-					usedBuses.put( usedBusesIndex, (val+1).neg.asInt );
+					usedBuses.put( usedBusesIndex, (val+1).neg.asInteger );
 				};
 				this.updateMax;
 			});

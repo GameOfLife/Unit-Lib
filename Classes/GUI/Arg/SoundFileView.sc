@@ -221,7 +221,7 @@ BufSndFileView {
 			] )
 			.action_({ |pu|
 				var pth, ext;
-				switch( pu.value.asInt,
+				switch( pu.value.asInteger,
 					2, {  // reveal in Finder
 						pth = this.performSndFile( \path );
 						if( pth.notNil ) {

@@ -88,9 +88,9 @@ BarMapGUI {
 			views = ();
 			localAction = {
 				// barMap.setSignatureAtBar( views[ \signature ].value, views[ \bar ].value );
-				item[ 0 ] = views[ \signature ].num.asInt;
-				item[ 1 ] = views[ \signature ].denom.asInt;
-				item[ 2 ] = views[ \bar ].value.asInt;
+				item[ 0 ] = views[ \signature ].num.asInteger;
+				item[ 1 ] = views[ \signature ].denom.asInteger;
+				item[ 2 ] = views[ \bar ].value.asInteger;
 				allViews[i-1] !? { |vws| vws[\bar].clipHi_( item[ 2 ] - 1 ) };
 				allViews[i+1] !? { |vws| vws[\bar].clipLo_( item[ 2 ] + 1 ) };
 				barMap.events = localEvents.copy;

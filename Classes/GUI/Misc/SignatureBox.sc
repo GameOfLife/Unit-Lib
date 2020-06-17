@@ -40,18 +40,18 @@ SignatureBox : RoundNumberBox {
 					string = denom.asString;
 				};
 			};
-			({ string.interpret }.try ? value).asInt;
+			({ string.interpret }.try ? value).asInteger;
 		};
 	}
 	
 	denom_ { |new| denom = 2**(( new ? denom ).log2.round(1).clip(0,10)); this.refresh; }
 	
 	num { ^value }
-	num_ { |num| value = (num ? denom).asInt.max(1); this.refresh; }
+	num_ { |num| value = (num ? denom).asInteger.max(1); this.refresh; }
 	
 	value_ { |val, refresh = true|
 		val = val.asCollection;
-		value = val[0].asInt.max(1);
+		value = val[0].asInteger.max(1);
 		denom = 2**(( val[1] ? denom ).log2.round(1).clip(0,10));
 		if( refresh ) { this.refresh; };
 	}

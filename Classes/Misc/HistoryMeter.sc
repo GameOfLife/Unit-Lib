@@ -15,7 +15,7 @@ HistoryMeter : UserViewHolder {
 	draw {
 		var height, width;
 		height = this.bounds.height;
-		width = this.bounds.width.asInt;
+		width = this.bounds.width.asInteger;
 		Pen.moveTo( 0 @ history[pos].linlin(0,1,height,0) );
 		(history.size).do({ |item, i|
 			Pen.lineTo( (i+1) @ history.wrapAt(pos+i).linlin(0,1,height,0) );

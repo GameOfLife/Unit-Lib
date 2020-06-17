@@ -166,7 +166,7 @@ UFadeTimesSpec : Spec {
 					Pen.roundedRect( rect, 2 ).clip;
 					Pen.color = Color(1.0, 1.0, 1.0, 0.5);
 					Pen.fillRect( rect );
-					values = (rect.width.asInt + 1).collect({ |i|
+					values = (rect.width.asInteger + 1).collect({ |i|
 						i.lincurve(0, rect.width, rect.bottom, rect.top, fadeInCurve )
 					});
 					Pen.moveTo( rect.leftBottom );
@@ -198,7 +198,7 @@ UFadeTimesSpec : Spec {
 					Pen.roundedRect( rect, 2 ).clip;
 					Pen.color = Color(1.0, 1.0, 1.0, 0.5);
 					Pen.fillRect( rect );
-					values = (rect.width.asInt + 1).collect({ |i|
+					values = (rect.width.asInteger + 1).collect({ |i|
 						i.lincurve(0, rect.width, rect.top, rect.bottom, fadeOutCurve )
 					});
 					Pen.moveTo( rect.leftBottom );

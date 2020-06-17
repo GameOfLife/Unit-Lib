@@ -380,7 +380,7 @@ AbstractSndFile : AbstractRichBuffer {
 		 
 	usedFrames { ^(this.endFrame ?? { startFrame - 1 }) - startFrame } // -1 if unknown or to end
 	usedFrames_ { |frames = (-1)| // -1 means from startFrame to end 
-		if( [-1, nil].includes(frames.asInt) ) { 
+		if( [-1, nil].includes(frames.asInteger) ) { 
 			this.endFrame = nil; 
 		} { 
 			this.endFrame = frames + startFrame 
@@ -775,9 +775,9 @@ DiskSndFile : AbstractSndFile {
 			} {
 				actualStartFrame = startFrame + addStartFrame;
 			};
-			buf = Buffer.alloc(server, diskBufferSize.asInt, numChannels, { arg buffer;
-				buffer.readMsg(path.getGPath, actualStartFrame.asInt,
-					diskBufferSize.asInt, 0, true, {|buf|
+			buf = Buffer.alloc(server, diskBufferSize.asInteger, numChannels, { arg buffer;
+				buffer.readMsg(path.getGPath, actualStartFrame.asInteger,
+					diskBufferSize.asInteger, 0, true, {|buf|
 						["/b_query", buf.bufnum]
 					}
 				);

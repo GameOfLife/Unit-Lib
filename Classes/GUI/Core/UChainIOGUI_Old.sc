@@ -317,7 +317,7 @@ UChainIOGUI_Old : UChainGUI {
 	
 	setMixSlider { |mx, bus = 0, i = 0, rate = \audio, stringColor|
 		var busConnection;
-		busConnection = analyzers[ rate ].busConnection( \in, bus.asInt, i.asInt );
+		busConnection = analyzers[ rate ].busConnection( \in, bus.asInteger, i.asInteger );
 		mx.sliderView.string = this.getBusLabel( busConnection, \in, bus, rate );
 		mx.sliderView.hiliteColor = this.getPopUpColor( [busConnection], 0 );
 		mx.sliderView.stringColor = stringColor;
@@ -328,9 +328,9 @@ UChainIOGUI_Old : UChainGUI {
 		var items, lastNotNil = 0;
 		var func;
 		
-		func = { |bus| analyzers[ rate ].busConnection( mode, bus.asInt, i.asInt ) };
+		func = { |bus| analyzers[ rate ].busConnection( mode, bus.asInteger, i.asInteger ) };
 				
-		items = (max+2).asInt.collect( func );
+		items = (max+2).asInteger.collect( func );
 		items.do({ |item, ii|
 			if( item.notNil ) {
 				lastNotNil = ii;
@@ -347,7 +347,7 @@ UChainIOGUI_Old : UChainGUI {
 		
 		^if( busConnection.notNil ) {
 			index = busConnection[2][ 
-				busConnection[3].indexOfEqual( bus.asInt ) 
+				busConnection[3].indexOfEqual( bus.asInteger ) 
 			];
 			"% %:% (%)".format( 
 				prefix,
@@ -369,7 +369,7 @@ UChainIOGUI_Old : UChainGUI {
 	
 	getPopUpColor { |busConnections, bus = 0|
 		var item;
-		item = busConnections.clipAt( bus.asInt );
+		item = busConnections.clipAt( bus.asInteger );
 		if( item.notNil ) {
 			^unitColors[ item[1] ]
 		} {

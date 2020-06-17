@@ -14,7 +14,7 @@
 		top = viewRect.top;
 		bottom = viewRect.bottom;
 		width = viewRect.width.ceil;
-		round = round = (width / 20).max(1).nextPowerOfTwo.asInt;
+		round = round = (width / 20).max(1).nextPowerOfTwo.asInteger;
 		left60 = viewRect.left.round(60);
 		leftRounded = viewRect.left.round(round);
 		//bnds = "000".bounds( Font( Font.defaultSansFace, 9 ) );

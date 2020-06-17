@@ -428,8 +428,8 @@ UScore : UEvent {
     }
     
     removeEmptyTracks {
-	    var usedTracks = events.collect(_.track).asInt.as(Set).as(Array).sort;
-	    events.do({ |evt| evt.track = usedTracks.indexOf( evt.track.asInt ) ? evt.track; });
+	    var usedTracks = events.collect(_.track).asInteger.as(Set).as(Array).sort;
+	    events.do({ |evt| evt.track = usedTracks.indexOf( evt.track.asInteger ) ? evt.track; });
     }
 
 	//SCORE PLAYING

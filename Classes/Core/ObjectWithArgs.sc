@@ -41,7 +41,7 @@ ObjectWithArgs {
 		keys = this.keys;
 		^keys.indexOf( key ) ?? {
 			if( key.isNumber && { (0 <= key) and: ( key < keys.size ) } ) {
-				key.asInt;
+				key.asInteger;
 			};
 		};
 	}

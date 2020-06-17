@@ -149,7 +149,7 @@ PartConvBufferView {
 			] )
 			.action_({ |pu|
 				var pth, ext, closeFunc;
-				switch( pu.value.asInt,
+				switch( pu.value.asInteger,
 					2, { // convert ir file
 						CocoaDialog.getPaths({ |paths|
 							PartConvBuffer.convertIRFile( paths[0], 
