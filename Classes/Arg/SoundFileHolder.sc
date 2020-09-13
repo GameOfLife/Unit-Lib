@@ -803,6 +803,8 @@ DiskSndFile : AbstractSndFile {
     unitNamePrefix{ ^"disk" }
     
     u_waitTime { ^1 }
+    
+    hasGlobal { ^false }
 	
 }
 
