@@ -69,7 +69,7 @@ ValueUMapDef( \midi_cc, { |unit, midifunc|
 					endPoint.name.find( unit.get( \port ) ).notNil;
 				}
 			}) {
-				if( num.asInt == unit.get( \cc ).asInt && {
+				if( num.asInteger == unit.get( \cc ).asInteger && {
 					unit.get( \channel ) !? (_ == chan) ? true
 				}) {
 					if( unit.get( \clipMode ) === \ignore ) {

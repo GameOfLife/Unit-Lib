@@ -25,7 +25,7 @@ defs = [ 4,8,12,16,24,32,48,64,128 ].collect({ |n|
 			thisThread.randSeed = seed.next.asControlInput;
 			arr = (..n-1).scramble;
 			loop {
-				index = arr.removeAt( histSize.next.asInt rrand: (n-1).asInt );
+				index = arr.removeAt( histSize.next.asInteger rrand: (n-1).asInteger );
 				arr = arr.addFirst( index );
 				vals.at( index ).yield;
 			};

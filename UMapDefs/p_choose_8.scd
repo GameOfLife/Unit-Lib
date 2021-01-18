@@ -24,7 +24,7 @@ UPatDef( \p_choose_8, { |unit,
 		thisThread.randSeed = seed.next.asControlInput;
 		arr = (..7).scramble;
 		loop {
-			index = arr.removeAt( histSize.next.asInt rrand: 7 );
+			index = arr.removeAt( histSize.next.asInteger rrand: 7 );
 			arr = arr.addFirst( index );
 			[
 				value0, value1, value2, value3, 

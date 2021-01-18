@@ -27,7 +27,7 @@ def = UPatDef( \p_select_8, { |unit,
 			[
 				value0, value1, value2, value3, 
 				value4, value5, value6, value7 
-			].at( index.next.asInt ).next.yield;
+			].at( index.next.asInteger ).next.yield;
 		};
 	}.r;
 }).mappedArgs_( values )

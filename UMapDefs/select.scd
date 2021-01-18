@@ -31,9 +31,9 @@ defs = [ 8,12,16,24,32,48,64,128 ].collect({ |n|
 		UMapOut.kr( sig );
 	}, { |unit, index = 0, interpolate = 0, vals = #[0.5]|
 		var out;
-		out = vals.asCollection.wrapAt( index.asInt );
+		out = vals.asCollection.wrapAt( index.asInteger );
 		if( interpolate.booleanValue ) {
-			out = out.blend( vals.asCollection.wrapAt( index.asInt + 1 ), index.frac );
+			out = out.blend( vals.asCollection.wrapAt( index.asInteger + 1 ), index.frac );
 		};
 		out;
 	}, addToAll: false, extraPrefix: "select" ).category_( \choice )
