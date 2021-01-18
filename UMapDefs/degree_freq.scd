@@ -22,38 +22,48 @@ var allScales, defDefs;
 
 allScales = Order();
 
-ScaleInfo.scales.keysValuesDo({ |key, value| 
-	allScales[ value.pitchesPerOctave ] = allScales[ value.pitchesPerOctave ].add( key );
-});
+if( \ScaleInfo.asClass.notNil ) {
+	\ScaleInfo.asClass.scales.keysValuesDo({ |key, value|
+		allScales[ value.pitchesPerOctave ] = allScales[ value.pitchesPerOctave ].add( key );
+	});
+} {
+	Scale.all.parent.keysValuesDo({ |key, value|
+		allScales[ value.pitchesPerOctave ] = allScales[ value.pitchesPerOctave ].add( key );
+	});
+};
 
 defDefs = allScales.collectAs({	|scales, ii|
 	var tunings, subScales, defs;
 	var default;
-	
+
 	default = ( 12: \et12, 24: \et24, 43: \partch )[ ii ];
-	
-	tunings = TuningInfo.tunings.select({ |item| item.tuning.size == ii }).keys.asArray.sort;
+
+	if( \TuningInfo.asClass.notNil ) {
+		tunings = \TuningInfo.asClass.tunings.select({ |item| item.tuning.size == ii }).keys.asArray.sort;
+	} {
+		tunings = Tuning.all.parent.select({ |item| item.tuning.size == ii }).keys.asArray.sort;
+	};
 	scales = scales.sort;
-	
-	if( ii == 24 ) { 
+
+	if( ii == 24 ) {
 		tunings.remove( \harmonic );
 		tunings = tunings.reverse;
 	 };
-	
+
 	subScales = Order();
-	
+
 	scales.do({ |item|
 		var sc;
 		sc = Scale.newFromKey( item ).degrees.size;
 		subScales[ sc ] = subScales[ sc ].add( item );
 	});
-	
+
 	defs = subScales.collectAs({ |item, i|
 		FuncUMapDef( i, { |unit, degree = 0, offset = 0, base = 440, key = 0, octave = 0, scale = \chromatic, tuning = 'et12'|
 			scale = Scale.newFromKey( scale, tuning );
-			if( key != 0 && { i != ii }) {	
-				scale = Scale( 
-					(scale.degrees + key).wrap(0,ii).sort, 
+			if( key != 0 && { i != ii }) {
+				scale = Scale(
+					(scale.degrees + key).wrap(0,ii).sort,
 					scale.pitchesPerOctave,
 					scale.tuning
 				);
@@ -76,7 +86,7 @@ defDefs = allScales.collectAs({	|scales, ii|
 			.setSpec( \tuning, ListSpec( tunings, tunings.indexOf( default ) ) )
 			.setDefault( \tuning, default );
 	}, Array ).reverse;
-	
+
 	MultiUMapDef( ii, defs, \convert, \numSteps, false, addToAll: false );
 }, Array);
 
@@ -87,7 +97,7 @@ MultiUMapDef( \degree_freq, defDefs, \convert, \type, false, addToAll: true );
 
 FuncUMapDef( \degree_freq, { |unit, degree = 0, base = 440, octave = 0, scale = \chromatic, tuning = 'et12'|
 	Scale.newFromKey( scale, tuning ).degreeToFreq( degree, base, octave );
-	
+
 })
 	.category_( 'convert' )
 	.useMappedArgs_( false )
@@ -101,7 +111,7 @@ FuncUMapDef( \degree_freq, { |unit, degree = 0, base = 440, octave = 0, scale = 
 	.setSpec( \base, [68.midicps, 70.midicps,\lin,0,440].asSpec )
 	.setSpec( \scale, ListSpec( scales, scales.indexOf( 'chromatic' ) ) )
 	.setSpec( \tuning, ListSpec( tunings, tunings.indexOf( 'et12' ) ) );
-	
+
 */
 /*
 t = Tuning.newFromKey( \et12 );
@@ -130,7 +140,7 @@ ScaleInfo.scales.select({ |item|
 }).dopostln;
 
 ScaleInfo.scales.do({ |item, key|
-	key.post; ": ".post; item.tuning.postln; 
+	key.post; ": ".post; item.tuning.postln;
 })
 
 Tuning.et12.asControlInput
