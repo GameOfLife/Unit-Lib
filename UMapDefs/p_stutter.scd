@@ -17,7 +17,7 @@ UPatDef( \p_stutter, { |unit, input = 0, n = 1|
 	Pstutter( n, input ).asStream;
 })
 	.setSpec( \input, UAdaptSpec() )
-	.setSpec( \n, IntegerSpec(1, 1,((2**31) - 1).asInt) )
+	.setSpec( \n, IntegerSpec(1, 1,((2**31) - 1).asInteger) )
 	.canUseUMapFunc_({ |unit, key, umapdef|
 		unit.isKindOf( UPattern ).not && {
 			[ Point, SimpleNumber, Array, Symbol, Boolean ].any({ |class|

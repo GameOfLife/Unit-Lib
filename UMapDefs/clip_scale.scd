@@ -48,7 +48,7 @@ HybridUMapDef( \clip_scale, { |input = 0.0, fromRange = #[0.0, 1.0], toRange = #
 	sig = sig.linlin(*fromRange ++ [-1,1,\none]);
 	sig = sig.lincurve(-1,1,-1,1, curve, \none );
 	sig = if( invert, sig.neg, sig );
-	sig = switch( clipMode.asInt,
+	sig = switch( clipMode.asInteger,
 		0, { sig.softclip2(1, clipSoftness) },
 		1, { sig.softfold2(1, clipSoftness) },
 		2, { if( clipSoftness > 0 ) { sig.wrap2(1) } { sig.softwrap2(1, clipSoftness) } },

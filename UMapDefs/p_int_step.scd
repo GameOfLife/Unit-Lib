@@ -22,7 +22,7 @@ UPatDef( \p_int_step, { |unit, lo = 0, hi = 99, stepsize = 1, loop = \loop|
 	{
 		var current = 0, direction = 1;
 		if( loop.next == \backwards ) { current = 1; direction = -1 };
-		current = lo.next.asInt;
+		current = lo.next.asInteger;
 		inf.do { |i|
 			current = current + (direction * stepsize.next);
 			switch( loop.next,
@@ -39,7 +39,7 @@ UPatDef( \p_int_step, { |unit, lo = 0, hi = 99, stepsize = 1, loop = \loop|
 				},
 				\off, { current = current.clip(lo.next,hi.next); direction = 1; }
 			);
-			current.asInt.yield;
+			current.asInteger.yield;
 		};
 	}.r;
 })
