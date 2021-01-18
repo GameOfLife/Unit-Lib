@@ -48,7 +48,7 @@ UMapDef( \onsets, { |
 	sig = BLowCut.ar( sig, filter[0], 2 );
 	sig = BHiCut.ar( sig, filter[1], 2 );
 	fft = FFT( LocalBuf( fftsize, 1 ), sig );
-	onsets = Onsets.kr( fft, threshold, \rcomplex, relaxtime, floor, mingap, medianspan );
+	onsets = Onsets.kr( fft, threshold, odftype, relaxtime, floor, mingap, medianspan );
 	onsets = onsets.linlin(0,1,*range);
 	UMapOut.kr(onsets);
 })
