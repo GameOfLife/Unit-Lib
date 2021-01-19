@@ -84,12 +84,9 @@ LocalUdef : Udef {
             var innerAction = action.getAction;
             this.synthDef.send(server);
             if( UEvent.nrtMode != true ) {
-           	 OSCresponderNode( server.addr, '/done', { |time, resp, msg, addr|
-	                if( msg == [ '/done', '/d_recv' ]  ) {
-	                    resp.remove;
-	                    innerAction.value;
-	                };
-	           }).add;
+           	 OSCFunc({ |msg, time, addr, recvPort|
+	           	 innerAction.value;
+	           }, '/done', server.addr, argTemplate: ['/d_recv'] ).oneShot;
             } {
 	            innerAction.value;
             };

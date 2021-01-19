@@ -23,7 +23,7 @@ SyncCenter {
 	classvar <>serverCounts, <master;
 	classvar <>recSynths;
 	classvar <>masterCountTime;
-	classvar <>responder;
+	classvar <>oscFunc;
 	classvar <>global;
 	classvar <>ready;
 	classvar <>inBus = 0, <>outBus = 14;
@@ -151,16 +151,16 @@ SyncCenter {
 		ready.value_(false).changed;
 		if( mode === 'sample' ) { 
 
-			if( responder.notNil ) {
-				responder.remove; 
-				if( verbose ) { "removing responder".postln }
+			if( oscFunc.notNil ) {
+				oscFunc.free; 
+				if( verbose ) { "removing oscFunc".postln }
 			};
 			
 			serverCounts.pairsDo{ |server,count|
 				count.value_(-1).changed
 			};
 				
-			responder = OSCresponderNode( nil, '/tr', { |time, resp, msg|
+			oscFunc = OSCFunc({ |msg, time, addr, port|
 				var server, numOfBlocks, offsetInsideBlock, count;
 				
 				case{ msg[ 2 ] == 99 }
@@ -190,7 +190,7 @@ SyncCenter {
 								.postf( server, msg[2], count )
 						};	
 					 } {
-						 if( verbose ) { ("Received: "++[time, resp, msg] ).postln };
+						 if( verbose ) { ("Received: "++[time, oscFunc, msg] ).postln };
 					 };
 						
 				if( 
@@ -203,11 +203,11 @@ SyncCenter {
 					}.as(Array).reduce('&&')
 
 				) { 
-					resp.remove; responder = nil;
+					oscFunc.free; oscFunc = nil;
 					ready.value_(true).changed;
 					if(verbose) { "received all counts".postln;  }
 				};
-			}).add;
+			}, '/tr');
 			
 			this.playRecDefs;
 			
@@ -223,8 +223,8 @@ SyncCenter {
 					this.changed( \notSynced );
 					if( verbose ) {  "No Sync".postln };
 				};
-				responder.remove;
-				responder = nil;
+				oscFunc.free;
+				oscFunc = nil;
 				recSynths.do({ |synth| if(synth.isPlaying){synth.free} });
 				recSynths = nil;
 				

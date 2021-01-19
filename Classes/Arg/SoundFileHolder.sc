@@ -211,12 +211,9 @@ RichBuffer : AbstractRichBuffer {
 	makeBuffer { |server, startPos = 0, action, bufnum|
 	    var buf;
 		buf = Buffer.alloc(server, numFrames, numChannels, nil, bufnum );
-		OSCresponderNode( server.addr, '/done', { |time, resp, msg, addr|
-			if( msg == [ '/done', '/b_alloc', buf.bufnum ] ) {
-				resp.remove;
-				action.value( buf );
-			};
-		}).add;
+		OSCFunc( { |msg, time, addr, recvPort|
+			action.value( buf );
+		}, '/done', server.addr, argTemplate: [ '/b_alloc', buf.bufnum ] ).oneShot;
 		this.addBuffer( buf );
 		^buf;
 	}

@@ -4,12 +4,9 @@
 		var buffer = this.alloc(server, ceil(collection.size / numChannels), numChannels);
 		var pos, collstream, collsize, bundsize;
 		if( UEvent.nrtMode != true ) {
-			OSCresponderNode( server.addr, '/done', { |time, resp, msg, addr|
-				if( msg == [ '/done', '/b_alloc', buffer.bufnum ] ) {
-					resp.remove;
-					{ buffer.sendCollection( collection, 0, wait, action ); }.fork;
-				};
-			}).add;
+			OSCFunc({ |msg, time, addr|
+				{ buffer.sendCollection( collection, 0, wait, action ); }.fork;
+			}, '/done', server.addr, argTemplate: [ '/b_alloc', buffer.bufnum ]).oneShot;
 		} {
 			collstream = CollStream.new;
 			collstream.collection = collection;
