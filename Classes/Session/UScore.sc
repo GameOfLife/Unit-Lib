@@ -70,6 +70,10 @@ UScore : UEvent {
 			x.scoreView.scoreList.last;
 		} 
 	}
+		
+	*findByName { |name|
+		^UScoreEditorGUI.all.detect({ |se| se.score.name == name }) !? _.score;
+	}
 
 	*new { |... events| 
 		^super.new.init( events );
