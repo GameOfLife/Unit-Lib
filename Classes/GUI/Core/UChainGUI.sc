@@ -63,11 +63,7 @@ UChainGUI {
 		);
 	
 		StartUp.defer({ 
-			if( GUI.id == \cocoa ) { 
-				skin.font = Font( Font.defaultSansFace, 10 ); 
-			} {
-				skin.font = Font( Font.defaultSansFace, 9 );
-			};
+			skin.font = Font( Font.defaultSansFace, 10 ); 
 		});
 		
 		all = [];
