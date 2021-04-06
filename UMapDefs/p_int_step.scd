@@ -50,7 +50,8 @@ UPatDef( \p_int_step, { |unit, lo = 0, hi = 99, stepsize = 1, loop = \loop|
 .canUseUMapFunc_({ |unit, key, umapdef|
 	var spec;
 	spec = unit.getSpec( key );
-	[ IntegerSpec, UAdaptSpec ].any({ |class| spec.isKindOf( class ); });
+	[ IntegerSpec, UAdaptSpec ].any({ |class| spec.isKindOf( class ); }) or:
+	(spec == URandSeed)
 })
 .setSpec( \loop, ListSpec( [ \off, \loop, \backwards, \alternate ], 1 ) )
 .category_( 'pattern' );
