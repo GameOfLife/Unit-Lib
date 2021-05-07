@@ -131,6 +131,7 @@ UMarkerEventView : UEventView {
 			
 			Pen.use({	
 				var textLeft = 2;
+				var nme;
 				
 				this.drawShape(innerRect, scaledUserView.view.bounds.height);
 				Pen.clip;
@@ -153,8 +154,10 @@ UMarkerEventView : UEventView {
 							scaledRect.top, 14, 14 ) );
 						textLeft = textLeft + 12;
 				     };
+				     nme = event.name;
+				     if( nme.find("#").isNil ) { nme = this.getName };
 					Pen.stringAtPoint(
-						" " ++ this.getName,
+						" " ++ nme,
 						scaledRect.leftTop.max( 0 @ -inf ) + (textLeft @ 1)
 					);		       
 				};
