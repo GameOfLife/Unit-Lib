@@ -20,15 +20,22 @@ part of the Unit lib default UMapDefs set
 
 UPatDef( \p_int_step, { |unit, lo = 0, hi = 99, stepsize = 1, loop = \loop|
 	{
-		var current = 0, direction = 1;
+		var current = 0, direction = 1, hist = [], arr, amb;
 		if( loop.next == \backwards ) { current = 1; direction = -1 };
 		current = lo.next.asInteger;
+		current.asInteger.yield;
 		inf.do { |i|
-			current = current + (direction * stepsize.next);
 			switch( loop.next,
-				\loop, { current = current.wrap( lo.next, hi.next ); direction = 1; },
-				\backwards, { current = current.wrap( lo.next, hi.next ); direction = -1; },
+				\loop, { 
+					current = current + (direction * stepsize.next);
+					current = current.wrap( lo.next, hi.next );
+					direction = 1; 
+				},
+				\backwards, { 
+					current = current + (direction * stepsize.next);
+					current = current.wrap( lo.next, hi.next ); direction = -1; },
 				\alternate, { 
+					current = current + (direction * stepsize.next);
 					case { current > 1 } {
 						current = current.fold(lo.next,hi.next);
 						direction = -1;
@@ -37,7 +44,17 @@ UPatDef( \p_int_step, { |unit, lo = 0, hi = 99, stepsize = 1, loop = \loop|
 						direction = 1;
 					};
 				},
-				\off, { current = current.clip(lo.next,hi.next); direction = 1; }
+				\rand, {
+					arr = (lo.next..(hi.next));
+					amb = arr.last - arr.first;
+					hist.do({ |item| arr.remove( item ) });
+					current = arr.choose;
+					hist = hist.addFirst( current )[..stepsize.next.abs.min(amb) - 1];
+				},
+				\off, { 
+					current = current + (direction * stepsize.next);
+					current = current.clip(lo.next,hi.next); direction = 1; 
+				}
 			);
 			current.asInteger.yield;
 		};
@@ -53,5 +70,5 @@ UPatDef( \p_int_step, { |unit, lo = 0, hi = 99, stepsize = 1, loop = \loop|
 	[ IntegerSpec, UAdaptSpec ].any({ |class| spec.isKindOf( class ); }) or:
 	(spec == URandSeed)
 })
-.setSpec( \loop, ListSpec( [ \off, \loop, \backwards, \alternate ], 1 ) )
+.setSpec( \loop, ListSpec( [ \off, \loop, \backwards, \alternate, \rand ], 1 ) )
 .category_( 'pattern' );
