@@ -55,7 +55,7 @@ ULib {
 	    if( runCmdPeriod == true ) { CmdPeriod.run; };
 	    UChain.clear;
 	    U.clear;
-	    ULib.allServers.do(_.sendNotifyRequest);
+	    ULib.allServers.do(_.notify_(true));
 	    BufSndFile.reloadAllGlobal;
     }
 

@@ -97,20 +97,20 @@
 		if (isLocal, {
 			
 			running = {
-				active.stringColor_( onColor );
+				{ active.stringColor_( onColor ); }.defer;
 				booter.value = 1;
 			};
 			stopped = {
-				active.stringColor_(Color.grey(0.3));
+				{ active.stringColor_(Color.grey(0.3)); }.defer;
 				booter.value = 0;
 
 			};
 			booting = {
-				active.stringColor_( Color.new255(255, 140, 0) );
+				{ active.stringColor_( Color.new255(255, 140, 0) ); }.defer;
 			};
 			
 			bundling = {
-				active.stringColor_(Color.new255(237, 157, 196));
+				{ active.stringColor_(Color.new255(237, 157, 196)); }.defer;
 				booter.value = 1;
 			};
 			
@@ -122,14 +122,14 @@
 			};
 		},{	
 			running = {
-				active.background = onColor
+				{ active.background = onColor }.defer;
 			};
 			stopped = {
-				active.background = Color.white;
+				{ active.background = Color.white; }.defer;
 
 			};
 			booting = {
-				active.background = Color.yellow;
+				{ active.background = Color.yellow; }.defer;
 			};
 			
 			oldOnClose = w.onClose.copy;
