@@ -679,14 +679,15 @@ UChain : UEvent {
         preparedServers = nil;
         this.score = nil;
         targets = target.asCollection;
-         if( verbose ) { "% starting on %".format( this, targets ).postln; };
-        latency = latency ?? { Server.default.latency; };
+        if( verbose ) { "% starting on %".format( this, targets ).postln; };
         units.do( _.modPerform(\start, startPos, latency) );
         bundles = this.makeBundle( targets, startPos , withRelease );
         targets.do({ |target, i|
-            if( bundles[i].size > 0 ) {
-                target.asTarget.server.sendSyncedBundle( latency, nil, *bundles[i] );
-            };
+	        var server;
+	        if( bundles[i].size > 0 ) {
+	            server = target.asTarget.server;
+	            server.sendSyncedBundle( latency ? server.latency, nil, *bundles[i] );
+	        };
         });
         if( target.size == 0 ) {
             ^this.groups[0]

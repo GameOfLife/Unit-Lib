@@ -120,6 +120,10 @@ LoadBalancer {
 		^server.asTarget;
 	}
 	
+	latency { ^servers[0].latency }
+	
+	latency_ { |latency| servers.do(_.latency_(latency)); }
+	
 	doesNotUnderstand { |selector ...args|
 		var res;
 		servers[0] !? { 
