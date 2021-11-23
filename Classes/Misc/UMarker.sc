@@ -85,15 +85,16 @@ UMarker : UEvent {
 	*fromPreset { |name| ^presetManager.apply( name ) }
 	
 	fromPreset { |name| ^presetManager.apply( name, this ); }
-	
-	start { |target, startPos = 0, latency| 
-		var old;
+
+	start { |target, startPos = 0, latency|
+		var old, sc;
 		if( startPos == 0 ) {
 			if( autoPause ) {
 				if( this.score.startedAt.notNil && {
-					startTime > (this.score.startedAt[0] + 0.125) 
-				}) { 
-					this.score.pause; 
+					startTime > (this.score.startedAt[0] + 0.125)
+				}) {
+					sc = this.score;
+					{ sc.pause; }.defer;
 					this.score.pausedByUMarker = true;
 				};
 			} {
