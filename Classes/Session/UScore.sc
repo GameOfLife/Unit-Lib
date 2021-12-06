@@ -81,8 +81,8 @@ UScore : UEvent {
 	
 	*open { |path, action|
         if( path.isNil ) {
-		    Dialog.getPaths( { |paths|
-		        action.value( openFunc.(paths[0]) );
+		    Dialog.openPanel( { |path|
+		        action.value( openFunc.(path) );
 		    });
 	    } {
             path = path.standardizePath;
@@ -92,9 +92,9 @@ UScore : UEvent {
 	
 	*openMultiple { |paths, action| // action fired for each path
 		if( paths.isNil ) {
-		    Dialog.getPaths( { |paths|
+		    Dialog.openPanel( { |paths|
 			    paths.do({ |path| action.value( openFunc.(path) ); });
-		    });
+		    }, multipleSelection: true );
 	    } {
 		    paths.do({ |path|
 			    path = path.standardizePath;
