@@ -24,6 +24,7 @@ UMenuBarIDE {
 	classvar <>currentMenuName;
 	classvar <>sessionMenu;
 	classvar <>skipJack, <>windowsMenu;
+	classvar <>openRecentMenu;
 
 	*fillWindowsMenu {
 		if( windowsMenu.notNil ) {
@@ -56,6 +57,14 @@ UMenuBarIDE {
 		MainMenu.register( MenuAction( "Open Score...", {
 			UScore.openMultiple(nil, UScoreEditorGUI(_) )
 		}), name );
+
+		openRecentMenu = Menu().title_("Open Recent");
+
+		MainMenu.register( openRecentMenu, name );
+
+		URecentScorePaths.menu = openRecentMenu;
+
+		URecentScorePaths.fillMenu;
 
 		MainMenu.register( MenuAction( "Save Score", {
 			UScore.current !! _.save

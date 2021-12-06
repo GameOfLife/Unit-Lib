@@ -23,6 +23,7 @@ UScore : UEvent {
 	classvar <>openFunc;
 	classvar <>updateWaitTime = 0.1;
 	classvar <>storeDisplayBounds = true;
+	classvar <>storeRecentScorePaths = true;
 
 	/*
 	*   events: Array[UEvent]
@@ -82,10 +83,16 @@ UScore : UEvent {
 	*open { |path, action|
         if( path.isNil ) {
 		    Dialog.openPanel( { |path|
+				if( storeRecentScorePaths ) {
+					URecentScorePaths.addPath( path );
+				};
 		        action.value( openFunc.(path) );
 		    });
 	    } {
             path = path.standardizePath;
+			if( storeRecentScorePaths ) {
+				URecentScorePaths.addPath( path );
+			};
             action.value( openFunc.(path) );
 	    };
 	}
@@ -93,11 +100,19 @@ UScore : UEvent {
 	*openMultiple { |paths, action| // action fired for each path
 		if( paths.isNil ) {
 		    Dialog.openPanel( { |paths|
-			    paths.do({ |path| action.value( openFunc.(path) ); });
+				if( storeRecentScorePaths ) {
+					URecentScorePaths.addPaths( paths );
+				};
+			    paths.do({ |path|
+					action.value( openFunc.(path) );
+				});
 		    }, multipleSelection: true );
 	    } {
+			paths = paths.collect(_.standardizePath);
+			if( storeRecentScorePaths ) {
+				URecentScorePaths.addPaths( paths );
+			};
 		    paths.do({ |path|
-			    path = path.standardizePath;
 			    action.value( openFunc.(path) );
 			});
 	    };
@@ -1017,8 +1032,11 @@ UScore : UEvent {
 	
 	textArchiveFileExtension { ^"uscore" }
 
-	onSaveAction { this.name = filePath.basename.removeExtension }
-	
+	onSaveAction {
+		this.name = filePath.basename.removeExtension;
+		if( storeRecentScorePaths ) { URecentScorePaths.addPath( filePath ) };
+	}
+
 	readTextArchiveAction{ this.name = filePath.basename.removeExtension }
 	
 	windowBounds {

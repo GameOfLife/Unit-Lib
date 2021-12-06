@@ -121,12 +121,14 @@ UScoreEditorGUI : UAbstractWindow {
                 if( (this.score.events.size != 0) && (this.score.isDirty) && askForSave ) {
                     SCAlert( "Do you want to save your score? (" ++ this.score.name ++ ")" ,
                         [ [ "Don't save" ], [ "Cancel" ], [ "Save" ],[ "Save as"] ],
-                        [ 	nil,
+						[ 	{ if( UScore.storeRecentScorePaths ) { { URecentScorePaths.fillMenu }.defer(0.1) } },
                             { UScoreEditorGUI(scoreEditor) },
                             { this.score.save(nil, {UScoreEditorGUI(scoreEditor)} ) },
                             { this.score.saveAs(nil,nil, {UScoreEditorGUI(scoreEditor)} ) }
                         ] );
-                };
+                } {
+					{ if( UScore.storeRecentScorePaths ) { { URecentScorePaths.fillMenu }.defer(0.1) } }
+				};
             }.defer(0.1)
         }, margin:margin, gap:gap);
         view.addFlowLayout(margin@margin,gap@gap);
