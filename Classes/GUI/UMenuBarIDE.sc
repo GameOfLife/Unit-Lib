@@ -23,6 +23,25 @@ UMenuBarIDE {
 
 	classvar <>currentMenuName;
 	classvar <>sessionMenu;
+	classvar <>skipJack, <>windowsMenu;
+
+	*fillWindowsMenu {
+		if( windowsMenu.notNil ) {
+			windowsMenu.clear;
+
+			UScoreEditorGUI.all.do({ |gui|
+				windowsMenu.addAction(
+					MenuAction( gui.windowTitle, { gui.toFront } )
+				)
+			});
+
+			UChainGUI.all.do({ |gui|
+				windowsMenu.addAction(
+					MenuAction( gui.window.name, { gui.window !? _.front } )
+				)
+			});
+		};
+	}
 
 	*new { |name = "Unit Lib"|
 
@@ -253,6 +272,15 @@ UMenuBarIDE {
 			ULib.servers.first.meter;
 		}), "View");
 
+		windowsMenu = Menu().title_( "Windows" );
+
+		MainMenu.register( windowsMenu, "View" );
+
+		this.fillWindowsMenu;
+
+		if( skipJack.notNil ) { skipJack.stop };
+
+		skipJack = SkipJack( { this.fillWindowsMenu }, 1 );
 	}
 
 	*add { |name, function, menuName|
