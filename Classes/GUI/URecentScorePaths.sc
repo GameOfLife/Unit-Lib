@@ -37,7 +37,7 @@ URecentScorePaths {
 		} {
 			dict = dict.add( [ Date.localtime.stamp, path ] );
 		};
-		dict = dict.sort({ |a,b| a[0] <= b[0] });
+		dict = dict.sort({ |a,b| a[0] >= b[0] });
 		if( dict.size > maxSize ) { dict = dict[..maxSize-1]; };
 		this.writePrefs;
 		{ this.fillMenu; }.defer(0.1);
@@ -53,7 +53,7 @@ URecentScorePaths {
 				dict = dict.add( [ Date.localtime.stamp, path ] );
 			};
 		});
-		dict = dict.sort({ |a,b| a[0] <= b[0] });
+		dict = dict.sort({ |a,b| a[0] >= b[0] });
 		if( dict.size > maxSize ) { dict = dict[..maxSize-1]; };
 		this.writePrefs;
 		{ this.fillMenu; }.defer(0.1);

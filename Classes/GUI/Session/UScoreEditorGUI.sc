@@ -127,7 +127,7 @@ UScoreEditorGUI : UAbstractWindow {
                             { this.score.saveAs(nil,nil, {UScoreEditorGUI(scoreEditor)} ) }
                         ] );
                 } {
-					{ if( UScore.storeRecentScorePaths ) { { URecentScorePaths.fillMenu }.defer(0.1) } }
+					if( UScore.storeRecentScorePaths ) { { URecentScorePaths.fillMenu }.defer(0.1) }
 				};
             }.defer(0.1)
         }, margin:margin, gap:gap);
