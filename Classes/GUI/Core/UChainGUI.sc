@@ -151,6 +151,7 @@ UChainGUI {
 		RoundView.useWithSkin( skin ++ (RoundView.skin ? ()), {
 			this.prMakeViews( bounds );
 		});
+		this.fixPopUpMenus;
 	}
 	
 	undo { |amt = 1|
@@ -1602,6 +1603,23 @@ UChainGUI {
 	font_ { |font| uguis.do({ |vw| vw.font = font }); }
 		
 	view { ^composite }
+
+	fixPopUpMenus {
+		var func;
+		if( Platform.ideName == "scqt" ) {
+			func = { |vw|
+				if( vw.isKindOf( PopUpMenu ) ) {
+					vw.mouseWheelAction = { |vw|
+						vw.enabled_( false );
+						{ vw.enabled_( true ) }.defer(0.1);
+					};
+				} {
+					vw.children.do({ |child| func.( child ) });
+				};
+			};
+			func.( this.window.view );
+		}
+	}
 }
 
 + UChain {
