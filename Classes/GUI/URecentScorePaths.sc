@@ -80,11 +80,13 @@ URecentScorePaths {
 	}
 
 	*fillMenu { |menu|
+		var userPath;
 		menu = menu ?? { this.menu; };
 		if( menu.notNil ) {
 			menu.clear;
+			userPath = "~".standardizePath;
 			this.pathList.do({ |path|
-				menu.addAction( MenuAction( path, { UScore.open( path, _.gui ) }) );
+				menu.addAction( MenuAction( path.replace( userPath, "~" ), { UScore.open( path, _.gui ) }) );
 			});
 			menu.addAction( MenuAction.separator );
 			menu.addAction( MenuAction( "Clear", { this.clear; this.fillMenu( menu ) } ));
