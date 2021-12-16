@@ -289,7 +289,7 @@ UMenuBarIDE {
 
 		if( skipJack.notNil ) { skipJack.stop };
 
-		skipJack = SkipJack( { this.fillWindowsMenu }, 1 );
+		skipJack = SkipJack( { UMenuBarIDE.fillWindowsMenu }, 1 );
 	}
 
 	*add { |name, function, menuName|
