@@ -18,15 +18,15 @@
 */
 
 CodeEditView {
-	
+
 	var <>object, <cs;
 	var <view, <textView, <okButton, <cancelButton, <revertButton, <labelView;
 	var <>action, <>failAction;
-	
+
 	*new { |parent, bounds, object, label, labelHeight = 20|
 		^super.newCopyArgs( object ? {} ).init( parent, bounds, label, labelHeight );
 	}
-	
+
 	init { |parent, bounds, label, labelHeight|
 		var margin, gap, cs, hasParent = false;
 		if( parent.notNil ) { hasParent = true };
@@ -41,8 +41,8 @@ CodeEditView {
 				view.parent.findWindow.name = label;
 			};
 		};
-		textView = TextView( view, 
-				bounds.width @ 
+		textView = TextView( view,
+				bounds.width @
 				(bounds.height-(gap.y+20)) )
 			.resize_( 5 )
 			.hasVerticalScroller_(true)
@@ -54,18 +54,18 @@ CodeEditView {
 
 		view.decorator.nextLine;
 		view.decorator.shift( bounds.width - (3 * (60 + gap.x)) );
-			
+
 		revertButton = SmoothButton( view,  60@20 )
 			.label_( "revert" )
 			.canFocus_( false )
 			.resize_( 9 )
 			.action_({ this.setCode( object ); });
-			
+
 		okButton = SmoothButton( view,  60@20 )
 			.label_( "OK" )
 			.canFocus_( false )
 			.resize_( 9 )
-			.action_( { 
+			.action_( {
 				var obj;
 				obj = { textView.string.interpret }.try;
 				if( obj.notNil ) {
@@ -75,22 +75,22 @@ CodeEditView {
 					failAction.value( this );
 				};
 			} );
-			
+
 		this.setCode( object );
 	}
-	
+
 	setCode { |object|
 		cs = object.asCompileString;
-		
+
 		if( ( /*{*/ cs.last == $} ) && { cs[cs.size-2] != $\n }  ) {
 			/*{*/ cs = cs[..cs.size-2] ++ "\n}";
 		};
-			
+
 		textView.string = cs;
 		textView.syntaxColorize;
 		this.checkChanged;
 	}
-	
+
 	checkChanged {
 		if( textView.string != cs ) {
 			revertButton.enabled = true;
@@ -98,12 +98,12 @@ CodeEditView {
 			revertButton.enabled = false;
 		};
 	}
-	
+
 	resize_ { |resize| view.resize_(resize) }
-	
+
 	ok { okButton.doAction }
 	revert { revertButton.doAction }
-	
+
 	font_ { |font|
 		labelView !? { labelView.font = font };
 		[  revertButton, okButton ].do(_.font_(font));

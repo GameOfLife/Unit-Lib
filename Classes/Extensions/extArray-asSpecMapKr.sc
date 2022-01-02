@@ -13,7 +13,7 @@ x = Synth( "test_map", [ \freq, [220,440,\exp].asSpec ] );
 */
 
 + ControlSpec {
-	
+
 	asControlInput {
 		var curveval, curvenum;
 		curvenum = warp.asSpecifier;
@@ -21,20 +21,20 @@ x = Synth( "test_map", [ \freq, [220,440,\exp].asSpec ] );
 			curveval = curvenum;
 			curvenum = 5;
 		} {
-			curvenum = ( 
-				\lin: 1, 
-				\linear: 1, 
-				\exp: 2, 
-				\exponential: 2, 
-				\cos: 3, 
-				\sin: 4, 
-				\amp: 6, 
+			curvenum = (
+				\lin: 1,
+				\linear: 1,
+				\exp: 2,
+				\exponential: 2,
+				\cos: 3,
+				\sin: 4,
+				\amp: 6,
 				\db: 7
 			)[curvenum ];
 		};
 		^[ minval, maxval, curvenum, curveval ? -2, step ];
 	}
-	
+
 	asOSCArgEmbeddedArray { | array| ^this.asControlInput.asOSCArgEmbeddedArray(array) }
 }
 
@@ -43,12 +43,12 @@ x = Synth( "test_map", [ \freq, [220,440,\exp].asSpec ] );
 	asControlInput {
 		^this.asControlSpec.asControlInput;
 	}
-	
+
 	asOSCArgEmbeddedArray { | array| ^this.asControlInput.asOSCArgEmbeddedArray(array) }
 }
 
 + Array {
-	
+
 	asSpecMapKr { |value = 0|
 		var minval, maxval, curvenum, curve, step;
 		var range, dbrange, ratio, grow, a, b, value_squared, minval_dbamp;
@@ -72,16 +72,16 @@ x = Synth( "test_map", [ \freq, [220,440,\exp].asSpec ] );
 			sin(0.5pi * value) * range + minval, // sin
 			b - (a * pow(grow, value)), // curve
 			if(range >= 0,  // amp
-				value_squared * range + minval, 
-				(1 - (1-value).squared) * range + minval 
+				value_squared * range + minval,
+				(1 - (1-value).squared) * range + minval
 			),
 			Select.kr( dbrange >= 0, [ // db
 				((1 - (1-value).squared) * dbrange + minval_dbamp).ampdb,
-				(value_squared * dbrange + minval_dbamp).ampdb 
+				(value_squared * dbrange + minval_dbamp).ampdb
 			])
 		]).round(step);
 	}
-	
+
 	asSpecUnmapKr { |value = 0|
 		var minval, maxval, curvenum, curve, step;
 		var range, dbrange, ratio, grow, a, b, minval_dbamp, maxval_dbamp, value_dbamp;
@@ -110,7 +110,7 @@ x = Synth( "test_map", [ \freq, [220,440,\exp].asSpec ] );
 				1 - sqrt(1 - ((value - minval) / range))
 			),
 			if(dbrange >= 0, // db
-				((value_dbamp - minval_dbamp) / dbrange).sqrt, 
+				((value_dbamp - minval_dbamp) / dbrange).sqrt,
 				1 - sqrt(1 - ((value_dbamp - minval_dbamp) / dbrange))
 			)
 		]);

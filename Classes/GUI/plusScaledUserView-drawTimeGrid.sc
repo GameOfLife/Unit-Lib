@@ -1,9 +1,9 @@
 + ScaledUserView {
-	
+
 	drawTimeGrid { // assumes that 1px (unscaled) = 1s
 		var viewRect, left, width, left60, round, leftRounded, bnds, scaleAmt;
 		var top, bottom;
-		
+
 		viewRect = this.viewRect;
 		top = viewRect.top;
 		bottom = viewRect.bottom;
@@ -15,10 +15,10 @@
 		bnds = "00:00".bounds( Font( Font.defaultSansFace, 9 ) );
 		bnds.width = bnds.width + 4;
 		scaleAmt = 1/this.scaleAmt.asArray;
-		
+
 		Pen.width = this.pixelScale.x / 2;
 		Pen.color = Color.gray.alpha_(0.25);
-		
+
 		if( viewRect.width < (this.view.bounds.width/4) ) {			width.do({ |i|
 				Pen.line( (i + left) @ top, (i + left) @ bottom );
 			});
@@ -32,14 +32,14 @@
 				Pen.stroke;
 			};
 		};
-		
+
 		Pen.color = Color.white.alpha_(0.75);
 		(width / 60).ceil.do({ |i|
 			i = (i * 60) + left60;
 			Pen.line( i @ top, i @ bottom );
 		});
 		Pen.stroke;
-		
+
 		(width/round).ceil.do({ |i|
 			Pen.use({
 				i = i * round;
@@ -53,7 +53,7 @@
 					SMPTE.global.initSeconds( i+leftRounded ).asMinSec
 						.collect({ |item| item.asInteger.asStringToBase(10,2); })
 						.join($:),
-					2@(bnds.height.neg - 1) 
+					2@(bnds.height.neg - 1)
 				);
 			});
 		});

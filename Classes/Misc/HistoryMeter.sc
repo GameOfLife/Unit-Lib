@@ -6,12 +6,12 @@ HistoryMeter : UserViewHolder {
 	var <color;
 	var <>active = false;
 	var <>interval = 1;
-	
+
 	init { |parent, bounds|
 		super.init( parent, bounds );
 		history = Array.fill( this.bounds.asRect.width, 0);
 	}
-	
+
 	draw {
 		var height, width;
 		height = this.bounds.height;
@@ -26,14 +26,14 @@ HistoryMeter : UserViewHolder {
 		if( color.notNil ) { Pen.color = color; };
 		Pen.fill;
 	}
-	
+
 	clear { history = Array.fill( this.bounds.asRect.width, 0); pos = 0; this.refresh; }
-	
+
 	color_ { |aColor| color = aColor; this.refresh }
-	
+
 	value { history[ pos ] }
-	value_ { |val = 0| 
-		if( this.isClosed.not ) {	
+	value_ { |val = 0|
+		if( this.isClosed.not ) {
 			latestValue = val;
 			if( active ) {
 				if( updated ) {
@@ -47,19 +47,19 @@ HistoryMeter : UserViewHolder {
 				};
 			} {
 				value = val;
-				history[ pos ] = val; 
-				pos = (pos + 1).wrap(0, history.size -1); 
+				history[ pos ] = val;
+				pos = (pos + 1).wrap(0, history.size -1);
 				this.refresh;
 			};
 		}
 	}
-	
+
 	start {
 		routine.stop;
 		routine = Task({
 			while { active && this.isClosed.not } {
 				history[ pos ] = value;
-				pos = (pos + 1).wrap(0, history.size -1); 
+				pos = (pos + 1).wrap(0, history.size -1);
 				updated = true;
 				value = latestValue;
 				this.refresh;
@@ -68,6 +68,6 @@ HistoryMeter : UserViewHolder {
 		}, AppClock ).start;
 		active = true;
 	}
-	
+
 	stop { active = false }
 }

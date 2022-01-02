@@ -18,33 +18,33 @@
 */
 
 UGUI {
-	
+
 	classvar <>nowBuildingUnit;
-	
+
 	var <unit;
-	
+
 	var <parent, <composite, <views, <controller;
 	var <viewHeight = 14, <labelWidth = 80;
 	var <>action;
 	var <>mapSetAction, <>mapCheckers;
-	
+
 	*new { |parent, bounds, unit|
 		^super.newCopyArgs( unit ).init( parent, bounds );
 	}
-	
+
 	init { |inParent, bounds|
 		parent = inParent;
 		if( parent.isNil ) { parent = Window( unit.defName ).front };
 		this.makeViews( bounds );
 	}
-	
+
 	*getHeight { |unit, viewHeight, margin, gap|
 		viewHeight = viewHeight ? 14;
 		margin = margin ?? {0@0};
 		gap = gap ??  {4@4};
 		^(margin.y * 2) + ( this.viewNumLines( unit ) * (viewHeight + gap.y) ) - gap.y;
 	}
-	
+
 	*viewNumLines { |unit|
 		^(unit.argSpecsForDisplay ? [])
 			.collect({|x|
@@ -55,17 +55,17 @@ UGUI {
 				};
 			}).sum;
 	}
-	
+
 	makeViews { |bounds|
 		this.prMakeViews( bounds );
 	}
-	
+
 	prMakeViews { |bounds|
 		var margin = 0@0, gap = 4@4;
-		
+
 		nowBuildingUnit = unit;
-		
-		if( bounds.isNil ) { 
+
+		if( bounds.isNil ) {
 			bounds = parent.asView.bounds.insetBy(4,4);
 			if( parent.asView.class.name == \SCScrollTopView ) {
 				bounds.width = bounds.width - 16;
@@ -77,49 +77,49 @@ UGUI {
 		bounds = bounds.asRect;
 		bounds.height = this.class.getHeight( unit, viewHeight, margin, gap );
 		controller = SimpleController( unit );
-		
+
 		if( unit.isKindOf( MassEditU ) ) {
 			mapCheckers = unit.units.collect({ |unit|
 				if( unit.isKindOf( U ) ) {
-					UMapSetChecker( unit, { mapSetAction.value( this ) } ); 
+					UMapSetChecker( unit, { mapSetAction.value( this ) } );
 				} { nil };
 			}).select(_.notNil);
 			unit.connect;
 		} {
 			mapCheckers = [ UMapSetChecker( unit, { mapSetAction.value( this ) } ) ];
 		};
-		
+
 		composite = CompositeView( parent, bounds ).resize_(2);
 		composite.addFlowLayout( margin, gap );
 		composite.onClose = {
 			if( unit.class == MassEditU ) {
 				unit.disconnect;
-			}; 
+			};
 			controller.remove;
 			mapCheckers.do(_.remove);
 		 };
-		 
+
 		 this.makeSubViews( bounds );
-		 
+
 		 nowBuildingUnit = nil;
 	}
-	
+
 	makeSubViews { |bounds|
 		views = ();
-		
+
 		this.makeHeader(bounds);
-		
+
 		if( GUI.id == \cocoa ) { View.currentDrag = nil; };
-		
+
 		unit.argSpecsForDisplay.do({ |argSpec, i|
 			var vw, key, value;
 			var decLastPos;
 			var umapdragbin;
 			var viewNumLines;
-			
+
 			key = argSpec.name;
 			value = unit.at( key );
-			
+
 			if( argSpec.notNil && (argSpec.spec.viewNumLines != 0)) {
 				if( value.isUMap ) {
 					vw = UMapGUI( composite, composite.bounds.insetBy(0,-24), value );
@@ -132,54 +132,54 @@ UGUI {
 						UMapSetChecker.stall = false;
 					};
 				} {
-					vw = ObjectView( composite, bounds.width * argSpec.width, unit, key, 
+					vw = ObjectView( composite, bounds.width * argSpec.width, unit, key,
 						argSpec.spec, controller,
 						switch( argSpec.mode,
 						 	\nonsynth, { key ++ " (l)" },
 						 	\init, { key ++ " (i)" }
-						 ) 
+						 )
 					);
 					vw.testValue = { |value| value.isKindOf( UMap ).not };
 					vw.action = { action.value( this, key, value ); };
-					
+
 					if( [ \nonsynth ].includes(argSpec.mode).not ) {						viewNumLines = argSpec.spec.viewNumLines;
-						
+
 						composite.decorator.shift( (bounds.width * argSpec.width.neg) - 3, 0 );
-						
+
 						umapdragbin = UDragBin( composite, labelWidth @ viewHeight )
 							.canReceiveDragHandler_({ |vw, x,y|
 								(View.currentDrag.isKindOf( UMapDef ) && {
-									unit.canUseUMap( key, View.currentDrag ); 
+									unit.canUseUMap( key, View.currentDrag );
 								}) or: (View.currentDrag.isKindOf( UMap ) && {
-									unit.canUseUMap( key, View.currentDrag.def ); 
+									unit.canUseUMap( key, View.currentDrag.def );
 								});
 							});
-						
+
 						umapdragbin.receiveDragHandler_({
 							UMapSetChecker.stall = true;
 							unit.insertUMap( key, View.currentDrag );
 							UMapSetChecker.stall = false;
 						});
-						
+
 						composite.decorator.shift( (bounds.width * argSpec.width) - (labelWidth + 3), 0 );
 					};
 				};
 				views[ key ] = vw;
 			}
-		
+
 		});
-		
+
 		if( views.size == 0 ) {
 			controller.remove;
 			mapCheckers.do(_.remove);
 		};
 	}
-	
+
 	makeHeader { }
-	
+
 	resize_ { |resize| composite.resize_(resize) }
 	reset { unit.reset }
-	
+
 	font_ { |font| views.values.do({ |vw| vw.font = font }); }
 	viewHeight_ { |height = 16|
 		views.values.do({ |vw| vw.view.bounds = vw.view.bounds.height_( height ) });
@@ -189,26 +189,26 @@ UGUI {
 		labelWidth = width;
 		views.values.do(_.labelWidth_(width));
 	}
-	
+
 	view { ^composite }
 }
 
 UMapSetChecker {
-	
+
 	classvar <>stallAction;
 	classvar <stall;
-	
+
 	var unit, <>action, argDict;
-	
+
 	*new { |unit, action|
 		^super.newCopyArgs( unit, action ).init;
 	}
-	
+
 	*stall_ { |bool = true|
 		if( bool == false ) { stallAction.value; stallAction = nil; };
 		stall = bool;
 	}
-	
+
 	init {
 		argDict = ();
 		unit.args.pairsDo({ |key, value|
@@ -218,9 +218,9 @@ UMapSetChecker {
 		});
 		unit.addDependant( this );
 	}
-	
+
 	remove { unit.removeDependant( this ) }
-	
+
 	update { |obj, key, value|
 		if( value.isUMap ) {
 			if( argDict[ key ] !== value ) {
@@ -240,7 +240,7 @@ UMapSetChecker {
 					action.value( this, key, value );
 				};
 			};
-		}	
+		}
 	}
 }
 

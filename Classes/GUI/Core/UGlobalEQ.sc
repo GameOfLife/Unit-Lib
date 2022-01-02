@@ -27,39 +27,39 @@ It creates the following private controls automatically:
 
 UGlobalEQ.gui creates a gui for the global EQ. It sends its values to the rootnode of each
 server in the UServerCenter, so that all currently active units get the correct settings.
- 
+
 */
 
 UGlobalEQ {
-	
+
 	classvar <eqSetting;
 	classvar <>ctrl;
 	classvar <>view;
 	classvar <>presets;
-	
+
 	*initClass {
 		Class.initClassTree(EQSetting);
 		this.eqSetting = EQSetting(); // the default eq setting (may change later)
 	}
-	
+
 	*eqSetting_ { |new|
 		eqSetting.removeDependant( this );
 		eqSetting = new;
 		eqSetting.addDependant( this );
 	}
-	
+
 	*ar { |in|
 		var setting, bypass;
-		
+
 		Udef.addBuildSpec( ArgSpec( \u_globalEQ_setting, UGlobalEQ, UGlobalEQ, true ) );
 		setting = \u_globalEQ_setting.kr( eqSetting.asControlInput );
-		
+
 		Udef.addBuildSpec( ArgSpec( \u_globalEQ_bypas, false, BoolSpec(false), true ) );
 		bypass = \u_globalEQ_bypass.kr( 0 );
-		
+
 		^if( bypass, in, eqSetting.ar( in, setting ) );
 	}
-	
+
 	*gui { |parent, bounds|
 		if( view.isNil or: { view.view.isClosed } ) {
 			RoundView.useWithSkin( UChainGUI.skin, {
@@ -70,11 +70,11 @@ UGlobalEQ {
 			^view.front;
 		};
 	}
-	
+
 	*asUGenInput { ^eqSetting.asUGenInput }
 	*asControlInput { ^eqSetting.asControlInput }
 	*asOSCArgEmbeddedArray { | array| ^eqSetting.asOSCArgEmbeddedArray(array) }
-	
+
 	*update { |obj, what ... args|
 		if( what == \setting ) {
 			ULib.servers.do({ |item|
@@ -84,32 +84,32 @@ UGlobalEQ {
 					});
 				} {
 					this.sendServer( item );
-				};	
+				};
 			});
 		};
 	}
-	
+
 	*sendServer { |server|
 		RootNode( server ).set( \u_globalEQ_setting, this );
 	}
-	
+
 	*doesNotUnderstand { |selector ...args|
 		var res;
 		res = eqSetting.perform( selector, *args );
 		if( res != eqSetting ) { ^res }
 	}
-	
+
 	// double as Spec
 	*new { ^this } // only use as class
-	
+
 	*asSpec { ^this }
-	
+
 	*constrain { ^this } // whatever comes in; UGlobalEQ comes out
-	
+
 	*default { ^this }
-	
+
 	*massEditSpec { ^nil }
-	
+
 	*findKey {
 		^Spec.specs.findKeyForValue(this);
 	}

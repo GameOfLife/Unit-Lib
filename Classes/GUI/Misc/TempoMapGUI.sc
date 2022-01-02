@@ -1,16 +1,16 @@
 TempoMapGUI {
-	
+
 	var <tempoMap;
 	var <parent, <scrollView, <composite, <allViews, <localEvents;
 	var <>action;
 	var <viewHeight = 14;
 	var <mode = \bar;
 	var skin;
-	
+
 	*new { |parent, tempoMap, action|
 		^super.new.init( parent, tempoMap, action );
 	}
-	
+
 	init { |inParent, inTempoMap, inAction|
 		var scrollViewHeight;
 		tempoMap = inTempoMap ?? { TempoMap(); };
@@ -24,45 +24,45 @@ TempoMapGUI {
 			.resize_(4);
 		this.makeViews();
 	}
-	
+
 	rebuild {
-		{	
+		{
 			composite.remove;
 			RoundView.useWithSkin( skin, { this.makeViews; });
 		}.defer(0.1);
 	}
-	
+
 	tempoMap_ { |newTempoMap|
 		if( newTempoMap !== tempoMap ) {
 			tempoMap = newTempoMap;
 			this.rebuild;
 		};
 	}
-	
+
 	mode_ { |newMode|
 		if( (mode != newMode) && { [ \time, \bar ].includes( newMode ) } ) {
 			mode = newMode;
 			this.rebuild;
 		};
 	}
-	
-	makeViews {	
+
+	makeViews {
 		var ctrl, font;
-		var bounds = Point( 
-			(160 + (viewHeight * 2)), 
+		var bounds = Point(
+			(160 + (viewHeight * 2)),
 			(viewHeight + 4) * (tempoMap.events.size + 2)
-		);	
-		
+		);
+
 		skin = RoundView.skin;
-			
-		font = RoundView.skin.tryPerform( \at, \font ) ?? { 
-			Font( Font.defaultSansFace, viewHeight - 4) 
+
+		font = RoundView.skin.tryPerform( \at, \font ) ?? {
+			Font( Font.defaultSansFace, viewHeight - 4)
 		};
-		
+
 		localEvents = tempoMap.events.copy;
 		composite = CompositeView( scrollView, bounds);
 		composite.addFlowLayout;
-		
+
 		ctrl = SimpleController( tempoMap )
 			.put( \events, {
 				var currentEvent;
@@ -75,13 +75,13 @@ TempoMapGUI {
 						} {
 							allViews[ i ][ \time ].value = item[2];
 						};
-						allViews[ i ][ \tempo ].value = tempoMap.tempoToBPM( item[0] ) 
+						allViews[ i ][ \tempo ].value = tempoMap.tempoToBPM( item[0] )
 					});
 				};
 			});
-			
+
 		composite.onClose_({ ctrl.remove; });
-	
+
 		PopUpMenu( composite, 90@viewHeight )
 			.items_( [ \time, \bar ] )
 			.value_( [ \time, \bar ].indexOf( mode ) ? 0 )
@@ -91,10 +91,10 @@ TempoMapGUI {
 					this.mode = pu.item;
 				};
 			});
-		
+
 		StaticText( composite, 80@viewHeight ).string_( " bpm" ).font_( font );
 		composite.decorator.nextLine;
-		
+
 		allViews = localEvents.collect({ |item, i|
 			var views, localAction;
 			views = ();
@@ -104,24 +104,24 @@ TempoMapGUI {
 					item[ 1 ] = views[ \bar ].value;
 					item[ 0 ] = tempoMap.bpmToTempo( views[ \tempo ].value );
 					tempoMap.prUpdateTimes;
-					if( i > 1 ) { 
-						allViews[i-1] !? { |vws| vws[\bar].clipHi_( item[ 1 ] - 0.001 ) }; 
+					if( i > 1 ) {
+						allViews[i-1] !? { |vws| vws[\bar].clipHi_( item[ 1 ] - 0.001 ) };
 					};
 					allViews[i+1] !? { |vws| vws[\bar].clipLo_( item[ 1 ] + 0.001 ) };
 				} {
 					item[ 2 ] = views[ \time ].value;
 					item[ 0 ] = tempoMap.bpmToTempo( views[ \tempo ].value );
 					tempoMap.prUpdateBeats;
-					if( i > 1 ) { 
-						allViews[i-1] !? { |vws| vws[\time].clipHi_( item[ 2 ] - 0.001 ) }; 
+					if( i > 1 ) {
+						allViews[i-1] !? { |vws| vws[\time].clipHi_( item[ 2 ] - 0.001 ) };
 					};
 					allViews[i+1] !? { |vws| vws[\time].clipLo_( item[ 2 ] + 0.001 ) };
 				};
 				tempoMap.events = localEvents.copy;
 				action.value;
 			};
-			
-			switch( mode, 
+
+			switch( mode,
 				\time, {
 					views[ \time ] = SMPTEBox( composite, 90@viewHeight )
 						.applySmoothSkin
@@ -134,7 +134,7 @@ TempoMapGUI {
 								0
 							};
 						)
-						.clipHi_( 
+						.clipHi_(
 							if( i != 0 ) {
 								(localEvents[i+1] ? [0,inf,inf])[2] - 0.001
 							} {
@@ -155,26 +155,26 @@ TempoMapGUI {
 								0
 							};
 						)
-						.clipHi_( 
+						.clipHi_(
 							if( i != 0 ) {
-								(localEvents[i+1] ? [0,inf,inf])[1] - 
+								(localEvents[i+1] ? [0,inf,inf])[1] -
 								(0.001/tempoMap.barMap.beatDenom)
 							} {
 								0
 							}
 						)
 						.action_( localAction );
-					
+
 					if( i == 0 ) { views[ \bar ].enabled_( false ) };
 				}
 			);
-				
+
 			views[ \tempo ] = SmoothNumberBox( composite, 50@viewHeight )
 				.font_( font )
 				.clipLo_(1)
 				.value_( tempoMap.tempoToBPM( item[0] ) )
-				.action_( localAction ); 
-				
+				.action_( localAction );
+
 			if( i != 0 ) {
 				views[ \remove ] = SmoothButton( composite, viewHeight@viewHeight )
 					.label_( '-' )
@@ -185,7 +185,7 @@ TempoMapGUI {
 						tempoMap.events = bb;
 						action.value;
 					});
-					
+
 			} {
 				composite.decorator.shift( viewHeight + 4, 0 );
 			};
@@ -193,17 +193,17 @@ TempoMapGUI {
 				.label_( '+' )
 				.action_({
 					if( mode == \bar ) {
-						tempoMap.setBPMAtBeat( 
-							views[ \tempo ].value, views[ \bar ].value + 1, true 
+						tempoMap.setBPMAtBeat(
+							views[ \tempo ].value, views[ \bar ].value + 1, true
 						);
 					} {
-						tempoMap.setBPMAtTime( 
-							views[ \tempo ].value, views[ \time ].value + 1, true 
+						tempoMap.setBPMAtTime(
+							views[ \tempo ].value, views[ \time ].value + 1, true
 						);
 					};
 					action.value;
 				});
-				
+
 			composite.decorator.nextLine;
 			views;
 		});
@@ -216,5 +216,5 @@ TempoMapGUI {
 				action.value;
 			});
 		}
-	
+
 }

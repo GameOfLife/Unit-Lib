@@ -27,16 +27,16 @@
     init{ |parent, bounds|
         this.makeGui(parent, bounds);
         this.addControllers;
-        
+
 		        view = parent ?? { Window.new("UTranportBar",bounds).front };
                         view = CompositeView( parent, bounds.moveTo(0,0) );
                         		view.addFlowLayout(marginH@marginV);
 		//view.background_( Color.white );
 		view.resize_(5);
 		        height = bounds.height - (2*marginV);
-		
-		        
-        
+
+
+
     }
 */
 
@@ -72,7 +72,7 @@ UTransportView {
                 views[\play].value = 0;
 		    };
 		    if( newState == \preparing  ) {
-		        { views[\prepare].start }.defer;
+		        { views[\prepare].start }.defer;
                 views[\pause].value = 2;
 		    };
 		    //resuming
@@ -81,7 +81,7 @@ UTransportView {
 		    };
 		    if( newState == \prepared ) {
 
-                { views[\prepare].stop }.defer;
+                { views[\prepare].stop }.defer;
                 views[\play].value = 2;
 		    };
 		    if( newState == \paused ) {
@@ -144,7 +144,7 @@ UTransportView {
                     }
 
 			});
-			
+
 		views[\pause] = SmoothSimpleButton( parent, 50@height  )
 			.states_( [
 			    [ \pause, Color.black, Color.clear ],

@@ -33,13 +33,13 @@ It creates the following private controls automatically:
 An UEnv is typically applied once in a unit that has output(s) to the hardware buses.
 In UChains it is used internally for releasing, gain and setting the overal level.
 Units containing a UEnv are usually found at the tail of a UChain, and UChains should
-contain at least one unit with a UEnv (otherwise they have no control over fade times, 
+contain at least one unit with a UEnv (otherwise they have no control over fade times,
 duration etc.).
- 
+
 */
 
 UEnv : UIn {
-	
+
 	*initClass {
 		specs.addAll([
 			\dur -> ControlSpec(0, inf),
@@ -52,7 +52,7 @@ UEnv : UIn {
 			\fadeOutCurve -> ControlSpec(-20, 20);
 		]);
 	}
-	
+
 	*kr { |gain = 0, fadeIn = 0, fadeOut = 0, extraSilence = 0, useGlobalGain = 1, ignoreFadeIn = false|
 		var name = this.getControlName( );
 		var gate = this.getControl( \kr, name, 'gate', 1 );
@@ -62,7 +62,7 @@ UEnv : UIn {
 
 		var fadeInCurve = this.getControl( \kr, name, 'fadeInCurve', 0 );
 		var fadeOutCurve = this.getControl( \kr, name, 'fadeOutCurve', 0 );
-		
+
 		if( UGen.buildSynthDef.controlNames.any({ |cn| cn.name == \u_index }) ) {
 			doneAction = doneAction * (1 - \u_index.ir(0).min(1) );
 		};
@@ -72,13 +72,13 @@ UEnv : UIn {
 			fadeIn = this.getControl( \kr, name, 'fadeIn', fadeIn );
 		};
 		fadeOut = this.getControl( \kr, name, 'fadeOut', fadeOut );
-		
-		^DemandEnvGen.kr( 
-				Dseq( [ 0, 1, 1, 0, 0 ], 1 ), 
+
+		^DemandEnvGen.kr(
+				Dseq( [ 0, 1, 1, 0, 0 ], 1 ),
 				Dseq( [ fadeIn, dur - (fadeIn+fadeOut), fadeOut, extraSilence ], 1 ),
-				Dseq( [ 
-					if( fadeInCurve.abs > 0.001, 5, 1 ), 1, 
-					if( fadeOutCurve.abs > 0.001, 5, 1 ),1 ], 
+				Dseq( [
+					if( fadeInCurve.abs > 0.001, 5, 1 ), 1,
+					if( fadeOutCurve.abs > 0.001, 5, 1 ),1 ],
 				1 ),
 				Dseq( [ fadeInCurve, 0, fadeOutCurve, 0 ], 1 ),
 				doneAction: doneAction ) *
@@ -86,7 +86,7 @@ UEnv : UIn {
 				.kr( doneAction, RunningMin.kr( gate ) + Impulse.kr(0) ) *
 			UGlobalGain.kr( useGlobalGain ) * gain.dbamp * (1-mute);
 	}
-	
+
 	*ar { ^this.shouldNotImplement }
 }
 

@@ -18,23 +18,23 @@
 */
 
 PartConvBufferView {
-	
+
 	var <partConvBuffer;
 	var <parent, <view, <views;
 	var <>action;
 	var <viewHeight = 14;
-	
+
 	*new { |parent, bounds, action, partConvBuffer|
 		^super.new.init( parent, bounds, action ).value_( partConvBuffer );
 	}
-	
+
 	init { |parent, bounds, inAction|
 		action = inAction;
 		this.makeView( parent, bounds );
 	}
-	
+
 	doAction { action.value( this ) }
-	
+
 	value { ^partConvBuffer }
 	value_ { |newPartConvBuffer|
 		if( partConvBuffer != newPartConvBuffer ) {
@@ -44,85 +44,85 @@ PartConvBufferView {
 			this.update;
 		};
 	}
-	
+
 	update {
 		if( partConvBuffer.notNil ) { this.setViews( partConvBuffer ) };
 	}
-	
+
 	resize_ { |resize|
 		view.resize = resize ? 5;
 	}
-	
+
 	remove {
-		if( partConvBuffer.notNil ) { 
+		if( partConvBuffer.notNil ) {
 			partConvBuffer.removeDependant( this );
 		};
 	}
-	
+
 	setViews { |inPartConvBuffer|
-		
+
 		views[ \path ].value = inPartConvBuffer.path;
 		if( File.exists( inPartConvBuffer.path.getGPath ? "" ) ) {
 			views[ \path ].stringColor = Color.black;
 		} {
 			views[ \path ].stringColor = Color.red(0.66);
 		};
-		
-		{ views[ \duration ].string = (inPartConvBuffer.duration ? 0).asSMPTEString(1000); }.defer;		
+
+		{ views[ \duration ].string = (inPartConvBuffer.duration ? 0).asSMPTEString(1000); }.defer;
 	}
-	
+
 	setFont { |font|
 		font = font ??
-			{ RoundView.skin !? { RoundView.skin.font } } ?? 
+			{ RoundView.skin !? { RoundView.skin.font } } ??
 			{ Font( Font.defaultSansFace, 10 ) };
-		
+
 		{
 			views[ \durationLabel ].font = font;
 			views[ \duration ].font = font;
 			views[ \operations ].font = font;
 		}.defer;
-		
+
 		views[ \path ].font = font;
 		views[ \plot ].font = font;
 	}
-	
+
 	performPartConvBuffer { |selector ...args|
 		if( partConvBuffer.notNil ) {
 			^partConvBuffer.perform( selector, *args );
-		} { 
+		} {
 			^nil
 		};
 	}
-	
+
 	*viewNumLines { ^4 }
-	
+
 	makeView { |parent, bounds, resize|
-		
+
 		if( bounds.isNil ) { bounds= 350 @ (this.class.viewNumLines * (viewHeight + 4)) };
-		
+
 		view = EZCompositeView( parent, bounds, gap: 4@4 );
 		bounds = view.asView.bounds;
 		view.onClose_({ this.remove; });
 		view.resize_( resize ? 5 );
 		views = ();
-		
+
 		views[ \path ] = FilePathView( view, bounds.width @ ( (viewHeight * 2) + 4) )
 			.resize_( 2 )
 			.action_({ |fv|
-				if( fv.value.notNil && { 
-					(fv.value.pathExists != false) && { fv.value.extension.toLower != "partconv" } 
+				if( fv.value.notNil && {
+					(fv.value.pathExists != false) && { fv.value.extension.toLower != "partconv" }
 					}
 				) {
 					SCAlert( "The file '%' doesn't appear to be a .partconv file\ndo you want to convert it?"
 							.format( fv.value.basename ),
-					 	[ "use anyway", "convert" ], 
-					 	[{ 
+					 	[ "use anyway", "convert" ],
+					 	[{
 							this.performPartConvBuffer( \path_ , fv.value );
 							this.performPartConvBuffer( \fromFile );
 							action.value( this );
 						}, {
-							PartConvBuffer.convertIRFile( fv.value, 
-								server: ULib.servers, 
+							PartConvBuffer.convertIRFile( fv.value,
+								server: ULib.servers,
 								action: { |path| fv.value = path; fv.doAction }
 							);
 						}]
@@ -133,7 +133,7 @@ PartConvBufferView {
 					action.value( this );
 				};
 			});
-			
+
 		views[ \operations ] = PopUpMenu( view, 80 @ viewHeight )
 			.applySkin( RoundView.skin ? () )
 			.items_( [
@@ -152,11 +152,11 @@ PartConvBufferView {
 				switch( pu.value.asInteger,
 					2, { // convert ir file
 						CocoaDialog.getPaths({ |paths|
-							PartConvBuffer.convertIRFile( paths[0], 
-								server: ULib.servers, 
-								action: { |path| 
-									views[ \path ].value = path; 
-									views[ \path ].doAction 
+							PartConvBuffer.convertIRFile( paths[0],
+								server: ULib.servers,
+								action: { |path|
+									views[ \path ].value = path;
+									views[ \path ].doAction
 								}
 							)
 						});
@@ -178,21 +178,21 @@ PartConvBufferView {
 										PartConvBuffer.convertIRFile(
 											PartConvBuffer.generateDanStowelIR( views[ \genDur ].value ),
 											path.replaceExtension( "partconv" ),
-											ULib.servers, 
-											{ |path| 
-												views[ \path ].value = path; 
-												views[ \path ].doAction 
+											ULib.servers,
+											{ |path|
+												views[ \path ].value = path;
+												views[ \path ].doAction
 											}
 										)
 									});
 								});
-								
+
 							closeFunc = { views[ \genWindow ] !? (_.close); };
-							
+
 							views[ \operations ].onClose = views[ \operations ].onClose.addFunc( closeFunc );
-							
-							views[ \genWindow ].onClose = { 
-								views[ \operations ].onClose.removeFunc( closeFunc ); 
+
+							views[ \genWindow ].onClose = {
+								views[ \operations ].onClose.removeFunc( closeFunc );
 								views[ \genWindow ] = nil;
 							};
 						} {
@@ -213,10 +213,10 @@ PartConvBufferView {
 							};
 							Dialog.savePanel({ |path|
 								var res;
-								res = pth.asPathFromServer.moveTo( path.dirname ); 
+								res = pth.asPathFromServer.moveTo( path.dirname );
 								if( res ) {
 									this.performPartConvBuffer( \path_ ,
-										path.dirname +/+ pth.basename 
+										path.dirname +/+ pth.basename
 									);
 								};
 							});
@@ -227,10 +227,10 @@ PartConvBufferView {
 						if( pth.notNil ) {
 							Dialog.savePanel({ |path|
 								var res;
-								res = pth.getGPath.asPathFromServer.copyTo( path.dirname ); 
+								res = pth.getGPath.asPathFromServer.copyTo( path.dirname );
 								if( res ) {
 									this.performPartConvBuffer( \path_ ,
-										path.dirname +/+ pth.basename 
+										path.dirname +/+ pth.basename
 									);
 								};
 							});
@@ -243,7 +243,7 @@ PartConvBufferView {
 							Dialog.savePanel({ |path|
 								var res;
 								path =  path.replaceExtension( ext );
-								res = pth.getGPath.asPathFromServer.copyFile(  path ); 
+								res = pth.getGPath.asPathFromServer.copyFile(  path );
 								if( res ) {
 									this.performPartConvBuffer( \path_ , path );
 								};
@@ -253,21 +253,21 @@ PartConvBufferView {
 				);
 				pu.value = 0;
 			});
-			
+
 		views[ \plot ] = SmoothButton( view, 40 @ viewHeight )
 			.radius_( 3 )
 			.border_( 1 )
 			.resize_( 3 )
 			.label_( "plot" )
 			.action_({ |bt|
-				
+
 				// this will have to go in a separate class
 				var w, a, f, b, x;
 				var closeFunc;
-				
+
 				x = partConvBuffer;
 				f = this.performPartConvBuffer( \asSoundFile );
-				
+
 				w = Window(f.path, Rect(200, 200, 850, 400), scroll: false);
 				a = SCSoundFileView.new(w, w.view.bounds);
 				a.resize_(5);
@@ -279,26 +279,26 @@ PartConvBufferView {
 				a.waveColors = Color.gray(0.2)!16;
 				w.front;
 				a.background = Gradient( Color.white, Color.gray(0.7), \v );
-				
+
 				closeFunc = { w.close; };
-				
+
 				w.onClose = { bt.onClose.removeFunc( closeFunc ) };
-				
+
 				bt.onClose = bt.onClose.addFunc( closeFunc );
-					
+
 			});
-			
+
 		view.view.decorator.nextLine;
-					
+
 		views[ \durationLabel ] = StaticText( view, 40 @ viewHeight )
 			.applySkin( RoundView.skin ? () )
 			.string_( "duration" );
-		
+
 		views[ \duration ] = StaticText( view, (bounds.width - 88) @ viewHeight )
 			.resize_( 2 )
 			.applySkin( RoundView.skin ? () );
-		
+
 		this.setFont;
 	}
-	
+
 }

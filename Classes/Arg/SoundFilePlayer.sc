@@ -23,10 +23,10 @@
 //	[ bufnum, rate, loop ]
 
 BufSndFilePlayer {
-	
+
 	// *getArgs may also be used to feed other buffer playing UGens
 	//	the list is formed according to PlayBuf arguments
-	
+
 	*getArgs { |numChannels = 1, key, trigger = 1, startPos, ugenRate = \audio| // user may override startPos
 		var bufnum, rate, loop, startFrame;
 		key = key ? 'soundFile';
@@ -36,17 +36,17 @@ BufSndFilePlayer {
 		if( ugenRate == \control ) { startFrame = startFrame / (SampleRate.ir / ControlRate.ir); };
 		^[ numChannels, bufnum, BufRateScale.kr( bufnum ) * rate, trigger, startFrame, loop ];
 	}
-	
+
 	*ar { |numChannels = 1, key, trigger = 1, startPos, doneAction = 0|
 		Udef.addBuildSpec(ArgSpec(key ? 'soundFile', nil, BufSndFileSpec(nil) ) );
 		^PlayBuf.ar( *this.getArgs( numChannels, key, trigger, startPos ) ++ [ doneAction ] );
 	}
-	
+
 	*kr { |numChannels = 1, key, trigger = 1, startPos, doneAction = 0|
 		Udef.addBuildSpec(ArgSpec(key ? 'soundFile', nil, BufSndFileSpec(nil) ) );
 		^PlayBuf.kr( *this.getArgs( numChannels, key, trigger, startPos, \control ) ++ [ doneAction ]  );
 	}
-	
+
 }
 
 
@@ -55,7 +55,7 @@ BufSndFilePlayer {
 //	[ bufnum, rate, loop ]
 
 DiskSndFilePlayer {
-	
+
 	*ar { |numChannels = 1, key|
 		var bufnum, rate, loop;
 		key = key ? 'soundFile';
@@ -63,5 +63,5 @@ DiskSndFilePlayer {
 		Udef.addBuildSpec(ArgSpec(key ? 'soundFile', nil, DiskSndFileSpec(nil) ) );
 		^VDiskIn.ar( numChannels, bufnum, BufRateScale.kr( bufnum ) * rate, loop );
 	}
-	
+
 }

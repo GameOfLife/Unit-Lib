@@ -53,18 +53,18 @@ UArchivable {
 	    };
 	    filePath = pathname;
     }
-    
+
     textArchiveFileExtension { ^nil }
 
     write { |path, overwrite=false, ask=true, successAction, cancelAction|
 	    var writeFunc;
 	    writeFunc = { |overwrite, ask, path|
 		    var text;
-		    
+
 		    GlobalPathDict.relativePath = path.dirname;
 		    text = this.asTextArchive;
 		    GlobalPathDict.relativePath = nil;
-		    
+
 		    if( this.textArchiveFileExtension.notNil ) {
 			    path = path.replaceExtension( this.textArchiveFileExtension );
 		    };
@@ -131,7 +131,7 @@ UArchivable {
 	}
 
 	onSaveAction{ this.subclassResponsibility(thisMethod) }
-	
+
 	readTextArchiveAction{ this.subclassResponsibility(thisMethod) }
 
 }

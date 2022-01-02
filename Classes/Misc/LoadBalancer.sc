@@ -20,37 +20,37 @@
 // a LoadBalancer holds a set of servers and their approximate cpu loads
 
 LoadBalancer {
-	
+
 	classvar <>all;
-	
+
 	var <servers;
 	var <>name;
 	var <>loads;
 	var <>verbose = false;
-	
+
 	*initClass { all = [] }
-	
+
 	*new { |...servers|
 		^super.newCopyArgs( servers ).init.addToAll;
 	}
-	
+
 	at { |index = 0| ^servers.at( index ) }
-	
+
 	init {
 		loads = 0!servers.size;
 	}
-	
+
 	indexOf { |server|
 		^servers.indexOf( server );
 	}
-	
+
 	addServer { |server|
 		if( servers.includes( server ).not ) {
 			servers = servers.add( server );
 			loads = loads.add(0);
 		};
 	}
-	
+
 	removeServer { |server|
 		var index;
 		index = this.indexOf( server );
@@ -61,17 +61,17 @@ LoadBalancer {
 			^nil
 		};
 	}
-	
+
 	addToAll {
 		if( all.includes( this ).not ) {
 			all = all.add( this );
 		};
 	}
-	
+
 	removeFromAll {
 		all.remove( this );
 	}
-	
+
 	addLoad { |server, load = 0|
 		var index;
 		index = this.indexOf( server );
@@ -85,7 +85,7 @@ LoadBalancer {
 			loads[ index ] = loads[ index ] + load;
 		};
 	}
-	
+
 	setLoad { |server, load = 0|
 		var index;
 		index = this.indexOf( server );
@@ -96,13 +96,13 @@ LoadBalancer {
 			loads[ index ] = load;
 		};
 	}
-	
+
 	reset { this.init }
-	
+
 	lowest {
 		^servers[ loads.minIndex ];
 	}
-	
+
 	asTarget { |addLoad = 0|
 		var server;
 		server = this.lowest;
@@ -119,34 +119,34 @@ LoadBalancer {
 		*/
 		^server.asTarget;
 	}
-	
+
 	latency { ^servers[0].latency }
-	
+
 	latency_ { |latency| servers.do(_.latency_(latency)); }
-	
+
 	doesNotUnderstand { |selector ...args|
 		var res;
-		servers[0] !? { 
+		servers[0] !? {
 			res = servers[0].perform( selector, *args );
 		};
 		if( res == servers[0] ) { ^this } { ^res };
 	}
-	
+
 	asArray { ^servers }
 }
 
 + Server {
-	
+
 	loadBalancerAddLoad { |load = 0|
 		LoadBalancer.all.do({ |lb|
 			lb.addLoad( this, load );
 		});
 	}
-	
+
 	loadBalancerSetLoad { |load = 0|
 		LoadBalancer.all.do({ |lb|
 			lb.setLoad( this, load );
 		});
 	}
-	
+
 }

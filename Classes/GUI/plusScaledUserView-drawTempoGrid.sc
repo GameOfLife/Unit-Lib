@@ -1,5 +1,5 @@
 + ScaledUserView {
-	
+
 	drawTempoGrid { |tempoMap|
 		var viewRect, pixelScale;
 		var barLines, firstBar;
@@ -24,11 +24,11 @@
 		firstBar = tempoMap.barAtTime(barLines.first ? 0)[0];
 		signatures = tempoMap.signaturesBetween( viewRect.left, viewRect.right );
 		tempos = tempoMap.bpmsBetween( viewRect.left, viewRect.right );
-		
+
 		Pen.color = Color.gray.alpha_(0.25);
-		
+
 		if( viewRect.width < (this.view.bounds.width/100) ) {
-			Pen.use({	
+			Pen.use({
 				if( GUI.id == \cocoa ) {
 					Pen.width = pixelScale.x / 2;
 					Pen.lineDash_( FloatArray[ 0.5, 0.5 ] );
@@ -41,7 +41,7 @@
 				Pen.stroke;
 			});
 		};
-		
+
 		if( viewRect.width < (this.view.bounds.width/4) ) {
 			Pen.width = pixelScale.x / 2;
 			tempoMap.divisionLines( viewRect.left, viewRect.right ).do({ |i|
@@ -49,7 +49,7 @@
 			});
 			Pen.stroke;
 		};
-		
+
 		if( viewRect.width < (this.view.bounds.width) ) {
 			Pen.width = pixelScale.x;
 			barLines.do({ |i|
@@ -57,7 +57,7 @@
 			});
 			Pen.stroke;
 		};
-		
+
 		Pen.color = Color.white.alpha_(0.75);
 		Pen.width = pixelScale.x;
 		(width / 60).ceil.do({ |i|
@@ -65,7 +65,7 @@
 			Pen.line( i @ top, i @ bottom );
 		});
 		Pen.stroke;
-		
+
 		(barLines ? [])[0,round..].do({ |item, i|
 			Pen.use({
 				var string, bnds;
@@ -80,11 +80,11 @@
 				Pen.color = Color.white.alpha_(0.5);
 				Pen.stringAtPoint(
 					string,
-					2@(bnds.height.neg - 1) 
+					2@(bnds.height.neg - 1)
 				);
 			});
 		});
-		
+
 		temposSignatures = signatures.collect({ |item, i|
 			var tempo;
 			tempo = tempos.detect({ |t|
@@ -97,11 +97,11 @@
 				[ [ item[0].join("/") ], item[1] ]
 			};
 		});
-		
-		temposSignatures = temposSignatures.addAll( 
+
+		temposSignatures = temposSignatures.addAll(
 			tempos.collect({ |item| [ [ item[0] ], item[1] ] })
 		);
-		
+
 		temposSignatures.do({ |item, i|
 			Pen.use({
 				var string, bnds;
@@ -116,7 +116,7 @@
 				Pen.color = Color.white.alpha_(0.5);
 				Pen.stringAtPoint(
 					string,
-					2@((bnds.height.neg*2) -1) 
+					2@((bnds.height.neg*2) -1)
 				);
 			});
 		});

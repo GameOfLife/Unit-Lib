@@ -1,11 +1,11 @@
 MIDISpec : Spec {
-	
+
 	classvar <>valueSpecs, <>typeSpecs;
-	
+
 	var <>types, <>defaultType = \noteOn;
-	
+
 	*initClass {
-		
+
 		valueSpecs = (
 			\chan: MIDINumberSpec(maxval:15),
 			\note: MIDINoteSpec(),
@@ -14,7 +14,7 @@ MIDISpec : Spec {
 			\val: MIDIValueSpec(),
 			\bend: MIDIValueSpec(maxval:16383, default:8192)
 		);
-		
+
 		typeSpecs = (
 			\noteOn: [ \chan, \note, \velo ],
 			\noteOff: [ \chan, \note, \velo ],
@@ -25,17 +25,17 @@ MIDISpec : Spec {
 			\pitchBend: [ \chan, \val ]
 		);
 	}
-	
+
 	getNames { |type|
 		^typeSpecs[ type ];
 	}
-	
+
 	getSpecs { |type|
 		^this.getNames( type ).collect({ |item|
 			valueSpecs[ item ];
 		});
 	}
-	
+
 	constrain { |array| // outputs an array [ type, channel, val1 (, val2) ]
 		var type, specs;
 		if( array.size == 0 ) {
@@ -55,7 +55,7 @@ MIDISpec : Spec {
 			};
 		};
 		specs = this.getSpecs( type );
-		if( specs.isNil ) { 
+		if( specs.isNil ) {
 			type = defaultType;
 			specs = this.getSpecs( type );
 		};
@@ -64,39 +64,39 @@ MIDISpec : Spec {
 			specs[i].constrain( item );
 		});
 	}
-	
-	
+
+
 }
 
 MIDIValueSpec : ControlSpec {
-	
+
 	var <>allowNil = false;
-	
+
 	*new {  arg minval=0, maxval=127, warp='lin', step=1, default, units;
 		^super.newCopyArgs(minval, maxval, warp, step,
 				default ? 0, units ? ""
 			).init
 	}
-	
+
 	constrain { arg value; // allows nil
 		^if( value.notNil ) { value.asFloat.clip(clipLo, clipHi).round(step) } {
-			if( allowNil.not ) { default } 
+			if( allowNil.not ) { default }
 		};
 	}
 }
 
 MIDINumberSpec : MIDIValueSpec {
-	
+
 	*new {  arg minval=0, maxval=127, warp='lin', step=1, default, units;
 		^super.newCopyArgs(minval, maxval, warp, step,
 				default ? 0, units ? ""
 			).init
 	}
-	
+
 }
 
 MIDINoteSpec : MIDIValueSpec {
-	
+
 	*new {  arg minval=0, maxval=127, warp='lin', step=1, default, units;
 		^super.newCopyArgs(minval, maxval, warp, step,
 				default ? 60, units ? ""

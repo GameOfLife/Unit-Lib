@@ -1,5 +1,5 @@
 + Buffer {
-	
+
 	*uSendCollection { |server, collection, numChannels = 1, wait = 0.02, action|
 		var buffer = this.alloc(server, ceil(collection.size / numChannels), numChannels);
 		var pos, collstream, collsize, bundsize;
@@ -22,5 +22,5 @@
 		};
 		^buffer;
 	}
-	
+
 }

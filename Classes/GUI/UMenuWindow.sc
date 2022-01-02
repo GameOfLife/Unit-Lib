@@ -19,35 +19,35 @@
 
 
 UMenuWindow {
-	
+
 	classvar <>window, <font;
 	classvar <>sessionMenu, <>scoreMenu, <>viewMenu;
 	classvar <>sessionDict, <>scoreDict, <>viewDict;
-	
+
 	*initClass {
 		sessionDict = MultiLevelIdentityDictionary();
 		scoreDict = MultiLevelIdentityDictionary();
 		viewDict = MultiLevelIdentityDictionary();
-		
+
 	}
-	
-	*new { 
+
+	*new {
 		if( window.notNil && { window.isClosed.not } ) {
 			window.front;
 		} {
 			this.makeWindow;
 		};
 	}
-	
+
 	*makeWindow {
-		
+
 		if( font.class != Font.implClass ) { font = nil };
-		
+
 		font = font ?? { Font( Font.defaultSansFace, 12 ); };
-		
+
 		window = Window( "UMenuWindow", Rect(0, Window.screenBounds.height - 30, 428, 30) ).front;
 		window.addFlowLayout;
-		
+
 		sessionMenu = PopUpTreeMenu(window, 120@20 )
 			.font_( font )
 			.background_( Color.white(0.1) )
@@ -60,7 +60,7 @@ UMenuWindow {
 					'Save as...', { USession.current !? _.saveAs },
 					' ', (),
 					'Add', OEM(
-						'New', OEM( 
+						'New', OEM(
 							'UChain', { USession.current !? _.add(UChain()) },
 							'UChainGroup', { USession.current !? _.add(UChainGroup()) },
 							'UScore', { USession.current !? _.add(UScore()) },
@@ -106,8 +106,8 @@ UMenuWindow {
 								USession.current !? { |session|
 									UScoreEditorGUI.current !? { |editor|
 										editor.selectedEvents !? { |events|
-											session.add( 
-												UChainGroup( 
+											session.add(
+												UChainGroup(
 												    *events.collect{ |x|
 												         x.deepCopy.getAllUChains
 												    }.flat
@@ -121,10 +121,10 @@ UMenuWindow {
 								USession.current !? { |session|
 									UScoreEditorGUI.current !? { |editor|
 										editor.selectedEvents !? { |events|
-											session.add( 
+											session.add(
 												UScore(
 												    *events.collect{ |x|
-											 	        x.deepCopy.getAllUChains 
+											 	        x.deepCopy.getAllUChains
 											 	    }.flat
 											 	)
 											)
@@ -141,8 +141,8 @@ UMenuWindow {
 			.action_({ |vw, value|
 				vw.value = [ 'Session' ];
 				vw.tree.atPath( value ).value;
-			});	
-		
+			});
+
 		scoreMenu = PopUpTreeMenu(window, 150@20 )
 			.font_( font )
 			.background_( Color.white(0.1) )
@@ -153,9 +153,9 @@ UMenuWindow {
 					'Open...', { UScore.open(nil, UScoreEditorGUI(_) ); },
 					'Save', { UScore.current !? _.save; },
 					'Save as...', { UScore.current !! _.saveAs; },
-					' ', (), 
+					' ', (),
 					'Export as audio file...', {
-						UScore.current !? { |x| 
+						UScore.current !? { |x|
 							Dialog.savePanel({ |path|
 								x.writeAudioFile( path );
 							});
@@ -168,27 +168,27 @@ UMenuWindow {
 					'Delete', { UScoreEditorGUI.current !? { |x| x.scoreView.deleteSelected } },
 					'   ', (),
 					'Copy', { UScoreEditorGUI.currentSelectedEvents !? UScoreEditor.copy(_) },
-					'Paste', { 
+					'Paste', {
 						UScoreEditorGUI.current !? { |x|
-							x.scoreView.currentEditor.pasteAtCurrentPos 
+							x.scoreView.currentEditor.pasteAtCurrentPos
 						};
 					},
 					'    ', (),
-					'Clean overlaps', { 
+					'Clean overlaps', {
 						UScoreEditorGUI.current !? { |x| x.score.cleanOverlaps }
 					},
 					'Sort Events', {
 						UScoreEditorGUI.current !! { |x|
-							UScore.current.events.sort; 
+							UScore.current.events.sort;
 							UScore.current.changed( \numEventsChanged );
-							UScore.current.changed( \something ); 
+							UScore.current.changed( \something );
 						};
 					},
-					'Remove empty tracks', { 
+					'Remove empty tracks', {
 						UScoreEditorGUI.current !? { |x| x.score.removeEmptyTracks }
 					},
 					'     ', (),
-					'Disable selected', { 
+					'Disable selected', {
 						UScoreEditorGUI.current !! { |x| x.scoreView.disableSelected }
 					},
 					'Enable selected', {
@@ -196,18 +196,18 @@ UMenuWindow {
 					},
 					'      ', (),
 					'Add Track', { UScoreEditorGUI.current !! { |x| x.scoreView.addTrack } },
-					'Remove Unused Tracks', { 
+					'Remove Unused Tracks', {
 						UScoreEditorGUI.current !! { |x| x.scoreView.removeUnusedTracks }
 					}
 				)
 			)
-			.sortFunc_({true}) 
+			.sortFunc_({true})
 			.value_( [ 'Score' ] )
 			.action_({ |vw, value|
 				vw.value = [ 'Score' ];
 				vw.tree.atPath( value ).value;
-			});	
-		
+			});
+
 		viewMenu = PopUpTreeMenu(window, 140@20 )
 			.font_( font )
 			.background_( Color.white(0.1) )
@@ -220,12 +220,12 @@ UMenuWindow {
 					'Level meters', { ULib.servers.first.meter; }
 				)
 			)
-			.sortFunc_({true}) 
+			.sortFunc_({true})
 			.value_( [ 'View' ] )
 			.action_({ |vw, value|
 				vw.value = [ 'View' ];
 				vw.tree.atPath( value ).value;
-			});	
+			});
 	}
-	
+
 }

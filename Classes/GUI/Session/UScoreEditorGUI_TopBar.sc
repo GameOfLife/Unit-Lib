@@ -46,7 +46,7 @@ UScoreEditorGui_TopBar {
     }
 
     addScoreEditorController{
-	    
+
         if(scoreEditorController.notNil) {
                 scoreEditorController.remove;
         };
@@ -82,15 +82,15 @@ UScoreEditorGui_TopBar {
     makeGui{ |parent, bounds|
         var font = Font( Font.defaultSansFace, 11 ), size, marginH, marginV;
 		views = ();
-		
+
 	    marginH = 2;
 	    marginV = 2;
 		size = bounds.height - (2*marginV);
-		
+
         header = CompositeView( parent, bounds );
-        
+
         RoundView.pushSkin( UChainGUI.skin );
-        
+
 		header.addFlowLayout(marginH@marginV);
 		header.resize_(2);
 
@@ -120,21 +120,21 @@ UScoreEditorGui_TopBar {
 				    scoreView.currentEditor.addEvent
 				}
 			});
-			
+
 		SmoothButton( header, size@size )
 			.states_( [[ { |bt, rect|
 				var square;
-				square = Rect.aboutPoint( rect.center, 
-						rect.width.min( rect.height ) / 5, 
+				square = Rect.aboutPoint( rect.center,
+						rect.width.min( rect.height ) / 5,
 						rect.width.min( rect.height ) / 4 );
-						
+
 				Pen.line( square.leftBottom, square.leftTop );
 				Pen.lineTo( square.rightTop );
 				Pen.lineTo( square.right @ (square.top + (square.height / 2) ) );
 				Pen.lineTo( square.left @ (square.top + (square.height / 2) ) );
 				Pen.lineTo( square.leftBottom );
 				Pen.fillStroke;
-				
+
 			 } ]] )
 			.canFocus_(false)
 			.action_({
@@ -152,7 +152,7 @@ UScoreEditorGui_TopBar {
 			.action_({
 				this.selectedEventsOrAll !? { |x| this.scoreEditor.trimEventsStartAtPos( x ) }
 			});
-		
+
 		header.decorator.shift(-1);
 
 		SmoothButton( header, size@size  )
@@ -163,7 +163,7 @@ UScoreEditorGui_TopBar {
 			.action_({
 				this.selectedEventsOrAll !? { |x| this.scoreEditor.splitEventsAtPos( x ) }
 			});
-			
+
 		header.decorator.shift(-1);
 
 		SmoothButton( header, size@size  )
@@ -186,7 +186,7 @@ UScoreEditorGui_TopBar {
 			.action_({
 				this.scoreEditor.undo
 			});
-			
+
 		header.decorator.shift(-1);
 
 		views[\redo] = SmoothButton( header, (size * 0.8)@size )
@@ -200,7 +200,7 @@ UScoreEditorGui_TopBar {
 			});
 
 		header.decorator.shift(-5);
-		
+
 		views[ \disableUndo ] = SmoothButton( header, 9@9 )
 			.states_( [ ['+'], ['-'] ] )
 			.hiliteColor_( nil )
@@ -208,18 +208,18 @@ UScoreEditorGui_TopBar {
 			.canFocus_(false)
 			.action_({ |bt|
 				switch( bt.value,
-					1, { 
-						UScoreEditor.enableUndo = true; 
+					1, {
+						UScoreEditor.enableUndo = true;
 						this.scoreEditor.changed( \undo );
 					},
-					0, { 
+					0, {
 						UScoreEditor.enableUndo = false;
 						this.scoreEditor.clearUndo;
 						this.scoreEditor.changed( \undo );
 					}
-				);  
+				);
 			});
-		
+
 		header.decorator.shift(10);
 
 		SmoothButton( header, size@size  )
@@ -228,7 +228,7 @@ UScoreEditorGui_TopBar {
 			.action_({ |b|
 				this.selectedEvents !? { |x|  this.scoreEditor.toggleDisableEvents( x ) }
 			});
-			
+
 		SmoothButton( header, size@size  )
 			.states_( [[ \lock, Color.black, Color.clear ]] )
 			.canFocus_(false)
@@ -244,7 +244,7 @@ UScoreEditorGui_TopBar {
                         	this.scoreEditor.folderFromEvents(x);
 				}
 			});
-			
+
 		SmoothButton( header, 40@size  )
 			.states_( [[ "unfold" , Color.black, Color.clear ]] )
 			.canFocus_(false)
@@ -271,10 +271,10 @@ UScoreEditorGui_TopBar {
 			.resize_(3);
 
 		PopUpMenu( header, 55@size )
-			.items_( [ 
+			.items_( [
 				"off", "cf",
-				"0.001", "0.01", "0.1", 
-				"1/32", "1/16", "1/12", "1/8", "1/6", "1/5", "1/4", "1/3", "1/2", "1" 
+				"0.001", "0.01", "0.1",
+				"1/32", "1/16", "1/12", "1/8", "1/6", "1/5", "1/4", "1/3", "1/2", "1"
 			] )
 			.canFocus_(false)
 			.font_( font )
@@ -285,8 +285,8 @@ UScoreEditorGui_TopBar {
 					{ scoreView.snapActive = false; }
 					{ scoreView.snapActive = true; };
 
-				scoreView.snapH = (1/[inf, 
-					ULib.servers[0].options.sampleRate ? 44100 / 
+				scoreView.snapH = (1/[inf,
+					ULib.servers[0].options.sampleRate ? 44100 /
 					ULib.servers[0].options.blockSize,
 				1000,100,10,32,16,12,8,6,5,4,3,2,1])[ v.value ];
 				});
@@ -296,9 +296,9 @@ UScoreEditorGui_TopBar {
 			.resize_(3)
 			.canFocus_(false)
 			.action_({
-				this.selectedEvents !? { |x| 
+				this.selectedEvents !? { |x|
 					this.scoreEditor.quantizeEvents(
-						x, scoreView.snapH, scoreView.showTempoMap 
+						x, scoreView.snapH, scoreView.showTempoMap
 					)
 				} ?? {
 					this.scoreEditor.quantizePos( scoreView.snapH, scoreView.showTempoMap );
@@ -318,7 +318,7 @@ UScoreEditorGui_TopBar {
 			.action_({ |v|
 				scoreView.usessionMouseEventsManager.mode = v.items[v.value].asSymbol;
 			});
-			
+
 		RoundView.popSkin;
 
     }

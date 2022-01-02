@@ -38,7 +38,7 @@ USession : UArchivable{
         ^[UChain,UChainGroup,UScore,UScoreList]
     }
 
-    at { |...path| 
+    at { |...path|
 		 var out;
 		 out = objects;
 		 path.do({ |item|
@@ -100,7 +100,7 @@ USession : UArchivable{
         chains.do(_.prepareAndStart(targets))
         ^chains
     }
-    
+
     startScores { |targets|
         var scores = objects.select(_.isUScoreLike);
         scores.do(_.prepareAndStart(targets))
@@ -118,11 +118,11 @@ USession : UArchivable{
 	}
 
 	storeArgs { ^this.getInitArgs }
-	
+
 	textArchiveFileExtension { ^"usession" }
 
 	onSaveAction { this.name = filePath.basename.removeExtension }
-	
+
 	readTextArchiveAction{ this.name = filePath.basename.removeExtension }
 
 	name_ { |x| name = x; this.changed(\name) }

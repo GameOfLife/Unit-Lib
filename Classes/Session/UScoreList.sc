@@ -36,8 +36,8 @@ UScoreList : UEvent {
             score
         });
     }
-    
-      at { |...path| 
+
+      at { |...path|
 		 var out;
 		 out = scores;
 		 path.do({ |item|
@@ -95,7 +95,7 @@ UScoreList : UEvent {
     release{ ^this.stop }
 
     gui { }
-    
+
     storeArgs { ^scores }
 
 }

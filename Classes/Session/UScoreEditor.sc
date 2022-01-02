@@ -80,9 +80,9 @@ UScoreEditor {
 		redoSize = 0;
 		this.changed(\something);
 	}
-	
+
 	storeUndoState {
-		if( enableUndo ) {	
+		if( enableUndo ) {
 			undoStates.wrapPut( undoPos, score.events.collect( _.copy ) );
 			undoPos = undoPos + 1;
 			undoSize = (undoSize + 1).min( maxUndoStates );
@@ -131,7 +131,7 @@ UScoreEditor {
         });
         score.changed(\numEventsChanged);
     }
-    
+
     addMarker{
         this.changeScore({
             score.addEventToEmptyTrack( UMarker().startTime_(score.pos) )
@@ -147,7 +147,7 @@ UScoreEditor {
 	}
 
 	deleteEvents { |events|
-		if( events.size > 0 ) {	
+		if( events.size > 0 ) {
 			this.changeScore({
 			    score.events_(score.events.select(events.includes(_).not));
 			});
@@ -172,7 +172,7 @@ UScoreEditor {
 	        events.do( _.toggleDisable );
 	    })
 	}
-	
+
 	toggleLockEvents { |events|
 	    this.changeScore({
 	        events.do( _.toggleLockStartTime );
@@ -244,7 +244,7 @@ UScoreEditor {
 			score.changed(\numEventsChanged);
 		}
 	}
-	
+
 	moveEvents { |events, amount = 0| // use for small steps
 		if( events.size > 0 ) {
 			if( amount.isNegative ) {
@@ -259,12 +259,12 @@ UScoreEditor {
 			};
 		};
 	}
-	
+
 	moveEventsBeats { |events, amount = 0|
 		if( events.size > 0 ) {
 			if( amount.isNegative ) {
-				amount = amount.max( 
-					score.tempoMap.beatAtTime( events.collect(_.startTime ).minItem ).neg 
+				amount = amount.max(
+					score.tempoMap.beatAtTime( events.collect(_.startTime ).minItem ).neg
 				);
 			};
 			if( amount != 0 ) {
@@ -279,7 +279,7 @@ UScoreEditor {
 	}
 
 	changeEventsTrack { |events, amount = 0|
-		if( events.size > 0 ) {	
+		if( events.size > 0 ) {
 			var minStartTime;
 			amount = amount.round(1);
 			if( amount.isNegative ) { // don't allow negative tracks
@@ -344,11 +344,11 @@ UScoreEditor {
 	splitEventsAtPos { |events|
 	    this.splitEvents(events, score.pos)
 	}
-	
+
 	quantizeEvents { |events, amount = 0, useTempoMap = false|
 		amount = amount ? 0;
 		if( amount > 0 ) {
-			this.changeScore({	
+			this.changeScore({
 				if( useTempoMap ) {
 					events.do({ |event|
 						event.startTime = score.tempoMap.timeAtBeat(

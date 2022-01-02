@@ -50,7 +50,7 @@ ULib {
             }
         }
     }
-    
+
     *clear { |runCmdPeriod = true| // use after unexpected Server quit or lost connection
 	    if( runCmdPeriod == true ) { CmdPeriod.run; };
 	    UChain.clear;

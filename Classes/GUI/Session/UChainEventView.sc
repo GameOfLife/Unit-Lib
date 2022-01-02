@@ -105,11 +105,11 @@ UChainEventView : UEventView {
 	// resize - only resizing events activated
 	// fades - only changing fade times activated
 	mouseDownAll{ |mousePos,scaledUserView,shiftDown|
-		
+
        	px5Scaled =  scaledUserView.pixelScale.x * 5;
 		px10Scaled = scaledUserView.pixelScale.x * 10;
 		this.createRect(px10Scaled, scaledUserView.fromBounds.width);
-		
+
 		fadeAreaHeight = (rect.height*0.3);
 
         this.ifIsInsideRect( mousePos, {
@@ -157,11 +157,11 @@ UChainEventView : UEventView {
 	}
 
 	mouseDownMove{ |mousePos,scaledUserView,shiftDown|
-		
+
 		px5Scaled =  scaledUserView.pixelScale.x * 5;
 		px10Scaled = scaledUserView.pixelScale.x * 10;
 		this.createRect(px10Scaled, scaledUserView.fromBounds.width);
-        
+
 		fadeAreaHeight = (rect.height*0.3);
 
         this.ifIsInsideRect( mousePos, {
@@ -182,11 +182,11 @@ UChainEventView : UEventView {
 	}
 
 	mouseDownResize{ |mousePos,scaledUserView,shiftDown|
-		
+
         	px5Scaled =  scaledUserView.pixelScale.x * 5;
 		px10Scaled = scaledUserView.pixelScale.x * 10;
 		this.createRect(px10Scaled, scaledUserView.fromBounds.width);
-		
+
 		fadeAreaHeight = (rect.height*0.3);
 
         this.ifIsInsideRect( mousePos, {
@@ -216,11 +216,11 @@ UChainEventView : UEventView {
 	}
 
 	mouseDownFades{ |mousePos,scaledUserView,shiftDown|
-		
+
         px5Scaled =  scaledUserView.pixelScale.x * 5;
         px10Scaled = scaledUserView.pixelScale.x * 10;
         this.createRect(px10Scaled, scaledUserView.fromBounds.width);
-        
+
 		fadeAreaHeight = (rect.height*0.3);
 
         this.ifIsInsideRect( mousePos, {
@@ -256,10 +256,10 @@ UChainEventView : UEventView {
 		{\fades}{ this.mouseDownFades(mousePos,scaledUserView,shiftDown) }
 
 	}
-	
+
 	getTimeWithSnap { |originalTime, deltaTime, snap, tempoMap|
 		^if( tempoMap.notNil ) {
-			tempoMap.timeMoveWithSnap( 
+			tempoMap.timeMoveWithSnap(
 				originalTime, deltaTime, snap
 			).max(0);
 		} {
@@ -270,21 +270,21 @@ UChainEventView : UEventView {
 	mouseMoveEvent{ |deltaTime, deltaTrack, overallState, snap, moveVert, tempoMap|
 		if( moveVert.not ) {
 			switch(overallState,
-				\resizingFront, { 
-					event.trimStart( 
+				\resizingFront, {
+					event.trimStart(
 						this.getTimeWithSnap( originalStartTime, deltaTime, snap, tempoMap )
 					);
 				},
-				\resizingBack, { 
-					event.trimEnd( 
+				\resizingBack, {
+					event.trimEnd(
 						this.getTimeWithSnap( originalEndTime, deltaTime, snap, tempoMap )
 					);
 				},
 				\moving, {
 					event.startTime = this.getTimeWithSnap( originalStartTime, deltaTime, snap, tempoMap );
 				},
-				\fadeIn, { 
-					event.fadeIn = originalFades[0] + deltaTime; 
+				\fadeIn, {
+					event.fadeIn = originalFades[0] + deltaTime;
 				},
 				\fadeOut, {
 					event.fadeOut = originalFades[1] - deltaTime;
@@ -300,17 +300,17 @@ UChainEventView : UEventView {
 		var scaledRect, innerRect;
 		var px5sq;
 		var pixelScale;
-		
+
 		pixelScale = scaledUserView.pixelScale;
 
 		this.createRect( pixelScale.x * 10, maxWidth);
-		
+
 		scaledRect = scaledUserView.translateScale(rect);
-		
+
 		if( scaledUserView.view.drawBounds.intersects( scaledRect.insetBy(-2,-2) ) ) {
-			
+
 			innerRect = scaledRect.insetBy(0.5,0.5);
-	
+
 			//selected outline
 			if( selected ) {
 				Pen.width = 2;
@@ -318,7 +318,7 @@ UChainEventView : UEventView {
 				this.drawShape(scaledRect);
 				Pen.stroke;
 			};
-			
+
 			//event is playing
 			if( event.isPlaying ) {
 				Pen.width = 3;
@@ -326,69 +326,69 @@ UChainEventView : UEventView {
 				this.drawShape(scaledRect);
 				Pen.stroke;
 			};
-			
+
 		   if( UScoreView.hideUChains.not ) {
-	
+
 	        Pen.use({
 	            var fadeinScaled, fadeoutScaled, fades;
 	            var textLeft = 2;
-	
+
 	            this.drawShape(innerRect);
 	            Pen.clip;
-	            
+
 	            // fill inside
 	            Pen.addRect( innerRect );
 	            event.getTypeColor.penFill(innerRect, lineAlpha, nil, 10);
-	            
+
 	            // resize handles
-	            if( event.duration != inf ) {	
+	            if( event.duration != inf ) {
 		            px5sq = scaledRect.width.linlin( 5, 5 * 3, 0, 5, \minmax );
 		            Pen.addRect( scaledRect.copy.width_(px5sq) );
 		            Pen.addRect( scaledRect.copy.left_(scaledRect.right - px5sq).width_(px5sq) );
 		            Pen.color =  Color.gray(0.2, if( selected ) { 0.25 } { 0.125 });
 		            Pen.fill;
 		        };
-	            
+
 	            //draw fades
 	            fades = event.fadeTimeValues;
-	            
+
 	            if( fades.any(_!=0) ) { // draw only if needed
-		            
+
 		            Pen.color = Color.gray(0.75, 0.75);
-		            
+
 		            fadeinScaled = innerRect.left + (fades[0] / pixelScale.x);
 		            fadeoutScaled = innerRect.right - (fades[1] / pixelScale.x);
-		            
+
 		            // fade in
 		            Pen.moveTo(innerRect.leftBottom);
 		            if( UScoreView.showFadeCurves && { event.fadeInCurve != 0 }) {
 			            ((..7)/8).do({	 |item|
 				            Pen.lineTo(
-				            	innerRect.left.blend( fadeinScaled, item ) @ 
-				            	(innerRect.bottom.blend( innerRect.top, item.lincurve(0,1,0,1, event.fadeInCurve) )) 
+				            	innerRect.left.blend( fadeinScaled, item ) @
+				            	(innerRect.bottom.blend( innerRect.top, item.lincurve(0,1,0,1, event.fadeInCurve) ))
 				            );
 			            });
 		            };
 		            Pen.lineTo(fadeinScaled @ (innerRect.top) );
 		            Pen.lineTo(innerRect.leftTop);
 		            Pen.lineTo(innerRect.leftBottom);
-		           
+
 		            // fade out
 		            Pen.lineTo(innerRect.rightBottom);
 		            if( UScoreView.showFadeCurves && { event.fadeOutCurve != 0 }) {
 			            ((..7)/8).do({	 |item|
 				            Pen.lineTo(
-				            	innerRect.right.blend( fadeoutScaled, item ) @ 
-				            	(innerRect.bottom.blend( innerRect.top, item.lincurve(0,1,0,1, event.fadeOutCurve.neg) )) 
+				            	innerRect.right.blend( fadeoutScaled, item ) @
+				            	(innerRect.bottom.blend( innerRect.top, item.lincurve(0,1,0,1, event.fadeOutCurve.neg) ))
 				            );
 			            });
 		            };
 		            Pen.lineTo(fadeoutScaled @ (innerRect.top));
 		            Pen.lineTo(innerRect.rightTop);
 		            Pen.lineTo(innerRect.rightBottom);
-		
+
 		            Pen.fill;
-		            
+
 		            //fade lines
 		            Pen.width = 1;
 		            Pen.color = Color.grey(0.3, 0.5);
@@ -396,11 +396,11 @@ UChainEventView : UEventView {
 		            Pen.lineTo(fadeoutScaled @ (innerRect.bottom));
 		            Pen.moveTo(fadeinScaled @ (innerRect.top));
 		            Pen.lineTo(fadeinScaled @ (innerRect.bottom));
-		            
-		            Pen.stroke;	 
-		                       
+
+		            Pen.stroke;
+
 		       };
-		       
+
 		       //draw name
 		       if( UScoreView.showUChainNames && {scaledRect.height > 4} ) {
 			       Pen.color = Color.black.alpha_( lineAlpha  );
@@ -408,13 +408,13 @@ UChainEventView : UEventView {
 				       DrawIcon( \lock, Rect( scaledRect.left + 2, scaledRect.top, 14, 14 ) );
 				       textLeft = textLeft + 12;
 			       };
-			       Pen.stringAtPoint( 
-			       	" " ++ this.getName, 
-			       	scaledRect.leftTop.max( 0 @ -inf ) + (textLeft @ 1) 
+			       Pen.stringAtPoint(
+			       	" " ++ this.getName,
+			       	scaledRect.leftTop.max( 0 @ -inf ) + (textLeft @ 1)
 			       );
 		       };
 	        });
-	        
+
 		   };
 	    };
 

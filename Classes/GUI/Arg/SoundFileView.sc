@@ -18,42 +18,42 @@
 */
 
 BufSndFileView {
-	
+
 	classvar <timeMode = \frames; // or \seconds
 	classvar <rateMode = \semitones; // or \ratio
-	classvar <all; 
-	
+	classvar <all;
+
 	var <sndFile;
 	var <parent, <view, <views;
 	var <>action;
 	var <viewHeight = 14;
 	var <>autoCreateSndFile = false;
-	
+
 	*new { |parent, bounds, action, sndFile|
 		^super.new.init( parent, bounds, action ).value_( sndFile ).addToAll;
 	}
-	
+
 	init { |parent, bounds, inAction|
 		action = inAction;
 		this.makeView( parent, bounds );
 	}
-	
+
 	addToAll {
 		all = all.add( this );
 	}
-	
+
 	*timeMode_ { |new = \frames|
 		timeMode = new.asSymbol;
 		all.do( _.setTimeMode( timeMode ) );
 	}
-	
+
 	*rateMode_ { |new = \semitones|
 		rateMode = new.asSymbol;
 		all.do( _.setRateMode( rateMode ) );
 	}
-	
+
 	doAction { action.value( this ) }
-	
+
 	value { ^sndFile }
 	value_ { |newSndFile|
 		if( sndFile != newSndFile ) {
@@ -63,59 +63,59 @@ BufSndFileView {
 			this.update;
 		};
 	}
-	
+
 	update {
 		if( sndFile.notNil ) { this.setViews( sndFile ) };
 	}
-	
+
 	resize_ { |resize|
 		view.resize = resize ? 5;
 	}
-	
+
 	remove {
-		if( sndFile.notNil ) { 
+		if( sndFile.notNil ) {
 			sndFile.removeDependant( this );
 		};
 		all.remove( this );
 	}
-	
+
 	setViews { |inSndFile|
-		
+
 		views[ \path ].value = inSndFile.path;
 		views[ \path ].stringColor = if( inSndFile.exists ) { Color.black; } { Color.red(0.66); };
-		
+
 		if( inSndFile.respondsTo( \hasGlobal ) ) {
 			{ views[ \hasGlobal ].visible = true; }.defer;
 			views[ \hasGlobal ].value = inSndFile.hasGlobal.binaryValue;
 		} {
 			{ views[ \hasGlobal ].visible = false; }.defer;
 		};
-		
+
 		views[ \startFrame ].value = inSndFile.startFrame;
 		views[ \startFrame ].clipHi = inSndFile.numFrames ? inf;
-		
+
 		views[ \startSecond ].value = inSndFile.startSecond;
 		views[ \startSecond ].clipHi = inSndFile.fileDuration ? inf;
-		
+
 		views[ \endFrame ].value = inSndFile.endFrame;
 		views[ \endFrame ].clipHi = inSndFile.numFrames ? inf;
-		
+
 		views[ \endSecond ].value = inSndFile.endSecond;
 		views[ \endSecond ].clipHi = inSndFile.fileDuration ? inf;
-		
+
 		views[ \loop ].value = inSndFile.loop.binaryValue;
-		
+
 		views[ \rateRatio ].value = inSndFile.rate;
 		views[ \rateSemitones ].value = inSndFile.rate.ratiomidi.round( 1e-6);
-		
-		{ views[ \numChannels ].string = "% channel%".format( 
-				inSndFile.numChannels, 
+
+		{ views[ \numChannels ].string = "% channel%".format(
+				inSndFile.numChannels,
 				if( inSndFile.numChannels == 1 ) { "" } { "s" }
 			)
 		}.defer;
-		
+
 	}
-	
+
 	setTimeMode { |mode = \frames|
 		switch ( ( mode.asString[0] ? $f ).toLower,
 			$s, { // \seconds
@@ -124,8 +124,8 @@ BufSndFileView {
 				views[ \endSecond ].visible_( true );
 				views[ \endFrame ].visible_( false );
 				{ views[ \timeMode ].value = 0 }.defer;
-						
-			}, 
+
+			},
 			$f, { // \frames
 				views[ \startSecond ].visible_( false );
 				views[ \startFrame ].visible_( true );
@@ -135,27 +135,27 @@ BufSndFileView {
 			}
 		);
 	}
-	
+
 	setRateMode { |mode = \semitones|
 		switch( ( mode.asString[0] ? $s ).toLower,
 			$r, { // \ratio
 				views[ \rateRatio ].visible_( true );
 				views[ \rateSemitones ].visible_( false );
 				{ views[ \rateMode ].value = 0 }.defer;
-			}, 
-			$s, { 
+			},
+			$s, {
 				views[ \rateRatio ].visible_( false );
 				views[ \rateSemitones ].visible_( true );
 				{ views[ \rateMode ].value = 1 }.defer;
 			}
 		);
 	}
-	
+
 	setFont { |font|
 		font = font ??
-			{ RoundView.skin !? { RoundView.skin.font } } ?? 
+			{ RoundView.skin !? { RoundView.skin.font } } ??
 			{ Font( Font.defaultSansFace, 10 ) };
-		
+
 		{
 			views[ \startLabel ].font = font;
 			views[ \timeMode ].font = font;
@@ -163,7 +163,7 @@ BufSndFileView {
 			views[ \rateLabel ].font = font;
 			views[ \rateMode ].font = font;
 		}.defer;
-		
+
 		views[ \path ].font = font;
 		views[ \startFrame ].font = font;
 		views[ \startSecond ].font = font;
@@ -174,7 +174,7 @@ BufSndFileView {
 		views[ \rateSemitones ].font = font;
 
 	}
-	
+
 	performSndFile { |selector ...args|
 		if( sndFile.notNil ) {
 			^sndFile.perform( selector, *args );
@@ -187,20 +187,20 @@ BufSndFileView {
 			};
 		};
 	}
-	
+
 	*viewNumLines { ^6 }
-	
+
 	makeView { |parent, bounds, resize|
 		var globalDepFunc, updGlobal;
-		
+
 		if( bounds.isNil ) { bounds= 350 @ (this.class.viewNumLines * (viewHeight + 4)) };
-		
+
 		view = EZCompositeView( parent, bounds, gap: 4@4 );
 		bounds = view.asView.bounds;
 		view.onClose_({ this.remove; });
 		view.resize_( resize ? 5 );
 		views = ();
-		
+
 		views[ \path ] = FilePathView( view, bounds.width @ ( (viewHeight * 2) + 4) )
 			.resize_( 2 )
 			.action_({ |fv|
@@ -208,7 +208,7 @@ BufSndFileView {
 				this.performSndFile( \fromFile );
 				action.value( this );
 			});
-			
+
 		views[ \operations ] = PopUpMenu( view, 80 @ viewHeight )
 			.applySkin( RoundView.skin ? () )
 			.items_( [
@@ -239,7 +239,7 @@ BufSndFileView {
 								var res, newName;
 								newName = path.dirname +/+ pth.basename;
 								if( File.exists( newName ).not ) {
-									res = pth.getGPath.asPathFromServer.moveTo( path.dirname ); 
+									res = pth.getGPath.asPathFromServer.moveTo( path.dirname );
 									if( res ) {
 										this.performSndFile( \path_ ,
 											newName
@@ -248,7 +248,7 @@ BufSndFileView {
 								} {
 									"file % already exists, changing url".postf( pth.quote );
 									this.performSndFile( \path_ ,
-										path.dirname +/+ pth.basename 
+										path.dirname +/+ pth.basename
 									);
 								};
 							});
@@ -261,16 +261,16 @@ BufSndFileView {
 								var res, newName;
 								newName = path.dirname +/+ pth.basename;
 								if( File.exists( newName ).not ) {
-									res = pth.getGPath.asPathFromServer.copyTo( path.dirname ); 
+									res = pth.getGPath.asPathFromServer.copyTo( path.dirname );
 									if( res ) {
 										this.performSndFile( \path_ ,
-											path.dirname +/+ pth.basename 
+											path.dirname +/+ pth.basename
 										);
 									};
 								} {
 									"file % already exists, changing url".postf( pth.quote );
 									this.performSndFile( \path_ ,
-										path.dirname +/+ pth.basename 
+										path.dirname +/+ pth.basename
 									);
 								};
 							});
@@ -283,7 +283,7 @@ BufSndFileView {
 							Dialog.savePanel({ |path|
 								var res;
 								path =  path.replaceExtension( ext );
-								res = pth.getGPath.asPathFromServer.copyFile( path ); 
+								res = pth.getGPath.asPathFromServer.copyFile( path );
 								if( res ) {
 									this.performSndFile( \path_ , path );
 								};
@@ -293,20 +293,20 @@ BufSndFileView {
 				);
 				pu.value = 0;
 			});
-			
+
 		views[ \plot ] = SmoothButton( view, 40 @ viewHeight )
 			.radius_( 3 )
 			.border_( 1 )
 			.label_( "plot" )
 			.action_({ |bt|
-				
+
 				// this will have to go in a separate class
 				var w, a, f, b, x;
 				var closeFunc;
-				
+
 				x = sndFile;
 				f = this.performSndFile( \asSoundFile );
-				
+
 				w = Window(f.path, Rect(200, 200, 850, 400), scroll: false);
 				a = SoundFileView.new(w, w.view.bounds);
 				a.resize_(5);
@@ -329,21 +329,21 @@ BufSndFileView {
 				};
 				b.lo = x.startFrame / x.numFrames;
 				b.hi = x.endFrame / x.numFrames;
-				
+
 				closeFunc = { w.close; };
-				
+
 				w.onClose = { bt.onClose.removeFunc( closeFunc ) };
-				
+
 				bt.onClose = bt.onClose.addFunc( closeFunc );
-					
+
 			});
-			
+
 		views[ \numChannels ] = StaticText( view, 62 @ viewHeight )
 			.applySkin( RoundView.skin ? () )
 			.string_( "" );
-		
+
 		view.view.decorator.shift( (bounds.width - 44) - 190, 0 );
-		
+
 		views[ \hasGlobal ] = SmoothButton( view, 40 @ viewHeight )
 				.radius_( 3 )
 				.border_( 1 )
@@ -355,25 +355,25 @@ BufSndFileView {
 						0, { this.performSndFile( \disposeGlobal ) }
 					);
 				});
-		updGlobal = { 
+		updGlobal = {
 			views[ \hasGlobal ].value = this.performSndFile( \hasGlobal ).binaryValue;
 		};
-		
+
 		BufSndFile.global.addDependant( updGlobal );
 		views[ \hasGlobal ].onClose_({
 			BufSndFile.global.removeDependant( updGlobal );
 		});
-			
+
 		view.view.decorator.nextLine;
-					
+
 		views[ \startLabel ] = StaticText( view, 25 @ viewHeight )
 			.applySkin( RoundView.skin ? () )
 			.string_( "trim" );
-		
+
 		views[ \startComp ] = CompositeView( view, (((bounds.width - 73)/2)-2) @ viewHeight )
 			.resize_( 2 );
-		
-		views[ \startSecond ] = SMPTEBox( views[ \startComp ], 
+
+		views[ \startSecond ] = SMPTEBox( views[ \startComp ],
 				views[ \startComp ].bounds.moveTo(0,0) )
 			.applySmoothSkin
 			.resize_( 5 )
@@ -382,8 +382,8 @@ BufSndFileView {
 				this.performSndFile( \startSecond_ , nb.value );
 				action.value( this );
 			});
-			
-		views[ \startFrame] = SmoothNumberBox( views[ \startComp ], 
+
+		views[ \startFrame] = SmoothNumberBox( views[ \startComp ],
 				views[ \startComp ].bounds.moveTo(0,0) )
 			.resize_( 5 )
 			.clipLo_( 0 )
@@ -392,11 +392,11 @@ BufSndFileView {
 				action.value( this );
 			})
 			.visible_( false );
-			
+
 		views[ \endComp ] = CompositeView( view, (((bounds.width - 73)/2)-2) @ viewHeight )
 			.resize_( 2 );
-		
-		views[ \endSecond ] = SMPTEBox( views[ \endComp ], 
+
+		views[ \endSecond ] = SMPTEBox( views[ \endComp ],
 				views[ \endComp ].bounds.moveTo(0,0) )
 			.applySmoothSkin
 			.resize_( 5 )
@@ -405,8 +405,8 @@ BufSndFileView {
 				this.performSndFile( \endSecond_ , nb.value );
 				action.value( this );
 			});
-			
-		views[ \endFrame] = SmoothNumberBox( views[ \endComp ], 
+
+		views[ \endFrame] = SmoothNumberBox( views[ \endComp ],
 				views[ \endComp ].bounds.moveTo(0,0) )
 			.resize_( 5 )
 			.clipLo_( 0 )
@@ -415,7 +415,7 @@ BufSndFileView {
 				action.value( this );
 			})
 			.visible_( false );
-		
+
 		views[ \timeMode ] = PopUpMenu( view, 40 @ viewHeight )
 			.applySkin( RoundView.skin ? ())
 			.items_( [ "s", "smp" ] )
@@ -423,15 +423,15 @@ BufSndFileView {
 			.action_({ |pu|
 				this.class.timeMode = [ \seconds, \frames ][ pu.value ];
 			});
-			
+
 		views[ \rateLabel ] = StaticText( view, 25 @ viewHeight )
 			.applySkin( RoundView.skin ? () )
 			.string_( "rate" );
-			
+
 		views[ \rateComp ] = CompositeView( view, (bounds.width - 113) @ viewHeight )
 			.resize_( 2 );
-		
-		views[ \rateRatio ] = SmoothNumberBox( views[ \rateComp ], 
+
+		views[ \rateRatio ] = SmoothNumberBox( views[ \rateComp ],
 				views[ \rateComp ].bounds.moveTo(0,0) )
 			.resize_( 5 )
 			.scroll_step_( 0.1 )
@@ -441,8 +441,8 @@ BufSndFileView {
 				this.performSndFile( \rate_ , nb.value );
 				action.value( this );
 			});
-			
-		views[ \rateSemitones ] = SmoothNumberBox( views[ \rateComp ], 
+
+		views[ \rateSemitones ] = SmoothNumberBox( views[ \rateComp ],
 				views[ \rateComp ].bounds.moveTo(0,0) )
 			.resize_( 5 )
 			.action_({ |nb|
@@ -450,7 +450,7 @@ BufSndFileView {
 				action.value( this );
 			})
 			.visible_( false );
-			
+
 		views[ \rateMode ] = PopUpMenu( view, 80 @ viewHeight )
 			.applySkin( RoundView.skin ? () )
 			.items_( [ "ratio", "semitones" ] )
@@ -458,11 +458,11 @@ BufSndFileView {
 			.action_({ |pu|
 				this.class.rateMode = [ \ratio, \semitones ][ pu.value ];
 			});
-			
+
 		views[ \loopLabel ] = StaticText( view, 25 @ viewHeight )
 			.applySkin( RoundView.skin )
 			.string_( "loop" );
-		
+
 		views[ \loop ] = SmoothButton( view, viewHeight @ viewHeight )
 			.radius_( 3 )
 			.border_( 1 )
@@ -472,16 +472,16 @@ BufSndFileView {
 				this.performSndFile( \loop_ , bt.value.booleanValue );
 				action.value( this );
 			});
-			
+
 		this.setFont;
 		this.setTimeMode( timeMode );
 		this.setRateMode( rateMode );
 	}
-	
+
 }
 
 DiskSndFileView : BufSndFileView {
-	
+
 	performSndFile { |selector ...args|
 		if( sndFile.notNil ) {
 			^sndFile.perform( selector, *args );

@@ -28,7 +28,7 @@ UIn -> *ar { |id, numChannels|
      -> generates the following control(s) for the synth:
      	\u_i_ar_<id>_bus (id)
      -> if numChannels > 1 it creates multiple inputs with adjecent id's
-     	
+
   *kr { |id, numChannels|
     id (0): corresponds with default private bus to send to
     numChannels (1): number of buses
@@ -36,53 +36,53 @@ UIn -> *ar { |id, numChannels|
      -> creates a control input from a private bus
      -> generates the following control(s) for the synth:
      	\u_i_kr_<id>_bus (id)
-     
+
 UOut -> *ar { |id, channelsArray|
     id: corresponds with default private bus to send to
     channelsArray: array of input channels
 
      -> creates audio outputs for each of the channels to a private bus
      -> generates the following control(s) for the synth:
-     	\u_o_ar_<id>_bus (id)	
-    
+     	\u_o_ar_<id>_bus (id)
+
   *kr { |id, channelsArray|
     id: corresponds with default private bus to send to
 	channelsArray: array of input channels
-	
+
      -> creates a control outputs for each of the channels to a private bus
      -> generates the following control(s) for the synth:
      	\u_o_kr_<id>_bus (id)
-     
-    
+
+
 */
 
 UIn {
-	
+
 	classvar <>specs;
-	
+
 	*initClass {
 		Class.initClassTree(Spec);
 		specs = IdentityDictionary();
 		specs.put( \bus, PositiveIntegerSpec() );
 	}
 
-	
+
 	*key { ^'u' } // 'wfsu_' controls automatically become private args
-	
+
 	*firstPrivateBus { ^NumOutputBuses.ir + NumInputBuses.ir }
 	*firstControlBus { ^1000 } // don't use any buses below this value
-	
-	*firstBusFor { |mode = \ar| 
+
+	*firstBusFor { |mode = \ar|
 		switch( mode,
 			\ar, { ^this.firstPrivateBus },
 			\kr, { ^this.firstControlBus }
 		);
 	}
-	
+
 	*getControlName { |...args|
 		^([this.key] ++ args).join("_").asSymbol;
 	}
-	
+
 	*getControl { |mode = \kr, name, what, value, lag, argMode|
 		var spec;
 		name = (name ++ "_" ++ what).asSymbol;
@@ -92,18 +92,18 @@ UIn {
 		};
 		^name.perform( mode, value, lag );
 	}
-	
+
 	*ar { |id = 0, numChannels = 1, endPoint = false|
 		^numChannels.collect({ |i| this.new1( \ar, id + i, endPoint ); }).returnFirstIfSize1;
 	}
-	
+
 	*kr { |id = 0, numChannels = 1, endPoint = false|
 		^numChannels.collect({ |i| this.new1( \kr, id + i, endPoint ); }).returnFirstIfSize1;
-	}	
-	
+	}
+
 	*new1 { |selector = \ar, id = 0, endPoint = false|
 		var res;
-		id = this.getControl( \kr, this.getControlName( 'i',  selector, id ), "bus", id); 
+		id = this.getControl( \kr, this.getControlName( 'i',  selector, id ), "bus", id);
 		res = In.perform( selector, this.firstBusFor( selector ) + id, 1 );
 		if( endPoint ) {
 			ReplaceOut.perform( selector, this.firstBusFor( selector ) + id, Silent.ar );
@@ -114,21 +114,21 @@ UIn {
 }
 
 UOut : UIn { // overwrites bus (ReplaceOut)
-	
+
 	*ar { |id = 0, channelsArray, offset = false| // use offset = true for generators (sample-sync)
-		^channelsArray.asCollection.collect({ |item, i| 
-			this.new1( \ar, id + i, item, offset ) 
+		^channelsArray.asCollection.collect({ |item, i|
+			this.new1( \ar, id + i, item, offset )
 		});
 	}
-	
+
 	*kr { |id = 0, channelsArray|
-		^channelsArray.asCollection.collect({ |item, i| 
-			this.new1( \kr, id + i, item ) 
+		^channelsArray.asCollection.collect({ |item, i|
+			this.new1( \kr, id + i, item )
 		});
 	}
-	
+
 	*new1 { |selector = \ar, id = 0, input, offset = false|
-		id = this.getControl( \kr, this.getControlName( 'o', selector, id ), "bus", id); 
+		id = this.getControl( \kr, this.getControlName( 'o', selector, id ), "bus", id);
 		if( offset ) {
 			ReplaceOut.perform( selector, this.firstBusFor( selector ) + id, Silent.ar );
 			^OffsetOut.perform( selector, this.firstBusFor( selector ) + id, input );
@@ -139,23 +139,23 @@ UOut : UIn { // overwrites bus (ReplaceOut)
 }
 
 UMixOut : UIn {
-	
+
 	*initClass {
 		specs.put( 'lvl', \amp.asSpec );
 	}
-	
+
 	*ar { |id = 0, channelsArray, inLevel = 0, offset = false |
-		^channelsArray.asCollection.collect({ |item, i| 
-			this.new1( \ar, id + i, item, inLevel, offset ) 
+		^channelsArray.asCollection.collect({ |item, i|
+			this.new1( \ar, id + i, item, inLevel, offset )
 		});
 	}
-	
+
 	*kr { |id = 0, channelsArray, inLevel = 0|
-		^channelsArray.asCollection.collect({ |item, i| 
-			this.new1( \kr, id + i, item, inLevel ) 
+		^channelsArray.asCollection.collect({ |item, i|
+			this.new1( \kr, id + i, item, inLevel )
 		});
 	}
-	
+
 	*new1 { |selector = \ar, id = 0, input, inLevel=0, offset = false|
 		var in, out;
 		var name = this.getControlName( 'o', selector, id );

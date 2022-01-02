@@ -18,9 +18,9 @@
 */
 
 SignatureBox : RoundNumberBox {
-	
+
 	var <denom = 4;
-	
+
 	init { |parent, bounds|
 		super.init( parent, bounds );
 		clipLo = 1;
@@ -28,9 +28,9 @@ SignatureBox : RoundNumberBox {
 		scroll_step = 1;
 		alt_scale = 1; // cents
 		value = 4;
-		
+
 		formatFunc = { |value| "%/%".format( value, denom ) };
-		
+
 		interpretFunc = { |string|
 			if( string.includes( $/ ) ) {
 				string = string.split( $/ );
@@ -43,19 +43,19 @@ SignatureBox : RoundNumberBox {
 			({ string.interpret }.try ? value).asInteger;
 		};
 	}
-	
+
 	denom_ { |new| denom = 2**(( new ? denom ).log2.round(1).clip(0,10)); this.refresh; }
-	
+
 	num { ^value }
 	num_ { |num| value = (num ? denom).asInteger.max(1); this.refresh; }
-	
+
 	value_ { |val, refresh = true|
 		val = val.asCollection;
 		value = val[0].asInteger.max(1);
 		denom = 2**(( val[1] ? denom ).log2.round(1).clip(0,10));
 		if( refresh ) { this.refresh; };
 	}
-	
+
 	valueAction_ { arg val;
 		var oldValue;
 		oldValue = this.value;
@@ -64,12 +64,12 @@ SignatureBox : RoundNumberBox {
 			{ action.value(this, value); };
 		this.refresh;
 	}
-	
+
 	value { ^[ value, denom ] }
-	
+
 	decrement {arg mul=1; this.valueAction = this.value - (step*(mul * [1,0.5])) }
-	
-	getScale { |modifiers| 
+
+	getScale { |modifiers|
 		var inc = [1, (2**(denom.abs.log2.round(1))).max(1) ];
 		^case
 			{ modifiers & 131072 == 131072 } { inc }
@@ -77,18 +77,18 @@ SignatureBox : RoundNumberBox {
 			{ modifiers & 524288 == 524288 } { inc * [0,1] }
 			{ inc * [1,0] };
 	}
-	
+
 	applySmoothSkin {
-		this.applySkin( ( 
+		this.applySkin( (
 			extrude: false,
 			border: 0,
 			background: Color.white.alpha_(0.5),
 			typingColor: Color.red(0.5).alpha_(0.75)
 		) );
 	}
-	
+
 	applyRoundSkin {
-		this.applySkin( ( 	
+		this.applySkin( (
 			extrude: true,
 			border: 2,
 			background: Color.white,

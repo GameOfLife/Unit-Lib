@@ -18,18 +18,18 @@
 */
 
 MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the same
-	
+
 	var <units, <>argSpecs;
 	var <>autoUpdate = true;
 	var <>defNameKey;
 	var <>subDef;
-	
+
 	*new { |units| // all units have to be of the same Udef
 		^super.newCopyArgs.init( units );
 	}
-	
+
 	guiColor { ^units.detect(_.respondsTo(\guiColor)) !? _.guiColor ?? { Color.clear; } }
-	
+
 	init { |inUnits, active = true|
 		var firstDef, defs;
 		var dkey, dval;
@@ -44,13 +44,13 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 				units.every({ |unit|
 					unit.get( dkey ) == dval
 				});
-			}) {	
+			}) {
 				argSpecs = def.argSpecs( inUnits[0] );
 			} {
 				argSpecs = [ def.getArgSpec( dkey, units[0] ) ];
 			};
-			
-			if( def.isKindOf( MultiUdef ) ) { 
+
+			if( def.isKindOf( MultiUdef ) ) {
 				defNameKey = def.defNameKey;
 				subDef = units[0].subDef;
 				if( units[1..].any({ |item| item.subDef != subDef }) ) {
@@ -59,37 +59,37 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 			} {
 				subDef = units[0].subDef;
 			};
-			
+
 			argSpecs = argSpecs.collect({ |argSpec|
 				var values, massEditSpec, value;
 				values = units.collect({ |unit|
 					unit.get( argSpec.name );
 				});
-				
+
 				if( values.any(_.isUMap) ) {
 					massEditSpec = MassEditUMapSpec( MassEditUMap( values ) );
-				} {	
+				} {
 					massEditSpec = argSpec.spec.massEditSpec( values );
 				};
 				if( massEditSpec.notNil ) {
 					ArgSpec( argSpec.name, massEditSpec.default, massEditSpec,
-						argSpec.private, argSpec.mode ); 
+						argSpec.private, argSpec.mode );
 				} {
 					nil;
 				};
-			}).select(_.notNil);	
+			}).select(_.notNil);
 			args = argSpecs.collect({ |item| [ item.name, item.default ] }).flatten(1);
 			if( active == true ) { this.changed( \init ); };
 		} {
 			"MassEditU:init - not all units are of the same Udef".warn;
 		};
 	}
-	
-	units_ { |inUnits, active = true| 
+
+	units_ { |inUnits, active = true|
 		this.disconnect;
-		this.init( inUnits, active ); 
+		this.init( inUnits, active );
 	}
-	
+
 	getArgSpec { |name|
 		name = name.asSymbol;
 		^argSpecs.detect({ |item| item.name == name });
@@ -100,15 +100,15 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 		units.select(_.isKindOf(U) ).do(_.guiCollapsed_(bool));
 		this.changed( \init );
 	}
-	
+
 	connect {
 		units.do(_.addDependant(this));
 	}
-	
+
 	disconnect {
 		units.do(_.removeDependant(this));
 	}
-	
+
 	resetArg { |key| // doesn't change the units
 		var spec, values;
 		if( key.notNil ) {
@@ -121,46 +121,46 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 			this.keys.do({ |key| this.resetArg( key ) });
 		};
 	}
-	
+
 	update { |obj, what ...args|
-		if( autoUpdate ) { 
+		if( autoUpdate ) {
 			if( this.keys.includes( what ) ) {
 				this.resetArg( what );
-			}; 
+			};
 		}
 	}
-	
+
 	stop { units.do(_.stop) }
-	
+
 	insertUMap { |key, umapdef, args|
 		if( umapdef.isKindOf( UMap ) ) {
 			units.do({ |unit|
 				unit.insertUMap( key, umapdef.deepCopy, args );
 			});
-		} {	
+		} {
 			units.do({ |unit|
 				unit.insertUMap( key, umapdef, args );
 			});
 		};
 	}
-	
+
 	removeUMap { |key|
 		units.do({ |unit|
 			unit.removeUMap( key )
 		});
 	}
-	
+
 	set { |...args|
 		var autoUpdateWas, defNameWas;
-		
+
 		if( defNameKey.notNil ) {
 			defNameWas = units.first.get( defNameKey );
 		};
-		
+
 		// disable auto updating to prevent loop
 		autoUpdateWas = autoUpdate;
 		autoUpdate = false;
-		
+
 		args.pairsDo({ |key, value|
 			var values;
 			this.setArg( key, value );
@@ -169,60 +169,60 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 				unit.set( key, values[i] );
 			});
 		});
-		
+
 		// re-enable auto updating
 		autoUpdate = autoUpdateWas;
-		
-		if( defNameWas.notNil && { units.any( { |unit| 
-				unit.get( defNameKey ) != defNameWas } ) 
+
+		if( defNameWas.notNil && { units.any( { |unit|
+				unit.get( defNameKey ) != defNameWas } )
 		} ) {
 			this.changed( \init );
 		};
 	}
-	
+
 	getSpec { |name|
 		^units[0].getSpec( name );
 	}
-	
+
 	canUseUMap { |key, umapdef|
 		^units.first.canUseUMap( key, umapdef );
 	}
-	
+
 	defName { ^((this.def !? { this.def.name } ? "mixed").asString + "(% units)".format( units.size )).asSymbol }
-	
+
 	fullDefName {
 		^((this.def !? { this.def.name } ? "mixed").asString ++
 		if( defNameKey.notNil && subDef.notNil ) { " /" + units[0].subDefNames.join( " / " ) } { "" } ++
 		" (% units)".format( units.size ));
 	}
-	
+
 	def_ { |def|  units.do(_.def_( def ) ); this.init( units ); }
-	
+
 	checkDef { units.do(_.checkDef) }
-	
+
 	storeArgs { ^[ units ] }
-	
+
 }
 
 
 MassEditUChain {
-	
+
 	var <uchains;
 	var <umarkers;
 	var <units;
 	var <>prepareTasks;
-	
+
 	*new { |uchains, umarkers|
 		^super.newCopyArgs( uchains, umarkers ).init;
 	}
-	
+
 	lockStartTime { ^uchains.any(_.lockStartTime) }
 	lockStartTime_ { |bool| ^uchains.do(_.lockStartTime_(bool)) }
-	
+
 	init {
 		var allDefNames = [], allUnits = Order();
 		var multiUdefs = Set();
-		
+
 		uchains.do({ |uchain|
 			uchain.units.select({|x| x.def.class != LocalUdef}).do({ |unit|
 				var defName, index;
@@ -237,7 +237,7 @@ MassEditUChain {
 				allUnits.put( index, allUnits[ index ].add( unit ) );
 			});
 		});
-		
+
 		units = allUnits.asArray.collect({ |item, i|
 			var variants = ();
 			if( allDefNames[i].notNil ) {
@@ -254,7 +254,7 @@ MassEditUChain {
 							if( variants[ key ].size == 1 ) {
 								variants[ key ][ 0 ];
 							} {
-								MassEditU( variants[ key ] ) 
+								MassEditU( variants[ key ] )
 							};
 						});
 					} {
@@ -265,43 +265,43 @@ MassEditUChain {
 				nil
 			};
 		}).select(_.notNil).flatten(1);
-		
+
 		this.changed( \init );
 	}
-	
+
 	addDependantToChains { |dependant|
 		uchains.do(_.addDependant(dependant));
 	}
-	
+
 	removeDependantFromChains { |dependant|
 		uchains.do(_.removeDependant(dependant));
 	}
-	
+
 	connect {
 		uchains.do(_.addDependant(this));
 	}
-	
+
 	disconnect {
 		uchains.do(_.removeDependant(this));
 	}
-	
+
 	update { |obj, what ...args|
 		this.changed( what, *args );
 	}
-	
+
 	groups { ^uchains.collect(_.groups).flatten(1); } // don't know any groups
-	
+
 	releaseSelf { ^uchains.collect(_.releaseSelf).every(_==true); }
 	releaseSelf_ { |bool|
 		uchains.do(_.releaseSelf_(bool));
 	}
-	
+
 	global { ^uchains.collect(_.global).every(_==true); }
 	global_ { |bool|
 		uchains.do(_.global_(bool));
 	}
-	
-	addAction { 
+
+	addAction {
 		var actions = uchains.collect(_.addAction);
 		var first = actions.first;
 		if( actions.every(_ === first) ) {
@@ -313,71 +313,71 @@ MassEditUChain {
 	addAction_ { |symbol|
 		if( symbol != \mixed ) { uchains.do(_.addAction_(symbol)); };
 	}
-	
+
 	ugroup {
 		var first;
 		first = uchains.first.ugroup;
 		if( uchains[1..].any({ |item| item.ugroup != first }) ) { ^\mixed } { ^first };
 	}
-	
+
 	ugroup_ { |ugroup|
 		if( ugroup !== \mixed ) {
 			uchains.do(_.ugroup_( ugroup ));
 		};
 	}
-	
+
 	uchainsOrUMarkers { if( uchains.size > 0 ) { ^uchains } { ^umarkers } }
-	
+
 	getTypeColor {
-		^Color( 
+		^Color(
 			*this.uchainsOrUMarkers
 				.collect(_.getTypeColor).select(_.isKindOf( Color ) ).collect(_.asArray).mean
 		 );
 	}
-	
-	displayColor { 
+
+	displayColor {
 		^if( this.uchainsOrUMarkers.any({ |item| item.displayColor != nil }) ) {
 			this.getTypeColor
-		}; 
+		};
 	}
-	
-	displayColor_ { |color| 
-		this.uchainsOrUMarkers.do({ |item| item.displayColor = color }); 
+
+	displayColor_ { |color|
+		this.uchainsOrUMarkers.do({ |item| item.displayColor = color });
 		this.changed( \displayColor, color );
 	}
-	
+
 	fadeIn_ { |fadeIn = 0|
 		var add = fadeIn - this.fadeInTime;
-		
+
 		uchains.do({ |item|
 			item.fadeIn_( item.fadeInTime + add );
-		});	
+		});
 	}
-	
+
 	fadeOut_ { |fadeOut = 0|
 		var add = fadeOut - this.fadeOutTime;
-		
+
 		uchains.do({ |item|
 			item.fadeOut_( item.fadeOutTime + add );
-		});	
+		});
 	}
-	
+
 	fadeOut {
 		^uchains.collect({ |item| item.fadeOutTime }).maxItem ? 0;
 	}
-	
+
 	fadeIn {
 		^uchains.collect({ |item| item.fadeInTime }).maxItem ? 0;
 	}
-	
+
 	fadeOutTime {
 		^uchains.collect({ |item| item.fadeOutTime }).maxItem ? 0;
 	}
-	
+
 	fadeInTime {
 		^uchains.collect({ |item| item.fadeInTime }).maxItem ? 0;
 	}
-	
+
 	fadeInCurve_ { |curve = 0|
 		uchains.do({ |item|
 			item.fadeInCurve_( curve );
@@ -402,7 +402,7 @@ MassEditUChain {
 		var durs;
 		uchains.do(_.useSndFileDur);
 	}
-	
+
 	getMaxDurChain { // get unit with longest non-inf duration
 		var dur, out;
 		uchains.do({ |uchain|
@@ -413,14 +413,14 @@ MassEditUChain {
 				out = uchain;
 			};
 		});
-		^out;	
+		^out;
 	}
-	
+
 	dur { // get longest duration
 		var uchain;
 		uchain = this.getMaxDurChain;
-		if( uchain.isNil ) { 
-			^inf 
+		if( uchain.isNil ) {
+			^inf
 		} {
 			^uchain.dur;
 		};
@@ -446,21 +446,21 @@ MassEditUChain {
 		};
 		this.changed(\dur)
 	}
-	
+
 	duration { ^this.dur }
 	duration_ { |x| this.dur_(x)}
-	
+
 	muted { ^uchains.collect({ |ch| ch.muted.binaryValue }).mean > 0.5 }
-	muted_ { |bool| 
+	muted_ { |bool|
 		uchains.do({ |ch| ch.muted = bool });
 		this.changed( \muted );
-	} 
-	
+	}
+
 	startTime {
-		^(uchains.collect({ |ch| ch.startTime ? 0 }) ++ 
+		^(uchains.collect({ |ch| ch.startTime ? 0 }) ++
 		umarkers.collect({ |ch| ch.startTime ? 0 })).minItem;
 	}
-	
+
 	startTime_ { |newTime|
 		var oldStartTime, delta;
 		oldStartTime = this.startTime;
@@ -478,7 +478,7 @@ MassEditUChain {
 			});
 		};
 	}
-	
+
 	setGain { |gain = 0| // set the average gain of all units that have a u_gain arg
 		var mean, add;
 		mean = this.getGain;
@@ -486,15 +486,15 @@ MassEditUChain {
 		uchains.do({ |uchain|
 			 uchain.setGain( uchain.getGain + add );
 		});
-		this.changed( \gain );		
+		this.changed( \gain );
 	}
-	
+
 	getGain {
 		var gains;
 		gains = this.uchains.collect(_.getGain);
 		if( gains.size > 0 ) { ^gains.mean } { ^0 };
 	}
-	
+
 	autoPause { ^umarkers.collect(_.autoPause) }
 	autoPause_ { |newAutoPause|
 		newAutoPause = newAutoPause.asCollection.wrapExtend( umarkers.size );
@@ -503,15 +503,15 @@ MassEditUChain {
 		});
 		this.changed( \autoPause );
 	}
-	
-	
+
+
 	start { |target, latency|
 		^uchains.collect( _.start( target, latency ) );
 	}
-	
+
 	free { uchains.do(_.free); }
 	stop { uchains.do(_.stop); }
-	
+
 	release { |time|
 		uchains.do( _.release( time ) );
 	}
@@ -528,7 +528,7 @@ MassEditUChain {
 	prepareAndStart{ |target, startPos = 0|
 		var task, cond;
 		cond = Condition(false);
-		task = fork { 
+		task = fork {
 			var action;
 			action = { cond.test = true; cond.signal };
 			target = this.prepare( target, startPos, action );
@@ -536,12 +536,12 @@ MassEditUChain {
 	       	this.start(target);
 		};
 	}
-	
+
 	waitTime { ^this.units.collect(_.waitTime).sum }
-	
+
 	prepareWaitAndStart { |target, startPos = 0|
 		var task;
-		task = fork { 
+		task = fork {
 			this.prepare( target, startPos );
 			this.waitTime.wait; // doesn't care if prepare is done
 	       	this.start(target);
@@ -550,18 +550,18 @@ MassEditUChain {
 	}
 
 	dispose { uchains.do( _.dispose ) }
-	
+
 	// indexing / access
-		
+
 	at { |index| ^units[ index ] }
-		
+
 	last { ^units.last }
 	first { ^units.first }
-	
+
 	printOn { arg stream;
 		stream << "a " << this.class.name << "(" <<* units.collect(_.defName)  <<")"
 	}
-	
+
 	gui { |parent, bounds, score| ^UChainGUI( parent, bounds, this, score ) }
-	
+
 }

@@ -18,24 +18,24 @@
 */
 
 ObjectWithArgs {
-	
+
 	classvar <>verbose = false;
-	
+
 	var <args;
-	
+
 	// args are an array of key, value pairs: [ key, value, key, value ...etc ]
-	
+
 	keys { ^(args ? [])[0,2..] }
 	argNames { ^this.keys }
-	
+
 	values { ^(args ? [])[1,3..] }
-	values_ { |newValues|  
+	values_ { |newValues|
 		var keys = this.keys;
 		newValues[..keys.size-1].do({ |val, i|
 			this.setArg( keys[i], val )
 		});
 	}
-	
+
 	getIndexForKey { |key|
 		var keys;
 		keys = this.keys;
@@ -49,68 +49,68 @@ ObjectWithArgs {
 	setArg { |key, value|
 		var index;
 		index = this.getIndexForKey( key );
-		if( index.notNil ) { 
+		if( index.notNil ) {
 			args[ (index * 2) + 1 ] = value;
 			this.changed( key, value );
 		} {
 			if( verbose ) {
 				"%:% arg % not found".format( this.class, thisMethod.name, key ).warn;
 			};
-		};	
+		};
 	}
-	
+
 	getArg { |key|
 		var index;
 		index = this.getIndexForKey( key );
-		if( index.notNil ) { 
-			^args[ (index * 2) + 1 ] 
-		} { 
+		if( index.notNil ) {
+			^args[ (index * 2) + 1 ]
+		} {
 			if( verbose ) {
 				"%:% arg % not found".format( this.class, thisMethod.name, key ).warn;
 			};
-			^nil 
+			^nil
 		};
 	}
-	
+
 	findKeyForValue { |val|
 		var index;
 		index = this.values.indexOf( val );
 		^index !? { this.keys[ index ] }
 	}
-	
+
 	at { |key| ^if( key.isNumber ) { ^this.values[ key ] } { this.getArg( key ) } }
-	put { |key, what| 
+	put { |key, what|
 		if( key.isNumber ) { key = this.keys[ key ] };
 		if( key.notNil ) { this.setArg( key, what ) };
 	}
 
-	doesNotUnderstand { |selector ...args| 
+	doesNotUnderstand { |selector ...args|
 		// bypasses errors; warning if arg not found
-		if( selector.isSetter ) { 
-			this.setArg( selector.asGetter, *args ) 
+		if( selector.isSetter ) {
+			this.setArg( selector.asGetter, *args )
 		} {
 			^this.getArg( selector );
-		};	
+		};
 	}
-	
+
     archiveAsCompileString { ^true }
 
 }
 
 + SequenceableCollection {
-	
+
 	pairsAt { |key| // could be optimized
 		var index = this[0,2..].indexOf( key );
-		if( index.notNil ) { 
+		if( index.notNil ) {
 			^this.at( (index * 2) + 1 );
 		} {
-			^nil 
+			^nil
 		};
 	}
-	
+
 	pairsPut { |key, value| // only puts if key is found
 		var index = this[0,2..].indexOf( key );
-		if( index.notNil ) { 
+		if( index.notNil ) {
 			this.put((index * 2) + 1, value);
 		};
 	}

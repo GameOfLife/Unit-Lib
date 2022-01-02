@@ -18,7 +18,7 @@
 */
 
 MIDINoteBox : RoundNumberBox {
-	
+
 	init { |parent, bounds|
 		super.init( parent, bounds );
 		clipLo = 0;
@@ -29,7 +29,7 @@ MIDINoteBox : RoundNumberBox {
 		alt_scale = 0.01; // cents
 		shift_scale = 36;
 		allowedChars = "abcdefgABCDEFG#b-+. ";
-		
+
 		formatFunc = { |value|
 			var output;
 			output = value.midiname;
@@ -40,11 +40,11 @@ MIDINoteBox : RoundNumberBox {
 			};
 			output;
 		};
-		
-		interpretFunc = { |string| 
+
+		interpretFunc = { |string|
 			var output, numbers;
 			output = { string.namemidi }.try;
-			if( output.isNil ) { 
+			if( output.isNil ) {
 				output = { string.interpret }.try;
 				if( output.notNil && { output > clipHi } ) {
 					output = output.cpsmidi;
@@ -58,20 +58,20 @@ MIDINoteBox : RoundNumberBox {
 			output;
 		};
 	}
-	
-	
-	
+
+
+
 	applySmoothSkin {
-		this.applySkin( ( 
+		this.applySkin( (
 			extrude: false,
 			border: 0,
 			background: Color.white.alpha_(0.5),
 			typingColor: Color.red(0.5).alpha_(0.75)
 		) );
 	}
-	
+
 	applyRoundSkin {
-		this.applySkin( ( 	
+		this.applySkin( (
 			extrude: true,
 			border: 2,
 			background: Color.white,

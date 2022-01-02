@@ -24,7 +24,7 @@
 
 */
 UScoreView {
-	
+
 	classvar <spaceBarPlayAnyway = false;
 	classvar <>showGrid = true;
 	classvar <>showUChainNames = true;
@@ -40,18 +40,18 @@ UScoreView {
      var <>scoreList;
      var <currentScoreEditorController, <scoreController, <eventControllers = #[];
      var <tempoMapControllers;
-     
+
      var <updateTask, calledUpdate = false, <>updateInterval = 0.2;
      var <showTempoMap = false;
-     
+
      var <followPos = false;
 
      *new{ |parent, bounds, scoreEditor| ^super.new.init(scoreEditor, parent,bounds) }
-     
+
      *current {
 	     ^UScoreEditorGUI.current !? _.scoreView
      }
-     
+
      *spaceBarPlayAnyway_ { |bool = true|
 	     spaceBarPlayAnyway = bool;
 	     this.changed( \spaceBarPlayAnyway, spaceBarPlayAnyway );
@@ -106,7 +106,7 @@ UScoreView {
 		        this.baseEditor.changed(\score);
 		    }
 		});
-		
+
 		tempoMapControllers.do(_.remove);
 		tempoMapControllers = [
 			SimpleController( this.currentScore.tempoMap )
@@ -121,7 +121,7 @@ UScoreView {
 	    eventControllers = this.currentScore.collect{ |e|
             var s = SimpleController(e);
             [\startTime,\lockStartTime,\dur,\fadeIn,\fadeOut,\fadeInCurve,\fadeOutCurve,\name,\track,\displayColor,\start,\end,\autoPause].do{ |key|
-                s.put(key,{ { 
+                s.put(key,{ {
 	                if( this.currentScore.updatePos ) {
 		                this.currentScore.changed( \something );
 	                };
@@ -152,7 +152,7 @@ UScoreView {
 			this.prUpdate;
 		};
 	}
-	
+
 	prUpdate {
 		var zoom, score, dur;
 		score = this.currentScore;
@@ -186,7 +186,7 @@ UScoreView {
     isInnerScore{
         ^(scoreEditorsList.size > 1)
     }
-    
+
     followPos_ { |bool = false|
 	    if( followPos != bool ) {
 	   		followPos = bool;
@@ -200,14 +200,14 @@ UScoreView {
     editSelected{
         var event, events = this.selectedEvents, gui, currentScore, chains, markers;
         switch(events.size)
-            {0}{ 
+            {0}{
 	            currentScore = this.currentScore;
 	            chains = currentScore.getAllUChains;
 	            markers = currentScore.getAllUMarkers;
 	            if( chains.size > 0 or: { markers.size > 0 } ) {
 	           	 gui = MassEditUChain( chains, markers ).gui;
-	                 gui.windowName = "MassEdit : % (all % events)".format( 
-	                    currentScore.name, 
+	                 gui.windowName = "MassEdit : % (all % events)".format(
+	                    currentScore.name,
 	                    chains.size + markers.size
 	                 );
 	            };
@@ -217,28 +217,28 @@ UScoreView {
                 if(event.isFolder){
                     gui = MassEditUChain(event.getAllUChains, event.getAllUMarkers).gui( score: event );
                     currentScore = this.currentScore;
-                    gui.windowName = "MassEdit : % [ % ]".format( 
-                    	currentScore.name, 
+                    gui.windowName = "MassEdit : % [ % ]".format(
+                    	currentScore.name,
                     	currentScore.events.indexOf( event )
                     );
                 } {
                     gui = event.gui;
                     currentScore = this.currentScore;
-                    gui.windowName = "% : % [ % ]".format( 
+                    gui.windowName = "% : % [ % ]".format(
                     	event.class,
-                    	currentScore.name, 
+                    	currentScore.name,
                     	currentScore.events.indexOf( event )
                     );
                 }
             }
-            { 
-	            
+            {
+
 	            gui = MassEditUChain(
-	            	events.collect(_.getAllUChains).flat, 
+	            	events.collect(_.getAllUChains).flat,
 	            	events.collect(_.getAllUMarkers).flat
 	            ).gui;
-                 gui.windowName = "MassEdit : % ( % events )".format( 
-                    this.currentScore.name, 
+                 gui.windowName = "MassEdit : % ( % events )".format(
+                    this.currentScore.name,
                     gui.chain.uchains.size + gui.chain.umarkers.size
                  );
 	       }
@@ -284,7 +284,7 @@ UScoreView {
 	        		};
 	        		this.update;
 			};
-			
+
 	    };
     }
 
@@ -303,25 +303,25 @@ UScoreView {
     duplicateSelected {
         this.currentEditor.duplicateEvents(this.selectedEvents)
     }
-    
+
     moveSelected { |amt = 0|
 	    this.currentEditor.moveEvents(this.selectedEvents, amt)
     }
-    
+
     moveSelectedBeats { |amt = 0|
 	    this.currentEditor.moveEventsBeats(this.selectedEvents, amt)
     }
-    
+
     changeTrackSelected { |amt = 0|
 	    this.currentEditor.changeEventsTrack(this.selectedEvents, amt)
     }
-    
+
     showTempoMap_ { |bool|
 	    showTempoMap = bool.booleanValue;
 	    scoreView.refresh;
     }
-    
-    calcNumTracks { 
+
+    calcNumTracks {
 	    numTracks = ((this.currentScore.events.collect( _.track ).maxItem ? ( minTracks - 3)) + 3)
 			.max( minTracks );
     }
@@ -443,10 +443,10 @@ UScoreView {
 		scoreView.sliderWidth = 8;
 		scoreView.userView.view
 		    .canReceiveDragHandler_({
-                [ UChain, UScore ].includes(View.currentDrag.class) or: { 
+                [ UChain, UScore ].includes(View.currentDrag.class) or: {
 	                View.currentDrag.class == Array && {
-	                	View.currentDrag.flat.every({ |item| 
-		                	[ UChain, UScore ].includes(item.class) 
+	                	View.currentDrag.flat.every({ |item|
+		                	[ UChain, UScore ].includes(item.class)
 	                	})
                 	}
                 }
@@ -538,15 +538,15 @@ UScoreView {
 						// always stop
 						score.stop;
 					},
-					44, { // , 
+					44, { // ,
 						score.playAnyway(  ULib.servers );
 					},
 					48, { // 0
 						score.jumpTo( 0 );
 					},
-					{ 
+					{
 						if( c.asInteger.inclusivelyBetween( 49, 57 ) ) {
-							score.jumpTo( score.markerPositions[ a.asString.interpret - 1 ] 
+							score.jumpTo( score.markerPositions[ a.asString.interpret - 1 ]
 								? score.finiteDuration );
 						};
 					}
@@ -563,16 +563,16 @@ UScoreView {
 							if( this.selectedEvents.size > 0 ) {
 								this.moveSelectedBeats( snapH.neg )
 							} {
-								score.pos = score.tempoMap.useBeat( 
+								score.pos = score.tempoMap.useBeat(
 									score.pos, _ - snapH
 								).max(0);
-							}; 
+							};
 						} {
 							if( this.selectedEvents.size > 0 ) {
 								this.moveSelected( snapH.neg );
 							} {
 								score.pos = (score.pos - snapH).max(0);
-							};	
+							};
 						}
 					},
 					\right, { // right
@@ -580,16 +580,16 @@ UScoreView {
 							if( this.selectedEvents.size > 0 ) {
 								this.moveSelectedBeats( snapH )
 							} {
-								score.pos = score.tempoMap.useBeat( 
+								score.pos = score.tempoMap.useBeat(
 									score.pos, _ + snapH
 								);
-							}; 
+							};
 						} {
 							if( this.selectedEvents.size > 0 ) {
 								this.moveSelected( snapH );
 							} {
 								score.pos = score.pos + snapH;
-							};	
+							};
 						}
 					}
 				);
@@ -603,8 +603,8 @@ UScoreView {
 			.drawFunc_({ |v|
 				var viewRect, pixelScale, l, n, l60, r, lr, bnds, scaleAmt;
 				var top, bottom;
-				
-				if( showGrid ) {	
+
+				if( showGrid ) {
 					// grid lines
 					if( showTempoMap ) {
 						v.drawTempoGrid( score.tempoMap );
@@ -618,7 +618,7 @@ UScoreView {
 				rect = v.view.drawBounds.moveTo(0,0);
 
 				Pen.font = Font( Font.defaultSansFace, 10 );
-				
+
 				//draw events
 				usessionMouseEventsManager.eventViews.do({ |eventView|
 					eventView.draw(v, v.fromBounds.width );
@@ -627,7 +627,7 @@ UScoreView {
 				//draw selection rectangle
 				if(usessionMouseEventsManager.selectionRect.notNil) {
 					Pen.strokeColor = Color.white;
-					Pen.fillColor = Color.grey(0.3).alpha_(0.4); 
+					Pen.fillColor = Color.grey(0.3).alpha_(0.4);
 					Pen.addRect(v.translateScale(usessionMouseEventsManager.selectionRect));
 					Pen.fillStroke;
 				};
@@ -638,7 +638,7 @@ UScoreView {
 				scPos = v.translateScale( score.pos@0 );
 				Pen.line( (scPos.x)@0, (scPos.x)@v.bounds.height);
 				Pen.stroke;
-				
+
 				if( score.isPlaying ) { // draw ghost line showing latency
 					Pen.color = Color.black.alpha_(0.25);
 					scPos = v.translateScale( (score.pos - (Server.default.latency))@0 );
@@ -651,7 +651,7 @@ UScoreView {
 				Pen.strokeRect( rect.insetBy(0.5,0.5) );
 
 		});
-		
+
 		scoreView.userView.view.focus;
      }
 

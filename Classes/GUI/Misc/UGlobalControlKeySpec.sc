@@ -1,12 +1,12 @@
-UGlobalControlKeySpec : Spec { 
-	
+UGlobalControlKeySpec : Spec {
+
 	*new {
 		^super.newCopyArgs();
 	}
-	
+
 	map { |in| ^in }
 	unmap { |in| ^in }
-	
+
 	constrain { |key|
 		key = key.asSymbol;
 		if( key.notNil && { UGlobalControl.current.keys.any({ |item| item == key }).not }) {
@@ -15,9 +15,9 @@ UGlobalControlKeySpec : Spec {
 		};
 		^key;
 	}
-	
+
 	default { ^UGlobalControl.current.keys[0] }
-	
+
 	makeView { |parent, bounds, label, action, resize|
 		var multipleActions = action.size > 0;
 		var ctrl;
@@ -25,12 +25,12 @@ UGlobalControlKeySpec : Spec {
 		var views;
 		var font;
 		views = ();
-		
+
 		font = (RoundView.skin ? ()).font ?? { Font( Font.defaultSansFace, 10 ); };
-		
+
 		views[ \composite ] = EZCompositeView( parent, bounds, gap: 2@2 );
 		bounds = views[ \composite ].asView.bounds;
-		views[ \menu ] = EZPopUpMenu( views[ \composite ] , bounds.insetAll(0,0,42,0), 
+		views[ \menu ] = EZPopUpMenu( views[ \composite ] , bounds.insetAll(0,0,42,0),
 			label !? { label.asString ++ " " }
 		).font_( font );
 		views[ \button ] = SmoothButton( views[ \composite ], 40 @ (bounds.height) )
@@ -41,14 +41,14 @@ UGlobalControlKeySpec : Spec {
 			.action_({
 				UGlobalControlGUI();
 			});
-		
+
 		fillPopUp = {
 			if( keys != UGlobalControl.current.keys ) {				keys = UGlobalControl.current.keys.copy;
 				views[ \menu ].items = UGlobalControl.current.keys.collect({ |key|
 					key -> { |vw| action.value( views, key ) }
 				}) ++ [
 				     '' -> { },
-					'add...' -> { |vw| 
+					'add...' -> { |vw|
 						SCRequestString( "", "please enter key name:", { |string|
 							action.value( views, this.constrain( string.asSymbol ) );
 						})
@@ -67,7 +67,7 @@ UGlobalControlKeySpec : Spec {
 		if( resize.notNil ) { views[ \composite ].view.resize = resize };
 		^views
 	}
-	
+
 	setView { |view, value, active = false|
 		{  // can call from fork
 			value = this.constrain( value );
@@ -75,7 +75,7 @@ UGlobalControlKeySpec : Spec {
 			if( active ) { view.doAction };
 		}.defer;
 	}
-	
+
 	mapSetView { |view, value, active = false|
 		{  // can call from fork
 			view[ \menu ].value = view[ \menu ].items.collect(_.key).indexOf( value ) ? 0;
@@ -90,7 +90,7 @@ UGlobalControlKeySpec : Spec {
 		default = newList.indexOfEqual( default ) ? (newList.size-1);
 		^ListSpec( newList, default )
 	}
-	
+
 	massEditValue { |inArray|
 		var first;
 		first = inArray.first;
@@ -98,7 +98,7 @@ UGlobalControlKeySpec : Spec {
 			^first;
 		} {
 			^"mixed";
-		};	
+		};
 	}
 
 	massEdit { |inArray, params|
@@ -112,5 +112,5 @@ UGlobalControlKeySpec : Spec {
 			};
 		};
 	}
-	
+
 }

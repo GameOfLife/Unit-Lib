@@ -1,7 +1,7 @@
 UMapDef : Udef {
 	classvar <>all, <>defsFolders, <>userDefsFolder;
 	classvar <>defaultCanUseUMapFunc;
-	
+
 	var <>mappedArgs;
 	var <useMappedArgs = true;
 	var <>outputIsMapped = true;
@@ -11,9 +11,9 @@ UMapDef : Udef {
 	var <>canUseUMapFunc;
 	var <>apxCPU = 0;
 	var >guiColor;
-	
+
 	*initClass{
-		this.defsFolders = [ 
+		this.defsFolders = [
 			this.filenameSymbol.asString.dirname.dirname.dirname +/+ "UMapDefs"
 		];
 		this.userDefsFolder = Platform.userAppSupportDir ++ "/UMapDefs/";
@@ -23,21 +23,21 @@ UMapDef : Udef {
 			};
 		};
 	}
-	
+
 	defType { ^\dynamic }
-	
+
 	*prefix { ^"umap_" } // synthdefs get another prefix to avoid overwriting
-	
+
 	*from { |item| ^item.asUDef( this ) }
-	
+
 	*useMappedArgs {
 		^this.buildUdef.useMappedArgs ? true;
 	}
-	
+
 	*useMappedArgs_ { |bool = true|
 		this.buildUdef.useMappedArgs = bool;
 	}
-	
+
 	useMappedArgs_ { |bool = true|
 		if( Udef.buildUdef == this ) {
 			useMappedArgs = bool;
@@ -45,26 +45,26 @@ UMapDef : Udef {
 			"UMapDef:useMappedArgs can only be set from inside the synth function".warn;
 		};
 	}
-	
+
 	dontStoreValue { ^false }
-	
+
 	asArgsArray { |argPairs, unit, constrain = true|
 		argPairs = prepareArgsFunc.value( argPairs ) ? argPairs ? #[];
-		^this.argSpecs( unit ).collect({ |item| 
+		^this.argSpecs( unit ).collect({ |item|
 			var val;
 			val = argPairs.pairsAt(item.name) ?? { item.default.copy };
 			val = val.deepCopy.asUnitArg( unit, item.name );
-			if( constrain && this.isMappedArg( item.name ).not && { val.isKindOf( UMap ).not } ) { 
-				val = item.constrain( val ) 
+			if( constrain && this.isMappedArg( item.name ).not && { val.isKindOf( UMap ).not } ) {
+				val = item.constrain( val )
 			};
-			[ item.name,  val ] 
+			[ item.name,  val ]
 		}).flatten(1);
 	}
-	
+
 	isMappedArg { |name|
 		^this.mappedArgs.notNil && { this.mappedArgs.includes( name ) };
 	}
-	
+
 	argSpecs { |unit|
 		^argSpecs.collect({ |asp|
 			if( this.isMappedArg( asp.name ) ) {
@@ -74,11 +74,11 @@ UMapDef : Udef {
 			};
 		});
 	}
-	
+
 	args { |unit|
 		^this.argSpecs( unit ).collect({ |item| [ item.name, item.default ] }).flatten(1);
 	}
-		
+
 	getArgSpec { |name, unit|
 		var asp;
 		asp = argSpecs.detect({ |item| item.name == name });
@@ -88,7 +88,7 @@ UMapDef : Udef {
 			^asp
 		};
 	}
-	
+
 	getSpec { |name, unit|
 		var asp;
 		asp = argSpecs.detect({ |item| item.name == name });
@@ -98,13 +98,13 @@ UMapDef : Udef {
 			^asp.spec
 		};
 	}
-	
+
 	getDefault { |name, unit|
 		var asp;
 		asp = this.getArgSpec(name, unit);
 		if( asp.notNil ) { ^asp.default; } { ^nil };
 	}
-	
+
 	setSynth { |unit ...keyValuePairs|
 		keyValuePairs = keyValuePairs.clump(2).collect({ |item|
 			if( this.useMappedArgs && { this.isMappedArg( item[0] ) && { item[1].isUMap.not } } ) {
@@ -115,25 +115,25 @@ UMapDef : Udef {
 		}).flatten(1);
 		this.prSetSynth( unit.synths, *keyValuePairs );
 	}
-	
+
 	activateUnit { |unit, parentUnit| // called at UMap:asUnitArg
 		if( unit.synths.size == 0 && {
-			parentUnit.notNil && { parentUnit.synths.size > 0 } 
+			parentUnit.notNil && { parentUnit.synths.size > 0 }
 		}) {
 				unit.unit_(parentUnit);
 				unit.setUMapBus;
 				unit.prepareAndStart( unit.unit.synthsForUMap );
 			};
 	}
-	
+
 	asUMapDef { ^this }
-	
+
 	isUdef { ^false }
-	
+
 	needsStream { ^false }
-	
+
 	getNext { }
-	
+
 	getControlInput { |unit|
 		if( this.hasBus ) {
 			if( this.numChannels > 1 ) {
@@ -147,39 +147,39 @@ UMapDef : Udef {
 			^this.value( unit ).asControlInput;
 		};
 	}
-	
-	value { |unit|  
+
+	value { |unit|
 		// subclass may put something different here
 		^unit !? {|x| x.spec.default } ? 0;
 	}
-	
+
 	getValue { |unit|
-		 ^unit.get( \value ) ? unit 
+		 ^unit.get( \value ) ? unit
 	}
-	
+
 	getBus { |unit|
 		^unit.get(\u_mapbus) ? 0
 	}
-	
+
 	setBus { |bus = 0, unit|
 		unit.set(\u_mapbus, bus );
 	}
-	
+
 	hasBus { ^this.argNames.includes( \u_mapbus ); }
-	
+
 	createSynth { |umap, target, startPos = 0| // create A single synth based on server
 		target = target ? Server.default;
 		^Synth( this.synthDefName, umap.getArgsFor( target, startPos ), target, \addBefore );
 	}
-	
+
 	unitCanUseUMap { |unit, key|
 		^(canUseUMapFunc ? defaultCanUseUMapFunc).value( unit, key, this );
 	}
-	
+
 	canInsert {
 		^(canInsert != false) && { this.insertArgName.notNil; };
 	}
-	
+
 	insertArgName {
 		if( insertArgName.isNil ) {
 			if( outputIsMapped ) {
@@ -189,57 +189,57 @@ UMapDef : Udef {
 			} {
 				insertArgName = argSpecs.select({ |item|
 					item.private.not && { mappedArgs.asCollection.includes( item.name ).not }
-				}).detect({ |item| 
+				}).detect({ |item|
 					item.default.asControlInput.asCollection.size == this.numChannels;
 				}) !? _.name;
 			};
 		};
 		^insertArgName;
 	}
-	
+
 	argNeedsUnmappedInput { |key|
-		^useMappedArgs && { this.isMappedArg( key ) } 
+		^useMappedArgs && { this.isMappedArg( key ) }
 	}
-	
+
 	*defaultGUIColor { ^Color.blue.blend( Color.white, 0.8 ).alpha_(0.4); }
-	
+
 	guiColor { ^guiColor ? (this.class.defaultGUIColor) }
 }
 
 UMap : U {
-	
-	/* 
+
+	/*
 	example:
 	x = UChain([ 'sine', [ 'freq', UMap() ] ], 'output');
 	x.prepareAndStart;
 	x.stop;
 	*/
-	
+
 	classvar <>allUnits;
 	classvar <>currentBus = 0, <>maxBus = 499;
 	classvar >guiColor;
 	classvar <>allStreams;
 	classvar <>currentStreamID = 0;
-	
+
 	var <spec;
 	var <>useSpec;
 	var <>unitArgName;
 	var <>unitArgMode;
 	var <>unmappedKeys;
 	var <>streamID;
-	
+
 	*busOffset { ^1500 }
-	
+
 	*guiColor { ^guiColor ?? { guiColor = Color.blue.blend( Color.white, 0.8 ).alpha_(0.4) }; }
 	guiColor { ^this.subDef !? _.guiColor ? this.class.guiColor }
-	
+
 	init { |in, inArgs, inMod|
 		super.init( in, inArgs ? [], inMod );
 		this.setunmappedKeys( inArgs );
 		this.mapUnmappedArgs;
 		if( this.subDef.isKindOf( UPatDef ) && { spec.notNil } ) { this.makeStream };
 	}
-	
+
 	setunmappedKeys { |args|
 		args = (args ? []).clump(2).flop[0];
 		this.def.mappedArgs.do({ |item|
@@ -248,28 +248,28 @@ UMap : U {
 			};
 		});
 	}
-	
-	*initClass { 
+
+	*initClass {
 	    allUnits = IdentityDictionary();
 	    allStreams = Order();
 	}
-	
+
 	*defClass { ^UMapDef }
-	
+
 	asControlInput {
 		^this.def.getControlInput(this);
 	}
-	
+
 	asOSCArgEmbeddedArray { | array| ^this.asControlInput.asCollection.asOSCArgEmbeddedArray(array) }
-	
-	getBus { 
+
+	getBus {
 		^this.def.getBus( this );
 	}
-	
+
 	setBus { |bus = 0|
 		this.def.setBus( bus, this );
 	}
-	
+
 	nextBus {
 		var res, nextBus, n;
 		n = this.def.numChannels;
@@ -283,16 +283,16 @@ UMap : U {
 		currentBus = nextBus;
 		^res;
 	}
-	
+
 	setUMapBus {
 		if( this.hasBus ) {
 			this.setBus( this.nextBus );
 		};
 	}
-	
+
 	set { |...args|
 		var keys;
-		if( unmappedKeys.size > 0 ) {	
+		if( unmappedKeys.size > 0 ) {
 			keys = (args ? []).clump(2).flop[0];
 			keys.do({ |item|
 				if( unmappedKeys.includes( item ) ) {
@@ -302,17 +302,17 @@ UMap : U {
 		};
 		^super.set( *args );
 	}
-	
+
 	isUMap { ^true }
-	
+
 	hasBus { ^this.def.hasBus( this ) }
-	
+
 	setUMapBuses { } // this is done by the U for all (nested) UMaps
-	
+
 	u_waitTime { ^this.waitTime }
-	
+
 	dontStoreArgNames { ^[ 'u_dur', 'u_doneAction', 'u_mapbus', 'u_spec', 'u_store', 'u_prepared', 'u_originalSpec', 'u_useSpec' ] ++ if( this.def.dontStoreValue ) { [ \value ] } { [] } }
-	
+
 	spec_ { |newSpec|
 		if( spec.isNil ) {
 			if( newSpec.notNil ) {
@@ -320,7 +320,7 @@ UMap : U {
 				this.mapUnmappedArgs;
 			};
 		} {
-			if( newSpec != spec ) {	
+			if( newSpec != spec ) {
 				this.def.mappedArgs.do({ |key|
 					var val;
 					val = this.get( key );
@@ -334,9 +334,9 @@ UMap : U {
 				unmappedKeys = this.def.mappedArgs.copy;
 				this.mapUnmappedArgs;
 			}
-		} 
+		}
 	}
-	
+
 	mapUnmappedArgs {
 		if( spec.notNil ) {
 			unmappedKeys.copy.do({ |key|
@@ -350,7 +350,7 @@ UMap : U {
 			});
 		};
 	}
-	
+
 	// UMap is intended to use as arg for a Unit (or another UMap)
 	asUnitArg { |unit, key|
 		var notMappedArg = true;
@@ -366,11 +366,11 @@ UMap : U {
 						this.set( \u_useSpec, false );
 					};
 				} {
-					
+
 					if( unit.isKindOf( UMap ) && { unit.def.isMappedArg( key ) } ) {
 						notMappedArg = false;
 					};
-					
+
 					if( ( notMappedArg == true ) or: { unit.spec.notNil } ) {						this.spec = unit.getSpec( key ).copy;
 						this.useSpec = true;
 						this.set( \u_spec, this.spec );
@@ -385,11 +385,11 @@ UMap : U {
 			^unit.getDefault( key );
 		};
 	}
-	
+
 	argNeedsUnmappedInput { |key|
 		^this.subDef.argNeedsUnmappedInput( key, this );
 	}
-	
+
 	unit_ { |aUnit|
 		if( aUnit.notNil ) {
 			case { this.unit == aUnit } {
@@ -399,25 +399,25 @@ UMap : U {
 			} {
 				"Warning: unit_ \n%\nis already being used by\n%\n".postf(
 					this.class,
-					this.asCompileString, 
-					this.unit 
+					this.asCompileString,
+					this.unit
 				);
 			};
 		} {
 			allUnits[ this ] = nil; // forget unit
 		};
 	}
-	
+
 	unit { ^allUnits[ this ] !? { allUnits[ this ][0] }; }
-	
+
 	unitSet { // sets this object in the unit to enforce setting of the synths
-		if( this.unit.notNil ) {	
+		if( this.unit.notNil ) {
 			if( this.unitArgName.notNil ) {
 				this.unit.prSet( this.unitArgName, this );
 			};
 		};
 	}
-	
+
 	getSynthArgs {
 		var nonsynthKeys;
 		nonsynthKeys = this.argSpecs.select({ |item| item.mode == \nonsynth }).collect(_.name);
@@ -431,36 +431,36 @@ UMap : U {
 			})
 			.flatten(1);
 	}
-	
+
 	value { ^this.def.getValue( this ) }
-	
+
 	/// UPat
-	
+
 	stream {
 		^allStreams[ streamID ? -1 ];
 	}
-	
+
 	stream_ { |stream|
 		if( stream.isNil ) {
 			if( streamID.notNil ) {
 				allStreams.removeAt( streamID );
 			};
-		} {	
+		} {
 			this.makeStreamID;
 			allStreams[ streamID ] = stream;
 		};
 	}
-	
+
 	*nextStreamID {
 		^currentStreamID = currentStreamID + 1;
 	}
-	
+
 	makeStreamID { |replaceCurrent = false|
 		if( replaceCurrent or: { streamID.isNil }) {
 			streamID = this.class.nextStreamID;
 		};
 	}
-	
+
 	makeStream {
 		this.def.makeStream( this );
 	}
@@ -471,7 +471,7 @@ UMap : U {
 			this.makeStreamID( true );
 		};
 	}
-	
+
 	resetStreams {
 		this.resetStream;
 		this.args.pairsDo({ |key, item|
@@ -481,11 +481,11 @@ UMap : U {
 		});
 	}
 
-	next { 
+	next {
 		this.def.getNext( this );
 		^this.asControlInput;
 	}
-	
+
 	disposeFor {
 		if( this.unit.notNil && { this.unit.synths.select(_.isKindOf( Synth ) ).size == 0 }) {
 			this.unit = nil;
@@ -499,7 +499,7 @@ UMap : U {
 		    };
 		};
 	}
-	
+
 	dispose {
 	    this.free;
 	    this.values.do{ |val|
@@ -511,18 +511,18 @@ UMap : U {
 	    preparedServers = [];
 	    this.unit = nil;
 	}
-	
+
 	allowedModes { ^this.def.allowedModes( this ) }
 }
 
 MassEditUMap : MassEditU {
-	
+
 	var <>mixed = false;
-	
+
 	init { |inUnits|
 		var firstDef, defs;
 		units = inUnits.asCollection;
-		if( units.every(_.isUMap) ) {	
+		if( units.every(_.isUMap) ) {
 			defs = inUnits.collect(_.def);
 			firstDef = defs[0];
 			if( defs.every({ |item| item == firstDef }) ) {
@@ -534,11 +534,11 @@ MassEditUMap : MassEditU {
 					});
 					if( values.any(_.isUMap) ) {
 						massEditSpec = MassEditUMapSpec( MassEditUMap( values ) );
-					} {	
+					} {
 						massEditSpec = argSpec.spec.massEditSpec( values );
 					};
 					if( massEditSpec.notNil ) {
-						ArgSpec( argSpec.name, massEditSpec.default, massEditSpec, argSpec.private, argSpec.mode ); 
+						ArgSpec( argSpec.name, massEditSpec.default, massEditSpec, argSpec.private, argSpec.mode );
 					} {
 						nil;
 					};
@@ -552,73 +552,73 @@ MassEditUMap : MassEditU {
 			mixed = true;
 		};
 	}
-	
+
 	unitArgName { ^units.detect(_.isUMap).unitArgName }
-	
+
 	asUnitArg { }
-	
+
 	isUMap { ^true }
-	
-	defName { 
+
+	defName {
 		var numUMaps, numValues;
 		if( mixed ) {
 			numUMaps = units.count(_.isUMap);
 			numValues = units.size - numUMaps;
-			^("mixed" + "(% umaps%)".format( numUMaps, if( numValues > 0 ) { 
-				", % values".format( numValues ) 
+			^("mixed" + "(% umaps%)".format( numUMaps, if( numValues > 0 ) {
+				", % values".format( numValues )
 			} { "" }
 			)).asSymbol
 		} {
-			^((this.def !? { this.def.name }).asString + 
+			^((this.def !? { this.def.name }).asString +
 				"(% umaps)".format( units.size )).asSymbol
 		};
 	}
-	
+
 	def {
         ^if( mixed ) { ^nil } { def ?? { defName.asUdef( this.class.defClass ) } };
     }
-	
-	def_ { |def| 
+
+	def_ { |def|
 		units.do({ |item|
 			if( item.isUMap ) { item.def = def };
 		});
-		this.init( units ); 
-	}	
-	
+		this.init( units );
+	}
+
 	getInitArgs {
 		if( mixed ) { ^nil } { ^super.getInitArgs };
 	}
-	
+
 	remove {
 		units.do({ |item|
 			if( item.isUMap ) { item.remove };
 		});
-		this.init( units ); 
+		this.init( units );
 	}
 }
 
 MassEditUMapSpec : Spec {
-	
+
 	var <>default;
 	// placeholder for mass edit MassEditUMap
-	
+
 	*new { |default|
 		^super.newCopyArgs( default );
 	}
-	
-	viewNumLines { 
-		if( default.mixed ) { 
-			^1.1 
+
+	viewNumLines {
+		if( default.mixed ) {
+			^1.1
 		} {
 			^UMapGUI.viewNumLines( default );
 		};
 	}
-	
+
 	constrain { |value| ^value }
-	
+
 	map { |value| ^value }
 	unmap { |value| ^value }
-	
+
 }
 
 + Object {

@@ -17,20 +17,20 @@
     along with GameOfLife Unit Library.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/* 
+/*
 this is here as long as there isn't any incoming pattern matching functionality in sc itself.
 It is used for UOSCsetter
 */
 
-OSCMethodPatternDispatcher : OSCMessageDispatcher { 
-	
+OSCMethodPatternDispatcher : OSCMessageDispatcher {
+
 	classvar <>compatibilityMode = false;
-	
-	*initClass { 
+
+	*initClass {
 		compatibilityMode = OSCMessageDispatcher.findMethod( \value ).argNames[1] == \time;
 	}
-	
-	value {|msg, time, addr, recvPort| 
+
+	value {|msg, time, addr, recvPort|
 		var pattern;
 		if( compatibilityMode ) {
 			#time, addr, recvPort, msg = [ msg, time, addr, recvPort ];
@@ -40,7 +40,7 @@ OSCMethodPatternDispatcher : OSCMessageDispatcher {
 			if(pattern.matchOSCAddressPattern(key), {func.value(msg, time, addr, recvPort);});
 		})
 	}
-	
+
 	typeKey { ^('OSC patternmatched').asSymbol }
-	
+
 }

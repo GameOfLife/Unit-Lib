@@ -18,15 +18,15 @@
 */
 
 + Spec {
-	
+
 	massEditSpec { ^nil }
-	
+
 	massEditValue { ^0 }
-	
+
 	massEdit { |inArray, params|
 		^inArray;  // no mass editing for default spec
 	}
-	
+
 }
 
 + Nil {
@@ -34,39 +34,39 @@
 }
 
 + ControlSpec {
-	
+
 	massEditSpec { |inArray|
 		^this.asArrayControlSpec.default_( inArray );
 	}
-	
+
 	massEditValue { |inArray|
 		^inArray
 	}
-	
+
 	massEdit { |inArray, params|
 		^params;
 	}
-	
+
 }
 
 + AngleSpec {
-	
+
 	massEditSpec { |inArray|
 		^AngleArraySpec.newFrom( this ).default_( inArray );
 	}
-	
+
 	massEditValue { |inArray|
 		^inArray
 	}
-	
+
 	massEdit { |inArray, params|
 		^params;
 	}
-	
+
 }
 
 + ListSpec {
-	
+
 	massEditSpec { |inArray|
 		var default, newList;
 		default = this.massEditValue(inArray);
@@ -74,7 +74,7 @@
 		default = newList.indexOfEqual( default ) ? (list.size);
 		^ListSpec( list ++ [ "mixed" ], default, labels !? { labels ++ [ "mixed" ] })
 	}
-	
+
 	massEditValue { |inArray|
 		var first;
 		first = inArray.first;
@@ -82,7 +82,7 @@
 			^first;
 		} {
 			^"mixed";
-		};	
+		};
 	}
 
 	massEdit { |inArray, params|
@@ -99,59 +99,59 @@
 }
 
 + SMPTESpec {
-	
+
 	massEditSpec { |inArray|
 		^this.copy.default_( this.massEditValue( inArray ) );
 	}
-	
+
 	massEditValue { |inArray|
 		^inArray.minItem;
 	}
-	
+
 	massEdit { |inArray, params|
 		^(params - inArray.minItem) + inArray;
 	}
 }
 
 + TriggerSpec {
-	
+
 	massEditSpec { |inArray|
 		^this.copy;
 	}
-	
+
 	massEditValue { |inArray|
 		^inArray[0];
 	}
-	
+
 	massEdit { |inArray, params|
 		^inArray.collect({ |item| params });
  	}
 }
 
 + BoolSpec {
-	
+
 	massEditSpec { |inArray|
 		^BoolArraySpec( inArray, trueLabel, falseLabel );
 	}
-	
+
 	massEditValue { |inArray|
 		^inArray
 	}
-	
+
 	massEdit { |inArray, params|
 		^params;
 	}
-	
+
 }
 
 + RangeSpec {
-	
+
 	massEditSpec { |inArray|
 		var minmax;
 		minmax = this.massEditValue( inArray );
 		^RangeSpec( minval, maxval, 1.0e-11, inf, warp, step, minmax, units );
 	}
-	
+
 	massEditValue { |inArray|
 		if( inArray.notNil ) {
 			^[ inArray.flat.minItem, inArray.flat.maxItem ];
@@ -159,7 +159,7 @@
 			^[minval, maxval];
 		};
 	}
-	
+
 	massEdit { |inArray, params|
 		var linlinArgs;
 		linlinArgs = this.unmap( this.massEditValue( inArray ) ) ++ this.unmap( params );
@@ -170,30 +170,30 @@
 }
 
 + IntegerSpec {
-	
+
 	massEditSpec { |inArray|
 		^ArrayControlSpec( ).adaptToSpec( this ).default_( inArray );
 	}
-	
+
 	massEditValue { |inArray|
 		^inArray
 	}
-	
+
 	massEdit { |inArray, params|
 		^params;
 	}
 }
 
 + BufSndFileSpec {
-	
+
 	massEditSpec { |inArray|
-		^MultiSndFileSpec(inArray, true, this.class ); 
+		^MultiSndFileSpec(inArray, true, this.class );
 	}
-	
+
 	massEditValue { |inArray|
 		^inArray
 	}
-	
+
 	massEdit { |inArray, params|
 		^params;
 	}
@@ -202,15 +202,15 @@
 
 
 + DiskSndFileSpec {
-	
+
 	massEditSpec { |inArray|
-		^MultiSndFileSpec(inArray, true, this.class ); 
+		^MultiSndFileSpec(inArray, true, this.class );
 	}
-	
+
 	massEditValue { |inArray|
 		^inArray
 	}
-	
+
 	massEdit { |inArray, params|
 		^params;
 	}

@@ -18,7 +18,7 @@
 */
 
 UMarkerGUI : UChainGUI {
-	
+
 	prMakeViews { |bounds|
 		var margin = 0@0, gap = 4@4;
 		var heights, units;
@@ -26,37 +26,37 @@ UMarkerGUI : UChainGUI {
 		var controller;
 		var updateNotes = true;
 		// var unitInitFunc;
-		
+
 		labelWidth = 80;
-		
+
 		if( RoundView.skin.notNil ) { labelWidth = RoundView.skin.labelWidth ? 80 };
-		
+
 		views = ();
-		
+
 		originalBounds = bounds.copy;
-		
+
 		bounds = bounds ?? { parent.asView.bounds.insetBy(4,4) };
 		if( parent.asView.class.name == 'SCScrollTopView' ) {
 			bounds.width = bounds.width - 12;
 		};
-				
+
 		controller = SimpleController( chain );
-		
+
 		composite = CompositeView( parent, bounds ).resize_(5);
 		composite.addFlowLayout( margin, gap );
 		composite.onClose = { |vw|
-			controller.remove; 
+			controller.remove;
 			this.removeFromAll;
-			if( composite == vw && { current == this } ) { current = nil } 
+			if( composite == vw && { current == this } ) { current = nil }
 		};
-		
+
 		composite.decorator.shift( bounds.width - 80 - 28, 0 );
-		
+
 		views[ \displayColor ] = UserView( composite, 28@14 )
 			.resize_(3)
 			.drawFunc_({ |vw|
 				var wd = 8, smallRect;
-				if( chain.displayColor.notNil ) {	
+				if( chain.displayColor.notNil ) {
 					Pen.roundedRect(vw.drawBounds, wd);
 					chain.displayColor.penFill(vw.drawBounds, 1, nil, 10);
 					smallRect = Rect( vw.bounds.width - wd, 0, wd, wd );
@@ -74,22 +74,22 @@ UMarkerGUI : UChainGUI {
 				var wd = 8, smallRect;
 				smallRect = Rect( vw.bounds.width - wd, 0, wd, wd );
 				if( smallRect.containsPoint( x@y ) ) {
-					 chain.displayColor = nil; 
+					 chain.displayColor = nil;
 					 vw.refresh;
 				} {
-					if( views[ \colorEditor ].isNil ) { 
-						if( chain.displayColor.isNil or: { 
-								chain.displayColor.class == Color 
+					if( views[ \colorEditor ].isNil ) {
+						if( chain.displayColor.isNil or: {
+								chain.displayColor.class == Color
 							} ) {
 								RoundView.pushSkin( skin );
 								views[ \colorEditor ] = ColorSpec( chain.getTypeColor )
 									.makeView( "UMarker displayColor",
-										action: { |vws, color| 
-											chain.displayColor = color; 
-										} 
+										action: { |vws, color|
+											chain.displayColor = color;
+										}
 									);
-								views[ \colorEditor ].view.onClose = { 
-									views[ \colorEditor ] = nil 
+								views[ \colorEditor ].view.onClose = {
+									views[ \colorEditor ] = nil
 								};
 								RoundView.popSkin;
 						} {
@@ -100,11 +100,11 @@ UMarkerGUI : UChainGUI {
 					};
 				};
 			})
-			.keyDownAction_({ |vw, a,b,cx| 
-				if( cx == 127 ) { chain.displayColor = nil }; 
+			.keyDownAction_({ |vw, a,b,cx|
+				if( cx == 127 ) { chain.displayColor = nil };
 			})
 			.beginDragAction_({ chain.displayColor })
-			.canReceiveDragHandler_({ 
+			.canReceiveDragHandler_({
 				var obj;
 				obj = View.currentDrag;
 				if( obj.class == String ) {
@@ -112,9 +112,9 @@ UMarkerGUI : UChainGUI {
 				};
 				obj.respondsTo( \penFill );
 			})
-			.receiveDragHandler_({ 
+			.receiveDragHandler_({
 				if( View.currentDrag.class == String ) {
-					chain.displayColor = View.currentDrag.interpret; 
+					chain.displayColor = View.currentDrag.interpret;
 				} {
 					chain.displayColor = View.currentDrag;
 				};
@@ -124,7 +124,7 @@ UMarkerGUI : UChainGUI {
 				};
 			});
 
-		
+
 		views[ \singleWindow ] = SmoothButton( composite, 74@14 )
 			.label_( [ "single window", "single window" ] )
 			.border_( 1 )
@@ -134,24 +134,24 @@ UMarkerGUI : UChainGUI {
 			.action_({ |bt|
 				this.class.singleWindow = bt.value.booleanValue;
 			});
-		
+
 		composite.decorator.nextLine;
-		
+
 		// name
 		StaticText( composite, labelWidth@14 )
 			.applySkin( RoundView.skin )
 			.string_( "name" )
 			.align_( \right );
-			
+
 		views[ \name ] = TextField( composite, 84@14 )
 			.applySkin( RoundView.skin )
 			.string_( chain.name )
 			.action_({ |tf|
 				chain.name_( tf.string );
 			});
-			
+
 		composite.decorator.nextLine;
-			
+
 		// startTime
 		PopUpMenu( composite, labelWidth@14 )
 			.applySkin( RoundView.skin )
@@ -163,7 +163,7 @@ UMarkerGUI : UChainGUI {
 				views[ \startBar ].visible = (startTimeMode === \bar );
 			})
 			.value_( [ \time, \bar ].indexOf( startTimeMode ) ? 0 );
-			
+
 		views[ \startTime ] = SMPTEBox( composite, 84@14 )
 			.applySmoothSkin
 			.applySkin( RoundView.skin )
@@ -172,9 +172,9 @@ UMarkerGUI : UChainGUI {
 			.action_({ |nb|
 				chain.startTime_( nb.value );
 			});
-		
+
 		composite.decorator.shift( -88, 0 );
-		
+
 		views[ \startBar ] = TempoBarMapView( composite, 84@14, tempoMap  )
 			.applySkin( RoundView.skin )
 			.radius_(2)
@@ -183,37 +183,37 @@ UMarkerGUI : UChainGUI {
 			.action_({ |nb|
 				chain.startTime_( nb.value );
 			});
-						
+
 		composite.decorator.nextLine;
-		
+
 		// action
-		
+
 		RoundView.useWithSkin( RoundView.skin ++ ( labelWidth: 82 ), {
-			views[ \action ] = ObjectView( composite, (labelWidth + 120) @ 14, 
+			views[ \action ] = ObjectView( composite, (labelWidth + 120) @ 14,
 				chain, \action, CodeSpec({ |marker, score| }), controller
 			);
 		});
-		
+
 		composite.decorator.nextLine;
-		
+
 		// autoPause
-		
+
 		RoundView.useWithSkin( RoundView.skin ++ ( labelWidth: 82 ), {
-			views[ \action ] = ObjectView( composite, (labelWidth + 120) @ 14, 
+			views[ \action ] = ObjectView( composite, (labelWidth + 120) @ 14,
 				chain, \autoPause, BoolSpec(), controller
 			);
 		});
-		
+
 		composite.decorator.nextLine;
-		
+
 		// notes
 		StaticText( composite, labelWidth@14 )
 			.applySkin( RoundView.skin )
 			.string_( "notes" )
 			.align_( \right );
-			
-		views[ \notes ] = TextView( composite, 
-			(composite.bounds.width - (labelWidth+4)) @ 
+
+		views[ \notes ] = TextView( composite,
+			(composite.bounds.width - (labelWidth+4)) @
 			 	(composite.bounds.height - (PresetManagerGUI.getHeight + 12 + composite.decorator.top ))
 			 )
 			.applySkin( RoundView.skin )
@@ -231,16 +231,16 @@ UMarkerGUI : UChainGUI {
 			})
 			.background_( Color.gray(0.8) )
 			.resize_(5);
-		
+
 		composite.decorator.nextLine;
 		//composite.decorator.top = composite.bounds.height - (PresetManagerGUI.getHeight + 8 );
-		
+
 		CompositeView( composite, (composite.bounds.width - (margin.x * 2)) @ 2 )
 				.background_( Color.black.alpha_(0.25) )
 				.resize_(8);
-			
-		presetView = PresetManagerGUI( 
-			composite, 
+
+		presetView = PresetManagerGUI(
+			composite,
 			composite.bounds.width @ PresetManagerGUI.getHeight,
 			UMarker.presetManager,
 			chain
@@ -248,21 +248,21 @@ UMarkerGUI : UChainGUI {
 
 		controller
 			.put( \displayColor, { { views[ \displayColor ].refresh; }.defer; } )
-			.put( \startTime, { 
-				views[ \startTime ].value = chain.startTime ? 0; 
+			.put( \startTime, {
+				views[ \startTime ].value = chain.startTime ? 0;
 				views[ \startBar ].value = chain.startTime ? 0;
 			})
 			.put( \name, { { views[ \name ].value = chain.name; }.defer })
-			.put( \notes, { 
+			.put( \notes, {
 				if( updateNotes ) {
-					{ views[ \notes ].string = chain.notes ? ""; }.defer 
+					{ views[ \notes ].string = chain.notes ? ""; }.defer
 				};
 			});
-			
-		composite.getParents.last.findWindow !? _.toFrontAction_({ 
+
+		composite.getParents.last.findWindow !? _.toFrontAction_({
 			this.makeCurrent;
 		});
-		
+
 		chain.changed( \startTime );
 		chain.changed( \name );
 	}

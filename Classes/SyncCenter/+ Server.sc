@@ -18,7 +18,7 @@
 */
 
 + Server {
-	
+
 	listSendSyncedBundle{ |delta = 0.2, msgs, syncCenter|
 		syncCenter = syncCenter ? SyncCenter.current;
 		if( syncCenter.notNil ) {
@@ -27,9 +27,9 @@
 			if( SyncCenter.verbose ) { "falling back to normal bundle".postln; };
 			this.listSendBundle( delta, msgs );
 		};
-		
+
 	}
-	
+
 	sendSyncedBundle{ |delta = 0.2, syncCenter ... msgs|
 		syncCenter = syncCenter ? SyncCenter.current;
 		if( syncCenter.notNil ) {

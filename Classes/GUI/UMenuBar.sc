@@ -20,30 +20,30 @@
 
 
 UMenuBar {
-	
+
 	classvar <>sessionMenu, <>scoreMenu, <>viewMenu;
 	classvar <>sessionAdd, <>sessionNewAdd, <>sessionSelectedEvents;
 
     *new { |index = 3|
-	    
+
 /* USession */
 		sessionMenu = SCMenuGroup.new(nil, "Session", index);
 		SCMenuItem.new(sessionMenu,  "New").action_({
 			USession.new.gui
 		});
-		
+
 		SCMenuItem.new(sessionMenu, "Open...").action_({
 			USession.read(nil, USessionGUI(_) )
 		});
-		
+
 		SCMenuItem.new(sessionMenu, "Save").action_({
 			USession.current !! _.save
-		});	
-			
+		});
+
 		SCMenuItem.new(sessionMenu, "Save as...").action_({
 			USession.current !! _.saveAs
 		});
-		
+
 		SCMenuSeparator.new(sessionMenu);
 /* USession - ADD OBJECTS */
         sessionAdd = SCMenuGroup.new(sessionMenu, "Add");
@@ -76,9 +76,9 @@ UMenuBar {
                     }
                 }
             });
-            
+
         sessionSelectedEvents = SCMenuGroup.new(sessionAdd, "Selected events");
-        
+
         SCMenuItem.new(sessionSelectedEvents, "all").action_({
             USession.current !! { |session|
                 UScoreEditorGUI.current !! { |editor|
@@ -108,7 +108,7 @@ UMenuBar {
                         }
                     }
                 });
-                
+
           SCMenuItem.new(sessionSelectedEvents, "into a UScore").action_({
                     USession.current !! { |session|
                         UScoreEditorGUI.current !! { |editor|
@@ -141,24 +141,24 @@ UMenuBar {
 
 		SCMenuItem.new(scoreMenu, "Save as...").action_({
 			UScore.current !! _.saveAs
-		}).setShortCut("S",true);	
+		}).setShortCut("S",true);
 
 		SCMenuSeparator.new(scoreMenu);
-		
+
 		SCMenuItem.new(scoreMenu, "Export as audio file..").action_({
-			UScore.current !! { |x| 
+			UScore.current !! { |x|
 				Dialog.savePanel({ |path|
 					x.writeAudioFile( path );
 				});
 			};
 		});
-		
+
 		SCMenuSeparator.new(scoreMenu);
 
 		SCMenuItem.new(scoreMenu, "Add Event").action_({
 			UScoreEditorGUI.current !! { |x| x.editor.addEvent }
 		}).setShortCut("A",true);
-		
+
 		SCMenuItem.new(scoreMenu, "Add Marker").action_({
 			UScoreEditorGUI.current !! { |x| x.editor.addMarker }
 		});
@@ -180,67 +180,67 @@ UMenuBar {
 		SCMenuItem.new(scoreMenu, "Paste").action_({
 			UScoreEditorGUI.current !! { |x| x.scoreView.currentEditor.pasteAtCurrentPos }
 		}).setShortCut("P",true);
-		
+
 		SCMenuSeparator.new(scoreMenu);
-				
+
 		SCMenuItem.new(scoreMenu, "Select All").action_({
 			UScoreEditorGUI.current !! { |x| x.scoreView.selectAll }
 
-		}).setShortCut("a",true);	
-		
+		}).setShortCut("a",true);
+
 		SCMenuItem.new(scoreMenu, "Select Similar").action_({
 			UScoreEditorGUI.current !! { |x| x.scoreView.selectSimilar }
-		});		
-		
+		});
+
 		//sort
 		SCMenuSeparator.new(scoreMenu);
-		
+
 		SCMenuItem.new(scoreMenu, "Sort Events").action_({
 			UScoreEditorGUI.current !! { |x|
-				UScore.current.events.sort; 
+				UScore.current.events.sort;
 				UScore.current.changed( \numEventsChanged );
-				UScore.current.changed( \something ); 
+				UScore.current.changed( \something );
 			};
 		});
-		
+
 		SCMenuItem.new(scoreMenu, "Overlapping events to new tracks").action_({
 			UScoreEditorGUI.current !! { |x| x.score.cleanOverlaps }
 		});
-		
+
 		SCMenuItem.new(scoreMenu, "Remove empty tracks").action_({
 			UScoreEditorGUI.current !! { |x| x.score.removeEmptyTracks }
 		});
-		
+
 		//mute, solo
 		SCMenuSeparator.new(scoreMenu);
-		
+
 		SCMenuItem.new(scoreMenu, "Disable selected").action_({
 			UScoreEditorGUI.current !! { |x| x.scoreView.disableSelected }
 		}).setShortCut("m",true);
-		
+
 		SCMenuItem.new(scoreMenu, "Enable selected").action_({
 			UScoreEditorGUI.current !! { |x| x.scoreView.enableSelected }
 		}).setShortCut("u",true);
-		
+
 		SCMenuItem.new(scoreMenu, "Enable all").action_({
 			UScoreEditorGUI.current !! { |x| x.editor.enableAll }
 		});
-		
+
 		SCMenuItem.new(scoreMenu, "Enable selected and disable all others").action_({
 			UScoreEditorGUI.current !! { |x| x.scoreView.soloEnableSelected }
 		}).setShortCut("p",true);
 
 		//tracks
 		SCMenuSeparator.new(scoreMenu);
-		
+
 		SCMenuItem.new(scoreMenu, "Add Track").action_({
 			UScoreEditorGUI.current !! { |x| x.scoreView.addTrack }
 		});
-		
+
 		SCMenuItem.new(scoreMenu, "Remove Unused Tracks").action_({
 			UScoreEditorGUI.current !! { |x| x.scoreView.removeUnusedTracks }
 		});
-		
+
 		//view
 		viewMenu = SCMenuGroup.new(nil, "View", index + 3);
 		SCMenuItem.new(viewMenu, "EQ").action_( { UGlobalEQ.gui; });		SCMenuItem.new(viewMenu, "Level").action_( { UGlobalGain.gui; });
@@ -249,7 +249,7 @@ UMenuBar {
 			ULib.servers.first.meter;
 		});
 	}
-	
+
 	*remove {
 		sessionMenu !? _.remove;
 		sessionMenu = nil;

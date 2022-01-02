@@ -34,7 +34,7 @@ UScoreEventView : UEventView {
 		px5Scaled =  scaledUserView.doReverseScale(Point(5,0)).x;
 		px10Scaled = scaledUserView.doReverseScale(Point(10,0)).x;
 		this.createRect(px10Scaled, scaledUserView.viewRect.width);
-		
+
 
         this.ifIsInsideRect( mousePos, {
 
@@ -60,7 +60,7 @@ UScoreEventView : UEventView {
         if(overallState == \moving) {
 	        if( moveVert.not ) {
 				if( tempoMap.notNil ) {
-					event.startTime = tempoMap.timeMoveWithSnap( 
+					event.startTime = tempoMap.timeMoveWithSnap(
 						originalStartTime, deltaTime, snap
 					).max(0);
 				} {
@@ -79,10 +79,10 @@ UScoreEventView : UEventView {
 		this.createRect(scaledUserView.doReverseScale(Point(10,0)).x, maxWidth);
 
 		scaledRect = scaledUserView.translateScale(rect);
-		
-		if( scaledUserView.view.drawBounds.intersects( scaledRect.insetBy(-2,-2) ) ) {	
+
+		if( scaledUserView.view.drawBounds.intersects( scaledRect.insetBy(-2,-2) ) ) {
 			innerRect = scaledRect.insetBy(0.5,0.5);
-	
+
 			//selected outline
 			if( selected ) {
 				Pen.width = 2;
@@ -90,7 +90,7 @@ UScoreEventView : UEventView {
 				this.drawShape(scaledRect);
 				Pen.stroke;
 			};
-			
+
 			//event is playing
 			if( event.isPlaying ) {
 				Pen.width = 3;
@@ -98,17 +98,17 @@ UScoreEventView : UEventView {
 				this.drawShape(scaledRect);
 				Pen.stroke;
 			};
-			
-			Pen.use({	
+
+			Pen.use({
 				var textLeft = 2;
-				
+
 				this.drawShape(innerRect);
 				Pen.clip;
-				
+
 				// fill inside
 				Pen.addRect( innerRect );
 				event.getTypeColor.penFill(innerRect, lineAlpha * 0.75, nil, 10);
-				
+
 				//draw name
 				if( scaledRect.height > 4 ) {
 					Pen.color = Color.black.alpha_( lineAlpha  );
@@ -119,11 +119,11 @@ UScoreEventView : UEventView {
 					Pen.stringAtPoint(
 						" " ++ this.getName,
 						scaledRect.leftTop.max( 0 @ -inf ) + (textLeft @ 1)
-					);		       
+					);
 				};
-	
+
 			});
-			
+
 		};
 
 	}

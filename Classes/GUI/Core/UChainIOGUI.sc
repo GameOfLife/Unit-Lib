@@ -18,16 +18,16 @@
 */
 
 UChainIOGUI : UChainGUI {
-	
+
 	var <analyzers;
 	var <unitColors;
 	var <>max = 7;
 	var <>allBuses;
 	var <>usedBuses;
 	var <>setMaxFunc;
-	
+
 	makeViews { |bounds|
-		
+
 		allBuses = [];
 		usedBuses = [];
 		setMaxFunc = nil;
@@ -36,7 +36,7 @@ UChainIOGUI : UChainGUI {
 		});
 		this.updateMax;
 	}
-	
+
 	updateMax {
 		var oldMax;
 		max = ((((allBuses.maxItem+1)/ 8).ceil.max(1) * 8)-1).clip(7,31);
@@ -44,7 +44,7 @@ UChainIOGUI : UChainGUI {
 			setMaxFunc.value;
 		};
 	}
-	
+
 	getControlsForUnit { |unit|
 		var ins, outs, mix;
 		ins = unit.audioIns;
@@ -54,7 +54,7 @@ UChainIOGUI : UChainGUI {
 		});
 		^[ ins, outs, mix ];
 	}
-	
+
 	getHeight { |units, margin, gap|
 		^units.collect({ |unit, i|
 			((14 + gap.y) * (
@@ -63,7 +63,7 @@ UChainIOGUI : UChainGUI {
 				14 + gap.y + gap.y;
 		}).sum + (4 * (14 + gap.y));
 	}
-	
+
 	getUnits {
 		var units = [];
 		chain.units.do({ |unit|
@@ -76,110 +76,110 @@ UChainIOGUI : UChainGUI {
 		});
 		^units;
 	}
-	
+
 	makeUnitHeader { |units, margin, gap|
 		var comp, header, code, io;
 		var audio, control;
-		
+
 		comp = CompositeView( composite, (composite.bounds.width - (margin.x * 2))@16 )
 			.resize_(2);
-		
+
 		header = StaticText( comp, comp.bounds.moveTo(0,0) )
 				.applySkin( RoundView.skin )
 				.string_( " units" )
 				.align_( \left )
 				.resize_(2);
-				
+
 		io = SmoothButton( comp, Rect( comp.bounds.right - 40, 1, 40, 12 ) )
                 .label_( "i/o" )
                 .border_( 1 )
                 .radius_( 2 )
                 .background_( Color.green )
                 .action_({
-	                UChainGUI( 
-	                	this.window.name, originalBounds, 
-	                	chain, replaceCurrent: true 
+	                UChainGUI(
+	                	this.window.name, originalBounds,
+	                	chain, replaceCurrent: true
 	                );
                 }).resize_(3);
-         
+
          code = SmoothButton( comp,
                     Rect( comp.bounds.right - (40 + 4 + 40), 1, 40, 12 ) )
                 .label_( "code" )
                 .border_( 1 )
                 .radius_( 2 )
                 .action_({
-	                UChainCodeGUI( 
-	                	this.window.name, originalBounds, 
-	                	chain, replaceCurrent: true 
+	                UChainCodeGUI(
+	                	this.window.name, originalBounds,
+	                	chain, replaceCurrent: true
 	                );
                 }).resize_(3);
-						
+
 		CompositeView( comp, Rect( 0, 14, (composite.bounds.width - (margin.x * 2)), 2 ) )
 			.background_( Color.black.alpha_(0.25) )
 			.resize_(2)
 
 	}
-	
+
 	makeUnitSubViews { |scrollView, units, margin, gap|
 		var unitInitFunc;
 		var labelWidth;
 		var width;
-		
+
 		width = scrollView.bounds.width - 12 - (margin.x * 2);
-		
+
 		labelWidth = 80;
-		
+
 		if( RoundView.skin.notNil ) { labelWidth = RoundView.skin.labelWidth ? 80 };
 
 		unitInitFunc = { |unit, what ...args|
 			if( what === \init ) { // close all views and create new
 				chain.changed( \units );
 			};
-		};		
-		
+		};
+
 		scrollView.decorator.gap = 4@0;
-		
+
 		^units.collect({ |unit, i|
 			var header, comp, views, params;
 			var index;
-			
+
 			index = chain.deepIndexOf( unit );
 			if( index.size > 1 ) {
 				index[ 0 ] = "%: %".format(  index[0], chain.units[ index[0] ].fullDefName );
 			};
-			
+
 			comp = CompositeView( scrollView, width@16 )
 				.resize_(2);
-				
+
 			header = StaticText( comp, width @ 14 )
 				.applySkin( RoundView.skin )
-				.string_( 
-				 	" " ++ index.asCollection.join( "." ) ++ ": " ++ 
-					if( unit.def.class == LocalUdef ) { "[Local] " } { "" } ++ 
+				.string_(
+				 	" " ++ index.asCollection.join( "." ) ++ ": " ++
+					if( unit.def.class == LocalUdef ) { "[Local] " } { "" } ++
 					unit.fullDefName
 				)
 				.background_( if( unit.isUMap ) { unit.guiColor } { Color.gray(0.9) } )
 				.resize_(2)
-				.font_( 
-					(RoundView.skin.tryPerform( \at, \font ) ?? 
-						{ Font( Font.defaultSansFace, 12) }).boldVariant 
+				.font_(
+					(RoundView.skin.tryPerform( \at, \font ) ??
+						{ Font( Font.defaultSansFace, 12) }).boldVariant
 				);
-			
+
 			views = this.makeUnitView( scrollView, unit, i, labelWidth, width );
-			
+
 			unit.addDependant( unitInitFunc );
-			
-			header.onClose_({ 
+
+			header.onClose_({
 				unit.removeDependant( unitInitFunc );
 				views[ \ctrl ].remove;
 			});
-			
+
 			views;
-			
+
 		});
-	
+
 	}
-	
+
 	prScanForBus { |array, bus = 0|
 		var neg;
 		neg = (bus+1).neg;
@@ -191,19 +191,19 @@ UChainIOGUI : UChainGUI {
 		});
 		^false;
 	}
-	
+
 	makeUnitView { |scrollView, unit, i, labelWidth, width|
 		var ctrl;
 		var views;
 		var controls;
 		var func;
-		
+
 		views = ();
-		
+
 		controls = this.getControlsForUnit( unit );
-		
+
 		ctrl = SimpleController( unit );
-		
+
 		func = { |item, mode = \in, mix = 0|
 			var nb, sl;
 			var key, val;
@@ -233,7 +233,7 @@ UChainIOGUI : UChainGUI {
 					)
 				)
 				.string_( "% % ".format( mode, item )  );
-							
+
 			sl = SmoothSlider( scrollView, (width - labelWidth - (45 + 4 + 4))@16 )
 				.hiliteColor_( nil )
 				.knobSize_( 0 )
@@ -255,10 +255,10 @@ UChainIOGUI : UChainGUI {
 				(size.asInteger ..0).do({ |i, index|
 					var y, alpha;
 					if( (sl.value * max).round(1) != index ) {
-						if( which.includes( index.asInteger ) ) { 
+						if( which.includes( index.asInteger ) ) {
 							alpha = 0.75;
-						} { 
-							alpha = 0.1; 
+						} {
+							alpha = 0.1;
 						};
 					} {
 						alpha = mix.value * 0.75;
@@ -272,7 +272,7 @@ UChainIOGUI : UChainGUI {
 					};
 				});
 			});
-			
+
 			sl.knobColor_(
 				switch( mode,
 					\in, { { |rect|
@@ -291,28 +291,28 @@ UChainIOGUI : UChainGUI {
 						} {
 							Pen.line( rect.left @ center.y, rect.right @ center.y ).stroke;
 						};
-						
+
 						if( used ) {
 							Pen.color = Color.green(0.65);
 						} {
-							Pen.color = Color.gray(0.65); 
+							Pen.color = Color.gray(0.65);
 						};
-						Pen.fillOval( rect.insetAll(3,3,3,3) ) 
+						Pen.fillOval( rect.insetAll(3,3,3,3) )
 					} },
 					\out, { { |rect|
 						var center;
-						
+
 						Pen.width = 5;
 						Pen.color = Color.gray(0.4).alpha_(0.75);
 						center = rect.center;
 						Pen.line( rect.right @ center.y, center ).stroke;
-						
-						Pen.color = Color.red(0.75); 
+
+						Pen.color = Color.red(0.75);
 						Pen.fillOval( rect.insetAll(3,3,3,3) );
 					} }
 				)
 			);
-						
+
 			nb = SmoothNumberBox( scrollView, 45@14 )
 				.clipLo_( 0 )
 				.clipHi_( 31 )
@@ -322,67 +322,67 @@ UChainIOGUI : UChainGUI {
 				.action_( { |nb|
 					unit.set( key, nb.value.round(1) );
 				} );
-				
+
 			setMaxFunc = setMaxFunc.addFunc({
 				sl.step = 1/max;
 				sl.value = allBuses[ allBusesIndex ]/max;
 			});
-					
+
 			ctrl.put( key, {
 				var val;
 				val = unit.get( key );
 				nb.value = val;
 				sl.value = val/max;
 				allBuses.put( allBusesIndex, val.asInteger );
-				case { mode == \out } { 
+				case { mode == \out } {
 					usedBuses.put( usedBusesIndex, val.asInteger );
-				} { endPoint } { 
+				} { endPoint } {
 					usedBuses.put( usedBusesIndex, (val+1).neg.asInteger );
 				};
 				this.updateMax;
 			});
-			
+
 			views[ mode ] = views[ mode ].add( [ nb, sl ] );
-			
+
 			[ nb, sl ];
 		};
-		
+
 		controls[0].do({ |item|
 			func.( item, \in );
 		});
-		
+
 		controls[1].do({ |item| // out
 			var key, val, mx;
-			
-			if( controls[2].includes( item ) ) {	
+
+			if( controls[2].includes( item ) ) {
 				key = unit.getIOKey( \out, \audio, item, "lvl" );
 				val = unit.get( key );
-				
+
 				mx = EZSmoothSlider(  scrollView, width@14,
 					"mix % ".format( item ),
-					\amp.asSpec, 
-					{ |vw| 
+					\amp.asSpec,
+					{ |vw|
 						unit.set( key, vw.value );
-					}, 
+					},
 					labelWidth: labelWidth
 				);
 				mx.labelWidth_( labelWidth );
-						
+
 				mx.value = val;
 				mx.view.resize = 2;
 				mx.sliderView.focusColor = Color.gray(0.2).alpha_(0.2);
-				
+
 				ctrl.put( key, {
 					mx.value = unit.get( key );
-				});	
-				
+				});
+
 				views[ \mix ] = views[ \mix ].add( mx );
 			};
-			
+
 			func.( item, \out, mx ? 0 );
 		});
-				
-		if( views.size == 0 ) { 
+
+		if( views.size == 0 ) {
 			ctrl.remove;
 		} {
 			views[ \ctrl ] = ctrl;

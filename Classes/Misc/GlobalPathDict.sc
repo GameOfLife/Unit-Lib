@@ -18,23 +18,23 @@
 */
 
 GlobalPathDict {
-	
+
 	classvar <>dict, <>replaceChar = $@;
 	classvar <>relativePath;
-	
-	*initClass { 
-		dict = IdentityDictionary(); 
+
+	*initClass {
+		dict = IdentityDictionary();
 		GlobalPathDict.put( \resources, Platform.resourceDir );
 	}
-	
+
 	*put { |key, path|
 		dict.put( key, path );
 	}
-	
+
 	*at { |key|
 		^dict.at( key );
 	}
-	
+
 	*getPath { |path|
 		var index, key;
 		if( path[0] == replaceChar ) {
@@ -53,29 +53,29 @@ GlobalPathDict {
 			^path.standardizePath;
 		};
 	}
-	
+
 	*formatPath { |path|
 		var stPath, array = [], key, i = 0;
 		var relative;
-		
+
 		dict.keysValuesDo({ |key, value|
 			if( key != '_relative' ) {
 				array = array.add( [ value.standardizePath.withTrailingSlash, key ] );
 			};
 		});
-		
+
 		array = array.sort({ |a,b|
 			(a[0].size < b[0].size) or: { a[0].size == b[0].size && { a[1] <= b[1] } }
 		}).reverse;
-		
+
 		relative = relativePath ?? { thisProcess.nowExecutingPath !? _.dirname };
 		if( relative.notNil ) {
 			array = [ [ relative.standardizePath.withTrailingSlash, '_relative' ] ] ++ array;
 			this.put( '_relative', relative );
 		};
-		
+
 		stPath = this.getPath( path );
-		
+
 		while { key.isNil && (i < array.size) } {
 			if( stPath.find( array[i][0] ) == 0 ) {
 				key = array[i][1];
@@ -88,7 +88,7 @@ GlobalPathDict {
 				i = i+1;
 			};
 		};
-		
+
 		if( key.notNil ) {
 			^stPath.findReplace( array[i][0], replaceChar ++ key ++ "/" );
 		} {
@@ -98,29 +98,29 @@ GlobalPathDict {
 }
 
 + String {
-	
+
 	getGPath {
 		^GlobalPathDict.getPath( this );
 	}
-	
+
 	formatGPath {
 		^GlobalPathDict.formatPath( this );
 	}
-	
+
 	putGPath { |key = \default|
 		GlobalPathDict.put( key, this );
 	}
-	
+
 }
 
 + Nil {
-	
+
 	putGPath { |key = \default|
 		GlobalPathDict.put( key, this );
 	}
-	
+
 	getGPath { ^this }
-	
+
 	formatGPath { ^this }
 
 }

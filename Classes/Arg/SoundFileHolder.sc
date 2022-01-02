@@ -18,20 +18,20 @@
 */
 
 AbstractRichBuffer {
-	
+
 	classvar <>allBuffers;
 	classvar <>allUnits;
-	
+
 	classvar <>useCheckFree = true; // safer in high-traffic situations, but not for NRT
 	classvar <>checkExists = true;
-	
+
     var <numFrames, <numChannels, <sampleRate;
     var <>unitArgName;
 
 	// var <>buffers; // holder for all buffers
     // var <unit, <unitArgName;
-    
-    *initClass { 
+
+    *initClass {
 	    allBuffers = IdentityDictionary();
 	    allUnits = IdentityDictionary();
 	}
@@ -43,7 +43,7 @@ AbstractRichBuffer {
     shallowCopy{
         ^this.class.new(numFrames, numChannels, sampleRate)
 	}
-		
+
 	== { |that| // use === for identity
 		^this.compareObject(that);
 	}
@@ -62,7 +62,7 @@ AbstractRichBuffer {
 		sampleRate = new ? 44100;
 		this.changed( \sampleRate, sampleRate );
 	}
-	
+
 	buffers { ^allBuffers[ this ] }
 	buffers_ { |buffers| allBuffers[ this ] = buffers; }
 
@@ -88,15 +88,15 @@ AbstractRichBuffer {
 	currentBuffer { |server|
 		var buf;
 	    buf = this.currentBuffers(server).last;
-	    if( buf.notNil ) { 
+	    if( buf.notNil ) {
 		    ^buf;
 	    } {
 		    "%:currentBuffer - no buffer loaded for %"
 		    		.format( this.class, server ).warn;
 		    	^buf
-	    };   
+	    };
 	}
-	
+
 	freeBuffer { |buf, action|
 		if( buf.notNil ) {
 			if( UEvent.nrtMode != true ) {
@@ -110,7 +110,7 @@ AbstractRichBuffer {
 		    	action.value;
 		};
 	}
-	
+
 	freeAllBuffers { |server|
 	    if( server.notNil ) {
 		    this.currentBuffers( server ).do( this.freeBuffer(_) )
@@ -118,7 +118,7 @@ AbstractRichBuffer {
 		    this.buffers.copy.do( this.freeBuffer(_) )
 		}
 	}
-	
+
 	freeBufferFor { |server|
 		if( server.notNil ) {
 			this.freeBuffer( this.currentBuffers(server).first );
@@ -150,9 +150,9 @@ AbstractRichBuffer {
 	}
 
 	asControlInputFor { |server| ^this.currentBuffer(server) }
-	
+
 	u_waitTime { ^1 }
-	
+
 	asUnitArg { |unit, key|
 		this.unitArgName = key;
 	}
@@ -166,19 +166,19 @@ AbstractRichBuffer {
 			} {
 				"Warning: unit_ \n%\nis already being used by\n%\n".postf(
 					this.class,
-					this.asCompileString, 
-					this.unit 
+					this.asCompileString,
+					this.unit
 				);
 			};
 		} {
 			allUnits[ this ] = nil; // forget unit
 		};
-		
+
 		/*
-	    case { unit == aUnit } { 
+	    case { unit == aUnit } {
 		    // do nothing
 		} {
-		    unit.isNil 
+		    unit.isNil
 		} {
 	        unit = aUnit;
 	        unitArgName = nil;
@@ -190,11 +190,11 @@ AbstractRichBuffer {
 	    };
 	    */
 	}
-	
+
 	unit { ^allUnits[ this ] !? { allUnits[ this ][0] }; }
-	
+
 	unitSet { // sets this object in the unit to enforce setting of the synths
-		if( this.unit.notNil ) {	
+		if( this.unit.notNil ) {
 			if( this.unitArgName.notNil ) {
 				this.unit.set( this.unitArgName, this );
 			};
@@ -232,24 +232,24 @@ RichBuffer : AbstractRichBuffer {
 }
 
 AbstractSndFile : AbstractRichBuffer {
-	
+
 	// points to a Sndfile and holds its specs, similar to SoundFile
 	// aditional parameters for Buffer loading and playback settings
 	// fully MVC aware
-	
+
 	var <path;
 	var <startFrame = 0, endFrame;  // for buffer loading
 	var <rate = 1;
 	var <loop = false;
-		
-	*newBasic{ |path, numFrames, numChannels, sampleRate = 44100, startFrame = 0, endFrame, 
+
+	*newBasic{ |path, numFrames, numChannels, sampleRate = 44100, startFrame = 0, endFrame,
 		rate = 1, loop = false |
 		^super.new(numFrames, numChannels, sampleRate)
 		    .initAbstractSndFile( path, startFrame, endFrame, rate, loop );
 	}
 
 	shallowCopy{
-        ^this.class.newBasic(path, numFrames, numChannels, sampleRate, startFrame, endFrame, rate, 
+        ^this.class.newBasic(path, numFrames, numChannels, sampleRate, startFrame, endFrame, rate,
         		loop);
 	}
 
@@ -265,7 +265,7 @@ AbstractSndFile : AbstractRichBuffer {
 		 rate = inRate;
 		 loop = inLoop;
 	}
-	
+
 	exists { ^File.exists(  path.getGPath.asPathFromServer ) }
 
 	*buf{ ^BufSndFile }
@@ -277,55 +277,55 @@ AbstractSndFile : AbstractRichBuffer {
 	}
 
 	fromFile { |soundfile|
-		if( this.prReadFromFile( soundfile ).not ) { 
-			"%:fromFile - could not open file '%'\n".postf( this.class, path.basename ) 
+		if( this.prReadFromFile( soundfile ).not ) {
+			"%:fromFile - could not open file '%'\n".postf( this.class, path.basename )
 		}
 	}
-	
+
 	prReadFromFile { |soundfile|
 		var test = true;
 		if( soundfile.isNil or: { soundfile.isOpen.not } ) {
-			soundfile = soundfile ?? { SoundFile.new }; 
+			soundfile = soundfile ?? { SoundFile.new };
 			test = soundfile.openRead( path.getGPath.asPathFromServer );
 			soundfile.close; // close if it wasn't open
 		};
-		if( test ) {	
+		if( test ) {
 			this.numFrames = soundfile.numFrames;
 			this.numChannels = soundfile.numChannels;
 			this.sampleRate = soundfile.sampleRate;
 			^true;
-		} { 
-			^false 
+		} {
+			^false
 		};
 	}
-	
+
 	asSoundFile { // convert to normal soundfile
 		^SoundFile( path.getGPath.asPathFromServer )
 			//.numFrames_( numFrames ? 0 )
 			.instVarPut( \numFrames,  numFrames ? 0 )
 			.numChannels_( numChannels ? 1 )
 			.sampleRate_( sampleRate ? 44100 );
-	} 
-	
+	}
+
 	// mvc aware setters
-	
+
 	path_ { |new, update = false|
 		path = (new ? path).formatGPath;
 		this.changed( \path, path );
 		if( update == true ) { this.prReadFromFile; };
 	}
-	
+
 	basename { ^path !? { path.basename } }
-	basename_ { |basename| 
+	basename_ { |basename|
 		if( path.isNil ) {
 			this.path = basename;
 		} {
 			this.path = path.dirname +/+ basename;
 		};
 	}
-	
+
 	dirname {  ^path !? { path.dirname } }
-	dirname_ { |dirname| 
+	dirname_ { |dirname|
 		if( path.isNil ) {
 			this.path = dirname;
 		} {
@@ -337,19 +337,19 @@ AbstractSndFile : AbstractRichBuffer {
 		startFrame = (new ? 0).max(0);
 		this.changed( \startFrame, startFrame );
 	}
-	
+
 	endFrame_ { |new|
 		endFrame = new.min(numFrames);
 		this.changed( \endFrame, endFrame );
 	}
-	
+
 	start { ^this.startFrame }
 	start_ { |frame| this.startFrame = frame }
-	
+
 	end { ^this.endFrame }
 	end_ { |frame| this.endFrame = frame }
-	
-	
+
+
 	cutStart { |time = 0|
 		this.startSecond = this.startSecond + time;
 	}
@@ -359,28 +359,28 @@ AbstractSndFile : AbstractRichBuffer {
 		this.changed( \rate, rate );
 		this.unitSet;
 	}
-	
+
 	loop_ { |new|
 		loop = new ? false;
 		this.changed( \loop, loop );
 		this.unitSet;
 	}
-	
-	endFrame { if( numFrames.notNil ) { 
-			^(endFrame ? numFrames) % (numFrames+1) 
-		} { 
-			^endFrame 
+
+	endFrame { if( numFrames.notNil ) {
+			^(endFrame ? numFrames) % (numFrames+1)
+		} {
+			^endFrame
 		};
 	}
-	
+
 	// pseudo getter/setters
-		 
+
 	usedFrames { ^(this.endFrame ?? { startFrame - 1 }) - startFrame } // -1 if unknown or to end
-	usedFrames_ { |frames = (-1)| // -1 means from startFrame to end 
-		if( [-1, nil].includes(frames.asInteger) ) { 
-			this.endFrame = nil; 
-		} { 
-			this.endFrame = frames + startFrame 
+	usedFrames_ { |frames = (-1)| // -1 means from startFrame to end
+		if( [-1, nil].includes(frames.asInteger) ) {
+			this.endFrame = nil;
+		} {
+			this.endFrame = frames + startFrame
 		};
 	}
 
@@ -392,35 +392,35 @@ AbstractSndFile : AbstractRichBuffer {
 	duration 		{ ^this.framesToSeconds(this.usedFrames); } // negative if unknown
 	fileDuration 	{ ^this.framesToSeconds(this.numFrames); }
 	eventDuration { ^if(loop){ inf }{ this.duration } }
-	
+
 	startSecond_ { |startSecond = 0| this.startFrame = this.secondsToFrames( startSecond ); }
 	endSecond_ { |endSecond = 0| this.endFrame = this.secondsToFrames( endSecond ); }
 	duration_ { |duration| this.usedFrames = this.secondsToFrames( duration ) }
 	fileDuration_ { |duration| this.numFrames = this.secondsToFrames( duration ); }
-	
+
 	// utilities
-	
+
 	plot { this.asSoundFile.plot; }
-	
+
 	checkDo { |action|
 		var test = true;
-		if( numFrames.isNil ) { 
+		if( numFrames.isNil ) {
 			test = this.prReadFromFile; // get numFrames etc.
 		};
-		if( test ) { 
-			^action.value 
+		if( test ) {
+			^action.value
 		} {
 			"%: file % not found".format( this.class, path.quote ).warn;
 			^false;
 		};
 	}
-	
+
 	splice { |seconds|
 		^this.checkDo({
 			this.spliceFrames( this.secondsToFrames( seconds ) );
 		});
 	}
-	
+
 	spliceFrames { |frame = 0| // split into segments based on frame or frames relative to startFrame
 		^this.checkDo({
 			var positions, segments, usedFrames;
@@ -439,16 +439,16 @@ AbstractSndFile : AbstractRichBuffer {
 						.startFrame_( startFrame + segment[0] )
 						.endFrame_( startFrame + segment[1] )
 				});
-			} { 
+			} {
 				[ this ];
 			}
 		});
 	}
-	
-	makeUnit { 
+
+	makeUnit {
 		^U( this.unitNamePrefix++"SoundFile", [\soundFile, this ] );
 	}
-	
+
 	asUnit {
 		^this.makeUnit;
 	}
@@ -480,7 +480,7 @@ AbstractSndFile : AbstractRichBuffer {
              startFrame, endFrame, rate, loop
 		]  <<")"
 	}
-	
+
 }
 
 BufSndFile : AbstractSndFile {
@@ -489,12 +489,12 @@ BufSndFile : AbstractSndFile {
     classvar <>globalServers;
     classvar <>globalLoading;
     classvar <>autoLoadGlobal = true;
-    
+
     var <useChannels, <>useStartPosForBuf = false;
-    
+
     *initClass { global = (); }
 
-	*new{ |path, startFrame = 0, endFrame, rate = 1, loop = false, useChannels | 
+	*new{ |path, startFrame = 0, endFrame, rate = 1, loop = false, useChannels |
 		// path of existing file or SoundFile
 		if( path.class == SoundFile ) {
 			^this.newBasic( path.path, nil, nil, nil, startFrame, endFrame, rate, loop )
@@ -504,11 +504,11 @@ BufSndFile : AbstractSndFile {
 				.useChannels_(useChannels).fromFile;
 		};
 	}
-	
+
 	asBufSndFile { ^this }
-	
+
 	id { ^[ this.path, this.startFrame, this.endFrame, this.numChannels ].join( $_ ).asSymbol }
-	
+
 	*fromID { |id|
 		var path, startFrame, endFrame, numChannels, obj;
 		id = id.asString.split( $_ ).reverse;
@@ -520,7 +520,7 @@ BufSndFile : AbstractSndFile {
 		};
 		^obj;
 	}
-	
+
 	prepare { |servers, startPos = 0, action|
 	    if( this.hasGlobal ) {
 		     action.value;
@@ -529,7 +529,7 @@ BufSndFile : AbstractSndFile {
 	    		servers.do({ |server| this.makeBuffer(server, startPos, action: action.getAction) })
 	    };
 	}
-	
+
 	loadGlobal { |action, replace = true|
 		var id;
 		id = this.id;
@@ -550,19 +550,19 @@ BufSndFile : AbstractSndFile {
 			global.changed( id );
 		};
 	}
-	
+
 	disposeGlobal { |action|
 		var id;
 		id = this.id;
 		MultiActionFunc.use( action, { |act|
 			global[ id ].do({ |buf|
 				this.freeBuffer( buf, act.getAction );
-			}); 
+			});
 			global[ id ] = nil;
 			global.changed( id );
 		});
 	}
-	
+
 	*disposeAllGlobal {
 		global.keys.as(Array).do({ |key|
 			global[ key ].do(_.free);
@@ -570,14 +570,14 @@ BufSndFile : AbstractSndFile {
 			global.changed( key );
 		});
 	}
-	
+
 	*reloadAllGlobal {
-		var keys;		
+		var keys;
 		keys = global.keys.asArray;
 		this.disposeAllGlobal;
 		keys.do({ |key| this.fromID( key ).loadGlobal( replace: true ); });
 	}
-	
+
 	findGlobal { |server|
 		if( UEvent.nrtMode != true ) {
 			^global[ this.id ].detect({ |buf| buf.server === server });
@@ -585,65 +585,65 @@ BufSndFile : AbstractSndFile {
 			^nil;
 		};
 	}
-	
-	hasGlobal { 
+
+	hasGlobal {
 		if( UEvent.nrtMode != true ) {
 			^global[ this.id ].notNil;
 		} {
 			^false;
 		};
 	}
-	
+
 	hasGlobal_ { |bool = true|
 		if( bool && autoLoadGlobal ) { this.loadGlobal( replace: false ); };
 	}
-	
-	asMonoBufSndFile { 
-		^MonoBufSndFile.newCopyVars( this ); 
+
+	asMonoBufSndFile {
+		^MonoBufSndFile.newCopyVars( this );
 	}
-	
-	asDiskSndFile { 
+
+	asDiskSndFile {
 		var unit; // pass unit on to new object
 		unit = this.unit;
 		this.unit = nil;
-		^DiskSndFile.newCopyVars( this ).unit_( unit ); 
+		^DiskSndFile.newCopyVars( this ).unit_( unit );
 	}
 
     useChannels_ { |new|
         useChannels = new;
         this.changed( \useChannels, useChannels );
     }
-    
+
     numChannelsForPlayBuf {
 	    ^if( useChannels.isNil ) { ^numChannels } { ^this.useChannels.size };
     }
-    
-    asControlInputFor { |server, startPos = 0| 
-	    ^[ 
-	    		this.findGlobal( server ) ?? { this.currentBuffer(server, startPos) }, 
-	    		rate, loop.binaryValue 
-	    	] 
+
+    asControlInputFor { |server, startPos = 0|
+	    ^[
+	    		this.findGlobal( server ) ?? { this.currentBuffer(server, startPos) },
+	    		rate, loop.binaryValue
+	    	]
 	   }
-	   
+
 	// not used by Unit:
-	asControlInput { 
+	asControlInput {
 		^this.asControlInputFor( Server.default ); // assume default server
 	}
-	
+
 	asOSCArgEmbeddedArray { | array| ^this.asControlInput.asOSCArgEmbeddedArray(array) }
 
     makeBuffer { |server, startPos = 0, action, bufnum, add = true|
 		var buf, addStartFrame = 0, localUsedFrames;
-		
+
 		localUsedFrames = this.usedFrames;
-		
-		if( useStartPosForBuf && { startPos != 0 } ) { 
+
+		if( useStartPosForBuf && { startPos != 0 } ) {
 			addStartFrame = this.secondsToFrames( startPos );
-			if( localUsedFrames != -1 ) { 
+			if( localUsedFrames != -1 ) {
 				localUsedFrames - addStartFrame;
 			};
 		};
-		
+
 		if( this.useChannels.notNil ) {
 			buf = Buffer.readChannel( server, path.getGPath,
 					startFrame + addStartFrame, localUsedFrames, this.useChannels, action, bufnum );
@@ -656,21 +656,21 @@ BufSndFile : AbstractSndFile {
 	}
 
     unitNamePrefix{ ^"buf" }
-    
+
     u_waitTime { ^if( this.hasGlobal ) { 0 } { 5 } }
-    
+
     storeOn { arg stream;
 		stream << this.class.name << ".newBasic(" <<* [ // use newBasic to prevent file reading
 		    path.formatGPath.quote, numFrames, numChannels, sampleRate,
              startFrame, endFrame, rate, loop
-		]  << ")" << 
+		]  << ")" <<
 		if( this.useChannels.notNil ) { ".useChannels_(%)".format( useChannels ) } { "" } <<
 		if( this.hasGlobal == true ) { ".hasGlobal_(true)" } { "" };
-		
+
 	}
-	
+
 	cutStart { |time=0|
-		if( loop.not ) { 
+		if( loop.not ) {
 			if( time < this.endSecond ) {
 				this.startSecond = this.startSecond + time;
 			};
@@ -689,30 +689,30 @@ BufSndFile : AbstractSndFile {
 }
 
 MonoBufSndFile : BufSndFile {
-	
+
 	var <channel = 0;
-	
+
 	useChannels { ^[ channel ] }
-	useChannels_ { |new| 
+	useChannels_ { |new|
 		this.channel = new.asCollection.first ? 0;
 		this.changed( \useChannels, useChannels );
 	}
-	
+
 	channel_ { |new = 0|
 		channel = new.min( numChannels );
 		this.changed( \useChannels, useChannels );
 	}
-	
-	asMonoBufSndFile { 
-		^this 
+
+	asMonoBufSndFile {
+		^this
 	}
-	
+
 	asBufSndFile {
 		^BufSndFile.newCopyVars( this );
 	}
-	
+
 	numChannels { ^1 }
-	
+
 	storeOn { arg stream;
 		stream << this.class.name << ".newBasic(" <<* [ // use newBasic to prevent file reading
 		    path.formatGPath.quote, numFrames, numChannels, sampleRate,
@@ -720,14 +720,14 @@ MonoBufSndFile : BufSndFile {
 		]  << ")" << if( this.channel != 0 ) { ".channel_(%)".format( this.channel ) } { "" } <<
 		if( this.hasGlobal == true ) { ".hasGlobal_(true)" } { "" };
 	}
-	
+
 }
 
 DiskSndFile : AbstractSndFile {
-	
+
 	var <>diskBufferSize = 32768;
 
-	*new{ |path, startFrame = 0, endFrame, rate = 1, loop = false| 
+	*new{ |path, startFrame = 0, endFrame, rate = 1, loop = false|
 		// path of existing file or SoundFile
 		if( path.class == SoundFile ) {
 			^this.newBasic( path.path, nil, nil, nil, startFrame, endFrame, rate, loop )
@@ -736,36 +736,36 @@ DiskSndFile : AbstractSndFile {
 			^this.newBasic( path, nil, nil, nil, startFrame, endFrame, rate, loop).fromFile;
 		};
 	}
-	
-	asBufSndFile { 
+
+	asBufSndFile {
 		var unit; // pass unit on to new object
 		unit = this.unit;
 		this.unit = nil;
-		^BufSndFile.newCopyVars( this ).unit_( unit ); 
+		^BufSndFile.newCopyVars( this ).unit_( unit );
 	}
-	
+
 	asMonoBufSndFile {
 		^MonoBufSndFile.newCopyVars( this );
 	}
-	
+
 	asDiskSndFile { ^this }
-	
-	asControlInputFor { |server, startPos = 0| 
-		^[ this.currentBuffer(server, startPos), rate, loop.binaryValue ] 
+
+	asControlInputFor { |server, startPos = 0|
+		^[ this.currentBuffer(server, startPos), rate, loop.binaryValue ]
 	}
-	
+
 	makeBuffer {  |server, startPos = 0, action, bufnum|  // startOffset in seconds
 	    //endFrame not used
 		var test = true;
 		var buf, addStartFrame = 0;
 		var actualStartFrame;
-		
-		if( numChannels.isNil ) { 
+
+		if( numChannels.isNil ) {
 			test = this.prReadFromFile; // get numchannels etc.
 		};
-		
+
 		if( test ) {
-			
+
 			if( startPos != 0 ) { addStartFrame = this.secondsToFrames( startPos ) };
 			if( loop ) {
 				 actualStartFrame = (startFrame + addStartFrame).wrap( 0, this.endFrame );
@@ -785,7 +785,7 @@ DiskSndFile : AbstractSndFile {
 			"DiskSndFile:prReadBuffer : file not found".warn;
 		};
 	}
-	
+
 	 freeBuffer { |buf, action|
 		 if( UEvent.nrtMode != true ) {
 			buf.checkCloseFree( action );
@@ -798,11 +798,11 @@ DiskSndFile : AbstractSndFile {
 	}
 
     unitNamePrefix{ ^"disk" }
-    
+
     u_waitTime { ^1 }
-    
+
     hasGlobal { ^false }
-	
+
 }
 
 + Object {
@@ -810,27 +810,27 @@ DiskSndFile : AbstractSndFile {
 		var correspondingVars, new;
 		exclude = exclude.asCollection;
 		new = this.newCopyArgs(); // set nothing, init nothing
-		this.instVarNames.select({ |item| 
+		this.instVarNames.select({ |item|
 			exclude.includes( item ).not && {
 				obj.class.instVarNames.includes( item );
 			};
 		}).do({ |item|
 			new.instVarPut( item, obj.instVarAt( item ).copy );
 		});
-		^new;		
+		^new;
 	}
 }
 
 + Object {
-	
-	asBufSndFile { 
+
+	asBufSndFile {
 		^BufSndFile.newBasic(Platform.resourceDir +/+ "sounds/a11wlk01-44_1.aiff", 107520, 1, 44100, 0, nil, 1, false)
 	}
-	
-	asMonoBufSndFile { 
+
+	asMonoBufSndFile {
 		^MonoBufSndFile.newBasic(Platform.resourceDir +/+ "sounds/a11wlk01-44_1.aiff", 107520, 1, 44100, 0, nil, 1, false)
 	}
-	
+
 	asDiskSndFile {
 		^DiskSndFile.newBasic(Platform.resourceDir +/+ "sounds/a11wlk01-44_1.aiff", 107520, 1, 44100, 0, nil, 1, false)
 	}
@@ -865,21 +865,21 @@ UChain(\test).gui
 			^this;
 		};
 	}
-	
+
 	asUnit {
 		^this.asBufSndFile.asUnit;
 	}
-	
-	asBufSndFile { 
+
+	asBufSndFile {
 		^BufSndFile( this );
 	}
-	
+
 	asDiskSndFile {
 		^DiskSndFile( this );
 	}
-	
-	asPathFromServer { 
-		
+
+	asPathFromServer {
+
 		// a relative path on the server is not the same as on the lang for standalone apps.
 		// this method always returns a path that points to same file on both server and lang
 
@@ -887,13 +887,13 @@ UChain(\test).gui
 		if( [ $/, $~ ].includes( this[0] ).not ) {
 			scdir = String.scDir;
 			if( scdir != File.getcwd ) { // <- means this is a standalone app
-				^scdir +/+ this;	
+				^scdir +/+ this;
 			} {
 				^this
 			};
 		} {
 			^this;
-		}	
+		}
 	}
 
 	asBufKr{ |key, numChannels = 1, startFrame = 0, endFrame|

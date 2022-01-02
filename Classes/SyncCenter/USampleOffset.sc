@@ -18,16 +18,16 @@
 */
 
 USampleOffset : Spec {
-	
+
 	*ar { |in, use = 1|
 		var delay;
-		Udef.addBuildSpec( 
-			ArgSpec( \u_sampleOffset, this, this, true, \init ) 
+		Udef.addBuildSpec(
+			ArgSpec( \u_sampleOffset, this, this, true, \init )
 		);
 		delay = (\u_sampleOffset.ir( 0 ) * use) / SampleRate.ir;
-		^DelayN.ar( in, delay, delay );	
+		^DelayN.ar( in, delay, delay );
 	}
-	
+
 	*getCurrent {
 		var round, count;
 		if( SyncCenter.current.notNil && { SyncCenter.mode === \sample } ) {
@@ -43,18 +43,18 @@ USampleOffset : Spec {
 	*asControlInput { ^this.getCurrent }
 	*asOSCArgEmbeddedArray { | array| ^this.getCurrent.asOSCArgEmbeddedArray(array) }
 
-	
-	// fixed output: 
+
+	// fixed output:
 	*new { ^this } // only use as class
-	
+
 	*asSpec { ^this }
-	
+
 	*constrain { ^this } // whatever comes in; UGlobalEQ comes out
-	
+
 	*default {  ^this }
-	
+
 	*massEditSpec { ^nil }
-	
+
 	*findKey {
 		^Spec.specs.findKeyForValue(this);
 	}

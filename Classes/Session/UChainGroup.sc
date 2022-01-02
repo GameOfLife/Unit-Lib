@@ -27,7 +27,7 @@ UChainGroup : UEvent {
     init { |inChains|
         chains = inChains;
     }
-    
+
     at { |index| ^chains[ index ] }
     copySeries { |first, second, last| ^chains.copySeries( first, second, last ) }
 	collect { |func|  ^chains.collect( func );  }
@@ -69,6 +69,6 @@ UChainGroup : UEvent {
     groups { ^chains.collect(_.groups).flat }
 
     gui { |parent, bounds, score| ^MassEditUChain(chains).gui( parent, bounds, score ) }
-    
+
     storeArgs { ^chains }
 }

@@ -1,10 +1,10 @@
 UDragSource {
-	
+
 	classvar <>mouseSynth;
-	
+
 	var <>view;
 	var <>beginDragAction;
-	
+
 	*initClass {
 		Platform.case(
 			\osx, {
@@ -17,21 +17,21 @@ UDragSource {
 			}
 		);
 	}
-	
+
 	*viewClass { ^DragSource }
-	
+
 	*new { |parent, bounds|
 		^super.new.view_( this.viewClass.new( parent, bounds ) ).init;
 	}
-	
+
 	init {
 		if( GUI.id == \cocoa ) {
 			view.beginDragAction_({ |vw|
-				if( Server.default.isLocal ) {	
+				if( Server.default.isLocal ) {
 					mouseSynth = Synth( 'UDragSource_mouseState' ).onFree({
-						{ 
+						{
 							if( View.currentDrag.notNil ) {
-								View.currentDrag = nil; 
+								View.currentDrag = nil;
 								UChainGUI.all.do({ |x| x.view.refresh });
 					              UGlobalControlGUI.current !? {|x| x.view.view.refresh };
 							};
@@ -47,11 +47,11 @@ UDragSource {
 			});
 		};
 	}
-	
+
 	applySkin { |skin|
 		view.applySkin( skin );
 	}
-	
+
 	doesNotUnderstand { arg ... args;
 		var result = view.perform( *args );
 		^if( result === view, { this }, { result }); // be sure to replace view with base
@@ -59,7 +59,7 @@ UDragSource {
 }
 
 UDragBoth : UDragSource {
-	
+
 	*viewClass { ^DragBoth }
-	
+
 }

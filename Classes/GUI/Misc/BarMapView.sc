@@ -18,7 +18,7 @@
 */
 
 BarMapView {
-	
+
 	var <value = 0;
 	var <barMap;
 	var <parent, <view, <views;
@@ -28,11 +28,11 @@ BarMapView {
 	var <viewHeight = 14;
 	var <visible = true;
 	var <enabled;
-	
+
 	*new { |parent, bounds, barMap, action|
 		^super.new.init( parent, bounds, barMap, action );
 	}
-	
+
 	init { |parent, bounds, inBarMap, inAction|
 		barMap = inBarMap ?? { BarMap(); };
 		barMap.addDependant( this );
@@ -44,14 +44,14 @@ BarMapView {
 		};
 		this.makeView( parent, bounds );
 	}
-	
+
 	doAction { action.value( this ) }
-	
+
 	value_ { |newValue = 0|
 		value = newValue;
 		this.update;
 	}
-	
+
 	visible_ { |bool = true|
 		if( bool != visible ) {
 			visible = bool;
@@ -59,26 +59,26 @@ BarMapView {
 		};
 		{ view.visible = visible }.defer;
 	}
-	
+
 	enabled_ { |bool = true|
 		enabled = bool;
 		views.do(_.enabled_(enabled));
 	}
-	
+
 	update {
 		if( visible ) { this.setViews( value ); };
 	}
-	
+
 	resize_ { |resize|
 		view.resize = resize ? 5;
 	}
-	
+
 	remove {
-		if( barMap.notNil ) { 
+		if( barMap.notNil ) {
 			barMap.removeDependant( this );
 		};
 	}
-	
+
 	setViews { |value|
 		var new, x, div, sub;
 		new = barMap.barAtBeat( value, true );
@@ -89,51 +89,51 @@ BarMapView {
 		views[ \division ].value = div;
 		views[ \sub ].value = sub;
 	}
-		
+
 	setFont { |font|
 		font = font ??
-			{ RoundView.skin !? { RoundView.skin.font } } ?? 
+			{ RoundView.skin !? { RoundView.skin.font } } ??
 			{ Font( Font.defaultSansFace, viewHeight - 4 ) };
-		
+
 		views[ \bar ].font = font;
 		views[ \division ].font = font;
 		views[ \sub ].font = font;
 	}
-	
+
 	autoScale_ { |bool|
 		views[ \bar ].autoScale = bool;
 		views[ \division ].autoScale = bool;
 		views[ \sub ].autoScale = bool;
 	}
-	
+
 	radius_ { |radius|
 		radius = radius.asCollection.wrapExtend(4);
 		views[ \bar ].radius = [ radius[0], 0, 0, radius[3] ];
 		views[ \sub ].radius = [ 0, radius[1], radius[2], 0 ];
 	}
-	
+
 	*viewNumLines { ^1 }
-	
+
 	getValue {
-		value = barMap.beatAtBar( views[ \bar ].value, 
-			views[ \division ].value + (views[ \sub ].value / 1000) 
+		value = barMap.beatAtBar( views[ \bar ].value,
+			views[ \division ].value + (views[ \sub ].value / 1000)
 		);
 		value = value.clip( clipLo, clipHi );
 	}
-	
+
 	makeView { |parent, bounds, resize|
 		var centerWidth, sideWidth;
 		if( bounds.isNil ) { bounds= 350 @ (this.class.viewNumLines * (viewHeight + 4)) };
-		
+
 		view = EZCompositeView( parent, bounds, gap: 2@2 );
 		bounds = view.asView.bounds;
 		view.onClose_({ this.remove; });
 		view.resize_( resize ? 5 );
 		views = ();
-		
+
 		centerWidth = (viewHeight * 1.25).floor;
 		sideWidth = ( ( bounds.width - (centerWidth + 4) ) / 2 ).floor;
-		
+
 		views[ \bar ] = SmoothNumberBox( view, sideWidth @ viewHeight )
 			.step_(1).scroll_step_(1)
 			.radius_( [ viewHeight, 0, 0, viewHeight ] / 2 )
@@ -150,7 +150,7 @@ BarMapView {
 					{ vw.keyDown( char, modifiers, unicode, keycode, key ) }
 				);
 			});
-			
+
 		views[ \division ] = SmoothNumberBox( view, centerWidth @ viewHeight )
 			.step_(1).scroll_step_(1)
 			.radius_( 0 )
@@ -167,7 +167,7 @@ BarMapView {
 					{ vw.keyDown( char, modifiers, unicode, keycode, key ) }
 				);
 			});
-			
+
 		views[ \sub ] = SmoothNumberBox( view, sideWidth @ viewHeight )
 			.step_(1).scroll_step_(1)
 			.radius_( [ 0, viewHeight, viewHeight, 0 ] / 2 )
@@ -183,17 +183,17 @@ BarMapView {
 					{ vw.keyDown( char, modifiers, unicode, keycode, key ) }
 				);
 			});
-			
+
 		this.setFont;
 		this.setViews( value );
 	}
-	
+
 }
 
 TempoBarMapView : BarMapView {
-	
+
 	var <tempoMap;
-	
+
 	init { |parent, bounds, inBarMap, inAction|
 		case { inBarMap.isKindOf( TempoMap ) } {
 			tempoMap = inBarMap;
@@ -214,7 +214,7 @@ TempoBarMapView : BarMapView {
 		};
 		this.makeView( parent, bounds );
 	}
-	
+
 	setViews { |value|
 		var new, x, div, sub;
 		new = tempoMap.barAtTime( value, true );
@@ -225,19 +225,19 @@ TempoBarMapView : BarMapView {
 		views[ \division ].value = div;
 		views[ \sub ].value = sub;
 	}
-	
+
 	getValue {
-		value = tempoMap.timeAtBar( views[ \bar ].value, 
-			views[ \division ].value + (views[ \sub ].value / 1000) 
+		value = tempoMap.timeAtBar( views[ \bar ].value,
+			views[ \division ].value + (views[ \sub ].value / 1000)
 		);
 		value = value.clip( clipLo, clipHi );
 	}
-	
+
 	remove {
-		if( barMap.notNil ) { 
+		if( barMap.notNil ) {
 			barMap.removeDependant( this );
 		};
-		if( tempoMap.notNil ) { 
+		if( tempoMap.notNil ) {
 			tempoMap.removeDependant( this );
 		};
 	}

@@ -80,7 +80,7 @@ UEnvGen {
 				[ item[1], item[2], item[3], item[0] ]
 			}).flatten(1);
 	}
-	
+
 	*getLineArgs { |env, timeScale = 1|
 		var start, dur;
 		start = \u_startPos.kr(0.0);
@@ -88,7 +88,7 @@ UEnvGen {
 		dur = env[3];
 		^[ start / timeScale, dur, ((dur * timeScale)-start).max(0) ]
 	}
-	
+
 	*getTimeScale { |timeScale = 1|
 		if( timeScale.class == Symbol ) {
 			Udef.addBuildSpec(
@@ -99,7 +99,7 @@ UEnvGen {
 			^timeScale;
 		};
 	}
-	
+
 	*getLoopMode { |loop = 1|
 		if( loop.class == Symbol ) {
 			Udef.addBuildSpec(
@@ -110,7 +110,7 @@ UEnvGen {
 			^loop;
 		};
 	}
-	
+
 	*getDelay { |delay = 0|
 		if( delay.class == Symbol ) {
 			Udef.addBuildSpec(
@@ -121,7 +121,7 @@ UEnvGen {
 			^delay;
 		};
 	}
-	
+
 	*getTrigger { |trigger = 0|
 		if( trigger.class == Symbol ) {
 			Udef.addBuildSpec(
@@ -132,7 +132,7 @@ UEnvGen {
 			^trigger;
 		};
 	}
-	
+
 	*getLineKr { |dur, timeScale = 1, loop = 0, delay = 0, trigger = 0|
 		var start, phasor;
 		start = \u_startPos.ir(0.0);
@@ -141,12 +141,12 @@ UEnvGen {
 		delay = this.getDelay( delay );
 		trigger = this.getTrigger( trigger );
 		start = Select.kr( Peak.kr( trigger ), [ start, 0 ] );
-		phasor = Phasor.kr( trigger, 
-			(ControlDur.ir + SampleDur.ir) / timeScale, 
-			(start - delay) / timeScale, inf, 0 
+		phasor = Phasor.kr( trigger,
+			(ControlDur.ir + SampleDur.ir) / timeScale,
+			(start - delay) / timeScale, inf, 0
 		).max(0);
 		if( loop.isUGen ) {
-			^Select.kr( loop, [ 
+			^Select.kr( loop, [
 				phasor.clip(0,dur),
 				phasor.wrap(0,dur),
 				phasor.fold(0,dur)
@@ -222,7 +222,7 @@ ULine {
 }
 
 UEnvGenRel : UEnvGen {
-	
+
 	*getLineArgs { |env, timeScale = 1|
 		var start, dur, envdur;
 		start = \u_startPos.kr(0.0);
@@ -231,12 +231,12 @@ UEnvGenRel : UEnvGen {
 		envdur = env[3] / timeScale;
 		^[ envdur * (start/dur), envdur, (dur-start).max(0) ]
 	}
-	
+
 	*getLineKr { |dur, timeScale = 1, loop = 0, delay = 0, trigger = 0|
 		timeScale = this.getTimeScale( timeScale ) * ((\u_dur.kr(1.0) + \u_startPos.ir(0)) / dur);
 		^super.getLineKr( dur, timeScale, loop, delay, trigger )
 	}
-	
+
 }
 
 UXLineRel {
@@ -268,7 +268,7 @@ ULineRel {
 }
 
 UIEnvGen : UEnvGen {
-	
+
 	*kr { |env, spec, index = 0| // index is always 0-1
 		if( env.isKindOf( Env ) && { spec.isNil } ) {
 			spec = ControlSpec( env.levels.minItem, env.levels.maxItem );
@@ -279,5 +279,5 @@ UIEnvGen : UEnvGen {
 		index = index * env[3];
 		^spec.map( IEnvGen.kr(env, index) )
 	}
-	
+
 }

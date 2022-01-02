@@ -18,18 +18,18 @@
 */
 
 ObjectWithDef : ObjectWithArgs {
-	
+
 	var def, defName;
-	
+
 	*new { |def, args|
 		^super.new.init( def, args );
 	}
-	
+
 	*defClass { ^GenericDef }
-	
+
 	// subclass responsibility
 	*asDefMethod { ^\value }
-	
+
 	init { |inDef, inArgs|
 		if( inDef.isKindOf( this.class.defClass ) ) {
 			def = inDef;
@@ -48,7 +48,7 @@ ObjectWithDef : ObjectWithArgs {
 			"def '%' not found".format(inDef).warn;
 		};
 	}
-	
+
 	def {
         ^def ?? { defName.asUdef }
     }
@@ -64,5 +64,5 @@ ObjectWithDef : ObjectWithArgs {
     defName_ { |newDefName, keepArgs = true|
         this.init( newDefName, if( keepArgs ) { args } { [] });
     }
-	
+
 }

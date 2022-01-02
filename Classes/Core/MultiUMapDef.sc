@@ -24,10 +24,10 @@ MultiUMapDef : UMapDef {
 	var >defNameKey;
 	var tempDef;
 	var <defaultDefName;
-	
+
 	*defNameKey { ^\u_defName }
 	defNameKey { ^defNameKey ? this.class.defNameKey }
-	
+
 	defType {
 		var first;
 		first = udefs.first.defType;
@@ -37,53 +37,53 @@ MultiUMapDef : UMapDef {
 			\mixed
 		};
 	}
-	
-	guiColor { ^guiColor ?? {	 
-			if( this.defType === \mixed ) { 
-				this.class.defaultGUIColor 
+
+	guiColor { ^guiColor ?? {
+			if( this.defType === \mixed ) {
+				this.class.defaultGUIColor
 			} {
 				udefs.first.guiColor;
 			}
 		}
 	}
-	
+
 	*defaultGUIColor { ^Color.white.alpha_(0.66) }
-	
+
 	*new { |name, udefs, category, setter, setterIsPrivate = true, addToAll = true| // first udef in list is default
-		^super.basicNew( name, [ 
-			ArgSpec( setter ? this.defNameKey, 
+		^super.basicNew( name, [
+			ArgSpec( setter ? this.defNameKey,
 				udefs[0].name, ListSpec( udefs.collect(_.name) ), setterIsPrivate, \nonsynth )
 		], category, addToAll )
 			.defNameKey_( setter )
 			.useMappedArgs_( udefs.first.useMappedArgs )
 			.udefs_( udefs );
 	}
-	
+
 	defaultDefName_ { |name|
 		defaultDefName = name;
 		this.setDefault( defNameKey, defaultDefName );
 	}
-	
+
 	useMappedArgs_ { |bool| useMappedArgs = bool }
-	
+
 	findUdef{ |name|
 		^udefs.detect({ |item| item.name == name }) ? udefs[0];
 	}
-	
-	dontStoreArgNames { 
+
+	dontStoreArgNames {
 		^dontStoreArgNames ?? {
 			if( this.getArgSpec( this.defNameKey ).private ) {
 				[ this.defNameKey ]
 			}
 		};
 	}
-	
+
 	createsSynth { ^udefs.any(_.createsSynth) }
-	
+
 	findUdefFor { |unit|
 		^tempDef ?? { this.findUdef( unit.get( this.defNameKey ) ); };
 	}
-	
+
 	asArgsArray { |argPairs, unit, constrain = true|
 		var defName, argz, newDefName;
 		argPairs = prepareArgsFunc.value( argPairs ) ? argPairs;
@@ -106,48 +106,48 @@ MultiUMapDef : UMapDef {
 		tempDef = nil;
 		^argz ++ [ this.defNameKey, defName ];
 	}
-	
-	args { |unit| 
-		^(this.findUdefFor( unit ).args( unit ) ? []) ++ 
-			argSpecs.collect({ |item| [ item.name, item.default ] }).flatten(1) 
+
+	args { |unit|
+		^(this.findUdefFor( unit ).args( unit ) ? []) ++
+			argSpecs.collect({ |item| [ item.name, item.default ] }).flatten(1)
 	}
-	
+
 	argNamesFor { |unit|
 		^(this.findUdefFor( unit ).argNamesFor( unit ) ? []) ++ this.argNames;
 	}
-	
+
 	synthDef { ^udefs.collect(_.synthDef).flat }
-	
+
 	createSynth { |unit, target, startPos|
 		^this.findUdefFor( unit ).createSynth( unit, target, startPos );
 	}
-		
+
 	prIOids { |mode = \in, rate = \audio, unit|
 		^this.findUdefFor( unit ).prIOids( mode, rate, unit );
 	}
-	
+
 	inputIsEndPoint { |unit|
 		^this.findUdefFor( unit ).inputIsEndPoint( unit );
 	}
-	
+
 	prepare { |servers, unit, action, startPos|
- 		^this.findUdefFor( unit ).prepare( servers, unit, action, startPos ) 
+ 		^this.findUdefFor( unit ).prepare( servers, unit, action, startPos )
  	}
- 	
+
  	doPrepareFunc { |servers, unit, action, startPos|
- 		^this.findUdefFor( unit ).doPrepareFunc( servers, unit, action, startPos ) 
+ 		^this.findUdefFor( unit ).doPrepareFunc( servers, unit, action, startPos )
  	}
-	
+
 	canFreeSynth { |unit| ^this.findUdefFor( unit ).canFreeSynth( unit ) }
-	
+
 	getNext { |unit|
 		^this.findUdefFor( unit ).getNext( unit );
 	}
-	
+
 	getControlInput { |unit|
 		^this.findUdefFor( unit ).getControlInput( unit );
 	}
-	
+
 	chooseDef { |unit|
 		var currentDefName, newDefName;
 		if( chooseFunc.notNil ) {
@@ -160,7 +160,7 @@ MultiUMapDef : UMapDef {
 			};
 		};
 	}
-	
+
 	allowedModes { |unit|
 		if( unit.notNil ) {
 			^this.findUdefFor( unit ).allowedModes( unit )
@@ -168,15 +168,15 @@ MultiUMapDef : UMapDef {
 			^allowedModes
 		};
 	}
-	
+
 	hasBus { |unit| ^this.findUdefFor( unit ).hasBus( unit ) }
-	
+
 	shouldPlayOn { |unit, server| // returns nil if no func
-		^shouldPlayOnFunc !? 
+		^shouldPlayOnFunc !?
 		{ shouldPlayOnFunc.value( unit, server ); } ??
 		{ this.findUdefFor( unit ).shouldPlayOn( unit, server ) };
 	}
-	
+
 	setSynth { |unit ...keyValuePairs|
 		this.chooseDef( unit ); // change def based on chooseFunc if needed
 		if( keyValuePairs.includes( this.defNameKey ) ) {
@@ -186,11 +186,11 @@ MultiUMapDef : UMapDef {
 			^this.findUdefFor( unit ).setSynth( unit, *keyValuePairs );
 		};
 	}
-	
+
 	makeSynth { |unit, target, startPos = 0, synthAction|
 		^this.findUdefFor( unit ).makeSynth( unit, target, startPos, synthAction );
 	}
-	
+
 	getArgSpec { |key, unit|
 		if( key === this.defNameKey ) {
 			^argSpecs[0];
@@ -198,7 +198,7 @@ MultiUMapDef : UMapDef {
 			^this.findUdefFor( unit ).getArgSpec( key, unit );
 		};
 	}
-	
+
 	getSpec { |key, unit|
 		if( key === this.defNameKey ) {
 			^argSpecs[0].spec;
@@ -206,25 +206,25 @@ MultiUMapDef : UMapDef {
 			^this.findUdefFor( unit ).getSpec( key, unit );
 		};
 	}
-	
+
 	getDefault { |name, unit|
 		var asp;
 		asp = this.getArgSpec(name, unit);
 		if( asp.notNil ) { ^asp.default } { ^nil };
 	}
-	
+
 	getValue { |unit|
 		^this.findUdefFor( unit ).getValue( unit );
 	}
-	
+
 	makeStream { |unit|
 		unit.subDef.makeStream( unit );
 	}
-	
+
 	needsStream { ^udefs.first.needsStream }
-	
+
 	useMappedArgs { ^udefs.first.useMappedArgs }
-	
+
 	findUdefsWithArgName { |key|
 		if( key === this.defNameKey ) {
 			^[ this ];
@@ -234,13 +234,13 @@ MultiUMapDef : UMapDef {
 			});
 		};
 	}
-	
+
 	setSpec { |name, spec, mode, constrainDefault = true| // set the spec for all enclosed udefs
 		this.findUdefsWithArgName( name ).do({ |item|
 			item.setSpec( name, spec, mode, constrainDefault );
 		});
 	}
-	
+
 	setSpecMode { |...pairs|
 		pairs.pairsDo({ |name, mode|
 			this.findUdefsWithArgName( name ).do({ |item|
@@ -248,16 +248,16 @@ MultiUMapDef : UMapDef {
 			});
 		});
 	}
-	
+
 	setArgSpec { |argSpec|
 		argSpec = argSpec.asArgSpec;
 		this.findUdefsWithArgName( argSpec.name ).do({ |item|
 			item.setArgSpec( argSpec );
 		});
 	}
-	
+
 	argSpecs { |unit|
 		^this.findUdefFor( unit ).argSpecs( unit ) ++ argSpecs;
 	}
-	
+
 }

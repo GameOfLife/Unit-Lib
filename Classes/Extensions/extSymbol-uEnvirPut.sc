@@ -1,5 +1,5 @@
 + Symbol {
-	
+
 	uEnvirPut { |value, spec|
 		currentEnvironment.put( this, value.value );
 		if( spec.notNil ) {
@@ -8,5 +8,5 @@
 		};
 		currentEnvironment.changed( this );
 	}
-	
+
 }

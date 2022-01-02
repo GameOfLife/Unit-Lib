@@ -29,7 +29,7 @@ UAbstractWindow {
     *current { ^currentDict[this] }
 
     *current_ { |x| currentDict[this] = x }
-    
+
     *all { ^allDict[this] }
 
     toFront {

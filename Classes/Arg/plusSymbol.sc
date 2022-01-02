@@ -6,7 +6,7 @@ Udef(\test,{
 
 UChain(\test, \stereoOutput).gui
 
-Udef( \testTrig, { 
+Udef( \testTrig, {
 	var in;
 	in = UIn.ar(0);
 	in = in * Sweep.kr( \trigger.utr ).wrap(0,1);

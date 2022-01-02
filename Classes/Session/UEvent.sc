@@ -18,7 +18,7 @@
 */
 
 UEvent : UArchivable {
-	
+
 	classvar >renderNumChannels = 2;
 	classvar <>renderMaxTime = 60;
 	classvar <>nrtMode = false;
@@ -38,60 +38,60 @@ UEvent : UArchivable {
     If 'releaseSelf' is set to false, then uchains will not free themselves automatically when the events stop playing.
     If 'releaseSelf' is set to true, then uchains will free themselves even if the score is paused;
 	*/
-    
+
     // event duration of non-inf will cause the event to release its chain
     // instead of the chain releasing itself
 
 	waitTime { this.subclassResponsibility(thisMethod) }
 	prepareTime { ^startTime - this.waitTime } // time to start preparing
-	
-	<= { |that| 
+
+	<= { |that|
 		^case { this.prepareTime == that.prepareTime } {
 			this.track <= that.track;
 		} {
-			this.prepareTime < that.prepareTime 
+			this.prepareTime < that.prepareTime
 		};
 	} // sort support
-		
+
 	== { |that| // use === for identity
 		^this.compareObject(that);
 	}
-	
+
 	dur { ^this.duration }
 	isFinite{ ^this.duration < inf}
 
     duration_{ this.subclassResponsibility(thisMethod) }
     isPausable_{ this.subclassResponsibility(thisMethod) }
-    
+
     finiteDuration { |addInf = 10|
 	    if( this.isFinite ) { ^this.duration } { ^addInf };
     }
-    
+
     allowPause_ { |bool = false|
-	    if( bool == true ) { 
-		    "allowPause_( true ) not (yet) supported for %\n".postf( this.class ); 
+	    if( bool == true ) {
+		    "allowPause_( true ) not (yet) supported for %\n".postf( this.class );
 		};
     }
-    
+
     resume { }
-    
+
     renderNumChannels { ^renderNumChannels.value }
-    
+
     track_ { |newTrack = 0| track = newTrack; this.changed( \track ) }
-    
+
     startTime_ { |newTime|
 	   if( lockStartTime.not ) { startTime = newTime; };
 	   this.changed( \startTime )
     }
-    
+
     lockStartTime_ { |bool = false|
 	    lockStartTime = bool;
 	    this.changed( \lockStartTime );
     }
-    
+
     score { ^nil }
     score_ { }
-    
+
     useNRT { |func|
 	    if( nrtMode == true ) {
 		    func.value
@@ -107,7 +107,7 @@ UEvent : UArchivable {
 		    };
 	    };
     }
-    
+
     isFolder { ^false }
 
     endTime { ^startTime + this.duration; } // may be inf
@@ -117,25 +117,25 @@ UEvent : UArchivable {
 	enable { this.disabled_(false) }
 	toggleDisable { this.disabled_(disabled.not) }
 	toggleLockStartTime { this.lockStartTime_( lockStartTime.not ) }
-	
+
 	displayColor_ { |color|
 		displayColor = color.copy;
 		this.changed( \displayColor );
 	}
 
 	getTypeColor {
-		^this.displayColor ?? { 
-			if(this.duration == inf) { 
-				Color(0.33, 0.33, 0.665) 
+		^this.displayColor ?? {
+			if(this.duration == inf) {
+				Color(0.33, 0.33, 0.665)
 			}{
 				Color.white
 			};
 		};
 	}
-	
+
 	connect { }
 	disconnect { }
-	
+
     /*
     *   server: Server or Array[Server]
     */
@@ -152,22 +152,22 @@ UEvent : UArchivable {
             };
         }
     }
-    
+
     asScore { |duration, timeOffset=0|
-	    
+
 	    if( duration.isNil ) {
 		    duration = this.finiteDuration;
 	    };
-	    
-	    ^Score( 
+
+	    ^Score(
 			this.collectOSCBundles( ULib.allServers.first, timeOffset, duration  )
 	    			++ [ [ duration, [ \c_set, 0,0 ] ] ]
 	    	);
     }
-    
+
     collectOSCBundles { ^[] }
     collectOSCBundleFuncs { ^[] }
-    
+
     render { // standalone app friendly version
 		arg path, maxTime=60, sampleRate = 44100,
 			headerFormat = "AIFF", sampleFormat = "int24", options, inputFilePath, action;
@@ -183,55 +183,55 @@ UEvent : UArchivable {
 		);
 		Score.program = oldpgm;
     }
-    
+
     writeAudioFile { |path, maxTime, action, headerFormat = "AIFF", sampleFormat = "int24", numChannels|
 		var o;
-		
+
 		if( this.isFinite.not && { maxTime == nil } ) {
 			maxTime = this.finiteDuration + 60;
 		};
-		
+
 		numChannels = numChannels ? this.renderNumChannels ? 2;
-		
+
 		if( numChannels > 0 ) {
 			o = ServerOptions.new
 				.numOutputBusChannels_( numChannels ? this.renderNumChannels ? 2)
 				.memSize_( 2**19 )
 				.maxSynthDefs_(2048);
 			path = path.replaceExtension( headerFormat.toLower );
-			this.render( 
+			this.render(
 				path,
 				maxTime, // explicit nil forces UScore to use score duration
 				sampleRate: ULib.servers.first.sampleRate,
-				headerFormat: headerFormat, 
+				headerFormat: headerFormat,
 				sampleFormat: sampleFormat,
 				options: o,
 				action: action
-			);		
+			);
 		} {
 			"%:writeAudioFile - no audio file written; numChannels needs to be > 0\n"
 				.postf( this.class );
 			action.value;
 		};
     }
-    
+
     // tag system: for UScores and UChains
 	setTag { |tag| UTagSystem.add( this, tag ); }
-	
+
 	removeTag { |tag| UTagSystem.remove( this, tag ); }
-	
+
 	clearTags { UTagSystem.removeObject( this ); }
 	deepClearTags { UTagSystem.removeObject( this ); }
-	
+
 	tags { ^UTagSystem.getTags( this ); }
-	
+
 	tags_ { |tags|
 		UTagSystem.removeObject( this );
 		tags.asCollection.do({ |tag|
 			UTagSystem.add( this, tag );
 		});
 	}
-	
+
 	storeTags { |stream|
 		var tags;
 		tags = this.tags;
@@ -239,28 +239,28 @@ UEvent : UArchivable {
 			stream << ".tags_(" <<<* tags.asArray.sort << ")";
 		};
 	}
-	
+
 	storeDisplayColor { |stream|
 		if( this.displayColor.notNil ) {
 			stream << ".displayColor_(" <<< this.displayColor << ")";
 		};
 	}
-	
+
 	storeDisabledStateOn { |stream|
 		if( this.disabled == true ) {
 			stream << ".disabled_(true)";
 		};
 	}
-	
+
 	storeModifiersOn { |stream|
 		this.storeTags( stream );
 		this.storeDisplayColor( stream );
 		this.storeDisabledStateOn( stream );
 	}
-	
+
 	makeView { |i=0, minWidth, maxWidth| ^UEventView( this, i, minWidth, maxWidth ) }
-		
-	
+
+
 	//// UOSCsetter support
 	oscSetter_ { |newOSCsetter, removeOld = true|
 		if( removeOld ) {
@@ -271,15 +271,15 @@ UEvent : UArchivable {
 		oscSetter = newOSCsetter;
 		this.changed( \oscSetter );
 	}
-	
+
 	enableOSC { |name|
 		this.oscSetter = UOSCsetter( this, name );
 	}
-	
-	disableOSC { 
+
+	disableOSC {
 		this.oscSetter = nil;
 	}
-	
+
 	listOSCMessages {
 	}
 

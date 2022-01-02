@@ -1,16 +1,16 @@
 UDragBin {
-	
+
 	classvar <>current;
-	
+
 	var <>view;
 	var <>canReceiveDragHandler;
 	var <>task;
 	var <>color;
-	
+
 	*new { |parent, bounds|
 		^super.new.view_( UserView( parent, bounds ) ).init;
 	}
-	
+
 	init {
 		color = Color.blue;
 		view.canFocus_( false );
@@ -39,7 +39,7 @@ UDragBin {
 				if( task.isPlaying.not ) {
 					task = Task({
 						while { vw.isClosed.not && {							canReceiveDragHandler.value == true
-							} 
+							}
 						} {
 							0.25.wait;
 						};
@@ -51,7 +51,7 @@ UDragBin {
 			};
 		};
 	}
-	
+
 	doesNotUnderstand { arg ... args;
 		var result = view.perform( *args );
 		^if( result === view, { this }, { result }); // be sure to replace view with base

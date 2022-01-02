@@ -18,7 +18,7 @@
 */
 
 UScore : UEvent {
-	
+
 	classvar <>activeScores;
 	classvar <>openFunc;
 	classvar <>updateWaitTime = 0.1;
@@ -66,20 +66,20 @@ UScore : UEvent {
 	}
 
 	*current { ^UScoreEditorGUI.current !? { |x| x.score } }
-	
-	*currentSubScore { ^UScoreEditorGUI.current !? { |x| 
+
+	*currentSubScore { ^UScoreEditorGUI.current !? { |x|
 			x.scoreView.scoreList.last;
-		} 
+		}
 	}
-		
+
 	*findByName { |name|
 		^UScoreEditorGUI.all.detect({ |se| se.score.name == name }) !? _.score;
 	}
 
-	*new { |... events| 
+	*new { |... events|
 		^super.new.init( events );
 	}
-	
+
 	*open { |path, action|
         if( path.isNil ) {
 		    Dialog.openPanel( { |path|
@@ -96,7 +96,7 @@ UScore : UEvent {
             action.value( openFunc.(path) );
 	    };
 	}
-	
+
 	*openMultiple { |paths, action| // action fired for each path
 		if( paths.isNil ) {
 		    Dialog.openPanel( { |paths|
@@ -117,7 +117,7 @@ UScore : UEvent {
 			});
 	    };
 	}
-	
+
 	/*
 	* Syntaxes for UScore creation:
 	* UScore( <UEvent 1>, <UEvent 2>,...)
@@ -126,13 +126,13 @@ UScore : UEvent {
 	*/
 
 	init{ |args|
-		if( args[0].isNumber ) { 
-			startTime = args[0]; 
-			args = args[1..] 
+		if( args[0].isNumber ) {
+			startTime = args[0];
+			args = args[1..]
 		};
-		if( args[0].isNumber ) { 
-			track = args[0]; 
-			args = args[1..] 
+		if( args[0].isNumber ) {
+			track = args[0];
+			args = args[1..]
 		};
 	    events = if(args.size >0){args}{Array.new};
 	    soloed = [];
@@ -146,17 +146,17 @@ UScore : UEvent {
 		this.prRecheckSoloMutes;
 	    this.changed(\events);
 	}
-	
+
 	loop_ { |bool|
 		loop = bool;
 		this.changed(\loop);
 	}
-	
+
 	allowPause_ { |bool = false|
 		allowPause = bool;
 		this.changed( \allowPause, bool );
 	}
-	
+
 	releaseSelf { ^true }
 	releaseSelf_ { "%:releaseSelf - can't use releaseSelf\n".postf( this.class ) }
 
@@ -171,7 +171,7 @@ UScore : UEvent {
 	        this.changed(\playState,newState,playState);  //send newState oldState
 	    };
 	    playState = newState;
-	    
+
 	    if( playState === \stopped ) {
 		    activeScores.remove( this );
 	    } {
@@ -184,13 +184,13 @@ UScore : UEvent {
 	    .startTime_( startTime )
 	    .track_( track )
 	    .tempoMap_( tempoMap.duplicate )
-	    .displayColor_( displayColor ); 
+	    .displayColor_( displayColor );
 	}
 
     makeView{ |i,minWidth,maxWidth| ^UScoreEventView(this,i,minWidth, maxWidth) }
     isFolder{ ^true }
 	//ARRAY SUPPORT
-	at { |...path| 
+	at { |...path|
 		 var out;
 		 out = events;
 		 path.do({ |item|
@@ -218,11 +218,11 @@ UScore : UEvent {
 			^index
 		};
 	}
-	
+
 	setOrPerform { |key ...value|
 		// args: list of keys, ending with the value to set
 		var setter, parent, res;
-		key = key.asCollection;	
+		key = key.asCollection;
 		setter = key.last;
 		key.pop;
 		if( key.size > 0 ) {
@@ -307,29 +307,29 @@ UScore : UEvent {
 		^events.collect(_.getAllUMarkers).flat
 	}
 	startTimes { ^events.collect( _.startTime ); }
-	startTimes_ { |times| 
+	startTimes_ { |times|
 		times = times.asCollection;
-		events.do({ |evt, i| 
+		events.do({ |evt, i|
 			if( times[i].notNil ) {
-				evt.startTime = times[i]; 
+				evt.startTime = times[i];
 			};
-		}); 
+		});
 		this.changed( \events );
 	}
-	
+
 	startBeats { ^events.collect({ |evt| tempoMap.beatAtTime( evt.startTime ) }); }
 	startBeats_ { |beats|
 		beats = beats.asCollection;
-		events.do({ |evt, i| 
+		events.do({ |evt, i|
 			if( beats[i].notNil ) {
-				evt.startTime = tempoMap.timeAtBeat( beats[i] ) 
+				evt.startTime = tempoMap.timeAtBeat( beats[i] )
 			};
-		}); 
+		});
 		this.changed( \events );
 	}
-	
+
 	durations { ^events.collect( _.dur ); }
-	
+
 	duration {
 		var dur = 0;
 		events.do({ |evt|
@@ -338,13 +338,13 @@ UScore : UEvent {
 		});
 		^dur;
 	}
-    
+
     finiteDuration { |addInf = 10|
 	    var time = 0;
 		events.do({ |evt|
 			time = time.max( evt.startTime + evt.finiteDuration );
 		});
-		^time; 
+		^time;
 	}
     displayDuration { |margin = 10| // used by UScoreView
 	   ^(this.finiteDuration(margin) + margin).max(margin);
@@ -365,9 +365,9 @@ UScore : UEvent {
 	}
 
 	fromTrack { |track = 0| ^this.class.new( events.select({ |event| event.track == track }) ); }
-	
+
 	sort { events.sort; this.changed( \numEventsChanged ); this.changed( \sort ); }
-	
+
 	connect { events.do(_.connect) }
 	disconnect { events.do(_.disconnect) }
 
@@ -445,7 +445,7 @@ UScore : UEvent {
 	cleanOverlaps {
 		events.do{ |x| this.moveEventToEmptyTrack(x) }
     }
-    
+
     removeEmptyTracks {
 	    var usedTracks = events.collect(_.track).asInteger.as(Set).as(Array).sort;
 	    events.do({ |evt| evt.track = usedTracks.indexOf( evt.track.asInteger ) ? evt.track; });
@@ -581,7 +581,7 @@ UScore : UEvent {
 		if( callStopFirst ) { this.stop(nil,false, false); }; // in case it was still running
         this.prStartTasks( targets, startPos, assumePrepared, updatePosition, startEventsActiveAtStartPos, loop );
 	}
-	
+
 	prStartTasks { |targets, startPos = 0, assumePrepared = false, updatePosition = true, startEventsActiveAtStartPos = true, loop = false|
         var prepareEvents, startEvents, releaseEvents, prepStartRelEvents, preparePos,
             allEvents, deltaToStart,dur, actions, needsPrepare, updatePosFunc, waitError;
@@ -603,9 +603,9 @@ UScore : UEvent {
                 { |event| event.startAndRelease(targets) }
             ];
         };
-        
+
         dur = this.duration;
-        
+
         if( loop ) {
 	        // if a score is infinitely long, it cannot loop
             case { dur == inf } {
@@ -642,10 +642,10 @@ UScore : UEvent {
                 }).start;
             };
         };
-        
-        if( pausedByUMarker ) { 
-	        UMarker.umarkerIndexIncrease; 
-	        pausedByUMarker = false; 
+
+        if( pausedByUMarker ) {
+	        UMarker.umarkerIndexIncrease;
+	        pausedByUMarker = false;
 	    };
 
         //if there is some time between preparing and starting to play
@@ -750,7 +750,7 @@ UScore : UEvent {
 	        this.playState_(\stopped,changed);
 	    }
 	}
-	
+
 	pause {
 	    if(playState == \playing){
 		    this.stopScore;
@@ -778,7 +778,7 @@ UScore : UEvent {
 		    pausedAt = nil;
 		}
 	}
-	
+
 	togglePlayback { |targets|
 		case { this.isStopped } {
 			this.prepareAndStart( targets, this.pos, true, this.loop);
@@ -790,7 +790,7 @@ UScore : UEvent {
 			this.stop;
 		};
 	}
-	
+
 	playAnyway { |targets|
 		// play, resume or keep playing (but not stop)
 		if( targets.isNumber ) { targets = nil };
@@ -802,51 +802,51 @@ UScore : UEvent {
 			this.prepareAndStart( targets, this.pos, true, this.loop);
 		};
 	}
-	
+
 	dispose { events.do(_.dispose) }
-	
+
 	collectOSCBundleFuncs { |server, startOffset = 0, infdur = 60|
 		var array, wasCheckFree, out;
-		
-		if( disabled.not ) {	
+
+		if( disabled.not ) {
 			server = server ? Server.default;
-			
+
 			array = events.collect({ |item|
 				item.collectOSCBundleFuncs( server, item.startTime + startOffset, infdur );
 			}).flatten(1);
-			
+
 			^array.sort({ |a,b| a[0] <= b[0] })
 		} {
 			^[];
 		};
 	}
-	
-	
+
+
 	collectOSCBundles { |server, startOffset = 0, infdur = 60|
 		var array, wasCheckFree, out;
-		
+
 		if( disabled.not ) {
 			server = server ? Server.default;
-			
+
 			this.useNRT({
-							
+
 				array = events.collect({ |item|
 					item.collectOSCBundleFuncs( server, item.startTime + startOffset, infdur );
 				}).flatten(1);
-				
+
 				out = array.sort({ |a,b| a[0] <= b[0] }).collect({ |item|
 					server.makeBundle( false, item[1] ).collect({ |bundle|
-						[ item[0], bundle ] 
+						[ item[0], bundle ]
 					});
 				}).flatten(1).select({ |item| item.size > 1 });
-				
+
 			});
 			^out;
 		} {
 			^[];
 		};
 	}
-	
+
 	cmdPeriod {
 		this.stop;
 		CmdPeriod.remove( this ); // always remove;
@@ -873,15 +873,15 @@ UScore : UEvent {
 	    updatePos = x;
 	    this.changed(\updatePos,x)
 	}
-	
+
 	// markers
-	
+
 	markerPositions {
 		^events.select({ |item|
 			item.isKindOf( UMarker );
 		}).collect(_.startTime).sort;
 	}
-	
+
 	jumpTo { |pos = 0|
 		case { this.isPlaying } {
 			this.stop;
@@ -893,18 +893,18 @@ UScore : UEvent {
 			this.pos = pos;
 		};
 	}
-	
+
 	toNextMarker { |includeEnd = true|
 		var markerPositions, dur, newPos;
 		markerPositions = this.markerPositions;
 		if( includeEnd ) {
-			markerPositions = markerPositions.add( this.finiteDuration(0) ); 
+			markerPositions = markerPositions.add( this.finiteDuration(0) );
 		};
 		if( (newPos = markerPositions.detect({ |item| item > this.pos })).notNil ) {
-			this.jumpTo( newPos ); 
+			this.jumpTo( newPos );
 		};
 	}
-	
+
 	toPrevMarker { |includeStart = true|
 		var markerPositions, dur, nowPos, newPos;
 		markerPositions = this.markerPositions;
@@ -914,10 +914,10 @@ UScore : UEvent {
 		nowPos = this.pos;
 		if( this.isPlaying && { nowPos >= 0.5 } ) { nowPos = nowPos - 0.5 };
 		if( (newPos = markerPositions.reverse.detect({ |item| item < nowPos })).notNil ) {
-			this.jumpTo( newPos ); 
+			this.jumpTo( newPos );
 		};
 	}
-	
+
 	// SOLO / MUTE
 	prSetHardMutes{
 		this.getAllUChains.do{ |ev| ev.muted_( (softMuted.includes(ev) || ( (soloed.size != 0) && soloed.includes(ev).not )) ) }
@@ -967,10 +967,10 @@ UScore : UEvent {
 	printOn { arg stream;
 		stream << this.class.name << "( " << name << ", " << events.size <<" events )"
 	}
-	
+
 	getInitArgs {
 		var numPreArgs = -1;
-		
+
 		if( track != 0 ) {
 			numPreArgs = 1
 		} {
@@ -978,12 +978,12 @@ UScore : UEvent {
 				numPreArgs = 0
 			}
 		};
-		
+
 		^([ startTime, track ][..numPreArgs]) ++ events;
 	}
-	
+
 	storeArgs { ^this.getInitArgs }
-	
+
 	storeParamsOn { arg stream;
 		var args = this.storeArgs;
 		var useArray = args.size > 254;
@@ -1003,7 +1003,7 @@ UScore : UEvent {
 		};
 		stream << ")";
 	}
-	
+
 	storeModifiersOn { |stream|
 		if( tempoMap != TempoMap.default ) {
 			stream << ".tempoMap_(" <<< tempoMap << ")";
@@ -1017,19 +1017,19 @@ UScore : UEvent {
 		this.storeDisabledStateOn( stream );
 		this.storeDisplayBoundsOn( stream );
 	}
-	
+
 	storeName { |stream|
 		if( name != "untitled" ) {
 			stream << ".name_(" <<< name << ")";
 		};
 	}
-	
+
 	storeDisplayBoundsOn { |stream|
 		if( displayBounds.notNil ) {
 			stream << ".displayBounds_(" <<< displayBounds << ")";
 		};
 	}
-	
+
 	textArchiveFileExtension { ^"uscore" }
 
 	onSaveAction {
@@ -1038,17 +1038,17 @@ UScore : UEvent {
 	}
 
 	readTextArchiveAction{ this.name = filePath.basename.removeExtension }
-	
+
 	windowBounds {
 		^UScoreEditorGUI.all.detect({ |item|
 			item.score == this
 		}) !? { |gui| gui.window.bounds };
 	}
-	
+
 	windowBounds_ { |rect|
 		UScoreEditorGUI.all.detect({ |item|
 			item.score == this
-		}) !? { |gui| 
+		}) !? { |gui|
 			case { rect.isKindOf( Rect ) } {
 				gui.window.bounds = rect;
 			} { rect.isKindOf( Point ) } {
@@ -1058,12 +1058,12 @@ UScore : UEvent {
 	}
 
 	name_ { |x| name = x; this.changed(\name) }
-	
-	deepClearTags {   
-		UTagSystem.removeObject( this ); 
+
+	deepClearTags {
+		UTagSystem.removeObject( this );
 		events.do(_.deepClearTags);
 	}
-	
+
 	setUMapsActive { |active = true, verbose = true|
 		var f, c, count = 0;
 		f = { |unit, mode = true|
@@ -1081,7 +1081,7 @@ UScore : UEvent {
 		c = { |chain, mode = true|
 			if( chain.isKindOf( UScore ) ) {
 				chain.events.do({ |evt| c.( evt, active ) });
-			} {	
+			} {
 				chain.units.do({ |unit|
 					f.( unit, active );
 				});

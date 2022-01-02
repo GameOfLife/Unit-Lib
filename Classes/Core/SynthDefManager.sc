@@ -19,11 +19,11 @@
 
 SynthDefManager {
 	classvar <>dict;
-	
+
 	*initClass {
 		dict = ();
 	}
-	
+
 	*load { |target, def, completionMsg, dir|
 		var server, bytes;
 		server = target.asTarget.server;
@@ -37,7 +37,7 @@ SynthDefManager {
 			dict[ server ] = dict[ server ].add( def );
 		};
 	}
-	
+
 	*send { |target, def, completionMsg, dir|
 		var server, bytes;
 		server = target.asTarget.server;
@@ -47,7 +47,7 @@ SynthDefManager {
 		(dict[ server ] ? []).removeAllSuchThat({ |item| item.name == def.name });
 		dict[ server ] = dict[ server ].add( def );
 	}
-	
+
 	*prSend { |server, def, completionMsg|
 		var bytes;
 		bytes = def.asBytes;
@@ -56,7 +56,7 @@ SynthDefManager {
 		};
 		server.sendMsg("/d_recv", bytes, completionMsg);
 	}
-	
+
 	*reset { |target|
 		if( target.isNil ) {
 			dict = ();
@@ -64,7 +64,7 @@ SynthDefManager {
 			dict[ target.asTarget.server ] = nil;
 		};
 	}
-	
+
 	*removeDef { |def, target|
 		if( target.isNil ) {
 			dict.values.do(_.remove(def));
@@ -72,5 +72,5 @@ SynthDefManager {
 			dict[ target.asTarget.server ].remove(def);
 		};
 	}
-	
+
 }

@@ -1,26 +1,26 @@
 UTagSystem {
-	
+
 	// a global referencing system based on tag names
-	
+
 	// - one tag name can point to multiple objects
 	// - an object can also have multiple tag names
 	// - tags are not copied when an object is copied
-	
+
 	classvar <>objectDict, <>tagDict;
-	
+
 	*initClass {
 		objectDict = IdentityDictionary();
-		tagDict = IdentityDictionary()	
+		tagDict = IdentityDictionary()
 	}
-	
+
 	*defaultTag { ^\default }
-	
+
 	*add { |object, tag|
 		tag = (tag ? this.defaultTag).asSymbol;
 		objectDict[ object ] = (objectDict[ object ] ?? { IdentitySet() }).add( tag );
 		tagDict[ tag ] = (tagDict[ tag ] ?? { IdentitySet() }).add( object );
 	}
-	
+
 	*remove { |object, tag|
 		tag = (tag ? this.defaultTag).asSymbol;
 		objectDict[ object ].remove( tag );
@@ -29,7 +29,7 @@ UTagSystem {
 			this.removeKey( tag );
 		};
 	}
-	
+
 	*removeObject { |object|
 		var tags;
 		tags = objectDict[ object ];
@@ -43,7 +43,7 @@ UTagSystem {
 			})
 		};
 	}
-	
+
 	*removeTag { |tag|
 		var objects;
 		tag = (tag ? this.defaultTag).asSymbol;
@@ -58,19 +58,19 @@ UTagSystem {
 			})
 		};
 	}
-	
+
 	*at { |tag| ^this.atTag( tag ); }
 	*getTags { |object| ^this.atObject( object ); }
-	
+
 	*atTag { |tag| ^tagDict[ tag.asSymbol ]; }
 	*atObject { |object| ^objectDict[ object ]; }
-	
+
 	*objects { ^objectDict.keys }
 	*tags { ^tagDict.keys }
-	
+
 	*keys { ^this.tags } // synonym
-	
-	*clear { 
+
+	*clear {
 		tagDict.clear;
 		objectDict.clear;
 	}

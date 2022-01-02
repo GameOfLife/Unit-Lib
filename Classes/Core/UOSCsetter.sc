@@ -19,43 +19,43 @@
 
 
 UOSCsetter {
-	
+
 	classvar <>all;
-	
+
 	var <>uobject;
 	var <name;
 	var <oscfunc;
-	
+
 	*initClass {
 		all = Set();
 	}
-	
+
 	*new { |uobject, name|
 		^super.newCopyArgs( uobject, name ).init;
 	}
-	
+
 	init {
-		
+
 		if( name.isNil && { uobject.respondsTo( \name ) } ) {
 			name = uobject.name;
 		} {
 			"%:init - missing name: did not create OSCFunc\n".postf( this.class );
 			^this;
 		};
-		
-		oscfunc = OSCFunc({ |msg| 
+
+		oscfunc = OSCFunc({ |msg|
 			this.set( *msg );
 		}, this.oscPath, dispatcher: OSCMethodPatternDispatcher.new );
-		
+
 		oscfunc.permanent = true;
 		oscfunc.enable;
 		"started UOSCsetter for %\n - messages should start with '/%/'\n - port: %\n".postf( uobject, name, NetAddr.langPort );
 	}
-	
+
 	addToAll { all.add( this ) }
-	
+
 	oscPath { ^"/" ++ name ++ "/*" }
-	
+
 	set { |pth ...inArgs|
 		var obj;
 		var path, args;
@@ -69,50 +69,50 @@ UOSCsetter {
 				item.asSymbol;
 			}
 		}).select(_.notNil);
-		inArgs = inArgs.collect({ |item| 
+		inArgs = inArgs.collect({ |item|
 			if( [ "nil", 'nil', "", '' ].includesEqual( item ) ) {
 				nil
-			} { 
-				item 
+			} {
+				item
 			};
 		});
 		this.uobject.setOrPerform( path, *inArgs );
 	}
-	
+
 	enable { oscfunc.enable }
-	
+
 	disable { oscfunc.disable }
-	
-	remove { 
+
+	remove {
 		oscfunc.free;
 		all.remove( this );
 	}
-	
-	*disable { 
+
+	*disable {
 		all.do(_.disable);
 	}
-	
+
 	*enable {
 		all.do(_.enable);
 	}
-	
+
 }
 
 UOSCSetterCurrent : UOSCsetter {
 	*new { |recvPort|
 		^super.newCopyArgs().init( recvPort );
 	}
-	
+
 	uobject { ^UScore.current }
-	
+
 	init { |recvPort|
-		
+
 		name = "current";
-		
-		oscfunc = OSCFunc({ |msg| 
+
+		oscfunc = OSCFunc({ |msg|
 			if( this.uobject.notNil ) { this.set( *msg ); };
 		}, this.oscPath, recvPort: recvPort, dispatcher: OSCMethodPatternDispatcher.new );
-		
+
 		oscfunc.permanent = true;
 		oscfunc.enable;
 		"started UOSCsetter for %\n - messages should start with '/%/'\n - port: %\n".postf( uobject, name, recvPort ?? { NetAddr.langPort });

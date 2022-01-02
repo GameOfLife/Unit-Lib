@@ -18,10 +18,10 @@
 */
 
 DebugNetAddr : NetAddr {
-	
+
 	classvar <>debug = true;
 	classvar <>postStatus = false;
-	
+
 	sendRaw { arg rawArray;
 		if( debug ) { rawArray.postln };
 		^super.sendRaw( rawArray );

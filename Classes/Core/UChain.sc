@@ -26,11 +26,11 @@
 // UChain implements the UEvent interface, therefore it has a startTime, track, duration, muted, releaseSelf variables.
 
 UChain : UEvent {
-	
+
 	classvar <>verbose = false;
 	classvar <>groupDict;
 	classvar <>presetManager;
-	
+
 	classvar <>makeDefaultFunc;
 	classvar <>nowPreparingChain;
 
@@ -38,75 +38,75 @@ UChain : UEvent {
 	var <prepareTasks;
 	var <>preparedServers;
 	var <muted = false;
-	
+
 	var <addAction = \addToHead;
 	var <global = false;
 	var <ugroup;
 	var <>handlingUndo = false;
-	
+
 	var <lastTarget;
-	
+
 	var <>serverName; // name of a server to match for playback
-	
+
 	var <>parent;
 	var <>voicerNote, <>voicerValue; // UVoicer support
-	
+
 	var <>score;
 
 	*initClass {
-		
+
 		Class.initClassTree( PresetManager );
-		
+
 		presetManager = PresetManager( this, [ \default, { UChain.default } ] )
 			.getFunc_({ |obj| obj.deepCopy })
 			.applyFunc_({ |object, preset|
 			 	object.fromObject( preset );
 		 	});
-		
+
 		groupDict = IdentityDictionary( );
 		makeDefaultFunc = {
 			UChain( [ \sine, [ \freq, 440 ] ], \output ).duration_(10).fadeIn_(1).fadeOut_(1);
 		};
 	}
-	
+
 	*new { |startTime, track, duration, releaseSelf ...units|
 		^super.new.init( [startTime,track,duration,releaseSelf] ++ units );
 	}
-	
+
 	*presets { ^presetManager.presets.as(IdentityDictionary) }
-	
+
 	fromObject { |obj|
 		this.units = obj.value.units.deepCopy;
 		this.duration = this.duration; // update duration of units
 	}
-	
+
 	*fromObject { |obj|
 		^obj.value.deepCopy;
 	}
-	
+
 	*fromPreset { |name| ^presetManager.apply( name ) }
-	
+
 	fromPreset { |name| ^presetManager.apply( name, this ); }
-	
+
 	handleUndo { |obj|
 		if( obj.notNil ) {
 			handlingUndo = true;
 			this.fromObject( obj );
 		};
 	}
-	
+
 	*clear {
-		groupDict.do({ |groups| 
-			groups.do({ |group| if( group.isPlaying ) { 
-					group.free 
+		groupDict.do({ |groups|
+			groups.do({ |group| if( group.isPlaying ) {
+					group.free
 				} {
 					group.changed( \n_end );
-				}; 
+				};
 			});
 		});
 		groupDict = IdentityDictionary();
 	}
-	
+
 	*current { ^UChainGUI.current !? _.chain }
 
 
@@ -121,38 +121,38 @@ UChain : UEvent {
 
 	init { |args|
 		var tempDur;
-		
-		if( args[0].isNumber, { 
-			startTime = args[0]; 
+
+		if( args[0].isNumber, {
+			startTime = args[0];
 			args[0] = nil;
 		});
-		
-		if( args[1].isNumber, { 
-			track = args[1]; 
+
+		if( args[1].isNumber, {
+			track = args[1];
 			args[1] = nil;
 		});
-		
-		if( args[2].isNumber, { 
-			tempDur = args[2]; 
+
+		if( args[2].isNumber, {
+			tempDur = args[2];
 			args[2] = nil;
 		});
-		
+
 		if( args[3].isKindOf( Boolean ), {
-			releaseSelf = args[3]; 
+			releaseSelf = args[3];
 			args[3] = nil;
 		});
-		
+
 		units = args.select(_.notNil).collect(_.asUnit);
 		if( tempDur.notNil ) { this.duration = tempDur };
-		
+
 		prepareTasks = [];
-		
+
 		units.reverse.do(_.uchainInit( this ));
-		
+
 		this.changed( \init );
 	}
 
-    name { 
+    name {
 	    var names = [], last;
 	    units.do({ |unit|
 		    var name;
@@ -180,15 +180,15 @@ UChain : UEvent {
 	duplicate{
 	    ^this.deepCopy;
 	}
-	
+
 	// global setters (acces specific units inside the chain)
-	
+
 	prGetCanFreeSynths { // returns the units that can free synths (they will free the whole group)
 		^units.select({ |unit| unit.canFreeSynth });
 	}
 
 	canFreeSynth{ ^this.prGetCanFreeSynths.size != 0 }
-	
+
 	prSetCanFreeSynths { |...args|
 		units.do({ |unit|
 			if( unit.canFreeSynth ) {
@@ -196,7 +196,7 @@ UChain : UEvent {
 			};
 		});
 	}
-	
+
 	units_ { |newUnits|
 		units = newUnits.collect(_.asUnit);
 		this.changed( \units );
@@ -222,9 +222,9 @@ UChain : UEvent {
 				}
 			};
 		});
-		this.changed( \fadeIn );	
+		this.changed( \fadeIn );
 	}
-	
+
 	fadeOut_ { |fadeOut = 0|
 
 		fadeOut = fadeOut.max(0).min(duration - this.fadeIn);
@@ -245,22 +245,22 @@ UChain : UEvent {
 		});
 		this.changed( \fadeOut );
 	}
-	
+
 	fadeOut {
 		^this.prGetCanFreeSynths.collect({ |item| item.get( \u_fadeOut ) }).maxItem ? 0;
 	}
-	
+
 	fadeIn {
 		^this.prGetCanFreeSynths.collect({ |item| item.get( \u_fadeIn ) }).maxItem ? 0;
 	}
-	
+
 	// only returns numbers
 	fadeInTime {
 		var out;
 		out = this.fadeIn;
 		^if( out.isKindOf( UMap ) ) { 0 } { out }
 	}
-	
+
 	fadeOutTime {
 		var out;
 		out = this.fadeOut;
@@ -270,11 +270,11 @@ UChain : UEvent {
 	fadeTimeValues { ^[ this.fadeInTime, this.fadeOutTime ] }
 
 	fadeTimes { ^[this.fadeIn, this.fadeOut] }
-	
+
 	fadeTimes_ { |fadeTimes = #[0,0]|
-		
+
 		fadeTimes = fadeTimes.asCollection.wrapExtend(2);
-		
+
 		if( fadeTimes.sum > duration.max(1.0e-12) ) {
 			fadeTimes = fadeTimes.normalizeSum * duration;
 		};
@@ -289,7 +289,7 @@ UChain : UEvent {
 		this.changed( \fadeIn );
 		this.changed( \fadeOut );
 	}
-	
+
 	fadeInCurve_{ |curve = 0|
 		this.prSetCanFreeSynths(\u_fadeInCurve, curve);
     this.changed( \fadeInCurve );
@@ -326,7 +326,7 @@ UChain : UEvent {
 			this.dur_( durs.maxItem );
 		};
 	}
-	
+
 	getMaxDurUnit { // get unit with longest non-inf duration
 		var dur, out;
 		units.do({ |unit|
@@ -339,14 +339,14 @@ UChain : UEvent {
 				};
 			};
 		});
-		^out;	
+		^out;
 	}
-	
+
 	prGetChainsDur { // get longest duration
 		var unit;
 		unit = this.getMaxDurUnit;
-		if( unit.isNil ) { 
-			^inf 
+		if( unit.isNil ) {
+			^inf
 		} {
 			^unit.get( \u_dur );
 		};
@@ -380,7 +380,7 @@ UChain : UEvent {
         //this.fadeOut_(this.fadeOut.min(dur));
         //this.fadeIn_(this.fadeIn.min(dur));
     }
-    
+
     updateDur {
 	    units.do(_.setDur(duration));
 	    if( releaseSelf ) {
@@ -398,17 +398,17 @@ UChain : UEvent {
              this.prSetChainsDur(duration);
         }
     }
-	
+
 	dur { ^this.duration }
 	dur_ { |x| this.duration_(x)}
-	
+
 	getTypeColor {
 		^case {
 	        this.displayColor.notNil;
         } {
 	        this.displayColor;
-        } { 
-	        this.duration == inf 
+        } {
+	        this.duration == inf
 	   } {
 	        Color(0.4, 0.4, 0.8)
         } {
@@ -419,14 +419,14 @@ UChain : UEvent {
 	        Color(0.4, 0.6, 0.6);
         };
 	}
-	
+
 	global_ { |bool = false| global = bool; this.changed( \global, bool ) }
 	addAction_ { |symbol = 'addToHead'| addAction = symbol; this.changed( \addAction, symbol ); }
 	ugroup_ { |symbol| ugroup = symbol; this.changed( \ugroup, symbol ); }
-	
+
 	gain { ^this.getGain }
 	gain_ { |gain = 0| ^this.setGain(gain) }
-	
+
 	muted_ { |bool|
 		muted = bool.booleanValue;
 		this.prGetCanFreeSynths.do({ |unit|
@@ -434,10 +434,10 @@ UChain : UEvent {
 		});
 		this.changed( \muted );
 	}
-	
+
 	mute { this.muted = true; }
 	unmute { this.muted = false; }
-	
+
 	setGain { |gain = 0| // set the average gain of all units that have a u_gain arg
 		var mean, add;
 		mean = this.getGain;
@@ -445,22 +445,22 @@ UChain : UEvent {
 		this.prGetCanFreeSynths.do({ |unit|
 			 unit.set( \u_gain, unit.get( \u_gain ) + add );
 		});
-		this.changed( \gain );		
+		this.changed( \gain );
 	}
-	
+
 	getGain {
 		var gains;
 		gains = this.prGetCanFreeSynths.collect({ |item| item.get( \u_gain ) });
 		if( gains.size > 0 ) { ^gains.mean } { ^0 };
 	}
-	
+
 	setDoneAction { // set doneAction 14 for unit with longest non-inf duration
 		var maxDurUnit;
 		maxDurUnit = this.getMaxDurUnit;
 		if( maxDurUnit.isNil ) { // only inf synths
 			this.prGetCanFreeSynths.do({ |item, i|
 		        	item.set( \u_doneAction, 14 );        			});
-		} {	 
+		} {
 			this.prGetCanFreeSynths.do({ |item, i|
 		        	if( item == maxDurUnit or: { item.get( \u_dur ) == inf } ) {
 			        	item.set( \u_doneAction, 14 );
@@ -497,7 +497,7 @@ UChain : UEvent {
     //events can become bigger
 	trimStart{ |newStart,removeFade = false|
 		var delta1,delta2;
-		if( lockStartTime.not ) {	
+		if( lockStartTime.not ) {
 			delta1 = newStart - startTime;
 			if(newStart < this.endTime) {
 	            startTime = newStart;
@@ -510,7 +510,7 @@ UChain : UEvent {
 				} {	//making event bigger
 					//do something when making event bigger
 				}
-	
+
 			}
 		};
 	}
@@ -542,16 +542,16 @@ UChain : UEvent {
 
         }
 	}
-	
+
 	bounce { |index = 0, path, action, replace = true, single = true|
 		var tempChain, playbackUnit, dur, newAction;
 		var usedBuses;
 		path = path.getGPath.replaceExtension( "aiff" );
 		dur = this.duration;
-		
+
 		tempChain = this.deepCopy;
 		tempChain.units = tempChain.units[..index];
-		
+
 		if( single == true ) {
 			usedBuses = tempChain.units.last.audioOuts.collect({ |item|
 				tempChain.units.last.getAudioOut( item );
@@ -559,38 +559,38 @@ UChain : UEvent {
 		} {
 			usedBuses = UChainAudioAnalyzer( tempChain ).usedBuses.sort;
 		};
-		
+
 		usedBuses.do({ |bus, i|
 			tempChain.add( U( \output, [ \bus, i ] ).setAudioIn( 0, bus ) );
 		});
-		
-		if( replace == true ) {	
+
+		if( replace == true ) {
 			playbackUnit = U( \diskSoundFile, [ \soundFile, DiskSndFile.newBasic(
-					path, 
-					(dur * 44100).floor, 
+					path,
+					(dur * 44100).floor,
 					usedBuses.size
-				) ] 
+				) ]
 			);
-			
+
 			usedBuses.do({ |bus, i|
 				playbackUnit.setAudioOut( i, bus );
 			});
-			
+
 			if( single == true ) {
 				this.units = this.units.put( index, playbackUnit );
 			} {
 				this.units = [ playbackUnit ] ++ (this.units[index + 1..]);
 			};
-			
+
 			this.duration = dur;
 			newAction = {
 				playbackUnit.soundFile.path = playbackUnit.soundFile.path;
 				action.value;
 			};
 		};
-		
-		tempChain.writeAudioFile( path, sampleFormat: "float", 
-			numChannels: usedBuses.size, 
+
+		tempChain.writeAudioFile( path, sampleFormat: "float",
+			numChannels: usedBuses.size,
 			action: newAction ? action
 		);
 	}
@@ -598,31 +598,31 @@ UChain : UEvent {
 	 makeView{ |i=0,minWidth, maxWidth| ^UChainEventView(this, i, minWidth, maxWidth) }
 
 	isPlaying { ^units.any(_.isPlaying) }
-	
+
 	connect { units.do(_.connect) }
 	disconnect { units.do(_.disconnect) }
-	
+
 	/// creation
-	
+
 	groups { ^groupDict[ this ] ? [] }
-	
+
 	groups_ { |groups| groupDict.put( this, groups ); }
-	
+
 	addGroup { |group|
-		 groupDict.put( this, groupDict.at( this ).add( group ) ); 
-		 this.class.changed( \groupDict, \add, this ); 
+		 groupDict.put( this, groupDict.at( this ).add( group ) );
+		 this.class.changed( \groupDict, \add, this );
 	}
-	
+
 	removeGroup { |group|
 		var groups;
 		groups = this.groups;
 		groups.remove( group );
 		if( groups.size == 0 ) {
-			groupDict.put( this, nil ); 
+			groupDict.put( this, nil );
 		} {
 			groupDict.put( this, groups );  // not needed?
 		};
-		this.class.changed( \groupDict, \remove, this); 
+		this.class.changed( \groupDict, \remove, this);
 	}
 
 	makeGroupAndSynth { |target, startPos = 0|
@@ -695,7 +695,7 @@ UChain : UEvent {
             ^this.groups;
         };
 	}
-	
+
 	start { |target, startPos = 0, latency|
 		this.prStartBasic(target, startPos, latency, false )
 	}
@@ -703,17 +703,17 @@ UChain : UEvent {
 	startAndRelease { |target, startPos = 0, latency|
         this.prStartBasic(target, startPos, latency, true )
 	}
-	
+
 	stopPrepareTasks {
-		if( prepareTasks.size > 0 ) { 
+		if( prepareTasks.size > 0 ) {
 			prepareTasks.do(_.stop);
 			prepareTasks = [];
 		};
 	}
-	
+
 	free { this.groups.do(_.free) }
 	stop { this.stopPrepareTasks; this.free; }
-	
+
 	release { |time, keepFadeOutIfInf = true|
 		var releaseUnits;
 		releaseUnits = units.select({ |unit| unit.def.canFreeSynth });
@@ -726,7 +726,7 @@ UChain : UEvent {
 			this.stop; // stop if no releaseable synths
 		};
 	}
-	
+
 	shouldPlayOn { |target|
 		var res;
 		res = units.collect({ |unit|
@@ -755,16 +755,16 @@ UChain : UEvent {
 
 	prepare { |target, startPos = 0, action|
 		var cpu, firstAction;
-		
+
 		nowPreparingChain = this;
-		
+
 		// lastTarget = target;
 		action = MultiActionFunc( action );
 		target = target.asCollection;
 		if( target.size == 0 ) {
 			target = (ULib.servers ? Server.default).asCollection;
 		};
-		
+
 		if( serverName.notNil ) {
 			target = target.select({ |trg|
 				if( trg.isKindOf( LoadBalancer ).not ) {
@@ -774,7 +774,7 @@ UChain : UEvent {
 				};
 			});
 		};
-		
+
 		if( global ) {
 			target = target.collect({ |trg|
 				if( trg.isKindOf( LoadBalancer ) ) {
@@ -784,7 +784,7 @@ UChain : UEvent {
 				};
 			}).flat;
 		};
-		
+
 		target = target.select({ |tg|
 			this.shouldPlayOn( tg ) != false;
 		});
@@ -800,11 +800,11 @@ UChain : UEvent {
 		firstAction = action.getAction;
 		units.do( _.prepare(target, startPos, action.getAction ) );
 	     firstAction.value; // fire action at least once
-	     
+
 	     if( verbose ) { "% preparing for %".format( this, preparedServers ).postln; };
-	     
+
 	     nowPreparingChain = nil
-	     
+
 	     ^target; // return array of actually prepared servers
 	}
 
@@ -815,20 +815,20 @@ UChain : UEvent {
 		};
 		cond = Condition(false);
 		target = this.prepare( target, startPos, { cond.test = true; cond.signal } );
-		task = fork { 
+		task = fork {
 			cond.wait;
 	       	this.start(target, startPos);
 	       	prepareTasks.remove(task);
 		};
 	    prepareTasks = prepareTasks.add( task );
 	}
-	
+
 	waitTime { ^this.units.collect(_.waitTime).sum }
-	
+
 	prepareWaitAndStart { |target, startPos = 0, startAction|
 		var task;
 		target = this.prepare( target, startPos );
-		task = fork { 
+		task = fork {
 			this.waitTime.wait; // doesn't care if prepare is done
 	       	this.start(target, startPos);
 	       	startAction.value( this );
@@ -837,7 +837,7 @@ UChain : UEvent {
 	    prepareTasks = prepareTasks.add( task );
 	}
 
-	dispose { 
+	dispose {
 		units.do( _.dispose );
 		preparedServers.do({ |srv|
 			srv.asTarget.server.loadBalancerAddLoad( this.apxCPU.neg );
@@ -845,27 +845,27 @@ UChain : UEvent {
 		preparedServers = [];
 		this.score = nil;
 	}
-	
+
 	disposeSynths {
 		units.do( _.disposeSynths );
 		this.groups.do({ UGroup.end( this ); });
 		this.groups.copy.do( _.changed( \n_end ) );
 	}
-	
+
 	collectOSCBundleFuncs { |server, startOffset = 0, infdur = 60|
 		var array;
 		// returns a set of OSC bundles to be used by Score for NRT purposes
-		
-		if( disabled.not ) {	
+
+		if( disabled.not ) {
 			server = server ? Server.default;
-			
-			array = [ 
-				[ startOffset, { 
+
+			array = [
+				[ startOffset, {
 					this.prepare(server);
-					this.start(server); 
+					this.start(server);
 				}]
 			];
-			
+
 			if( this.releaseSelf.not ) {
 				if( this.duration != inf ) {
 					array = array.add( [ startOffset + this.eventSustain, { this.release }] );
@@ -873,77 +873,77 @@ UChain : UEvent {
 					array = array.add( [ infdur - this.fadeOut, { this.release }] );
 				};
 			};
-			
+
 			if( this.duration == inf )  {
 				array = array.add( [ infdur, { this.disposeSynths }]);
 			} {
 				array = array.add( [ startOffset + this.duration, { this.disposeSynths }]
 				);
 			};
-			
+
 			^array;
 		} {
 			^[]
 		}
-		
+
 	}
-	
+
 	collectOSCBundles { |server, startOffset = 0, infdur = 60|
 		var array, prepareArray;
 		// returns a set of OSC bundles to be used by Score for NRT purposes
-		
-		if( disabled.not ) {	
+
+		if( disabled.not ) {
 			server = server ? Server.default;
-			
-			this.useNRT({	
-				
+
+			this.useNRT({
+
 				prepareArray = server.makeBundle( false, { this.prepare(server); } );
-				
+
 				prepareArray.do({ |item|
 					array = array ++ [ [ startOffset, item ] ];
 				});
-				
-				array = array ++ [ 
-					[ startOffset ] ++ server.makeBundle( false, { this.start(server); }) 
+
+				array = array ++ [
+					[ startOffset ] ++ server.makeBundle( false, { this.start(server); })
 				];
-				
+
 				if( this.releaseSelf.not ) {
 					if( this.duration != inf ) {
-						array = array.add( 
-							[ startOffset + this.eventSustain ] ++ 
+						array = array.add(
+							[ startOffset + this.eventSustain ] ++
 								server.makeBundle( false, { this.release })
 						);
 					} {
-						array = array.add( 
-							[ infdur - this.fadeOut ] ++ 
-								server.makeBundle( false, { this.release }) 
+						array = array.add(
+							[ infdur - this.fadeOut ] ++
+								server.makeBundle( false, { this.release })
 						);
 					};
 				};
-				
+
 				if( this.duration == inf )  {
 					array = array.add( [ infdur ] ++ server.makeBundle( false, { this.disposeSynths }) );
 				} {
-					array = array.add( 
-						[ startOffset + this.duration ] ++ 
+					array = array.add(
+						[ startOffset + this.duration ] ++
 							server.makeBundle( false, { this.disposeSynths })
 					);
 				};
-				
+
 			});
-			
+
 			^array.sort({ |a,b| a[0] <= b[0] });
 		} {
 			^[];
 		};
 	}
-	
+
 	resetGroups { this.groups = nil; } // after unexpected server quit
-	
+
 	resetStreams { this.units.do(_.resetStreams) }
-	
+
 	// indexing / access
-		
+
 	at { |index| ^units[ index ] }
 	copySeries { |first, second, last| ^units.copySeries( first, second, last ) }
 	collect { |func|  ^units.collect( func );  }
@@ -951,7 +951,7 @@ UChain : UEvent {
 	last { ^units.last }
 	first { ^units.first }
 	indexOf { |obj| ^units.indexOf( obj ); }
-	
+
 	deepIndexOf { |obj|
 		var key, val;
 		^this.indexOf( obj ) ?? {
@@ -965,7 +965,7 @@ UChain : UEvent {
 			nil;
 		};
 	}
-	
+
 	set { |key, value| // sets all units that respond to  key
 		var extid, subkey;
 		subkey = key;
@@ -975,11 +975,11 @@ UChain : UEvent {
 		};
 		units.select({ |u| u.keys.includes( subkey ) }).do(_.set( key, value ));
 	}
-	
+
 	get { |key|
 		^units.select({ |u| u.keys.includes( key ) }).collect(_.get(key));
 	}
-	
+
 	setAt { |index, key, value|
 		this.units.at(index).set(key, value)
 	}
@@ -992,18 +992,18 @@ UChain : UEvent {
 		units = units.add( unit.asUnit );
 		this.changed( \units );
 	}
-	
+
 	addAll { |inUnits| // a UChain or Array with units
 		if( inUnits.class == this.class ) { inUnits = inUnits.units; };
 		units = units.addAll( inUnits.collect(_.asUnit) );
 		this.changed( \units );
 	}
-	
+
 	put { |index, unit|
 		units.put( index, unit.asUnit );
 		this.changed( \units );
 	}
-	
+
 	insert { |index, unit|
 		units = units.insert( index, unit.asUnit );
 		this.changed( \units );
@@ -1014,14 +1014,14 @@ UChain : UEvent {
 	    units = units[..(index-1)]++newUnits++units[(index+1)..];
 	    this.changed( \units )
 	}
-	
+
 	removeAt { |index|
 		var out;
 		out = units.removeAt( index );
 		this.changed( \units );
 		^out;
 	}
-	
+
 	/*
 	*   uchain: UChain
 	*/
@@ -1042,16 +1042,16 @@ UChain : UEvent {
 	printOn { arg stream;
 		stream << this.class.name << "( " <<* units.collect(_.defName)  << " )"
 	}
-	
+
 	*duration { // returns duration of current UPattern
 		var chain;
 		chain = UChain.nowPreparingChain ?? { UPattern.nowCallingPattern };
 		^if( chain.notNil ) { chain.duration };
 	}
-	
+
 	getInitArgs {
 		var numPreArgs = -1;
-		if( releaseSelf != true ) { 
+		if( releaseSelf != true ) {
 			numPreArgs = 3
 		} {
 			if( duration != inf ) {
@@ -1066,13 +1066,13 @@ UChain : UEvent {
 				}
 			}
 		};
-		
-		^([ startTime, track, duration, releaseSelf ][..numPreArgs]) ++ 
+
+		^([ startTime, track, duration, releaseSelf ][..numPreArgs]) ++
 			units.collect(_.getSetArgs);
 	}
-	
+
 	storeArgs { ^this.getInitArgs }
-	
+
 	storeModifiersOn { |stream|
 		this.storeTags( stream );
 		this.storeDisplayColor( stream );

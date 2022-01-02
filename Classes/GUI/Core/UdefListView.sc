@@ -18,12 +18,12 @@
 */
 
 UdefListView {
-	
+
 	classvar <>current;
-	
+
 	var <view, <views;
 	var <collapsed;
-	
+
 	*new { |parent, bounds, makeCurrent = true|
 		if( parent.isNil && { current.notNil && { current.view.isClosed.not } } ) {
 			^current.rebuild.front;
@@ -31,20 +31,20 @@ UdefListView {
 			^super.new.init( parent, bounds ).makeCurrent( makeCurrent );
 		};
 	}
-	
+
 	makeCurrent { |bool| if( bool == true ) { current = this } }
-	
+
 	rebuild {
 		var parent, cx = false;
 		parent = view.parent;
-		if( current == this ) { 
+		if( current == this ) {
 			cx = true;
 		};
 		parent.children.do(_.remove);
 		this.init( parent );
 		this.makeCurrent( cx );
 	}
-	
+
 	*front {
 		var parent;
 		if( current.notNil && { current.view.isClosed.not } ) {
@@ -53,7 +53,7 @@ UdefListView {
 			^UdefListView( );
 		};
 	}
-	
+
 	collapseAll {
 		views.do({ |item|
 			if( item.class == ExpandView ) {
@@ -61,7 +61,7 @@ UdefListView {
 			};
 		});
 	}
-	
+
 	expandAll {
 		views.do({ |item|
 			if( item.class == ExpandView ) {
@@ -69,47 +69,47 @@ UdefListView {
 			};
 		});
 	}
-		
-	
+
+
 	front { view.findWindow.front }
-	
+
 	init { |parent, bounds|
-		
+
 		var categories, names, rackCategories, g;
 		var scrollerMargin = 12;
 		var refreshFunc;
 		var controller;
-		
+
 		refreshFunc = ActionFunc( \delay, { { this.rebuild }.defer( 0.01 ); }, 0.1 );
-		
+
 		controller = SimpleController( Udef.all );
-		
+
 		controller.put( \added, { refreshFunc.value });
-		
+
 		if( GUI.id == \qt ) { scrollerMargin = 20 };
-			
+
 		collapsed = collapsed ?? { () };
-		
+
 		if( parent.notNil ) {
 			bounds = bounds ?? { parent.bounds.moveTo(0,0).insetBy(4,4) };
 		} {
 			bounds = bounds ? 220@400;
 		};
-		
+
 		view = EZCompositeView( parent, bounds ).resize_(5);
 		bounds = view.bounds;
-		view.onClose_({ 
+		view.onClose_({
 			if( current == this ) { current = nil };
 			controller.remove;
 		});
 		views = ();
-		
+
 		views[ \scrollview ] = ScrollView( view, view.bounds.moveTo(0,0) ).resize_(5);
 		views[ \scrollview ].addFlowLayout;
 		views[ \scrollview ].hasBorder = false;
-		
+
 		categories = [];
-		
+
 		Udef.all !? { |all| all.keys.asArray.sort.do({ |key|
                 var category, index, udef;
                 udef = all[ key ];
@@ -140,13 +140,13 @@ UdefListView {
 
 		g = { |cat, udefs|
             if( cat !== \private ) {
-			
+
             views[ cat ] = ExpandView( views[ \scrollview ],
                 (bounds.width - (scrollerMargin+6))@( (udefs.size + 1) * 22 ),
                 (bounds.width - (scrollerMargin+6))@18,
                 collapsed[ cat ] ? true
             );
-            
+
             views[ cat ].button.background = nil;
 
             views[ cat ].addFlowLayout( 0@0, 4@4 );
@@ -166,7 +166,7 @@ UdefListView {
                     .object_( udef )
                      .beginDragAction_({ |vw|
 	                    UDragBin.current = nil;
-	                    { 
+	                    {
 		                    UChainGUI.all.do({ |x| x.view.refresh });
 		                    UGlobalControlGUI.current !? {|x| x.view.view.refresh };
 		               }.defer(0.1);
@@ -174,7 +174,7 @@ UdefListView {
                     })
                     .string_( " " ++ udef.name.asString )
                     .applySkin( RoundView.skin ? () );
-                  
+
                 if( hasFile ) {
 	               SmoothButton( views[ cat ], 18@18 )
 	                	.label_( \document )
@@ -183,27 +183,27 @@ UdefListView {
 	                	.resize_(3)
 	                	.canFocus_( false )
 	                	.action_({
-		                	udef.openDefFile 
+		                	udef.openDefFile
 		                });
                 };
             });
-            
+
             collapsed[ cat ] = views[ cat ].collapsed;
-            
+
             views[ cat ]
             	.expandAction_({ collapsed[ cat ] = false })
             	.collapseAction_({ collapsed[ cat ] = true })
             	.hideOutside;
-            
+
             };
         };
 
 		RoundView.useWithSkin( UChainGUI.skin ++ (RoundView.skin ? ()), {
 			var comp;
-			
+
 			comp = CompositeView( views[ \scrollview ], (bounds.width - 18)@14 );
 			comp.addFlowLayout( 0@0, 4@0 );
-			
+
 			SmoothButton(comp, 50@14 )
 				.label_([ "show all", "hide all" ])
 				.hiliteColor_( Color.clear )
@@ -211,19 +211,19 @@ UdefListView {
 				.radius_(2)
 				.canFocus_(false)
 				.action_({ |bt|
-					switch( bt.value, 
+					switch( bt.value,
 						1, { this.expandAll },
 						0, { this.collapseAll }
 					);
 				});
-				
+
 			SmoothButton(comp, 50@14 )
 				.label_( "refresh" )
 				.border_(1)
 				.radius_(2)
 				.canFocus_(false)
 				.action_({ { this.rebuild }.defer( 0.01 ) });
-				
+
 			SmoothButton(comp, 50@14 )
 				.label_([ "load all" ])
 				.hiliteColor_( Color.clear )
@@ -235,10 +235,10 @@ UdefListView {
 					Udef.loadOnInit = false;
 					defs = Udef.loadAllFromDefaultDirectory.collect(_.synthDef).flat.select(_.notNil);
 					Udef.loadOnInit = true;
-					ULib.servers.do({ |srv| 
+					ULib.servers.do({ |srv|
 						if( srv.class == LoadBalancer ) {
 							if( srv.servers[0].isLocal ) {
-								defs.do(_.justWriteDefFile); 
+								defs.do(_.justWriteDefFile);
 								srv.servers.do({ |sx|
 									sx.loadDirectory( SynthDef.synthDefDir );
 								});
@@ -248,17 +248,17 @@ UdefListView {
 								};
 							};
 						} {
-							if( srv.isLocal ) { 
-								defs.do(_.justWriteDefFile); 
-								srv.loadDirectory( SynthDef.synthDefDir ); 
+							if( srv.isLocal ) {
+								defs.do(_.justWriteDefFile);
+								srv.loadDirectory( SynthDef.synthDefDir );
 							} {
-								defs.do(_.send(srv)); 
+								defs.do(_.send(srv));
 							};
 						};
 					});
 					UnitRack.loadAllFromDefaultDirectory;
 				});
-				
+
 			StaticText(views[ \scrollview],100@25).string_("Udefs");
 			views[ \scrollview].decorator.nextLine;
 			categories = categories.clump(2).sort({ |a,b| a[0] <= b[0] }).flatten(1);
@@ -269,5 +269,5 @@ UdefListView {
             rackCategories.pairsDo(g);
 		});
 	}
-	
+
 }

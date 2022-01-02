@@ -1,10 +1,10 @@
 UVoicer : UEvent {
-	
+
 	classvar <>currentNote, <>currentAmp;
-	
+
 	var <chain;
 	var <>events;
-	
+
 	*new { |chain, startTime = 0, track = 0, duration = inf, releaseSelf = false|
 		chain = chain ?? { UChain.default };
 		^super.newCopyArgs
@@ -15,29 +15,29 @@ UVoicer : UEvent {
 			.duration_( duration )
 			.init
 	}
-	
+
 	init {
 		events = Order();
 		this.changed( \init );
 	}
-	
+
 	releaseSelf_ { |bool|
 		if(releaseSelf != bool) {
 	        releaseSelf = bool;
 	        this.changed( \releaseSelf );
         };
     }
-    
+
     chain_ { |aChain|
 	    chain = aChain;
 	    this.changed( \chain );
     }
-    
+
     duration_{ |dur|
         duration = dur;
         this.changed( \dur );
     }
-    
+
     prPrepareUnit { |unit|
 		var prepareThese;
 		prepareThese = unit.valuesToPrepare.select({ |item|
@@ -54,7 +54,7 @@ UVoicer : UEvent {
 			 };
 		});
 	}
-	
+
 	prPatternsToValues { |unit|
 		unit.args.pairsDo({ |key, item|
 			if( item.isKindOf( UMap ) ) {
@@ -66,16 +66,16 @@ UVoicer : UEvent {
 			};
 		});
 	}
-	
+
 	nextChain { |startTime = 0, note = 69, value = 0.5|
-		var next, was, ctrl;	
+		var next, was, ctrl;
 		next = chain.deepCopy;
 		next.startTime = startTime;
 		next.voicerNote = note;
 		next.voicerValue = value;
 		next.releaseSelf_( true );
 		next.parent = this;
-		if( next.class == UChain ) {	
+		if( next.class == UChain ) {
 			was = UChain.nowPreparingChain;
 			UChain.nowPreparingChain = next;
 			next.units.do({ |unit|
@@ -86,8 +86,8 @@ UVoicer : UEvent {
 		};
 		ctrl = SimpleController( next )
 			.put( \end, {
-				if( next.isKindOf( UPattern ) or: { 
-					next.units.every({ |unit| unit.synths.size == 0 }) 
+				if( next.isKindOf( UPattern ) or: {
+					next.units.every({ |unit| unit.synths.size == 0 })
 				} ) {
 					events[ note ].remove( next );
 					ctrl.remove;
@@ -95,20 +95,20 @@ UVoicer : UEvent {
 			});
 		^next;
 	}
-	
+
 	startEvent { |note = 69, value = 0.5|
 		events[ note ] = events[ note ].add(
 			this.nextChain( this.startTime, note, value ).prepareAndStart
 		);
 	}
-	
+
 	endEvent { |note = 69, releaseTime|
 		events[ note ].do(_.release( releaseTime ));
 	}
-	
+
 	endAll { |releaseTime|
 		events.do({ |evts| evts.do(_.release( releaseTime )); });
 	}
-	
+
 	allEvents { ^events.flatten(1) }
 }

@@ -44,7 +44,7 @@ x.def.loadSynthDef
 x.start
 (
 x = Udef( \sine, { |freq = 440, amp = 0.1|
-	Out.ar( 0, SinOsc.ar( freq, 0, amp ) ) 
+	Out.ar( 0, SinOsc.ar( freq, 0, amp ) )
 } );
 )
 
@@ -62,11 +62,11 @@ y.set( \freq, 700 );
 // a styled gui in user-defined window
 w = Window( y.defName, Rect( 300,25,200,200 ) ).front;
 w.addFlowLayout;
-RoundView.useWithSkin( ( 
-	labelWidth: 40, 
-	font: Font( Font.defaultSansFace, 10 ), 
+RoundView.useWithSkin( (
+	labelWidth: 40,
+	font: Font( Font.defaultSansFace, 10 ),
 	hiliteColor: Color.gray(0.25)
-), { 
+), {
 	SmoothButton( w, 16@16 )
 		.label_( ['power', 'power'] )
 		.hiliteColor_( Color.green.alpha_(0.5) )
@@ -79,12 +79,12 @@ RoundView.useWithSkin( (
 */
 
 Udef : GenericDef {
-	
+
 	classvar <>all, <>defsFolders, <>userDefsFolder;
 	classvar <>buildUdef; // the Udef currently under construction
 	classvar <>buildArgSpecs; //The specs under construction
 	classvar <>loadOnInit = true;
-		
+
 	var <>func, <>category;
 	var <>synthDef;
 	var <>shouldPlayOnFunc;
@@ -101,9 +101,9 @@ Udef : GenericDef {
 	var <>inputIsEndPoint = false;
 	var <>dontStoreArgNames;
 	var <>dontStoreSynthDef = false;
-	
+
 	*initClass{
-		defsFolders = [ 
+		defsFolders = [
 			this.filenameSymbol.asString.dirname.dirname.dirname +/+ "UnitDefs"
 		];
 		userDefsFolder = Platform.userAppSupportDir ++ "/UnitDefs/";
@@ -113,16 +113,16 @@ Udef : GenericDef {
 		^super.new( name, args, addToAll )
 			.extraPrefix_( extraPrefix ).category_( category ? \default );
 	}
-	
+
 	*new { |name, func, args, category, addToAll=true, extraPrefix|
 		^super.new( name, args, addToAll )
 			.extraPrefix_( extraPrefix ).init( func ).category_( category ? \default );
 	}
-	
+
 	*prefix { ^"u_" }
 
 	*callByName { ^true }
-	
+
 	*numChannels { ^buildUdef !? { buildUdef.numChannels } ? 1 }
 
 	*addBuildSpec { |argSpec|
@@ -147,25 +147,25 @@ Udef : GenericDef {
 
 	init { |inFunc|
 		var argNames, values;
-		
+
 		func = inFunc;
-		
+
 		this.class.buildUdef = this;
 		this.class.buildArgSpecs = [];
 		this.synthDef = SynthDef( this.prGenerateSynthDefName, func );
 		this.class.buildUdef = nil;
-		
+
 		argSpecs = ArgSpec.fromSynthDef( this.synthDef, argSpecs ++ this.class.buildArgSpecs );
-		
+
 		this.class.buildArgSpecs = nil;
 
 		this.initArgs;
-		
+
 		if( this.dontStoreSynthDef ) { this.synthDef = nil };
 		if( loadOnInit ) { this.loadSynthDef };
 		this.changed( \init );
 	}
-	
+
 	initArgs {
 		argSpecs.do({ |item|
 			if( item.name.asString[..1].asSymbol == 'u_' ) {
@@ -178,23 +178,23 @@ Udef : GenericDef {
 			};
 		});
 	}
-	
+
 	asArgsArray { |argPairs, unit, constrain = true|
 		argPairs = prepareArgsFunc.value( argPairs ) ? argPairs ? #[];
-		^this.argSpecs( unit ).collect({ |item| 
+		^this.argSpecs( unit ).collect({ |item|
 			var val;
 			val = argPairs.pairsAt(item.name) ?? { item.default.copy };
 			val = val.deepCopy.asUnitArg( unit, item.name );
 			if( constrain && { val.isKindOf( UMap ).not } ) { val = item.constrain( val ) };
-			[ item.name,  val ] 
+			[ item.name,  val ]
 		}).flatten(1);
 	}
-	
+
 	argNamesFor { |unit| ^this.argNames }
-	
+
 	createsSynth { ^true }
-	
-	// this may change 
+
+	// this may change
 	// temp override to send instead of load (remote servers can't load!!)
 	loadSynthDef { |server|
 		var defs;
@@ -218,15 +218,15 @@ Udef : GenericDef {
 				}
 
 			} {
-				if( s.isLocal ) { 
-					defs.do(_.load(s)); 
+				if( s.isLocal ) {
+					defs.do(_.load(s));
 				} {
-					defs.do(_.send(s)); 
+					defs.do(_.send(s));
 				};
 			};
 		}
 	}
-	
+
 	sendSynthDef { |server|
 		var defs;
 		server = server ? ULib.servers ? Server.default;
@@ -253,7 +253,7 @@ Udef : GenericDef {
 			action.value
 		};
 	}
-	
+
 	doPrepareFunc { |servers, unit, action, startPos|
 		if( prepareFunc.notNil ) {
 			prepareFunc.value( servers, unit, action, startPos );
@@ -261,20 +261,20 @@ Udef : GenericDef {
 			action.value
 		};
 	}
-	
+
 	needsPrepare { ^false }
-	
+
 	stop { |unit|
-		unit.synths.do(_.free);  
+		unit.synths.do(_.free);
 	}
-	
+
 	synthDefName { ^this.synthDef.name }
-	
+
 	isUdef { ^true }
-	
+
 	load { |server| this.loadSynthDef( server ) }
 	send { |server| this.sendSynthDef( server ) }
-	
+
 	makeSynth { |unit, target, startPos = 0, synthAction|
 	    var synth;
 	    var started = false;
@@ -308,21 +308,21 @@ Udef : GenericDef {
 		};
 		^synth;
 	}
-	
+
 	shouldPlayOn { |unit, server| // returns nil if no func
 		^shouldPlayOnFunc !? { shouldPlayOnFunc.value( unit, server ); }
 	}
-	
+
 	// I/O
-	
+
 	prGetIOKey { |mode = \in, rate = \audio ... extra|
-		^([ 
-			"u", 
-			switch( mode, \in, "i", \out, "o" ),  
+		^([
+			"u",
+			switch( mode, \in, "i", \out, "o" ),
 			switch( rate, \audio, "ar", \control, "kr" )
 		] ++ extra).join( "_" );
 	}
-	
+
 	prIOspecs { |mode = \in, rate = \audio, key, unit|
 		key = key ?? { this.prGetIOKey( mode, rate ); };
 		^this.argSpecs( unit ).select({ |item|
@@ -332,7 +332,7 @@ Udef : GenericDef {
 			 	{ name[ name.size - 3 .. ] == "bus" };
 		});
 	}
-	
+
 	prIOids { |mode = \in, rate = \audio, unit|
 		var key;
 		key = this.prGetIOKey( mode, rate );
@@ -340,12 +340,12 @@ Udef : GenericDef {
 			item.name.asString[key.size+1..].split( $_ )[0].interpret;
 		});
 	}
-	
+
 	audioIns { |unit| ^this.prIOids( \in, \audio, unit ); }
 	controlIns { |unit| ^this.prIOids( \in, \control, unit ); }
 	audioOuts { |unit| ^this.prIOids( \out, \audio, unit ); }
 	controlOuts { |unit| ^this.prIOids( \out, \control, unit ); }
-	
+
 	prGetIOName { |mode = \in, rate = \audio, index = 0|
 		if( this.ioNames.notNil ) {
 			^this.ioNames[ mode, rate, index.asInteger ];
@@ -353,19 +353,19 @@ Udef : GenericDef {
 			^nil
 		};
 	}
-	
+
 	prSetIOName { |mode = \in, rate = \audio, index = 0, name|
 		if( this.ioNames.isNil ) {
 			this.ioNames = MultiLevelIdentityDictionary();
 		};
 		this.ioNames.put( mode, rate, index.asInteger, name );
 	}
-	
+
 	audioInName { |index=0| ^this.prGetIOName( \in, \audio, index ); }
 	controlInName { |index=0| ^this.prGetIOName( \in, \control, index ); }
 	audioOutName { |index=0| ^this.prGetIOName( \out, \audio, index ); }
 	controlOutName { |index=0| ^this.prGetIOName( \out, \control, index ); }
-	
+
 	prSetMultiIOName { |mode, rate, index, name|
 		if( name.isString ) { name = [ name ] };
 		name = name.asCollection.collect(_.asSymbol);
@@ -373,32 +373,32 @@ Udef : GenericDef {
 			this.prSetIOName( mode, rate, index, name[i] );
 		});
 	}
-	
+
 	setAudioInName { |index, name| this.prSetMultiIOName( \in, \audio, index, name ); }
 	setControlInName { |index, name| this.prSetMultiIOName( \in, \control, index, name ); }
 	setAudioOutName { |index, name| this.prSetMultiIOName( \out, \audio, index, name ); }
 	setControlOutName { |index, name| this.prSetMultiIOName( \out, \control, index, name ); }
-	
-	canFreeSynth { |unit| ^this.keys.includes( \u_doneAction ) } 
+
+	canFreeSynth { |unit| ^this.keys.includes( \u_doneAction ) }
 		// assumes the Udef contains a UEnv
-	
+
 	// these may differ in subclasses of Udef
 	createSynth { |unit, target, startPos = 0| // create A single synth based on server
 		target = target ? Server.default;
 		^Synth( this.synthDefName, unit.getArgsFor( target, startPos ), target, \addToTail );
 	}
-	
+
 	setSpec { |name, spec, mode, constrainDefault = true, private|
 		var asp;
 		asp = this.getArgSpec(name);
-		if( asp.notNil ) { 
+		if( asp.notNil ) {
 			if( spec.notNil ) { asp.spec = spec.asSpec; };
 			if( mode.notNil ) { asp.mode = mode; };
 			if( constrainDefault ) { asp.constrainDefault };
 			if( private.notNil ) { asp.private = private };
 		};
 	}
-	
+
 	setSpecMode { |...pairs|
 		pairs.pairsDo({ |name, mode|
 			var asp;
@@ -406,16 +406,16 @@ Udef : GenericDef {
 			if( asp.notNil ) { asp.mode = mode };
 		});
 	}
-	
+
 	argSpecModes { // collect all modes into a dict
-		var dict = IdentityDictionary(); 
+		var dict = IdentityDictionary();
 		argSpecs.do({ |item| dict[ item.name ] = item.mode; });
 		^dict;
 	}
 	setSynth { |unit ...keyValuePairs|
 		this.prSetSynth( unit.synths, *keyValuePairs );
 	}
-	
+
 	prSetSynth { |synths ...keyValuePairs|
 		var syncIndices, normalIndices;
 		var modes;
@@ -443,23 +443,23 @@ Udef : GenericDef {
 			});
 		};
 	}
-	
+
 	prSetSynthSync { |synth ...keyValuePairs|
 		var server;
 		server = synth.server;
-		server.sendSyncedBundle( Server.default.latency, nil, 
+		server.sendSyncedBundle( Server.default.latency, nil,
 			*server.makeBundle( false, {
 				this.prSetSynthNormal( synth, *keyValuePairs )			})
 		);
 	}
-	
+
 	prSetSynthNormal { |synth ...keyValuePairs|
 		synth.set(*keyValuePairs.clump(2).collect{ |arr|
-				[arr[0],arr[1].asControlInputFor(synth.server)] 
+				[arr[0],arr[1].asControlInputFor(synth.server)]
 			}.flatten
 		);
 	}
-	
+
 	synthsForUMap { |unit|
 		// return only one synth per server
 		var servers, synths;
@@ -473,28 +473,28 @@ Udef : GenericDef {
 		});
 		^synths;
 	}
-	
+
 	printOn { arg stream;
 		stream << "a " << this.class.name << "(" <<* [this.name]  <<")"
 	}
 
 	storeOn { arg stream;
 		stream << this.class.name << "(" <<* [
-			this.name.asCompileString, 
+			this.name.asCompileString,
 			func.asCompileString,
 			argSpecs.asCompileString,
 			category.asCompileString
 		]  <<")"
 	}
-	
+
 	asUdef { ^this }
-	
+
 	asUnit { ^U( this ) }
-		
+
 }
 
 U : ObjectWithArgs {
-	
+
 	classvar <>loadDef = false;
 	classvar <>synthDict;
 	classvar <>uneditableCategories;
@@ -507,7 +507,7 @@ U : ObjectWithArgs {
 	var <mod;
 	var <guiCollapsed = false;
 	var <>parentChain;
-	
+
 	*initClass {
 	    synthDict = IdentityDictionary( );
 	    uneditableCategories = [];
@@ -520,13 +520,13 @@ U : ObjectWithArgs {
 	*new { |def, args, mod|
 		^super.new.init( def, args ? [], mod )
 	}
-	
+
 	*defClass { ^Udef }
-	
+
 	*clear {
-		synthDict.do({ |synths| 
-			synths.do({	 |synth| if( synth.isPlaying ) { 
-					synth.free 
+		synthDict.do({ |synths|
+			synths.do({	 |synth| if( synth.isPlaying ) {
+					synth.free
 				} {
 					synth.changed( \n_end );
 				};
@@ -534,7 +534,7 @@ U : ObjectWithArgs {
 		});
 		synthDict = IdentityDictionary();
 	}
-	
+
 	init { |in, inArgs, inMod|
 		if( in.isKindOf( this.class.defClass ) ) {
 			def = in;
@@ -558,12 +558,12 @@ U : ObjectWithArgs {
 	}
 	allKeys { ^this.keys }
 	allValues { ^this.values }
-	
+
 	uchainInit { |...args|
 		this.def !? { |d| d.uchainInitFunc.value( this, *args ) };
 		this.getUMaps.do(_.uchainInit(this, *args));
 	}
-	
+
 	guiCollapsed_ { |bool = false|
 		if( guiCollapsed != bool ) {
 			guiCollapsed = bool;
@@ -586,8 +586,8 @@ U : ObjectWithArgs {
     defName_ { |newDefName, keepArgs = true|
         this.init( newDefName, if( keepArgs ) { args } { [] }, mod); // keep args
     }
-    
-    subDef { 
+
+    subDef {
 	    var df;
 	    df = this.def;
 	    while { df.respondsTo( \findUdefFor ) } {
@@ -595,8 +595,8 @@ U : ObjectWithArgs {
 	    };
 	    ^df;
     }
-    
-    subDefNames {  
+
+    subDefNames {
 	    var df, res;
 	    df = this.def;
 	    while { df.respondsTo( \findUdefFor ) } {
@@ -605,17 +605,17 @@ U : ObjectWithArgs {
 	    };
 	    ^res;
     }
-    
+
     fullDefName {
 	    ^([ this.defName ] ++ this.subDefNames).join( " / " );
     }
-    
+
     checkDef {
 	    if( this.def.notNil && { this.def.argNamesFor( this ) != this.argNames } ) {
 		    this.init( this.def, args, mod );
 	    };
     }
-    
+
     constrainArgs { |exclude|
 	    	this.argSpecs.do({ |argSpec|
 		    	var val;
@@ -627,7 +627,7 @@ U : ObjectWithArgs {
 		    	}
 		});
     }
-    
+
     name {
 	    if( this.def.respondsTo( \nameFunc ) && { this.def.nameFunc.notNil } ) {
 		    ^this.def.nameFunc.value( this );
@@ -654,22 +654,22 @@ U : ObjectWithArgs {
 				value = value.asUnitArg( this, key );
 			};
 			this.setArg( key, value );
-			synthArgs = synthArgs.addAll( [ key, value ] ); 
+			synthArgs = synthArgs.addAll( [ key, value ] );
 		});
 		this.def.setSynth( this, *synthArgs );
 	}
-	
+
 	prSet { |...args| // without changing the arg
 		this.def.setSynth( this, *args );
 	}
-	
+
 	setConstrain { |...args|
-		this.set( 
+		this.set(
 			*args.clump(2).collect({ |item|
 				var key, value;
 				if( key.asString.includes($.) ) { // don't constrain in this case
 					item
-				} {	
+				} {
 					#key, value = item;
 					if( value.isUMap.not ) {
 						[ key, this.getSpec( key ).uconstrain( value ) ]
@@ -680,11 +680,11 @@ U : ObjectWithArgs {
 			}).flatten(1)
 		);
 	}
-	
+
 	setSynth { |key, value|
 		this.def.setSynth( this, [ key, value ?? { this.get( key ) } ] );
 	}
-	
+
 	insertUMap { |key, umapdef, args|
 		var item, umap;
 		if( umapdef.isKindOf( UMap ) ) {
@@ -712,7 +712,7 @@ U : ObjectWithArgs {
 			};
 		};
 	}
-	
+
 	removeUMap { |key|
 		var umap, insertArg;
 		umap = this.get( key );
@@ -729,9 +729,9 @@ U : ObjectWithArgs {
 			};
 		};
 	}
-	
+
 	argNeedsUnmappedInput { ^false }
-	
+
 	get { |key|
 		^this.getArg( key );
 	}
@@ -758,18 +758,18 @@ U : ObjectWithArgs {
 		    this.get(key)
 		}
 	}
-	
+
 	setDur { |dur = inf|
 		if( this.keys.includes( \u_dur ) ) {
 			this.set( \u_dur, dur );
 		};
 		this.getUMaps.do(_.setDur(dur));
 	}
-	
+
 	getDur {
 		^this.get( \u_dur );
 	}
-	
+
 	argSpecsForDisplay {
 		var out;
 		if( this.guiCollapsed ) {
@@ -787,12 +787,12 @@ U : ObjectWithArgs {
 			^this.argSpecs.select({ |item| item.private.not })
 		};
 	}
-	
+
 	mod_ { |newMod|
 		this.modPerform( \disconnect );
 		mod = newMod.asUModFor( this );
 	}
-	
+
 	addMod { |newMod|
 		if( mod.isKindOf( UMod ) ) {
 			mod = UModDict( mod );
@@ -808,16 +808,16 @@ U : ObjectWithArgs {
 			this.mod = UModDict( newMod );
 		};
 	}
-	
+
 	modPerform { |what ...args| mod !? _.perform( what, this, *args ); }
-	
-	umapPerform { |what ...args| 
+
+	umapPerform { |what ...args|
 		this.getUMaps.do({ |item|
 			item.perform( what, *args );
 		});
 	}
-	
-	getUMaps { 
+
+	getUMaps {
 		var res = [];
 		this.values.do({ |item|
 			if( item.isUMap && { res.includes( item ).not } ) {
@@ -826,8 +826,8 @@ U : ObjectWithArgs {
 		});
 		^res;
 	}
-	
-	getAllUMaps { 
+
+	getAllUMaps {
 		var umaps;
 		this.getUMaps.do({ |item|
 			umaps = umaps.add( item );
@@ -835,26 +835,26 @@ U : ObjectWithArgs {
 		});
 		^umaps;
 	}
-	
+
 	setUMapBuses {
 		this.getAllUMaps.do({ |item|
 			item.setUMapBus;
 		});
 	}
-	
+
 	getUMapBusNumChannels {
 		^(this.getAllUMaps.select(_.hasBus).collect({ |item| item.def.numChannels }) ? []).sum;
 	}
-	
+
 	canUseUMap { |key, umapdef|
-		^this.def.canUseUMap == true && 
+		^this.def.canUseUMap == true &&
 		{ umapdef.allowedModes.includes( this.getSpecMode( key ) ) && {
 			this.getSpec( key ).isKindOf( UAdaptSpec ) or:
-			{ umapdef.unitCanUseUMap( this, key ); }	
+			{ umapdef.unitCanUseUMap( this, key ); }
 			};
 		}
 	}
-	
+
 	resetStreams {
 		this.args.pairsDo({ |key, item|
 			if( item.isKindOf( UMap ) ) {
@@ -862,10 +862,10 @@ U : ObjectWithArgs {
 			};
 		});
 	}
-	
+
 	connect { this.modPerform( \connect ); this.changed( \connect ); }
 	disconnect {  this.modPerform( \disconnect ); this.changed( \disconnect ); }
-	
+
 	release { |releaseTime, doneAction| // only works if def.canFreeSynth == true
 		var args;
 		if( doneAction.notNil && { this.get( \u_doneAction ) != doneAction } ) {			args = [ \u_doneAction, doneAction ];
@@ -873,22 +873,22 @@ U : ObjectWithArgs {
 		if( releaseTime.notNil ) {
 			args = [ \u_fadeOut, releaseTime ] ++ args;
 		};
- 
+
 		this.prSet( *args );
 		this.set( \u_gate, 0 );
 	}
-	
+
 	getArgsFor { |server, startPos = 0|
 		server = server.asTarget.server;
 		^this.class.formatArgs( this.getSynthArgs, server, startPos );
 	}
-	
+
 	getSynthArgs {
 		var nonsynthKeys;
 		nonsynthKeys = this.argSpecs.select({ |item| item.mode == \nonsynth }).collect(_.name);
 		^this.args.clump(2).select({ |item| nonsynthKeys.includes( item[0] ).not }).flatten(1);
 	}
-	
+
 	getArgs { |selection|
 		if( selection.notNil ) {
 			selection = selection.asArray;
@@ -897,16 +897,16 @@ U : ObjectWithArgs {
 			^this.args;
 		};
 	}
-	
+
 	*formatArgs { |inArgs, server, startPos = 0|
 		^inArgs.clump(2).collect({ |item, i|
-			[ item[0], switch( item[0], 
+			[ item[0], switch( item[0],
 				\u_startPos, { startPos },
 				\u_dur, { item[1] - startPos },
-				\u_fadeIn, { 
+				\u_fadeIn, {
 					if( startPos > 0 ) {
-						(item[1] - startPos).max(0.025) 
-					} { 
+						(item[1] - startPos).max(0.025)
+					} {
 						item[1]
 					};
 				},
@@ -914,11 +914,11 @@ U : ObjectWithArgs {
 			) ];
 		}).flatten(1);
 	}
-	
+
 	getIOKey { |mode = \in, rate = \audio, id = 0, what = "bus"|
 		^this.def.prGetIOKey( mode, rate, id, what ).asSymbol;
 	}
-	
+
 	setAudioIn { |id = 0, bus = 0|
 		this.set( this.getIOKey( \in, \audio, id ), bus );
 	}
@@ -937,8 +937,8 @@ U : ObjectWithArgs {
 	setControlMixOutLevel { |id = 0, level = 0|
 		^this.set( this.getIOKey( \out, \control, id, "lvl" ), level );
 	}
-	
-	
+
+
 	getAudioIn { |id = 0|
 		^this.get( this.getIOKey( \in, \audio, id ) );
 	}
@@ -957,14 +957,14 @@ U : ObjectWithArgs {
 	getControlMixOutLevel { |id = 0|
 		^this.get( this.getIOKey( \out, \control, id, "lvl" ) );
 	}
-	
+
 	audioIns { ^this.def.audioIns( this ); }
 	controlIns { ^this.def.controlIns( this ); }
 	audioOuts { ^this.def.audioOuts( this ); }
 	controlOuts { |unit| ^this.def.controlOuts( this ); }
-	
+
 	inputIsEndPoint { ^this.def.inputIsEndPoint( this ); }
-	
+
 	increaseIOs { |amt = 1|
 		var audioIns = this.audioIns;
 		var controlIns = this.controlIns;
@@ -983,22 +983,22 @@ U : ObjectWithArgs {
 			this.setControlOut(item, this.getControlOut(item) + (controlOuts.size * amt));
 		});
 	}
-		
+
 	canFreeSynth { ^this.def.canFreeSynth( this ) }
-	
-	shouldPlayOn { |target| // this may prevent a unit or chain to play on a specific server 
+
+	shouldPlayOn { |target| // this may prevent a unit or chain to play on a specific server
 		^this.def.shouldPlayOn( this, target );
 	}
-	
-	doesNotUnderstand { |selector ...args| 
+
+	doesNotUnderstand { |selector ...args|
 		// bypasses errors; warning only if arg not found
-		if( selector.isSetter ) { 
-			this.set( selector.asGetter, *args ) 
+		if( selector.isSetter ) {
+			this.set( selector.asGetter, *args )
 		} {
 			^this.get( selector );
-		};	
+		};
 	}
-	
+
 	// override methods from Object to support args with names 'loop' and 'rate'
 	rate { ^this.get( \rate ) }
 	rate_ { |new| this.set( \rate, new ) }
@@ -1017,27 +1017,27 @@ U : ObjectWithArgs {
 			};
 		});
 	}
-	
+
 	synths { ^synthDict[ this ] ? [] }
-	
+
 	synthsForUMap {
 		^this.def.synthsForUMap( this );
 	}
-	
+
 	synths_ { |synths| synthDict.put( this, synths ); }
-	
+
 	addSynth { |synth|
-		 synthDict.put( this, synthDict.at( this ).add( synth ) ); 
+		 synthDict.put( this, synthDict.at( this ).add( synth ) );
 	}
-	
+
 	removeSynth { |synth|
 		var synths;
 		synths = this.synths;
 		synths.remove( synth );
 		if( synths.size == 0 ) {
-			 synthDict.put( this, nil ); 
+			 synthDict.put( this, nil );
 		} {
-			 synthDict.put( this, synths ); 
+			 synthDict.put( this, synths );
 		};
 	}
 
@@ -1048,7 +1048,7 @@ U : ObjectWithArgs {
 			this.umapPerform( \makeSynth, synth, startPos );
 		};
 	}
-	
+
 	makeBundle { |targets, startPos = 0, synthAction|
 		^targets.asCollection.collect({ |target|
 			target.asTarget.server.makeBundle( false, {
@@ -1056,7 +1056,7 @@ U : ObjectWithArgs {
 			});
 		})
 	}
-	
+
 	start { |target, startPos = 0, latency|
 		var targets, bundles;
 		target = target ? preparedServers ? Server.default;
@@ -1071,36 +1071,36 @@ U : ObjectWithArgs {
 		});
 		if( target.size == 0 ) {
 			^this.synths[0]
-		} { 
+		} {
 			^this.synths;
 		};
 	}
-	
-	free { 
+
+	free {
 		this.def.stop( this );
 		this.modPerform( \stop );
 		this.umapPerform( \free );
-	} 
+	}
 	stop { this.free }
-	
+
 	resetSynths { this.synths = nil; } // after unexpected server quit
 	resetArgs {
-		this.values = this.def.values.deepCopy; 
+		this.values = this.def.values.deepCopy;
 		this.def.setSynth( this, *args );
 	}
-	
+
 	argSpecs { ^this.def.argSpecs( this ) }
 	getSpec { |key| ^this.def.getSpec( key, this ); }
 	getArgSpec { |key| ^this.def.getArgSpec( key, this ) }
 	getSpecMode { |key| ^this.def.getArgSpec( key, this ) !? _.mode }
 	getDefault { |key| ^this.def.getDefault( key, this ); }
-	
+
 	indexOf { |obj|  // returns key of first arg found to be equal to object
 		var keyIndex;
 		keyIndex = this.values.indexOf( obj );
 		^keyIndex !? { |x| this.keys[x] }
 	}
-	
+
 	deepIndexOf { |obj|  // returns key of first arg found to be equal to object
 		var key, val;
 		^this.indexOf( obj ) ?? {
@@ -1118,19 +1118,19 @@ U : ObjectWithArgs {
 	}
 
 	isPlaying { ^(this.synths.size != 0) }
-		
+
 	printOn { arg stream;
 		stream << this.class.name << "( " <<* this.argsForPrint  <<" )"
 	}
-	
-	dontStoreArgNames { ^[ 'u_dur', 'u_doneAction', 'u_gate' ] 
+
+	dontStoreArgNames { ^[ 'u_dur', 'u_doneAction', 'u_gate' ]
 		++ this.def.dontStoreArgNames.value( this );
 	}
-	
+
 	getInitArgs {
 		var defArgs;
 		defArgs = (this.def.args( this ) ? []).clump(2);
-		^args.clump(2).select({ |item, i| 
+		^args.clump(2).select({ |item, i|
 			(item != defArgs[i]) && { this.dontStoreArgNames.includes( item[0] ).not };
 		 }).collect({ |item|
 			 var umapArgs;
@@ -1157,8 +1157,8 @@ U : ObjectWithArgs {
             ^[ initDef ];
         };
     }
-	
-	storeArgs { 
+
+	storeArgs {
 		var initArgs, initDef;
 		initArgs = this.getInitArgs;
 		initDef = if( this.def.class.callByName ) {
@@ -1176,7 +1176,7 @@ U : ObjectWithArgs {
 			};
 		};
 	}
-	
+
 	getSetArgs {
 		var storeArgs;
 		storeArgs = this.storeArgs;
@@ -1186,7 +1186,7 @@ U : ObjectWithArgs {
 			^storeArgs;
 		};
 	}
-	
+
 	asUnit { ^this }
 
 	prSyncCollection { |targets|
@@ -1194,44 +1194,44 @@ U : ObjectWithArgs {
 	        t.asTarget.server.sync;
 	    };
 	}
-	
+
 	waitTime { ^waitTime ?? { this.values.collect( _.u_waitTime ).sum } }
-	
+
 	valuesAsUnitArg {
 		this.args.pairsDo({ |key, value| value.asUnitArg( this, key ); });
 	}
-	
+
 	valuesSetUnit {
-		this.args.pairsDo({ |key, value| 
-			if( value.respondsTo( \unit_ ) ) { 
+		this.args.pairsDo({ |key, value|
+			if( value.respondsTo( \unit_ ) ) {
 				value.unit = this;
 			}
 		});
 	}
-	
+
 	valuesToPrepare {
 		^this.values.select( _.respondsTo(\prepare) );
 	}
-	
+
 	needsPrepare {
-		^this.valuesToPrepare.size > 0 or: { 
-			this.subDef.needsPrepare; 
+		^this.valuesToPrepare.size > 0 or: {
+			this.subDef.needsPrepare;
 		};
 	}
-	
+
 	apxCPU { |target|
 		if( target.isNil or: { this.shouldPlayOn( target.asTarget ) ? true } ) {
-		 	^this.def.apxCPU 
+		 	^this.def.apxCPU
 		 } {
 			 ^0
 		 };
 	}
-	
+
 	prepare { |target, startPos = 0, action|
 		var valuesToPrepare, act, firstAct, servers;
-		
+
 		parentChain = UChain.nowPreparingChain;
-		
+
 		target = target.asCollection.collect{ |t| t.asTarget( this.apxCPU ) };
 		target = target.select({ |tg|
 			this.shouldPlayOn( tg ) != false;
@@ -1263,7 +1263,7 @@ U : ObjectWithArgs {
 		this.setUMapBuses;
 	    ^target; // returns targets actually prepared for
     }
-    
+
     prepareAnd { |target, action|
 	    fork{
 	        target = this.prepare(target);
@@ -1294,7 +1294,7 @@ U : ObjectWithArgs {
 	    this.modPerform( \dispose );
 	    preparedServers = [];
 	}
-	
+
 	disposeSynths {
 		this.synths.copy.do(_.changed( \n_end ));
 		  this.values.do{ |val|
@@ -1329,20 +1329,20 @@ U : ObjectWithArgs {
 	asControlInputFor { |server, startPos| ^this.value( server, startPos ) }
 }
 
-+ Symbol { 
++ Symbol {
 	asUnit { |args| ^U( this, args ) }
 	asUdef { |defClass| ^(defClass ? Udef).fromName( this ); }
 	asUnitArg { |unit, key|
 		var umapdef, umap;
-		if( unit.getSpec( key ).isNil or: { 
-			unit.getSpec( key ).default.isMemberOf( Symbol ).not 
+		if( unit.getSpec( key ).isNil or: {
+			unit.getSpec( key ).default.isMemberOf( Symbol ).not
 		}) {
 			umapdef = this.asUdef( UMapDef );
 			if( unit.canUseUMap( key, umapdef ) ) {
 				^UMap( this ).asUnitArg( unit, key );
 			} {
 				^this;
-			}; 
+			};
 		} {
 			^this;
 		};
@@ -1359,15 +1359,15 @@ U : ObjectWithArgs {
 	}
 	asUnitArg { |unit, key|
 		var umapdef, umap;
-		if( ( this[0].isMemberOf( Symbol ) or: this[0].isKindOf( UMapDef ) ) && { 
-			this[1].isArray 
-		} ) { 
+		if( ( this[0].isMemberOf( Symbol ) or: this[0].isKindOf( UMapDef ) ) && {
+			this[1].isArray
+		} ) {
 			umapdef = this[0].asUdef( UMapDef );
 			if( umapdef.notNil && { unit.canUseUMap( key, umapdef ) } ) {
 				^UMap( *this ).asUnitArg( unit, key );
 			} {
 				^unit.getDefault( key );
-			}; 
+			};
 		} {
 			^this;
 		};

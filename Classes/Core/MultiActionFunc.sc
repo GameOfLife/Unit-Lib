@@ -40,11 +40,11 @@ a = MultiActionFunc( { |...args| args.postln; nil; } );
 
 MultiActionFunc {
 	var <>action, <>routine, <>i = 0, <>n = 0;
-	
-	*new { |action| 
-		^super.newCopyArgs( action ); 
+
+	*new { |action|
+		^super.newCopyArgs( action );
 	}
-	
+
 	*use { |action, func, alwaysFire = true|
 		var maf, first;
 		maf = this.new( action );
@@ -52,7 +52,7 @@ MultiActionFunc {
 		func.value( maf );
 		first.value;
 	}
-	
+
 	getAction {
 		n = n + 1;
 		^{ |...args|
@@ -63,5 +63,5 @@ MultiActionFunc {
 			};
 		};
 	}
-	
+
 }

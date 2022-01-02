@@ -20,20 +20,20 @@
 UScoreEditorGui_TransportBar {
     var <scoreView;
     var <>views, <>scoreController, <scoreViewController;
-    
+
     *initClass {
-	    StartUp.defer({			
+	    StartUp.defer({
 			DrawIcon.drawFuncs.put( \lock, { |rect|
 				var size = rect.width.min( rect.height ) * 0.8;
 				var radius = size/6;
 				var corners = [ -1 @ 0, -1 @ -2, 1 @ -2, 1 @ 0 ] * radius;
-				
+
 				Pen.use({
-					
+
 					Pen.translate( *rect.center.asArray );
-					
+
 					Pen.fillRect( Rect( size.neg * 0.25,0, size / 2, size / 3 ) );
-					
+
 					2.do({
 						Pen.moveTo( corners[0] )
 							.arcTo( corners[1], corners[2], radius )
@@ -43,19 +43,19 @@ UScoreEditorGui_TransportBar {
 						radius = radius / 2;
 					});
 					Pen.fill;
-			
+
 					});
 				}
 			).put( \unlock, { |rect|
 				var size = rect.width.min( rect.height ) * 0.8;
 				var radius = size/6;
 				var corners = [ 0 @ 0, 0 @ -2, 2 @ -2, 2 @ 0 ] * radius;
-				
+
 				Pen.use({
 					Pen.translate( *rect.center.asArray );
-					
+
 					Pen.fillRect( Rect( (size.neg * 0.25) - (radius/2),0, size / 2, size / 3 ) );
-					
+
 					2.do({
 						Pen.moveTo( corners[0] )
 							.arcTo( corners[1], corners[2], radius )
@@ -65,7 +65,7 @@ UScoreEditorGui_TransportBar {
 						radius = radius / 2;
 					});
 					Pen.fill;
-					
+
 					});
 				}
 			);
@@ -108,7 +108,7 @@ UScoreEditorGui_TransportBar {
                 views[\play].value = 0;
 		    };
 		    if( newState == \preparing  ) {
-		        {Êviews[\prepare].start }.defer;
+		        {ï¿½views[\prepare].start }.defer;
                 views[\pause].value = 2;
 		    };
 		    //resuming
@@ -117,7 +117,7 @@ UScoreEditorGui_TransportBar {
 		    };
 		    if( newState == \prepared ) {
 
-                {Êviews[\prepare].stop }.defer;
+                {ï¿½views[\prepare].stop }.defer;
                 views[\play].value = 2;
 		    };
 		    if( newState == \paused ) {
@@ -134,11 +134,11 @@ UScoreEditorGui_TransportBar {
             views[\counter].value = this.score.pos;
             views[\barMap ].value = this.score.pos;
             views[\tempo ].value = this.score.tempoMap.bpmAtTime( this.score.pos ).round(0.001);
-            views[\signature ].value = this.score.tempoMap.signatureAtTime( this.score.pos ) 
+            views[\signature ].value = this.score.tempoMap.signatureAtTime( this.score.pos )
 		});
-		
+
 		scoreController.put(\loop, { |who,what|
-            views[\loop].value = this.score.loop.binaryValue; 
+            views[\loop].value = this.score.loop.binaryValue;
 		});
 
 		views[\play].value = this.score.isPlaying.binaryValue;
@@ -165,7 +165,7 @@ UScoreEditorGui_TransportBar {
 	    marginV = 2;
 		size = bounds.height - (2*marginV);
         view = CompositeView( parent, bounds );
-        
+
         RoundView.pushSkin( UChainGUI.skin );
 
 		view.addFlowLayout(marginH@marginV);
@@ -199,7 +199,7 @@ UScoreEditorGui_TransportBar {
                     }
 
 			});
-			
+
 		views[\pause] = SmoothSimpleButton( view, 50@size  )
 			.states_( [
 			    [ \pause, Color.black, Color.clear ],
@@ -230,7 +230,7 @@ UScoreEditorGui_TransportBar {
 			.action_({
 			    this.score.toPrevMarker;
 			});
-			
+
 		views[\next] = SmoothButton( view, 30@size  )
 			.states_( [[\skip, Color.black, Color.clear ]])
 			.canFocus_(false)
@@ -265,9 +265,9 @@ UScoreEditorGui_TransportBar {
                     this.score.pos = v.value
                 }
             });
-            
+
         view.decorator.shift( -114, 0 );
-        
+
         views[\barMap] = TempoBarMapView( view, 110@size, this.score.tempoMap )
 			.value_( this.score.pos )
 			.clipLo_(0)
@@ -278,7 +278,7 @@ UScoreEditorGui_TransportBar {
 					this.score.pos = v.value;
 				};
 			});
-            
+
 	   views[\timeMode ] = PopUpMenu( view, 50@size )
 			.items_( [ "time", "bar" ] )
 			.canFocus_(false)
@@ -293,7 +293,7 @@ UScoreEditorGui_TransportBar {
 				views[\barMap].visible = scoreView.showTempoMap;
 				views[\counter].visible = scoreView.showTempoMap.not;
 			});
-			
+
 		views[\signature] = SignatureBox( view,35@size )
 			.applySmoothSkin
 			.visible_( scoreView.showTempoMap )
@@ -303,7 +303,7 @@ UScoreEditorGui_TransportBar {
 			.action_({ |vw|
 				this.score.tempoMap.setSignatureAtTime( vw.value, this.score.pos );
 			});
-			
+
 		views[\tempo] = SmoothNumberBox( view,40@size )
 			.visible_( scoreView.showTempoMap )
 			.clipLo_(1)
@@ -313,19 +313,19 @@ UScoreEditorGui_TransportBar {
 				var beats;
 				if(this.score.isStopped && (views[ \lockToTempo ].value == 1) ) {
 					beats = this.score.startBeats;
-					this.score.tempoMap.setBPMAtBeat( vw.value, 
+					this.score.tempoMap.setBPMAtBeat( vw.value,
 						this.score.tempoMap.beatAtTime( this.score.pos )
 					);
 					this.score.startBeats = beats;
 				} {
-					this.score.tempoMap.setBPMAtBeat( vw.value, 
+					this.score.tempoMap.setBPMAtBeat( vw.value,
 						this.score.tempoMap.beatAtTime( this.score.pos )
 					);
 				};
 			});
-			
+
 		view.decorator.shift( -16, 0 );
-			
+
 		views[\lockToTempo ] = SmoothButton( view,12@12 )
 			.label_( [ 'unlock', 'lock' ] )
 			.states_( [ [ 'unlock' ], [ 'lock', Color.red ] ] )
@@ -335,7 +335,7 @@ UScoreEditorGui_TransportBar {
 			.background_( nil )
 			.border_( 0 )
 			.visible_( scoreView.showTempoMap );
-			
+
 		views[\editTempo ] = SmoothButton( view, 28@size )
             	.radius_( bounds.height / 8 )
 			.label_( "edit" )
@@ -344,9 +344,9 @@ UScoreEditorGui_TransportBar {
 			.action_({ |b|
 				views[\tempoEditor ] = UScoreTempoMapGUI( score: scoreView.currentScore );
 			});
-	    
+
         view.decorator.shift( view.decorator.indentedRemaining.width - 161, 0 );
-        
+
         views[\active] = SmoothButton( view, 39@size )
             .label_( [ "active", "active" ] )
             .hiliteColor_( Color.green.alpha_(0.5) )
@@ -355,7 +355,7 @@ UScoreEditorGui_TransportBar {
             .action_({ |bt| this.score.setUMapsActive( bt.value.booleanValue ) })
             .resize_(3)
             .canFocus_(false);
-        
+
         views[\follow] = SmoothButton( view, 39@size )
             .label_( [ "follow", "follow" ] )
             .hiliteColor_( Color.green.alpha_(0.5) )
@@ -364,7 +364,7 @@ UScoreEditorGui_TransportBar {
             .action_({ |bt| scoreView.followPos = bt.value.booleanValue; })
             .resize_(3)
             .canFocus_(false);
-        
+
         views[\update] = SmoothButton( view, 39@size )
             .label_( [ "update", "update" ] )
             .hiliteColor_( Color.green.alpha_(0.5) )
@@ -373,7 +373,7 @@ UScoreEditorGui_TransportBar {
             .action_({ |bt| this.score.updatePos = bt.value.booleanValue; })
             .resize_(3)
             .canFocus_(false);
-        
+
         views[\osc] = SmoothButton( view, 28@size )
             .label_( [ "osc", "osc" ] )
             .hiliteColor_( Color.green.alpha_(0.5) )
@@ -386,9 +386,9 @@ UScoreEditorGui_TransportBar {
             })
             .resize_(3)
             .canFocus_(false);
-        
+
         RoundView.popSkin;
-        
+
         view.onClose_({ views[\tempoEditor ] !? _.close })
 
     }

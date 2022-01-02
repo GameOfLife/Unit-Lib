@@ -26,7 +26,7 @@ UChainCodeGUI : UChainGUI {
 		});
 
 	}
-	
+
 	getUnits { ^chain.units }
 
     makeUnitHeader { |units, margin, gap|
@@ -47,12 +47,12 @@ UChainCodeGUI : UChainGUI {
                 .border_( 1 )
                 .radius_( 2 )
                 .action_({
-	                UChainIOGUI( 
-	                	this.window.name, originalBounds, 
-	                	chain, replaceCurrent: true 
+	                UChainIOGUI(
+	                	this.window.name, originalBounds,
+	                	chain, replaceCurrent: true
 	                );
                 }).resize_(3);
-                
+
         code = SmoothButton( comp,
                     Rect( comp.bounds.right - (40 + 4 + 40), 1, 40, 12 ) )
                 .label_( "code" )
@@ -60,12 +60,12 @@ UChainCodeGUI : UChainGUI {
                 .radius_( 2 )
                 .background_( Color.green )
                 .action_({
-	                UChainGUI( 
-	                	this.window.name, originalBounds, 
-	                	chain, replaceCurrent: true 
+	                UChainGUI(
+	                	this.window.name, originalBounds,
+	                	chain, replaceCurrent: true
 	                );
                 }).resize_(3);
-                
+
         CompositeView( comp, Rect( 0, 14, (composite.bounds.width - (margin.x * 2)), 2 ) )
             .background_( Color.black.alpha_(0.25) )
             .resize_(2)

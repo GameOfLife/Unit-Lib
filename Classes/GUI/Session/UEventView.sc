@@ -18,7 +18,7 @@
 */
 
 UEventView {
-	
+
 	classvar <>showIndex = true;
 
 	var <>event, <>i, rect, <>selected = false, <>state = \nothing;
@@ -55,9 +55,9 @@ UEventView {
 
 	getTypeColor { }
 
-	getName { 
+	getName {
 		if( showIndex ) {
-			^i.asString ++": "++event.name 
+			^i.asString ++": "++event.name
 		} {
 			^event.name;
 		};

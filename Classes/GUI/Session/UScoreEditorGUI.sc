@@ -101,7 +101,7 @@ UScoreEditorGUI : UAbstractWindow {
 
         margin = 4;
         gap = 2;
-        
+
         if( bounds.isNil ) {
 	        if( this.score.notNil ) {
 		       bounds = this.score.displayBounds;
@@ -152,8 +152,8 @@ UScoreEditorGUI : UAbstractWindow {
 
         //BOTTOM
         tranportBar = UScoreEditorGui_TransportBar(view,  Rect(0,0, bounds.width - (2*margin), tranBarH ), scoreView);
-        
-        if( UScore.storeDisplayBounds ) {	
+
+        if( UScore.storeDisplayBounds ) {
 	        window.drawFunc = {
 		        this.score.displayBounds = window.bounds;
 	        };

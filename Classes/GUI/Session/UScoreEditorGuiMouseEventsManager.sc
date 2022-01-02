@@ -33,20 +33,20 @@ UScoreEditorGuiMouseEventsManager {
 	//state is \nothing, \moving, \resizingFront, \resizingBack, \selecting, \fadeIn, \fadeOut;
 	//mode is \all, \move, \resize, \fades
 	//protocol:
-	
+
 	//initial click:
 	// inside region
-	//	- no shift down -> select 
+	//	- no shift down -> select
 	//	- shift down -> invert selection
 	// resize region area
 	//   - mouseUp after no movement -> select, no resize
 	//   - mouseUp after movement -> don't select, start resize, of all selected
 	// outside any region
-	//   -> start selecting 
+	//   -> start selecting
 	//     - shiftDown -> add to selection
 	//     - no shiftDown -> only set newly selected events
-	
-	
+
+
 	*new { |scoreView|
 		^super.newCopyArgs(scoreView).init
 	}
@@ -74,16 +74,16 @@ UScoreEditorGuiMouseEventsManager {
 			event.makeView(i,minWidth, maxWidth)
 	    };
 	}
-	
+
 	isResizing{
 		^(state == \resizingFront) || (state == \resizingBack )
 	}
-	
+
 	isResizingOrFades {
 		^(state == \resizingFront) || (state == \resizingBack ) || (state == \fadeIn) || (state == \fadeOut )
 	}
-	
-	selectedEventViews {	
+
+	selectedEventViews {
 		var events = this.eventViews.select{ |eventView|
 			eventView.selected
 		};
@@ -107,9 +107,9 @@ UScoreEditorGuiMouseEventsManager {
 	        }
 	    }
 	}
-		
+
 	mouseDownEvent{ |mousePos,unscaledMousePos,shiftDown,altDown,scaledUserView, inClickCount|
-		
+
 		mouseDownPos = mousePos;
 		unscaledMouseDownPos = unscaledMousePos;
 		clickCount = inClickCount;
@@ -118,41 +118,41 @@ UScoreEditorGuiMouseEventsManager {
 		eventViews.do{ |eventView|
 			eventView.mouseDownEvent(mousePos,scaledUserView,shiftDown,mode)
 		};
-		
+
 		theEventView = eventViews.select{ |eventView|
 			eventView.state == \resizingFront
 		}.at(0);
-		
+
 		if(theEventView.notNil){
 			state = \resizingFront
 		} {
 			theEventView = eventViews.select{ |eventView|
 				eventView.state == \resizingBack
 			}.at(0);
-			
+
 			if(theEventView.notNil){
 				state = \resizingBack
 			} {
-				
+
 				theEventView = eventViews.select{ |eventView|
 					eventView.state == \fadeIn
-				
+
 				}.at(0);
-				
+
 				if(theEventView.notNil){
 					state = \fadeIn
 				} {
 					theEventView = 	eventViews.select{ |eventView|
 						eventView.state == \fadeOut
-					
+
 					}.at(0);
-					
+
 					if(theEventView.notNil){
 						state = \fadeOut
 					} {
 						theEventView = 	eventViews.select{ |eventView|
 							eventView.state == \moving
-						
+
 						}.at(0);
 						if(theEventView.notNil) {
 							state = \moving;
@@ -164,17 +164,17 @@ UScoreEditorGuiMouseEventsManager {
 											eventView.selected = false
 										}
 									});
-								} 
+								}
 							} {
 								theEventView.selected = theEventView.selected.not;
 								if( theEventView.selected.not ) {
 									state = \nothing;
 								};
-							};				
+							};
 							if(altDown){
 								isCopying = true;
 								"going to copy";
-							};					
+							};
 						} {
 							state = \selecting;
 							selectionRect = Rect.fromPoints(mousePos,mousePos);
@@ -187,17 +187,17 @@ UScoreEditorGuiMouseEventsManager {
                             };
 						}
 					}
-				}		
+				}
 			}
-						
+
 		};
-		
+
 		//make sure there is only one theEventView being operated on
 		if(theEventView.notNil) {
 			eventViews.do{ |eventView|
 				if(theEventView != eventView) {
 					eventView.state = \nothing
-				}			
+				}
 			};
 			if(clickCount == 2) {
                 if(theEventView.event.isFolder){
@@ -222,24 +222,24 @@ UScoreEditorGuiMouseEventsManager {
 
 		("Current state is "++state);
 	}
-	
+
 	mouseXDelta{ |mousePos,scaledUserView|
 		^mousePos.x - mouseDownPos.x
 	}
-	
+
 	mouseYDelta{ |mousePos,scaledUserView|
 		^mousePos.y - mouseDownPos.y
 	}
-	
+
 	mouseMoveEvent{ |mousePos,unscaledMousePos,scaledUserView,snap,shiftDown,maxWidth|
 		var deltaX, deltaY, newEvents, selectedEvent;
 		var tempoMap;
-		
+
 		// only start changing startTime if mouse has moved > 3px horizontally
-		if( moveVert == true ) { 
+		if( moveVert == true ) {
 			moveVert = (unscaledMousePos - unscaledMouseDownPos).x.abs <= minimumMov;
 		};
-		
+
 			//score will change store undo state
 			if((mouseMoved == false) && [\nothing, \selecting].includes(state).not){
 
@@ -250,7 +250,7 @@ UScoreEditorGuiMouseEventsManager {
 
 			if( isCopying && copyed.not ) {
 				//"copying Events".postln;
-				
+
 				newEvents = this.selectedEventViews.collect({ |ev,j|
 					ev.event.duplicate;
 				});
@@ -270,32 +270,32 @@ UScoreEditorGuiMouseEventsManager {
 
 				//("scoreEvents "++score.events.size).postln;
 				//("selected events"++this.selectedEventViews).postln;
-				copyed = true;				
+				copyed = true;
 			};
-		
+
 			if([\nothing, \selecting].includes(state).not) {
 
 				deltaX = this.mouseXDelta(mousePos,scaledUserView);
 				deltaY = this.mouseYDelta(mousePos,scaledUserView).round( scaledUserView.gridSpacingV );
 				if(state == \moving) {
 					deltaX = deltaX.max(xLimit.neg);
-					deltaY = deltaY.max(yLimit.neg);	
+					deltaY = deltaY.max(yLimit.neg);
 				};
-				
+
 				//if event is selected apply action all selected, otherwise apply action only to the event
 				if( scoreView.showTempoMap ) { tempoMap = score.tempoMap };
 				if(theEventView.selected) {
-					
+
 					this.selectedEventViews.do{ |eventView|
 						("resizing "++eventView);
 						eventView.mouseMoveEvent(deltaX,deltaY,state,snap,shiftDown or: moveVert,tempoMap)
 					}
 				} {
 					theEventView.mouseMoveEvent(deltaX,deltaY,state,snap,shiftDown or: moveVert,tempoMap)
-				}				
+				}
 
 			} {
-				
+
 				"selecting now";
 				//selecting
 				selectionRect = Rect.fromPoints(mouseDownPos,mousePos);
@@ -306,9 +306,9 @@ UScoreEditorGuiMouseEventsManager {
 					};
 			}
 
-		
+
 	}
-	
+
 	mouseUpEvent{ |mousePos,unscaledMousePos,shiftDown,scaledUserView|
 		var newSelectedEvents;
 
@@ -320,10 +320,10 @@ UScoreEditorGuiMouseEventsManager {
 						eventView.selected = false
 					}{
 						eventView.selected = true
-					}	
+					}
 				}
 			}
-				
+
 		} {
 			if((state == \moving)) {
 				//"finished move".postln;
@@ -340,9 +340,9 @@ UScoreEditorGuiMouseEventsManager {
 					});
 					*/
 				};
-				
+
 			} {
-	
+
 				if(state == \selecting) {
 					eventViews.do{ |eventView|
 						eventView.checkSelectionStatus(selectionRect,shiftDown,
@@ -353,7 +353,7 @@ UScoreEditorGuiMouseEventsManager {
 				}
 			}
 		};
-			
+
 		/*if( UEventEditor.current.notNil && { this.selectedEventViews[0].notNil } ) {
 			this.selectedEventViews[0].event.edit( parent: scoreEditor );
 		};*/
@@ -381,6 +381,6 @@ UScoreEditorGuiMouseEventsManager {
 		lastSelectedEvents = newSelectedEvents
 
 	}
-	
-	
+
+
 }

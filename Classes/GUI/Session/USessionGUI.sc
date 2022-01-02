@@ -295,7 +295,7 @@ UChainGroupSessionView {
             button.value = 1;
         };
     }
-    
+
     remove{ }
 
 }

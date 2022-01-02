@@ -1,33 +1,33 @@
 ValueUMapDef : UMapDef {
-	
+
 	classvar <>activeUnits;
-	
+
 	var <>valueIsMapped = true;
 	var <>startFunc, <>endFunc;
-	
+
 	*defaultGUIColor { ^Color.yellow.blend( Color.white, 0.8 ).alpha_(0.4); }
-	
+
 	defType { ^\control }
-	
+
 	*initClass {
 		activeUnits = IdentityDictionary();
 		CmdPeriod.add( this );
 	}
-	
+
 	*cmdPeriod {
 		activeUnits.keys.asArray.do(_.set( \active, false ));
 	}
-	
+
 	*new { |name, startFunc, endFunc, args, category, addToAll=true|
 		^this.basicNew( name, args ? [], addToAll )
-			.initFunc( startFunc, endFunc ).category_( category ? \default ); 
+			.initFunc( startFunc, endFunc ).category_( category ? \default );
 	}
-	
+
 	initFunc { |instartFunc, inendFunc|
 		startFunc = instartFunc;
 		endFunc = inendFunc;
 		argSpecs = ([
-			[ \value, 0, ControlSpec(0,1) ], 
+			[ \value, 0, ControlSpec(0,1) ],
 			[ \active, false, BoolSpec(false) ],
 			[ \u_spec, [0,1].asSpec, ControlSpecSpec(), true ],
 			[ \u_useSpec, true, BoolSpec(true), true ],
@@ -39,30 +39,30 @@ ValueUMapDef : UMapDef {
 		this.canUseUMap = false;
 		this.changed( \init );
 	}
-	
+
 	makeSynth { ^nil }
-	
+
 	prepare { |servers, unit, action|
 		this.activateUnit( unit ); // make sure it is running
 		action.value;
 	}
-	
+
 	needsPrepare { ^true }
-	
+
 	stop { |unit|
 		unit.set( \active, false );
 	}
-	
+
 	activateUnit { |unit|
-		if( unit.get( \active ).booleanValue == true && { 
-			activeUnits.keys.includes( unit ).not 
+		if( unit.get( \active ).booleanValue == true && {
+			activeUnits.keys.includes( unit ).not
 		}) {
 			unit.set( \active, true );
 		};
 	}
-	
+
 	hasBus { ^false }
-	
+
 	isMappedArg { |name|
 		if( name == \value ) {
 			^valueIsMapped;
@@ -70,7 +70,7 @@ ValueUMapDef : UMapDef {
 			^mappedArgs.notNil && { mappedArgs.includes( name ) };
 		};
 	}
-	
+
 	value { |unit|
 		var out, spec;
 		out = unit.get( \value );
@@ -80,19 +80,19 @@ ValueUMapDef : UMapDef {
 			} {
 				spec = unit.get( \u_spec ) ?? { [0,1].asSpec };
 			};
-			^spec.map( 
+			^spec.map(
 				unit.getSpec( \value ).unmap( out )
 			);
 		} {
 			^out;
 		};
 	}
-	
+
 	setSynth { |unit ...keyValuePairs|
 		keyValuePairs.clump(2).do({ |item|
 			switch( item[0],
 				 \value, { unit.unitSet; },
-				 \active, { 
+				 \active, {
 					 if( item[1].booleanValue ) {
 						 activeUnits.put( unit, startFunc.value( unit, activeUnits[ unit ] ) );
 					 } {

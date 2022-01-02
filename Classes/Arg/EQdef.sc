@@ -18,21 +18,21 @@
 */
 
 EQdef {
-	
+
 	classvar <>default;
 	classvar <>all;
 	classvar <>specDict;
-	
+
 	var <>names, <>classes, <>argNames, <>defaultSetting, <>specs;
 	var <>presets;
 	var <>presetManager;
-	
+
 	*initClass {
-		
+
 		Class.initClassTree(Spec);
-		
+
 		all = IdentityDictionary[];
-		
+
 		specDict = (
 			\freq: FreqSpec( 20, 20000, \exp, 0, 440 ).asSpec,
 			\rq: [ 0.001, 10, \exp, 0.01, 0.707 ].asSpec,
@@ -48,83 +48,83 @@ EQdef {
 			\coef: [-0.999, 0.999, \lin, 0.001, 0 ].asSpec,
 			\order: [0,5,\lin,1,2].asSpec
 		);
-		
-		default = EQdef( 
-			'lowShelf', BLowShelf, 
+
+		default = EQdef(
+			'lowShelf', BLowShelf,
 			'peak1', BPeakEQ,
 			'peak2', BPeakEQ,
 			'peak3', BPeakEQ,
 			'hiShelf', BHiShelf,
 			'gain', Gain
 		).defaultSetting_(
-			[ 
-				[ 100, 1, 0 ], 
-				[ 250, 1, 0 ], 
-				[ 1000, 1, 0 ], 
-				[ 3500, 1, 0 ], 
+			[
+				[ 100, 1, 0 ],
+				[ 250, 1, 0 ],
+				[ 1000, 1, 0 ],
+				[ 3500, 1, 0 ],
 				[ 6000, 1, 0 ],
 				[ 0 ]
 			]
 		);
-		
-		default.presetManager.presets = [ 	
-			'flat', [ 
-				[ 100.0, 1.0, 0.0 ], [ 250.0, 1.0, 0.0 ], [ 1000.0, 1.0, 0.0 ], 
-				[ 3500.0, 1.0, 0.0 ], [ 6000.0, 1.0, 0.0 ], [ 0.0 ] 
-			], 
-			'low boost', [ 
-				[ 100.0, 1.0, 6.0 ], [ 250.0, 1.0, 0.0 ], [ 1000.0, 1.0, 0.0 ],
-				[ 3500.0, 1.0, 0.0 ], [ 6000.0, 1.0, 0.0 ], [ 0.0 ] 
+
+		default.presetManager.presets = [
+			'flat', [
+				[ 100.0, 1.0, 0.0 ], [ 250.0, 1.0, 0.0 ], [ 1000.0, 1.0, 0.0 ],
+				[ 3500.0, 1.0, 0.0 ], [ 6000.0, 1.0, 0.0 ], [ 0.0 ]
 			],
-			'loudness', [ 
-				[ 100.0, 1.0, 6.0 ], [ 250.0, 1.0, 0.0 ], [ 1000.0, 1.0, 0.0 ], 
-				[ 3500.0, 1.0, 3.0 ], [ 6000.0, 1.0, 6.0 ], [ 0.0 ] 
-			], 
-			'telephone', [ 
-				[ 200.0, 1.0, -24.0 ], [ 250.0, 1.0, 0.0 ], [ 1500.0, 1.0, 6.0 ], 
-				[ 3500.0, 1.0, 0.0 ], [ 3500.0, 1.0, -24.0 ], [ 0.0 ] 
+			'low boost', [
+				[ 100.0, 1.0, 6.0 ], [ 250.0, 1.0, 0.0 ], [ 1000.0, 1.0, 0.0 ],
+				[ 3500.0, 1.0, 0.0 ], [ 6000.0, 1.0, 0.0 ], [ 0.0 ]
+			],
+			'loudness', [
+				[ 100.0, 1.0, 6.0 ], [ 250.0, 1.0, 0.0 ], [ 1000.0, 1.0, 0.0 ],
+				[ 3500.0, 1.0, 3.0 ], [ 6000.0, 1.0, 6.0 ], [ 0.0 ]
+			],
+			'telephone', [
+				[ 200.0, 1.0, -24.0 ], [ 250.0, 1.0, 0.0 ], [ 1500.0, 1.0, 6.0 ],
+				[ 3500.0, 1.0, 0.0 ], [ 3500.0, 1.0, -24.0 ], [ 0.0 ]
 			]
 		];
-		
+
 		default.name_( \default );
-		
+
 	}
-	
+
 	*new { |...bandPairs|
-		
+
 		// \bandName, Class, \bandName, Class etc..
 		// class must respond to *coeffs
-		
+
 		^super.newCopyArgs.init( bandPairs );
 	}
-	
+
 	addToDefs { |key = \new|
 		all[ key ] = this;
 	}
-	
+
 	*fromKey { |key|
-		^all[ key ]	
+		^all[ key ]
 	}
-	
+
 	*fromName { |name|
 		^all[ name.asSymbol ];
 	}
-	
+
 	name { ^all.findKeyForValue( this ); }
 	name_ { |name|
 		all.removeAt( this.name );
 		all[ name.asSymbol ] = this;
 		presetManager.id_( (this.class.name ++ "_" ++ name).asSymbol );
 	}
-	
+
 	init { |bandPairs|
 		var methods;
-		
+
 		bandPairs = bandPairs.clump(2).flop;
-		
+
 		names = bandPairs[0];
 		classes = bandPairs[1];
-		
+
 		methods = bandPairs[1].collect({ |cl|
 			var method;
 			method = cl.class.findRespondingMethodFor( \coeffs );
@@ -135,11 +135,11 @@ EQdef {
 			};
 			method;
 		});
-		
+
 		argNames = methods.collect({ |method|
 			(method.argNames ? [])[2..].as(Array);
 		});
-		
+
 		defaultSetting = methods.collect({ |method, i|
 			if( method.notNil ) {
 				method.prototypeFrame[2 .. argNames[i].size + 1]
@@ -147,25 +147,25 @@ EQdef {
 				[]
 			};
 		});
-		
+
 		specs = argNames.collect({ |names|
 			names.collect({ |name|
 				specDict[ name ];
 			});
 		});
-		
+
 		presetManager = PresetManager( this, [ \default, { this.defaultSetting } ] )
 			.getFunc_({ |obj| obj.setting.deepCopy })
 			.applyFunc_({ |object, preset|
 			 	object.setting = preset;
 		 	});
-		
+
 	}
-	
+
 	formatSetting { |setting|
 		^this.constrainSetting( this.parseSetting( setting ) );
 	}
-	
+
 	parseSetting { |setting|
 		var default;
 		default = this.defaultSetting.deepCopy;
@@ -182,7 +182,7 @@ EQdef {
 			});
 		};
 	}
-	
+
 	constrainSetting { |setting|
 		// setting needs to be parsed first
 		^setting.collect({ |item, i|
@@ -195,16 +195,16 @@ EQdef {
 			});
 		});
 	}
-	
+
 	indexOf { |name, argName|
 		var nameIndex, argNameIndex;
-		
+
 		if( name.isNumber ) {
 			nameIndex = name;
 		} {
 			nameIndex = names.indexOf( name );
 		};
-		
+
 		if( nameIndex.isNil ) {
 			"%:indexOf - name '%' not found\n"
 				.format( this.class, name )
@@ -216,7 +216,7 @@ EQdef {
 			} {
 				argNameIndex = argNames[ nameIndex ].indexOf( argName );
 			};
-			
+
 			if( argNameIndex.isNil ) {
 				^[ nameIndex, nil ];
 			} {
@@ -224,7 +224,7 @@ EQdef {
 			};
 		};
 	}
-	
+
 	flatIndexOf { |name, argName|
 		var argIndex;
 		#name, argIndex = this.indexOf( name, argName );
@@ -232,14 +232,14 @@ EQdef {
 			^(argNames[..name-1].collect(_.size).sum) + argIndex;
 		} {
 			if( argName.isNil ) {
-				^(argNames[..name-1].collect(_.size).sum) + 
+				^(argNames[..name-1].collect(_.size).sum) +
 					argNames[name].collect({ |item, i| i });
 			} {
 				^nil;
 			};
 		};
 	}
-	
+
 	constrain { |name, argName, value|
 		#name, argName = this.indexOf( name, argName );
 		if( specs[ name ][ argName ].notNil ) {
@@ -248,32 +248,32 @@ EQdef {
 			^value
 		};
 	}
-	
+
 }
 
 EQSetting {
-	
+
 	classvar <>global;
-	
+
 	var <def, <setting;
 	var <>action;
-	
+
 	*initClass {
 		Class.initClassTree(EQdef);
 		global = this.new;
 	}
-	
+
 	*new { |def, setting|
 		^this.newCopyArgs( def, setting ).init;
 	}
-	
+
 	fromPreset { |name|
 		this.getEQdef.presetManager.apply( name, this );
 	}
-	
+
 	getEQdef {
 		var eqdef;
-		
+
 		if( def.isKindOf( EQdef ) ) {
 			eqdef = def;
 			def = def.name;
@@ -282,18 +282,18 @@ EQSetting {
 			eqdef = EQdef.all[ def ];
 			if( eqdef.isNil ) { eqdef = EQdef.fromKey( \default ) };
 		};
-		
+
 		^eqdef;
 	}
-	
+
 	init {
 		var eqdef;
-		
+
 		def = def ? \default;
 		eqdef = this.getEQdef;
-		setting = eqdef.formatSetting( setting );		
+		setting = eqdef.formatSetting( setting );
 	}
-	
+
 	set { |name, argName, value, constrain = true, active = true|
 		#name, argName = this.getEQdef.indexOf( name, argName );
 		if( argName.notNil ) {
@@ -318,7 +318,7 @@ EQSetting {
 			};
 		};
 	}
-	
+
 	get { |name, argName|
 		var argIndex;
 		#name, argIndex = this.getEQdef.indexOf( name, argName );
@@ -336,34 +336,34 @@ EQSetting {
 			};
 		};
 	}
-	
+
 	at { |name, argName|
 		^this.get( name, argName );
 	}
-	
+
 	put { |...args|
 		var value;
 		value = args.pop;
 		args = args.extend( 2, nil );
 		this.set( args[0], args[1], value );
 	}
-	
-	setting_ { |new| 
+
+	setting_ { |new|
 		setting = this.getEQdef.formatSetting( new );
 		this.changed( \setting );
 		action.value( this );
 	}
-	
+
 	 names { ^this.getEQdef.names }
 	 classes { ^this.getEQdef.classes }
-	 argNames { ^this.getEQdef.argNames }	
+	 argNames { ^this.getEQdef.argNames }
 	 defaultSetting { ^this.getEQdef.defaultSetting }
 	 specs { ^this.getEQdef.specs }
-	 
+
 	 asUGenInput { ^setting.flat.asUGenInput }
 	 asControlInput { ^setting.flat.asControlInput }
 	 asOSCArgEmbeddedArray { | array| ^setting.flat.asOSCArgEmbeddedArray(array) }
-	 
+
 	 doesNotUnderstand { |selector ...args|
 		 var split, ids;
 		 split = selector.asString.split( $_ ).select({|x|x.size>0}).collect(_.asSymbol);
@@ -376,7 +376,7 @@ EQSetting {
 			 };
 		 };
 	 }
-	 
+
 	 *ar { |in, setting, def|
 		 var new;
 		 if( setting.isKindOf( EQSetting ) ) {
@@ -389,7 +389,7 @@ EQSetting {
 		 };
 		^new.ar( in, setting );
 	}
-	 
+
 	 ar { |in, setting|
 		var eqdef;
 	 	setting = setting.flat;
@@ -399,21 +399,21 @@ EQSetting {
 		});
 		^in;
 	 }
-	 
+
 	 magResponses { |freqs|
 		 ^this.classes.collect({ |class, i|
 			class.magResponse( freqs ? 1000, 44100, *setting[i] );
 		});
 	 }
-	 
+
 	 magResponse { |freqs|
 		  ^this.magResponses(freqs).product;
 	 }
-	 
+
 	 storeArgs { ^[ def, setting ] }
-	 
+
 	 gui { |parent, bounds|
-		 ^EQView( parent, bounds, this ); 
+		 ^EQView( parent, bounds, this );
 	 }
 
 }

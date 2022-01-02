@@ -1,5 +1,5 @@
 PresetManager {
-	
+
 	classvar <>all;
 	classvar <>fileExtension = "presets";
 
@@ -10,62 +10,62 @@ PresetManager {
 	var <>lastChosen;
 	var <>lastObject;
 	var <>filePath;
-	
+
 	*initClass {
 		all = IdentityDictionary();
 	}
-	
+
 	*new { |object, presets, getFunc, applyFunc, matchFunc|
 		^super.newCopyArgs().init(object, presets, getFunc, applyFunc, matchFunc).addToAll;
 	}
-	
+
 	init { |inObject, inPresets, inGetFunc, inApplyFunc, inMatchFunc|
-		
+
 		object = inObject;
-		
+
 		id = object.class.name;
-		
+
 		presets = inPresets ? [];
-		
+
 		// by default the presets replace the whole object, by returning a copy
 		getFunc = inGetFunc ? { |object| object.deepCopy };
 		applyFunc = inApplyFunc ? { |object, preset| preset.deepCopy };
 		matchFunc = inMatchFunc ? { |object, preset| object == preset };
 	}
-	
+
 	addToAll {
 		all.put( object, this );
 	}
-	
+
 	remove { all.remove( this ) }
-	
+
 	*forObject { |object, presets, getFunc, applyFunc|
 		^all[ object ] ?? { this.new( object, presets, getFunc, applyFunc ) };
 	}
-	
+
 	presets_ { |newPresets|
 		presets = newPresets ? [];
 		this.changed( \presets );
 	}
-	
+
 	clear { this.presets = []; }
-	
+
 	put { |name = \default, obj|
 		this.putRaw( name, getFunc.value( obj ? object ) );
 	}
-	
+
 	putRaw { |name, preset|
 		var index;
 		name = name.asSymbol;
 		index = presets[0,2..].indexOf( name );
-		if( index.notNil ) { 
+		if( index.notNil ) {
 			presets.put((index * 2) + 1, preset);
 		} {
 			presets = presets ++ [ name, preset ];
 		};
 		this.changed( \presets );
 	}
-	
+
 	match { |obj| // returns currently used preset, if any (otherwise nil)
 		var i=0, size, preset;
 		obj = obj ? object;
@@ -79,7 +79,7 @@ PresetManager {
 		};
 		^nil;
 	}
-	
+
 	removeAt { |name|
 		var i=0, size, res;
 		name = name.asSymbol;
@@ -95,7 +95,7 @@ PresetManager {
 		};
 		^nil;
 	}
-	
+
 	at { |name|
 		var i=0, size;
 		name = name.asSymbol;
@@ -108,7 +108,7 @@ PresetManager {
 		};
 		^nil;
 	}
-	
+
 	apply { |name = \default, obj|
 		var preset;
 		obj = obj ? object;
@@ -122,7 +122,7 @@ PresetManager {
 			^obj;
 		};
 	}
-	
+
 	undo { |obj|
 		var res;
 		if( lastObject.notNil ) {
@@ -135,29 +135,29 @@ PresetManager {
 			^obj
 		};
 	}
-	
+
 	applyPreset { |obj, preset|
 		var res;
 		res = applyFunc.value( obj ? object, preset.value );
 		this.changed( \apply );
 		^res;
 	}
-	
+
 	write { |path, overwrite=false, ask=true, successAction, cancelAction|
 	    var writeFunc;
 	    writeFunc = { |overwrite, ask, path, forceExtension = true|
 		    var text, extension;
-		    
+
 		    text = this.presets.cs;
-		    
-		    if( forceExtension ) {	
+
+		    if( forceExtension ) {
 			    extension = id !? { [ id, fileExtension ].join(".") } ? fileExtension;
-			    
+
 			    if( path.find( extension ).isNil ) {
 				    path = path.replaceExtension( extension );
 			    };
 			};
-		    
+
 		    File.checkDo( path, { |f|
 				f.write( text );
 				successAction.value(path);
@@ -175,22 +175,22 @@ PresetManager {
 		    writeFunc.value(overwrite,ask,path);
 	    };
     }
-    
+
     read { |path, action, silent = false|
 	    var readFunc;
-	    
+
 	    if( path === \browse ) {
-		    path = nil; 
+		    path = nil;
 		} {
-		    path = path ? filePath; 
+		    path = path ? filePath;
 		};
-	    
+
 	    readFunc = { |path|
 		    this.presets = path.load;
 		    if( silent.not ) { "read presets from file: %".postf( path ); };
 		    action.value(this);
 	    };
-	    
+
 	    if( path.isNil ) {
 		    Dialog.getPaths( { |paths|
 			    readFunc.value(paths[0])
@@ -204,17 +204,17 @@ PresetManager {
 		    };
 	    };
     }
-    
+
     readAdd { |path, action, silent = false|
 	    // read a file and add presets to current (overwriting double names)
 	    var readFunc, addPresets;
-	    
+
 	    if( path === \browse ) {
-		    path = nil; 
+		    path = nil;
 		} {
-		    path = path ? filePath; 
+		    path = path ? filePath;
 		};
-	    
+
 	    readFunc = { |path|
 		    addPresets = path.load;
 		    addPresets.pairsDo({ |key, value|
@@ -223,7 +223,7 @@ PresetManager {
 		    if( silent.not ) { "added presets from file: %".postf( path ); };
 		    action.value(this);
 	    };
-	    
+
 	    if( path.isNil ) {
 		    Dialog.getPaths( { |paths|
 			    readFunc.value(paths[0])
@@ -237,5 +237,5 @@ PresetManager {
 		    };
 	    };
     }
-    
+
 }

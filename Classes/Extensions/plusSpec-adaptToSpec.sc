@@ -1,23 +1,23 @@
 UAdaptSpec : ControlSpec {
 	var <>func;
-	
+
 	*new { |func|
 		func = func ?? { { |spec| spec.copy } };
 		^super.new( 0, 1, \lin, 0.0, 0 ).func_( func );
 	}
-	
+
 	adaptToSpec { |spec|
 		^spec !? { func.value( spec ) } ? this;
 	}
 }
 
 + Spec {
-	
+
 	adaptToSpec { }
 }
 
 + ControlSpec {
-	
+
 	adaptToSpec { |spec|
 		var res = this, class = this.class;
 		if ( spec.respondsTo(\asControlSpec) ) {
@@ -32,11 +32,11 @@ UAdaptSpec : ControlSpec {
 		};
 		^res;
 	}
-	
+
 }
 
 + ArrayControlSpec {
-	
+
 	adaptToSpec { |spec|
 		var res = this, class = this.class;
 		if ( spec.respondsTo(\asControlSpec) ) {
@@ -48,12 +48,12 @@ UAdaptSpec : ControlSpec {
 		res.originalSpec = spec.copy;
 		^res;
 	}
-	
+
 }
 
 
 + PointSpec {
-	
+
 	adaptToSpec { |spec|
 		var res = this, class = this.class;
 		if ( spec.respondsTo(\asControlSpec) ) {
@@ -65,11 +65,11 @@ UAdaptSpec : ControlSpec {
 		};
 		^res;
 	}
-	
+
 }
 
 + UEnvSpec {
-	
+
 	adaptToSpec { |spec|
 		if( spec.notNil && spec.respondsTo(\asControlSpec) ) {
 			^this.copy.spec_( spec.asControlSpec );
@@ -77,7 +77,7 @@ UAdaptSpec : ControlSpec {
 			^this;
 		};
 	}
-	
+
 }
 
 + DisplaySpec {

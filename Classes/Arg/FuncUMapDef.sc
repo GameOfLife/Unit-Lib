@@ -1,33 +1,33 @@
 FuncUMapDef : UMapDef {
-	
+
 	// example function for random value
 	/*
 	{ |unit, range = #[0.0,1.0]|
 		range[0] rrand: range[1]; // result sets \value arg
-	} 
+	}
 	*/
-	
+
 	classvar <>valueIsPrivate = true;
-	
+
 	var <>valueIsMapped = true;
 	var <>dontStoreValue = true;
-	
+
 	*defaultGUIColor { ^Color(0.67843137254902, 0.84705882352941, 0.90196078431373)
-		.blend( Color.white, 0.5 ).alpha_(0.4); 
+		.blend( Color.white, 0.5 ).alpha_(0.4);
 	}
-	
+
 	defType { ^\value }
-	
+
 	*new { |name, func, args, valueIsPrivate, category, addToAll=true|
 		^this.basicNew( name, args ? [], category, addToAll )
-			.initFunc( func, valueIsPrivate ? this.valueIsPrivate ).category_( category ? \default ); 
+			.initFunc( func, valueIsPrivate ? this.valueIsPrivate ).category_( category ? \default );
 	}
-	
+
 	initFunc { |inFunc, valueIsPrivate|
 		func = inFunc;
 		argSpecs = ArgSpec.fromFunc( func, argSpecs )[1..];
 		argSpecs = argSpecs ++ [
-			[ \value, 0, DisplaySpec(), valueIsPrivate ], 
+			[ \value, 0, DisplaySpec(), valueIsPrivate ],
 			[ \u_spec, [0,1].asSpec, ControlSpecSpec(), true ],
 			[ \u_useSpec, true, BoolSpec( true ), true ],
 			[ \u_prepared, false, BoolSpec(false), true ]
@@ -38,7 +38,7 @@ FuncUMapDef : UMapDef {
 		allowedModes = [ \init, \sync, \normal ];
 		this.changed( \init );
 	}
-		
+
 	isMappedArg { |name|
 		if( name == \value ) {
 			^valueIsMapped;
@@ -46,26 +46,26 @@ FuncUMapDef : UMapDef {
 			^mappedArgs.notNil && { mappedArgs.includes( name ) };
 		};
 	}
-	
+
 	useMappedArgs_ { |bool| useMappedArgs = bool }
-	
+
 	asUnmappedArgsArray { |unit, argPairs|
 		argPairs = argPairs ? #[];
-		^unit.argSpecs.collect({ |item| 
+		^unit.argSpecs.collect({ |item|
 			var val;
 			val = argPairs.pairsAt(item.name) ?? { item.default.copy };
-			if( this.useMappedArgs && { this.isMappedArg( item.name ) } ) { 
-				val = item.spec.unmap( val.value ); 
+			if( this.useMappedArgs && { this.isMappedArg( item.name ) } ) {
+				val = item.spec.unmap( val.value );
 			} {
 				val = val.value;
 			};
-			[ item.name,  val ] 
+			[ item.name,  val ]
 		}).flatten(1);
 	}
-	
+
 	doFunc { |unit|
 		var res;
-		res = func.value( unit, 
+		res = func.value( unit,
 			*this.asUnmappedArgsArray( unit, unit.args ).clump(2).flop[1]
 		);
 		if( this.useMappedArgs && valueIsMapped ) {
@@ -74,17 +74,17 @@ FuncUMapDef : UMapDef {
 			unit.setArg( \value, res );
 		};
 	}
-	
+
 	uPrepareValue { |unit| // can prepare value earlier if needed
 		this.prepare( nil, unit );
 		unit.setArg( \u_prepared, true );
 		^unit.value;
 	}
-	
+
 	doPrepareFunc { |servers, unit, action, startPos|
 		this.prepare( servers, unit, action, startPos );
 	}
-	
+
 	prepare { |servers, unit, action|
 		if( unit.get( \u_prepared ) == false ) {
 			this.doFunc( unit );
@@ -92,34 +92,34 @@ FuncUMapDef : UMapDef {
 		};
 		action.value;
 	}
-	
+
 	needsPrepare { ^true }
-	
+
 	activateUnit { |unit| // called at UMap:asUnitArg
 		if( unit.unit.notNil && { unit.unit.synths.size > 0 } ) {
 			unit.prepare;
 		};
 	}
-	
+
 	makeSynth { |unit, target, startPos = 0, synthAction|
 		unit.set( \u_prepared, false );
 		^target;
 	}
-	
+
 	hasBus { ^false }
-	
+
 	value { |unit|
 		var out;
 		out = unit.get( \value );
 		if( out.isUMap.not && { this.useMappedArgs && valueIsMapped }) {
-			^(unit.get( \u_spec ) ?? { [0,1].asSpec }).map( 
+			^(unit.get( \u_spec ) ?? { [0,1].asSpec }).map(
 				unit.getSpec( \value ).unmap( out );
 			);
 		} {
 			^out;
 		};
 	}
-	
+
 	setSynth { |unit ...keyValuePairs|
 		keyValuePairs.clump(2).do({ |item|
 			if( [ \u_spec, \u_prepared, \u_gate ].includes( item[0] ).not ) {
@@ -128,14 +128,14 @@ FuncUMapDef : UMapDef {
 			};
 		});
 	}
-	
+
 	getNext { |unit|
 		if( unit.get( \u_prepared ) == false ) {
 			this.doFunc( unit );
 			unit.setArg( \u_prepared, true );
 		};
 	}
-	
+
 	getControlInput { |unit|
 		var out;
 		out = unit.get( \value );
@@ -147,7 +147,7 @@ FuncUMapDef : UMapDef {
 		};
 		^out;
 	}
-	
+
 	canInsert { ^false }
 
 }
@@ -157,8 +157,8 @@ FuncUMapDef : UMapDef {
 }
 
 + U {
-	uPrepareValue { |target, startPos = 0, action| 
-			this.prepare( target, startPos, action ); 
+	uPrepareValue { |target, startPos = 0, action|
+			this.prepare( target, startPos, action );
 			^this.value;
 	}
 }

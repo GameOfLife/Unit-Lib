@@ -18,22 +18,22 @@
 */
 
 MultiChannelUdef : MultiUdef {
-	
+
 	classvar <>channelSpec;
-	
+
 	var <>chSpec;
-	
+
 	*defNameKey { ^\numChannels }
-	
+
 	*initClass {
 		channelSpec = ListSpec([1,2,3,4,5,6,7,8,10,12,16,24,32]);
 	}
-	
-	*new { |name, func, args, category, setterIsPrivate = false, channels, addToAll=true, extraPrefix| 
+
+	*new { |name, func, args, category, setterIsPrivate = false, channels, addToAll=true, extraPrefix|
 		var chSpec = channelSpec;
 		if( channels.notNil ) { chSpec = ListSpec(channels); };
-		^super.basicNew( name, [ 
-			ArgSpec( this.defNameKey, 
+		^super.basicNew( name, [
+			ArgSpec( this.defNameKey,
 				chSpec.default, chSpec, setterIsPrivate, \nonsynth )
 		], category, addToAll, extraPrefix )
 			.chSpec_( chSpec )
@@ -49,21 +49,21 @@ MultiChannelUdef : MultiUdef {
 }
 
 MultiChannelSubUdef : Udef {
-	
+
 	var <>prDefName;
-	
+
 	*prefix { ^"umc_" }
-	
+
 	*new { |name, numChannels = 1, func, args, extraPrefix|
 		^this.basicNew( name, args, \private, false, extraPrefix )
 			.numChannels_(numChannels)
 			.prDefName_( name )
-			.init( func ); 
+			.init( func );
 	}
-	
+
 	prGenerateSynthDefName {
        ^this.class.prefix ++ (extraPrefix ? "") ++ this.prDefName.asString ++ "_" ++ numChannels;
     }
-	
+
 	name { ^numChannels }
 }

@@ -1,5 +1,5 @@
 + Env {
-	
+
 	put { |time = 0, level = 1, precision = 0.001| // put a level at an absolute time
 		var absTimes, index;
 		absTimes = [0] ++ this.times.integrate;

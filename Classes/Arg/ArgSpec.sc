@@ -33,13 +33,13 @@ ArgSpec : Spec {
 	var <>mode = \sync; // \sync, \normal, \init, \nonsynth
 	var <>width = 1;
 	var >label;
-	
+
 	*new { |name, default, spec, private, mode, width = 1|
-		^super.newCopyArgs( name.asSymbol, default, spec, private ? false, mode ? \sync, 
+		^super.newCopyArgs( name.asSymbol, default, spec, private ? false, mode ? \sync,
 			width ? 1 ).init;
 	}
-	
-	init { 
+
+	init {
 		var specName;
 		if( spec.class == Symbol ) {
 			specName = ControlSpec.specs.keys.detect({ |key|
@@ -64,54 +64,54 @@ ArgSpec : Spec {
 		if( spec.notNil ) { default = default ? spec.default };
 		//default = this.constrain( default );
 	}
-	
-	doWithSpec { |selector, value ...more| 
-		^spec.tryPerform( selector, value, *more ) ? value; 
+
+	doWithSpec { |selector, value ...more|
+		^spec.tryPerform( selector, value, *more ) ? value;
 	}
-	
+
 	label { ^label ? name }
-		
+
 	constrain { |value|
 		^this.doWithSpec( \uconstrain, value );
 	}
-	
+
 	constrainDefault {
 		this.default = this.constrain( default );
 	}
-		
+
 	asSynthArg { |value|
 		^[]
 	}
-	
+
 	map { |value|
 		^this.doWithSpec( \map, value );
 	}
-	
+
 	unmap { |value|
 		^this.doWithSpec( \unmap, value );
 	}
-	
+
 	makeView { |parent, bounds, label, action, resize|
 		var vws;
 		if( private.not ) { // no view if private
 			case { label.isNil } { label = this.label }
-				{ label == false } { label = nil }; 
+				{ label == false } { label = nil };
 			vws = spec.asSpec.makeView( parent, bounds, label, action, resize );
 			if( default.notNil ) { this.setView( vws, default, false ) };
 			^vws;
-		} { 
+		} {
 			^nil;
 		};
-	}	
-	
+	}
+
 	setView { |view, value, active = false|
 		spec.asSpec.setView( view, value, active );
 	}
-	
+
 	mapSetView { |view, value, active = false|
 		spec.asSpec.mapSetView( view, value, active );
 	}
-	
+
 	adaptToSpec { |spec|
 		var asp;
 		if( spec.notNil ) {
@@ -123,9 +123,9 @@ ArgSpec : Spec {
 			^this;
 		};
 	}
-	
+
 	asArgSpec { ^this }
-	
+
 	printOn { arg stream;
 		stream << "an " << this.class.name << "(" <<* [name, default]  <<")"
 	}
@@ -139,32 +139,32 @@ ArgSpec : Spec {
 			spc = spc.asCompileString;
 		};
 		stream << this.class.name << "(" <<* [
-			name.asCompileString, 
-			default.asCompileString, 
-			spc, 
+			name.asCompileString,
+			default.asCompileString,
+			spc,
 			private,
 			mode.asCompileString
 		]  <<")"
 	}
 
 	*fromArgsArray { |args| // creates array of ArgSpecs
-		
+
 		if( args.notNil && { args[0].class == Symbol } ) { // assume synth-like arg pairs
 			args = args.clump(2);
 		};
-		
+
 		^args.collect({ |item| item.asArgSpec });
 	}
-	
+
 	*fromFunc { |func, args| // creates array of ArgSpecs
 		var argNames, values, inArgNames;
-		
+
 		args = this.fromArgsArray( args ); // these overwrite the ones found in the func
 		inArgNames = args.collect(_.name);
-		
+
 		argNames = (func.argNames ? #[]);
 		values = func.def.prototypeFrame ? #[];
-		
+
 		^argNames.collect({ |key, i|
 			var inArgIndex;
 			inArgIndex = (inArgNames ? []).indexOf( key );
@@ -174,20 +174,20 @@ ArgSpec : Spec {
 				args[ inArgIndex ];
 			};
 		});
-		
+
 	}
-	
+
 	*fromSynthDef { |synthDef, args| // creates array of ArgSpecs
 		var argNames, values, inArgNames;
 		var allControlNames;
-		
+
 		args = this.fromArgsArray( args ); // these overwrite the ones found in the func
 		inArgNames = args.collect(_.name);
-		
+
 		allControlNames = synthDef.allControlNames;
 		argNames = (allControlNames.collect(_.name) ? #[]);
 		values = allControlNames.collect(_.defaultValue) ? #[];
-		
+
 		^argNames.collect({ |key, i|
 			var inArgIndex;
 			inArgIndex = (inArgNames ? []).indexOf( key );
@@ -197,7 +197,7 @@ ArgSpec : Spec {
 				args[ inArgIndex ];
 			};
 		});
-		
+
 	}
 
 
