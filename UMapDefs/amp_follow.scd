@@ -23,7 +23,7 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UMapDef( \amp_follow, { |filter = #[20,20000], fromRange = #[0.0, 1.0], toRange = #[0.0,1.0], 
+UMapDef( \amp_follow, { |filter = #[20,20000], fromRange = #[0.0, 1.0], toRange = #[0.0,1.0],
 	attackTime = 0.01, releaseTime = 0.01,
 	invert = 0, curve = 0, clipMode = 0, clipSoftness = 0.1|
 	var sig, unranged;
@@ -56,7 +56,7 @@ UMapDef( \amp_follow, { |filter = #[20,20000], fromRange = #[0.0, 1.0], toRange 
 	.setSpec( \clipSoftness, [0,1,\lin,0,0.1].asSpec )
 	.setSpec( \invert, BoolSpec(false) )
 	.setSpec( \curve, [-16,16,\lin,0,0].asSpec )
-	.prepareArgsFunc_( { |args| 
+	.prepareArgsFunc_( { |args|
 		var bus;
 		bus = args.pairsAt( \bus );
 		args ++ [ \u_i_ar_0_bus, bus ];

@@ -28,13 +28,13 @@ defs = [8,16,32].collect({ |n|
 		phase = \phase.kr([0,0]);
 		URandSeed.ir();
 		freqs = SortedRand.ir( n, 0, 1, \lin, variation * 2 );
-		freqs = (exponential * freqs.linexp(0,1,*range)) + 
+		freqs = (exponential * freqs.linexp(0,1,*range)) +
 			((1-exponential) * freqs.linlin(0,1,*range));
 		amp = \amp.asSpec.map( Rand(0.dup(n),1).linlin(0,1,*amp) );
 		phase = Rand(0.dup(n),1).linlin(0,1,*phase);
 		sig = DynKlang.ar( `[ freqs, amp, phase ] ) * (1/n).sqrt * Line.ar(0,1,1/range[0]);
 		UMixOut.ar( 0, sig, 0, true );
-	}, [ 
+	}, [
 		[ \range, [440,880], FreqSpec(2,20000).asRangeSpec ],
 		[ \exponential, 1, [0,1].asSpec ],
 		[ \variation, 0, [0,1].asSpec ],

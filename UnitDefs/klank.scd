@@ -29,14 +29,14 @@ defs = [8,16,32].collect({ |n|
 		ringTime = \ringTime.kr([0.1,0.1]);
 		URandSeed.ir( );
 		freqs = SortedRand.ir( n, 0, 1, \lin, variation * 2 );
-		freqs = (exponential * freqs.linexp(0,1,*range)) + 
+		freqs = (exponential * freqs.linexp(0,1,*range)) +
 			((1-exponential) * freqs.linlin(0,1,*range));
 		amp = \amp.asSpec.map( Rand(0.dup(n),1).linlin(0,1,*amp) );
 		ringTime = Rand(0.dup(n),1).linexp(0,1,*ringTime);
 		in = UIn.ar( 0 );
 		sig = DynKlank.ar( `[ freqs, amp, ringTime ], in ) * (1/n).sqrt * 0.1;
 		UMixOut.ar( 0, sig );
-	}, [ 
+	}, [
 		[ \range, [440,880], FreqSpec(20,20000).asRangeSpec ],
 		[ \exponential, 1, [0,1].asSpec ],
 		[ \variation, 0, [0,1].asSpec ],

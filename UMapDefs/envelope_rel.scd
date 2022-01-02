@@ -3,7 +3,7 @@
 
 An envelope generator of which the duration is automatically scaled to that of the event.
 
-env: an Env or EnvM object, containing time and level values. 
+env: an Env or EnvM object, containing time and level values.
 timeScale: if timeScale is 1, the duration of the envelope will become exactly that of the event, lower and higher timeScales result in a shorter and longer envelope durations.
 loop: loopmode (0: off, 1: loop, 2: alternate)
 delay: delay time before starting the env (not affected by timeScale)

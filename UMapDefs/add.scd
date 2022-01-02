@@ -1,7 +1,7 @@
 /*
 \add
 
-Creates an UMap adding (+) two values together. 
+Creates an UMap adding (+) two values together.
 
 input: the value to add to
 add: the amount to add

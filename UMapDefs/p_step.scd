@@ -28,7 +28,7 @@ UPatDef( \p_step, { |unit, lo = 0.0, hi = 1.0, steps = 12, loop = \loop|
 			switch( loop.next,
 				\loop, { current = current.wrap( 0.0, 1.0 ); direction = 1; },
 				\backwards, { current = current.wrap( 0.0, 1.0 ); direction = -1; },
-				\alternate, { 
+				\alternate, {
 					case { current > 1 } {
 						current = current.fold(0.0,1.0);
 						direction = -1;

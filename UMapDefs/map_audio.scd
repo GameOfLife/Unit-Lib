@@ -48,7 +48,7 @@ UMapDef( \map_audio, { |fromRange = #[-1.0, 1.0], toRange = #[0.0,1.0], 	curve =
 	.setSpec( \clipSoftness, [0,1,\lin,0,0.1].asSpec )
 	.setSpec( \invert, BoolSpec(false) )
 	.setSpec( \curve, [-16,16,\lin,0,0].asSpec )
-	.prepareArgsFunc_( { |args| 
+	.prepareArgsFunc_( { |args|
 		var bus;
 		bus = args.pairsAt( \bus );
 		args ++ [ \u_i_ar_0_bus, bus ];

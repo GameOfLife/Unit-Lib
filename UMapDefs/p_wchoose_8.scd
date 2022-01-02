@@ -13,20 +13,20 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UPatDef( \p_wchoose_8, { |unit, 
+UPatDef( \p_wchoose_8, { |unit,
 	value0 = 0.5, value1 = 0.5, value2 = 0.5, value3 = 0.5,
-	value4 = 0.5, value5 = 0.5, value6 = 0.5, value7 = 0.5, 
+	value4 = 0.5, value5 = 0.5, value6 = 0.5, value7 = 0.5,
 	weight0 = 1.0, weight1 = 1.0, weight2 = 1.0, weight3 = 1.0,
 	weight4 = 1.0, weight5 = 1.0, weight6 = 1.0,  weight7 = 1.0|
 	{
 		loop {
 			[
-				value0, value1, value2, value3, 
-				value4, value5, value6, value7, 
-			].wchoose( [ 
-					weight0.next, weight1.next, weight2.next, weight3.next, 
-					weight4.next, weight5.next, weight6.next, weight7.next, 
-				].normalizeSum 
+				value0, value1, value2, value3,
+				value4, value5, value6, value7,
+			].wchoose( [
+					weight0.next, weight1.next, weight2.next, weight3.next,
+					weight4.next, weight5.next, weight6.next, weight7.next,
+				].normalizeSum
 			).next.yield;
 		};
 	}.r;

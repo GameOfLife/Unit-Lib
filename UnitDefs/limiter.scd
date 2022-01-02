@@ -3,7 +3,8 @@
 
 A lookahead transparent limiter.
 
-limit: in dB.lookAhead: lookahead time in seconds. The signal will be delayed by this amount of time, to give the limiter the chance to eliminate peaks from it. Lower lookahead times will result in faster response, but also more side-effects. lookAhead is an 'init' parameter (recognized by the "(i)" in the UChain editor), which means changed values only become effective when the event is started the next time.
+limit: in dB.
+lookAhead: lookahead time in seconds. The signal will be delayed by this amount of time, to give the limiter the chance to eliminate peaks from it. Lower lookahead times will result in faster response, but also more side-effects. lookAhead is an 'init' parameter (recognized by the "(i)" in the UChain editor), which means changed values only become effective when the event is started the next time.
 
 --
 this is an Udef definition file

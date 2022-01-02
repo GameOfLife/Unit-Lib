@@ -14,7 +14,7 @@ this is an UMapDef definition file
 part of the WFSCollider Class Library default UMapDefs set
 */
 
-UMapDef( \shared_buffer_in, { 
+UMapDef( \shared_buffer_in, {
 	var buffer;
 	buffer = USharedBufferIn.kr( \id );
 	UMapOut.kr([buffer,\rate.kr(1),\loop.kr(0)], false);

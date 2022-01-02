@@ -2,7 +2,14 @@
 \rmsCompressor
 
 An rms-compressor. The mean value is taken over a range of 40 samples.
-thresh: in dB.ratio: ratio of the reduced level to the original level.knee: the size of the knee in dB over and under the threshold. 0 is equal to no knee.att: attack. The time it takes to follow an attack.rel: release. The time it takes to follow a decay.makeUp: make-up gain.
+
+thresh: in dB.
+ratio: ratio of the reduced level to the original level.
+knee: the size of the knee in dB over and under the threshold. 0 is equal to no knee.
+att: attack. The time it takes to follow an attack.
+rel: release. The time it takes to follow a decay.
+makeUp: make-up gain.
+
 --
 this is an Udef definition file
 part of the Unit lib default Udefs set

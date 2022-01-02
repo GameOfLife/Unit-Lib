@@ -26,7 +26,7 @@ Udef( \magFreeze, { |fftSize = 4096, hold = 0, amp = 0.1, noise = 0.0|
 	normal = IFFT.ar( fft1 ) * 1;
 	sig = XFade2.ar( normal, conv, noise.linlin(0,1,-1,1) );
 	UOut.ar( 0, sig * amp );
-})	
+})
 	.setSpec( \hold, BoolSpec(false) )
 	.setSpec( \fftSize, ListSpec([512,1024,2048,4096]), \init)
 	.category_( \effect );

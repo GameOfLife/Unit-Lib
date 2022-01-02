@@ -4,7 +4,7 @@
 A simple gain stage. Can set a gain in dB and inverse phase.
 
 gain: added gain (dB)
-inverse: inverse phase (false/true) 
+inverse: inverse phase (false/true)
 numChannels: number of channels
 
 --

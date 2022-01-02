@@ -29,7 +29,7 @@ var d;
 d = MultiChannelUdef( \grainSoundFile, {
 	var numChannels, bufnum, rate, trigger, startFrame, loop;
 	var pos, density, timeVar, rateVar, rateScale, overlap, pan, sig;
-	#numChannels, bufnum, rate, trigger, startFrame, loop = 
+	#numChannels, bufnum, rate, trigger, startFrame, loop =
 		BufSndFilePlayer.getArgs( 1, startPos: 0 );
 	rate = rate / BufRateScale.kr( bufnum );
 	pos = \pos.kr( [0.5,0.5] );
@@ -41,15 +41,15 @@ d = MultiChannelUdef( \grainSoundFile, {
 	pan = \pan.kr( [ -1,1 ] );
 	URandSeed.ir(\seed);
 	trigger = TDuty.ar( Dwhite( 0,1 ).linexp( 0,1, 1/timeVar/density, timeVar/density ) );
-	sig = GrainBuf.ar( Udef.numChannels, trigger, overlap/density, bufnum, 
+	sig = GrainBuf.ar( Udef.numChannels, trigger, overlap/density, bufnum,
 		Demand.ar( trigger, 0, Dwhite( 0,1 ).linexp( 0,1, rate/rateVar, rate*rateVar ) ),
 		Demand.ar( trigger, 0, Dwhite( *pos ) ),
 		4,
 		Demand.ar( trigger, 0, Dwhite( *pan ) ),
 	);
 	UMixOut.ar( 0, sig * \level.ukr( 1, \amp ), 0, true );
-}, [ 
-	[ \soundFile, nil, MonoBufSndFileSpec(nil) ], 
+}, [
+	[ \soundFile, nil, MonoBufSndFileSpec(nil) ],
 	[ \pos, [0,1], [0,1].asSpec.asRangeSpec ],
 	[ \density, 100, [1,10000,\exp,0,100].asSpec ],
 	[ \timeVar, 0, [0,4,2].asSpec ],

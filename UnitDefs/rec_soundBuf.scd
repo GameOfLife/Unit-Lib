@@ -31,7 +31,7 @@ UMapDef( \rec_soundBuf, { |buffer = 0, recLevel = 1.0, preLevel = 0.0, run = 1.0
 	.setSpec( \trigger, TriggerSpec() )
 	.setSpec( \playbackRate, [0,2,\lin,0,1].asSpec )
 	.setSpec( \playbackLoop, BoolSpec(true) )
-	.prepareArgsFunc_( { |args| 
+	.prepareArgsFunc_( { |args|
 		var bus;
 		bus = args.pairsAt( \bus );
 		args ++ [ \u_i_ar_0_bus, bus ];

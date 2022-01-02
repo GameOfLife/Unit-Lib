@@ -32,14 +32,14 @@ part of the Unit lib default UMapDefs set
 UMapDef( \gendy, { |ampdist = 1, durdist = 1, adparam = 1, ddparam = 1, freq = #[0.1,100], ampscale = 0.5, durscale = 0.5, initCPs = 12, knum = 12, range = #[0,1]|
 	var sig;
 	URandSeed.ir();
-	
+
 	freq[0] = freq[0].min( ControlRate.ir / knum );
 	freq[1] = freq[1].min( ControlRate.ir / knum );
-		
-	sig = Gendy1.kr( ampdist, durdist, adparam, ddparam, freq[0], freq[1], 
+
+	sig = Gendy1.kr( ampdist, durdist, adparam, ddparam, freq[0], freq[1],
 		ampscale, durscale, initCPs, knum ).linlin(-1,1,*range);
-		
-	UMapOut.kr( sig ) 
+
+	UMapOut.kr( sig )
 } ).category_( \modulation )
 	.mappedArgs_( [ \range ] )
 	.setSpec( \ampdist, ListSpec( (..5), 1, [ \LINEAR, \CAUCHY, \LOGIST, \HYPERBCOS, \ARCSINE, \EXPON ] ) )

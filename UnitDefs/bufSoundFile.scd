@@ -9,7 +9,7 @@ soundFile: a BufSndFile object, a region of an existig soundfile url on your har
 	- loop: loop mode on or off (can be changed during playback)
 	- rate: playback rate (semitones or ratio)
 level: playback level (amplitude of the soundfile)
-	
+
 (*) only the following numbers of channels are allowed:
 1,2,3,4,5,6,7,8,10,12,16,24,32
 
@@ -19,7 +19,7 @@ part of the Unit lib default Udefs set
 */
 
 MultiChannelUdef( \bufSoundFile, {
-		UMixOut.ar( 0, BufSndFilePlayer.ar( Udef.numChannels, \soundFile, \trigger.utr(1) ) 
+		UMixOut.ar( 0, BufSndFilePlayer.ar( Udef.numChannels, \soundFile, \trigger.utr(1) )
 			* \level.ukr( 1, \amp ), 0, true );
 	}, [ [ \soundFile, nil, BufSndFileSpec(nil) ] ], \soundFile, true )
 	.chooseFunc_({ |args|

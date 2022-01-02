@@ -13,7 +13,7 @@ part of the Unit lib default UMapDefs set
 */
 
 HybridUMapDef( \tempo_time, { |factor = 1, tempo = 60|
-	UMapDef.useMappedArgs = false; 
+	UMapDef.useMappedArgs = false;
 	UMapOut.kr( factor / tempo * 60, false );
 }, { |unit, factor = 1, tempo = 60, quantize = 0.0|
 	var time, currentTime, out;

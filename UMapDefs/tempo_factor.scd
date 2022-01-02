@@ -24,7 +24,7 @@ FuncUMapDef( \tempo_factor, { |unit, sustain = 1, timeToNext = 1, tempo = 60, qu
 		} {
 			timeToNext = currentTime + timeToNext;
 		}
-	};	
+	};
 	[ sustain, timeToNext ];
 })
 	.category_( 'upattern' )

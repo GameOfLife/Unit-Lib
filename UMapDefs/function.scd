@@ -16,7 +16,7 @@ part of the Unit lib default UMapDefs set
 FuncUMapDef( \function, { |unit, function|
 	function.value( unit ) ? 0;
 })
-	.setDefault( \function, { |unit| 
+	.setDefault( \function, { |unit|
 	// result shoud be between 0 and 1
 	// and will be mapped to the output spec
 	1.0.rand;

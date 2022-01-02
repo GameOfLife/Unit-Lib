@@ -18,7 +18,7 @@ HybridUMapDef( \semitones_rate, { |semitones = 0|
 })
 	.mappedArgs_([ \semitones ])
 	.setSpec( \semitones, UAdaptSpec({ |spec|
-		ControlSpec( spec.minval.ratiomidi, spec.maxval.ratiomidi, \lin, 
+		ControlSpec( spec.minval.ratiomidi, spec.maxval.ratiomidi, \lin,
 			0, spec.default.ratiomidi );
 	}) )
 	.canUseUMapFunc_({ |unit, key, umapdef|

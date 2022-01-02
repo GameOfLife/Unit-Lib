@@ -20,7 +20,7 @@ HybridUMapDef( \integer, { |input = 0.5|
 	}, \convert
 )
 	.valueIsMapped_( false )
-	.setSpec( \input, UAdaptSpec( { |spec| 
+	.setSpec( \input, UAdaptSpec( { |spec|
 		IntegerSpec( spec.default, spec.minval, spec.maxval );
 	} ) )
 	.canUseUMapFunc_({ |unit, key, umapdef|

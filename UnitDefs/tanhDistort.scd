@@ -2,7 +2,9 @@
 \tanhDistort
 
 Distorts the sound via a hyperbolic tangent function.
-inGain: input gain (dB).outGain:output gain (dB).
+
+inGain: input gain (dB).
+outGain:output gain (dB).
 
 --
 this is an Udef definition file

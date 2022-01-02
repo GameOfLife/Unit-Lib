@@ -30,7 +30,7 @@ HybridUMapDef( \round, { |input = 0.5, round = 0|
 		args;
 	})
 	.valueIsMapped_( false )
-	.setSpec( \round, UAdaptSpec( { |spec| 
+	.setSpec( \round, UAdaptSpec( { |spec|
 		var center;
 		spec = spec.copy;
 		if( spec.isKindOf( FreqSpec ) ) {

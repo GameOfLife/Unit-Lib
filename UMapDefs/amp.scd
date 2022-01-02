@@ -4,7 +4,7 @@
 A simple amplitude gain stage. Can set an amplitude (multiplier) and inverse phase. Note that this Udef can only make the input signal softer, not louder.
 
 amp: amplitude (0-1)
-inverse: inverse phase (false/true) 
+inverse: inverse phase (false/true)
 numChannels: number of channels
 
 --

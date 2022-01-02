@@ -25,7 +25,7 @@ UPatDef( \p_envelope, { |unit, env, timeScale = 1, loop = \loop|
 			envx = env.next;
 			switch( loop.next,
 				\loop, { current = current.wrap( 0.0, env.duration );  direction = 1 },
-				\alternate, { 
+				\alternate, {
 					case { current > 1 } {
 						current = current.fold(0.0,env.duration);
 						direction = -1;

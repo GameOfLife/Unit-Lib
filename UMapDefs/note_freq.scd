@@ -16,7 +16,7 @@ part of the Unit lib default UMapDefs set
 
 HybridUMapDef( \note_freq, { |note = 64, round = 1, base = 440, detune = 0, transpose = 0|
 	UMapDef.useMappedArgs = false; // use raw values instead of mapped (0-1)
-	UMapOut.kr( 
+	UMapOut.kr(
 		base * 2.pow((note.round(round) + (detune/100)) + transpose - 69 / 12) );
 }, { |unit, note = 64, round = 1, base = 440, detune = 0, transpose = 0|
 	base * 2.pow((note.round(round) + (detune/100)) + transpose - 69 / 12);

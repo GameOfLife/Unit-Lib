@@ -41,8 +41,8 @@ HybridUMapDef( \logical, { |a = 0, b = 0, mode = 0, trueValue = 1.0, falseValue 
 	var index, and, or, output;
 	a = a.booleanValue;
 	b = b.booleanValue;
-	if( 
-		switch( mode, 
+	if(
+		switch( mode,
 			0, { a && b },
 			1, { a or: b },
 			2, { a nand: b },

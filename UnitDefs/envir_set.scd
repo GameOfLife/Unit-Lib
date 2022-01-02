@@ -13,12 +13,12 @@ type: the type of parameter (\value, \freq, \amp, \boolean, \time)
 this is an Udef definition file
 part of the Unit lib default UDefs set
 */
-	
+
 (
 var defs, def;
-defs = [ 
-	\value, [ 0, 1 ], 
-	\freq, FreqSpec(2,20000), 
+defs = [
+	\value, [ 0, 1 ],
+	\freq, FreqSpec(2,20000),
 	\amp, \amp,
 	\integer, IntegerSpec(),
 	\boolean, BoolSpec(),
@@ -36,7 +36,7 @@ defs = [
 		var value;
 		value = unit.get( \value );
 		unit.get( \key ).asSymbol.uEnvirPut( value.value, spec );
-		if( value.isKindOf( UMap ) ) { 
+		if( value.isKindOf( UMap ) ) {
 			value.start
 		};
 		action.value;

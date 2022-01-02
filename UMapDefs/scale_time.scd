@@ -13,7 +13,7 @@ part of the Unit lib default UMapDefs set
 */
 
 HybridUMapDef( \scale_time, { |time = 1, factor = 1, add = 0|
-	UMapDef.useMappedArgs = false; 
+	UMapDef.useMappedArgs = false;
 	UMapOut.kr( (time * factor) + add, false );
 }, { |unit, time = 1, factor = 1, add = 0|
 	 (time * factor) + add

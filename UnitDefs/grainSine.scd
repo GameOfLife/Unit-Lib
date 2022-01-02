@@ -28,12 +28,12 @@ MultiChannelUdef( \grainSine, {
 	amp = \amp.kr( 0.1 );
 	URandSeed.ir();
 	trigger = TDuty.ar( Dwhite( 0,1 ).linexp( 0,1, 1/timeVar/density, timeVar/density ) );
-	sig = GrainSin.ar( Udef.numChannels, trigger, overlap/density, 
+	sig = GrainSin.ar( Udef.numChannels, trigger, overlap/density,
 		Demand.ar( trigger, 0, Dwhite( 0,1 ).linexp( 0,1, *range ) ),
 		Demand.ar( trigger, 0, Dwhite( *pan ) ),
 	) * amp;
 	UMixOut.ar( 0, sig, 0, true );
-}, [ 
+}, [
 	[ \range, [440,880], FreqSpec(2,20000).asRangeSpec ],
 	[ \density, 100, [1,10000,\exp,0,100].asSpec ],
 	[ \timeVar, 0, [0,4,2].asSpec ],

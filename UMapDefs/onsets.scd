@@ -33,12 +33,12 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UMapDef( \onsets, { | 
-	filter = #[20,20000], 
+UMapDef( \onsets, { |
+	filter = #[20,20000],
 	threshold = 0.5,
 	odftype = 3,
 	relaxtime = 1.0,
-	floor = 0.1, 
+	floor = 0.1,
 	mingap = 10,
 	medianspan = 11,
 	range = #[0.0,1.0]|
@@ -61,7 +61,7 @@ UMapDef( \onsets, { |
 	.setSpec( \mingap, [1,100,\lin,1,10].asSpec )
 	.setSpec( \medianspan, [1,100,\lin,1,11].asSpec )
 	.setSpec( \fftsize, ListSpec([512,1024],0), \init )
-	.prepareArgsFunc_( { |args| 
+	.prepareArgsFunc_( { |args|
 		var bus;
 		bus = args.pairsAt( \bus );
 		args ++ [ \u_i_ar_0_bus, bus ];

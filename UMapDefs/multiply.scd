@@ -2,7 +2,7 @@
 \multiply
 
 Creates an UMap for multiplication (*) of two values.
- 
+
 input: the value to multiply
 multiply: the multiplier
 negative: multiply with negative value
@@ -36,7 +36,7 @@ HybridUMapDef( \multiply, { |input = 0.0, multiply = 1.0, negative = 0, factor =
 		args;
 	})
 	.setSpec( \negative, BoolSpec(false) )
-	.setSpec( \factor, ListSpec( [-2,-1,0,1,2,3,4,5], 2, 
+	.setSpec( \factor, ListSpec( [-2,-1,0,1,2,3,4,5], 2,
 		[-2,-1,0,1,2,3,4,5].collect({ |x| (10**x).asString })
 	 ) )
 	.setSpec( \input, UAdaptSpec() )

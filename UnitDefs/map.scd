@@ -62,7 +62,7 @@ HybridUMapDef( \map, { |input = 0.5, min = 0, max = 1, warp = -1, curve = 0|
 			warp = sp.warp.asSpecifier;
 		};
 		ListSpec([-1,0,1,2,3,4,5,6],-1,[
-			"auto (%)".format( warp ).asSymbol, 
+			"auto (%)".format( warp ).asSymbol,
 			\step,\lin,\exp,\cos,\sin,\curve,\amp
 		])
 	})

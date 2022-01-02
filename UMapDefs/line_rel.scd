@@ -36,8 +36,8 @@ UMapDef( \line_rel, { |a = 0.0, b = 1.0, curve = 0|
 		timeScale = unit.timeScale;
 		unit.def = \line;
 		if( timeScale != 1 ) {
-			unit.duration = [ \scale_time, [ 
-					\time, \uchain_duration, 
+			unit.duration = [ \scale_time, [
+					\time, \uchain_duration,
 					\factor, timeScale
 				]
 			];

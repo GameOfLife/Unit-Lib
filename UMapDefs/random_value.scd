@@ -32,7 +32,7 @@ FuncUMapDef( \random_value, { |unit, range = #[0.0,1.0], type = 'white'|
 		\lp, { 2.collect({ range[0] rrand: range[1] }).minItem },
 		\hp, { 2.collect({ range[0] rrand: range[1] }).maxItem },
 		{ range[0] rrand: range[1]; }
-	);	
+	);
 })
 	.mappedArgs_([\range])
 	.setSpec( \type, ListSpec(['white', 'linear', 'invlinear', 'bilinear', 'mean', 'sum3', 'lp', 'hp' ]) )

@@ -33,7 +33,7 @@ defs = [
 		.setSpec( \time, [0,10, 1.calcCurve(0,10) ].asSpec )
 		.setSpec( \order, [1,4,\lin,0,1].asSpec )
 		.mappedArgs_([ \value ]),
-	
+
 	UMapDef( \up_down, { |value = 0.5, timeUp = 0.1, timeDown = 0.1, order = 1|
 		4.do({ |i|
 			var amt;
@@ -46,14 +46,14 @@ defs = [
 		.setSpec( \timeDown, [0,10, 1.calcCurve(0,10) ].asSpec )
 		.setSpec( \order, [1,4,\lin,0,1].asSpec )
 		.mappedArgs_([ \value ]),
-	
+
 	UMapDef( \linear, { |value = 0.5, time = 0.1, curve = 0.0|
 		UMapOut.kr(value.varlag(time, curve));
 	}, addToAll: false, extraPrefix: "lag_" )
 		.setSpec( \time, [0,10, 1.calcCurve(0,10) ].asSpec )
 		.setSpec( \curve, [-40,40,\lin].asSpec )
 		.mappedArgs_([ \value ]),
-	
+
 	UMapDef( \lpf, { |value = 0.5, time = 0.0|
 		UMapOut.kr( LPFLag.kr( value, time).clip(0,1) );
 	}, addToAll: false, extraPrefix: "lag_" )

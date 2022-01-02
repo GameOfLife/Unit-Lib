@@ -16,7 +16,7 @@ UPatDef( \p_envir_get, { |unit, key = 'a'|
 	{
 		var kkey, val, spec, fromSpec;
 		spec = unit.spec ?? { [0,1].asSpec; };
-		loop { 
+		loop {
 			kkey = key.next.asSymbol;
 			if( kkey.notNil ) {
 				val = currentEnvironment[ kkey ] ? (spec.default);
@@ -41,7 +41,7 @@ UPatDef( \p_envir_get, { |unit, key = 'a'|
 			val.yield;
 		};
 	}.r
-})	
+})
 	.setSpec( \key, EnvirSpec() )
 	.mappedArgs_([])
 	.category_( 'pattern_envir' );

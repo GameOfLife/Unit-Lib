@@ -2,7 +2,7 @@
 \divide
 
 Creates an UMap for division (/) of two values.
- 
+
 input: the value
 divide: the divider
 negative: divide by negative value
@@ -36,7 +36,7 @@ HybridUMapDef( \divide, { |input = 0.0, divide = 1.0, negative = 0, factor = 0|
 	})
 	.setSpec( \divide, [0.1,10,\exp,0,1].asSpec )
 	.setSpec( \negative, BoolSpec(false) )
-	.setSpec( \factor, ListSpec( [-2,-1,0,1,2,3,4,5], 2, 
+	.setSpec( \factor, ListSpec( [-2,-1,0,1,2,3,4,5], 2,
 		[-2,-1,0,1,2,3,4,5].collect({ |x| (10**x).asString })
 	 ) )
 	 .setSpec( \input, UAdaptSpec() )

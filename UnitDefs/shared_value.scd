@@ -18,9 +18,9 @@ part of the Unit lib default UDefs set
 
 (
 var defs, def;
-defs = [ 
-	\value, [ 0, 1 ], 
-	\freq, FreqSpec(2,20000), 
+defs = [
+	\value, [ 0, 1 ],
+	\freq, FreqSpec(2,20000),
 	\amp, \amp,
 	\trigger, TriggerSpec(),
 	\boolean, BoolSpec(),
@@ -36,8 +36,8 @@ defs = [
 			\trigger,  { sig = \value.tr( spec.default ); },
 			\boolean, { sig = \value.kr( 1.0 ); },
 			\range, { sig = \range.kr( [0.0, 1.0] ); },
-			{ 
-				sig = \value.kr( spec.default ); 
+			{
+				sig = \value.kr( spec.default );
 				sig = spec.unmap( sig );
 				range = spec.unmap( \range.kr([spec.minval, spec.maxval]) );
 				sig = Select.kr( (range * [-1,1]).sum > 0, [ // prevent nan

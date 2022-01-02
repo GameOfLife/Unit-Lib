@@ -26,15 +26,15 @@ UPatDef( \p_int_step, { |unit, lo = 0, hi = 99, stepsize = 1, loop = \loop|
 		current.asInteger.yield;
 		inf.do { |i|
 			switch( loop.next,
-				\loop, { 
+				\loop, {
 					current = current + (direction * stepsize.next);
 					current = current.wrap( lo.next, hi.next );
-					direction = 1; 
+					direction = 1;
 				},
-				\backwards, { 
+				\backwards, {
 					current = current + (direction * stepsize.next);
 					current = current.wrap( lo.next, hi.next ); direction = -1; },
-				\alternate, { 
+				\alternate, {
 					current = current + (direction * stepsize.next);
 					case { current > 1 } {
 						current = current.fold(lo.next,hi.next);
@@ -51,9 +51,9 @@ UPatDef( \p_int_step, { |unit, lo = 0, hi = 99, stepsize = 1, loop = \loop|
 					current = arr.choose;
 					hist = hist.addFirst( current )[..stepsize.next.abs.min(amb) - 1];
 				},
-				\off, { 
+				\off, {
 					current = current + (direction * stepsize.next);
-					current = current.clip(lo.next,hi.next); direction = 1; 
+					current = current.clip(lo.next,hi.next); direction = 1;
 				}
 			);
 			current.asInteger.yield;

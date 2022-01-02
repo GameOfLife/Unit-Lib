@@ -3,11 +3,11 @@
 
 Creates an pattern UMap for extracting time data from Standard MIDI Files (.mid/.smf). There are currently two data types available; timeToNext and sustain, both of which extract timing of noteOn/noteOff events in the MIDI file. The notes are extracted in order of appearance, and can be filtered by channel. Typical use of this UMap would be on an UPattern with 'sustain_time', where both sustain and timeToNext receive an instance of this UMap, with corresponding 'type' setting. Tempo data found in the MIDI file is also used. The 'p_midiFile' UMap can then be used on other units in the UPattern to extract corresponding note or velocity values.
 
-MIDI files (UMIDIFile) are loaded globally, and all currently loaded files will be shown in a popup menu in the GUI, next to the buttons for loading new files and refreshing the current file. Refreshing the file in one instance of the UMap will also refresh in all other instances using the same MIDI file. 
+MIDI files (UMIDIFile) are loaded globally, and all currently loaded files will be shown in a popup menu in the GUI, next to the buttons for loading new files and refreshing the current file. Refreshing the file in one instance of the UMap will also refresh in all other instances using the same MIDI file.
 
 midiFile: the midi file (an UMIDIFile object).
 channel: the channel to listen to (can be nil / 'any')
-type: type of data to extract; 
+type: type of data to extract;
 	\timeToNext: time until the next note will play
 	\sustain: duration of the current note
 scale: applies a scaling factor (0.1-10) to the time.

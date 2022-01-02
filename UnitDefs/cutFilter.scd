@@ -2,7 +2,15 @@
 \cutFilter
 
 This is a combination of a low cut and a high cut filter. Both filters are cascaded Butterworth filters, and order is settable between 2nd and 8th.
-freq: cutoff frequency for a low cut and a high cut filter.order: sets the order (steepness) of both filters. The orders are: 	0: off	1: 2nd order (12dB/octave)	2 (default): 4th order (24dB/octave)	3: 6th order (36dB/octave)	4: 8th order (48dB/octave)lag: smoothing time for the freq parameter.
+
+freq: cutoff frequency for a low cut and a high cut filter.
+order: sets the order (steepness) of both filters. The orders are:
+	0: off
+	1: 2nd order (12dB/octave)
+	2 (default): 4th order (24dB/octave)
+	3: 6th order (36dB/octave)
+	4: 8th order (48dB/octave)
+lag: smoothing time for the freq parameter.
 mode: operating mode;
 	low_high (default): combination of low and high cut filters
 	low: only low cut
@@ -15,9 +23,9 @@ part of the Unit lib default Udefs set
 
 (
 var defs, def;
-defs = [ 
+defs = [
 	\low_high, \freq.asSpec.asRangeSpec.default_( [20,20000] ),
-	\low, FreqSpec(default: 20), 
+	\low, FreqSpec(default: 20),
 	\high, FreqSpec(default: 20000),
 ].clump(2).collect({ |args|
 	var type, spec;

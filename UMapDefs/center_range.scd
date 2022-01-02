@@ -25,7 +25,7 @@ HybridUMapDef( \center_range, { |center = 0.5, range = 1.0|
 	halfRange = range/2;
 	center = center.linlin( 0, 1, halfRange, 1-halfRange );
 	[ center - halfRange, center + halfRange ]
-	
+
 })
 	.mappedArgs_( [ \center ] )
 	.canUseUMapFunc_({ |unit, key, umapdef|

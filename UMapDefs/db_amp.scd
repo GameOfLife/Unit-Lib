@@ -15,7 +15,7 @@ HybridUMapDef( \db_amp, { |db = 64, mute = 0|
 	UMapDef.useMappedArgs = false; // use raw values instead of mapped (0-1)
 	UMapOut.kr( db.dbamp * (1-mute) );
 }, { |unit, db = 64, mute = 0|
-	 db.dbamp * (1-mute.binaryValue) 
+	 db.dbamp * (1-mute.binaryValue)
 }
 )
 	.mappedArgs_([ \db ])

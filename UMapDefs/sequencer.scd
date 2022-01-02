@@ -30,7 +30,7 @@ defs = [ 8,12,16,24,32,48,64,128 ].collect({ |n|
 		values = \vals.kr( { |i| i/(n-1) }!n );
 		step = ((ControlDur.ir + SampleDur.ir) * speed) * reverse.linlin(0,1,1,-1);
 		range = range + [0,1];
-		resetPos = (range[0] - step) + 
+		resetPos = (range[0] - step) +
 			((\u_startPos.ir(0.0) * ControlRate.ir) * step).wrap( 0, range[1] - range[0] );
 		phase = Phasor.kr( Impulse.kr(0), step, range[0], range[1], resetPos );
 		phase = if( interpolate, phase, phase.floor );
@@ -44,7 +44,7 @@ defs = [ 8,12,16,24,32,48,64,128 ].collect({ |n|
 		.setSpec( \range, [0,n-1,\lin,1].asSpec.asRangeSpec )
 		.setSpec( \vals, ArrayControlSpec(0,1,\lin,default: { |i| i/(n-1) }!n ).size_(n) )
 		.mappedArgs_([ \vals ]);
-});	
-	
+});
+
 MultiUMapDef( \sequencer, defs, \modulation, \n, false )
 	.mappedArgs_([ \vals ]);

@@ -4,7 +4,7 @@
 Creates an UMap for indexing an envelope.
 
 index: the index (0-1, modulatable)
-env: an Env or EnvM object, containing time and level values. 
+env: an Env or EnvM object, containing time and level values.
 
 
 The 'env' arg range is mapped to that of the parameter to which the UMap is connected.

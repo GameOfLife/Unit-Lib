@@ -2,7 +2,7 @@
 \delay
 
 time: the length of the delay.
-timeScale: the number of seconds by which 'time' is multiplied. This value can not be changed during playback. 
+timeScale: the number of seconds by which 'time' is multiplied. This value can not be changed during playback.
 dry: level of the dry signal.
 amp: level of the delayed signal.
 lag: smoothing time applied to change of delay time, use to prevent clicks during change of delay time.

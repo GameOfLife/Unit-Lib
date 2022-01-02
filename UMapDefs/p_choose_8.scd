@@ -14,7 +14,7 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UPatDef( \p_choose_8, { |unit, 
+UPatDef( \p_choose_8, { |unit,
 	value0 = 0.5, value1 = 0.5, value2 = 0.5, value3 = 0.5,
 	value4 = 0.5, value5 = 0.5, value6 = 0.5, value7 = 0.5,
 	histSize = 0, seed
@@ -27,8 +27,8 @@ UPatDef( \p_choose_8, { |unit,
 			index = arr.removeAt( histSize.next.asInteger rrand: 7 );
 			arr = arr.addFirst( index );
 			[
-				value0, value1, value2, value3, 
-				value4, value5, value6, value7, 
+				value0, value1, value2, value3,
+				value4, value5, value6, value7,
 			].at( index ).next.yield;
 		};
 	}.r;

@@ -31,7 +31,7 @@ UPatDef( \p_uscore_status, { |unit, playingValue = 1, pausedValue = 0.5, stopped
 				} {
 					stoppedValue.next.yield;
 				};
-			} { 
+			} {
 				stoppedValue.next.yield;
 			};
 		};
@@ -44,5 +44,5 @@ UPatDef( \p_uscore_status, { |unit, playingValue = 1, pausedValue = 0.5, stopped
 	.setSpec( \pausedValue, UAdaptSpec() )
 	.setSpec( \stoppedValue, UAdaptSpec() )
 	.canUseUMapFunc_({ |unit, key, umapdef|
-		unit.isKindOf( UPattern ).not 
+		unit.isKindOf( UPattern ).not
 	})

@@ -47,7 +47,7 @@ scaleFunc = { |value, fromRange = #[0,127], invert = false, curve = 0, clipMode 
 };
 
 defs = [
-	UPatDef( \note, { |unit, midiFile, channel = nil, fromRange = #[0,127], toRange = #[0,1], 
+	UPatDef( \note, { |unit, midiFile, channel = nil, fromRange = #[0,127], toRange = #[0,1],
 			invert = false, curve = 0, clipMode = \ignore, clipSoftness = 0|
 		{
 			var smf, nmf, notes = [], index = 0, chn, cmd, lastChn = -1, current = 69;
@@ -62,7 +62,7 @@ defs = [
 				} {
 					smf = nil;
 				};
-				
+
 				chn = channel.next;
 				if( chn != lastChn ) {
 					if( smf.notNil ) {
@@ -74,10 +74,10 @@ defs = [
 					};
 				};
 				lastChn = chn;
-				
+
 				cmd = clipMode.next;
 				ffrange = fromRange.next;
-				
+
 				if( cmd == \ignore ) {
 					if( notes[ index ].notNil && { notes[ index ].inclusivelyBetween( *ffrange ) } ) {
 						current = notes[ index ];
@@ -85,7 +85,7 @@ defs = [
 				} {
 					current = notes[ index ] ? current;
 				};
-				
+
 				index = (index + 1).wrap( 0, notes.size-1 );
 				value = scaleFunc.( current, ffrange, invert.next, curve.next, cmd, clipSoftness.next );
 				value.linlin(-1,1,*toRange.next ++ [ \none ]).yield;
@@ -96,15 +96,15 @@ defs = [
 		.setDefault( \midiFile, UMIDIFile() )
 		.setSpec( \channel, ListSpec( [ nil ] ++ (..15), 0, [ "any" ] ++ (..15).collect(_.asString) ) )
 		.setSpec( \fromRange, RangeSpec(0,127,step:1) )
-		.setSpec( \toRange, RangeSpec(0,1) ) 
+		.setSpec( \toRange, RangeSpec(0,1) )
 		.setSpec( \invert, BoolSpec(false) )
 		.setSpec( \curve, [-16,16,\lin,0,0].asSpec )
 		.setSpec( \clipMode, ListSpec( [ \ignore, \clip, \fold, \wrap, \none ] ) )
 		.setSpec( \clipSoftness, [0,1].asSpec )
 		.setDefault( \channel, nil )
 		.category_( 'pattern' ),
-	
-	UPatDef( \velocity, { |unit, midiFile, channel = nil, fromRange = #[1,127], toRange = #[0,1], 
+
+	UPatDef( \velocity, { |unit, midiFile, channel = nil, fromRange = #[1,127], toRange = #[0,1],
 			invert = false, curve = 0, clipMode = \ignore, clipSoftness = 0|
 		{
 			var smf, nmf, notes = [], index = 0, chn, cmd, lastChn = -1, current = 69;
@@ -119,7 +119,7 @@ defs = [
 				} {
 					smf = nil;
 				};
-				
+
 				chn = channel.next;
 				if( chn != lastChn ) {
 					if( smf.notNil ) {
@@ -131,10 +131,10 @@ defs = [
 					};
 				};
 				lastChn = chn;
-				
+
 				cmd = clipMode.next;
 				ffrange = fromRange.next;
-				
+
 				if( cmd == \ignore ) {
 					if( notes[ index ].notNil && { notes[ index ].inclusivelyBetween( *ffrange ) } ) {
 						current = notes[ index ];
@@ -142,7 +142,7 @@ defs = [
 				} {
 					current = notes[ index ] ? current;
 				};
-				
+
 				index = (index + 1).wrap( 0, notes.size-1 );
 				value = scaleFunc.( current, ffrange, invert.next, curve.next, cmd, clipSoftness.next );
 				value.linlin(-1,1,*toRange.next ++ [ \none ]).yield;			};
@@ -152,15 +152,15 @@ defs = [
 		.setDefault( \midiFile, UMIDIFile() )
 		.setSpec( \channel, ListSpec( [ nil ] ++ (..15), 0, [ "any" ] ++ (..15).collect(_.asString) ) )
 		.setSpec( \fromRange, RangeSpec(1,127,step:1) )
-		.setSpec( \toRange, RangeSpec(0,1) ) 
+		.setSpec( \toRange, RangeSpec(0,1) )
 		.setSpec( \invert, BoolSpec(false) )
 		.setSpec( \curve, [-16,16,\lin,0,0].asSpec )
 		.setSpec( \clipMode, ListSpec( [ \ignore, \clip, \fold, \wrap, \none ] ) )
 		.setSpec( \clipSoftness, [0,1].asSpec )
 		.setDefault( \channel, nil )
 		.category_( 'pattern' ),
-		
-	UPatDef( \cc, { |unit, midiFile, cc = 0, channel = nil, fromRange = #[1,127], toRange = #[0,1], 
+
+	UPatDef( \cc, { |unit, midiFile, cc = 0, channel = nil, fromRange = #[1,127], toRange = #[0,1],
 			invert = false, curve = 0, clipMode = \ignore, clipSoftness = 0|
 		{
 			var smf, nmf, notes = [], index = 0, ccx, lastCc, chn, cmd, lastChn = -1, current = 69;
@@ -197,7 +197,7 @@ defs = [
 				} {
 					current = notes[ index ] ? current;
 				};
-				
+
 				value = scaleFunc.( current, ffrange, invert.next, curve.next, cmd, clipSoftness.next );
 				index = (index + 1).wrap( 0, notes.size-1 );
 				value.linlin(-1,1,*toRange.next ++ [ \none ]).yield;
@@ -209,14 +209,14 @@ defs = [
 		.setSpec( \cc, [0,127,\lin,1,0].asSpec )
 		.setSpec( \channel, ListSpec( [ nil ] ++ (..15), 0, [ "any" ] ++ (..15).collect(_.asString) ) )
 		.setSpec( \fromRange, RangeSpec(0,127,step:1) )
-		.setSpec( \toRange, RangeSpec(0,1) ) 
+		.setSpec( \toRange, RangeSpec(0,1) )
 		.setSpec( \invert, BoolSpec(false) )
 		.setSpec( \curve, [-16,16,\lin,0,0].asSpec )
 		.setSpec( \clipMode, ListSpec( [ \ignore, \clip, \fold, \wrap, \none ] ) )
 		.setSpec( \clipSoftness, [0,1].asSpec )
 		.setDefault( \channel, nil )
 		.category_( 'pattern' ),
-			
+
 	];
 
 MultiUMapDef( \p_midiFile, defs, \pattern_midiFile, \type, false )

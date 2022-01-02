@@ -15,7 +15,7 @@ part of the Unit lib default UMapDefs set
 
 UMapDef( \value_to_range, { |value = 0.5, decay = 0.999|
 	var range;
-	range = [  
+	range = [
 		1 - PeakFollower.kr( 1 - value, decay ),
 		PeakFollower.kr( value, decay )
 	];

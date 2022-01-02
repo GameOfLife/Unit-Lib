@@ -16,9 +16,9 @@ part of the Unit lib default UMapDefs set
 
 UMapDef( \peak, { |value = 0.5, decay = 0.999, direction = 1.0|
 	var peak;
-	peak =  LinXFade2.kr( 
-		1 - PeakFollower.kr( 1 - value, decay ), 
-		PeakFollower.kr( value, decay ), 
+	peak =  LinXFade2.kr(
+		1 - PeakFollower.kr( 1 - value, decay ),
+		PeakFollower.kr( value, decay ),
 		direction
 	);
 	UMapOut.kr(peak);

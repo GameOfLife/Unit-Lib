@@ -16,6 +16,6 @@ FreeUdef( \displayName, [
 	.apxCPU_( 0 )
 	.createsSynth_( false )
 	.nameFunc_({ |unit|
-		unit.get( \name );	
+		unit.get( \name );
 	})
 	.category_( 'utility' );

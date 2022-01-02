@@ -17,7 +17,7 @@ part of the Unit lib default UMapDefs set
 UPatDef( \p_coin, { |unit, a = 0.0, b = 1.0, prob = 0.5|
 	{
 		inf.do { |i|
-			
+
 			[a,b][ prob.next.coin.binaryValue ].next.yield;
 		};
 	}.r;

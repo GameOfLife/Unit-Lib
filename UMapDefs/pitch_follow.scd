@@ -20,11 +20,11 @@ part of the Unit lib default UMapDefs set
 
 UMapDef( \pitch_follow, { |
 	ampThreshold = 0.02, median = 7,
-	pitchRange = #[60, 4000], toRange = #[0.0,1.0], 
+	pitchRange = #[60, 4000], toRange = #[0.0,1.0],
 	invert = 0, curve = 0|
 	var sig, unranged;
 	sig = UIn.ar( 0 );
-	sig = Pitch.kr( sig, 440, pitchRange[0], pitchRange[1], 
+	sig = Pitch.kr( sig, 440, pitchRange[0], pitchRange[1],
 		ampThreshold: ampThreshold, median: median, clar: 1
 	);
 	USharedValueOut.kr( \hasPitchID, sig[1] );
@@ -43,7 +43,7 @@ UMapDef( \pitch_follow, { |
 	.setSpec( \pitchRange, FreqSpec(2,20000).asRangeSpec )
 	.setSpec( \invert, BoolSpec(false) )
 	.setSpec( \curve, [-16,16,\lin,0,0].asSpec )
-	.prepareArgsFunc_( { |args| 
+	.prepareArgsFunc_( { |args|
 		var bus;
 		bus = args.pairsAt( \bus );
 		args ++ [ \u_i_ar_0_bus, bus ];

@@ -25,8 +25,8 @@ ValueUMapDef( \osc_set, { |unit, oscfunc|
 		unit.set( \message, message.asString );
 	};
 	message = message.asSymbol;
-	"setting up OSCFunc on port % for message \"%\", range %\n".postf( 
-		NetAddr.langPort, 
+	"setting up OSCFunc on port % for message \"%\", range %\n".postf(
+		NetAddr.langPort,
 		if( message.asString[0] == $/ ) { message } { "/" ++ message },
 		if( unit.get( \mapped ) ) {
 			"0 - 1"

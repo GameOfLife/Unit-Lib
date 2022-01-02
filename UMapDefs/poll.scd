@@ -23,7 +23,7 @@ UMapDef( \poll, { |value = 0.0|
 	change = HPZ1.kr( value ).abs > 0;
 	change = (HPZ1.kr( change ).abs > 0) + (TDuty.kr( 0.1, change ) * change);
 	change = change * onChange;
-	Poll.kr( Impulse.kr( speed ) + trigger + change, 
+	Poll.kr( Impulse.kr( speed ) + trigger + change,
 		\u_spec.asSpecMapKr( value ),
 		"poll" );
 	UMapOut.kr(value);

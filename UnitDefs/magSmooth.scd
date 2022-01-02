@@ -28,7 +28,7 @@ Udef( \magSmooth, { |fftSize = 4096, smooth = 0.0, smear = 0.0, amp = 0.1, noise
 	normal = IFFT.ar( fft1, 0 ) * 1;
 	sig = XFade2.ar( normal, conv, noise.linlin(0,1,-1,1) );
 	UOut.ar( 0, sig * amp );
-})	
+})
 	.setSpec( \smooth, [0,1, 0.9.calcCurve].asSpec )
 	.setSpec( \smear, [0,1, 0.05.calcCurve].asSpec )
 	.setSpec( \fftSize, ListSpec([128,256,512,1024,2048,4096,8192]), \init)

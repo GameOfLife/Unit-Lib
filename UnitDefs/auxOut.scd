@@ -15,6 +15,6 @@ Udef( \auxOut, { |bus = 0, amp = 1|
 	var input;
 	input = UIn.ar(0);
 	Out.ar( bus + FirstPrivateBus.ir + 32, input * amp * UEnv.kr( extraSilence: 0.2, useGlobalGain: 0 ) );
-})	
+})
 	.category_( \io )
 	.setSpec( \bus, PositiveIntegerSpec( 0, 0, 32 ) )

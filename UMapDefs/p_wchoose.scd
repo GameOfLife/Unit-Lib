@@ -20,7 +20,7 @@ var defs;
 
 defs = [ 4, 8,12,16,24,32,48,64,128 ].collect({ |n|
 	UPatDef( n, { |unit, vals, weights, seed|
-		{	
+		{
 			thisThread.randSeed = seed.next.asControlInput;
 			loop {
 				vals.at( (..n-1).wchoose( weights.next.normalizeSum ) ).yield;
@@ -33,8 +33,8 @@ defs = [ 4, 8,12,16,24,32,48,64,128 ].collect({ |n|
 		.setSpec( \vals, ArrayControlSpec(0,1,\lin,default: 0.5!n ).size_(n) )
 		.setSpec( \weights, ArrayControlSpec(0,1,\lin,default: 0.5!n ).size_(n) )
 		.mappedArgs_([ \vals ]);
-});	
-	
+});
+
 MultiUMapDef( \p_wchoose, defs, \pattern_random, \n, false )
 	.mappedArgs_([ \vals ])
 	.defaultDefName_( 8 )

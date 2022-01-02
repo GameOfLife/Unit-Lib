@@ -17,10 +17,10 @@ UPatDef( \p_interpolate, { |unit, input = 0, n = 1|
 	{
 		var i = 0, val, nn;
 		var last;
-		if( unit.spec.respondsTo( \warp ) && { unit.spec.warp.asSpecifier != \lin }; ) { 
+		if( unit.spec.respondsTo( \warp ) && { unit.spec.warp.asSpecifier != \lin }; ) {
 			val = unit.spec.unmap( input.next( true ) );
-			loop {	
-				if( i == 0 ) { 
+			loop {
+				if( i == 0 ) {
 					last = val;
 					val = unit.spec.unmap( input.next );
 					nn = n.next;
@@ -32,7 +32,7 @@ UPatDef( \p_interpolate, { |unit, input = 0, n = 1|
 		} {
 			val = input.next( true );
 			loop {
-				if( i == 0 ) { 
+				if( i == 0 ) {
 					last = val;
 					val = input.next;
 					nn = n.next;

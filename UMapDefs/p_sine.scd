@@ -15,21 +15,21 @@ part of the Unit lib default UMapDefs set
 */
 
 UPatDef( \p_sine, { |unit,
-		freq = 0.1, 
+		freq = 0.1,
 		phase = 0,
 		min = 0.0,
 		max = 1.0,
 		timeBase = \seconds|
-	{	
+	{
 		var i = 0;
 		var timer = UPattern.deltaTimer;
 		if( timeBase.next === \seconds ) {
-			i = freq.next * UPattern.startPos; 
+			i = freq.next * UPattern.startPos;
 		};
 		loop {
 			(((i % 1) * 2pi) + phase.next).sin.linlin(-1,1,min.next,max.next).yield;
-			switch( timeBase.next, 
-				\events, { i = i + freq.next; }, 
+			switch( timeBase.next,
+				\events, { i = i + freq.next; },
 				\seconds, { i = i + (freq.next * timer.value); },
 			);
 		};

@@ -1,7 +1,7 @@
 /*
 \uchain_track
 
-Creates an UMap that passes on the track number of the current UChain. 
+Creates an UMap that passes on the track number of the current UChain.
 
 max: maximum track number (scales to range upper value)
 range: range to which the track number will be scaled (track 0 = lower value)

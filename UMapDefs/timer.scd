@@ -5,7 +5,7 @@ This UMap measures the elapsed time between triggers. Every time a trigger is re
 
 trigger: the trigger
 minTime: minimum time, will be mapped to the lower value of 'range'
-maxTime: maximum time, will be mapped to the higher value of 'range'. 
+maxTime: maximum time, will be mapped to the higher value of 'range'.
 range: the output range to scale the time values to. If minTime > maxTime the range gets inverted.
 curve: a curvature value for the mapped range. If curve == 0, the mapping is linear.
 clipMode: can be one of the following modes:

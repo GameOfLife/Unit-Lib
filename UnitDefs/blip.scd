@@ -13,7 +13,7 @@ part of the Unit lib default Udefs set
 */
 
 Udef( \blip, { |freq = 440, numharm = 200, amp = 0.1|
-	UMixOut.ar( 0, Blip.ar( freq, numharm, amp ), 0, true ) 
+	UMixOut.ar( 0, Blip.ar( freq, numharm, amp ), 0, true )
 } ).category_( \oscillator )
 	.setSpec( \freq, FreqSpec( 2, 20000 ) )
 	.setSpec( \numharm, PositiveIntegerSpec(200,1, 1000) )

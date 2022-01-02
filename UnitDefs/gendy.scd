@@ -31,13 +31,13 @@ part of the Unit lib default Udefs set
 Udef( \gendy, { |ampdist = 1, durdist = 1, adparam = 1, ddparam = 1, freq = #[290,590], ampscale = 0.5, durscale = 0.5, initCPs = 12, knum = 12, amp = 0.1|
 	var sig;
 	URandSeed.ir();
-		
+
 	freq[1] = freq[1].min( SampleRate.ir / knum );
-		
-	sig = Gendy1.ar( ampdist, durdist, adparam, ddparam, freq[0], freq[1], 
+
+	sig = Gendy1.ar( ampdist, durdist, adparam, ddparam, freq[0], freq[1],
 		ampscale, durscale, initCPs, knum, amp );
-		
-	UMixOut.ar( 0, sig, 0, true ) 
+
+	UMixOut.ar( 0, sig, 0, true )
 } ).category_( \synthesis )
 	.setSpec( \ampdist, ListSpec( (..5), 1, [ \LINEAR, \CAUCHY, \LOGIST, \HYPERBCOS, \ARCSINE, \EXPON ] ) )
 	.setSpec( \durdist, ListSpec( (..5), 1, [ \LINEAR, \CAUCHY, \LOGIST, \HYPERBCOS, \ARCSINE, \EXPON ] ) )

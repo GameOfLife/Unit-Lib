@@ -43,7 +43,7 @@ defs = [ 8,12,16,24,32,48,64,128 ].collect({ |n|
 		.setSpec( \range, [0,n-1,\lin,1].asSpec.asRangeSpec )
 		.setSpec( \vals, ArrayControlSpec(0,1,\lin,default: { |i| i/(n-1) }!n ).size_(n) )
 		.mappedArgs_([ \vals ]);
-});	
-	
+});
+
 MultiUMapDef( \trig_select, defs, \trigger_to_value, \n, false )
 	.mappedArgs_([ \vals ]);

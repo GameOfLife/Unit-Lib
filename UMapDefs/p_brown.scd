@@ -16,7 +16,7 @@ part of the Unit lib default UMapDefs set
 */
 
 UPatDef( \p_brown, { |unit, lo = 0.0, hi = 1.0, step = 0.125, seed|
-	{ 
+	{
 		var stream, curr, llo, hhi;
 		thisThread.randSeed = seed.next.asControlInput;
 		curr = lo.next rrand: hi.next;

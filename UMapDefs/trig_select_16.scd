@@ -43,7 +43,7 @@ UMapDef( \trig_select_16, {
 		unit.n = values.size;
 		unit.range = range;
 		if( values.any( _.isKindOf( UMap ) ) ) {
-			unit.vals = [ \expand,  
+			unit.vals = [ \expand,
 				16.collect({ |i| [ ("value"++i).asSymbol, values[i] ] }).flatten(1);
 			];
 		} {

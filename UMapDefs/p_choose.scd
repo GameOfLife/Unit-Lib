@@ -20,7 +20,7 @@ var defs;
 
 defs = [ 4,8,12,16,24,32,48,64,128 ].collect({ |n|
 	UPatDef( n, { |unit, vals, histSize = 0, seed|
-		{	
+		{
 			var index, size, arr, nn;
 			thisThread.randSeed = seed.next.asControlInput;
 			arr = (..n-1).scramble;
@@ -37,8 +37,8 @@ defs = [ 4,8,12,16,24,32,48,64,128 ].collect({ |n|
 		.setDefault( \seed, URandSeed() )
 		.setSpec( \vals, ArrayControlSpec(0,1,\lin,default: 0.5!n ).size_(n) )
 		.mappedArgs_([ \vals ]);
-});	
-	
+});
+
 MultiUMapDef( \p_choose, defs, \pattern_random, \n, false )
 	.mappedArgs_([ \vals ])
 	.defaultDefName_( 8 )

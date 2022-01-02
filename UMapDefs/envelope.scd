@@ -1,9 +1,9 @@
 /*
 \envelope
 
-An envelope generator. 
+An envelope generator.
 
-env: an Env or EnvM object, containing time and level values. 
+env: an Env or EnvM object, containing time and level values.
 timeScale: a scale for the time/duration of the Env (can be modulated)
 loop: loopmode (0: off, 1: loop, 2: alternate)
 delay: delay time before starting the env

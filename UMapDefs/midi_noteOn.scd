@@ -59,10 +59,10 @@ ValueUMapDef( \midi_noteOn, { |unit, midifunc|
 			unit.set( \learn, false );
 		};
 		fromRange = unit.get( \fromRange );
-		if( endPoint.isNil or: { unit.get( \device ).size == 0 or: { 
+		if( endPoint.isNil or: { unit.get( \device ).size == 0 or: {
 				endPoint.device.find( unit.get( \device ) ).notNil;
 			}
-		}) { if( endPoint.isNil or: { unit.get( \port ).size == 0 or: { 
+		}) { if( endPoint.isNil or: { unit.get( \port ).size == 0 or: {
 					endPoint.name.find( unit.get( \port ) ).notNil;
 				}
 			}) { if( unit.get( \channel ) !? (_ == chan) ? true ) {
@@ -80,13 +80,13 @@ ValueUMapDef( \midi_noteOn, { |unit, midifunc|
 }, { |unit, midifunc|
 	midifunc.free;
 	nil;
-}, [ 
+}, [
 	[ \channel, nil, ListSpec( [ nil ] ++ (..15), 0, [ "any" ] ++ (..15).collect(_.asString) ) ],
 	[ \device, "", StringSpec() ],
 	[ \port, "", StringSpec() ],
 	[ \learn, false, BoolSpec( false ) ],
 	[ \fromRange, [0,127], RangeSpec(0,127,step:1) ],
-	[ \toRange, [0,1], RangeSpec(0,1) ], 
+	[ \toRange, [0,1], RangeSpec(0,1) ],
 	[ \invert, false, BoolSpec(false) ],
 	[ \curve, 0, [-16,16,\lin,0,0].asSpec ],
 	[ \clipMode, \ignore, ListSpec( [ \ignore, \clip, \fold, \wrap, \none ] ) ],

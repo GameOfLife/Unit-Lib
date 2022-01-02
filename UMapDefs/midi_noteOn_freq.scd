@@ -48,10 +48,10 @@ ValueUMapDef( \midi_noteOn_freq, { |unit, midifunc|
 			unit.set( \learn, false );
 		};
 		range = unit.get( \range );
-		if( endPoint.isNil or: { unit.get( \device ).size == 0 or: { 
+		if( endPoint.isNil or: { unit.get( \device ).size == 0 or: {
 				endPoint.device.find( unit.get( \device ) ).notNil;
 			}
-		}) { if( endPoint.isNil or: { unit.get( \port ).size == 0 or: { 
+		}) { if( endPoint.isNil or: { unit.get( \port ).size == 0 or: {
 					endPoint.name.find( unit.get( \port ) ).notNil;
 				}
 			}) { if( unit.get( \channel ) !? (_ == chan) ? true ) {
@@ -65,7 +65,7 @@ ValueUMapDef( \midi_noteOn_freq, { |unit, midifunc|
 }, { |unit, midifunc|
 	midifunc.free;
 	nil;
-}, [ 
+}, [
 	[ \channel, nil, ListSpec( [ nil ] ++ (..15), 0, [ "any" ] ++ (..15).collect(_.asString) ) ],
 	[ \device, "", StringSpec() ],
 	[ \port, "", StringSpec() ],

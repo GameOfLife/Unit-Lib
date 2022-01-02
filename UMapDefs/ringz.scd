@@ -5,7 +5,7 @@ Creates an UMap that routes an input value through a ringing filter with attack 
 
 value: the value upon which the lag is applied (this can be another UMap as well)
 freq: the frequency of the filter. Rapid changes of this value may cause the filter to be temporarily unstable
-attackTime: the attack time of the 
+attackTime: the attack time of the
 decayTime: the decay time of the ringing filter
 amp: amplitude of the ringing filter
 

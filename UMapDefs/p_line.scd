@@ -31,8 +31,8 @@ UPatDef( \p_line, { |unit, a = 0.0, b = 1.0, curve = 0, time = 10, loop = \loop,
 		now = current;
 		ddelay = delay.next;
 		while { current < ddelay } {
-			if( loop.next === \backwards ) { 
-				direction = -1; 
+			if( loop.next === \backwards ) {
+				direction = -1;
 				b.next.yield;
 			} {
 				direction = 1;
@@ -51,7 +51,7 @@ UPatDef( \p_line, { |unit, a = 0.0, b = 1.0, curve = 0, time = 10, loop = \loop,
 			switch( loop.next,
 				\loop, { current = current.wrap( 0.0, ttime );  direction = 1 },
 				\backwards, { current = current.wrap( 0.0, ttime );  direction = -1; },
-				\alternate, { 
+				\alternate, {
 					case { current > ttime } {
 						current = current.fold(0.0, ttime);
 						direction = -1;
@@ -67,7 +67,7 @@ UPatDef( \p_line, { |unit, a = 0.0, b = 1.0, curve = 0, time = 10, loop = \loop,
 					} {
 						direction = 1;
 					};
-					
+
 				},
 				\hold, {
 					current = current.clip(0.0, ttime);

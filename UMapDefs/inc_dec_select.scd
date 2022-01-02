@@ -35,8 +35,8 @@ defs = [ 2,3,4,5,6,7,8,10,12,16,24,32,48,64,128 ].collect({ |n|
 		index = LocalIn.kr( 1, resetIndex );
 		index = (index + inc - dec).round(1);
 		index = Select.kr( (wrap + (reset * 2)).clip(0,2), [
-			index.clip(0,n-1), 
-			index.wrap(0,n), 
+			index.clip(0,n-1),
+			index.wrap(0,n),
 			resetIndex,
 		]);
 		LocalOut.kr(index);
@@ -53,8 +53,8 @@ defs = [ 2,3,4,5,6,7,8,10,12,16,24,32,48,64,128 ].collect({ |n|
 		.setSpec( \wrap, BoolSpec(false) )
 		.setSpec( \vals, ArrayControlSpec(0,1,\lin,default: { |i| i/(n-1) }!n ).size_(n) )
 		.mappedArgs_([ \vals ]);
-});	
-	
+});
+
 MultiUMapDef( \inc_dec_select, defs, \trigger_to_value, \n, false )
 	.defaultDefName_( 8 )
 	.mappedArgs_([ \vals ]);

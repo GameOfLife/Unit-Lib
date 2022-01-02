@@ -1,7 +1,7 @@
 /*
 \p_post
 
-Creates an pattern UMap for posting values in the post window. 
+Creates an pattern UMap for posting values in the post window.
 
 input: value or UMap to post
 
@@ -16,7 +16,7 @@ UPatDef( \p_post, { |unit, input = 0|
 	{
 		loop { input.next.postln.yield };
 	}.r
-})	
+})
 	.setSpec( \input, UAdaptSpec() )
 	.canUseUMapFunc_({ |unit, key, umapdef| unit.isKindOf( UPattern ).not })
 	.useMappedArgs_( false )

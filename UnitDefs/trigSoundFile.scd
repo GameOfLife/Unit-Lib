@@ -14,7 +14,7 @@ soundFile: a BufSndFile object, a region of an existig soundfile url on your har
 	- rate: playback rate (semitones or ratio)
 rateScale: a scale value for the playback rate (can be modulated)
 level: playback level (amplitude of the soundfile)
-	
+
 only the following numbers of channels are allowed:
 1,2,3,4,5,6,7,8,10,12,16,24,32
 
@@ -27,28 +27,28 @@ MultiChannelUdef( \trigSoundFile, {
 		var sig;
 		var pos, reverse, crossfade;
 		var numChannels, bufnum, rate, trigger, startPos, loop;
-		
+
 		trigger = \trigger.tr(1);
 		crossfade = \crossfade.kr(0.1);
 		pos = \pos.kr(0.0);
 		reverse = \reverse.kr(0.0);
 		pos = (pos + reverse).fold(0,1);
-		
+
 		#numChannels, bufnum, rate, trigger, startPos, loop =
 			BufSndFilePlayer.getArgs( Udef.numChannels, \soundFile, trigger, 0 );
-			
+
 		rate = rate * \rateScale.kr( 1 ) * reverse.linlin(0,1,1,-1);
-			
-		sig = PlayBufCF.ar( 
+
+		sig = PlayBufCF.ar(
 			numChannels, bufnum, rate, trigger, pos * BufFrames.ir( bufnum ),
 			loop, crossfade, 4 // 4 voices
 		);
-		
+
 		sig = sig * Peak.kr( trigger );
-	
+
 		UMixOut.ar( 0, sig * \level.ukr( 1, \amp ), 0, true );
-		
-		
+
+
 	}, [ [ \soundFile, nil, BufSndFileSpec(nil) ] ], \soundFile, true )
 	.setSpec( \trigger, TriggerSpec() )
 	.setSpec( \level, \amp.asSpec, \normal )

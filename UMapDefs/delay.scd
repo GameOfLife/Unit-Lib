@@ -5,7 +5,7 @@ This UMapDef creates an UMap for delaying value changes. The delay time itself c
 
 value: the value (or UMap) to be delayed
 time: the length of the delay.
-timeScale: the number of seconds by which 'time' is multiplied. This value can not be changed during playback. 
+timeScale: the number of seconds by which 'time' is multiplied. This value can not be changed during playback.
 lag: smoothing time applied to change of delay time, use to prevent sudden jumps during change of delay time.
 
 The 'value' arg range is mapped to that of the parameter to which the UMap is connected.

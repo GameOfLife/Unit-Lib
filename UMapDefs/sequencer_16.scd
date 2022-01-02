@@ -29,7 +29,7 @@ UMapDef( \sequencer_16, {
 	});
 	step = ((ControlDur.ir + SampleDur.ir) * speed) * reverse.linlin(0,1,1,-1);
 	range = range + [0,1];
-	resetPos = (range[0] - step) + 
+	resetPos = (range[0] - step) +
 		((\u_startPos.ir(0.0) * ControlRate.ir) * step).wrap( 0, range[1] - range[0] );
 	phase = Phasor.kr( Impulse.kr(0), step, range[0], range[1], resetPos );
 	phase = (phase.floor * (1-smooth)) + (phase * smooth);
@@ -45,7 +45,7 @@ UMapDef( \sequencer_16, {
 		unit.interpolate = smooth.booleanValue;
 		unit.n = values.size;
 		if( values.any( _.isKindOf( UMap ) ) ) {
-			unit.vals = [ \expand,  
+			unit.vals = [ \expand,
 				16.collect({ |i| [ ("value"++i).asSymbol, values[i] ] }).flatten(1);
 			];
 		} {

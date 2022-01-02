@@ -6,7 +6,7 @@ Equal power crossfade between two sources.
 crossfade: amount of left/right
 level: output level of the signal
 numChannels: number of channels (per source)
-mode:	
+mode:
 	'equal': equal power crossfade (-3dB at center; cosine curve)
 	'linear': linear crossfade (-6dB at center)
 	'overlap': in center position both sources are at max. loudness
@@ -17,24 +17,24 @@ part of the Unit lib default Udefs set
 */
 
 var defs, def;
-defs = [ 
-	\equal, 
-	\linear, 
-	\overlap, 
+defs = [
+	\equal,
+	\linear,
+	\overlap,
 ].collect({ |type|
 	MultiChannelUdef( type, { |crossfade = 0.5, level = 1.0|
 		var in1, in2, out;
 		in1 = UIn.ar(0, Udef.numChannels, endPoint: true );
 		in2 = UIn.ar( Udef.numChannels, Udef.numChannels, endPoint: true );
 		switch( type,
-			\equal,  { 
+			\equal,  {
 				out = XFade2.ar( in1, in2, crossfade.linlin(0,1,-1,1), level);
 			},
-			\linear, { 
+			\linear, {
 				out = LinXFade2.ar( in1, in2, crossfade.linlin(0,1,-1,1), level);
 			},
-			\overlap, { 
-				out = (in1 * crossfade.linlin(0.5,1,1,0)) + 
+			\overlap, {
+				out = (in1 * crossfade.linlin(0.5,1,1,0)) +
 				(in2 * crossfade.linlin(0,0.5,0,1));
 				out = out * level;
 			},

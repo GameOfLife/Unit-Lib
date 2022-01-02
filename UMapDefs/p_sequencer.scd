@@ -19,7 +19,7 @@ var defs;
 
 defs = [ 4,8,12,16,24,32,48,64,128 ].collect({ |n|
 	UPatDef( n, { |unit, range = #[0,7], reverse = false, vals|
-		{	
+		{
 			var current = 0, direction = 1;
 			vals.at( current ).yield;
 			inf.do { |i|
@@ -34,8 +34,8 @@ defs = [ 4,8,12,16,24,32,48,64,128 ].collect({ |n|
 		.setSpec( \reverse, BoolSpec(false) )
 		.setSpec( \vals, ArrayControlSpec(0,1,\lin,default: 0.5!n ).size_(n) )
 		.mappedArgs_([ \vals ]);
-});	
-	
+});
+
 MultiUMapDef( \p_sequencer, defs, \pattern, \n, false )
 	.mappedArgs_([ \vals ])
 	.defaultDefName_( 8 )

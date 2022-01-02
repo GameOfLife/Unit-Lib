@@ -10,7 +10,7 @@ this is an Udef definition file
 part of the Unit lib default Udefs set
 */
 
-Udef( \envelope_amp, { 
+Udef( \envelope_amp, {
 	var in;
 	in = UIn.ar(0);
 	in = in * UEnvGen.ar( \env, \amp );

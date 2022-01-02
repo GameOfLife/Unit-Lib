@@ -17,7 +17,7 @@ var def, values;
 
 values = 8.collect({ |i| ("value"++i).asSymbol });
 
-def = UPatDef( \p_select_8, { |unit, 
+def = UPatDef( \p_select_8, { |unit,
 	index = 0,
 	value0 = 0.5, value1 = 0.5, value2 = 0.5, value3 = 0.5,
 	value4 = 0.5, value5 = 0.5, value6 = 0.5, value7 = 0.5
@@ -25,15 +25,15 @@ def = UPatDef( \p_select_8, { |unit,
 	{
 		inf.do { |i|
 			[
-				value0, value1, value2, value3, 
-				value4, value5, value6, value7 
+				value0, value1, value2, value3,
+				value4, value5, value6, value7
 			].at( index.next.asInteger ).next.yield;
 		};
 	}.r;
 }).mappedArgs_( values )
 .useMappedArgs_( false )
 .canUseUMapFunc_({ |unit, key, umapdef|
-	unit.isKindOf( UPattern ).not && {	
+	unit.isKindOf( UPattern ).not && {
 		[ Point, SimpleNumber, Array, Symbol ].any({ |class|
 			unit.getDefault( key ).isKindOf( class )
 		});

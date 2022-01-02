@@ -49,7 +49,7 @@ HybridUMapDef( \center_focus, { |center = 0.5, focus = 0.0, knee = 0.0|
 	lo = center.linlin( focus.linlin(0,1,0.5,0),1,-1,0,\none).sineclip2(1,knee) + 1;
 	hi = center.linlin( 0, focus.linlin(0,1,0.5,1),0,1,\none).sineclip2(1,knee);
 	[lo, hi]
-	
+
 })
 	.mappedArgs_([\center])
 	.canUseUMapFunc_({ |unit, key, umapdef|

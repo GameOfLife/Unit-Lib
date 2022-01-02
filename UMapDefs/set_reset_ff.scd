@@ -1,7 +1,7 @@
 /*
 \set_reset_ff
 
-This UMap implements a flip-flop switch mechanism. 
+This UMap implements a flip-flop switch mechanism.
 
 trigger: the set trigger
 reset: the reset trigger

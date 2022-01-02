@@ -12,7 +12,7 @@ this is an UMapDef definition file
 part of the WFSCollider Class Library default UMapDefs set
 */
 
-UMapDef( \shared_buffer_out, { |soundFile = #[0,1,0]| 
+UMapDef( \shared_buffer_out, { |soundFile = #[0,1,0]|
 	USharedBufferOut.kr( \id, soundFile[0] );
 	UMapOut.kr( soundFile, false);
 })
