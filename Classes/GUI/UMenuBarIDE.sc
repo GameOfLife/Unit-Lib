@@ -48,7 +48,7 @@ UMenuBarIDE {
 	*registerMenu { |menuAction, name|
 		var mn;
 		if( mode === \mainmenu ) {
-			MainMenu.register( menuAction, name.asString );
+			MainMenu.register( menuAction, name.asString, 'unitlib' );
 		} {
 			if( toolBar.isNil ) {
 				toolBar = ToolBar(
@@ -70,7 +70,20 @@ UMenuBarIDE {
 		};
 	}
 
+	*clear {
+		var menus;
+		if( mode === \mainmenu ) {
+			MainMenu.registered.do({ |item|
+				item.value.detect({ |acc| acc.key == 'unitlib' })
+				.value.do({ |menu| menus =menus.add( menu ) })
+			});
+			menus.do({ |item| MainMenu.unregister( item ) });
+		};
+	}
+
 	*new { |name = "Unit Lib"|
+
+		this.clear; // clear the old menu first
 
 		currentMenuName = name;
 
