@@ -25,6 +25,7 @@ UMenuBarIDE {
 	classvar <>sessionMenu;
 	classvar <>skipJack, <>windowsMenu;
 	classvar <>openRecentMenu;
+	classvar <>mode = \mainmenu, <>toolBar; // or \toolbar
 
 	*fillWindowsMenu {
 		if( windowsMenu.notNil ) {
@@ -44,39 +45,64 @@ UMenuBarIDE {
 		};
 	}
 
+	*registerMenu { |menuAction, name|
+		var mn;
+		if( mode === \mainmenu ) {
+			MainMenu.register( menuAction, name.asString );
+		} {
+			if( toolBar.isNil ) {
+				toolBar = ToolBar(
+					Menu(
+						menuAction
+					).title_( name.asString )
+				).minWidth_(300).front;
+			} {
+				mn = toolBar.actions.detect({ |item| item.string == name.asString });
+				if( mn.isNil ) {
+					toolBar.addAction( Menu(
+						menuAction
+					).title_( name.asString )
+					);
+				} {
+					mn.menu.addAction( menuAction );
+				};
+			};
+		};
+	}
+
 	*new { |name = "Unit Lib"|
 
 		currentMenuName = name;
 
 /* MAIN */
 
-		MainMenu.register( MenuAction( "New Score", {
+		this.registerMenu( MenuAction( "New Score", {
 				UScore.new.gui;
 			}), name );
 
-		MainMenu.register( MenuAction( "Open Score...", {
+		this.registerMenu( MenuAction( "Open Score...", {
 			UScore.openMultiple(nil, UScoreEditorGUI(_) )
 		}), name );
 
 		openRecentMenu = Menu().title_("Open Recent");
 
-		MainMenu.register( openRecentMenu, name );
+		this.registerMenu( openRecentMenu, name );
 
 		URecentScorePaths.menu = openRecentMenu;
 
 		URecentScorePaths.fillMenu;
 
-		MainMenu.register( MenuAction( "Save Score", {
+		this.registerMenu( MenuAction( "Save Score", {
 			UScore.current !! _.save
 		}), name );
 
-		MainMenu.register( MenuAction( "Save Score as...", {
+		this.registerMenu( MenuAction( "Save Score as...", {
 			UScore.current !! _.saveAs
 		}), name );
 
-		MainMenu.register( MenuAction.separator("Export"), name );
+		this.registerMenu( MenuAction.separator("Export"), name );
 
-		MainMenu.register( MenuAction( "Export as audio file..", {
+		this.registerMenu( MenuAction( "Export as audio file..", {
 			UScore.current !! { |x|
 				Dialog.savePanel({ |path|
 					x.writeAudioFile( path );
@@ -86,7 +112,7 @@ UMenuBarIDE {
 
 /* SESSION */
 
-		MainMenu.register( MenuAction.separator("Sessions"), name );
+		this.registerMenu( MenuAction.separator("Sessions"), name );
 
 		sessionMenu = Menu(
 
@@ -183,50 +209,50 @@ UMenuBarIDE {
 			).title_("New"),
 		).title_("Session");
 
-		MainMenu.register( sessionMenu, name );
+		this.registerMenu( sessionMenu, name );
 
 /* EDIT */
-		MainMenu.register( MenuAction( "Copy", {
+		this.registerMenu( MenuAction( "Copy", {
 	        UScoreEditorGUI.currentSelectedEvents !! UScoreEditor.copy(_)
 		}), "Edit" );
 
-		MainMenu.register( MenuAction( "Paste", {
+		this.registerMenu( MenuAction( "Paste", {
 			UScoreEditorGUI.current !! { |x| x.scoreView.currentEditor.pasteAtCurrentPos }
 		}), "Edit" );
 
-		MainMenu.register( MenuAction.separator("Events"), "Edit" );
+		this.registerMenu( MenuAction.separator("Events"), "Edit" );
 
-		MainMenu.register( MenuAction( "Add Event", {
+		this.registerMenu( MenuAction( "Add Event", {
 			UScoreEditorGUI.current !! { |x| x.editor.addEvent }
 		}), "Edit" );
 
-		MainMenu.register( MenuAction( "Add Marker", {
+		this.registerMenu( MenuAction( "Add Marker", {
 			UScoreEditorGUI.current !! { |x| x.editor.addMarker }
 		}), "Edit" );
 
-		MainMenu.register( MenuAction( "Edit Selected", {
+		this.registerMenu( MenuAction( "Edit Selected", {
 			UScoreEditorGUI.current !! { |x| x.scoreView.editSelected }
 		}), "Edit" );
 
-		MainMenu.register( MenuAction( "Delete Selected", {
+		this.registerMenu( MenuAction( "Delete Selected", {
 			UScoreEditorGUI.current !! { |x| x.scoreView.deleteSelected }
 		}), "Edit" );
 
-		MainMenu.register( MenuAction.separator("Select"), "Edit" );
+		this.registerMenu( MenuAction.separator("Select"), "Edit" );
 
-		MainMenu.register( MenuAction( "Select All", {
+		this.registerMenu( MenuAction( "Select All", {
 			UScoreEditorGUI.current !! { |x| x.scoreView.selectAll }
 
 		}), "Edit" );
 
-		MainMenu.register( MenuAction( "Select Similar", {
+		this.registerMenu( MenuAction( "Select Similar", {
 			UScoreEditorGUI.current !! { |x| x.scoreView.selectSimilar }
 		}), "Edit" );
 
 		//sort
-		MainMenu.register( MenuAction.separator("Sort"), "Edit" );
+		this.registerMenu( MenuAction.separator("Sort"), "Edit" );
 
-		MainMenu.register( MenuAction( "Sort Events", {
+		this.registerMenu( MenuAction( "Sort Events", {
 			UScoreEditorGUI.current !! { |x|
 				UScore.current.events.sort;
 				UScore.current.changed( \numEventsChanged );
@@ -234,56 +260,56 @@ UMenuBarIDE {
 			};
 		}), "Edit" );
 
-		MainMenu.register( MenuAction( "Overlapping events to new tracks", {
+		this.registerMenu( MenuAction( "Overlapping events to new tracks", {
 			UScoreEditorGUI.current !! { |x| x.score.cleanOverlaps }
 		}), "Edit" );
 
-		MainMenu.register( MenuAction( "Remove empty tracks", {
+		this.registerMenu( MenuAction( "Remove empty tracks", {
 			UScoreEditorGUI.current !! { |x| x.score.removeEmptyTracks }
 		}), "Edit" );
 
 		//mute, solo
-		MainMenu.register( MenuAction.separator("Disable/Enable"), "Edit" );
+		this.registerMenu( MenuAction.separator("Disable/Enable"), "Edit" );
 
-		MainMenu.register( MenuAction( "Disable selected", {
+		this.registerMenu( MenuAction( "Disable selected", {
 			UScoreEditorGUI.current !! { |x| x.scoreView.disableSelected }
 		}), "Edit" );
 
-		MainMenu.register( MenuAction( "Enable selected", {
+		this.registerMenu( MenuAction( "Enable selected", {
 			UScoreEditorGUI.current !! { |x| x.scoreView.enableSelected }
 		}), "Edit" );
 
-		MainMenu.register( MenuAction( "Enable all", {
+		this.registerMenu( MenuAction( "Enable all", {
 			UScoreEditorGUI.current !! { |x| x.editor.enableAll }
 		}), "Edit" );
 
-		MainMenu.register( MenuAction( "Enable selected and disable all others", {
+		this.registerMenu( MenuAction( "Enable selected and disable all others", {
 			UScoreEditorGUI.current !! { |x| x.scoreView.soloEnableSelected }
 		}), "Edit" );
 
 		//tracks
-		MainMenu.register( MenuAction.separator("Tracks"), "Edit" );
+		this.registerMenu( MenuAction.separator("Tracks"), "Edit" );
 
-		MainMenu.register( MenuAction( "Add Track", {
+		this.registerMenu( MenuAction( "Add Track", {
 			UScoreEditorGUI.current !! { |x| x.scoreView.addTrack }
 		}), "Edit" );
 
-		MainMenu.register( MenuAction( "Remove Unused Tracks", {
+		this.registerMenu( MenuAction( "Remove Unused Tracks", {
 			UScoreEditorGUI.current !! { |x| x.scoreView.removeUnusedTracks }
 		}), "Edit" );
 
 	/* VIEW */
 
-		MainMenu.register( MenuAction( "EQ", { UGlobalEQ.gui; }), "View");
-		MainMenu.register( MenuAction( "Level", { UGlobalGain.gui; }), "View");
-		MainMenu.register( MenuAction( "Udefs", { UdefsGUI(); }), "View");
-		MainMenu.register( MenuAction( "Level meters", {
+		this.registerMenu( MenuAction( "EQ", { UGlobalEQ.gui; }), "View");
+		this.registerMenu( MenuAction( "Level", { UGlobalGain.gui; }), "View");
+		this.registerMenu( MenuAction( "Udefs", { UdefsGUI(); }), "View");
+		this.registerMenu( MenuAction( "Level meters", {
 			ULib.servers.first.meter;
 		}), "View");
 
 		windowsMenu = Menu().title_( "Windows" );
 
-		MainMenu.register( windowsMenu, "View" );
+		this.registerMenu( windowsMenu, "View" );
 
 		this.fillWindowsMenu;
 
@@ -294,9 +320,9 @@ UMenuBarIDE {
 
 	*add { |name, function, menuName|
 		if( function === \separator ) {
-			MainMenu.register( MenuAction.separator( name ), menuName ? currentMenuName ? "Unit Lib" );
+			this.registerMenu( MenuAction.separator( name ), menuName ? currentMenuName ? "Unit Lib" );
 		} {
-			MainMenu.register( MenuAction( name, function ), menuName ? currentMenuName ? "Unit Lib" );
+			this.registerMenu( MenuAction( name, function ), menuName ? currentMenuName ? "Unit Lib" );
 		};
 	}
 }
