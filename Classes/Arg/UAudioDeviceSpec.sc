@@ -91,12 +91,49 @@ UAudioDeviceSpec : Spec {
 		}
 	}
 
+	*compareString { |str, other|
+		var matrix, upper, corner, compareFunc;
+		if( str.respondsTo( \editDistance ) ) {
+			^str.editDistance( other );
+		} {
+			// This is the same algorithm as the primitive, just in
+			// sclang to allow equality
+			matrix = Array.iota(other.size + 1);
+
+			if(str.isEmpty || other.isEmpty) {
+				^str.size;
+			};
+
+			// use identity if not given another way to compare
+			compareFunc = compareFunc ? { |a, b| a === b; };
+
+			str.size.do { |indX|
+				corner = indX;
+				matrix[0] = indX + 1;
+
+				other.size.do { |indY|
+					upper = matrix[indY + 1];
+
+					matrix[indY + 1] = if(compareFunc.value(str.at(indX), other.at(indY))) {
+						corner;
+					} {
+						[upper, corner, matrix[indY]].minItem + 1;
+					};
+
+					corner = upper;
+				};
+			};
+
+			^matrix[other.size];
+		};
+	}
+
 	*autoSelectOutDevice { |inDevice|
 		^if( inDevice.isNil ) {
 			nil
 		} {
 			outDevices[
-				outDevices.collect({ |item| item.editDistance( inDevice ) }).minIndex
+				outDevices.collect({ |item| this.compareString( item, inDevice ); }).minIndex
 			];
 		};
 	}
