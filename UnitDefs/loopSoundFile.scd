@@ -37,7 +37,7 @@ MultiChannelUdef( \loopSoundFile, { |loopStart = #[0,0], loopDur = #[1,1], cross
 
 		sig = PlayBufCF.ar(
 			numChannels, bufnum, rate,
-			Dwhite( *loopDur * ( BufDur.ir( bufnum ) / rate) ),
+		    Dwhite( *loopDur * ( BufDur.ir( bufnum ) / rate * BufRateScale.ir( bufnum ) ) ),
 			Dwhite( *loopStart * BufFrames.ir( bufnum ) ),
 			loop, crossfade, 4 // 4 voices
 		);
