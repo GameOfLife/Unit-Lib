@@ -17,16 +17,21 @@ trigger: retriggers the note at the current freq.
 this is an Udef definition file
 part of the Unit lib default Udefs set
 */
+var class;
 
-Udef(\mda_piano,{ |freq = 440, vel = 0.8, decay = 0.8, hard = 0.8, muffle = 0.8, stereo = 0.2, sustain = 0, amp = 0.1|
-	var sig, detune, midi, trigger;
-	trigger = \trigger.tr(0);
-	midi = freq.clip(20,20000).cpsmidi;
-	detune = ((midi - midi.round(1))) + 0.5;
-	freq = midi.round(1).midicps;
-	sig = MdaPiano.ar( freq, 1 - trigger, vel * 127, decay, 0.8, hard, 0.8, muffle, 0.8, 0.8, stereo, detune, 0.1, 0.1, sustain ) * amp;
-	UMixOut.ar(0, sig, 0, true );
-}).category_( \synthesis )
-.setSpec( \trigger, TriggerSpec() )
-.setSpec( \gate, BoolSpec(true) )
-.setSpec( \sustain, BoolSpec(false) );
+class = 'MdaPiano'.asClass;
+
+if( class.notNil ) {
+	Udef(\mda_piano,{ |freq = 440, vel = 0.8, decay = 0.8, hard = 0.8, muffle = 0.8, stereo = 0.2, sustain = 0, amp = 0.1|
+		var sig, detune, midi, trigger;
+		trigger = \trigger.tr(0);
+		midi = freq.clip(20,20000).cpsmidi;
+		detune = ((midi - midi.round(1))) + 0.5;
+		freq = midi.round(1).midicps;
+		sig = class.ar( freq, 1 - trigger, vel * 127, decay, 0.8, hard, 0.8, muffle, 0.8, 0.8, stereo, detune, 0.1, 0.1, sustain ) * amp;
+		UMixOut.ar(0, sig, 0, true );
+	}).category_( \synthesis )
+	.setSpec( \trigger, TriggerSpec() )
+	.setSpec( \gate, BoolSpec(true) )
+	.setSpec( \sustain, BoolSpec(false) );
+};

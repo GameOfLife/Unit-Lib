@@ -14,22 +14,27 @@ seed: random seed of the noise
 this is an Udef definition file
 part of the Unit lib default Udefs set
 */
+var class;
 
-Udef( \magSmooth, { |fftSize = 4096, smooth = 0.0, smear = 0.0, amp = 0.1, noise = 0.0|
-	var sig, fft1, fft2, conv, normal, delay;
-	URandSeed.ir();
-	sig = UIn.ar( 0, Udef.numChannels );
-	fft1 = FFT( LocalBuf(fftSize).clear, sig, 0.5, 0);
-	fft2 = FFT( LocalBuf(fftSize).clear, WhiteNoise.ar(0.05), 0.5, 0 );
-	fft1 = PV_MagSmooth( fft1, smooth );
-	fft1 = PV_MagSmear( fft1, smear *  fftSize );
-	fft2 = PV_MagMul( fft2, fft1 );
-	conv = IFFT.ar( fft2, 0 ) * 1;
-	normal = IFFT.ar( fft1, 0 ) * 1;
-	sig = XFade2.ar( normal, conv, noise.linlin(0,1,-1,1) );
-	UOut.ar( 0, sig * amp );
-})
+class = 'PV_MagSmooth'.asClass;
+
+if( class.notNil ) {
+	Udef( \magSmooth, { |fftSize = 4096, smooth = 0.0, smear = 0.0, amp = 0.1, noise = 0.0|
+		var sig, fft1, fft2, conv, normal, delay;
+		URandSeed.ir();
+		sig = UIn.ar( 0, Udef.numChannels );
+		fft1 = FFT( LocalBuf(fftSize).clear, sig, 0.5, 0);
+		fft2 = FFT( LocalBuf(fftSize).clear, WhiteNoise.ar(0.05), 0.5, 0 );
+		fft1 = class.new( fft1, smooth );
+		fft1 = 'PV_MagSmear'.asClass.new( fft1, smear *  fftSize );
+		fft2 = PV_MagMul( fft2, fft1 );
+		conv = IFFT.ar( fft2, 0 ) * 1;
+		normal = IFFT.ar( fft1, 0 ) * 1;
+		sig = XFade2.ar( normal, conv, noise.linlin(0,1,-1,1) );
+		UOut.ar( 0, sig * amp );
+	})
 	.setSpec( \smooth, [0,1, 0.9.calcCurve].asSpec )
 	.setSpec( \smear, [0,1, 0.05.calcCurve].asSpec )
 	.setSpec( \fftSize, ListSpec([128,256,512,1024,2048,4096,8192]), \init)
 	.category_( \effect );
+};
