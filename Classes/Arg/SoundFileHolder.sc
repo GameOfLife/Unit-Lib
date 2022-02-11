@@ -751,7 +751,9 @@ DiskSndFile : AbstractSndFile {
 	asDiskSndFile { ^this }
 
 	asControlInputFor { |server, startPos = 0|
-		^[ this.currentBuffer(server, startPos), rate, loop.binaryValue ]
+		var bufRateScale;
+		bufRateScale = sampleRate / server.sampleRate;
+		^[ this.currentBuffer(server, startPos), rate * bufRateScale, loop.binaryValue ]
 	}
 
 	makeBuffer {  |server, startPos = 0, action, bufnum|  // startOffset in seconds

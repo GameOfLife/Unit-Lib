@@ -61,7 +61,7 @@ DiskSndFilePlayer {
 		key = key ? 'soundFile';
 		#bufnum, rate, loop = key.asSymbol.kr( [ 0, 1, 0 ] );
 		Udef.addBuildSpec(ArgSpec(key ? 'soundFile', nil, DiskSndFileSpec(nil) ) );
-		^VDiskIn.ar( numChannels, bufnum, BufRateScale.kr( bufnum ) * rate, loop );
+		^VDiskIn.ar( numChannels, bufnum, /*BufRateScale.kr( bufnum ) * */ rate, loop );
 	}
 
 }
