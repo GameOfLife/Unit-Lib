@@ -752,7 +752,7 @@ DiskSndFile : AbstractSndFile {
 
 	asControlInputFor { |server, startPos = 0|
 		var bufRateScale;
-		bufRateScale = sampleRate / server.sampleRate;
+		bufRateScale = (sampleRate ? 44100) / server.sampleRate;
 		^[ this.currentBuffer(server, startPos), rate * bufRateScale, loop.binaryValue ]
 	}
 
