@@ -260,6 +260,21 @@ UEvent : UArchivable {
 
 	makeView { |i=0, minWidth, maxWidth| ^UEventView( this, i, minWidth, maxWidth ) }
 
+	selectUMaps { ^[] }
+
+	setUMapsActive { |active = true, verbose = true|
+		var umaps;
+
+		umaps = this.selectUMaps({ |umap|
+			umap.def.isKindOf( ValueUMapDef );
+		});
+
+		umaps.do( _.set( \active, active ) );
+
+		if( verbose ) {
+			"% UMaps set to 'active' = %\n".postf( umaps.size, active );
+		};
+	}
 
 	//// UOSCsetter support
 	oscSetter_ { |newOSCsetter, removeOld = true|

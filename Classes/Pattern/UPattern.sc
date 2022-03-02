@@ -725,6 +725,18 @@ UPattern : UChain {
 	    }).asString;
 	}
 
+	selectUMaps { |selectFunc|
+		if( pattern.isUMap ) {
+			^units.collect({ |unit|
+				unit.selectUMaps( selectFunc );
+			}).flatten(1) ++ ( pattern.selectUMaps( selectFunc ) );
+		} {
+			^units.collect({ |unit|
+				unit.selectUMaps( selectFunc );
+			}).flatten(1);
+		};
+	}
+
 	storeModifiersOn { |stream|
 		var patArgs;
 		this.storeTags( stream );

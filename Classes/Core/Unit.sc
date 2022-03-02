@@ -1316,6 +1316,37 @@ U : ObjectWithArgs {
 		    parentChain = nil; // forget chain after disposing last server
 	    };
 	}
+
+	selectUMaps { |selectFunc|
+		var f, c, selected = [];
+		selectFunc = selectFunc ? true; // select all
+		f = { |unit|
+			unit.values.do({ |value|
+				if( value.isUMap ) {
+					if( selectFunc.( value ) == true ) {
+						selected = selected ++ [ value ];
+					};
+					f.( value );
+				};
+			});
+		};
+		f.( this );
+		^selected;
+	}
+
+	setUMapsActive { |active = true, verbose = true|
+		var umaps;
+
+		umaps = this.selectUMaps({ |umap|
+			umap.def.isKindOf( ValueUMapDef );
+		});
+
+		umaps.do( _.set( \active, active ) );
+
+		if( verbose ) {
+			"% UMaps set to 'active' = %\n".postf( umaps.size, active );
+		};
+	}
 }
 
 + Object {

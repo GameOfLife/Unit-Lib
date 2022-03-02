@@ -1049,6 +1049,12 @@ UChain : UEvent {
 		^if( chain.notNil ) { chain.duration };
 	}
 
+	selectUMaps { |selectFunc|
+		^units.collect({ |unit|
+			unit.selectUMaps( selectFunc );
+		}).flatten(1);
+	}
+
 	getInitArgs {
 		var numPreArgs = -1;
 		if( releaseSelf != true ) {
