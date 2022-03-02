@@ -1079,14 +1079,26 @@ UScore : UEvent {
 	}
 
 	makeUMapMap {
+		^this.makeValueMap( _.isUMap, true );
+	}
+
+	makeValueMap { |selectFunc, includeUMaps = false|
 		var f, c, lib = ();
 		f = { |unit, path|
 			unit.values.do({ |value, i|
 				var newPath;
 				newPath = path +/+ unit.keys[i];
 				if( value.isUMap ) {
-					lib[ newPath.asSymbol ] = value;
+					if( includeUMaps ) {
+						if( selectFunc.( value ) != false ) {
+							lib[ newPath.asSymbol ] = value;
+						};
+					};
 					f.( value, newPath );
+				} {
+					if( selectFunc.( value ) != false ) {
+						lib[ newPath.asSymbol ] = value;
+					};
 				};
 			});
 		};
@@ -1106,7 +1118,6 @@ UScore : UEvent {
 		};
 		c.( this, this.name );
 		^lib;
-
 	}
 
 }
