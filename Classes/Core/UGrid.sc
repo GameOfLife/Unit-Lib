@@ -180,6 +180,10 @@ UGrid : UEvent {
 		if( update ) { this.changed( \events ); };
 	}
 
-	storeArgs { ^events ? #[] }
+	onSaveAction { }
+
+	readTextArchiveAction { }
+
+	storeArgs { ^[ events ] }
 }
 	
