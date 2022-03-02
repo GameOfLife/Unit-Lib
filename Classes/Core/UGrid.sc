@@ -180,6 +180,12 @@ UGrid : UEvent {
 		if( update ) { this.changed( \events ); };
 	}
 
+	selectUMaps { |selectFunc|
+		^this.allEvents.collect({ |evt|
+			evt.selectUMaps( selectFunc );
+		}).flatten(1);
+	}
+
 	onSaveAction { }
 
 	readTextArchiveAction { }
