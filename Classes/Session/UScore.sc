@@ -1077,4 +1077,36 @@ UScore : UEvent {
 		c.( this );
 		^selected;
 	}
+
+	makeUMapMap {
+		var f, c, lib = ();
+		f = { |unit, path|
+			unit.values.do({ |value, i|
+				var newPath;
+				newPath = path +/+ unit.keys[i];
+				if( value.isUMap ) {
+					lib[ newPath.asSymbol ] = value;
+					f.( value, newPath );
+				};
+			});
+		};
+		c = { |chain, path|
+			if( chain.isKindOf( UScore ) ) {
+				chain.events.do({ |evt, i| c.( evt, path +/+ i ) });
+			} {
+				chain.units.do({ |unit, i|
+					f.( unit, path +/+ i );
+				});
+				if( chain.isKindOf( UPattern ) ) {
+					if( chain.pattern.isUMap ) {
+						f.( chain.pattern, path +/+ "pattern" );
+					}
+				}
+			};
+		};
+		c.( this, this.name );
+		^lib;
+
+	}
+
 }
