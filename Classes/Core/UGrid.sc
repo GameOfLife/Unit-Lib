@@ -134,6 +134,19 @@ UGrid : UEvent {
 		};
 	}
 
+	doInRow { |row = 0, col = 0, func, othersFunc|
+		var selectedEvent;
+		selectedEvent = this[row,col];
+		othersFunc = othersFunc ?? { _.release };
+		this.eventsDo({ |evt|
+			if( evt == selectedEvent ) {
+				func.( evt );
+			} {
+				othersFunc.( evt );
+			};
+		}, row)
+	}
+
 	startCol { |col = 0, force = false|
 		var nRows;
 		nRows = this.nRows;
