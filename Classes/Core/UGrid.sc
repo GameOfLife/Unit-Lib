@@ -120,7 +120,7 @@ UGrid : UEvent {
 	startInRow { |row = 0, col = 0, force = false| // start event in row, stop the rest
 		var evtToStart;
 		evtToStart = this[row,col];
-		if( force or: evtToStart.isNil ) {
+		if( force or: (evtToStart.isNil) ) {
 			this.release( row );
 			evtToStart !? _.prepareAndStart;
 		} {
