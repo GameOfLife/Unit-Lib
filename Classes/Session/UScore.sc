@@ -82,7 +82,7 @@ UScore : UEvent {
 
 	*open { |path, action|
         if( path.isNil ) {
-		    Dialog.openPanel( { |path|
+		    ULib.openPanel( { |path|
 				if( storeRecentScorePaths ) {
 					URecentScorePaths.addPath( path );
 				};
@@ -99,7 +99,7 @@ UScore : UEvent {
 
 	*openMultiple { |paths, action| // action fired for each path
 		if( paths.isNil ) {
-		    Dialog.openPanel( { |paths|
+		    ULib.openPanel( { |paths|
 				if( storeRecentScorePaths ) {
 					URecentScorePaths.addPaths( paths );
 				};

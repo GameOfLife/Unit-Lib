@@ -108,10 +108,10 @@ FilePathView {
 			.resize_( 3 )
 			.label_( 'folder' )
 			.action_({
-				Dialog.getPaths( { |paths|
-				  this.value = paths[0];
+				ULib.openPanel( { |path|
+				  this.value = path;
 				  action.value( this );
-				});
+				}, multipleSelection: false);
 			});
 
 		views[ \dirname ] = TextField( view, bounds.width @ viewHeight )

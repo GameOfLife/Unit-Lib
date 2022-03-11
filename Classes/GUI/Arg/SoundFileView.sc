@@ -235,7 +235,7 @@ BufSndFileView {
 							if( pth[..6] == "sounds/" ) {
 								"can't move %, try copying instead\n".postf( pth.quote );
 							};
-							Dialog.savePanel({ |path|
+							ULib.savePanel({ |path|
 								var res, newName;
 								newName = path.dirname +/+ pth.basename;
 								if( File.exists( newName ).not ) {
@@ -257,7 +257,7 @@ BufSndFileView {
 					4, { // copy to..
 						pth = this.performSndFile( \path );
 						if( pth.notNil ) {
-							Dialog.savePanel({ |path|
+							ULib.savePanel({ |path|
 								var res, newName;
 								newName = path.dirname +/+ pth.basename;
 								if( File.exists( newName ).not ) {

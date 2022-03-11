@@ -75,7 +75,7 @@ UArchivable {
 	    };
 
 	    if( path.isNil ) {
-		    Dialog.savePanel( { |pth|
+		    ULib.savePanel( { |pth|
 			    path = pth;
 			    writeFunc.value(true,false,path);
 		    }, cancelAction );

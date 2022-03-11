@@ -1874,7 +1874,7 @@
 			.font_( font )
 			.action_({
 				var paths;
-				Dialog.savePanel({ |path|
+				ULib.savePanel({ |path|
 					path = path.dirname;
 					paths = vws[ \val ].collect({ |item|
 						item.path.getGPath.asSymbol
@@ -1896,7 +1896,7 @@
 		if( fixedAmount == true ) {
 			vws[ \browse ].action_({
 				var paths;
-				Dialog.openPanel({ |paths|
+				ULib.openPanel({ |paths|
 					case { paths.size >= vws[ \val ].size } {
 						vws[ \val ].do({ |item, i|
 							item.path = paths[i];
@@ -1929,7 +1929,7 @@
 		} {
 			vws[ \browse ].action_({
 				var paths;
-				Dialog.openPanel({ |paths|
+				ULib.openPanel({ |paths|
 					action.value( vws, paths.collect({ |path| sndFileClass.new( path ) }) )
 				}, {}, true);
 			});

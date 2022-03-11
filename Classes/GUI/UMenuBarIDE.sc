@@ -117,7 +117,7 @@ UMenuBarIDE {
 
 		this.registerMenu( MenuAction( "Export as audio file..", {
 			UScore.current !! { |x|
-				Dialog.savePanel({ |path|
+				ULib.savePanel({ |path|
 					x.writeAudioFile( path );
 				});
 			};

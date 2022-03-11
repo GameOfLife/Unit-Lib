@@ -19,6 +19,7 @@
 
 ULib {
     classvar <>servers;
+	classvar <>lastPath;
 
     *initClass {
         servers = [Server.default]
@@ -189,6 +190,33 @@ ULib {
 			"writting % SynthDef file".format(def.name).postln;
 			def.justWriteDefFile;
 		}
+	}
+
+	*openPanel { arg okFunc, cancelFunc, multipleSelection = false;
+		var fileMode, func;
+		if( multipleSelection ) {
+			fileMode = 3;
+			func = { |paths|
+				lastPath = paths.first;
+				okFunc.( paths );
+			};
+		} {
+			fileMode = 1;
+			func = { |path|
+				lastPath = path;
+				okFunc.( path );
+			};
+		};
+		^FileDialog.new( func, cancelFunc, fileMode, 0, multipleSelection.not, lastPath );
+	}
+
+	*savePanel { arg okFunc, cancelFunc, path;
+		var func;
+		func = { |path|
+			lastPath = path;
+			okFunc.( path );
+		};
+		^FileDialog.new( func, cancelFunc, 0, 1, true, lastPath );
 	}
 
 }
