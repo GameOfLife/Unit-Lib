@@ -22,6 +22,7 @@ UEvent : UArchivable {
 	classvar >renderNumChannels = 2;
 	classvar <>renderMaxTime = 60;
 	classvar <>nrtMode = false;
+	classvar <>nrtStartBundle;
 
     var <startTime=0;
     var <track=0;  //track number (horizontal segment) on the score editor
@@ -160,6 +161,7 @@ UEvent : UArchivable {
 	    };
 
 	    ^Score(
+			[ [ 0 ] ++ nrtStartBundle ] ++
 			this.collectOSCBundles( ULib.allServers.first, timeOffset, duration  )
 	    			++ [ [ duration, [ \c_set, 0,0 ] ] ]
 	    	);
