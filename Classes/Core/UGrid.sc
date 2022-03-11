@@ -201,6 +201,8 @@ UGrid : UEvent {
 
 	onSaveAction { }
 
+	textArchiveFileExtension { ^"ugrid" }
+
 	readTextArchiveAction { }
 
 	storeArgs { ^[ events ] }
