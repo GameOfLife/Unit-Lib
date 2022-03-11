@@ -88,8 +88,8 @@ UArchivable {
          var score;
 
         if( path.isNil ) {
-		    Dialog.getPaths( { |paths|
-	             this.readTextArchive( paths[0] );
+		    ULib.openPanel( { |path|
+	             this.readTextArchive( path );
 	             action.value(score);
 	        });
 	    } {
@@ -103,8 +103,8 @@ UArchivable {
         var score;
 
         if( path.isNil ) {
-		    Dialog.getPaths( { |paths|
-	             score = this.readTextArchive( paths[0] );
+		    ULib.openPanel( { |path|
+	             score = this.readTextArchive( path );
 	             action.value(score);
 	             score
 	        });
