@@ -720,7 +720,7 @@ UScore : UEvent {
 	//stop just the spawning and releasing of events
 	stopScore {
 		pausedByUMarker = false;
-		[playTask, updatePosTask ].do(_.stop);
+		{ [playTask, updatePosTask ].do(_.stop); }.fork;
 	}
 
     //stop synths
