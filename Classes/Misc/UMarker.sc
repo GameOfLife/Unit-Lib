@@ -94,7 +94,7 @@ UMarker : UEvent {
 					startTime > (this.score.startedAt[0] + 0.125)
 				}) {
 					sc = this.score;
-					{ sc.pause; }.defer;
+					{ sc.pause; }.fork;
 					this.score.pausedByUMarker = true;
 				};
 			} {
