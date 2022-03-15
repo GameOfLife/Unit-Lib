@@ -777,6 +777,7 @@ RichBufferSpec : Spec {
 	var <>numChannels = 1; // fixed number of channels
 	var <numFrames;
 	var <>editMode; // nil (no gui), \seconds
+	classvar <>useServerSampleRate = true; // override stored samplerate for duration display
 
 
 	*new { |numChannels = 1, numFrames, editMode|

@@ -1764,7 +1764,13 @@
 					)
 					.applySmoothSkin
 				    .action_({ |vw|
-					    vws[ \val ].numFrames = (vw.value * vws[ \val ].sampleRate).asInteger;
+					    var sampleRate;
+					    if( useServerSampleRate ) {
+						    sampleRate = ULib.servers.first !? _.sampleRate ? 44100;
+					    } {
+						    sampleRate = vws[ \val ].sampleRate;
+					    };
+					    vws[ \val ].numFrames = (vw.value * sampleRate).asInteger;
 				        action.value( vw, vws[ \val ] );
 				    } ).resize_(5)
 				    .fps_( 1000 )
@@ -1772,7 +1778,13 @@
 					.clipHi_( 60 * 60 );
 
 				vws[ \updateViews ] = {
-					vws[ \box ].value = vws[ \val ].numFrames / vws[ \val ].sampleRate;
+					 var sampleRate;
+					 if( useServerSampleRate ) {
+						 sampleRate = ULib.servers.first !? _.sampleRate ? 44100;
+					 } {
+						 sampleRate = vws[ \val ].sampleRate;
+					 };
+					vws[ \box ].value = vws[ \val ].numFrames / sampleRate;
 				};
 
 				vws[ \updateViews ].value;
