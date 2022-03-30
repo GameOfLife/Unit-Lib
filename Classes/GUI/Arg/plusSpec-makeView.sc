@@ -1829,7 +1829,7 @@
 		vws[ \val ] = this.default ? [];
 
 		loopSpec = BoolSpec(true).massEditSpec( vws[ \val ].collect(_.loop) );
-		rateSpec = [-24,24].asSpec.massEditSpec( vws[ \val ].collect({|x| x.rate.ratiomidi }) );
+		rateSpec = [-96,96].asSpec.massEditSpec( vws[ \val ].collect({|x| x.rate.ratiomidi }) );
 
 		if( label.notNil ) {
 			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
