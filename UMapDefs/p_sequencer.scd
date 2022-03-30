@@ -18,13 +18,17 @@ part of the Unit lib default UMapDefs set
 var defs;
 
 defs = [ 4,8,12,16,24,32,48,64,128 ].collect({ |n|
-	UPatDef( n, { |unit, range = #[0,7], reverse = false, vals|
+	UPatDef( n, { |unit, range = #[0,7], reverse = false, loop = true, vals|
 		{
 			var current = 0, direction = 1;
 			vals.at( current ).yield;
 			inf.do { |i|
 				direction = if( reverse.next.booleanValue == true ) { -1 } { 1 };
-				current = (current + direction).wrap( *range.next + [0,1] );
+				if( loop.next.booleanValue == true ) {
+					current = (current + direction).wrap( *range.next + [0,1] );
+				} {
+					current = (current + direction).clip( *range.next + [0,0] );
+				};
 				vals.at( current ).yield;
 			};
 		}.r
@@ -32,6 +36,7 @@ defs = [ 4,8,12,16,24,32,48,64,128 ].collect({ |n|
 		.category_( \pattern )
 		.setSpec( \range, [0,n-1,\lin,1].asSpec.asRangeSpec )
 		.setSpec( \reverse, BoolSpec(false) )
+	    .setSpec( \loop, BoolSpec(true) )
 		.setSpec( \vals, ArrayControlSpec(0,1,\lin,default: 0.5!n ).size_(n) )
 		.mappedArgs_([ \vals ]);
 });
