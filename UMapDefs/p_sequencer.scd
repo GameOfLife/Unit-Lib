@@ -21,6 +21,7 @@ defs = [ 4,8,12,16,24,32,48,64,128 ].collect({ |n|
 	UPatDef( n, { |unit, range = #[0,7], reverse = false, loop = true, vals|
 		{
 			var current = 0, direction = 1;
+			current = range.next[0];
 			vals.at( current ).yield;
 			inf.do { |i|
 				direction = if( reverse.next.booleanValue == true ) { -1 } { 1 };
