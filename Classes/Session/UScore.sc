@@ -886,7 +886,7 @@ UScore : UEvent {
 		case { this.isPlaying } {
 			this.stop;
 			this.pos = pos;
-			this.prepareAndStart( startPos: pos );
+			{ this.prepareAndStart( startPos: pos ); }.fork;
 		} { this.isPaused } {
 			// don't jump
 		} {
