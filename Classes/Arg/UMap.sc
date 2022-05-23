@@ -351,6 +351,19 @@ UMap : U {
 		};
 	}
 
+	canUseUMap { |key, umapdef|
+		^this.def.canUseUMap == true &&
+		{ umapdef.allowedModes.includes( this.getSpecMode( key ) ) && {
+			if( spec.notNil ) {
+				this.getSpec( key ).isKindOf( UAdaptSpec ) or:
+				{ umapdef.unitCanUseUMap( this, key ); }
+			} {
+				true // allow any umap at creation time
+			}
+		};
+		}
+	}
+
 	// UMap is intended to use as arg for a Unit (or another UMap)
 	asUnitArg { |unit, key|
 		var notMappedArg = true;
