@@ -15,11 +15,15 @@ this is an Udef definition file
 part of the Unit lib default Udefs set
 */
 
-MultiChannelUdef( \output, { |bus|
-	Out.ar( bus, UGlobalEQ.ar( UIn.ar( 0, Udef.numChannels, endPoint: true ) ) * UEnv.kr( extraSilence: 0.2 ) );
+MultiChannelUdef( \output, { |bus, useGlobalGain = 1|
+	Out.ar( bus, UGlobalEQ.ar( UIn.ar( 0, Udef.numChannels, endPoint: true ) ) * UEnv.kr(
+		extraSilence: 0.2,
+		useGlobalGain: useGlobalGain
+	) );
 })
 	.category_( \io )
-	.setSpec( \bus, PositiveIntegerSpec( 0, 0, 192 ) )
+    .setSpec( \useGlobalGain, BoolSpec(true) )
+    .setSpec( \bus, PositiveIntegerSpec( 0, 0, 192 ) )
 	.shouldPlayOnFunc_({ |unit, target|
 		target.asTarget.server.isLocal; // safety measure: no output on wfs servers
 	})
