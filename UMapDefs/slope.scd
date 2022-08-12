@@ -14,12 +14,13 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UMapDef( \slope, { |value = 0.0, abs = 0, range = #[0.0,1.0]|
+UMapDef( \slope, { |value = 0.0, abs = 0, boost = 0, range = #[0.0,1.0]|
 	var slope;
-	slope = HPZ1.kr( value.linlin(0,1,-1,1) );
+	slope = HPZ1.kr( value.linlin(0,1,-1,1) * DC.kr(1).blend( 1/ControlDur.ir, boost ) );
 	slope = if( abs, slope.abs.linlin(0,1,-1,1), slope );
 	UMapOut.kr( slope.linlin( -1, 1, *range ) );
 })
 .mappedArgs_([ \value, \range ])
 .setSpec( \abs, BoolSpec(false) )
+.setSpec( \boost, [0,1,\lin].asSpec )
 .category_( 'filter' )
