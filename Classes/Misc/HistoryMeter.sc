@@ -56,7 +56,7 @@ HistoryMeter : UserViewHolder {
 
 	start {
 		routine.stop;
-		routine = Task({
+		routine = Routine({
 			while { active && this.isClosed.not } {
 				history[ pos ] = value;
 				pos = (pos + 1).wrap(0, history.size -1);
@@ -65,7 +65,7 @@ HistoryMeter : UserViewHolder {
 				this.refresh;
 				interval.max(0.05).wait;
 			};
-		}, AppClock ).start;
+		}).play( AppClock );
 		active = true;
 	}
 

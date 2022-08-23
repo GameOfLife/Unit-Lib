@@ -38,14 +38,14 @@ CleanDragSink {
 	startTask {
 		this.task.stop;
 		view.background = this.color.copy.alpha_( 0.33 );
-		this.task = Task({
+		this.task = Routine({
 			var n;
 			n = (this.time / 0.2).asInteger;
 			n.do({ |i|
 				view.background = this.color.copy.alpha_( i.linlin(0,n-1,0.33,0) );
 				0.2.wait;
 			});
-		}, AppClock).start;
+		}).play( AppClock );
 	}
 
 	stopTask {
