@@ -37,7 +37,7 @@ UDragBin {
 				Pen.roundedRect( vw.bounds.moveTo(0,0).insetBy(1,1), 3 );
 				Pen.stroke;
 				if( task.isPlaying.not ) {
-					task = Task({
+					task = Routine({
 						while { vw.isClosed.not && {							canReceiveDragHandler.value == true
 							}
 						} {
@@ -46,7 +46,7 @@ UDragBin {
 						if( vw.isClosed.not ) {
 							vw.refresh;
 						};
-					}, AppClock).start;
+					}).play( AppClock );
 				};
 			};
 		};
