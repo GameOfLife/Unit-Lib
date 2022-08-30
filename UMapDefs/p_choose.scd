@@ -18,7 +18,7 @@ part of the Unit lib default UMapDefs set
 
 var defs;
 
-defs = [ 4,8,12,16,24,32,48,64,128 ].collect({ |n|
+defs = [ 3,4,5,6,7,8,10,12,16,24,32,48,64,128 ].collect({ |n|
 	UPatDef( n, { |unit, vals, histSize = 0, seed|
 		{
 			var index, size, arr, nn;
