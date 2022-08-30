@@ -22,7 +22,7 @@ FuncUMapDef( \single_chord, { |unit, n = 2, strum = 0|
 	.category_( 'upattern' )
 	.valueIsMapped_( false )
 	.setSpec( \strum, SMPTESpec(0,3600) )
-	.setSpec( \n, IntegerSpec(2,1,100) )
+	.setSpec( \n, IntegerSpec(2,1,10000) )
 	.dontStoreValue_( true )
 	.canUseUMapFunc_({ |unit, key, umapdef|
 		unit.getSpec( key ).isKindOf( UPatternSpec );
