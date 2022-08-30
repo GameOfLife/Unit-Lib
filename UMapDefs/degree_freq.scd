@@ -59,7 +59,8 @@ defDefs = allScales.collectAs({	|scales, ii|
 	});
 
 	defs = subScales.collectAs({ |item, i|
-		FuncUMapDef( i, { |unit, degree = 0, offset = 0, base = 440, key = 0, octave = 0, scale = \chromatic, tuning = 'et12'|
+		FuncUMapDef( i, { |unit, degree = 0, offset = 0, base = 440, transpose = 0, tune = 0, key = 0, octave = 0, scale = \chromatic, tuning = 'et12'|
+
 			scale = Scale.newFromKey( scale, tuning );
 			if( key != 0 && { i != ii }) {
 				scale = Scale(
@@ -68,7 +69,7 @@ defDefs = allScales.collectAs({	|scales, ii|
 					scale.tuning
 				);
 			};
-			scale.degreeToFreq( degree + offset, base, octave );
+			scale.degreeToFreq( degree + offset, base * (transpose + (tune/100)).midiratio, octave );
 		}, addToAll: false )
 			.category_( 'convert' )
 			.useMappedArgs_( false )
@@ -80,7 +81,9 @@ defDefs = allScales.collectAs({	|scales, ii|
 			.setSpec( \key, [0,ii-1,\lin,1,0].asSpec, private: i == ii )
 			.setSpec( \degree, [i * -2,i * 2,\lin,1,0].asSpec )
 			.setSpec( \octave, [ -4, 4,\lin,1,0].asSpec )
-			.setSpec( \base, [68.midicps, 70.midicps,\lin,0,440].asSpec )
+			.setSpec( \base, [68.midicps.floor, 70.midicps.ceil,\lin,0,440].asSpec )
+		    .setSpec( \transpose, [-12,12,\lin,1,0].asSpec )
+		    .setSpec( \tune, [-50,50,\lin,0,0].asSpec )
 			.setSpec( \offset, [ i * -1, i, \lin, 1, 0 ].asSpec )
 			.setSpec( \scale, ListSpec( item, 0 ) )
 			.setSpec( \tuning, ListSpec( tunings, tunings.indexOf( default ) ) )
