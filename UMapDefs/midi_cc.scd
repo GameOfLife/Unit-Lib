@@ -57,8 +57,12 @@ ValueUMapDef( \midi_cc, { |unit, midifunc|
 		if( unit.get( \learn ).booleanValue == true ) {
 			unit.set( \cc, num );
 			unit.set( \channel, chan );
-			unit.set( \device, endPoint !? _.device ? "" );
-			unit.set( \port, endPoint !? _.name ? "" );
+			if( unit.get( \learnDevice ).booleanValue == true ) {
+				unit.set( \device, endPoint !? _.device ? "" );
+			};
+			if( unit.get( \learnPort ).booleanValue == true ) {
+				unit.set( \port, endPoint !? _.name ? "" );
+			};
 			unit.set( \learn, false );
 		};
 		fromRange = unit.get( \fromRange );
@@ -87,17 +91,19 @@ ValueUMapDef( \midi_cc, { |unit, midifunc|
 	midifunc.free;
 	nil;
 }, [
+	[ \learn, false, BoolSpec( false ) ],
 	[ \cc, 0, PositiveIntegerSpec(maxval:127) ],
 	[ \channel, nil, ListSpec( [ nil ] ++ (..15), 0, [ "any" ] ++ (..15).collect(_.asString) ) ],
 	[ \device, "", StringSpec() ],
 	[ \port, "", StringSpec() ],
-	[ \learn, false, BoolSpec( false ) ],
 	[ \fromRange, [0,127], RangeSpec(0,127,step:1) ],
 	[ \toRange, [0,1], RangeSpec(0,1) ],
 	[ \invert, false, BoolSpec(false) ],
 	[ \curve, 0, [-16,16,\lin,0,0].asSpec ],
 	[ \clipMode, \clip, ListSpec( [ \ignore, \clip, \fold, \wrap, \none ] ) ],
 	[ \clipSoftness, 0, [0,1].asSpec ],
+	[ \learnDevice, true, BoolSpec( true ) ],
+	[ \learnPort, true, BoolSpec( true ) ],
 ]  )
 	.mappedArgs_([\toRange])
 	.category_(\midi);
