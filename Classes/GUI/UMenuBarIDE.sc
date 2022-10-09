@@ -106,11 +106,11 @@ UMenuBarIDE {
 		URecentScorePaths.fillMenu;
 
 		this.registerMenu( MenuAction( "Save Score", {
-			UScore.current !! _.save
+			{ UScore.current !! _.save }.defer(0.01);
 		}), name );
 
 		this.registerMenu( MenuAction( "Save Score as...", {
-			UScore.current !! _.saveAs
+			{ UScore.current !! _.saveAs }.defer(0.01);
 		}), name );
 
 		this.registerMenu( MenuAction.separator("Export"), name );
