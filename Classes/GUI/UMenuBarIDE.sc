@@ -55,7 +55,7 @@ UMenuBarIDE {
 					Menu(
 						menuAction
 					).title_( name.asString )
-				).minWidth_(300).front;
+				).minWidth_(300).font_( Font( Font.defaultSansFace, 12 ) ).front;
 			} {
 				mn = toolBar.actions.detect({ |item| item.string == name.asString });
 				if( mn.isNil ) {
