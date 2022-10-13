@@ -2,14 +2,14 @@
 
 	drawTimeGrid { // assumes that 1px (unscaled) = 1s
 		var viewRect, left, width, left60, round, leftRounded, bnds, scaleAmt;
-		var top, bottom;
+		var top, bottom, widthDivide = 1;
 
 		viewRect = this.viewRect;
 		top = viewRect.top;
 		bottom = viewRect.bottom;
 		left = viewRect.left.ceil;
 		width = viewRect.width.ceil;
-		round = (width / 5).max(1).nearestInList([1,5,10,30,60,300,600]);
+		round = (width / 5).max(1).nearestInList(#[1,5,10,30,60,300,600]);
 		leftRounded = left.round(round);
 		left60 = left.round(60);
 		bnds = "00:00".bounds( Font( Font.defaultSansFace, 9 ) );
@@ -19,8 +19,14 @@
 		Pen.width = this.pixelScale.x / 2;
 		Pen.color = Color.gray.alpha_(0.25);
 
-		if( viewRect.width < (this.view.bounds.width/4) ) {			width.do({ |i|
-				Pen.line( (i + left) @ top, (i + left) @ bottom );
+		widthDivide = (width / 100).max(1).nextPowerOfTwo.asInteger;
+
+		if( viewRect.width < (this.view.bounds.width/4) ) {
+			width.do({ |i|
+				i = i+left;
+				if( ((i)%widthDivide) == 0 ) {
+					Pen.line( i @ top, i @ bottom );
+				};
 			});
 			Pen.stroke;
 		} {
