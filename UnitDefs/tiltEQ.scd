@@ -12,9 +12,9 @@ this is an Udef definition file
 part of the Unit lib default Udefs set
 */
 
-Udef( \tiltEQ, { |tilt = 0, center = 650, rs = 2|
+MultiChannelUdef( \tiltEQ, { |tilt = 0, center = 650, rs = 2|
 	var in;
-	in = UIn.ar(0,1);
+	in = UIn.ar( 0, Udef.numChannels );
 	center = center.clip(20,20000);
 	in = BHiShelf.ar( in, center, rs, tilt );
 	in = BLowShelf.ar( in, center, rs, tilt.neg );
