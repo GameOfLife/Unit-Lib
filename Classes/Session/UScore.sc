@@ -803,6 +803,50 @@ UScore : UEvent {
 		};
 	}
 
+	playAtMarker { |markerIndex = 0, onFail, targets| // or from start if not found
+		var markerPos;
+		case { markerIndex.isNumber } {
+			markerPos = this.markerPositions[markerIndex];
+		} { markerIndex.asSymbol === \next } {
+			markerPos = ([0] ++ this.markerPositions).detect({ |item| this.pos <= item });
+		} { markerIndex.asSymbol === \prev } {
+			markerPos = this.markerPositions.detect({ |item| this.pos > item }) ? 0;
+		} { markerIndex.asSymbol === \this_or_next } {
+			markerPos = this.markerPositions.detect({ |item|
+				this.pos.equalWithPrecision( item, 0.1 ) or:
+				{ this.pos < item }
+			});
+		} {
+			markerPos = events.select({ |item|
+				item.isKindOf( UMarker );
+			}).detect({ |m| m.name.find( markerIndex.asString ).notNil }) !? _.startTime;
+		};
+		markerPos = markerPos ? onFail;
+		if( markerPos.notNil ) {
+			if( this.pos.equalWithPrecision( markerPos, 0.1 ) ) {
+				case { this.isPlaying } {
+					// keep playing
+				} { this.isPaused } {
+					this.resume( targets );
+				} {
+					this.prepareAndStart( targets, markerPos );
+				};
+			} {
+				case { this.isPlaying or: this.isPaused } {
+					this.stop;
+					{
+						0.1.wait;
+						this.prepareAndStart( targets, markerPos );
+					}.fork;
+				} {
+					this.prepareAndStart( targets, markerPos );
+				};
+			};
+		} {
+			"UScore.playAtMarker: marker not found".postln;
+		};
+	}
+
 	dispose { events.do(_.dispose) }
 
 	collectOSCBundleFuncs { |server, startOffset = 0, infdur = 60|
