@@ -84,6 +84,7 @@ Udef : GenericDef {
 	classvar <>buildUdef; // the Udef currently under construction
 	classvar <>buildArgSpecs; //The specs under construction
 	classvar <>loadOnInit = true;
+	classvar <>synthDefDir;
 
 	var <>func, <>category;
 	var <>synthDef;
@@ -205,10 +206,10 @@ Udef : GenericDef {
 				if( s.servers[0].isLocal ) {
 					defs.do{ |def|
 						//write once
-						def.writeDefFile;
+						def.writeDefFile( dir: synthDefDir );
 						//load for each server
 						s.servers.do{ |s|
-							s.sendMsg("/d_load", SynthDef.synthDefDir ++ def.name ++ ".scsyndef")
+							s.sendMsg("/d_load", (synthDefDir ? SynthDef.synthDefDir) ++ def.name ++ ".scsyndef")
 						}
 					}
 					} {
@@ -219,7 +220,7 @@ Udef : GenericDef {
 
 			} {
 				if( s.isLocal ) {
-					defs.do(_.load(s));
+					defs.do(_.load(s, dir: synthDefDir ? SynthDef.synthDefDir));
 				} {
 					defs.do(_.send(s));
 				};
@@ -243,7 +244,7 @@ Udef : GenericDef {
 	}
 
 	writeDefFile {
-		this.synthDef.asCollection( _.writeDefFile )
+		this.synthDef.asCollection( _.writeDefFile( dir: synthDefDir ) )
 	}
 
 	prepare { |servers, unit, action, startPos|

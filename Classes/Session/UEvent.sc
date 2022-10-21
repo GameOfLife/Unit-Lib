@@ -199,6 +199,7 @@ UEvent : UArchivable {
 			o = ServerOptions.new
 				.numOutputBusChannels_( numChannels ? this.renderNumChannels ? 2)
 				.memSize_( 2**19 )
+			    .numWireBufs_(2048)
 				.maxSynthDefs_(2048);
 			path = path.replaceExtension( headerFormat.toLower );
 			this.render(
