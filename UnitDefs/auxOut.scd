@@ -11,10 +11,15 @@ this is an Udef definition file
 part of the Unit lib default Udefs set
 */
 
-Udef( \auxOut, { |bus = 0, amp = 1|
+Udef( \auxOut, { |bus = 0, amp = 1, useUChainGain = 1|
 	var input;
 	input = UIn.ar(0);
+	amp = amp / if( useUChainGain, // quick workaround until UEnv supports useUChainGain
+		1,
+		UIn.getControl( \kr, UIn.getControlName( ), 'gain', 0, 0.5 ).dbamp.max(1.0e-12)
+	);
 	Out.ar( bus + FirstPrivateBus.ir + 32, input * amp * UEnv.kr( extraSilence: 0.2, useGlobalGain: 0 ) );
 })
 	.category_( \io )
+    .setSpec( \useUChainGain, BoolSpec(true) )
 	.setSpec( \bus, PositiveIntegerSpec( 0, 0, 32 ) )
