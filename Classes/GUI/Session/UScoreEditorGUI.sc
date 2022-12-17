@@ -28,6 +28,16 @@ UScoreEditorGUI : UAbstractWindow {
 
 	//*initClass { UI.registerForShutdown({ scoreEditor.askForSave = false }); }
 
+	*initClass {
+		CmdPeriod.add( this );
+	}
+
+	*cmdPeriod {
+		this.all.do({ |item|
+			item.tranportBar.views.active.value = 0;
+		});
+	}
+
 	*new { |scoreEditor, bounds|
 		^super.new.init( scoreEditor)
 			.addToAll

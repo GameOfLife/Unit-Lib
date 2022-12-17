@@ -60,6 +60,23 @@ ULib {
 	    BufSndFile.reloadAllGlobal;
     }
 
+	*setAllScoresActive { |bool = true|
+		if( bool ) {
+			UScoreEditorGUI.all.do({ |item|
+				item.score.setUMapsActive( false, false );
+				"  activating UScore '%':\n".postf( item.score.name );
+				item.score.setUMapsActive( true, true );
+				item.tranportBar.views.active.value = 1;
+			});
+		} {
+			UScoreEditorGUI.all.do({ |item|
+				"  de-activating UScore '%':\n".postf( item.score.name );
+				item.score.setUMapsActive( false, true );
+				item.tranportBar.views.active.value = 0;
+			});
+		};
+	}
+
     *serversWindow {
         var makePlotTree, makeMeter, killer;
         var servers = ULib.allServers;

@@ -311,6 +311,28 @@ UMenuBarIDE {
 			UScoreEditorGUI.current !! { |x| x.scoreView.removeUnusedTracks }
 		}), "Edit" );
 
+		this.registerMenu( MenuAction.separator("Reset"), "Edit" );
+
+		this.registerMenu( MenuAction( "Stop current Scores", {
+			UScoreEditorGUI.all.do({ |item| item.score.stop });
+		}), "Edit" );
+
+		this.registerMenu( MenuAction( "Stop all", {
+			CmdPeriod.run;
+		}), "Edit" );
+
+		this.registerMenu( MenuAction( "Clear ULib", {
+			ULib.clear( true );
+		}), "Edit" );
+
+		this.registerMenu( MenuAction( "(Re)activate all current Scores", {
+			ULib.setAllScoresActive( true );
+		}), "Edit" );
+
+		this.registerMenu( MenuAction( "Reload global buffers", {
+			 BufSndFile.reloadAllGlobal;
+		}), "Edit" );
+
 	/* VIEW */
 
 		this.registerMenu( MenuAction( "EQ", { UGlobalEQ.gui; }), "View");
