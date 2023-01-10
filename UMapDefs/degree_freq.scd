@@ -93,7 +93,8 @@ defDefs = allScales.collectAs({	|scales, ii|
 	MultiUMapDef( ii, defs, \convert, \numSteps, false, addToAll: false );
 }, Array);
 
-MultiUMapDef( \degree_freq, defDefs, \convert, \type, false, addToAll: true );
+MultiUMapDef( \degree_freq, defDefs, \convert, \type, false, addToAll: true )
+.allowedModes_([ \init, \sync, \normal ])
 
 
 /*
