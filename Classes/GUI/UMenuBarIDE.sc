@@ -123,6 +123,19 @@ UMenuBarIDE {
 			};
 		}), name );
 
+		this.registerMenu( MenuAction( "Export selection as audio file..", {
+			if( UScoreEditorGUI.currentSelectedEvents.notNil ) {
+				ULib.savePanel({ |path|
+					var evts, sc, minTime;
+					evts = UScoreEditorGUI.currentSelectedEvents.collect(_.deepCopy);
+					minTime = evts.collect(_.startTime).minItem;
+					evts.do({ |evt| evt.startTime = evt.startTime - minTime; });
+					sc = UScore( *evts );
+					sc.writeAudioFile( path );
+				});
+			};
+		}), name );
+
 /* SESSION */
 
 		this.registerMenu( MenuAction.separator("Sessions"), name );
