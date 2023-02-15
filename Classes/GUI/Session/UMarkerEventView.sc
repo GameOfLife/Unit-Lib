@@ -66,7 +66,9 @@ UMarkerEventView : UEventView {
 
 	createRect { |minWidth, maxWidth, scaledUserView|
 	    var dur = scaledUserView !? {
-		    scaledUserView.pixelScale.x * 30.max( this.getName.bounds.width + 2 +
+		    scaledUserView.pixelScale.x * 30.max(
+				this.getName.bounds( Font( Font.defaultSansFace, 10 )
+			).width + 8 +
 		    		if( event.lockStartTime ) { 12 } { 0 } +
 		    		if( event.autoPause ) { 12 } { 0 }
 		    	);
