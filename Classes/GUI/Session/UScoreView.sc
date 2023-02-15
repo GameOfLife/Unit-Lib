@@ -614,7 +614,7 @@ UScoreView {
 				};
 			})
 			.unscaledDrawFunc_( { |v|
-				var scPos, rect;
+				var scPos, rect, mrk, mrkrct;
 				rect = v.view.drawBounds.moveTo(0,0);
 
 				Pen.font = Font( Font.defaultSansFace, 10 );
@@ -649,6 +649,21 @@ UScoreView {
 				Pen.width = 1;
 				Pen.color = Color.grey(0.5,1);
 				Pen.strokeRect( rect.insetBy(0.5,0.5) );
+
+			    if( score.pausedByUMarker == true ) {
+				    mrk = score.events.detect({ |item|
+					    item.isKindOf( UMarker ) && {
+						    item.startTime.equalWithPrecision( score.pos, 0.01 );
+					    };
+				    });
+				    mrkrct = rect.copy.insetAll( 0, rect.height * ((numTracks-1)/numTracks), 0, 0 );
+				    Pen.color = mrk.getTypeColor;
+				    Pen.fillRect(mrkrct);
+				    Pen.font = Font( Font.defaultSansFace, 14 );
+				    Pen.stringCenteredIn( " " + mrk.name + (mrk.notes ? "" ), mrkrct,
+					    Font( Font.defaultSansFace, 16, true ), Color.black
+					);
+			    };
 
 		});
 
