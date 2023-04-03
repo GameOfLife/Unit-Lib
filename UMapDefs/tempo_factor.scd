@@ -22,7 +22,7 @@ FuncUMapDef( \tempo_factor, { |unit, sustain = 1, timeToNext = 1, tempo = 60, qu
 		if( ((UPattern.nowCallingPattern !? _.localPos) == 0) && { currentTime.abs > 1.0e-10 } ) {
 			sustain = 0; timeToNext = currentTime;
 		} {
-			timeToNext = currentTime + timeToNext;
+			//timeToNext = currentTime + timeToNext;
 		}
 	};
 	[ sustain, timeToNext ];
