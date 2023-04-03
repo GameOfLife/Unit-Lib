@@ -21,6 +21,8 @@ UEvent : UArchivable {
 
 	classvar >renderNumChannels = 2;
 	classvar <>renderMaxTime = 60;
+	classvar <>renderHeaderFormat = "WAV";
+	classvar <>renderSampleFormat = "int24";
 	classvar <>nrtMode = false;
 	classvar <>nrtStartBundle;
 
@@ -172,22 +174,30 @@ UEvent : UArchivable {
 
     render { // standalone app friendly version
 		arg path, maxTime=60, sampleRate = 44100,
-			headerFormat = "AIFF", sampleFormat = "int24", options, inputFilePath, action;
+			headerFormat, sampleFormat, options, inputFilePath, action;
 
 		var file, oscFilePath, score, oldpgm;
+		headerFormat = headerFormat ? this.class.renderHeaderFormat;
+		sampleFormat = sampleFormat ? this.class.renderSampleFormat;
 		oldpgm = Score.program;
 		Score.program = Server.program;
-		oscFilePath = "/tmp/temp_oscscore" ++ UniqueID.next;
+		oscFilePath = Platform.defaultTempDir +/+ "temp_oscscore" ++ UniqueID.next;
 		score = this.asScore(maxTime);
 		score.recordNRT(
 			oscFilePath, path, inputFilePath, sampleRate, headerFormat, sampleFormat,
-			options, "; rm" + oscFilePath, action: action;
+			options, action: { |res|
+				File.delete( oscFilePath );
+				action.value(res);
+			};
 		);
 		Score.program = oldpgm;
     }
 
-    writeAudioFile { |path, maxTime, action, headerFormat = "AIFF", sampleFormat = "int24", numChannels|
+    writeAudioFile { |path, maxTime, action, headerFormat, sampleFormat numChannels|
 		var o;
+
+		headerFormat = headerFormat ?  this.class.renderHeaderFormat;
+		sampleFormat = sampleFormat ? this.class.renderSampleFormat;
 
 		if( this.isFinite.not && { maxTime == nil } ) {
 			maxTime = this.finiteDuration + 60;
