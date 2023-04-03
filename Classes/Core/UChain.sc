@@ -875,9 +875,9 @@ UChain : UEvent {
 			};
 
 			if( this.duration == inf )  {
-				array = array.add( [ infdur, { this.disposeSynths }]);
+				array = array.add( [ infdur + 0.2, { this.disposeSynths }]);
 			} {
-				array = array.add( [ startOffset + this.duration, { this.disposeSynths }]
+				array = array.add( [ startOffset + this.duration + 0.2, { this.disposeSynths }]
 				);
 			};
 
@@ -922,10 +922,10 @@ UChain : UEvent {
 				};
 
 				if( this.duration == inf )  {
-					array = array.add( [ infdur ] ++ server.makeBundle( false, { this.disposeSynths }) );
+					array = array.add( [ infdur + 0.2 ] ++ server.makeBundle( false, { this.disposeSynths }) );
 				} {
 					array = array.add(
-						[ startOffset + this.duration ] ++
+						[ startOffset + this.duration + 0.2 ] ++
 							server.makeBundle( false, { this.disposeSynths })
 					);
 				};
