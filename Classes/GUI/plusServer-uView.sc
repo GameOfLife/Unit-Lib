@@ -1,12 +1,12 @@
 + Server {
 
 	uInfoString {
-		^"CPU: %/%\tS/D: %/%"
+		^"%\\% %\\%%s%d"
 			.format(
-				this.avgCPU !? { |x| x.asInteger.asString ++"."++ (x.frac * 10).round(1).asInteger } ? "avg",
-				this.peakCPU !? { |x| x.asInteger.asString ++"."++ (x.frac * 10).round(1).asInteger } ? "peak",
-				this.numSynths ? "?",
-				this.numSynthDefs ? "?"
+			this.avgCPU !? { |x| x.asInteger.asString.padLeft(3) ++"."++ (x.frac * 10).floor.asInteger } ? "avg",
+			this.peakCPU !? { |x| x.asInteger.asString.padLeft(3) ++"."++ (x.frac * 10).floor.asInteger } ? "peak",
+			(this.numSynths ? "?").asString.padLeft(6),
+			(this.numSynthDefs ? "?").asString.padLeft(6)
 			);
 	}
 
