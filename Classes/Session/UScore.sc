@@ -261,7 +261,7 @@ UScore : UEvent {
 			} {
 				{ parent.perform( setter, *value ); }.try({
 					{
-						parent.findUnitsForKey( setter ).do({ |unit|
+						parent.findUnitsForKey( setter.asString.split($.).first.asSymbol ).do({ |unit|
 							pointCheckSet.( unit, setter, value );
 						}) ?? {
 							"UScore:setOfPerform : no units with key '%' found in this UChain %"
@@ -276,7 +276,7 @@ UScore : UEvent {
 				});
 			};
 		} {
-			"UScore:set : invalid args [%, %], %"
+			"UScore:setOrPerform : invalid args [%, %], %"
 				.format( key.join( ", " ), setter, value )
 				.warn;
 		};
