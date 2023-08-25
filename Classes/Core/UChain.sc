@@ -980,6 +980,52 @@ UChain : UEvent {
 		^units.select({ |u| u.keys.includes( key ) }).collect(_.get(key));
 	}
 
+    findUnitsForKey { |key, searchUMaps = true| // searchUMaps; don't return UMapped values
+		var result, f;
+		if( searchUMaps ) {
+			f = { |unit|
+				if( unit.keys.includes( key ) ) {
+					if( unit[ key ].isKindOf( UMap ).not ) {
+						result = result.add( unit );
+					};
+				};
+				unit.args.select({ |aa|
+					aa.isKindOf( UMap );
+				}).do({ |umap|
+					f.( umap );
+				});
+			};
+		} {
+			f = { |unit|
+				if( unit.keys.includes( key ) ) {
+					result = result.add( unit );
+				}
+			};
+		};
+		units.do(f);
+		^result;
+	}
+
+	setAnyArg { |key, value|
+		this.findUnitsForKey( key ) !? _.do({ |unit|
+			unit.set( key, value );
+		}) ?? {
+			"UChain:setAnyArg : no U or UMap with key '%' found\n".postf( key );
+		};
+	}
+
+	setFirstArg { |key, value|
+		this.findUnitsForKey( key ).first !? _.set( key, value ) ?? {
+			"UChain:setFirstArg : no U or UMap with key '%' found\n".postf( key );
+		};
+	}
+
+	setLastArg { |key, value|
+		this.findUnitsForKey( key ).last !? _.set( key, value ) ?? {
+			"UChain:setFirstArg : no U or UMap with key '%' found\n".postf( key );
+		};
+	}
+
 	setAt { |index, key, value|
 		this.units.at(index).set(key, value)
 	}

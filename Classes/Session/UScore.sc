@@ -222,6 +222,7 @@ UScore : UEvent {
 	setOrPerform { |key ...value|
 		// args: list of keys, ending with the value to set
 		var setter, parent, res;
+		var pointCheckSet;
 		key = key.asCollection;
 		setter = key.last;
 		key.pop;
@@ -231,17 +232,20 @@ UScore : UEvent {
 			parent = this;
 		};
 		if( parent.notNil ) {
+			pointCheckSet = { |unit, key, val|
+				if( value.size > 1 ) {
+					if( unit.getSpec( key ).isKindOf( PointSpec ) ) {
+						unit.set( key, val.asPoint );
+					} {
+						unit.set( key, val );
+					};
+				} {
+					unit.set( key, val[0] );
+				};
+			};
 			if( parent.isKindOf( U ) ) {
 				if( parent.keys.includes( setter.asString.split($.).first.asSymbol ) ) {
-					if( value.size > 1 ) {
-						if( parent.getSpec( setter ).isKindOf( PointSpec ) ) {
-							parent.set( setter, value.asPoint );
-						} {
-							parent.set( setter, value );
-						};
-					} {
-						parent.set( setter, value[0] );
-					};
+					pointCheckSet.( parent, setter, value );
 				} {
 					if( parent.respondsTo( setter ) ) {
 						res = parent.perform( setter, value );
@@ -256,9 +260,19 @@ UScore : UEvent {
 				};
 			} {
 				{ parent.perform( setter, *value ); }.try({
-					"UScore:perform : can't perform %, % ( % )"
-					.format( key.join( ", " ), setter, value )
-					.warn;
+					{
+						parent.findUnitsForKey( setter ).do({ |unit|
+							pointCheckSet.( unit, setter, value );
+						}) ?? {
+							"UScore:setOfPerform : no units with key '%' found in this UChain %"
+							.format( setter, key.join( ", " ) )
+							.warn;
+						};
+					}.try({
+						"%:perform : can't perform %, % ( % )"
+						.format( parent.class, key.join( ", " ), setter, value )
+						.warn;
+					});
 				});
 			};
 		} {
