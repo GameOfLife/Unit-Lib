@@ -99,22 +99,42 @@ UOSCsetter {
 }
 
 UOSCSetterCurrent : UOSCsetter {
-	*new { |recvPort|
-		^super.newCopyArgs().init( recvPort );
+
+	classvar <>default;
+
+	*new { |recvPort, makeDefault = true|
+		^super.newCopyArgs().init( recvPort, makeDefault );
 	}
 
 	uobject { ^UScore.current }
 
-	init { |recvPort|
+	remove {
+		oscfunc.free;
+		if( default === this ) {
+			default = nil;
+		};
+	}
+
+	init { |recvPort, makeDefault = true|
 
 		name = "current";
 
 		oscfunc = OSCFunc({ |msg|
-			if( this.uobject.notNil ) { this.set( *msg ); };
+			if( this.uobject.notNil && {
+				this.uobject.oscSetter.notNil // only if it has an OSCSetter
+			} ) { this.set( *msg ); };
 		}, this.oscPath, recvPort: recvPort, dispatcher: OSCMethodPatternDispatcher.new );
 
 		oscfunc.permanent = true;
+
+		if( makeDefault ) {
+			if( default.notNil ) {
+				default.remove;
+			};
+			default = this;
+		};
+
 		oscfunc.enable;
-		"started UOSCsetter for %\n - messages should start with '/%/'\n - port: %\n".postf( uobject, name, recvPort ?? { NetAddr.langPort });
+		"started UOSCsetter for current score\n - messages should start with '/%/'\n - port: %\n".postf( name, recvPort ?? { NetAddr.langPort });
 	}
 }
