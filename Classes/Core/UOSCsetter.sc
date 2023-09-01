@@ -49,6 +49,7 @@ UOSCsetter {
 
 		oscfunc.permanent = true;
 		oscfunc.enable;
+		this.addToAll;
 		"started UOSCsetter for %\n - messages should start with '/%/'\n - port: %\n".postf( uobject, name, NetAddr.langPort );
 	}
 
@@ -104,6 +105,20 @@ UOSCSetterCurrent : UOSCsetter {
 
 	*new { |recvPort, makeDefault = true|
 		^super.newCopyArgs().init( recvPort, makeDefault );
+	}
+
+	*enable {
+		if( default.isNil ) { default = this.new(); };
+	}
+
+	*disable {
+		if( default.notNil ) { default.remove };
+	}
+
+	*cleanup { // disable if no UOSCSetter is active
+		if( UOSCsetter.all.size == 0 ) {
+			this.disable;
+		}
 	}
 
 	uobject { ^UScore.current }

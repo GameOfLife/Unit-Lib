@@ -300,12 +300,14 @@ UEvent : UArchivable {
 		this.changed( \oscSetter );
 	}
 
-	enableOSC { |name|
+	enableOSC { |name, enableCurrent = true|
 		this.oscSetter = UOSCsetter( this, name );
+		UOSCSetterCurrent.enable;
 	}
 
-	disableOSC {
+	disableOSC { |removeCurrent = true|
 		this.oscSetter = nil;
+		UOSCSetterCurrent.cleanup;
 	}
 
 	listOSCMessages {
