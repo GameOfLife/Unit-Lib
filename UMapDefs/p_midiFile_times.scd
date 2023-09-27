@@ -44,13 +44,13 @@ UPatDef( \p_midiFile_times, { |unit, midifile, channel = nil, type = \timeToNext
 							notes = smf.timeMode_( \seconds )
 								.noteSustainEvents( chn )
 								.sort({ |a,b| a[1] <= b[1] })
-								.flop[ 1 ].differentiate[1..];
+								.flop[ 1 ].differentiate;
 						},
 						\sustain, {
-							notes = smf.timeMode_( \seconds )
+							notes = [0] ++ (smf.timeMode_( \seconds )
 								.noteSustainEvents( chn )
 								.sort({ |a,b| a[1] <= b[1] })
-								.flop[ 6 ];
+								.flop[ 6 ])
 						}, {
 							notes = [];
 						}
