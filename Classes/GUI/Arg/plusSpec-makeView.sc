@@ -2787,9 +2787,11 @@
 
 + UMIDIFileSpec {
 
+	viewNumLines { ^2 }
+
 	makeView { |parent, bounds, label, action, resize|
 		var vws, view, labelWidth;
-		var ctrl, strWidth;
+		var ctrl, strWidth, viewHeight;
 		vws = (
 			menuPaths: [ nil ],
 			doAction: { |evt|
@@ -2799,14 +2801,16 @@
 
 		// this is basically an EZButton
 
-		bounds.isNil.if{bounds= 320@20};
+		bounds.isNil.if{bounds= 320@40};
 
 		#view, bounds = EZGui().prMakeMarginGap.prMakeView( parent, bounds );
 		 vws[ \view ] = view;
 
+		viewHeight = (bounds.height / 2) - 1;
+
 		if( label.notNil ) {
 			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
-			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ bounds.height )
+			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ viewHeight )
 				.string_( label.asString ++ " " )
 				.align_( \right )
 				.resize_( 4 )
@@ -2816,7 +2820,7 @@
 		};
 
 		vws[ \menu ] = PopUpMenu( view,
-			Rect( labelWidth + 2, 0, bounds.width - (40 + labelWidth + 2), bounds.height )
+			Rect( labelWidth + 2, 0, bounds.width - (40 + labelWidth + 2), viewHeight )
 		)	.resize_(3)
 			.applySkin( RoundView.skin ? () )
 			.items_( [ "" ] )
@@ -2848,7 +2852,7 @@
 
 		ctrl.value;
 
-		vws[ \browse ] = SmoothButton( view, Rect( bounds.width - 36, 0, 16, bounds.height ) )
+		vws[ \browse ] = SmoothButton( view, Rect( bounds.width - 36, 0, 16, viewHeight ) )
 			.radius_( 0 )
 			.border_(1)
 			.resize_( 3 )
@@ -2861,7 +2865,7 @@
 				});
 			});
 
-		vws[ \refresh ] = SmoothButton( view, Rect( bounds.width - 16, 0, 16, bounds.height ) )
+		vws[ \refresh ] = SmoothButton( view, Rect( bounds.width - 16, 0, 16, viewHeight ) )
 			.radius_( 0 )
 			.border_(1)
 			.resize_( 3 )
@@ -2869,6 +2873,22 @@
 			.action_({
 				vws[ \obj ] !? _.reload;
 			});
+
+		vws[ \info ] = StaticText( view,
+			Rect( labelWidth + 2, viewHeight + 2, bounds.width - (labelWidth + 2) - 36, viewHeight )
+		).applySkin( RoundView.skin )
+		.string_( "--" );
+
+		vws[ \plot ] = SmoothButton( view, Rect( bounds.width - 36, viewHeight + 2, 36, viewHeight ) ).radius_( 0 )
+			.border_(1)
+			.resize_( 3 )
+		    .label_( "plot" )
+		.action_({
+			if( vws[ \obj ].notNil ) {
+				vws[ \obj ].midiFile !? _.plot;
+			};
+		});
+
 
 		vws[ \menu ].onClose_( { UMIDIFile.removeDependant( ctrl ); } );
 
@@ -2881,6 +2901,15 @@
 		view[ \obj ] = value;
 		{
 			view[ \menu ].value = view[ \menuPaths ].indexOf( view[ \obj ] !? { |x| x.key } ) ? 0;
+			if( view[ \obj ].notNil && { view[ \obj ].midiFile.notNil }) {
+				view[ \info ].string = "%, % notes, % cc".format(
+					view[ \obj ].midiFile.timeMode_(\seconds).length.asSMPTEString(1000),
+					view[ \obj ].midiFile.realNoteOnEvents.size,
+					view[ \obj ].midiFile.controllerEvents.size
+				)
+			} {
+				view[ \info ].string = "--";
+			};
 		}.defer;
 		if( active ) { view.doAction };
 	}
