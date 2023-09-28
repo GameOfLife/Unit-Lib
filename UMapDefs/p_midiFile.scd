@@ -52,6 +52,7 @@ defs = [
 		{
 			var smf, nmf, notes = [], index = 0, chn, cmd, lastChn = -1, current = 69;
 			var ffrange, crve, trange, value, ttype, lastType;
+			var startPos = UPattern.startPos;
 			inf.do { |i|
 				nmf = midiFile.next.midiFile;
 				if( nmf.notNil ) {
@@ -66,8 +67,9 @@ defs = [
 				chn = channel.next;
 				if( chn != lastChn ) {
 					if( smf.notNil ) {
-						notes = smf.realNoteOnEvents( chn )
+						notes = smf.timeMode_( \seconds ).realNoteOnEvents( chn )
 							.sort({ |a,b| a[1] <= b[1] })
+						    .select({ |item| item[1] >= startPos })
 							.flop[ 4 ] ? [];
 					} {
 						notes = [];
@@ -109,6 +111,7 @@ defs = [
 		{
 			var smf, nmf, notes = [], index = 0, chn, cmd, lastChn = -1, current = 69;
 			var ffrange, crve, trange, value, ttype, lastType;
+			var startPos = UPattern.startPos;
 			inf.do { |i|
 				nmf = midiFile.next.midiFile;
 				if( nmf.notNil ) {
@@ -123,9 +126,10 @@ defs = [
 				chn = channel.next;
 				if( chn != lastChn ) {
 					if( smf.notNil ) {
-						notes = smf.realNoteOnEvents( chn )
+						notes = smf.timeMode_( \seconds ).realNoteOnEvents( chn )
 							.sort({ |a,b| a[1] <= b[1] })
-							.flop[ 5 ] ? [];
+						    .select({ |item| item[1] >= startPos })
+						    .flop[ 5 ] ? [];
 					} {
 						notes = [];
 					};
@@ -165,6 +169,7 @@ defs = [
 		{
 			var smf, nmf, notes = [], index = 0, ccx, lastCc, chn, cmd, lastChn = -1, current = 69;
 			var ffrange, crve, trange, value, ttype, lastType;
+			var startPos = UPattern.startPos;
 			inf.do { |i|
 				nmf = midiFile.next.midiFile;
 				if( nmf.notNil ) {
@@ -179,8 +184,9 @@ defs = [
 				ccx = cc.next;
 				if( chn != lastChn or: { ccx != lastCc } ) {
 					if( smf.notNil ) {
-						notes = smf.controllerEvents(ccx, chn )
+						notes = smf.timeMode_( \seconds ).controllerEvents(ccx, chn )
 							.sort({ |a,b| a[1] <= b[1] })
+						    .select({ |item| item[1] >= startPos })
 							.flop[ 5 ] ? [];
 					} {
 						notes = [];

@@ -25,6 +25,7 @@ UPatDef( \p_midiFile_times, { |unit, midifile, channel = nil, type = \timeToNext
 		var smf, nmf, notes, index = 0, chn, cmd, lastChn = -1, current = 69;
 		var ffrange, crve, trange, value, ttype, lastType;
 		var default;
+		var startPos = UPattern.startPos;
 		inf.do { |i|
 			nmf = midifile.next.midiFile;
 			if( nmf.notNil ) {
@@ -41,15 +42,17 @@ UPatDef( \p_midiFile_times, { |unit, midifile, channel = nil, type = \timeToNext
 				if( smf.notNil ) {
 					switch( ttype,
 						\timeToNext, {
-							notes = smf.timeMode_( \seconds )
+							notes = (smf.timeMode_( \seconds )
 								.noteSustainEvents( chn )
 								.sort({ |a,b| a[1] <= b[1] })
-								.flop[ 1 ].differentiate;
+							    .select({ |item| item[1] >= startPos })
+							.flop[ 1 ] - startPos).differentiate;
 						},
 						\sustain, {
 							notes = [0] ++ (smf.timeMode_( \seconds )
 								.noteSustainEvents( chn )
 								.sort({ |a,b| a[1] <= b[1] })
+								.select({ |item| item[1] >= startPos })
 								.flop[ 6 ])
 						}, {
 							notes = [];
