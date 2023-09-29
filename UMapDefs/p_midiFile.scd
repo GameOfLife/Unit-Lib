@@ -50,11 +50,12 @@ defs = [
 	UPatDef( \note, { |unit, midiFile, channel = nil, fromRange = #[0,127], toRange = #[0,1],
 			invert = false, curve = 0, clipMode = \ignore, clipSoftness = 0|
 		{
-			var smf, nmf, notes = [], index = 0, chn, cmd, lastChn = -1, current = 69;
+			var smf, nmf, umf, notes = [], index = 0, chn, cmd, lastChn = -1, current = 69;
 			var ffrange, crve, trange, value, ttype, lastType;
 			var startPos = UPattern.startPos;
 			inf.do { |i|
-				nmf = midiFile.next.midiFile;
+				umf = midiFile.next;
+			    nmf = umf.midiFile;
 				if( nmf.notNil ) {
 					if( smf != nmf ) {
 						smf = nmf;
@@ -67,8 +68,7 @@ defs = [
 				chn = channel.next;
 				if( chn != lastChn ) {
 					if( smf.notNil ) {
-						notes = smf.timeMode_( \seconds ).realNoteOnEvents( chn )
-							.sort({ |a,b| a[1] <= b[1] })
+						notes = umf.noteSustainEvents( chn )
 						    .select({ |item| item[1] >= startPos })
 							.flop[ 4 ] ? [];
 					} {
@@ -109,11 +109,12 @@ defs = [
 	UPatDef( \velocity, { |unit, midiFile, channel = nil, fromRange = #[1,127], toRange = #[0,1],
 			invert = false, curve = 0, clipMode = \ignore, clipSoftness = 0|
 		{
-			var smf, nmf, notes = [], index = 0, chn, cmd, lastChn = -1, current = 69;
+			var smf, nmf, umf, notes = [], index = 0, chn, cmd, lastChn = -1, current = 69;
 			var ffrange, crve, trange, value, ttype, lastType;
 			var startPos = UPattern.startPos;
 			inf.do { |i|
-				nmf = midiFile.next.midiFile;
+				umf = midiFile.next;
+			    nmf = umf.midiFile;
 				if( nmf.notNil ) {
 					if( smf != nmf ) {
 						smf = nmf;
@@ -126,8 +127,7 @@ defs = [
 				chn = channel.next;
 				if( chn != lastChn ) {
 					if( smf.notNil ) {
-						notes = smf.timeMode_( \seconds ).realNoteOnEvents( chn )
-							.sort({ |a,b| a[1] <= b[1] })
+						notes = umf.noteSustainEvents( chn )
 						    .select({ |item| item[1] >= startPos })
 						    .flop[ 5 ] ? [];
 					} {
@@ -184,7 +184,7 @@ defs = [
 				ccx = cc.next;
 				if( chn != lastChn or: { ccx != lastCc } ) {
 					if( smf.notNil ) {
-						notes = smf.timeMode_( \seconds ).controllerEvents(ccx, chn )
+						notes = smf.controllerEvents(ccx, chn )
 							.sort({ |a,b| a[1] <= b[1] })
 						    .select({ |item| item[1] >= startPos })
 							.flop[ 5 ] ? [];
@@ -215,6 +215,64 @@ defs = [
 		.setSpec( \cc, [0,127,\lin,1,0].asSpec )
 		.setSpec( \channel, ListSpec( [ nil ] ++ (..15), 0, [ "any" ] ++ (..15).collect(_.asString) ) )
 		.setSpec( \fromRange, RangeSpec(0,127,step:1) )
+		.setSpec( \toRange, RangeSpec(0,1) )
+		.setSpec( \invert, BoolSpec(false) )
+		.setSpec( \curve, [-16,16,\lin,0,0].asSpec )
+		.setSpec( \clipMode, ListSpec( [ \ignore, \clip, \fold, \wrap, \none ] ) )
+		.setSpec( \clipSoftness, [0,1].asSpec )
+		.setDefault( \channel, nil )
+		.category_( 'pattern' ),
+
+	UPatDef( \note_channel, { |unit, midiFile, fromRange = #[0,127], toRange = #[0,1],
+			invert = false, curve = 0, clipMode = \ignore, clipSoftness = 0|
+		{
+			var smf, nmf, umf, notes = [], index = 0, chn, cmd, lastChn = -1, current = 69;
+			var ffrange, crve, trange, value, ttype, lastType;
+			var startPos = UPattern.startPos;
+			inf.do { |i|
+				umf = midiFile.next;
+			    nmf = umf.midiFile;
+				if( nmf.notNil ) {
+					if( smf != nmf ) {
+						smf = nmf;
+						lastChn = -1;
+					};
+				} {
+					smf = nil;
+				};
+
+				if( chn != lastChn ) {
+					if( smf.notNil ) {
+						notes = umf.noteSustainEvents
+						    .select({ |item| item[1] >= startPos })
+							.flop[ 3 ] ? [];
+					} {
+						notes = [];
+					};
+				};
+				lastChn = chn;
+
+				cmd = clipMode.next;
+				ffrange = fromRange.next;
+
+				if( cmd == \ignore ) {
+					if( notes[ index ].notNil && { notes[ index ].inclusivelyBetween( *ffrange ) } ) {
+						current = notes[ index ];
+					}
+				} {
+					current = notes[ index ] ? current;
+				};
+
+				index = (index + 1).wrap( 0, notes.size-1 );
+				value = scaleFunc.( current, ffrange, invert.next, curve.next, cmd, clipSoftness.next );
+				value.linlin(-1,1,*toRange.next ++ [ \none ]).yield;
+			};
+		}.r;
+	}, addToAll: false ).mappedArgs_([\toRange])
+		.setSpec( \midiFile, UMIDIFileSpec() )
+		.setDefault( \midiFile, UMIDIFile() )
+		.setSpec( \channel, ListSpec( [ nil ] ++ (..15), 0, [ "any" ] ++ (..15).collect(_.asString) ) )
+		.setSpec( \fromRange, RangeSpec(0,15,step:1) )
 		.setSpec( \toRange, RangeSpec(0,1) )
 		.setSpec( \invert, BoolSpec(false) )
 		.setSpec( \curve, [-16,16,\lin,0,0].asSpec )

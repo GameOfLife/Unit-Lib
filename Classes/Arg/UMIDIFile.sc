@@ -1,11 +1,13 @@
 UMIDIFile {
 
 	classvar <>all;
+	classvar <>allNoteSustainEvents; // sorted note sustain events per path
 
 	var <path;
 
 	*initClass {
 		all = IdentityDictionary();
+		allNoteSustainEvents = IdentityDictionary();
 	}
 
 	*new { |path, reload = false|
@@ -21,7 +23,8 @@ UMIDIFile {
 				if( reload or: { all[ rawPath.asSymbol ].isNil }) {
 					file = SimpleMIDIFile.read( rawPath );
 					if( file.midiEvents.size > 0 ) {
-				 		all[ rawPath.asSymbol ] = SimpleMIDIFile.read( rawPath );
+						all[ rawPath.asSymbol ] = file.timeMode_( \seconds );
+						allNoteSustainEvents[ rawPath.asSymbol ] = file.noteSustainEvents.sort({ |a,b| a[1] <= b[1] });
 				 		UMIDIFile.changed( \added );
 					} {
 						"% : File appears to be empty (probably not a MIDI File)\n\t%"
@@ -37,6 +40,16 @@ UMIDIFile {
 	midiFile {
 		^if( path.notNil ) {
 			all[ this.key ] ?? { this.init; all[ this.key ] };
+		};
+	}
+
+	noteSustainEvents { |channel|
+		^if( channel.isNil ) {
+			if( path.notNil ) {
+				allNoteSustainEvents[ this.key ] ?? { this.init; allNoteSustainEvents[ this.key ] };
+			};
+		} {
+			this.midiFile.noteSustainEvents( channel ).sort({ |a,b| a[1] <= b[1] });
 		};
 	}
 
