@@ -19,7 +19,7 @@ MultiChannelUdef( \selectChannel, {
 	var index;
 	var fadeTime;
 	var in;
-	index = \index.ukr( 0, 0, Udef.numChannels - 1, \lin, 1 );
+	index = \index.ukr( 0, IntegerSpec(0, 0, Udef.numChannels - 1 ) );
 	fadeTime = \fadeTime.ukr( 0, 0, 1, \lin );
 	in = UIn.ar( 0, Udef.numChannels, true );
 	UOut.ar( 0, SelectCF.ar( index, in, fadeTime ) );
