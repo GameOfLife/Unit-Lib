@@ -86,7 +86,7 @@ SyncCenter {
 		^SynthDef( "sync_receive", { |id = 100, in = 0 |
 			// waits for an impulse
 			var trig;
-			trig = Trig1.ar( SoundIn.ar( in ) - 0.001 );
+			trig = Trig1.ar( SoundIn.ar( in ).excess(0.25) - 0.001 );
 			SendTrig.ar( trig, id, BlockOffset.ar( trig ) );
 		});
 	}
