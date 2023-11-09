@@ -45,6 +45,9 @@ HybridUMapDef : MultiUMapDef {
 		]
 	}
 
+	numChannels { ^udefs[0].numChannels }
+	numChannels_ { |newNumChannels| udefs.do(_.numChannels_( newNumChannels ) ) }
+
 	valueIsMapped { ^udefs[1].valueIsMapped }
 	valueIsMapped_ { |bool| udefs[1].valueIsMapped_( bool ) }
 
