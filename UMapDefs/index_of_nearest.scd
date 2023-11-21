@@ -29,7 +29,7 @@ defs = [ 2,3,4,5,6,7,8 ].collect({ |n|
 		array[1..].do({ |item,i|
 			out = if( item < out[0], [ item, i+1 ], out );
 		});
-		out = out[1].linlin(0, n-1, *range.poll ++ [ \none ]);
+		out = out[1].linlin(0, n-1, *range ++ [ \none ]);
 		UMapOut.kr( out );
 	}, { |unit, vals = #[0.5], nearestTo = 0.5, range = #[0.0,1.0] |
 		vals.collect(_.absdif( nearestTo ))
