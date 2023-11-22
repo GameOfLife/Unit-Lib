@@ -60,10 +60,12 @@ FreeUdef( "midi_ccOut", [
 })
 .createSynthFunc_({ |unit, server, startTime = 0 |
 	var channel, cc, val, midiOut;
-	#channel, cc, val, midiOut = unit.def.env[ unit ].atAll( [ \channel, \cc, \val, \midiOut ] );
-	unit.def.env[ unit ] = nil;
-	midiOut = unit.def.env[ \midiOuts ][ midiOut ];
-	midiOut.control( channel, cc, val );
+	if( unit.def.env[ unit ].notNil ) {
+		#channel, cc, val, midiOut = unit.def.env[ unit ].atAll( [ \channel, \cc, \val, \midiOut ] );
+		unit.def.env[ unit ] = nil;
+		midiOut = unit.def.env[ \midiOuts ][ midiOut ];
+		midiOut.control( channel, cc, val );
+	};
 	nil;
 })
 	.createsSynth_( false )

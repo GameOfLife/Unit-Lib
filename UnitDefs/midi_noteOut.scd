@@ -67,16 +67,18 @@ FreeUdef( "midi_noteOut", [
 })
 .createSynthFunc_({ |unit, server, startTime = 0 |
 	var channel, note, velo, midiOut, dur, startPos;
-	#channel, note, velo, midiOut, dur, startPos = unit.def.env[ unit ]
-	.atAll( [ \channel, \note, \velo, \midiOut, \dur, \startPos ] );
-	unit.def.env[ unit ] = nil;
-	midiOut = unit.def.env[ \midiOuts ][ midiOut ];
-	midiOut.noteOn( channel, note, velo );
-	if( dur != inf ) {
-		{
-			( dur - startPos ).wait;
-			midiOut.noteOff( channel, note );
-		}.fork;
+	if( unit.def.env[ unit ].notNil ) {
+		#channel, note, velo, midiOut, dur, startPos = unit.def.env[ unit ]
+		.atAll( [ \channel, \note, \velo, \midiOut, \dur, \startPos ] );
+		unit.def.env[ unit ] = nil;
+		midiOut = unit.def.env[ \midiOuts ][ midiOut ];
+		midiOut.noteOn( channel, note, velo );
+		if( dur != inf ) {
+			{
+				( dur - startPos ).wait;
+				midiOut.noteOff( channel, note );
+			}.fork;
+		};
 	};
 	nil;
 })
