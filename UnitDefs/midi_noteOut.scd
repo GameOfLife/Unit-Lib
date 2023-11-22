@@ -42,10 +42,11 @@ FreeUdef( "midi_noteOut", [
 	velo = unit.get( \velo );
 	midiOut = unit.get( \midiOut );
 	dur = unit.get( \u_dur );
+	midiOut = midiOut.value.asInteger;
 	env[ unit ].channel = channel.value.asInteger;
 	env[ unit ].note = note.value.asInteger;
 	env[ unit ].velo = velo.value.asInteger;
-	env[ unit ].midiOut = midiOut.value.asInteger;
+	env[ unit ].midiOut = midiOut;
 	env[ unit ].dur = dur;
 	env[ unit ].startPos = startPos ? 0;
 
