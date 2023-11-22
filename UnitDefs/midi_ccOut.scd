@@ -37,10 +37,11 @@ FreeUdef( "midi_ccOut", [
 	cc = unit.get( \cc );
 	val = unit.get( \val );
 	midiOut = unit.get( \midiOut );
+	midiOut = midiOut.value.asInteger;
 	env[ unit ].channel = channel.value.asInteger;
 	env[ unit ].cc = cc.value.asInteger;
 	env[ unit ].val = val.value.asInteger;
-	env[ unit ].midiOut = midiOut.value.asInteger;
+	env[ unit ].midiOut = midiOut;
 
 	if(MIDIClient.initialized.not,{ MIDIIn.connectAll });
 	if( env[ \midiOuts ].isNil ) {
