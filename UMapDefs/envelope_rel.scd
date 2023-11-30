@@ -20,5 +20,6 @@ UMapDef( \envelope_rel, {
 	var sig;
 	sig = UEnvGenRel.kr( \env, nil, \timeScale, \loop, \delay, \trigger );
 	UMapOut.kr(sig);
-}).mappedArgs_([ \env ])
-.category_( 'automation' )
+}).setSpec( \timeScale, [0.25,4,\exp,0,1].asSpec, \init )
+.mappedArgs_([ \env ])
+.category_( 'automation' );
