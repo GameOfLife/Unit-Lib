@@ -27,6 +27,12 @@ UMenuBarIDE {
 	classvar <>openRecentMenu;
 	classvar <>mode = \mainmenu, <>toolBar; // or \toolbar
 
+	*initClass {
+		if ( thisProcess.platform.name !== 'osx' ) {
+			mode = \toolbar;
+		};
+	}
+
 	*fillWindowsMenu {
 		if( windowsMenu.notNil ) {
 			windowsMenu.clear;
@@ -78,6 +84,9 @@ UMenuBarIDE {
 				.value.do({ |menu| menus =menus.add( menu ) })
 			});
 			menus.do({ |item| MainMenu.unregister( item ) });
+		} {
+			toolBar !? _.close;
+			toolBar = nil;
 		};
 	}
 
