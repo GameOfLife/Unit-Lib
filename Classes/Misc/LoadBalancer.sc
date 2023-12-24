@@ -22,6 +22,7 @@
 LoadBalancer {
 
 	classvar <>all;
+	classvar <>bootDelay = 5;
 
 	var <servers;
 	var <>name;
@@ -35,6 +36,19 @@ LoadBalancer {
 	}
 
 	at { |index = 0| ^servers.at( index ) }
+
+	boot {
+		if( servers[0].addr.isLocal ) {
+			{
+				bootDelay.wait;
+				servers[0].boot;
+				servers[1..].do({ |srv|
+					bootDelay.wait;
+					srv.boot;
+				});
+			}.fork;
+		};
+	}
 
 	init {
 		loads = 0!servers.size;
