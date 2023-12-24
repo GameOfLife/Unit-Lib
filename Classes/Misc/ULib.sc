@@ -78,16 +78,35 @@ ULib {
 	}
 
     *serversWindow {
-        var makePlotTree, makeMeter, killer;
+        var makePlotTree, makeMeter;
         var servers = ULib.allServers;
-        var w = Window("ULib servers", Rect(10, 10, 390, 3 + ( servers.size * 29))).front;
+        var w = Window("ULib servers", Rect(10, 10, 390, 26 +
+			ULib.servers.collect({ |item| item.uViewHeight + 22 }).sum
+		)
+		).front;
         w.addFlowLayout;
-        killer = Button(w, Rect(0,0, 20, 18));
-        killer.states = [["K"]];
-        killer.canFocus = false;
-        killer.action = { Server.killAll };
+		RoundView.pushSkin( UChainGUI.skin );
+
         w.view.decorator.nextLine;
-        servers.do{ |s| s.makeView(w) };
+		ULib.servers.do{ |s|
+			var ip;
+			if( s.addr.isLocal ) {
+				SmoothButton(w, Rect(0,0, 18, 18))
+				.states_( [["k"]] )
+				.canFocus_( false )
+				.action_({ Server.killAll });
+				if( NetAddr.respondsTo( \myIP ) ) {
+					ip = NetAddr.myIP;
+				};
+			} {
+				ip = s.addr.ip;
+			};
+			StaticText(w, 200@18 )
+			.font_( Font(Font.defaultSansFace, 10).boldVariant )
+			.string_( " " ++ s.name + "/" + ip );
+			w.view.decorator.nextLine;
+			s.uView(w);
+		};
         w.view.keyDownAction = { arg view, char, modifiers;
             // if any modifiers except shift key are pressed, skip action
             if(modifiers & 16515072 == 0) {
@@ -102,14 +121,13 @@ ULib {
         };
         makePlotTree = {
             var onClose, comp;
-            var servers = ULib.allServers;
+			var servers = ULib.allServers.select(_.isLocal);
             var window = Window.new("Node Tree(s)",
                 Rect(128, 64, 1000, 400),
                 scroll:true
             ).front;
-            var x = CompositeView(window.view, Rect(0,0,4000,4000));
-            x.addFlowLayout(0@0,0@0);
-            comp = servers.collect{ CompositeView(x,400@400) };
+            window.addFlowLayout(0@0,0@0);
+            comp = servers.collect{ CompositeView(window,400@400) };
             window.view.hasHorizontalScroller_(false).background_(Color.grey(0.9));
             onClose = [servers, comp].flopWith{ |s,c| s.plotTreeView(0.5, c, { defer {window.close}; }) };
             window.onClose = {
@@ -119,13 +137,13 @@ ULib {
         makeMeter = {
             var window = Window.new("Meter",
                 Rect(128, 64, 1000, 1000),
+				scroll: true
             ).front;
-            var x = CompositeView(window.view, Rect(0,0, 1000, 1000));
-            x.addFlowLayout;
+            window.addFlowLayout;
             servers.do{ |s|
                 var numIns = s.options.numInputBusChannels;
                 var numOuts = s.options.numOutputBusChannels;
-                ServerMeterView(s, x, 0@0, numIns, numOuts)
+                ServerMeterView(s, window, 0@0, numIns, numOuts)
             }
         };
         ^w
