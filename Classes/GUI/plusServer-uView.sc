@@ -89,7 +89,7 @@
 
 		};
 		booting = {
-			{ active.stringColor_( Color.orange ); }.defer;
+			{ active.stringColor_( Color(1.0, 0.5) ); }.defer;
 		};
 
 		bundling = {
