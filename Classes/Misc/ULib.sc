@@ -77,10 +77,10 @@ ULib {
 		};
 	}
 
-    *serversWindow {
+	*serversWindow { |name|
         var makePlotTree, makeMeter;
         var servers = ULib.allServers;
-        var w = Window("ULib servers", Rect(10, 10, 390, 26 +
+        var w = Window(name ? "ULib servers", Rect(10, 10, 420, 26 +
 			ULib.servers.collect({ |item| item.uViewHeight + 22 }).sum
 		)
 		).front;
