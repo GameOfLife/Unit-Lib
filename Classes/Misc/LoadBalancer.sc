@@ -51,13 +51,11 @@ LoadBalancer {
 	boot {
 		if( servers[0].addr.isLocal ) {
 			{
-				bootDelay.wait;
-				servers[0].boot;
-				servers[1..].do({ |srv|
+				servers.do({ |srv|
 					bootDelay.wait;
 					srv.boot;
 				});
-			}.fork;
+			}.fork( AppClock );
 		};
 	}
 
