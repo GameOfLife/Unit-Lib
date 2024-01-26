@@ -31,10 +31,10 @@ LoadBalancer {
 
 	*initClass { all = [] }
 
-	*fill { |n = 8, nameprefix = "ulib", addr, options|
+	*fill { |n = 8, name = "ulib", addr, options|
 		addr = addr ? NetAddr( "127.0.0.1", 58000 );
 		^this.new( *{ |i|
-			Server( name ++ "_" ++ (i+1), addr.copy.port_( addr.port + i ), options );
+			Server( name ++ "_" ++ (i+1), NetAddr( addr.hostname, addr.port + i ), options );
 		}!n );
 	}
 
