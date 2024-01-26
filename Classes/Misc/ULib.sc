@@ -87,7 +87,7 @@ ULib {
 			window.close;
 		};
 
-		w = Window(name ? "ULib servers", Rect(10, 10, 420, 26 +
+		w = Window(name ? "ULib servers", Rect(10, 10, 440, 26 +
 			ULib.servers.collect({ |item| item.uViewHeight + 22 }).sum
 		)
 		).front;
@@ -97,7 +97,7 @@ ULib {
         w.view.decorator.nextLine;
 		ULib.servers.do{ |s|
 			var ip, composite;
-			composite = CompositeView( w, Rect( 0,0, 412, 18 ) );
+			composite = CompositeView( w, Rect( 0,0, 432, 18 ) );
 			composite.background = Color.gray(0.8);
 			if( s.addr.isLocal ) {
 				SmoothButton(composite, Rect(0,0, 18, 18))
@@ -115,7 +115,7 @@ ULib {
 			.font_( Font(Font.defaultSansFace, 10).boldVariant )
 			.string_( " " ++ s.name + "/" + ip );
 			w.view.decorator.nextLine;
-			s.uView(w,416);
+			s.uView(w,436);
 		};
         w.view.keyDownAction = { arg view, char, modifiers;
             // if any modifiers except shift key are pressed, skip action
