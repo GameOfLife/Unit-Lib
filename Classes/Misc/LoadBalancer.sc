@@ -31,11 +31,22 @@ LoadBalancer {
 
 	*initClass { all = [] }
 
+	*fill { |n = 8, nameprefix = "ulib", addr, options|
+		addr = addr ? NetAddr( "127.0.0.1", 58000 );
+		^this.new( *{ |i|
+			Server( name ++ "_" ++ (i+1), addr.copy.port_( addr.port + i ), options );
+		}!n );
+	}
+
 	*new { |...servers|
 		^super.newCopyArgs( servers ).init.addToAll;
 	}
 
 	at { |index = 0| ^servers.at( index ) }
+
+	options { ^servers[0].options }
+
+	options_ { |options| servers.do({ |srv| srv.options = options }) }
 
 	boot {
 		if( servers[0].addr.isLocal ) {
