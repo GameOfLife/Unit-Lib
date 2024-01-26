@@ -32,15 +32,19 @@
 			w.view.decorator = FlowLayout(w.view.bounds);
 		});
 
+		composite = CompositeView( w, (width + 22) @ 18 );
+		composite.background = Color.gray(0.9);
+
 		if(isLocal,{
 			if( useRoundButton ) {
-				booter = RoundButton(w, Rect(0,0, 18, 18))
-				.canFocus_( false );
+				booter = RoundButton(composite, Rect(0,0, 18, 18))
+				.canFocus_( false )
+				.radius_(5);
 				booter.states = [
 					[ \power, Color.gray(0.2), Color.clear],
 					[ \power, Color.gray(0.2), onColor ]
 				];
-			} { booter = Button( w, Rect(0,0,18,18));
+			} { booter = Button( composite, Rect(0,0,18,18));
 				booter.states = [[ "B"],[ "Q", onColor ]];
 				booter.font = font;
 			};
@@ -55,28 +59,24 @@
 				});
 			};
 			booter.value = this.serverRunning.binaryValue;
-		},{
-			StaticText( w, Rect(0,0,18,18) );
 		});
 
-		cpuMeter = LevelIndicator( w, width@2 )
+		cpuMeter = LevelIndicator( composite, Rect( 22, 0, width, 18 ) )
 		//.numTicks_( 9 ) // includes 0;
 		//.numMajorTicks_( 5 )
-		.meterColor_( onColor )
-		.background_( Color.gray(0.9) )
+		.meterColor_( onColor.copy.alpha_(0.25) )
+		.criticalColor_( Color( 1,0.2,alpha: 0.4 ) )
+		.warningColor_( Color.yellow( 1,1, alpha: 0.4 ) )
+		.background_( Color.clear )
 		.drawsPeak_( true )
 		.warning_( 0.8 )
 		.critical_( 1 );
 
-		w.asView.decorator.shift( width.neg - 4, 2 );
-
-		active = StaticText(w, Rect(0,0, width, 16));
+		active = StaticText(composite, Rect(22,2, width, 16));
 		active.string = " " ++ this.name.asString + this.uInfoString;
 		active.align = \left;
 		active.font = font;
-		active.background = Color.gray(0.9);
 
-		w.asView.decorator.shift( 0, -2 );
 		if(this.serverRunning,running,stopped);
 
 		running = {
@@ -137,10 +137,10 @@
 		if( servers.size > 1 && { servers.size.asInteger.odd }) {
 			srvs = srvs.add( servers[ (servers.size/2).asInteger ] );
 		};
-		srvs.do({ |srv|
-			srv.uView( w, (width / 2), useRoundButton, onColor )
+		srvs.do({ |srv, i|
+			srv.uView( w, (width / 2), useRoundButton, onColor );
+			if( i.odd ) { w.asView.decorator.nextLine; }
 		});
-		w.asView.decorator.nextLine;
 	}
 
 	uViewHeight { ^((servers.size/2).ceil) * 22 }

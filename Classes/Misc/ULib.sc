@@ -20,6 +20,7 @@
 ULib {
     classvar <>servers;
 	classvar <>lastPath;
+	classvar <>window;
 
     *initClass {
         servers = [Server.default]
@@ -80,7 +81,13 @@ ULib {
 	*serversWindow { |name|
         var makePlotTree, makeMeter;
         var servers = ULib.allServers;
-        var w = Window(name ? "ULib servers", Rect(10, 10, 420, 26 +
+        var w;
+
+		if( window.notNil && { window.isClosed.not }) {
+			window.close;
+		};
+
+		w = Window(name ? "ULib servers", Rect(10, 10, 420, 26 +
 			ULib.servers.collect({ |item| item.uViewHeight + 22 }).sum
 		)
 		).front;
@@ -89,11 +96,14 @@ ULib {
 
         w.view.decorator.nextLine;
 		ULib.servers.do{ |s|
-			var ip;
+			var ip, composite;
+			composite = CompositeView( w, Rect( 0,0, 412, 18 ) );
+			composite.background = Color.gray(0.8);
 			if( s.addr.isLocal ) {
-				SmoothButton(w, Rect(0,0, 18, 18))
-				.states_( [["k"]] )
+				SmoothButton(composite, Rect(0,0, 18, 18))
+				.states_( [["K"]] )
 				.canFocus_( false )
+				.radius_(5)
 				.action_({ Server.killAll });
 				if( NetAddr.respondsTo( \myIP ) ) {
 					ip = NetAddr.myIP;
@@ -101,11 +111,11 @@ ULib {
 			} {
 				ip = s.addr.ip;
 			};
-			StaticText(w, 200@18 )
+			StaticText(composite, Rect( 22, 2, 200,16 ) )
 			.font_( Font(Font.defaultSansFace, 10).boldVariant )
 			.string_( " " ++ s.name + "/" + ip );
 			w.view.decorator.nextLine;
-			s.uView(w);
+			s.uView(w,416);
 		};
         w.view.keyDownAction = { arg view, char, modifiers;
             // if any modifiers except shift key are pressed, skip action
@@ -146,6 +156,7 @@ ULib {
                 ServerMeterView(s, window, 0@0, numIns, numOuts)
             }
         };
+		window = w;
         ^w
     }
 
