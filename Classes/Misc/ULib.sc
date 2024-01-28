@@ -217,6 +217,7 @@ ULib {
                 ServerMeterView(s, window, 0@0, numIns, numOuts)
             }
         };
+		w.onClose_({ if( window == w ) { window = nil } });
 		window = w;
         ^w
     }
