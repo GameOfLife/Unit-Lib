@@ -37,12 +37,12 @@
 
 		if(isLocal,{
 			if( useRoundButton ) {
-				booter = RoundButton(composite, Rect(0,0, 18, 18))
+				booter = SmoothButton(composite, Rect(0,0, 18, 18))
 				.canFocus_( false )
-				.radius_(5);
+				.radius_(2);
 				booter.states = [
 					[ \power, Color.gray(0.2), Color.clear],
-					[ \power, Color.gray(0.2), onColor ]
+					[ \power, Color.gray(0.2), onColor.copy.alpha_(0.5) ]
 				];
 			} { booter = Button( composite, Rect(0,0,18,18));
 				booter.states = [[ "B"],[ "Q", onColor ]];
