@@ -92,15 +92,18 @@ ULib {
 	}
 
 	*serversWindow { |name|
-        var makePlotTree, makeMeter;
+        var makePlotTree, makeMeter, font;
         var servers = ULib.allServers;
         var w;
+		var statusView, latencyView;
 
 		if( window.notNil && { window.isClosed.not }) {
 			window.close;
 		};
 
-		w = Window(name ? "ULib servers", Rect(10, 10, 440, 26 +
+		font = Font(Font.defaultSansFace, 10);
+
+		w = Window(name ? "ULib servers", Rect(10, 0, 440, 26 +
 			ULib.servers.collect({ |item| item.uViewHeight + 22 }).sum
 		)
 		).front;
@@ -108,15 +111,15 @@ ULib {
 		RoundView.pushSkin( UChainGUI.skin );
 
         w.view.decorator.nextLine;
-		ULib.servers.do{ |s|
+		ULib.servers.do{ |s, i|
 			var ip, composite;
 			composite = CompositeView( w, Rect( 0,0, 432, 18 ) );
 			composite.background = Color.gray(0.8);
 			if( s.addr.isLocal ) {
-				SmoothButton(composite, Rect(0,0, 18, 18))
+				SmoothButton(composite, Rect(440-26,0, 18, 18))
 				.states_( [["K"]] )
 				.canFocus_( false )
-				.radius_(5)
+				.font_( font )
 				.action_({ Server.killAll });
 				if( NetAddr.respondsTo( \myIP ) ) {
 					ip = NetAddr.myIP;
@@ -124,12 +127,51 @@ ULib {
 			} {
 				ip = s.addr.ip;
 			};
-			StaticText(composite, Rect( 22, 2, 200,16 ) )
-			.font_( Font(Font.defaultSansFace, 10).boldVariant )
+			StaticText(composite, Rect( 2, 2, 200,16 ) )
+			.font_( font.boldVariant )
 			.string_( " " ++ s.name + "/" + ip );
+			if( i == 0 ) {
+				latencyView = EZSmoothSlider(composite, Rect(440 - 108 - 20,1,100,16),nil, [0.02,1,\exp,0,0.02].asSpec)
+			    .value_( Server.default.latency)
+			    .font_( font )
+			    .action_({ |v| Server.default.latency = v.value})
+			    .numberWidth_( 40 );
+				latencyView
+			    .sliderView
+			    .string_("Latency")
+				.font_( font )
+			    .knobColor_( Color.black.alpha_(0.25) );
+			};
 			w.view.decorator.nextLine;
 			s.uView(w,436);
 		};
+
+		statusView = StaticText( w, (432 - 40) @ 18 )
+		.font_( font );
+
+		SmoothButton( w, Rect( 0, 0, 36, 16 ) )
+			.states_( [["clear"]] )
+		    .font_( font )
+		    .canFocus_( false )
+			.action_( {
+				ULib.clear;
+		     } );
+
+		SkipJack({
+			var numbufs = 0;
+			ULib.allServers.do({ |srv|
+				Buffer.cachedBuffersDo( srv, { numbufs = numbufs + 1 });
+			});
+			statusView.string_(
+				" UChains / Units / Buffers : % / % / %".format(
+					UChain.groupDict.keys.size,
+					U.synthDict.keys.size,
+					numbufs
+				)
+			);
+			latencyView.value = Server.default.latency;
+		}, 1, { w.isClosed }, "ULib_status" );
+
         w.view.keyDownAction = { arg view, char, modifiers;
             // if any modifiers except shift key are pressed, skip action
             if(modifiers & 16515072 == 0) {
