@@ -117,6 +117,10 @@ StringSpec : Spec {
 
 }
 
+IPSpec : StringSpec {
+	var <>default = "127.0.0.1";
+}
+
 SymbolSpec : StringSpec {
 
 	var <>default = '';

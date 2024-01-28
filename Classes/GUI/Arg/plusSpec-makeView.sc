@@ -526,6 +526,93 @@
 
 }
 
++ IPSpec {
+
+	makeView { |parent, bounds, label, action, resize|
+		var vws, view, labelWidth, textViewWidth;
+		vws = ();
+
+		// this is basically an EZButton
+
+		bounds.isNil.if{bounds= 320@20};
+
+		#view, bounds = EZGui().prMakeMarginGap.prMakeView( parent, bounds );
+		 vws[ \view ] = view;
+
+		if( label.notNil ) {
+			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
+			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ bounds.height )
+				.string_( label.asString ++ " " )
+				.align_( \right )
+				.resize_( 4 )
+				.applySkin( RoundView.skin );
+		} {
+			labelWidth = 0;
+		};
+
+		vws[ \setString ] = { |vws, string = ""|
+			vws[ \string ] = string;
+			{
+				vws[ \stringView ].value = vws[ \string ];
+				vws[ \stringView ].background = Color.white;
+			}.defer;
+		};
+
+		textViewWidth = bounds.width-(labelWidth+4+(bounds.height));
+
+		vws[ \stringView ] = TextField( view,
+			Rect( labelWidth + 2, 0, textViewWidth, bounds.height )
+		)	.resize_(2)
+			.applySkin( RoundView.skin ? () )
+			.action_({ |tf|
+				vws[ \task ].stop;
+				vws.setString( this.constrain( tf.value ) );
+				action.value( vws, vws[ \string ] );
+			})
+			.mouseDownAction_({ |view|
+				vws[ \task ].stop;
+				vws[ \task ] = {
+					block { |break|
+						loop {
+							0.1.wait;
+							if( view.isClosed ) { break.value; };
+							if( view.hasFocus.not ) { break.value; };
+							if( view.value != vws[ \string ] ) {
+								view.background = Color.red.blend( Color.white, 0.5 );
+							} {
+								view.background = Color.white;
+							};
+						};
+					};
+				}.fork( AppClock );
+			});
+
+		vws[ \local ] = SmoothButton( view, Rect( labelWidth + 4 + textViewWidth, 0, bounds.height, bounds.height ) )
+		.states_([["L"]])
+		.radius_( 2 )
+		.canFocus_( false )
+		.action_({
+			vws[ \task ].stop;
+			vws.setString( "127.0.0.1" );
+			action.value( vws, vws[ \string ] );
+		});
+
+		if( resize.notNil ) { vws[ \view ].resize = resize };
+		^vws;
+	}
+
+	setView { |view, value, active = false|
+		view.setString( this.constrain( value ).asString );
+		{
+			view.setString( this.constrain( value ).asString );
+			view[ \stringView ].value = this.constrain( value ).asString;
+
+		}.defer;
+		if( active ) { view[ \string ].doAction };
+	}
+
+}
+
 + EnvirSpec {
 
 	makeView { |parent, bounds, label, action, resize|
