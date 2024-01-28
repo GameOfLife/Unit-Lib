@@ -276,37 +276,7 @@ UChainGUI {
 				} ]
 		 	);
 
-		 if( chain.isKindOf( MassEditUChain ).not ) {
-			 composite.decorator.shift( 65, 0 );
-			 views[ \pattern ] = SmoothButton( composite, 74 @ 14 )
-			 	.label_( [ "pattern", "pattern" ] )
-			 	.border_( 1 )
-				.hiliteColor_( Color.green )
-				.value_( chain.isKindOf( UPattern ).binaryValue )
-				.action_({ |bt|
-					var new, index;
-					{
-						switch( bt.value,
-							0, { new = chain.asUChain; },
-							1, { new = chain.asUPattern; }
-						);
-						if( parentScore.notNil ) {
-							index = parentScore.indexOf( chain );
-							if( index.notNil ) {
-								parentScore.events[ index ] = new;
-								parentScore.changed(\numEventsChanged);
-								parentScore.changed(\events);
-								parentScore.changed(\something);
-							};
-						};
-						new.gui( score: score );
-					}.defer(0.1);
-				});
-
-			composite.decorator.shift( bounds.width - 14 - 80 - 65 - 80 - 32, 0 );
-		 } {
-			 composite.decorator.shift( bounds.width - 14 - 80 - 32, 0 );
-		 };
+		 composite.decorator.shift( bounds.width - 14 - 80 - 32, 0 );
 
 		if( chain.isKindOf( MassEditUChain ) ) {
 			chain.addDependantToChains( massEditController );
@@ -1106,7 +1076,7 @@ UChainGUI {
 		var scrollerMargin = 16;
 		var realIndex = 0;
 		var massEditWindow;
-		var upatGUI, upatCtrls, upatHeader;
+		var upatGUI, upatCtrls, upatHeader, upatComp;
 
 		if( GUI.id == \qt ) { scrollerMargin = 20 };
 
@@ -1167,15 +1137,38 @@ UChainGUI {
 
 		if( chain.isKindOf( UPattern ) ) {
 
-			upatHeader = StaticText( scrollView, width @ 14 )
-				.applySkin( RoundView.skin )
-				.string_( " UPattern" )
-				.background_( Color.white.blend( Color.green, 0.22 ).alpha_(0.5) )
-				.resize_(2)
-				.font_(
-					(RoundView.skin.tryPerform( \at, \font ) ??
-						{ Font( Font.defaultSansFace, 12) }).boldVariant
-				);
+			upatComp = CompositeView( scrollView, width@14 )
+			.background_( Color.white.blend( Color.green, 0.22 ).alpha_(0.5) )
+			.resize_(2);
+
+			upatHeader = StaticText( upatComp, Rect(2,0, width, 14 ) )
+			.applySkin( RoundView.skin )
+			.string_( "UPattern" )
+			.font_(
+				(RoundView.skin.tryPerform( \at, \font ) ??
+					{ Font( Font.defaultSansFace, 12) }).boldVariant
+			);
+
+			SmoothButton( upatComp,
+					Rect( upatComp.bounds.right - (12 + 2), 1, 12, 12 ) )
+				.label_( '-' )
+				.border_( 1 )
+				.action_({ |bt|
+					var new, index;
+					{
+						new = chain.asUChain;
+						if( parentScore.notNil ) {
+							index = parentScore.indexOf( chain );
+							if( index.notNil ) {
+								parentScore.events[ index ] = new;
+								parentScore.changed(\numEventsChanged);
+								parentScore.changed(\events);
+								parentScore.changed(\something);
+							};
+						};
+						new.gui( score: score );
+					}.defer(0.1);
+				}).resize_(3);
 
 			upatGUI = UGUI(
 				scrollView,
@@ -1202,6 +1195,42 @@ UChainGUI {
 			upatHeader.onClose_({
 				upatCtrls.do(_.remove);
 			});
+		} {
+			if( chain.isKindOf( MassEditUChain ).not ) {
+				upatComp = CompositeView( scrollView, width@14 )
+				.background_( Color.white.blend( Color.green, 0.22 ).alpha_(0.25) )
+				.resize_(2);
+
+				upatHeader = StaticText( upatComp, Rect(2,0, width, 14 ) )
+				.applySkin( RoundView.skin )
+				.string_( "UPattern" )
+				.stringColor_( Color.black.alpha_(0.5) )
+				.font_(
+					(RoundView.skin.tryPerform( \at, \font ) ??
+						{ Font( Font.defaultSansFace, 12) }).boldVariant
+				);
+
+				SmoothButton( upatComp,
+					Rect( upatComp.bounds.right - (12 + 2), 1, 12, 12 ) )
+				.label_( '+' )
+				.border_( 1 )
+				.action_({ |bt|
+					var new, index;
+					{
+						new = chain.asUPattern;
+						if( parentScore.notNil ) {
+							index = parentScore.indexOf( chain );
+							if( index.notNil ) {
+								parentScore.events[ index ] = new;
+								parentScore.changed(\numEventsChanged);
+								parentScore.changed(\events);
+								parentScore.changed(\something);
+							};
+						};
+						new.gui( score: score );
+					}.defer(0.1);
+				}).resize_(3);
+			};
 		};
 
 		ug = units.collect({ |unit, i|
