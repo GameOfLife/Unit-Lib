@@ -27,13 +27,13 @@ ULib {
     }
 
 	*allServers {
-        ^servers.collect{ |s|
+        ^servers.collect({ |s|
             if( s.isKindOf( LoadBalancer ) ) {
                 s.servers
             } {
                 s
             }
-        }.flat
+	}) !? _.flat
     }
 
 	*waitForServersToBoot {
@@ -65,13 +65,19 @@ ULib {
 		servers.do(_.quit);
 		Server.default = Server.local;
 		this.allServers.do({ |item|
-			Server.all.remove( item );
-			ServerTree.objects !? _.removeAt( item );
-			ServerBoot.objects !? _.removeAt( item );
-			RootNode.roots.removeAt( item.name );
-			NodeWatcher.all.removeAt( item.name );
+			if( item != Server.local ) {
+				Server.all.remove( item );
+				Server.named.removeAt( item.name );
+				ServerTree.objects !? _.removeAt( item );
+				ServerBoot.objects !? _.removeAt( item );
+				RootNode.roots.removeAt( item.name );
+				NodeWatcher.all.removeAt( item.name );
+			}
 		});
 		servers = nil;
+		if( window.notNil && { window.isClosed.not }) {
+			window.close;
+		};
 	}
 
 	*setAllScoresActive { |bool = true|
