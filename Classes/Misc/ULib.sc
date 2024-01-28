@@ -61,6 +61,19 @@ ULib {
 	    BufSndFile.reloadAllGlobal;
     }
 
+	*closeServers {
+		servers.do(_.quit);
+		Server.default = Server.local;
+		this.allServers.do({ |item|
+			Server.all.remove( item );
+			ServerTree.objects !? _.removeAt( item );
+			ServerBoot.objects !? _.removeAt( item );
+			RootNode.roots.removeAt( item.name );
+			NodeWatcher.all.removeAt( item.name );
+		});
+		servers = nil;
+	}
+
 	*setAllScoresActive { |bool = true|
 		if( bool ) {
 			UScoreEditorGUI.all.do({ |item|

@@ -60,6 +60,8 @@ LoadBalancer {
 		};
 	}
 
+	quit { servers.do(_.quit) }
+
 	init {
 		loads = 0!servers.size;
 	}
