@@ -33,6 +33,7 @@ LoadBalancer {
 
 	*fill { |n = 8, name = "ulib", addr, options|
 		addr = addr ? NetAddr( "127.0.0.1", 58000 );
+		options = options ?? { Server.defaultOptionsClass.new };
 		^this.new( *{ |i|
 			Server( name ++ "_" ++ (i+1), NetAddr( addr.hostname, addr.port + i ), options );
 		}!n );
