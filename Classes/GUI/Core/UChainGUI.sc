@@ -1117,7 +1117,7 @@ UChainGUI {
 				} {
 					submenu = Menu( *item[1].collect({ |def|
 						var checked;
-						checked = unit !? { unit.defName == def.name; } ? false;
+						checked = unit !? { unit.def.name == def.name; } ? false;
 						if( checked ) { includesChecked = true; };
 						MenuAction( def.name, {
 							action.value( def );
