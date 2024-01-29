@@ -191,7 +191,7 @@ UGUI {
 		var uDefsDict = ();
 
 		UMapDef.all !? { |all|
-			all.keys.asArray.sort.do({ |key|
+			all.keys.asArray.do({ |key|
 				var category, index, udef;
 				udef = all[ key ];
 				if( test.value( udef ) ) {
@@ -204,7 +204,29 @@ UGUI {
 			});
 		};
 
-		[ \dynamic, \mixed, \control, \value, \pattern ].do({ |key|
+		if( uDefsDict.keys.includes( \dynamic ) ) {
+			if( uDefsDict.keys.includes( \mixed ) ) {
+				uDefsDict[ \mixed ].keysValuesDo({ |category, defs|
+					uDefsDict[ \dynamic ][ category ] = uDefsDict[ \dynamic ][ category ].addAll( defs );
+				});
+				uDefsDict[ \mixed ] = nil;
+			};
+		} {
+			if( uDefsDict.keys.includes( \value ) && { uDefsDict.keys.includes( \mixed ) } ) {
+				uDefsDict[ \mixed ].keysValuesDo({ |category, defs|
+					uDefsDict[ \value ][ category ] = uDefsDict[ \value ][ category ].addAll( defs );
+				});
+				uDefsDict[ \mixed ] = nil;
+			};
+		};
+
+		uDefsDict.keysValuesDo({ |type, dict|
+			dict.keysValuesDo({ |category, defs|
+				defs.sort({ |a,b| a.name <= b.name })
+			});
+		});
+
+		[ \dynamic, \mixed, \value, \control, \pattern ].do({ |key|
 			if( uDefsDict.keys.includes( key ) ) {
 				uDefsList = uDefsList.add( key );
 				uDefsDict[ key ] !? _.sortedKeysValuesDo({ |key, value|
