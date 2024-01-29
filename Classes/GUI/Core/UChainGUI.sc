@@ -1350,13 +1350,13 @@ UChainGUI {
 					uDefMenuFunc.value(nil, { |def|
 						this.setUnits( units.insert( i, U( def ) ) );
 					}, {
-						addBefore.background = nil;
+						addBefore.background = Color.white.alpha_(0.25);
 					});
 					addBefore.background = Color.gray(0.3).alpha_(0.5);
 				});
 
 				addBefore.mouseUpAction_({
-					addBefore.background = nil;
+					addBefore.background = Color.white.alpha_(0.25);
 				});
 
 			} {
@@ -1620,12 +1620,16 @@ UChainGUI {
 				});
 
 			addLast.mouseDownAction_({
-				uDefMenuFunc.value(nil, { |def| chain.units = chain.units ++ [ U( def ) ]; }, { addLast.background = nil; });
+				uDefMenuFunc.value(nil, { |def|
+					chain.units = chain.units ++ [ U( def ) ];
+				}, {
+					addLast.background = Color.white.alpha_(0.25);
+				});
 				addLast.background = Color.gray(0.3).alpha_(0.5);
 			});
 
 			addLast.mouseUpAction_({
-				addLast.background = nil;
+				addLast.background = Color.white.alpha_(0.25);
 			});
 		};
 
