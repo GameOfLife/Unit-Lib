@@ -380,6 +380,13 @@ Udef : GenericDef {
 	setAudioOutName { |index, name| this.prSetMultiIOName( \out, \audio, index, name ); }
 	setControlOutName { |index, name| this.prSetMultiIOName( \out, \control, index, name ); }
 
+	ioType { |unit|
+		var hasIn, hasOut;
+		hasIn = this.audioIns( unit ).size > 0;
+		hasOut = this.audioOuts( unit ).size > 0;
+		^case { hasIn && hasOut } { \modifier } { hasOut } { \generator } { hasIn } { \endpoint } { \other };
+	}
+
 	canFreeSynth { |unit| ^this.keys.includes( \u_doneAction ) }
 		// assumes the Udef contains a UEnv
 
