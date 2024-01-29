@@ -21,10 +21,10 @@ HybridUMapDef( \time_freq, { |time = 0.002, factor = 1|
 		SMPTESpec( 1/spec.maxval, 1/(spec.minval.max(1.0e-12)) );
 	}) )
 	.setSpec( \factor, [ 0.1, 10, \exp ].asSpec )
-	/*
 	.canUseUMapFunc_({ |unit, key, umapdef|
-		unit.getSpec( key ).isKindOf( FreqSpec );
+		var spec;
+		spec = unit.getSpec( key );
+	    spec.isKindOf( ControlSpec ) && { spec.default.size < 2 && { spec.minval > 0 && { spec.maxval < inf } } };
 	})
-	*/
 	.mappedArgs_( [ \time ] )
 	.category_( 'convert' )

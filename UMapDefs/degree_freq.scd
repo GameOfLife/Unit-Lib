@@ -94,6 +94,11 @@ defDefs = allScales.collectAs({	|scales, ii|
 }, Array);
 
 MultiUMapDef( \degree_freq, defDefs, \convert, \type, false, addToAll: true )
+.canUseUMapFunc_({ |unit, key, umapdef|
+		var spec;
+		spec = unit.getSpec( key );
+	    spec.isKindOf( ControlSpec ) && { spec.default.size < 2 && { spec.minval > 0 && { spec.maxval < inf } } };
+	})
 .allowedModes_([ \init, \sync, \normal ])
 
 
