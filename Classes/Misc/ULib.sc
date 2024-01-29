@@ -109,14 +109,13 @@ ULib {
 
 		font = Font(Font.defaultSansFace, 10);
 
-		w = Window(name ? "ULib servers", Rect(10, 0, 440, 26 +
+		w = Window(name ? "ULib servers", Rect(10, 0, 440, 24 +
 			ULib.servers.collect({ |item| item.uViewHeight + 22 }).sum
 		)
 		).front;
         w.addFlowLayout;
 		RoundView.pushSkin( UChainGUI.skin );
 
-        w.view.decorator.nextLine;
 		ULib.servers.do{ |s, i|
 			var ip, composite;
 			composite = CompositeView( w, Rect( 0,0, 432, 18 ) );
