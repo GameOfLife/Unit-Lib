@@ -16,16 +16,6 @@ UPatternSpec : Spec {
 
 	default { ^[1,1] }
 
-	expandArgSpecs { ^specs }
-
-	expandValues { |obj|
-		^obj
-	}
-
-	objFromExpandValues { |values|
-		^values;
-	}
-
 	map { |value| ^value }
 	unmap { |value| ^value }
 
