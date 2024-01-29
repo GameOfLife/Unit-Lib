@@ -22,7 +22,7 @@ MultiChannelUdef( \outputWithSubwoofer, { |bus, subwooferBus=2|
 	Out.ar( subwooferBus, if(sig.size>0){sig.sum}{sig} * UGlobalSubwooferGain.kr );
 	Out.ar( bus, sig );
 })
-.category_( \io )
+.category_( \private )
 .setSpec( \bus, PositiveIntegerSpec( 0, 0, 192 ) )
 .setSpec( \subwooferBus, PositiveIntegerSpec( 0, 0, 192 ) )
 .shouldPlayOnFunc_({ |unit, target|

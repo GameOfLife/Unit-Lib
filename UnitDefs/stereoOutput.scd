@@ -33,7 +33,7 @@ Udef( \stereoOutput, { |bus = 0, point = #[0,0], dbRollOff = (-6), speakerRadius
 
 	Out.ar( bus, UGlobalEQ.ar( panned ) * pankr * UEnv.kr  );
 } )
-	.category_( \io )
+	.category_( \output )
 	.shouldPlayOnFunc_({ |unit, target|
 		target.asTarget.server.isLocal; // safety measure: no output on wfs servers
 	})

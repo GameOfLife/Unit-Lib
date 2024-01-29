@@ -31,4 +31,4 @@ MultiChannelUdef( \soundIn, { |bus = 0|
 			true;
 		};
 	})
-	.category_( \io );
+	.category_( \input );

@@ -44,7 +44,7 @@ MultiChannelUdef( \roundPanOutput, { |bus = 0, point = #[0,0], dbRollOff = (-6),
 
 	Out.ar( bus, UGlobalEQ.ar( panned ) * pankr * UEnv.kr  );
 }, channels: [2,3,4,5,6,7,8,10,12,16,24,32] )
-	.category_( \io )
+	.category_( \output )
 	.shouldPlayOnFunc_({ |unit, target|
 		target.asTarget.server.isLocal; // safety measure: no output on wfs servers
 	})

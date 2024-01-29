@@ -21,7 +21,7 @@ MultiChannelUdef( \output, { |bus, useGlobalGain = 1|
 		useGlobalGain: useGlobalGain
 	) );
 })
-	.category_( \io )
+	.category_( \output )
     .setSpec( \useGlobalGain, BoolSpec(true) )
     .setSpec( \bus, PositiveIntegerSpec( 0, 0, 192 ) )
 	.shouldPlayOnFunc_({ |unit, target|

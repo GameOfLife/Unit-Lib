@@ -15,4 +15,4 @@ Udef( \auxIn, { |bus = 0|
 	input = In.ar( bus + FirstPrivateBus.ir + 32 );
 	UOut.ar( 0, input );
 } ).setSpec( \bus, PositiveIntegerSpec( 0, 0, 32 ) )
-	.category_( \io );
+	.category_( \input );
