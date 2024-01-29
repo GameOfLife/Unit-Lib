@@ -173,6 +173,8 @@ UMapGUI : UGUI {
 				unit.def = def;
 			}, {
 				umapdragbinReplace.background = nil;
+			}, { |def|
+				unit.def.name == def.name
 			});
 			umapdragbinReplace.background = Color.blue(0.9).alpha_(0.25);
 		});

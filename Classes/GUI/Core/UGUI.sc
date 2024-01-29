@@ -186,8 +186,8 @@ UGUI {
 
 	makeHeader { }
 
-	makeUMapDefMenu { |test, action, hideAction|
-		var uDefsList = [], ctrl, menu;
+	makeUMapDefMenu { |test, action, hideAction, matchTest|
+		var uDefsList = [], ctrl, menuList, menu;
 		var uDefsDict = ();
 
 		UMapDef.all !? { |all|
@@ -221,15 +221,15 @@ UGUI {
 			};
 		};
 
-		menu = Menu( *uDefsList.collect({ |item|
-			var submenu, includesChecked = false;
+		menuList = uDefsList.collect({ |item|
+			var includesChecked = false;
 			if( item.isKindOf( Symbol ) ) {
 				MenuAction.separator( item.asString );
 			} {
-				submenu = Menu( *item[1].collect({ |def|
-					var checked = false;
-					//checked = unit !? { unit.def.name == def.name; } ? false;
-					//if( checked ) { includesChecked = true; };
+				Menu( *item[1].collect({ |def|
+					var checked;
+					checked = matchTest.value( def ) ? false;
+					if( checked ) { includesChecked = true; };
 					MenuAction( def.name, {
 						action.value( def );
 						menu.removeDependant( ctrl );
@@ -237,7 +237,15 @@ UGUI {
 					}).enabled_( checked.not ).font_( Font( Font.defaultSansFace, 12 ) );
 				})).title_( if( includesChecked ) { item[0] ++ " *" } { item[0] } );
 			}
-		})).font_( Font( Font.defaultSansFace, 12 ) ).front;
+		});
+
+		if( menuList.size == 2 ) {
+			menu = menuList[1];
+		} {
+			menu = Menu( *menuList ).font_( Font( Font.defaultSansFace, 12 ) );
+		};
+
+		menu.front;
 
 		^menu.addDependant( ctrl );
 	}
