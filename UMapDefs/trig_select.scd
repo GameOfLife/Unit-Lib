@@ -45,5 +45,5 @@ defs = [ 8,12,16,24,32,48,64,128 ].collect({ |n|
 		.mappedArgs_([ \vals ]);
 });
 
-MultiUMapDef( \trig_select, defs, \trigger_to_value, \n, false )
+MultiUMapDef( \trig_select, defs, \selection, \n, false )
 	.mappedArgs_([ \vals ]);

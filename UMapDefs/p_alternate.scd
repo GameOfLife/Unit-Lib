@@ -24,4 +24,4 @@ UPatDef( \p_alternate, { |unit, a = 0.0, b = 1.0|
 .canUseUMapFunc_({ |unit, key, umapdef| unit.isKindOf( UPattern ).not })
 .setSpec( \a, UAdaptSpec() )
 .setSpec( \b, UAdaptSpec() )
-.category_( 'pattern_choice' );
+.category_( 'pattern_selection' );

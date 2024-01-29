@@ -22,4 +22,4 @@ UMapDef( \schmidt, { |value = 0.0, range = #[0.25,0.75], trueValue = 1.0, falseV
 	UMapOut.kr( output );
 })
 .mappedArgs_([ \trueValue, \falseValue ])
-.category_( 'trigger' )
+.category_( 'switch' )

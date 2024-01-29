@@ -36,4 +36,4 @@ HybridUMapDef( \add, { |input = 0.0, add = 0.0, factor = 1|
 	.setSpec( \factor, [-1,1,\lin,0,0].asSpec )
 	.setSpec( \input, UAdaptSpec() )
 	.setSpec( \add, UAdaptSpec() )
-	.category_( 'operator' )
+	.category_( 'math' )

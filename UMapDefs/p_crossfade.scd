@@ -37,4 +37,4 @@ UPatDef( \p_crossfade, { |unit, a = 0.0, b = 1.0, crossfade = 0.5|
 		});
 	};
 })
-.category_( 'pattern_choice' );
+.category_( 'pattern_selection' );

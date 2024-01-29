@@ -44,6 +44,6 @@ defs = [ 8,12,16,24,32,48,64,128 ].collect({ |n|
 		.mappedArgs_( [ \vals ] );
 });
 
-MultiUMapDef( \select, defs, \choice, \n, false )
+MultiUMapDef( \select, defs, \selection, \n, false )
 	.mappedArgs_([ \vals ])
 	.allowedModes_( [ \init, \sync, \normal ] );

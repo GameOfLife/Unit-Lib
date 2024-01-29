@@ -19,7 +19,7 @@ HybridUMapDef( \round, { |input = 0.5, round = 0|
 		UMapOut.kr(input);
 	}, { |unit, input = 0.5, round = 0|
 		input.round( round ).clip( *[unit.spec.minval, unit.spec.maxval] );
-	}, \operator
+	}, \math
 )
 	.prepareArgsFunc_({ |args|
 		var index;

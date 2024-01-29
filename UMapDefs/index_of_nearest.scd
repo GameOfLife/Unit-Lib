@@ -42,6 +42,6 @@ defs = [ 2,3,4,5,6,7,8 ].collect({ |n|
 	    .setSpec( \range, ControlSpec(0.0,1.0,\lin).asRangeSpec )
 });
 
-MultiUMapDef( \index_of_nearest, defs, \operator, \n, false )
+MultiUMapDef( \index_of_nearest, defs, \selection, \n, false )
 	.allowedModes_( [ \init, \sync, \normal ] )
     .mappedArgs_( [ \range ] );

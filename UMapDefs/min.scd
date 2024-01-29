@@ -21,4 +21,4 @@ HybridUMapDef( \min, { |a = 0.5, b = 0.5|
 .mappedArgs_([ \a, \b ])
 .setSpec( \a, UAdaptSpec() )
 .setSpec( \b, UAdaptSpec() )
-.category_( 'operator' )
+.category_( 'math' )

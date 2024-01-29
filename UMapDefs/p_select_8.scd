@@ -40,7 +40,7 @@ def = UPatDef( \p_select_8, { |unit,
 	};
 })
 .setSpec( \index, IntegerSpec(0,0,7) )
-.category_( 'pattern_choice' );
+.category_( 'pattern_selection' );
 
 values.do({ |val| def.setSpec( val, UAdaptSpec() ) });
 

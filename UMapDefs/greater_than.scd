@@ -27,4 +27,4 @@ HybridUMapDef( \greater_than, { |a = 0.0, b = 0.5, trueValue = 1.0, falseValue =
 .setSpec( \trueValue, UAdaptSpec() )
 .setSpec( \falseValue, UAdaptSpec() )
 .mappedArgs_([ \trueValue, \falseValue ])
-.category_( 'if' )
+.category_( 'switch' )

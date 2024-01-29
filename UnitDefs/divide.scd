@@ -40,4 +40,4 @@ HybridUMapDef( \divide, { |input = 0.0, divide = 1.0, negative = 0, factor = 0|
 		[-2,-1,0,1,2,3,4,5].collect({ |x| (10**x).asString })
 	 ) )
 	 .setSpec( \input, UAdaptSpec() )
-	.category_( 'operator' )
+	.category_( 'math' )

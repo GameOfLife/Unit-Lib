@@ -19,5 +19,5 @@ HybridUMapDef( \crossfade, { |a = 0.0, b = 1.0, crossfade = 0.5|
 }, { |unit, a = 0.0, b = 1.0, crossfade = 0.5|
 	 (a * (1-crossfade)) + (b * crossfade)
 })
-	.category_( 'choice' )
+	.category_( 'selection' )
 	.mappedArgs_( [ \a, \b ] );
