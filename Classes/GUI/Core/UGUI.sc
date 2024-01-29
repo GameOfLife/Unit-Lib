@@ -161,6 +161,15 @@ UGUI {
 							UMapSetChecker.stall = false;
 						});
 
+						umapdragbin.mouseDownAction_({
+							this.makeUMapDefMenu({ |def| unit.canUseUMap( key, def ); }, { |def| unit.insertUMap( key, def ); }, { umapdragbin.background = nil; });
+							umapdragbin.background = Color.blue(0.9).alpha_(0.25);
+						});
+
+						umapdragbin.mouseUpAction_({
+							umapdragbin.background = nil;
+						});
+
 						composite.decorator.shift( (bounds.width * argSpec.width) - (labelWidth + 3), 0 );
 					};
 				};
@@ -176,6 +185,62 @@ UGUI {
 	}
 
 	makeHeader { }
+
+	makeUMapDefMenu { |test, action, hideAction|
+		var uDefsList = [], ctrl, menu;
+		var uDefsDict = ();
+
+		UMapDef.all !? { |all|
+			all.keys.asArray.sort.do({ |key|
+				var category, index, udef;
+				udef = all[ key ];
+				if( test.value( udef ) ) {
+					category = udef.category;
+					if( category != \private ) {
+						uDefsDict[ udef.defType ] = uDefsDict[ udef.defType ] ?? {()};
+						uDefsDict[ udef.defType ][ category ] = uDefsDict[ udef.defType ][ category ].add( udef );
+					};
+				};
+			});
+		};
+
+		[ \dynamic, \mixed, \control, \value, \pattern ].do({ |key|
+			if( uDefsDict.keys.includes( key ) ) {
+				uDefsList = uDefsList.add( key );
+				uDefsDict[ key ] !? _.sortedKeysValuesDo({ |key, value|
+					uDefsList = uDefsList.add( [ key, value ] );
+				});
+			};
+		});
+
+		ctrl = { |menu, what|
+			if( what === \aboutToHide ) {
+				hideAction.value;
+				menu.removeDependant( ctrl );
+				menu.destroy;
+			};
+		};
+
+		menu = Menu( *uDefsList.collect({ |item|
+			var submenu, includesChecked = false;
+			if( item.isKindOf( Symbol ) ) {
+				MenuAction.separator( item.asString );
+			} {
+				submenu = Menu( *item[1].collect({ |def|
+					var checked = false;
+					//checked = unit !? { unit.def.name == def.name; } ? false;
+					//if( checked ) { includesChecked = true; };
+					MenuAction( def.name, {
+						action.value( def );
+						menu.removeDependant( ctrl );
+						menu.destroy;
+					}).enabled_( checked.not ).font_( Font( Font.defaultSansFace, 12 ) );
+				})).title_( if( includesChecked ) { item[0] ++ " *" } { item[0] } );
+			}
+		})).font_( Font( Font.defaultSansFace, 12 ) ).front;
+
+		^menu.addDependant( ctrl );
+	}
 
 	resize_ { |resize| composite.resize_(resize) }
 	reset { unit.reset }

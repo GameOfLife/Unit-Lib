@@ -65,8 +65,8 @@ UMapGUI : UGUI {
 
 	makeHeader { |bounds|
 		var boldFont;
-		var umapdragbin;
-		var umapdragbinTask;
+		var umapdragbinInsert;
+		var umapdragbinReplace;
 		var dragging;
 
 		header = CompositeView( composite, bounds.width @ viewHeight )
@@ -116,36 +116,69 @@ UMapGUI : UGUI {
 					unit.guiCollapsed = bt.value.booleanValue;
 				});
 
-			UDragBin( header, // insert UMap
-				Rect( 14, 2, labelWidth - 10, 12 )
-			)
-				.canReceiveDragHandler_({ |vw, x,y|
-					View.currentDrag.isKindOf( UMapDef ) && {
-						(parentUnit !? (_.canUseUMap( unit.unitArgName, View.currentDrag ))
-							? false) && {
-								View.currentDrag.canInsert
-							};
-					};
-				})
-				.receiveDragHandler_({
-					var drg;
-					unit.stop;
-					UMapSetChecker.stall = true;
-					parentUnit.insertUMap( unit.unitArgName, View.currentDrag );
-					UMapSetChecker.stall = false;
-				});
+		umapdragbinInsert = UDragBin( header, // insert UMap
+			Rect( 14, 2, labelWidth - 10, 12 )
+		)
+		.canReceiveDragHandler_({ |vw, x,y|
+			View.currentDrag.isKindOf( UMapDef ) && {
+				(parentUnit !? (_.canUseUMap( unit.unitArgName, View.currentDrag ))
+					? false) && {
+					View.currentDrag.canInsert
+				};
+			};
+		})
+		.receiveDragHandler_({
+			unit.stop;
+			UMapSetChecker.stall = true;
+			parentUnit.insertUMap( unit.unitArgName, View.currentDrag );
+			UMapSetChecker.stall = false;
+		});
 
-			UDragBin( header, // replace UMap
-				Rect( labelWidth + 8, 2, (bounds.width - labelWidth - 16 - 6 - 16 ), 12 )
-			)
-				.canReceiveDragHandler_({ |vw, x,y|						View.currentDrag.isKindOf( UMapDef ) && {
-						parentUnit !? (_.canUseUMap( unit.unitArgName, View.currentDrag ))
-							? false;
-					};
-				})
-				.receiveDragHandler_({
-					unit.stop;
-					unit.def = View.currentDrag;
-				});
+		umapdragbinInsert.mouseDownAction_({
+			this.makeUMapDefMenu({ |def|
+				(parentUnit !? (_.canUseUMap( unit.unitArgName, def )) ? false) && { def.canInsert };
+			}, { |def|
+				unit.stop;
+				UMapSetChecker.stall = true;
+				parentUnit.insertUMap( unit.unitArgName, def );
+				UMapSetChecker.stall = false;
+			}, {
+				umapdragbinInsert.background = nil;
+			});
+			umapdragbinInsert.background = Color.blue(0.9).alpha_(0.25);
+		});
+
+		umapdragbinInsert.mouseUpAction_({
+			umapdragbinInsert.background = nil;
+		});
+
+		umapdragbinReplace = UDragBin( header, // replace UMap
+			Rect( labelWidth + 8, 2, (bounds.width - labelWidth - 16 - 6 - 16 ), 12 )
+		)
+		.canReceiveDragHandler_({ |vw, x,y|
+			View.currentDrag.isKindOf( UMapDef ) && {
+				parentUnit !? (_.canUseUMap( unit.unitArgName, View.currentDrag )) ? false;
+			};
+		})
+		.receiveDragHandler_({
+			unit.stop;
+			unit.def = View.currentDrag;
+		});
+
+		umapdragbinReplace.mouseDownAction_({
+			this.makeUMapDefMenu({ |def|
+				parentUnit !? (_.canUseUMap( unit.unitArgName, def )) ? false;
+			}, { |def|
+				unit.stop;
+				unit.def = def;
+			}, {
+				umapdragbinReplace.background = nil;
+			});
+			umapdragbinReplace.background = Color.blue(0.9).alpha_(0.25);
+		});
+
+		umapdragbinReplace.mouseUpAction_({
+			umapdragbinReplace.background = nil;
+		});
 	}
 }
