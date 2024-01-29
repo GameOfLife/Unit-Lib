@@ -1117,7 +1117,7 @@ UChainGUI {
 				} {
 					submenu = Menu( *item[1].collect({ |def|
 						var checked;
-						checked = unit.defName == def.name;
+						checked = unit !? { unit.defName == def.name; } ? false;
 						if( checked ) { includesChecked = true; };
 						MenuAction( def.name, {
 							action.value( def );
@@ -1345,6 +1345,20 @@ UChainGUI {
 								);
 							};
 					});
+
+				addBefore.mouseDownAction_({
+					uDefMenuFunc.value(nil, { |def|
+						this.setUnits( units.insert( i, U( def ) ) );
+					}, {
+						addBefore.background = nil;
+					});
+					addBefore.background = Color.gray(0.3).alpha_(0.5);
+				});
+
+				addBefore.mouseUpAction_({
+					addBefore.background = nil;
+				});
+
 			} {
 				addBefore.canFocus = false;
 			};
@@ -1604,6 +1618,15 @@ UChainGUI {
 							chain.units = chain.units ++ [ U( View.currentDrag.asSymbol ) ];
 						};
 				});
+
+			addLast.mouseDownAction_({
+				uDefMenuFunc.value(nil, { |def| chain.units = chain.units ++ [ U( def ) ]; }, { addLast.background = nil; });
+				addLast.background = Color.gray(0.3).alpha_(0.5);
+			});
+
+			addLast.mouseUpAction_({
+				addLast.background = nil;
+			});
 		};
 
 		if( scrollViewOrigin.notNil ) {
