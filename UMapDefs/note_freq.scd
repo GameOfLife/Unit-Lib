@@ -32,6 +32,6 @@ HybridUMapDef( \note_freq, { |note = 64, round = 1, base = 440, detune = 0, tran
 	.canUseUMapFunc_({ |unit, key, umapdef|
 		var spec;
 		spec = unit.getSpec( key );
-		spec.isKindOf( ControlSpec ) && { (spec.minval > 0) && { spec.maxval < inf } };
+	    spec.isKindOf( ControlSpec ) && { spec.default.size < 2 && { spec.minval > 0 && { spec.maxval < inf } } };
 	})
 	.category_( 'convert' )

@@ -22,5 +22,8 @@ UMapDef( \value_to_range, { |value = 0.5, decay = 0.999|
 	UMapOut.kr(range);
 })
 	.mappedArgs_( [ \value ] )
+    .canUseUMapFunc_({ |unit, key, umapdef|
+		unit.getSpec( key ).isKindOf( RangeSpec );
+	})
 	.setSpec( \decay, [0,1,-8].asSpec )
 	.category_( 'range' );
