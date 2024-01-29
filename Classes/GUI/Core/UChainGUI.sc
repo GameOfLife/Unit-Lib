@@ -1077,6 +1077,59 @@ UChainGUI {
 		var realIndex = 0;
 		var massEditWindow;
 		var upatGUI, upatCtrls, upatHeader, upatComp;
+		var uDefMenuFunc;
+
+		uDefMenuFunc = { |unit, action, hideAction|
+			var uDefsList = [], ctrl, menu;
+			var uDefsDict = ();
+
+			Udef.all !? { |all|
+				all.keys.asArray.sort.do({ |key|
+					var category, index, udef;
+					udef = all[ key ];
+					category = udef.category;
+					if( category != \private ) {
+						uDefsDict[ udef.ioType ] = uDefsDict[ udef.ioType ] ?? {()};
+						uDefsDict[ udef.ioType ][ category ] = uDefsDict[ udef.ioType ][ category ].add( udef );
+					};
+				});
+			};
+
+			[ \generator, \modifier, \endpoint, \other ].do({ |key|
+				uDefsList = uDefsList.add( key );
+				uDefsDict[ key ] !? _.sortedKeysValuesDo({ |key, value|
+					uDefsList = uDefsList.add( [ key, value ] );
+				});
+			});
+
+			ctrl = { |menu, what|
+				if( what === \aboutToHide ) {
+					hideAction.value;
+					menu.removeDependant( ctrl );
+					menu.destroy;
+				};
+			};
+
+			menu = Menu( *uDefsList.collect({ |item|
+				var submenu, includesChecked = false;
+				if( item.isKindOf( Symbol ) ) {
+					MenuAction.separator( item.asString );
+				} {
+					submenu = Menu( *item[1].collect({ |def|
+						var checked;
+						checked = unit.defName == def.name;
+						if( checked ) { includesChecked = true; };
+						MenuAction( def.name, {
+							action.value( def );
+							menu.removeDependant( ctrl );
+							menu.destroy;
+						}).enabled_( checked.not ).font_( Font( Font.defaultSansFace, 12 ) );
+					})).title_( if( includesChecked ) { item[0] ++ " *" } { item[0] } );
+				}
+			})).font_( Font( Font.defaultSansFace, 12 ) ).front;
+
+			menu.addDependant( ctrl );
+		};
 
 		if( GUI.id == \qt ) { scrollerMargin = 20 };
 
@@ -1328,6 +1381,15 @@ UChainGUI {
 
 			uview = UDragBin( comp, comp.bounds.moveTo(0,0).insetAll( 16,0,0,0) );
 			uview.color_( Color.gray(0.2) );
+
+			uview.mouseDownAction_({
+				uDefMenuFunc.value(unit, { |def| unit.def = def }, { uview.background = nil; });
+				uview.background = Color.gray(0.3).alpha_(0.5);
+			});
+
+			uview.mouseUpAction_({
+				uview.background = nil;
+			});
 
 			uview.canReceiveDragHandler_({ |sink|
 				var drg;
