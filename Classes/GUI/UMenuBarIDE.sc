@@ -30,7 +30,7 @@ UMenuBarIDE {
 
 	*initClass {
 		if ( thisProcess.platform.name !== 'osx' ) {
-			mode = \toolbar;
+			mode = \none;
 		};
 	}
 

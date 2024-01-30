@@ -100,7 +100,7 @@ ULib {
 	*serversWindow { |name|
         var makePlotTree, makeMeter, font;
         var servers = ULib.allServers;
-        var w;
+        var w, menuView;
 		var statusView, latencyView;
 
 		if( window.notNil && { window.isClosed.not }) {
@@ -110,11 +110,24 @@ ULib {
 		font = Font(Font.defaultSansFace, 10);
 
 		w = Window(name ? "ULib servers", Rect(10, 0, 440, 24 +
-			ULib.servers.collect({ |item| item.uViewHeight + 22 }).sum
-		)
-		).front;
+			ULib.servers.collect({ |item| item.uViewHeight + 22 }).sum +
+			if( UMenuBarIDE.allMenus.notNil ) { 28 } { 0 }
+		), resizable: false
+		).userCanClose_( false ).front;
         w.addFlowLayout;
 		RoundView.pushSkin( UChainGUI.skin );
+
+		if( UMenuBarIDE.allMenus.notNil ) {
+			menuView = View( w, Rect(0,0,440 - 8,20) );
+			menuView.background_( Color.gray(0.9) );
+			menuView.layout = HLayout(
+				ToolBar(
+					*[ \WFSCollider, \Edit, \View ].collect(UMenuBarIDE.allMenus[_] )
+				)
+			);
+			menuView.layout.margins = 0;
+			menuView.layout.spacing = 4;
+		};
 
 		ULib.servers.do{ |s, i|
 			var ip, composite;
