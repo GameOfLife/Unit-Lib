@@ -26,6 +26,7 @@ UMenuBarIDE {
 	classvar <>skipJack, <>windowsMenu;
 	classvar <>openRecentMenu;
 	classvar <>mode = \mainmenu, <>toolBar; // or \toolbar
+	classvar <>allMenus;
 
 	*initClass {
 		if ( thisProcess.platform.name !== 'osx' ) {
@@ -52,32 +53,29 @@ UMenuBarIDE {
 	}
 
 	*registerMenu { |menuAction, name|
-		var mn;
-		if( mode === \mainmenu ) {
-			MainMenu.register( menuAction, name.asString, 'unitlib' );
-		} {
-			if( toolBar.isNil ) {
-				toolBar = ToolBar(
-					Menu(
-						menuAction
-					).title_( name.asString )
-				).minWidth_(300).font_( Font( Font.defaultSansFace, 12 ) ).front;
-			} {
-				mn = toolBar.actions.detect({ |item| item.string == name.asString });
-				if( mn.isNil ) {
-					toolBar.addAction( Menu(
-						menuAction
-					).title_( name.asString )
-					);
-				} {
-					mn.menu.addAction( menuAction );
-				};
-			};
+		var mn, menuCreated = false;
+		allMenus = allMenus ?? {()};
+		mn = allMenus[ name.asSymbol ];
+		if( mn.isNil ) {
+			allMenus[ name.asSymbol ] = mn = Menu()
+			.title_( name.asString )
+			.font_( Font( Font.defaultSansFace, 12 ) );
+			menuCreated = true;
 		};
+		mn.addAction( menuAction );
+		switch( mode, \mainmenu, {
+			MainMenu.register( menuAction, name.asString, 'unitlib' );
+		}, \toolbar, {
+			if( toolBar.isNil ) {
+				toolBar = ToolBar().minWidth_(300).font_( Font( Font.defaultSansFace, 12 ) ).front;
+			};
+			if( menuCreated ) { toolBar.addAction( mn ) };
+		});
 	}
 
 	*clear {
 		var menus;
+		allMenus = nil;
 		if( mode === \mainmenu ) {
 			MainMenu.registered.do({ |item|
 				item.value.detect({ |acc| acc.key == 'unitlib' })
@@ -106,7 +104,7 @@ UMenuBarIDE {
 			UScore.openMultiple(nil, UScoreEditorGUI(_) )
 		}), name );
 
-		openRecentMenu = Menu().title_("Open Recent");
+		openRecentMenu = Menu().title_("Open Recent").font_( Font( Font.defaultSansFace, 12 ) );
 
 		this.registerMenu( openRecentMenu, name );
 
@@ -225,8 +223,8 @@ UMenuBarIDE {
 							}
 						}
 					}),
-				).title_( "Selected Events" )
-			).title_("Add"),
+				).title_( "Selected Events" ).font_( Font( Font.defaultSansFace, 12 ) )
+			).title_("Add").font_( Font( Font.defaultSansFace, 12 ) ),
 
 			Menu(
 				MenuAction( "UChain", {
@@ -241,8 +239,8 @@ UMenuBarIDE {
 				MenuAction( "UScoreList", {
 					USession.current !! _.add(UScoreList())
 				}),
-			).title_("New"),
-		).title_("Session");
+			).title_("New").font_( Font( Font.defaultSansFace, 12 ) ),
+		).title_("Session").font_( Font( Font.defaultSansFace, 12 ) );
 
 		this.registerMenu( sessionMenu, name );
 
@@ -364,7 +362,7 @@ UMenuBarIDE {
 			ULib.servers.first.meter;
 		}), "View");
 
-		windowsMenu = Menu().title_( "Windows" );
+		windowsMenu = Menu().title_( "Windows" ).font_( Font( Font.defaultSansFace, 12 ) );
 
 		this.registerMenu( windowsMenu, "View" );
 
