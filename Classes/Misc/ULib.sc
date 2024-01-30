@@ -123,7 +123,7 @@ ULib {
 			menuView.layout = HLayout(
 				ToolBar(
 					*[ \WFSCollider, \Edit, \View ].collect(UMenuBarIDE.allMenus[_] )
-				)
+				).font_( font )
 			);
 			menuView.layout.margins = 0;
 			menuView.layout.spacing = 4;
