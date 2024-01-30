@@ -108,6 +108,7 @@ UScoreEditorGUI : UAbstractWindow {
 	makeGui { |bounds|
 
 		var font = Font( Font.defaultSansFace, 11 ), header, windowTitle, margin, gap, topBarH, tranBarH, centerView, centerBounds;
+		var menuH, menuView;
 
         margin = 4;
         gap = 2;
@@ -147,8 +148,23 @@ UScoreEditorGUI : UAbstractWindow {
         gap = 2;
         topBarH = 22;
         tranBarH = 22;
+		menuH = 18;
 
-        centerBounds = Rect(0,0, bounds.width-8, bounds.height-( topBarH + tranBarH + (2*margin) + (2*gap) ));
+		if( UMenuBarIDE.allMenus.notNil ) {
+			menuView = View( view, Rect(0,0,bounds.width-8, menuH) );
+			menuView.resize_( 2 );
+			menuView.bounds = menuView.bounds.insetAll( -4, -4, -4, 0 );
+			menuView.background_( Color.gray(0.9) );
+			menuView.layout = HLayout(
+				ToolBar(
+					*[ UMenuBarIDE.currentMenuName.asSymbol, \Edit, \View ].collect(UMenuBarIDE.allMenus[_] )
+				).font_( font )
+			);
+			menuView.layout.margins = 0;
+			menuView.layout.spacing = 4;
+		};
+
+        centerBounds = Rect(0,0, bounds.width-8, bounds.height-( topBarH + tranBarH + menuH + (2*margin) + (3*gap) ));
         //centerView = CompositeView(view, centerBounds).resize_(5);
         scoreView = UScoreView(view, centerBounds, scoreEditor );
 

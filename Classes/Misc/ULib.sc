@@ -122,7 +122,7 @@ ULib {
 			menuView.background_( Color.gray(0.9) );
 			menuView.layout = HLayout(
 				ToolBar(
-					*[ \WFSCollider, \Edit, \View ].collect(UMenuBarIDE.allMenus[_] )
+					*[ UMenuBarIDE.currentMenuName.asSymbol, \Edit, \View ].collect(UMenuBarIDE.allMenus[_] )
 				).font_( font )
 			);
 			menuView.layout.margins = 0;
