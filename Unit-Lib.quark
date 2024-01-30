@@ -1,7 +1,7 @@
 (
   name: "Unit-Lib",
   summary: "The Unit Library is a system that provides high level abstractions on top of the SuperCollider language.",
-  version: "0.1.0",
+  version: "2.0.0",
   schelp: "Unit Library",
   dependencies: ["wslib", "NetLib"],
   license: "GPL3",
