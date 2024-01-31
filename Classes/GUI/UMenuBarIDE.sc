@@ -26,7 +26,7 @@ UMenuBarIDE {
 	classvar <>skipJack, <>windowsMenu;
 	classvar <>openRecentMenu;
 	classvar <>mode = \mainmenu, <>toolBar; // or \toolbar
-	classvar <>allMenus;
+	classvar >allMenus;
 
 	*initClass {
 		if ( thisProcess.platform.name !== 'osx' ) {
@@ -53,23 +53,32 @@ UMenuBarIDE {
 	}
 
 	*registerMenu { |menuAction, name|
-		var mn, menuCreated = false;
+		var menuCreated = false;
 		allMenus = allMenus ?? {()};
-		mn = allMenus[ name.asSymbol ];
-		if( mn.isNil ) {
-			allMenus[ name.asSymbol ] = mn = Menu()
-			.title_( name.asString )
-			.font_( Font( Font.defaultSansFace, 12 ) );
-			menuCreated = true;
-		};
-		mn.addAction( menuAction );
+		if( allMenus[ name.asSymbol ].isNil ) { menuCreated = true; };
+		allMenus[ name.asSymbol ] = allMenus[ name.asSymbol ].add( menuAction );
 		switch( mode, \mainmenu, {
 			MainMenu.register( menuAction, name.asString, 'unitlib' );
 		}, \toolbar, {
 			if( toolBar.isNil ) {
 				toolBar = ToolBar().minWidth_(300).font_( Font( Font.defaultSansFace, 12 ) ).front;
 			};
-			if( menuCreated ) { toolBar.addAction( mn ) };
+			if( menuCreated ) {
+				toolBar.addAction( Menu( menuAction ).title_( name.asString ) );
+			} {
+				toolBar.actions.detect({ |item| item.string == name.asString }) !? { |x| x.menu.addAction( menuAction ) }
+			};
+		});
+	}
+
+	*allMenus {
+		^allMenus.collect({ |item, key|
+			var mn;
+			mn = Menu()
+			.title_( key.asString )
+			.font_( Font( Font.defaultSansFace, 12 ) );
+			item.do({ |action| mn.addAction( action ) });
+			mn;
 		});
 	}
 
