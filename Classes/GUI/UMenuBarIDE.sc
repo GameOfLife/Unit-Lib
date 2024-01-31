@@ -87,7 +87,7 @@ UMenuBarIDE {
 		var menus;
 		if( allMenus.notNil ) {
 			menus = this.allMenus;
-			^ToolBar( *[ \File, \Edit, \View, currentMenuName.asSymbol ].collect( menus[_] ) )
+			^ToolBar( *[ currentMenuName.asSymbol, \File, \Edit, \View ].collect( menus[_] ) )
 		};
 	}
 
