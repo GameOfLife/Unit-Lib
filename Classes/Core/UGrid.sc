@@ -2,18 +2,28 @@ UGrid : UEvent {
 
 	var <>events;
 	var <>selected;
-	classvar <>nCols = 8; // only used in case of creation with array
+	var <>exclusiveMode; // \h, \v, \all, nil
+	classvar <>defaultNCols = 8; // only used in case of creation with array
 
-	*new { |events|
-		^super.new.init( events );
+	*new { |events, nCols|
+		^super.new.init( events, nCols );
 	}
 
-	init { |inEvents|
+	init { |inEvents, nCols|
+		nCols = nCols ? defaultNCols;
 		case { inEvents.isArray } {
 			events = Order();
-			inEvents.do({ |evt, i|
-				this.put( (i/nCols).asInteger, i.asInteger % nCols );
-			});
+			if( inEvents[0].isArray ) {
+				inEvents.do({ |arr, row|
+					arr.do({ |evt, col|
+						this.put( row, col, evt );
+					});
+				});
+			} {
+				inEvents.do({ |evt, i|
+					this.put( (i/nCols).asInteger, i.asInteger % nCols, evt );
+				});
+			};
 		} { inEvents.isKindOf( UEvent ) } {
 			events = Order();
 			this.put( 0, 0, inEvents );
@@ -89,6 +99,14 @@ UGrid : UEvent {
 		}, Array).flatten(1);
 	}
 
+	asArray {
+		^this.nRows.collect({ |row|
+			(events[ row ].indices.maxItem + 1).collect({ |col|
+				events[ row ][ col ];
+			});
+		});
+	}
+
 	eventsDo { |func, row, col|
 		if( row.isNil ) {
 			if( col.isNil ) {
@@ -113,25 +131,71 @@ UGrid : UEvent {
 		this.eventsDo( _.stop, row, col );
 	}
 
-	release { |row, col|
+	release { |row, col, exclude|
 		this.eventsDo( _.release, row, col );
 	}
 
-	startInRow { |row = 0, col = 0, force = false| // start event in row, stop the rest
-		var evtToStart;
-		evtToStart = this[row,col];
-		if( force or: (evtToStart.isNil) ) {
-			this.release( row );
-			evtToStart !? _.prepareAndStart;
-		} {
-			this.eventsDo({ |evt|
-				if( evt == evtToStart ) {
-					if( evt.isPlaying.not ) { evt.prepareAndStart };
+	doAt { |row = 0, col = 0, func, exclusive|  // exclusive \h, \v, \all, \none, nil (default)
+		var evtToApply;
+		evtToApply = this[row,col];
+		exclusive = exclusive ? exclusiveMode;
+		this.eventsDo({ |evt|
+			if( evt === evtToApply ) {
+				func.value( evtToApply );
+			} {
+				evt.release; if( evt.isKindOf( UScore ) ) { evt.pos = 0 };
+			};
+		}, *switch( exclusive,
+			\h, [row,nil],
+			\v, [nil,col],
+			\all, [nil,nil],
+			[row,col] )
+		);
+	}
+
+	startAt { |row = 0, col = 0, exclusive, force = false|
+		this.doAt( row, col, { |evt|
+			if( evt.isPlaying.not ) {
+				evt.prepareAndStart
+			} {
+				if( force ) {
+					evt.stop;
+					evt.prepareAndStart;
+				};
+			}
+		}, exclusive )
+	}
+
+	toggleAt { |row = 0, col = 0, exclusive|
+		this.doAt( row, col, { |evt|
+			if( evt.isPlaying.not ) {
+				evt.prepareAndStart
+			} {
+				evt.release;
+			}
+		}, exclusive )
+	}
+
+	toggleOrNextAt { |row = 0, col = 0, exclusive|
+		this.doAt( row, col, { |evt|
+			if( evt.isKindOf( UScore ) && {
+				evt.events.select(_.isKindOf(UMarker)).any({ |um|
+					um.autoPause == true && { um.disabled.not }
+				})
+			} ) {
+				evt.playAnyway;
+			} {
+				if( evt.isPlaying.not ) {
+					evt.prepareAndStart
 				} {
 					evt.release;
 				};
-			}, row)
-		};
+			}
+		}, exclusive )
+	}
+
+	startInRow { |row = 0, col = 0, force = false| // start event in row, stop the rest
+		this.startAt( row, col, \h, force );
 	}
 
 	doInRow { |row = 0, col = 0, func, othersFunc|
