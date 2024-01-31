@@ -25,6 +25,7 @@ UMenuBarIDE {
 	classvar <>sessionMenu;
 	classvar <>skipJack, <>windowsMenu;
 	classvar <>openRecentMenu;
+	classvar <>preferencesFunc;
 	classvar <>mode = \mainmenu, <>toolBar; // or \toolbar
 	classvar >allMenus;
 
@@ -82,6 +83,14 @@ UMenuBarIDE {
 		});
 	}
 
+	*createToolbar {
+		var menus;
+		if( allMenus.notNil ) {
+			menus = this.allMenus;
+			^ToolBar( *[ \File, \Edit, \View, currentMenuName.asSymbol ].collect( menus[_] ) )
+		};
+	}
+
 	*clear {
 		var menus;
 		allMenus = nil;
@@ -104,18 +113,43 @@ UMenuBarIDE {
 		currentMenuName = name;
 
 /* MAIN */
+		this.registerMenu( MenuAction( "Preferences...", {
+			preferencesFunc.value;
+		}), name );
+
+		this.registerMenu( MenuAction.separator("Reset"), name );
+
+		this.registerMenu( MenuAction( "Stop current Scores", {
+			UScoreEditorGUI.all.do({ |item| item.score.stop });
+		}), name );
+
+		this.registerMenu( MenuAction( "Stop all", {
+			CmdPeriod.run;
+		}), name );
+
+		this.registerMenu( MenuAction( "Clear ULib", {
+			ULib.clear( true );
+		}), name );
+
+		this.registerMenu( MenuAction( "(Re)activate all current Scores", {
+			ULib.setAllScoresActive( true );
+		}), name );
+
+		this.registerMenu( MenuAction( "Reload global buffers", {
+			 BufSndFile.reloadAllGlobal;
+		}), name );
 
 		this.registerMenu( MenuAction( "New Score", {
 				UScore.new.gui;
-			}), name );
+			}), "File" );
 
 		this.registerMenu( MenuAction( "Open Score...", {
 			UScore.openMultiple(nil, UScoreEditorGUI(_) )
-		}), name );
+		}), "File" );
 
 		openRecentMenu = Menu().title_("Open Recent").font_( Font( Font.defaultSansFace, 12 ) );
 
-		this.registerMenu( openRecentMenu, name );
+		this.registerMenu( openRecentMenu, "File" );
 
 		URecentScorePaths.menu = openRecentMenu;
 
@@ -123,13 +157,13 @@ UMenuBarIDE {
 
 		this.registerMenu( MenuAction( "Save Score", {
 			UScore.current !! _.save;
-		}), name );
+		}), "File" );
 
 		this.registerMenu( MenuAction( "Save Score as...", {
 			UScore.current !! _.saveAs;
-		}), name );
+		}), "File" );
 
-		this.registerMenu( MenuAction.separator("Export"), name );
+		this.registerMenu( MenuAction.separator("Export"), "File" );
 
 		this.registerMenu( MenuAction( "Export as audio file..", {
 			UScore.current !! { |x|
@@ -137,7 +171,7 @@ UMenuBarIDE {
 					x.writeAudioFile( path );
 				});
 			};
-		}), name );
+		}), "File" );
 
 		this.registerMenu( MenuAction( "Export selection as audio file..", {
 			if( UScoreEditorGUI.currentSelectedEvents.notNil ) {
@@ -150,11 +184,11 @@ UMenuBarIDE {
 					sc.writeAudioFile( path );
 				});
 			};
-		}), name );
+		}), "File" );
 
 /* SESSION */
 
-		this.registerMenu( MenuAction.separator("Sessions"), name );
+		this.registerMenu( MenuAction.separator("Sessions"), "File" );
 
 		sessionMenu = Menu(
 
@@ -251,7 +285,7 @@ UMenuBarIDE {
 			).title_("New").font_( Font( Font.defaultSansFace, 12 ) ),
 		).title_("Session").font_( Font( Font.defaultSansFace, 12 ) );
 
-		this.registerMenu( sessionMenu, name );
+		this.registerMenu( sessionMenu, "File" );
 
 /* EDIT */
 		this.registerMenu( MenuAction( "Copy", {
@@ -338,28 +372,6 @@ UMenuBarIDE {
 
 		this.registerMenu( MenuAction( "Remove Unused Tracks", {
 			UScoreEditorGUI.current !! { |x| x.scoreView.removeUnusedTracks }
-		}), "Edit" );
-
-		this.registerMenu( MenuAction.separator("Reset"), "Edit" );
-
-		this.registerMenu( MenuAction( "Stop current Scores", {
-			UScoreEditorGUI.all.do({ |item| item.score.stop });
-		}), "Edit" );
-
-		this.registerMenu( MenuAction( "Stop all", {
-			CmdPeriod.run;
-		}), "Edit" );
-
-		this.registerMenu( MenuAction( "Clear ULib", {
-			ULib.clear( true );
-		}), "Edit" );
-
-		this.registerMenu( MenuAction( "(Re)activate all current Scores", {
-			ULib.setAllScoresActive( true );
-		}), "Edit" );
-
-		this.registerMenu( MenuAction( "Reload global buffers", {
-			 BufSndFile.reloadAllGlobal;
 		}), "Edit" );
 
 	/* VIEW */
