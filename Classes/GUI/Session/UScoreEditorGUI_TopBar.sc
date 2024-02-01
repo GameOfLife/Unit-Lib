@@ -237,9 +237,12 @@ UScoreEditorGui_TopBar {
 				this.selectedEvents !? { |x|  this.scoreEditor.toggleLockEvents( x ) }
 			});
 
-		SmoothButton( header, size@size  )
-			.states_( [[ \folder, Color.black, Color.clear ]] )
+		header.decorator.shift(10);
+
+		SmoothButton( header, 40@size  )
+		.states_( [[ "folder", Color.black, Color.clear ]] )
 			.canFocus_(false)
+		    .radius_( [1,0,0,1] * (size/2) )
 			.action_({
 			    this.selectedEvents !? { |x|
                         	this.scoreEditor.folderFromEvents(x);
@@ -249,6 +252,7 @@ UScoreEditorGui_TopBar {
 		SmoothButton( header, 40@size  )
 			.states_( [[ "unfold" , Color.black, Color.clear ]] )
 			.canFocus_(false)
+		    .radius_( [0,1,1,0] * (size/2) )
 			.action_({
 			    this.selectedEvents !? { |x|
                         	this.scoreEditor.unpackSelectedFolders(x)
