@@ -23,7 +23,7 @@ UMenuBarIDE {
 
 	classvar <>currentMenuName;
 	classvar <>sessionMenu;
-	classvar <>skipJack, <>windowsMenu;
+	classvar <>skipJack, <>windowsMenu, <>windowsCtrl;
 	classvar <>openRecentMenu;
 	classvar <>preferencesFunc;
 	classvar <>mode = \mainmenu, <>toolBar; // or \toolbar
@@ -385,13 +385,13 @@ UMenuBarIDE {
 
 		windowsMenu = Menu().title_( "Windows" ).font_( Font( Font.defaultSansFace, 12 ) );
 
+		windowsCtrl.remove;
+		windowsCtrl = SimpleController( windowsMenu )
+		.put( \aboutToShow, {
+			this.fillWindowsMenu;
+		});
+
 		this.registerMenu( windowsMenu, "View" );
-
-		this.fillWindowsMenu;
-
-		if( skipJack.notNil ) { skipJack.stop };
-
-		skipJack = SkipJack( { UMenuBarIDE.fillWindowsMenu }, 1 );
 	}
 
 	*add { |name, function, menuName|
