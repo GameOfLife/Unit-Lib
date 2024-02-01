@@ -81,6 +81,7 @@ UScoreEditorGui_TopBar {
 
     makeGui{ |parent, bounds|
         var font = Font( Font.defaultSansFace, 11 ), size, marginH, marginV;
+		var umixer;
 		views = ();
 
 	    marginH = 2;
@@ -261,7 +262,11 @@ UScoreEditorGui_TopBar {
 			.canFocus_(false)
 			.font_( font )
 			.action_({ |b|
-				UMixer(scoreView.currentScore);
+			    if( umixer.notNil && { umixer.parent.isClosed.not } ) {
+				   umixer.parent.front;
+			    } {
+				   umixer = UMixer(scoreView.currentScore);
+			    }
 			});
 
 
