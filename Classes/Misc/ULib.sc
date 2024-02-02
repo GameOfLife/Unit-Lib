@@ -102,6 +102,7 @@ ULib {
         var servers = ULib.allServers;
         var w, menuView;
 		var statusView, latencyView;
+		var width = 480;
 
 		if( window.notNil && { window.isClosed.not }) {
 			window.close;
@@ -109,7 +110,7 @@ ULib {
 
 		font = Font(Font.defaultSansFace, 11);
 
-		w = Window(name ? "ULib servers", Rect(10, 0, 440, 24 +
+		w = Window(name ? "ULib servers", Rect(10, 10, width, 24 +
 			ULib.servers.collect({ |item| item.uViewHeight + 22 }).sum +
 			if( UMenuBarIDE.allMenus.notNil ) { 28 } { 0 }
 		), resizable: false
@@ -118,7 +119,7 @@ ULib {
 		RoundView.pushSkin( UChainGUI.skin );
 
 		if( UMenuBarIDE.allMenus.notNil ) {
-			menuView = View( w, Rect(0,0,440 - 8,18) );
+			menuView = View( w, Rect(0,0,width - 8,18) );
 			menuView.bounds = menuView.bounds.insetAll(0,-4,0,0);
 			menuView.background_( Color.gray(0.9) );
 			menuView.layout = HLayout( UMenuBarIDE.createToolbar.font_( Font( Font.defaultSansFace, 12 ) ) );
@@ -128,10 +129,10 @@ ULib {
 
 		ULib.servers.do{ |s, i|
 			var ip, composite;
-			composite = CompositeView( w, Rect( 0,0, 432, 18 ) );
+			composite = CompositeView( w, Rect( 0,0, width - 8, 18 ) );
 			composite.background = Color.gray(0.8);
 			if( s.addr.isLocal ) {
-				SmoothButton(composite, Rect(440-26,0, 18, 18))
+				SmoothButton(composite, Rect(width-26,0, 18, 18))
 				.states_( [["K"]] )
 				.canFocus_( false )
 				.font_( font )
@@ -146,7 +147,7 @@ ULib {
 			.font_( font.boldVariant )
 			.string_( " " ++ s.name + "/" + ip );
 			if( i == 0 ) {
-				latencyView = EZSmoothSlider(composite, Rect(440 - 108 - 20,1,100,16),nil, [0.02,1,\exp,0,0.02].asSpec)
+				latencyView = EZSmoothSlider(composite, Rect(width - 108 - 20,1,100,16),nil, [0.02,1,\exp,0,0.02].asSpec)
 			    .value_( Server.default.latency)
 			    .font_( font )
 			    .action_({ |v| Server.default.latency = v.value})
@@ -158,10 +159,10 @@ ULib {
 			    .knobColor_( Color.black.alpha_(0.25) );
 			};
 			w.view.decorator.nextLine;
-			s.uView(w,436);
+			s.uView(w, width-4);
 		};
 
-		statusView = StaticText( w, (432 - 40) @ 18 )
+		statusView = StaticText( w, (width - 8 - 40) @ 18 )
 		.font_( font );
 
 		SmoothButton( w, Rect( 0, 0, 36, 16 ) )
