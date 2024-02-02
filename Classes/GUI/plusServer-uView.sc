@@ -21,7 +21,7 @@
 
 		width = width - 26;
 
-		font = Font(Font.defaultSansFace, 10);
+		font = Font(Font.defaultSansFace, 11);
 		onColor = onColor ? Color.green(0.5);
 
 		if (window.notNil, { ^window.front });

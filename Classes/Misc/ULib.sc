@@ -107,7 +107,7 @@ ULib {
 			window.close;
 		};
 
-		font = Font(Font.defaultSansFace, 10);
+		font = Font(Font.defaultSansFace, 11);
 
 		w = Window(name ? "ULib servers", Rect(10, 0, 440, 24 +
 			ULib.servers.collect({ |item| item.uViewHeight + 22 }).sum +
@@ -118,9 +118,10 @@ ULib {
 		RoundView.pushSkin( UChainGUI.skin );
 
 		if( UMenuBarIDE.allMenus.notNil ) {
-			menuView = View( w, Rect(0,0,440 - 8,20) );
+			menuView = View( w, Rect(0,0,440 - 8,18) );
+			menuView.bounds = menuView.bounds.insetAll(0,-4,0,0);
 			menuView.background_( Color.gray(0.9) );
-			menuView.layout = HLayout( UMenuBarIDE.createToolbar.font_( font ) );
+			menuView.layout = HLayout( UMenuBarIDE.createToolbar.font_( Font( Font.defaultSansFace, 12 ) ) );
 			menuView.layout.margins = 0;
 			menuView.layout.spacing = 4;
 		};
