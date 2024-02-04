@@ -1786,7 +1786,7 @@
 
 		#view, bounds = EZGui().prMakeMarginGap.prMakeView( parent, bounds );
 		 vws[ \view ] = view;
-		 view.addFlowLayout(0@0, 4@4);
+		 view.addFlowLayout(0@0, 2@2);
 		if( label.notNil ) {
 			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
 			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ 14 )
