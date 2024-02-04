@@ -29,7 +29,7 @@ SignatureBox : RoundNumberBox {
 		alt_scale = 1; // cents
 		value = 4;
 
-		formatFunc = { |value| "%/%".format( value, denom ) };
+		formatFunc = { |value| "%/%".format( value.asInteger, denom.asInteger ) };
 
 		interpretFunc = { |string|
 			if( string.includes( $/ ) ) {
