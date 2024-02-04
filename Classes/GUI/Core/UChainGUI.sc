@@ -46,7 +46,7 @@ UChainGUI {
 	*initClass {
 
 		skin = (
-			labelWidth: 80,
+			labelWidth: 90,
 			hiliteColor: Color.black.alpha_(0.33),
 			RoundButton: (
 				border: 0.75,
@@ -63,7 +63,7 @@ UChainGUI {
 		);
 
 		StartUp.defer({
-			skin.font = Font( Font.defaultSansFace, 10 );
+			skin.font = Font( Font.defaultSansFace, 11 );
 		});
 
 		all = [];
@@ -108,7 +108,7 @@ UChainGUI {
 			} {
 				parent = Window(
 					parent,
-					bounds ?? { Rect(425 rrand: 525, 300 rrand: 350, 342, 600) },
+					bounds ?? { Rect(425 rrand: 525, 300 rrand: 350, 362, 600) },
 					scroll: false
 				).front;
 				this.makeViews( bounds );
@@ -552,7 +552,7 @@ UChainGUI {
 						};
 					});
 
-				views[ \infDur ] = SmoothButton( composite, 34@14 )
+				views[ \infDur ] = SmoothButton( composite, 40@14 )
 					.border_( 1 )
 					.radius_( 3 )
 					.label_( [ "inf", "inf" ] )
@@ -576,7 +576,7 @@ UChainGUI {
 					.action_({ chain.useSndFileDur });
 
 
-				views[ \releaseSelf ] = SmoothButton( composite, 70@14 )
+				views[ \releaseSelf ] = SmoothButton( composite, 84@14 )
 					.border_( 1 )
 					.radius_( 3 )
 					.label_( [ "releaseSelf", "releaseSelf" ] )
@@ -669,12 +669,12 @@ UChainGUI {
 				};
 
 				// ugroup
-				StaticText( composite, (labelWidth-2-14)@14 )
+				StaticText( composite, (labelWidth-8-14)@14 )
 					.applySkin( RoundView.skin )
 					.string_( "ugroup" )
 					.align_( \right );
 
-				views[ \ugroup ] = PopUpMenu( composite, 70@14 )
+				views[ \ugroup ] = PopUpMenu( composite, 84@14 )
 					.applySkin( RoundView.skin )
 					.items_( [ "-", "new..." ] )
 					.canFocus_( false )
@@ -742,7 +742,7 @@ UChainGUI {
 						chain.fadeOutCurve_( nb.value );
 					});
 
-				composite.decorator.shift( 38, 0 );
+				composite.decorator.shift( 44, 0 );
 
 				// global
 
@@ -755,7 +755,7 @@ UChainGUI {
 						chain.global = bt.value.booleanValue;
 					});
 
-				views[ \addAction ] = PopUpMenu( composite, 70@14 )
+				views[ \addAction ] = PopUpMenu( composite, 84@14 )
 					.applySkin( RoundView.skin )
 					.items_( [ "addBefore", "addToHead", "addToTail", "addAfter" ] )
 					.canFocus_( false )
