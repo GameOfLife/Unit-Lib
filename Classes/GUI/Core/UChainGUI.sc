@@ -46,7 +46,7 @@ UChainGUI {
 	*initClass {
 
 		skin = (
-			labelWidth: 90,
+			labelWidth: 100,
 			hiliteColor: Color.black.alpha_(0.33),
 			RoundButton: (
 				border: 0.75,
@@ -108,7 +108,7 @@ UChainGUI {
 			} {
 				parent = Window(
 					parent,
-					bounds ?? { Rect(425 rrand: 525, 300 rrand: 350, 362, 600) },
+					bounds ?? { Rect(425 rrand: 525, 300 rrand: 350, 372, 600) },
 					scroll: false
 				).front;
 				this.makeViews( bounds );
@@ -276,7 +276,7 @@ UChainGUI {
 				} ]
 		 	);
 
-		 composite.decorator.shift( bounds.width - 14 - 80 - 32, 0 );
+		 composite.decorator.shift( bounds.width - 14 - 90 - 32, 0 );
 
 		if( chain.isKindOf( MassEditUChain ) ) {
 			chain.addDependantToChains( massEditController );
@@ -370,7 +370,7 @@ UChainGUI {
 				};
 			});
 
-		views[ \singleWindow ] = SmoothButton( composite, 74@14 )
+		views[ \singleWindow ] = SmoothButton( composite, 84@14 )
 			.label_( [ "single window", "single window" ] )
 			.border_( 1 )
 			.hiliteColor_( Color.green )
@@ -669,7 +669,7 @@ UChainGUI {
 				};
 
 				// ugroup
-				StaticText( composite, (labelWidth-8-14)@14 )
+				StaticText( composite, (82-14)@14 )
 					.applySkin( RoundView.skin )
 					.string_( "ugroup" )
 					.align_( \right );
