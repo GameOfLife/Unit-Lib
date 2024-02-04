@@ -393,7 +393,7 @@ BufSndFileView {
 			})
 			.visible_( false );
 
-		views[ \endComp ] = CompositeView( view, (((bounds.width - 73)/2)-2) @ viewHeight )
+		views[ \endComp ] = CompositeView( view, (((bounds.width - 73)/2).floor-2) @ viewHeight )
 			.resize_( 2 );
 
 		views[ \endSecond ] = SMPTEBox( views[ \endComp ],
