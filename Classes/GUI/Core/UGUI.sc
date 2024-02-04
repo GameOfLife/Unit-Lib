@@ -24,7 +24,7 @@ UGUI {
 	var <unit;
 
 	var <parent, <composite, <views, <controller;
-	var <viewHeight = 14, <labelWidth = 80;
+	var <viewHeight = 14, <labelWidth = 100;
 	var <>action;
 	var <>mapSetAction, <>mapCheckers;
 
