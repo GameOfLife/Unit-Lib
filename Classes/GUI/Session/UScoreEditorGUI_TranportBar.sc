@@ -158,7 +158,7 @@ UScoreEditorGui_TransportBar {
 
     makeGui{ |parent, bounds|
 
-        var font = Font( Font.defaultSansFace, 11 ), view, size, marginH, marginV, playAlt;
+        var font, view, size, marginH, marginV, playAlt;
 		views = ();
 
 		marginH = 2;
@@ -167,6 +167,8 @@ UScoreEditorGui_TransportBar {
         view = CompositeView( parent, bounds );
 
         RoundView.pushSkin( UChainGUI.skin );
+
+		font = RoundView.skin.font;
 
 		view.addFlowLayout(marginH@marginV);
 		//view.background_( Color.white );
@@ -184,7 +186,6 @@ UScoreEditorGui_TransportBar {
 			    [ \stop, Color.black, Color.green.alpha_(0.5) ],
 			    [ \play, Color.blue, Color.red.alpha_(0.5) ]] )
 			.canFocus_(false)
-			.font_( font )
 			//.changeStateWhenPressed_(false)
 			.action_({  |v,c,d,e|
 
@@ -206,7 +207,6 @@ UScoreEditorGui_TransportBar {
 			    [ \pause, Color.red,Color.green.alpha_(0.5) ],
 			    [ \pause, Color.blue,Color.red.alpha_(0.5) ]] )
 			.canFocus_(false)
-			.font_( font )
 			.action_({ |v|
 			    switch( v.value)
 			    {0}{
@@ -226,7 +226,6 @@ UScoreEditorGui_TransportBar {
 			.states_( [[\return, Color.black, Color.clear ]])
 			.canFocus_(false)
 			.radius_( [ size/2, 0, 0, size/2 ] )
-			.font_( font )
 			.action_({
 			    this.score.toPrevMarker;
 			});
@@ -235,7 +234,6 @@ UScoreEditorGui_TransportBar {
 			.states_( [[\skip, Color.black, Color.clear ]])
 			.canFocus_(false)
 			.radius_( [ 0, size/2, size/2, 0 ] )
-			.font_( font )
 			.action_({
 			    this.score.toNextMarker;
 			});
@@ -245,7 +243,6 @@ UScoreEditorGui_TransportBar {
         			[\roundArrow, Color.black, Color.green.alpha_(0.5) ]])
         			.value_( this.score.loop.binaryValue )
         			.canFocus_(false)
-        			.font_( font )
         			.action_({ |v| this.score.loop = v.value.booleanValue;  });
 
         view.decorator.shift(20,0);

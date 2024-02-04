@@ -80,7 +80,7 @@ UScoreEditorGui_TopBar {
     }
 
     makeGui{ |parent, bounds|
-        var font = Font( Font.defaultSansFace, 11 ), size, marginH, marginV;
+        var font, size, marginH, marginV;
 		var umixer;
 		views = ();
 
@@ -91,6 +91,8 @@ UScoreEditorGui_TopBar {
         header = CompositeView( parent, bounds );
 
         RoundView.pushSkin( UChainGUI.skin );
+
+		font = RoundView.skin.font;
 
 		header.addFlowLayout(marginH@marginV);
 		header.resize_(2);
@@ -264,7 +266,6 @@ UScoreEditorGui_TopBar {
 		SmoothButton( header, 40@size  )
 			.states_( [[ "mixer", Color.black, Color.clear ]] )
 			.canFocus_(false)
-			.font_( font )
 			.action_({ |b|
 			    if( umixer.notNil && { umixer.parent.isClosed.not } ) {
 				   umixer.parent.front;
