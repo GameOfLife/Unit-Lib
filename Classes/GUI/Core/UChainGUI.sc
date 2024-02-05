@@ -1301,7 +1301,7 @@ UChainGUI {
 				realIndex = realIndex + 1;
 			};
 
-			addBefore = UDragBin( scrollView, width@6 )
+			addBefore = UDragBin( scrollView, width@7 )
 				.color_( Color.gray(0.2) )
 				.resize_(2);
 
@@ -1579,7 +1579,7 @@ UChainGUI {
 		});
 
 		if( notMassEdit && { units.size > 0 } ) {
-			addLast = UDragBin( scrollView, width@6 )
+			addLast = UDragBin( scrollView, width@7 )
 				.resize_(2)
 				.color_( Color.gray(0.2) )
 				.background_( Color.white.alpha_(0.25) )
