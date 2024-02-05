@@ -18,7 +18,7 @@ Udef( \peak, { |freq = 440, rq = 1, db = 0|
 	in = BPeakEQ.ar( in, freq.clip(20,20000), rq, db );
 	UOut.ar( 0, in );
 })
-.category_( \private )
+.category_( \filter )
 .setSpec( \freq, \freq.asSpec )
 .setSpec( \rq, [ 0.01, 10, \exp, 0, 1 ].asSpec )
 .setSpec( \db, [-24,24,\lin].asSpec )

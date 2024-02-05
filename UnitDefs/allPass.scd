@@ -18,7 +18,7 @@ Udef( \allPass, { |freq = 440, decayTime = 1, dry = 0|
 	in = AllpassC.ar( in, 1/2, 1/freq, decayTime ) + (in * dry);
 	UOut.ar( 0, in );
 })
-	.category_( \private )
+	.category_( \filter )
 	.setSpec( \freq, FreqSpec( 2, 20000 ))
 	.setSpec( \decayTime, [ 0.01, 10, \exp, 0, 0.1 ].asSpec )
 	.setSpec( \dry, \amp.asSpec );
