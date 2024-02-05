@@ -17,6 +17,6 @@ Udef( \bandStop, { |freq = 440, bw = 1|
 	in = BBandStop.ar( in, freq.clip(20,20000), bw );
 	UOut.ar( 0, in );
 })
-	.category_( \filter )
+	.category_( \private )
 	.setSpec( \freq, \freq.asSpec )
 	.setSpec( \bw, [ 0.01, 10, \exp, 0, 1 ].asSpec )
