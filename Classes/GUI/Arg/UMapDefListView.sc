@@ -159,7 +159,7 @@ UMapDefListView {
 		});
 
 		g = { |cat, udefs|
-		   var color;
+			var color, darkerWords = [ "point", "trigger", "upattern" ];
             if( cat !== \private ) {
 
 	       color = Color( *udefs.collect({ |x| x.guiColor.asArray }).mean );
@@ -173,7 +173,7 @@ UMapDefListView {
             views[ cat ].background = color;
 
             // temporary hack to make point and trigger sub-categories stick out
-            if( cat.asString.find("point").notNil or: { cat.asString.find("trigger").notNil } ) {
+			if( darkerWords.detect({ |item| cat.asString.find( item ).notNil }).notNil ) {
 	            views[ cat ].background = color.blend( Color.gray(0.5,0.75), 0.33 );
             };
 
@@ -291,7 +291,10 @@ UMapDefListView {
 				});
 
 			filterNames.do({ |filterName|
-				StaticText(views[ \scrollview],150@25).string_("UMapDefs" ++ if( filterName.notNil ) { " : " ++ filterName } { "" } );
+				StaticText(views[ \scrollview],(bounds.width - (scrollerMargin+6))@25)
+				.string_("UMapDefs" ++ if( filterName.notNil ) { " : " ++ filterName } { "" } )
+				.align_( \bottomLeft )
+				.font_( RoundView.skin.font.copy.bold_( true ) );
 				views[ \scrollview].decorator.nextLine;
 				dict[ filterName ].clump(2).sort({ |a,b| a[0] <= b[0] }).flatten(1).pairsDo(g);
 			});

@@ -75,7 +75,7 @@ UdefListView {
 
 	init { |parent, bounds|
 
-		var categories, names, rackCategories, g;
+		var ioTypes, names, rackCategories, g;
 		var scrollerMargin = 12;
 		var refreshFunc;
 		var controller;
@@ -108,19 +108,24 @@ UdefListView {
 		views[ \scrollview ].addFlowLayout;
 		views[ \scrollview ].hasBorder = false;
 
-		categories = [];
+		ioTypes = ();
 
-		Udef.all !? { |all| all.keys.asArray.sort.do({ |key|
-                var category, index, udef;
-                udef = all[ key ];
-                category = udef.category;
-                index = categories.indexOf( category );
-                if( index.isNil ) {
-                    categories = categories ++ [ category, [ udef ] ];
-                } {
-                    categories[ index + 1 ] = categories[ index + 1 ].add( udef );
-                };
-            })
+		Udef.all !? { |all|
+			all.keys.asArray.sort.do({ |key|
+				var category, index, udef;
+				var ioType, categories;
+				udef = all[ key ];
+				ioType = udef.ioType;
+				category = udef.category;
+				categories = ioTypes[ ioType ] ?? { [] };
+				index = categories.indexOf( category );
+				if( index.isNil ) {
+					categories = categories ++ [ category, [ udef ] ];
+				} {
+					categories[ index + 1 ] = categories[ index + 1 ].add( udef );
+				};
+				ioTypes[ ioType ] = categories;
+			})
 		};
 
         rackCategories = [];
@@ -259,12 +264,27 @@ UdefListView {
 					UnitRack.loadAllFromDefaultDirectory;
 				});
 
+			[ \generator, \modifier, \endpoint, \other ].do({ |ioType|
+				var categories;
+				StaticText(views[ \scrollview],(bounds.width - (scrollerMargin+6))@25)
+				.string_("Udefs: %".format( ioType ) )
+				.align_( \bottomLeft )
+				.font_( RoundView.skin.font.copy.bold_( true ) );
+				categories = ioTypes[ ioType ];
+				categories = categories.clump(2).sort({ |a,b| a[0] <= b[0] }).flatten(1);
+				categories.pairsDo(g);
+			});
+
+			/*
 			StaticText(views[ \scrollview],100@25).string_("Udefs");
 			views[ \scrollview].decorator.nextLine;
 			categories = categories.clump(2).sort({ |a,b| a[0] <= b[0] }).flatten(1);
-			categories.pairsDo(g);
-			StaticText(views[ \scrollview],100@25).string_("UnitRacks");
-            views[ \scrollview].decorator.nextLine;
+		    categories.pairsDo(g);
+			*/
+			StaticText(views[ \scrollview],(bounds.width - (scrollerMargin+6))@25)
+			.string_("UnitRacks")
+			.align_( \bottomLeft )
+			.font_( RoundView.skin.font.copy.bold_( true ) );
             rackCategories = rackCategories.clump(2).sort({ |a,b| a[0] <= b[0] }).flatten(1);
             rackCategories.pairsDo(g);
 		});
