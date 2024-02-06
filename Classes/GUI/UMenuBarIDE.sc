@@ -28,11 +28,13 @@ UMenuBarIDE {
 	classvar <>preferencesFunc;
 	classvar <>mode = \mainmenu, <>toolBar; // or \toolbar
 	classvar >allMenus;
+	classvar <>font;
 
 	*initClass {
 		if ( thisProcess.platform.name !== 'osx' ) {
 			mode = \none;
 		};
+		font = Font( Font.defaultSansFace, 13 );
 	}
 
 	*fillWindowsMenu {
@@ -62,7 +64,7 @@ UMenuBarIDE {
 			MainMenu.register( menuAction, name.asString, 'unitlib' );
 		}, \toolbar, {
 			if( toolBar.isNil ) {
-				toolBar = ToolBar().minWidth_(300).font_( Font( Font.defaultSansFace, 12 ) ).front;
+				toolBar = ToolBar().minWidth_(300).font_( font ).front;
 			};
 			if( menuCreated ) {
 				toolBar.addAction( Menu( menuAction ).title_( name.asString ) );
@@ -77,7 +79,7 @@ UMenuBarIDE {
 			var mn;
 			mn = Menu()
 			.title_( key.asString )
-			.font_( Font( Font.defaultSansFace, 12 ) );
+			.font_( font );
 			item.do({ |action| mn.addAction( action ) });
 			mn;
 		});
@@ -87,7 +89,7 @@ UMenuBarIDE {
 		var menus;
 		if( allMenus.notNil ) {
 			menus = this.allMenus;
-			^ToolBar( *[ currentMenuName.asSymbol, \File, \Edit, \View ].collect( menus[_] ) )
+			^ToolBar( *[ currentMenuName.asSymbol, \File, \Edit, \View ].collect( menus[_] ) ).font_( font )
 		};
 	}
 
@@ -147,7 +149,7 @@ UMenuBarIDE {
 			UScore.openMultiple(nil, UScoreEditorGUI(_) )
 		}), "File" );
 
-		openRecentMenu = Menu().title_("Open Recent").font_( Font( Font.defaultSansFace, 12 ) );
+		openRecentMenu = Menu().title_("Open Recent").font_( font );
 
 		this.registerMenu( openRecentMenu, "File" );
 
@@ -266,8 +268,8 @@ UMenuBarIDE {
 							}
 						}
 					}),
-				).title_( "Selected Events" ).font_( Font( Font.defaultSansFace, 12 ) )
-			).title_("Add").font_( Font( Font.defaultSansFace, 12 ) ),
+				).title_( "Selected Events" ).font_( font )
+			).title_("Add").font_( font ),
 
 			Menu(
 				MenuAction( "UChain", {
@@ -282,8 +284,8 @@ UMenuBarIDE {
 				MenuAction( "UScoreList", {
 					USession.current !! _.add(UScoreList())
 				}),
-			).title_("New").font_( Font( Font.defaultSansFace, 12 ) ),
-		).title_("Session").font_( Font( Font.defaultSansFace, 12 ) );
+			).title_("New").font_( font ),
+		).title_("Session").font_( font );
 
 		this.registerMenu( sessionMenu, "File" );
 
@@ -383,7 +385,7 @@ UMenuBarIDE {
 			ULib.servers.first.meter;
 		}), "View");
 
-		windowsMenu = Menu().title_( "Windows" ).font_( Font( Font.defaultSansFace, 12 ) );
+		windowsMenu = Menu().title_( "Windows" ).font_( font );
 
 		windowsCtrl.remove;
 		windowsCtrl = SimpleController( windowsMenu )
