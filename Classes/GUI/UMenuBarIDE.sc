@@ -34,7 +34,6 @@ UMenuBarIDE {
 		if ( thisProcess.platform.name !== 'osx' ) {
 			mode = \none;
 		};
-		font = Font( Font.defaultSansFace, 13 );
 	}
 
 	*fillWindowsMenu {
@@ -113,6 +112,8 @@ UMenuBarIDE {
 		this.clear; // clear the old menu first
 
 		currentMenuName = name;
+
+		font = font ? Font( Font.defaultSansFace, 13 );
 
 /* MAIN */
 		this.registerMenu( MenuAction( "Preferences...", {
