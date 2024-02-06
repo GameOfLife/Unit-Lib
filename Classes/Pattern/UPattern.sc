@@ -414,8 +414,12 @@ UPattern : UChain {
 				action.value( next, target, time, timeToNext );
 				this.class.currentTimeToNext = nil;
 				this.currentTimeToNext = timeToNext;
-				if( timeToNext == inf && { this.releaseSelf == true && { duration < inf }} ) {
-					((duration - startPos) - time).wait;
+				if( timeToNext == inf ) {
+					if( this.releaseSelf == true && { duration < inf } ) {
+						((duration - startPos) - time).wait;
+					} {
+						1316134912.wait; // wait for a long time but not inf
+					};
 				} {
 					timeToNext.wait;
 				};
