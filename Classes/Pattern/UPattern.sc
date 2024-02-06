@@ -8,7 +8,7 @@ UPattern : UChain {
 	var <repeats = inf;
 	var <pattern = #[1,1];
 	var fadeTimes;
-	var <>maxSimultaneousStarts = 100;
+	var <>maxSimultaneousStarts = 2000;
 	var <>localPos = 0;
 	var <>localCount = 0;
 	var <>startPos = 0;
