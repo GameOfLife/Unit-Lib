@@ -122,7 +122,7 @@ ULib {
 			menuView = View( w, Rect(0,0,width - 8,18) );
 			menuView.bounds = menuView.bounds.insetAll(0,-4,0,0);
 			menuView.background_( Color.gray(0.9) );
-			menuView.layout = HLayout( UMenuBarIDE.createToolbar.font_( Font( Font.defaultSansFace, 12 ) ) );
+			menuView.layout = HLayout( UMenuBarIDE.createToolbar.font_( Font( Font.defaultSansFace, 13 ) ) );
 			menuView.layout.margins = 0;
 			menuView.layout.spacing = 4;
 		};

@@ -155,7 +155,7 @@ UScoreEditorGUI : UAbstractWindow {
 			menuView.resize_( 2 );
 			menuView.bounds = menuView.bounds.insetAll( -4, -4, -4, 0 );
 			menuView.background_( Color.gray(0.9) );
-			menuView.layout = HLayout( UMenuBarIDE.createToolbar.font_( Font( Font.defaultSansFace, 12 ) ) );
+			menuView.layout = HLayout( UMenuBarIDE.createToolbar.font_( Font( Font.defaultSansFace, 13 ) ) );
 			menuView.layout.margins = 0;
 			menuView.layout.spacing = 4;
 		};
