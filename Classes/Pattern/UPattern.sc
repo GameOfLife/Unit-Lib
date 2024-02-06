@@ -498,6 +498,9 @@ UPattern : UChain {
 					preparedEvents.remove( chain );
 				});
 				if( preparedEventsRoutineShouldEnd ) {
+					if( this.releaseSelf == true && { duration < inf } ) {
+						((duration - startPos) - time).wait;
+					};
 					this.releaseRunning;
 					isPlaying = false;
 					this.changed( \end );
