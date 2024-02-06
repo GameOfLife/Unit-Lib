@@ -467,7 +467,7 @@ UPattern : UChain {
 					if( firstEvent ) {
 						UPattern.expectedNext = startedPreparingTime + (time - waitTime) + timeToNext;
 						nil.yield;
-						(time - waitTime).wait;
+						(time - waitTime).min( 1316134912 ).wait;
 						firstEvent = false;
 					};
 					if( chain.notNil ) {
