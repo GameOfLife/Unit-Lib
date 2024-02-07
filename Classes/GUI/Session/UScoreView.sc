@@ -435,11 +435,11 @@ UScoreView {
         			5);
 
         //CONFIGURE scoreView
-        scoreView.background = Color.gray(0.8);
+        scoreView.background = Color.gray(1.0,0.6);
         scoreView.composite.resize = 5;
 	    scoreView.gridLines = [ 0, numTracks];
 		scoreView.gridMode = ['blocks','lines'];
-		scoreView.gridColor = Color.gray(0.5, 0.125);
+		scoreView.gridColor = Color.gray(0.4, 0.125);
 		scoreView.sliderWidth = 8;
 		scoreView.userView.view
 		    .canReceiveDragHandler_({
