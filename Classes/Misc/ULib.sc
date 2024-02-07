@@ -118,7 +118,7 @@ ULib {
 				} {
 					22
 				};
-			}).sum + 24 +
+			}).sum + 26 +
 			if( UMenuBarIDE.hasMenus ) { 22 } { 0 }
 		), resizable: false
 		).userCanClose_( false ).front;

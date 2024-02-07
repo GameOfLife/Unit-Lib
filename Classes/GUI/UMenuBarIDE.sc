@@ -142,7 +142,7 @@ UMenuBarIDE {
 					if( boundsKnown.not ) {
 						menu.front( absoluteBounds.leftBottom );
 					};
-					if( (menu.bounds.height + absoluteBounds.bottom) > Window.screenBounds.height ) {
+					if( (menu.bounds.height + absoluteBounds.bottom) > Window.availableBounds.bottom ) {
 						menu.front( absoluteBounds.leftTop - (0@menu.bounds.height) );
 					} {
 						if( boundsKnown ) { menu.front( absoluteBounds.leftBottom ); };
