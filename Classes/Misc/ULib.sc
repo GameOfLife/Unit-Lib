@@ -112,7 +112,7 @@ ULib {
 
 		w = Window(name ? "ULib servers", Rect(10, 10, width, 24 +
 			ULib.servers.collect({ |item| item.uViewHeight + 22 }).sum +
-			if( UMenuBarIDE.allMenus.notNil ) { 28 } { 0 }
+			if( UMenuBarIDE.hasMenus ) { 22 } { 0 }
 		), resizable: false
 		).userCanClose_( false ).front;
         w.addFlowLayout;
