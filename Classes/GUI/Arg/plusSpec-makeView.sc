@@ -124,6 +124,8 @@
 		};
 		vw.labelWidth = 80; // same as EZSlider
 		vw.applySkin( RoundView.skin ); // compat with smooth views
+		vw.labelView.applySkin( RoundView.skin );
+		vw.menu.applySkin( RoundView.skin );
 		if( resize.notNil ) { vw.view.resize = resize };
 		^vw
 	}
