@@ -150,14 +150,8 @@ UScoreEditorGUI : UAbstractWindow {
         tranBarH = 22;
 		menuH = 18;
 
-		if( UMenuBarIDE.allMenus.notNil ) {
-			menuView = View( view, Rect(0,0,bounds.width-8, menuH) );
-			menuView.resize_( 2 );
-			menuView.bounds = menuView.bounds.insetAll( -4, -4, -4, 0 );
-			menuView.background_( Color.gray(0.9) );
-			menuView.layout = HLayout( UMenuBarIDE.createToolbar );
-			menuView.layout.margins = 0;
-			menuView.layout.spacing = 4;
+		if( UMenuBarIDE.hasMenus ) {
+			menuView = UMenuBarIDE.createMenuStrip( view, (bounds.width-8) @ menuH, [-4,-4,-4,0] );
 		};
 
         centerBounds = Rect(0,0, bounds.width-8, bounds.height-( topBarH + tranBarH + menuH + (2*margin) + (3*gap) ));

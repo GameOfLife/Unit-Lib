@@ -29,6 +29,7 @@ UMenuBarIDE {
 	classvar <>mode = \mainmenu, <>toolBar; // or \toolbar
 	classvar >allMenus;
 	classvar <>font;
+	classvar <>menuStripMode = \views; // or \toolbar
 
 	*initClass {
 		if ( thisProcess.platform.name !== 'osx' ) {
@@ -73,6 +74,8 @@ UMenuBarIDE {
 		});
 	}
 
+	*hasMenus { ^allMenus.notNil }
+
 	*allMenus {
 		^allMenus.collect({ |item, key|
 			var mn;
@@ -90,6 +93,100 @@ UMenuBarIDE {
 			menus = this.allMenus;
 			^ToolBar( *[ currentMenuName.asSymbol, \File, \Edit, \View ].collect( menus[_] ) ).font_( font )
 		};
+	}
+
+	*createMenuViews { |parent|
+		var menus, headers;
+		menus = this.allMenus.atAll( [ currentMenuName.asSymbol, \File, \Edit, \View ] );
+		headers = menus.collect({ |menu, i|
+			var header, ctrl, name;
+			var makeTask, stopTask, task;
+			name = menu.title;
+			header = StaticText( parent, ( name.bounds( font ).width + 16)@( parent.bounds.height ) );
+			header.align_( \center ).string_( name ).font_( font );
+
+			makeTask = {
+				//"create task % %\n".postf( name );
+				task.stop;
+				task = {
+					var pos, res;
+					loop {
+						pos = QtGUI.cursorPosition;
+						res = headers.detect({ |item|
+							item.absoluteBounds.containsPoint( pos );
+						});
+						//[ name, res, pos ].postln;
+						if( res.notNil && { header != res }) {
+							res.mouseDown;
+							task.stop;
+						};
+						0.05.wait;
+					};
+				}.fork( AppClock );
+			};
+
+			stopTask = {
+				//"stopped task % %\n".postf( name );
+				task.stop;
+				task = nil;
+			};
+
+			menu = menus[i];
+			header.mouseDownAction_({ |vw|
+				var absoluteBounds, boundsKnown = true;
+				menus.do({ |item| if( item != menu ) { item.visible_(false) }; });
+				if( menu.visible.not ) {
+					absoluteBounds = vw.absoluteBounds;
+					boundsKnown = menu.bounds.height > 0;
+					if( boundsKnown.not ) {
+						menu.front( absoluteBounds.leftBottom );
+					};
+					if( (menu.bounds.height + absoluteBounds.bottom) > Window.screenBounds.height ) {
+						menu.front( absoluteBounds.leftTop - (0@menu.bounds.height) );
+					} {
+						if( boundsKnown ) { menu.front( absoluteBounds.leftBottom ); };
+					};
+				};
+			});
+			menu.mouseLeaveAction = { |vw|
+				//"menu leave % %\n".postf( name, vw.visible );
+				if( vw.visible ) { makeTask.value; };
+			};
+			menu.mouseEnterAction = { |vw|
+				//"menu enter %\n".postf( name );
+				stopTask.value;
+			};
+			ctrl = SimpleController( menu )
+			.put( \aboutToShow, {
+				//"menu show %\n".postf( name );
+				header.background = Color.black.alpha_(0.1);
+				makeTask.value;
+			})
+			.put( \aboutToHide, {
+				//"menu hide %\n".postf( name );
+				header.background = Color.clear;
+				stopTask.value;
+			});
+			header.onClose_({ ctrl.remove; stopTask.value; });
+		});
+		^headers;
+	}
+
+	*createMenuStrip { |parent, bounds, inset = #[0,-4,0,0]|
+		var menuView;
+		menuView = View( parent, bounds );
+		menuView.resize_( 2 );
+		menuView.bounds = menuView.bounds.insetAll( *inset );
+		menuView.background_( Color.gray(0.9) );
+		if( menuStripMode == \views ) {
+			menuView.addFlowLayout(0@0, 0@4);
+			this.createMenuViews( menuView );
+		} {
+			menuView.layout = HLayout( this.createToolbar );
+			menuView.layout.margins = 0;
+			menuView.layout.spacing = 4;
+		};
+		^menuView;
 	}
 
 	*clear {
