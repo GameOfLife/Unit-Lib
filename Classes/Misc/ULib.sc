@@ -103,6 +103,7 @@ ULib {
         var w, menuView;
 		var statusView, latencyView;
 		var width = 480;
+		var gainSlider, gainSliderCtrl;
 
 		if( window.notNil && { window.isClosed.not }) {
 			window.close;
@@ -111,7 +112,13 @@ ULib {
 		font = Font(Font.defaultSansFace, 11);
 
 		w = Window(name ? "ULib servers", Rect(10, 10, width, 24 +
-			ULib.servers.collect({ |item| item.uViewHeight + 22 }).sum +
+			ULib.servers.collect({ |item|
+				if( item.isKindOf( LoadBalancer ) ) {
+					item.uViewHeight + 22
+				} {
+					22
+				};
+			}).sum + 24 +
 			if( UMenuBarIDE.hasMenus ) { 22 } { 0 }
 		), resizable: false
 		).userCanClose_( false ).front;
@@ -125,7 +132,6 @@ ULib {
 		ULib.servers.do{ |s, i|
 			var ip, composite;
 			composite = CompositeView( w, Rect( 0,0, width - 8, 18 ) );
-			composite.background = Color.gray(0.8);
 			if( s.addr.isLocal ) {
 				SmoothButton(composite, Rect(width-26,0, 18, 18))
 				.states_( [["K"]] )
@@ -138,9 +144,16 @@ ULib {
 			} {
 				ip = s.addr.ip;
 			};
-			StaticText(composite, Rect( 2, 2, 200,16 ) )
-			.font_( font.boldVariant )
-			.string_( " " ++ s.name + "/" + ip );
+			if( s.isKindOf( LoadBalancer ) ) {
+				composite.background = Color.gray(0.8);
+				StaticText(composite, Rect( 2, 2, 200,16 ) )
+				.font_( font.boldVariant )
+				.string_( " " ++ s.name + "/" + ip );
+				w.view.decorator.nextLine;
+				s.uView(w, width-4);
+			} {
+				s.uView( composite, width-108-20 );
+			};
 			if( i == 0 ) {
 				latencyView = EZSmoothSlider(composite, Rect(width - 108 - 20,1,100,16),nil, [0.02,1,\exp,0,0.02].asSpec)
 			    .value_( Server.default.latency)
@@ -153,11 +166,11 @@ ULib {
 				.font_( font )
 			    .knobColor_( Color.black.alpha_(0.25) );
 			};
-			w.view.decorator.nextLine;
-			s.uView(w, width-4);
+
 		};
 
 		statusView = StaticText( w, (width - 8 - 40) @ 18 )
+		.align_( \left )
 		.font_( font );
 
 		SmoothButton( w, Rect( 0, 0, 36, 16 ) )
@@ -168,13 +181,36 @@ ULib {
 				ULib.clear;
 		     } );
 
+		gainSlider = EZSmoothSlider( w, (w.bounds.width - 8) @ 20,
+			controlSpec: [ -60, 36, \lin, 1, -12, "db" ],
+		).value_( UGlobalGain.gain ).action_({ |vw| UGlobalGain.gain = vw.value });
+
+		gainSlider.numberView
+		.font_( font.copy.bold_( true ) )
+		.autoScale_( true )
+		.step_( 1 )
+		.scroll_step_( 1 )
+		.formatFunc_({ |value| value.round(1).asInteger });
+		gainSlider.sliderView
+		.mode_( \move )
+		.align_( \right )
+		.string_("Level (dB)   ")
+		.font_( font );
+
+		gainSliderCtrl = SimpleController( UGlobalGain )
+		.put( \gain, {
+			gainSlider.value = UGlobalGain.gain.asInteger
+		});
+
 		SkipJack({
 			var numbufs = 0;
 			ULib.allServers.do({ |srv|
 				Buffer.cachedBuffersDo( srv, { numbufs = numbufs + 1 });
 			});
 			statusView.string_(
-				" UChains / Units / Buffers : % / % / %".format(
+				"UScores (open, playing) / UChains / Units / Buffers : (%, %) / % / % / %".format(
+					UScoreEditorGUI.all.size,
+					UScore.activeScores.size,
 					UChain.groupDict.keys.size,
 					U.synthDict.keys.size,
 					numbufs
@@ -222,7 +258,7 @@ ULib {
                 ServerMeterView(s, window, 0@0, numIns, numOuts)
             }
         };
-		w.onClose_({ if( window == w ) { window = nil } });
+		w.onClose_({ if( window == w ) { window = nil }; gainSliderCtrl.remove; });
 		window = w;
         ^w
     }

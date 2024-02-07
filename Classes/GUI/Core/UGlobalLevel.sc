@@ -58,13 +58,13 @@ UGlobalGain {
 			); };
 			RoundView.useWithSkin( UChainGUI.skin, {
 				view = EZSmoothSlider( parent, bounds,
-					controlSpec: [ -60, 36, \lin, 0, -12, "db" ],
+					controlSpec: [ -60, 36, \lin, 1, -12, "db" ],
 					labelHeight: 50
 				).value_( gain ).action_({ |vw| this.gain = vw.value });
 				view.view.resize_(5);
 				view.numberView.autoScale_( true )
 					.scroll_step_( 1 )
-					.formatFunc_({ |value| value.round(1) });
+					.formatFunc_({ |value| value.round(1).asInteger });
 				view.sliderView.mode_( \move );
 				view.sliderView.keyDownAction = { |v, a,b,c,keycode,key|
 					var score;
