@@ -29,7 +29,7 @@ x.postln; // -> [ an ArgSpec(a, 1), an ArgSpec(b, 2) ]
 
 ArgSpec : Spec {
 	var <>name, <>default, <>spec;
-	var <>private = false;
+	var >private = false;
 	var <>mode = \sync; // \sync, \normal, \init, \nonsynth
 	var <>width = 1;
 	var >label;
@@ -70,6 +70,8 @@ ArgSpec : Spec {
 	}
 
 	label { ^label ? name }
+
+	private { ^private.value( this ) }
 
 	constrain { |value|
 		^this.doWithSpec( \uconstrain, value );
