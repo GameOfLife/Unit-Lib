@@ -34,6 +34,7 @@ UMenuBarIDE {
 	*initClass {
 		if ( thisProcess.platform.name !== 'osx' ) {
 			mode = \none;
+			menuStripMode = \toolbar;
 		};
 	}
 
