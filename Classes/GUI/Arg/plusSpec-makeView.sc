@@ -107,7 +107,7 @@
 		var multipleActions = action.size > 0;
 		var vw;
 		var lbls;
-		lbls = labels.asCollection;
+		lbls = labels.asCollection.collect(_.value);
 		vw = EZPopUpMenu( parent, bounds, label !? { label.asString ++ " " },
 			if( multipleActions ) {
 				list.collect({ |item, i|
