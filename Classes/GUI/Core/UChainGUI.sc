@@ -121,6 +121,8 @@ UChainGUI {
 			this.addToAll;
 		};
 
+		parent.asView.minWidth_( 372 ).minHeight_(200);
+
 	}
 
 	rebuild {
