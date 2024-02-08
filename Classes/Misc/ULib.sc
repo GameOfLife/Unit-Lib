@@ -111,6 +111,10 @@ ULib {
 
 		font = Font(Font.defaultSansFace, 11);
 
+		if( ULib.allServers.size == 1 ) {
+			width = 430;
+		};
+
 		w = Window(name ? "ULib servers", Rect(10, 10, width, 24 +
 			ULib.servers.collect({ |item|
 				if( item.isKindOf( LoadBalancer ) ) {
