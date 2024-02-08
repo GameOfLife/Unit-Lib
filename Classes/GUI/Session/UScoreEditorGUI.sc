@@ -150,6 +150,9 @@ UScoreEditorGUI : UAbstractWindow {
         tranBarH = 22;
 		menuH = 18;
 
+		view.minWidth = 675;
+		view.minHeight = 150;
+
 		if( UMenuBarIDE.hasMenus ) {
 			menuView = UMenuBarIDE.createMenuStrip( view, (bounds.width-8) @ menuH, [-4,-4,-4,0] );
 		};

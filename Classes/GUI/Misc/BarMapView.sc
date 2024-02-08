@@ -128,7 +128,7 @@ BarMapView {
 		view = EZCompositeView( parent, bounds, gap: 2@2 );
 		bounds = view.asView.bounds;
 		view.onClose_({ this.remove; });
-		view.resize_( resize ? 5 );
+		view.resize_( resize ? 1 );
 		views = ();
 
 		centerWidth = (viewHeight * 1.25).floor;
