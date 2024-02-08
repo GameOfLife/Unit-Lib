@@ -40,6 +40,7 @@ UScoreView {
      var <>scoreList;
      var <currentScoreEditorController, <scoreController, <eventControllers = #[];
      var <tempoMapControllers;
+	 var <enabled = true;
 
      var <updateTask, calledUpdate = false, <>updateInterval = 0.2;
      var <showTempoMap = false;
@@ -135,22 +136,30 @@ UScoreView {
         ([currentScoreEditorController, scoreController, usessionMouseEventsManager]++eventControllers++tempoMapControllers).do(_.remove)
     }
 
+	enabled_ { |bool = true|
+		enabled = bool;
+		this.changed( \enabled, bool );
+		scoreView.refresh;
+	}
+
 	update {
 		var zoom;
-		if( updateInterval > 0 ) {
-			calledUpdate = true;
-			if( updateTask.isNil or: { updateTask.isPlaying.not } ) {
-				 updateTask = Routine({
-				    while { calledUpdate } {
-					   this.prUpdate;
-					   calledUpdate = false;
-					   updateInterval.wait;
-				    };
-				}).play( AppClock );
+		if( enabled ) {
+			if( updateInterval > 0 ) {
+				calledUpdate = true;
+				if( updateTask.isNil or: { updateTask.isPlaying.not } ) {
+					updateTask = Routine({
+						while { calledUpdate } {
+							this.prUpdate;
+							calledUpdate = false;
+							updateInterval.wait;
+						};
+					}).play( AppClock );
+				};
+			} {
+				this.prUpdate;
 			};
-		} {
-			this.prUpdate;
-		};
+		}
 	}
 
 	prUpdate {
@@ -663,6 +672,11 @@ UScoreView {
 				    Pen.stringCenteredIn( " " + mrk.name + (mrk.notes ? "" ), mrkrct,
 					    Font( Font.defaultSansFace, 16, true ), Color.black
 					);
+			    };
+
+			    if( enabled == false ) {
+			    	Pen.color = Color.gray(0.75, 0.75);
+			    	Pen.fillRect( rect );
 			    };
 
 		});
