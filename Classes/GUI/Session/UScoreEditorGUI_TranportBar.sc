@@ -126,10 +126,6 @@ UScoreEditorGui_TransportBar {
 
 		});
 
-		scoreController.put(\updatePos, { |who,what,updatePos|
-		    views[\update].value = updatePos.binaryValue;
-		});
-
 		scoreController.put(\pos, { |who,what|
             views[\counter].value = this.score.pos;
             views[\barMap ].value = this.score.pos;
