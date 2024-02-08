@@ -108,7 +108,7 @@ UScoreEditorGui_TransportBar {
                 views[\play].value = 0;
 		    };
 		    if( newState == \preparing  ) {
-		        {�views[\prepare].start }.defer;
+		        { views[\prepare].start }.defer;
                 views[\pause].value = 2;
 		    };
 		    //resuming
@@ -117,7 +117,7 @@ UScoreEditorGui_TransportBar {
 		    };
 		    if( newState == \prepared ) {
 
-                {�views[\prepare].stop }.defer;
+                { views[\prepare].stop }.defer;
                 views[\play].value = 2;
 		    };
 		    if( newState == \paused ) {
