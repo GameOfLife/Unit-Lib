@@ -61,7 +61,11 @@ UAbstractWindow {
         margin = margin ? 4;
         gap = gap ? 2;
         view = window.view;
-        view.background_( background ? Color.grey(0.3,0.5) );
+		if( thisProcess.platform.name === \osx ) {
+			view.background_( background ? Color.grey(0.3,0.5) );
+		} {
+			view.background_( background ? Color.grey(0.6) );
+		};
         view.resize_(5);
 
         window.onClose = window.onClose.addFunc({ this.removeFromAll });
