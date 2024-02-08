@@ -342,7 +342,7 @@ UScoreEditorGui_TransportBar {
 				views[\tempoEditor ] = UScoreTempoMapGUI( score: scoreView.currentScore );
 			});
 
-        view.decorator.shift( view.decorator.indentedRemaining.width - 161, 0 );
+        view.decorator.shift( view.decorator.indentedRemaining.width - 118, 0 );
 
         views[\active] = SmoothButton( view, 39@size )
             .label_( [ "active", "active" ] )
@@ -359,15 +359,6 @@ UScoreEditorGui_TransportBar {
             .value_( scoreView.followPos.binaryValue )
             .radius_( bounds.height / 8 )
             .action_({ |bt| scoreView.followPos = bt.value.booleanValue; })
-            .resize_(3)
-            .canFocus_(false);
-
-        views[\update] = SmoothButton( view, 39@size )
-            .label_( [ "update", "update" ] )
-            .hiliteColor_( Color.green.alpha_(0.5) )
-            .value_(1)
-            .radius_( bounds.height / 8 )
-            .action_({ |bt| this.score.updatePos = bt.value.booleanValue; })
             .resize_(3)
             .canFocus_(false);
 

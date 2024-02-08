@@ -275,7 +275,7 @@ UScoreEditorGui_TopBar {
 			});
 
 
-		header.decorator.shift( header.decorator.indentedRemaining.width - (189 + size), 0 );
+		header.decorator.shift( header.decorator.indentedRemaining.width - (155 + size), 0 );
 
 		StaticText( header, 30@size ).string_( "snap:" ).font_( font ).align_( \right )
 			.resize_(3);
@@ -301,6 +301,16 @@ UScoreEditorGui_TopBar {
 				1000,100,10,32,16,12,8,6,5,4,3,2,1])[ v.value ];
 				});
 
+		PopUpMenu( header, 50@size )
+			.items_( [ "all","move","resize","fades"] )
+			.canFocus_(false)
+			.font_( font )
+			.resize_(3)
+			.value_(0)
+			.action_({ |v|
+				scoreView.usessionMouseEventsManager.mode = v.items[v.value].asSymbol;
+			});
+
 		SmoothButton( header, size@size )
 			.label_( "Q" )
 			.resize_(3)
@@ -313,20 +323,6 @@ UScoreEditorGui_TopBar {
 				} ?? {
 					this.scoreEditor.quantizePos( scoreView.snapH, scoreView.showTempoMap );
 				};
-			});
-
-		StaticText( header, 30@size ).string_( "mode:" ).font_( font )
-			.resize_(3)
-			.align_('right');
-
-		PopUpMenu( header, 50@size )
-			.items_( [ "all","move","resize","fades"] )
-			.canFocus_(false)
-			.font_( font )
-			.resize_(3)
-			.value_(0)
-			.action_({ |v|
-				scoreView.usessionMouseEventsManager.mode = v.items[v.value].asSymbol;
 			});
 
 		RoundView.popSkin;
