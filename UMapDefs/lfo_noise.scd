@@ -33,4 +33,4 @@ UMapDef( \lfo_noise, { |freq = 2, type = 2, range = #[0.0,1.0]|
 	.setSpec( \type, ListSpec([0,1,2,3], 0, [\step, \linear, \cubic, \clip]) )
 	.setSpec( \freq, FreqSpec(0.001,300, default: 2) )
 	.mappedArgs_( [ \range ] )
-	.category_( 'modulation' )
+	.category_( 'lfo' )

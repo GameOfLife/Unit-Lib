@@ -26,4 +26,4 @@ UMapDef( \lfo_step_noise, { |time = #[0.1,1], type = 0, range = #[0.0,1.0]|
 	.setSpec( \type, ListSpec([0,1], 0, [\step, \linear]) )
 	.setSpec( \time, RangeSpec(0.001,100, warp: \exp, default: [0.1,1]) )
 	.mappedArgs_( [ \range ] )
-	.category_( 'modulation' )
+	.category_( 'lfo' )

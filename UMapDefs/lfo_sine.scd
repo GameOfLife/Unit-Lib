@@ -22,4 +22,4 @@ UMapDef( \lfo_sine, { |freq = 2, phase = 0, range = #[0.0,1.0]|
 	.setSpec( \phase, AngleSpec() )
 	.setSpec( \freq, FreqSpec(0.001,300, default: 2) )
 	.mappedArgs_( [ \range ] )
-	.category_( 'modulation' )
+	.category_( 'lfo' )
