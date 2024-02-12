@@ -62,7 +62,7 @@ UAbstractWindow {
         gap = gap ? 2;
         view = window.view;
 		if( thisProcess.platform.name === \osx ) {
-			view.background_( background ? Color.grey(0.3,0.5) );
+			view.background_( background ? Color.grey(0.45,0.75) );
 		} {
 			view.background_( background ? Color.grey(0.6) );
 		};
