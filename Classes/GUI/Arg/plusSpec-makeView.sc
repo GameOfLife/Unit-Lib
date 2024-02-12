@@ -592,6 +592,7 @@
 		vws[ \local ] = SmoothButton( view, Rect( labelWidth + 4 + textViewWidth, 0, bounds.height, bounds.height ) )
 		.states_([["L"]])
 		.radius_( 2 )
+		.resize_(3)
 		.canFocus_( false )
 		.action_({
 			vws[ \task ].stop;
