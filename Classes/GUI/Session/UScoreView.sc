@@ -30,6 +30,7 @@ UScoreView {
 	classvar <>showUChainNames = true;
 	classvar <>hideUChains = false;
 	classvar <>showFadeCurves = true;
+	classvar <>updateInterval = 0.2;
 
      var <scoreEditorsList;
      var <usessionMouseEventsManager;
@@ -42,7 +43,7 @@ UScoreView {
      var <tempoMapControllers;
 	 var <enabled = true;
 
-     var <updateTask, calledUpdate = false, <>updateInterval = 0.2;
+     var <updateTask, calledUpdate = false;
      var <showTempoMap = false;
 
      var <followPos = false;
