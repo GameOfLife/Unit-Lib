@@ -56,15 +56,28 @@ LoadBalancer {
 		if( this.isLocal ) {
 			{
 				beforeBootAction.value( this );
-				servers.do({ |srv|
-					srv.boot;
-					srv.bootSync;
-				});
+				servers.do({ |srv| srv.bootSync; });
 				afterBootAction.value( this );
 			}.fork( AppClock );
-		} {
-			beforeBootAction.value( this );
-			afterBootAction.value( this );
+		}
+	}
+
+	bootSync { |condition|
+		if( this.isLocal ) {
+			condition ?? { condition = Condition.new };
+			condition.test = false;
+
+			{
+				beforeBootAction.value( this );
+				servers.do({ |srv| srv.bootSync; });
+				afterBootAction.value( this );
+
+				condition.test = true;
+				condition.signal
+
+			}.fork( AppClock );
+
+			condition.wait;
 		};
 	}
 
