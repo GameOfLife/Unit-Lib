@@ -480,6 +480,9 @@ UMenuBarIDE {
 		this.registerMenu( MenuAction( "EQ", { UGlobalEQ.gui; }), "View");
 		this.registerMenu( MenuAction( "Level (large)", { UGlobalGain.gui; }), "View");
 		this.registerMenu( MenuAction( "Udefs", { UdefsGUI(); }), "View");
+		this.registerMenu( MenuAction( "Environment", {
+			ULib.envirWindow;
+		}), "View");
 		this.registerMenu( MenuAction( "Level meters", {
 			ULib.servers.first.meter;
 		}), "View");

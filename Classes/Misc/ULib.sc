@@ -20,7 +20,7 @@
 ULib {
     classvar <>servers;
 	classvar <>lastPath;
-	classvar <>window;
+	classvar <>window, <>eWindow;
 
     *initClass {
         servers = [Server.default]
@@ -266,6 +266,45 @@ ULib {
 		window = w;
         ^w
     }
+
+	*envirWindow {
+		var w, bounds;
+
+		if( eWindow.notNil && { eWindow.isClosed.not }) {
+			bounds = eWindow.bounds;
+			eWindow.close;
+		};
+
+		w = Window( "ULib Environment", bounds, scroll: true ).front;
+		w.addFlowLayout( );
+		bounds = w.bounds;
+
+		eWindow = w;
+
+		RoundView.pushSkin( UChainGUI.skin );
+		StaticText( w, (bounds.width - 12)@14 )
+		.string_( " Environment" )
+		.applySkin( RoundView.skin )
+		.background_( Color.white.alpha_(0.5) );
+		w.asView.decorator.shift( -18, 0 );
+		SmoothButton( w, 14@14 ).label_( 'roundArrow' )
+		.action_({ { this.envirWindow; }.defer(0.1); });
+		~u_specs !? _.sortedKeysValuesDo({ |key, spec|
+			var view, ctrl;
+			view = spec.makeView( w, (bounds.width - 12)@14, "~" ++ key, { |vw, val|
+				key.uEnvirPut( val );
+			});
+			spec.setView( view, key.envirGet );
+			ctrl = SimpleController( currentEnvironment )
+			.put( key, { spec.setView( view, key.envirGet ); });
+			w.onClose = w.onClose.addFunc({ ctrl.remove; });
+		}) ?? {
+			StaticText( w, (bounds.width - 12)@20 ).string_(
+				" no Environment variables to display"
+			).applySkin( RoundView.skin );
+		};
+		RoundView.popSkin;
+	}
 
 	*startup { |sendDefsOnInit = true, createServers = false, numServers = 4, options, startGuis = true|
 
