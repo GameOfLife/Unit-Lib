@@ -13,31 +13,53 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UPatDef( \p_interpolate, { |unit, input = 0, n = 1|
+UPatDef( \p_interpolate, { |unit, input = 0, n = 1, type = \linear|
 	{
 		var i = 0, val, nn;
-		var last;
+		var last, hist = [], ttype;
+		var cubic = { |i, y0, y1, y2, y3|
+			// this is used by many UGens as "cubic"
+			var c0, c1, c2, c3;
+			c0 = y1;
+			c1 = 0.5 * (y2 - y0);
+			c2 = y0 - (2.5 * y1) + (2.0 * y2) - (0.5 * y3);
+			c3 = (0.5 * (y3 - y0)) + (1.5 * (y1 - y2));
+			((c3 * i + c2) * i + c1) * i + c0;
+		};
+
 		if( unit.spec.respondsTo( \warp ) && { unit.spec.warp.asSpecifier != \lin }; ) {
 			val = unit.spec.unmap( input.next( true ) );
+			hist = [val,val,val];
 			loop {
 				if( i == 0 ) {
-					last = val;
+					//last = val;
+					hist = hist[1..].add( val );
 					val = unit.spec.unmap( input.next );
 					nn = n.next;
 				};
-				unit.spec.map( last.blend( val, i/nn ) ).yield;
+				unit.spec.map(
+					switch( type.next,
+						\linear, { hist.last.blend( val, i/nn ) },
+						\cubic, { cubic.( i/nn, *hist.add( val ) ) },
+					)
+				).yield;
 				i = (i+1);
 				if( i > (nn - 1) ) { i = 0; };
 			};
 		} {
 			val = input.next( true );
+			hist = [val,val,val];
 			loop {
 				if( i == 0 ) {
-					last = val;
+					//last = val;
+					hist = hist[1..].add( val );
 					val = input.next;
 					nn = n.next;
 				};
-				last.blend( val, i/nn ).yield;
+				switch( type.next,
+					\linear, { hist.last.blend( val, i/nn ) },
+					\cubic, { cubic.( i/nn, *hist.add( val ) ) },
+				).yield;
 				i = (i+1);
 				if( i > (nn - 1) ) { i = 0; };
 			};
@@ -47,6 +69,7 @@ UPatDef( \p_interpolate, { |unit, input = 0, n = 1|
 	.useMappedArgs_( false )
 	.setSpec( \input, UAdaptSpec() )
 	.setSpec( \n, IntegerSpec(1, 1,((2**31) - 1).asInteger) )
+.setSpec( \type, ListSpec([ 'linear', 'cubic' ], 0 ) )
 	.canUseUMapFunc_({ |unit, key, umapdef|
 		unit.isKindOf( UPattern ).not && {
 			[ Point, SimpleNumber, Array ].any({ |class|
