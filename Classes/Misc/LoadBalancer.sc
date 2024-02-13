@@ -28,6 +28,7 @@ LoadBalancer {
 	var <>name;
 	var <>loads;
 	var <>verbose = false;
+	var <>beforeBootAction, <>afterBootAction;
 
 	*initClass { all = [] }
 
@@ -49,14 +50,19 @@ LoadBalancer {
 
 	options_ { |options| servers.do({ |srv| srv.options = options }) }
 
+	isLocal { ^servers[0].isLocal }
+
 	boot {
-		if( servers[0].addr.isLocal ) {
-			{
-				servers.do({ |srv|
-					bootDelay.wait;
-					srv.boot;
-				});
-			}.fork( AppClock );
+		if( this.isLocal ) {
+			beforeBootAction.value( this );
+			servers[..servers.size-2].collect({ |srv, i|
+				srv.doWhenBooted({ servers[i+1].boot });
+			});
+			servers.last.doWhenBooted({ afterBootAction.value( this ); });
+			servers.first.boot;
+		} {
+			beforeBootAction.value( this );
+			afterBootAction.value( this );
 		};
 	}
 
