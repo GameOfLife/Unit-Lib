@@ -54,12 +54,14 @@ LoadBalancer {
 
 	boot {
 		if( this.isLocal ) {
-			beforeBootAction.value( this );
-			servers[..servers.size-2].collect({ |srv, i|
-				srv.doWhenBooted({ servers[i+1].boot });
-			});
-			servers.last.doWhenBooted({ afterBootAction.value( this ); });
-			servers.first.boot;
+			{
+				beforeBootAction.value( this );
+				servers.do({ |srv|
+					srv.boot;
+					srv.bootSync;
+				});
+				afterBootAction.value( this );
+			}.fork( AppClock );
 		} {
 			beforeBootAction.value( this );
 			afterBootAction.value( this );
