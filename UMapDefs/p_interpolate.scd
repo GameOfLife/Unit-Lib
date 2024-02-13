@@ -39,6 +39,7 @@ UPatDef( \p_interpolate, { |unit, input = 0, n = 1, type = \linear|
 				};
 				unit.spec.map(
 					switch( type.next,
+						\step, { if( i/nn < 0.5 ) { hist.last; } { val } },
 						\linear, { hist.last.blend( val, i/nn ) },
 						\cubic, { cubic.( i/nn, *hist.add( val ) ) },
 					)
@@ -57,6 +58,7 @@ UPatDef( \p_interpolate, { |unit, input = 0, n = 1, type = \linear|
 					nn = n.next;
 				};
 				switch( type.next,
+					\step, { if( i/nn < 0.5 ) { hist.last; } { val } },
 					\linear, { hist.last.blend( val, i/nn ) },
 					\cubic, { cubic.( i/nn, *hist.add( val ) ) },
 				).yield;
@@ -69,7 +71,7 @@ UPatDef( \p_interpolate, { |unit, input = 0, n = 1, type = \linear|
 	.useMappedArgs_( false )
 	.setSpec( \input, UAdaptSpec() )
 	.setSpec( \n, IntegerSpec(1, 1,((2**31) - 1).asInteger) )
-.setSpec( \type, ListSpec([ 'linear', 'cubic' ], 0 ) )
+.setSpec( \type, ListSpec([ 'step', 'linear', 'cubic' ], 1 ) )
 	.canUseUMapFunc_({ |unit, key, umapdef|
 		unit.isKindOf( UPattern ).not && {
 			[ Point, SimpleNumber, Array ].any({ |class|
