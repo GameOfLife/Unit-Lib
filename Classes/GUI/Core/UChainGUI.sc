@@ -85,7 +85,7 @@ UChainGUI {
 		tempoMap = parentScore !? _.tempoMap ?? { TempoMap() };
 
 		if( skin.font.class != Font.implClass ) { // quick hack to make sure font is correct
-			skin.font = Font( Font.defaultSansFace, 10 );
+			skin.font = Font( Font.defaultSansFace, 11 );
 		};
 
 		if( parent.isNil ) {
