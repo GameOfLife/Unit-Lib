@@ -175,6 +175,7 @@ ULib {
 							startButton.value = 1;
 						} {
 							startButton.value = 0;
+							startButton.hiliteColor = Color(1.0, 0.5, alpha: 0.5 );
 						};
 					};
 				};
