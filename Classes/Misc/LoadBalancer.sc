@@ -29,6 +29,7 @@ LoadBalancer {
 	var <>loads;
 	var <>verbose = false;
 	var <>beforeBootAction, <>afterBootAction;
+	var <>bootRoutine;
 
 	*initClass { all = [] }
 
@@ -54,7 +55,8 @@ LoadBalancer {
 
 	boot {
 		if( this.isLocal ) {
-			{
+			bootRoutine.stop;
+			bootRoutine = {
 				beforeBootAction.value( this );
 				servers.do({ |srv| srv.bootSync; });
 				afterBootAction.value( this );
@@ -66,8 +68,8 @@ LoadBalancer {
 		if( this.isLocal ) {
 			condition ?? { condition = Condition.new };
 			condition.test = false;
-
-			{
+			bootRoutine.stop;
+			bootRoutine = {
 				beforeBootAction.value( this );
 				servers.do({ |srv| srv.bootSync; });
 				afterBootAction.value( this );
@@ -81,7 +83,13 @@ LoadBalancer {
 		};
 	}
 
-	quit { servers.do(_.quit) }
+	quit { bootRoutine.stop; servers.do(_.quit) }
+
+	serverRunning { ^servers.every({ |srv| srv.serverRunning == true }) }
+
+	serverBooting { ^bootRoutine !? { |r| #[3,5].includes( r.state ) } ? false }
+
+	hasBooted { ^servers.every(_.hasBooted) }
 
 	init {
 		loads = 0!servers.size;

@@ -134,7 +134,7 @@ ULib {
 		};
 
 		ULib.servers.do{ |s, i|
-			var ip, composite;
+			var ip, composite, startButton, startCtrl;
 			composite = CompositeView( w, Rect( 0,0, width - 8, 18 ) );
 			if( s.addr.isLocal ) {
 				SmoothButton(composite, Rect(width-26,0, 18, 18))
@@ -150,9 +150,38 @@ ULib {
 			};
 			if( s.isKindOf( LoadBalancer ) ) {
 				composite.background = Color.gray(0.8);
-				StaticText(composite, Rect( 2, 2, 200,16 ) )
+				StaticText(composite, Rect( 22, 2, 200,16 ) )
 				.font_( font.boldVariant )
 				.string_( " " ++ s.name + "/" + ip );
+				startButton = SmoothButton(composite, Rect(0,0,18,18))
+				.canFocus_( false )
+				.label_( [ 'power', 'power' ] )
+				.hiliteColor_( Color.green(0.5,0.5) )
+				.action_({ |bt|
+					switch( bt.value,
+						1, { s.boot },
+						0, { s.quit }
+					);
+				});
+				startCtrl = { |obj, what|
+					if( what === \serverRunning ) {
+						case { s.serverRunning } {
+							startButton.hiliteColor = Color.green(0.5,0.5);
+							startButton.value = 1;
+						} {
+							s.serverBooting;
+						} {
+							startButton.hiliteColor = Color(1.0, 0.5, alpha: 0.5 );
+							startButton.value = 1;
+						} {
+							startButton.value = 0;
+						};
+					};
+				};
+				s.servers.do({ |srv|
+					srv.addDependant( startCtrl );
+				});
+				startButton.onClose_({ s.servers.do(_.removeDependant( startCtrl ) ) });
 				w.view.decorator.nextLine;
 				s.uView(w, width-4);
 			} {
