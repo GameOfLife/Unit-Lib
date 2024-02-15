@@ -456,7 +456,7 @@
 + StringSpec {
 
 	makeView { |parent, bounds, label, action, resize|
-		var vws, view, labelWidth;
+		var vws, view, labelWidth, stringBackground;
 		vws = ();
 
 		// this is basically an EZButton
@@ -481,7 +481,7 @@
 			vws[ \string ] = string;
 			{
 				vws[ \stringView ].value = vws[ \string ];
-				vws[ \stringView ].background = Color.white;
+				vws[ \stringView ].background = stringBackground;
 			}.defer;
 		};
 
@@ -503,14 +503,16 @@
 							if( view.isClosed ) { break.value; };
 							if( view.hasFocus.not ) { break.value; };
 							if( view.value != vws[ \string ] ) {
-								view.background = Color.red.blend( Color.white, 0.5 );
+								view.background = Color.red.blend( stringBackground, 0.5 );
 							} {
-								view.background = Color.white;
+								view.background = stringBackground
 							};
 						};
 					};
 				}.fork( AppClock );
 			});
+
+		stringBackground = vws[ \stringView ].background;
 
 		if( resize.notNil ) { vws[ \view ].resize = resize };
 		^vws;
@@ -531,7 +533,7 @@
 + IPSpec {
 
 	makeView { |parent, bounds, label, action, resize|
-		var vws, view, labelWidth, textViewWidth;
+		var vws, view, labelWidth, textViewWidth, stringBackground;
 		vws = ();
 
 		// this is basically an EZButton
@@ -556,7 +558,7 @@
 			vws[ \string ] = string;
 			{
 				vws[ \stringView ].value = vws[ \string ];
-				vws[ \stringView ].background = Color.white;
+				vws[ \stringView ].background = stringBackground;
 			}.defer;
 		};
 
@@ -565,7 +567,7 @@
 		vws[ \stringView ] = TextField( view,
 			Rect( labelWidth + 2, 0, textViewWidth, bounds.height )
 		)	.resize_(2)
-			.applySkin( RoundView.skin ? () )
+			.applySkin( RoundView.skin )
 			.action_({ |tf|
 				vws[ \task ].stop;
 				vws.setString( this.constrain( tf.value ) );
@@ -580,14 +582,16 @@
 							if( view.isClosed ) { break.value; };
 							if( view.hasFocus.not ) { break.value; };
 							if( view.value != vws[ \string ] ) {
-								view.background = Color.red.blend( Color.white, 0.5 );
+								view.background = Color.red.blend( stringBackground, 0.5 );
 							} {
-								view.background = Color.white;
+								view.background = stringBackground;
 							};
 						};
 					};
 				}.fork( AppClock );
 			});
+
+		stringBackground = vws[ \stringView ].background;
 
 		vws[ \local ] = SmoothButton( view, Rect( labelWidth + 4 + textViewWidth, 0, bounds.height, bounds.height ) )
 		.states_([["L"]])

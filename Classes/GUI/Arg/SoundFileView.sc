@@ -28,6 +28,7 @@ BufSndFileView {
 	var <>action;
 	var <viewHeight = 14;
 	var <>autoCreateSndFile = false;
+	var <>stringColor;
 
 	*new { |parent, bounds, action, sndFile|
 		^super.new.init( parent, bounds, action ).value_( sndFile ).addToAll;
@@ -82,7 +83,9 @@ BufSndFileView {
 	setViews { |inSndFile|
 
 		views[ \path ].value = inSndFile.path;
-		views[ \path ].stringColor = if( inSndFile.exists ) { Color.black; } { Color.red(0.66); };
+		views[ \path ].stringColor = if( inSndFile.exists ) {
+			stringColor ?? { Color.black; }
+		} { Color.red(0.66); };
 
 		if( inSndFile.respondsTo( \hasGlobal ) ) {
 			{ views[ \hasGlobal ].visible = true; }.defer;
@@ -194,6 +197,8 @@ BufSndFileView {
 		var globalDepFunc, updGlobal;
 
 		if( bounds.isNil ) { bounds= 350 @ (this.class.viewNumLines * (viewHeight + 4)) };
+
+		stringColor = RoundView.skin !? _.stringColor ?? { Color.black };
 
 		view = EZCompositeView( parent, bounds, gap: 4@4 );
 		bounds = view.asView.bounds;
