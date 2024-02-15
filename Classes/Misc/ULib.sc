@@ -292,6 +292,8 @@ ULib {
                 ServerMeterView(s, window, 0@0, numIns, numOuts)
             }
         };
+
+		RoundView.popSkin;
 		w.onClose_({ if( window == w ) { window = nil }; gainSliderCtrl.remove; });
 		window = w;
         ^w

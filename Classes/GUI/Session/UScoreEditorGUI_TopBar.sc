@@ -90,9 +90,7 @@ UScoreEditorGui_TopBar {
 
         header = CompositeView( parent, bounds );
 
-        RoundView.pushSkin( UChainGUI.skin );
-
-		font = RoundView.skin.font;
+		font = RoundView.skin !? _.font ?? { Font( Font.defaultSansFace, 11 ) };
 
 		header.addFlowLayout(marginH@marginV);
 		header.resize_(2);
@@ -324,9 +322,6 @@ UScoreEditorGui_TopBar {
 					this.scoreEditor.quantizePos( scoreView.snapH, scoreView.showTempoMap );
 				};
 			});
-
-		RoundView.popSkin;
-
     }
 
 }

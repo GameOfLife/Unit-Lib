@@ -747,6 +747,7 @@
 				Rect(labelWidth + 2,0,bounds.width-(labelWidth + 2),bounds.height)
 			)
 			.applySmoothSkin
+		    .applySkin( RoundView.skin )
 		    .action_({ |vw|
 		        action.value( vw, vw.value );
 		    } ).resize_(5)

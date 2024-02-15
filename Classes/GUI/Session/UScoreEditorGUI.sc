@@ -153,6 +153,8 @@ UScoreEditorGUI : UAbstractWindow {
 		view.minWidth = 675;
 		view.minHeight = 150;
 
+		RoundView.pushSkin( UChainGUI.skin );
+
 		if( UMenuBarIDE.hasMenus ) {
 			menuView = UMenuBarIDE.createMenuStrip( view, (bounds.width-8) @ menuH, [-4,-4,-4,0] );
 		};
@@ -171,6 +173,8 @@ UScoreEditorGUI : UAbstractWindow {
 
         //BOTTOM
         tranportBar = UScoreEditorGui_TransportBar(view,  Rect(0,0, bounds.width - (2*margin), tranBarH ), scoreView);
+
+		RoundView.popSkin;
 
         if( UScore.storeDisplayBounds ) {
 	        window.drawFunc = {

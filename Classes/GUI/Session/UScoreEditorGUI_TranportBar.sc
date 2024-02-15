@@ -162,9 +162,7 @@ UScoreEditorGui_TransportBar {
 		size = bounds.height - (2*marginV);
         view = CompositeView( parent, bounds );
 
-        RoundView.pushSkin( UChainGUI.skin );
-
-		font = RoundView.skin.font;
+		font = RoundView.skin !? _.font ?? { Font( Font.defaultSansFace, 11 ) };
 
 		view.addFlowLayout(marginH@marginV);
 		//view.background_( Color.white );
@@ -249,6 +247,7 @@ UScoreEditorGui_TransportBar {
 			.align_( \center )
 			.clipLo_(0)
 			.applySmoothSkin
+		    .applySkin( RoundView.skin )
 			.border_(0.000001)
 			.charSelectColor_( Color.white.alpha_(0.5) )
 			.autoScale_( true )
@@ -370,8 +369,6 @@ UScoreEditorGui_TransportBar {
             })
             .resize_(3)
             .canFocus_(false);
-
-        RoundView.popSkin;
 
         view.onClose_({ views[\tempoEditor ] !? _.close })
 

@@ -17,12 +17,13 @@
 		var dumping=false;
 		var infoString, oldOnClose;
 		var font;
-		var cpuMeter, composite;
+		var cpuMeter, composite, inactiveColor;
 
 		width = width - 26;
 
-		font = Font(Font.defaultSansFace, 11);
+		font = RoundView.skin.font ? Font(Font.defaultSansFace, 11);
 		onColor = onColor ? Color.green(0.5);
+		inactiveColor = (RoundView.skin.stringColor ? Color.black).copy.alpha_(0.8);
 
 		if (window.notNil, { ^window.front });
 
@@ -33,7 +34,7 @@
 		});
 
 		composite = CompositeView( w, (width + 22) @ 18 );
-		composite.background = Color.gray(0.9);
+		composite.background = RoundView.skin.menuStripColor ?? { Color.gray(0.9); };
 
 		if(isLocal,{
 			if( useRoundButton ) {
@@ -84,7 +85,7 @@
 			if( isLocal ) { booter.value = 1; }
 		};
 		stopped = {
-			{ active.stringColor_( Color.grey(0.2) ); }.defer;
+			{ active.stringColor_( inactiveColor ); }.defer;
 			if( isLocal ) { booter.value = 0; }
 
 		};

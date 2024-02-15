@@ -178,7 +178,7 @@ UMenuBarIDE {
 		menuView = View( parent, bounds );
 		menuView.resize_( 2 );
 		menuView.bounds = menuView.bounds.insetAll( *inset );
-		menuView.background_( Color.gray(0.9) );
+		menuView.background_( RoundView.skin !? _.menuStripColor ?? { Color.gray(0.9) });
 		if( menuStripMode == \views ) {
 			menuView.addFlowLayout(0@0, 0@4);
 			this.createMenuViews( menuView );
