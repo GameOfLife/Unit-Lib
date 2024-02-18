@@ -1081,7 +1081,7 @@ UChainGUI {
 		var upatGUI, upatCtrls, upatHeader, upatComp;
 		var uDefMenuFunc;
 
-		uDefMenuFunc = { |unit, action, hideAction|
+		uDefMenuFunc = { |unit, action, hideAction, checkCategory|
 			var uDefsList = [], ctrl, menu, checkedMenu;
 			var uDefsDict = ();
 
@@ -1115,6 +1115,9 @@ UChainGUI {
 			menu = Menu( *uDefsList.collect({ |item, i|
 				var submenu, includesChecked = false;
 				if( item.isKindOf( Symbol ) ) {
+					if( checkCategory == item ) {
+						checkedMenu = i;
+					};
 					MenuAction.separator( item.asString );
 				} {
 					submenu = Menu( *item[1].collect({ |def|
@@ -1361,7 +1364,7 @@ UChainGUI {
 						this.setUnits( units.insert( i, U( def ) ) );
 					}, {
 						addBefore.background = Color.white.alpha_(0.25);
-					});
+					}, if( i == 0 ) { \generator } { \modifier } );
 					addBefore.background = Color.gray(0.3).alpha_(0.5);
 				});
 
@@ -1634,7 +1637,7 @@ UChainGUI {
 					chain.units = chain.units ++ [ U( def ) ];
 				}, {
 					addLast.background = Color.white.alpha_(0.25);
-				});
+				}, \endpoint );
 				addLast.background = Color.gray(0.3).alpha_(0.5);
 			});
 
