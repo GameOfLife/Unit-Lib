@@ -183,6 +183,9 @@ ULib {
 					srv.addDependant( startCtrl );
 				});
 				startButton.onClose_({ s.servers.do(_.removeDependant( startCtrl ) ) });
+				if( s.serverRunning == true ) {
+					startButton.value = 1;
+				};
 				w.view.decorator.nextLine;
 				s.uView(w, width-4);
 			} {

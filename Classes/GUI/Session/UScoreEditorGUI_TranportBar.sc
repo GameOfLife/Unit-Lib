@@ -176,8 +176,8 @@ UScoreEditorGui_TransportBar {
 
 		views[\play] = SmoothSimpleButton( view, 40@size  )
 			.states_( [
-			    [ \play, Color.black, Color.clear ],
-			    [ \stop, Color.black, Color.green.alpha_(0.5) ],
+			    [ \play, nil, Color.clear ],
+			    [ \stop, nil, Color.green.alpha_(0.5) ],
 			    [ \play, Color.blue, Color.red.alpha_(0.5) ]] )
 			.canFocus_(false)
 			//.changeStateWhenPressed_(false)
@@ -197,7 +197,7 @@ UScoreEditorGui_TransportBar {
 
 		views[\pause] = SmoothSimpleButton( view, 50@size  )
 			.states_( [
-			    [ \pause, Color.black, Color.clear ],
+			    [ \pause, nil, Color.clear ],
 			    [ \pause, Color.red,Color.green.alpha_(0.5) ],
 			    [ \pause, Color.blue,Color.red.alpha_(0.5) ]] )
 			.canFocus_(false)
@@ -217,7 +217,7 @@ UScoreEditorGui_TransportBar {
 			});
 
 		views[\return] = SmoothButton( view, 30@size  )
-			.states_( [[\return, Color.black, Color.clear ]])
+			.states_( [[\return, nil, Color.clear ]])
 			.canFocus_(false)
 			.radius_( [ size/2, 0, 0, size/2 ] )
 			.action_({
@@ -225,7 +225,7 @@ UScoreEditorGui_TransportBar {
 			});
 
 		views[\next] = SmoothButton( view, 30@size  )
-			.states_( [[\skip, Color.black, Color.clear ]])
+			.states_( [[\skip, nil, Color.clear ]])
 			.canFocus_(false)
 			.radius_( [ 0, size/2, size/2, 0 ] )
 			.action_({
@@ -233,8 +233,8 @@ UScoreEditorGui_TransportBar {
 			});
 
         views[\loop] = SmoothButton( view, 50@size  )
-        			.states_( [[\roundArrow, Color.black, Color.clear ],
-        			[\roundArrow, Color.black, Color.green.alpha_(0.5) ]])
+        			.states_( [[\roundArrow, nil, Color.clear ],
+        			[\roundArrow, nil, Color.green.alpha_(0.5) ]])
         			.value_( this.score.loop.binaryValue )
         			.canFocus_(false)
         			.action_({ |v| this.score.loop = v.value.booleanValue;  });

@@ -21,6 +21,7 @@ UScoreEditorGui_TopBar {
 
     var <>scoreView;
     var <header, <>views, <scoreEditorController, <scoreController;
+	var <>stringColor;
 
     *new{ |parent, bounds, scoreView|
         ^super.newCopyArgs(scoreView).init(parent, bounds)
@@ -65,10 +66,10 @@ UScoreEditorGui_TopBar {
     resetUndoRedoButtons{
         views[\redo]
             	.enabled_(this.scoreEditor.redoSize != 0)
-            	.stringColor_( Color.gray( [0.5,0][ UScoreEditor.enableUndo.binaryValue ] ) );
+            	.stringColor_( [ Color.gray(0.5), stringColor ][ UScoreEditor.enableUndo.binaryValue ] );
         views[\undo]
             	.enabled_(this.scoreEditor.undoSize != 0)
-            	.stringColor_( Color.gray( [0.5,0][ UScoreEditor.enableUndo.binaryValue ] ) );
+            	.stringColor_( [ Color.gray(0.5), stringColor ][ UScoreEditor.enableUndo.binaryValue ] );
     }
 
     selectedEvents{
@@ -92,11 +93,13 @@ UScoreEditorGui_TopBar {
 
 		font = RoundView.skin !? _.font ?? { Font( Font.defaultSansFace, 11 ) };
 
+		stringColor =  RoundView.skin !? _.stringColor ?? { Color.black };
+
 		header.addFlowLayout(marginH@marginV);
 		header.resize_(2);
 
 		SmoothButton( header, size@size )
-			.states_( [[ \i, Color.black, Color.blue.alpha_(0.125) ]] )
+			.states_( [[ \i, nil, Color.blue.alpha_(0.125) ]] )
 			.canFocus_(false)
 			.action_({ |b|
 				scoreView.editSelected;
@@ -145,7 +148,7 @@ UScoreEditorGui_TopBar {
 		header.decorator.shift(10);
 
 		SmoothButton( header, size@size  )
- 			.states_( [[ "[", Color.black, Color.clear ]] )
+ 			.states_( [[ "[", nil, Color.clear ]] )
  			.canFocus_(false)
 			.radius_( 0 )
 			.font_( Font( font.name, 10 ).boldVariant )
@@ -157,7 +160,7 @@ UScoreEditorGui_TopBar {
 		header.decorator.shift(-1);
 
 		SmoothButton( header, size@size  )
-			.states_( [[ "|", Color.black, Color.clear ]] )
+			.states_( [[ "|", nil, Color.clear ]] )
 			.canFocus_(false)
 			.radius_(0)
 			.font_( Font( font.name, 12 ).boldVariant )
@@ -168,7 +171,7 @@ UScoreEditorGui_TopBar {
 		header.decorator.shift(-1);
 
 		SmoothButton( header, size@size  )
-			.states_( [[ "]", Color.black, Color.clear ]] )
+			.states_( [[ "]", nil, Color.clear ]] )
 			.canFocus_(false)
 			.radius_([0,9,9,0])
 			.font_( Font( font.name, 10 ).boldVariant )
@@ -183,7 +186,7 @@ UScoreEditorGui_TopBar {
 			.radius_( [1,0,0,1] * (size/2) )
 			.canFocus_(false)
 			.enabled_(false)
-			.stringColor_( Color.gray( [0.5,0][ UScoreEditor.enableUndo.binaryValue ] ) )
+		    .stringColor_( [ Color.gray(0.5), stringColor ][ UScoreEditor.enableUndo.binaryValue ] )
 			.action_({
 				this.scoreEditor.undo
 			});
@@ -195,7 +198,7 @@ UScoreEditorGui_TopBar {
 			.radius_( [0,1,1,0] * (size/2) )
 			.canFocus_(false)
 			.enabled_(false)
-			.stringColor_( Color.gray( [0.5,0][ UScoreEditor.enableUndo.binaryValue ] ) )
+			.stringColor_( [ Color.gray(0.5), stringColor ][ UScoreEditor.enableUndo.binaryValue ] )
 			.action_({
 				this.scoreEditor.redo
 			});
@@ -224,14 +227,14 @@ UScoreEditorGui_TopBar {
 		header.decorator.shift(10);
 
 		SmoothButton( header, size@size  )
-			.states_( [[ \speaker, Color.black, Color.clear ]] )
+			.states_( [[ \speaker, nil, Color.clear ]] )
 			.canFocus_(false)
 			.action_({ |b|
 				this.selectedEvents !? { |x|  this.scoreEditor.toggleDisableEvents( x ) }
 			});
 
 		SmoothButton( header, size@size  )
-			.states_( [[ \lock, Color.black, Color.clear ]] )
+			.states_( [[ \lock, nil, Color.clear ]] )
 			.canFocus_(false)
 			.action_({ |b|
 				this.selectedEvents !? { |x|  this.scoreEditor.toggleLockEvents( x ) }
@@ -240,7 +243,7 @@ UScoreEditorGui_TopBar {
 		header.decorator.shift(10);
 
 		SmoothButton( header, 40@size  )
-		.states_( [[ "folder", Color.black, Color.clear ]] )
+		.states_( [[ "folder", nil, Color.clear ]] )
 			.canFocus_(false)
 		    .radius_( [1,0,0,1] * (size/2) )
 			.action_({
@@ -250,7 +253,7 @@ UScoreEditorGui_TopBar {
 			});
 
 		SmoothButton( header, 40@size  )
-			.states_( [[ "unfold" , Color.black, Color.clear ]] )
+			.states_( [[ "unfold", nil, Color.clear ]] )
 			.canFocus_(false)
 		    .radius_( [0,1,1,0] * (size/2) )
 			.action_({
@@ -262,7 +265,7 @@ UScoreEditorGui_TopBar {
 		header.decorator.shift(10);
 
 		SmoothButton( header, 40@size  )
-			.states_( [[ "mixer", Color.black, Color.clear ]] )
+			.states_( [[ "mixer", nil, Color.clear ]] )
 			.canFocus_(false)
 			.action_({ |b|
 			    if( umixer.notNil && { umixer.parent.isClosed.not } ) {
@@ -270,8 +273,11 @@ UScoreEditorGui_TopBar {
 			    } {
 				   umixer = UMixer(scoreView.currentScore);
 			    }
-			});
-
+			}).onClose_({
+			    if( umixer.notNil && { umixer.parent.isClosed.not } ) {
+			        umixer.parent.close
+		        };
+		   });
 
 		header.decorator.shift( header.decorator.indentedRemaining.width - (155 + size), 0 );
 
