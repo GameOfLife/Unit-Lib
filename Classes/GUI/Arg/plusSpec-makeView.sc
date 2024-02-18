@@ -889,6 +889,7 @@
 
 		vws[ \buttonView ]
 				.radius_( bounds.height / 8 )
+		        .hiliteColor_( RoundView.skin.hiliteColor ?? { Color.black.alpha_(0.33) } )
 				.value_( this.unmap( this.constrain( default ) ) )
 				.action_({ |bt| action.value( vws, this.map( bt.value ) ) })
 				.resize_( 1 );
@@ -1176,7 +1177,7 @@
 
 		vws[ \objectLabel ] = StaticText( view,
 			(bounds.width-(labelWidth + 2) - 42) @ (bounds.height)
-		).applySkin( RoundView.skin ).background_( Color.gray(0.8) );
+	).applySkin( RoundView.skin ).background_( Color.white.alpha_(0.25) );
 
 		vws[ \setLabel ] = {
 			{ vws[ \objectLabel ].string = " " ++ vws[ \val ].asString; }.defer;
@@ -1606,7 +1607,7 @@
 
 		font =  (RoundView.skin ? ()).font ?? { Font( Font.defaultSansFace, 10 ); };
 
-		bounds.isNil.if{bounds= 320@180};
+		bounds.isNil.if{bounds= 320@200};
 
 		view = EZCompositeView( parent, bounds, gap: 2@2 );
 		bounds = view.asView.bounds;

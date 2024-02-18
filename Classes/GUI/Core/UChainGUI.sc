@@ -48,17 +48,22 @@ UChainGUI {
 		skin = (
 			labelWidth: 100,
 			hiliteColor: Color.black.alpha_(0.33),
+			headerColor: Color.white.alpha_(0.5),
+			scoreEditorWindow: Color.gray(0.6),
 			RoundButton: (
 				border: 0.75,
-				background:  Gradient( Color.white, Color.gray(0.85), \v )
+				background:  Gradient( Color.white, Color.gray(0.85), \v ),
+				hiliteColor: Color.green(1.0,0.5),
 			),
 			SmoothButton: (
 				border: 0.75,
-				background:  Gradient( Color.white, Color.gray(0.85), \v )
+				background:  Gradient( Color.white, Color.gray(0.85), \v ),
+				hiliteColor: Color.green(1.0,0.5),
 			),
 			SmoothSimpleButton: (
 				border: 0.75,
-				background:  Gradient( Color.white, Color.gray(0.85), \v )
+				background:  Gradient( Color.white, Color.gray(0.85), \v ),
+				hiliteColor: Color.green(1.0,0.5),
 			),
 		);
 
@@ -269,9 +274,7 @@ UChainGUI {
 		views[ \startButton ] = SmoothButton( composite, 14@14 )
 			.label_( ['power', 'power'] )
 			.radius_(7)
-			.background_( Color.clear )
 			.border_(1)
-			.hiliteColor_( Color.green )
 			.action_( [ {
 					chain.prepareAndStart;							}, {
 					chain.release
@@ -375,7 +378,7 @@ UChainGUI {
 		views[ \singleWindow ] = SmoothButton( composite, 84@14 )
 			.label_( [ "single window", "single window" ] )
 			.border_( 1 )
-			.hiliteColor_( Color.green )
+			//.hiliteColor_( RoundView.skin.hiliteColor ? Color.green )
 			.value_( this.class.singleWindow.binaryValue )
 			.resize_(3)
 			.action_({ |bt|
@@ -558,7 +561,6 @@ UChainGUI {
 					.border_( 1 )
 					.radius_( 3 )
 					.label_( [ "inf", "inf" ] )
-					.hiliteColor_( Color.green )
 					.action_({ |bt|
 						var dur;
 						switch( bt.value,
@@ -582,7 +584,6 @@ UChainGUI {
 					.border_( 1 )
 					.radius_( 3 )
 					.label_( [ "releaseSelf", "releaseSelf" ] )
-					.hiliteColor_( Color.green )
 					.action_({ |bt|
 						chain.releaseSelf = bt.value.booleanValue;
 					});
@@ -595,6 +596,8 @@ UChainGUI {
 					.string_( "fadeTimes" )
 					.align_( \right );
 
+				views[ \numberBoxBackground ] = RoundView.skin[ 'SmoothNumberBox' ] !? _.background ? Color(1.0, 1.0, 1.0, 0.5);
+
 				views[ \fadeIn ] = SmoothNumberBox( composite, 40@14 )
 					.clipLo_(0)
 					.scroll_step_(0.1)
@@ -603,7 +606,7 @@ UChainGUI {
 						Pen.use({
 							var values;
 							Pen.roundedRect( rect, 2 ).clip;
-							Pen.color = Color(1.0, 1.0, 1.0, 0.5);
+							Pen.color = views[ \numberBoxBackground ];
 							Pen.fillRect( rect );
 							values = (rect.width.asInteger + 1).collect({ |i|
 								i.lincurve(0, rect.width, rect.bottom, rect.top, chain.fadeInCurve )
@@ -630,7 +633,7 @@ UChainGUI {
 						Pen.use({
 							var values;
 							Pen.roundedRect( rect, 2 ).clip;
-							Pen.color = Color(1.0, 1.0, 1.0, 0.5);
+							Pen.color = views[ \numberBoxBackground ];
 							Pen.fillRect( rect );
 							values = (rect.width.asInteger + 1).collect({ |i|
 								i.lincurve(0, rect.width, rect.top, rect.bottom, chain.fadeOutCurve )
@@ -752,7 +755,6 @@ UChainGUI {
 					.border_( 1 )
 					.radius_( 3 )
 					.label_( [ "global", "global" ] )
-					.hiliteColor_( Color.green )
 					.action_({ |bt|
 						chain.global = bt.value.booleanValue;
 					});
@@ -820,7 +822,7 @@ UChainGUI {
 				.border_( 1 )
 				.radius_( 3 )
 				.label_( [ "mute", "mute" ] )
-				.hiliteColor_( Color.red )
+			    .hiliteColor_( Color.red(1,0.75) )
 				.action_({ |bt|
 					switch( bt.value,
 						0, { chain.muted = false },
@@ -911,8 +913,9 @@ UChainGUI {
 						views[ \endTime ].enabled = false; // don't set value
 						views[ \endBar ].enabled = false; // don't set value
 						views[ \infDur ].value = 1;
-						views[ \releaseSelf ].hiliteColor = Color.green.alpha_(0.25);
-						views[ \releaseSelf ].stringColor = Color.black.alpha_(0.5);
+						views[ \releaseSelf ].enabled_( false );
+						//views[ \releaseSelf ].hiliteColor = Color.green.alpha_(0.25);
+						//views[ \releaseSelf ].stringColor = Color.black.alpha_(0.5);
 					} {
 						views[ \dur ].enabled = true;
 						views[ \endTime ].enabled = true;
@@ -921,8 +924,9 @@ UChainGUI {
 						views[ \endTime ].value = chain.startTime + dur;
 						views[ \endBar ].value = chain.startTime + dur;
 						views[ \infDur ].value = 0;
-						views[ \releaseSelf ].hiliteColor = Color.green.alpha_(1);
-						views[ \releaseSelf ].stringColor = Color.black.alpha_(1);
+						views[ \releaseSelf ].enabled_( true );
+						//views[ \releaseSelf ].hiliteColor = Color.green.alpha_(1);
+						//views[ \releaseSelf ].stringColor = Color.black.alpha_(1);
 					};
 					{ views[ \displayColor ].refresh; }.defer;
 				})
@@ -1164,7 +1168,7 @@ UChainGUI {
 			header = StaticText( comp, comp.bounds.width @ 14 )
 				.applySkin( RoundView.skin )
 				.string_( " empty: drag unit or Udef here" )
-				.background_( Color.yellow.alpha_(0.25) )
+				.background_( Color.yellow.alpha_(0.125) )
 				.resize_(2)
 				.font_(
 					(RoundView.skin.tryPerform( \at, \font ) ??
@@ -1204,7 +1208,7 @@ UChainGUI {
 		if( chain.isKindOf( UPattern ) ) {
 
 			upatComp = CompositeView( scrollView, width@14 )
-			.background_( Color.white.blend( Color.green, 0.22 ).alpha_(0.5) )
+			.background_( Color.green.alpha_(0.11) )
 			.resize_(2);
 
 			upatHeader = StaticText( upatComp, Rect(2,0, width, 14 ) )
@@ -1264,13 +1268,13 @@ UChainGUI {
 		} {
 			if( chain.isKindOf( MassEditUChain ).not ) {
 				upatComp = CompositeView( scrollView, width@14 )
-				.background_( Color.white.blend( Color.green, 0.22 ).alpha_(0.25) )
+				.background_( Color.green.alpha_(0.055) )
 				.resize_(2);
 
 				upatHeader = StaticText( upatComp, Rect(2,0, width, 14 ) )
 				.applySkin( RoundView.skin )
 				.string_( "UPattern" )
-				.stringColor_( Color.black.alpha_(0.5) )
+				.stringColor_( (RoundView.skin.stringColor ?? { Color.black }).copy.alpha_(0.5) )
 				.font_(
 					(RoundView.skin.tryPerform( \at, \font ) ??
 						{ Font( Font.defaultSansFace, 12) }).boldVariant
@@ -1378,8 +1382,8 @@ UChainGUI {
 
 			comp = CompositeView( scrollView, width@14 )
 				.background_( if( notMassEdit )
-					{ Color.white.alpha_(0.5) }
-					{ Color.white.blend( Color.yellow, 0.33 ).alpha_(0.5) }
+				    { RoundView.skin.headerColor ?? { Color.white.alpha_(0.5) } }
+					{ Color.yellow.alpha_( 0.165 ) }
 				)
 				.resize_(2);
 

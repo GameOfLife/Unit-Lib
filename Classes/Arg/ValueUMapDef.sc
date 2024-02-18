@@ -5,7 +5,7 @@ ValueUMapDef : UMapDef {
 	var <>valueIsMapped = true;
 	var <>startFunc, <>endFunc;
 
-	*defaultGUIColor { ^Color.yellow.blend( Color.white, 0.8 ).alpha_(0.4); }
+	*defaultGUIColor { ^Color.yellow.blend( Color.white, 0.8 ).alpha_(0.3); }
 
 	defType { ^\control }
 

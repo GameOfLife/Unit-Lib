@@ -41,6 +41,9 @@ CodeEditView {
 				view.parent.findWindow.name = label;
 			};
 		};
+
+		RoundView.pushSkin( UChainGUI.skin );
+
 		textView = TextView( view,
 				bounds.width @
 				(bounds.height-(gap.y+20)) )
@@ -75,6 +78,8 @@ CodeEditView {
 					failAction.value( this );
 				};
 			} );
+
+		RoundView.popSkin;
 
 		this.setCode( object );
 	}

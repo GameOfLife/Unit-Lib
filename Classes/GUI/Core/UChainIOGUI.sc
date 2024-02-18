@@ -94,7 +94,7 @@ UChainIOGUI : UChainGUI {
                 .label_( "i/o" )
                 .border_( 1 )
                 .radius_( 2 )
-                .background_( Color.green )
+                .background_( RoundView.skin[ 'SmoothButton' ] !? _.hiliteColor ? Color.green )
                 .action_({
 	                UChainGUI(
 	                	this.window.name, originalBounds,
@@ -158,7 +158,9 @@ UChainIOGUI : UChainGUI {
 					if( unit.def.class == LocalUdef ) { "[Local] " } { "" } ++
 					unit.fullDefName
 				)
-				.background_( if( unit.isUMap ) { unit.guiColor } { Color.gray(0.9) } )
+				.background_( if( unit.isUMap ) { unit.guiColor } {
+				    RoundView.skin.headerColor ?? { Color.gray(0.9) }
+			    } )
 				.resize_(2)
 				.font_(
 					(RoundView.skin.tryPerform( \at, \font ) ??

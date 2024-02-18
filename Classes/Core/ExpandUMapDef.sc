@@ -12,7 +12,7 @@ ExpandUMapDef : UMapDef {
 		};
 	}
 
-	*defaultGUIColor { ^Color.white.alpha_(0.66) }
+	*defaultGUIColor { ^Color.white.alpha_(0.33) }
 
 	defType { ^\mixed }
 

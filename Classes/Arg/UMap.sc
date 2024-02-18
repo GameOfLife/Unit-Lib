@@ -201,7 +201,7 @@ UMapDef : Udef {
 		^useMappedArgs && { this.isMappedArg( key ) }
 	}
 
-	*defaultGUIColor { ^Color.blue.blend( Color.white, 0.8 ).alpha_(0.4); }
+	*defaultGUIColor { ^Color.blue.blend( Color.white, 0.8 ).alpha_(0.3); }
 
 	guiColor { ^guiColor ? (this.class.defaultGUIColor) }
 }
@@ -230,7 +230,7 @@ UMap : U {
 
 	*busOffset { ^1500 }
 
-	*guiColor { ^guiColor ?? { guiColor = Color.blue.blend( Color.white, 0.8 ).alpha_(0.4) }; }
+	*guiColor { ^guiColor ?? { guiColor = Color.blue.blend( Color.white, 0.8 ).alpha_(0.3) }; }
 	guiColor { ^this.subDef !? _.guiColor ? this.class.guiColor }
 
 	init { |in, inArgs, inMod|

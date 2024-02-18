@@ -47,7 +47,7 @@ MultiUMapDef : UMapDef {
 		}
 	}
 
-	*defaultGUIColor { ^Color.white.alpha_(0.66) }
+	*defaultGUIColor { ^Color.white.alpha_(0.33) }
 
 	*new { |name, udefs, category, setter, setterIsPrivate = true, addToAll = true| // first udef in list is default
 		^super.basicNew( name, [

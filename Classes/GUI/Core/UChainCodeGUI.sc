@@ -58,7 +58,7 @@ UChainCodeGUI : UChainGUI {
                 .label_( "code" )
                 .border_( 1 )
                 .radius_( 2 )
-                .background_( Color.green )
+		        .background_( RoundView.skin[ 'SmoothButton' ] !? _.hiliteColor ? Color.green )
                 .action_({
 	                UChainGUI(
 	                	this.window.name, originalBounds,
@@ -91,6 +91,7 @@ UChainCodeGUI : UChainGUI {
 		DragSource(scrollView, width@16 )
 		.align_(\center)
 		.object_( chain.asCompileString )
+		.applySkin( RoundView.skin )
 		.string_( "drag me for the chain's code" );
 
 		^units.collect({ |unit, i|
@@ -102,7 +103,7 @@ UChainCodeGUI : UChainGUI {
 			header = StaticText( comp, comp.bounds.moveTo(0,0) )
 				.applySkin( RoundView.skin )
 				.string_( " " ++ i ++ ": " ++ if(unit.def.class == LocalUdef){"[Local] "}{""} ++ unit.defName )
-				.background_( Color.white.alpha_(0.5) )
+			    .background_( RoundView.skin.headerColor ?? { Color.white.alpha_(0.5) } )
 				.resize_(2)
 				.font_(
 					(RoundView.skin.tryPerform( \at, \font ) ??

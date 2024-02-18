@@ -136,12 +136,12 @@ UScoreEditorGUI : UAbstractWindow {
                             { UScoreEditorGUI(scoreEditor) },
                             { this.score.save(nil, {UScoreEditorGUI(scoreEditor)} ) },
                             { this.score.saveAs(nil,nil, {UScoreEditorGUI(scoreEditor)} ) }
-                        ] );
+					], background: UChainGUI.skin[ 'SCAlert' ] !? _.background  );
                 } {
 					if( UScore.storeRecentScorePaths ) { { URecentScorePaths.fillMenu }.defer(0.1) }
 				};
             }.defer(0.1)
-        }, margin:margin, gap:gap);
+        }, UChainGUI.skin.scoreEditorWindow, margin:margin, gap:gap);
         view.addFlowLayout(margin@margin,gap@gap);
         bounds = window.bounds;
         margin = 4;

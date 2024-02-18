@@ -13,7 +13,7 @@ FuncUMapDef : UMapDef {
 	var <>dontStoreValue = true;
 
 	*defaultGUIColor { ^Color(0.67843137254902, 0.84705882352941, 0.90196078431373)
-		.blend( Color.white, 0.5 ).alpha_(0.4);
+		.blend( Color.white, 0.5 ).alpha_(0.3);
 	}
 
 	defType { ^\value }

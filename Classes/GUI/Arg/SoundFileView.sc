@@ -353,7 +353,6 @@ BufSndFileView {
 				.radius_( 3 )
 				.border_( 1 )
 				.label_( ["global", "global"] )
-				.hiliteColor_( Color.green )
 				.action_({ |bt|
 					switch( bt.value,
 						1, { this.performSndFile( \loadGlobal ) },
@@ -472,6 +471,7 @@ BufSndFileView {
 			.radius_( 3 )
 			.border_( 1 )
 			.resize_( 3 )
+		    .hiliteColor_( RoundView.skin.hiliteColor ?? { Color.black.alpha_(0.33) } )
 			.label_( [ "", 'x' ] )
 			.action_({ |bt|
 				this.performSndFile( \loop_ , bt.value.booleanValue );
