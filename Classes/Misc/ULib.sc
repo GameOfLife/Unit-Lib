@@ -149,7 +149,7 @@ ULib {
 				ip = s.addr.ip;
 			};
 			if( s.isKindOf( LoadBalancer ) ) {
-				composite.background = Color.gray(0.5).alpha_(0.5);
+				composite.background = Color.gray(0.5).alpha_(0.2);
 				StaticText(composite, Rect( 22, 2, 200,16 ) )
 				.font_( font.boldVariant )
 				.string_( " " ++ s.name + "/" + ip );
