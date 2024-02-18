@@ -1082,7 +1082,7 @@ UChainGUI {
 		var uDefMenuFunc;
 
 		uDefMenuFunc = { |unit, action, hideAction|
-			var uDefsList = [], ctrl, menu;
+			var uDefsList = [], ctrl, menu, checkedMenu;
 			var uDefsDict = ();
 
 			Udef.all !? { |all|
@@ -1112,7 +1112,7 @@ UChainGUI {
 				};
 			};
 
-			menu = Menu( *uDefsList.collect({ |item|
+			menu = Menu( *uDefsList.collect({ |item, i|
 				var submenu, includesChecked = false;
 				if( item.isKindOf( Symbol ) ) {
 					MenuAction.separator( item.asString );
@@ -1127,8 +1127,16 @@ UChainGUI {
 							menu.destroy;
 						}).enabled_( checked.not ).font_( Font( Font.defaultSansFace, 12 ) );
 					})).title_( if( includesChecked ) { item[0] ++ " *" } { item[0] } );
+					if( includesChecked ) { checkedMenu = i };
+					submenu;
 				}
-			})).font_( Font( Font.defaultSansFace, 12 ) ).front;
+			})).font_( Font( Font.defaultSansFace, 12 ) );
+
+			if( checkedMenu.notNil ) {
+				menu.front( action: menu.actions[ checkedMenu ] ? nil );
+			} {
+				menu.front;
+			};
 
 			menu.addDependant( ctrl );
 		};

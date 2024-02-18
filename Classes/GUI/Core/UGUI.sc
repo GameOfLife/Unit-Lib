@@ -187,7 +187,7 @@ UGUI {
 	makeHeader { }
 
 	makeUMapDefMenu { |test, action, hideAction, matchTest|
-		var uDefsList = [], ctrl, menuList, menu;
+		var uDefsList = [], ctrl, menuList, menu, checkedIndex;
 		var uDefsDict = ();
 
 		UMapDef.all !? { |all|
@@ -243,12 +243,12 @@ UGUI {
 			};
 		};
 
-		menuList = uDefsList.collect({ |item|
-			var includesChecked = false;
+		menuList = uDefsList.collect({ |item, i|
+			var includesChecked = false, submenu;
 			if( item.isKindOf( Symbol ) ) {
 				MenuAction.separator( item.asString );
 			} {
-				Menu( *item[1].collect({ |def|
+				submenu = Menu( *item[1].collect({ |def|
 					var checked;
 					checked = matchTest.value( def ) ? false;
 					if( checked ) { includesChecked = true; };
@@ -258,16 +258,23 @@ UGUI {
 						menu.destroy;
 					}).enabled_( checked.not ).font_( Font( Font.defaultSansFace, 12 ) );
 				})).title_( if( includesChecked ) { item[0] ++ " *" } { item[0] } );
+				if( includesChecked ) { checkedIndex = i };
+				submenu;
 			}
 		});
 
 		if( menuList.size == 2 ) {
 			menu = menuList[1];
+			checkedIndex = menu.actions.detectIndex({ |item| item.enabled.not });
 		} {
 			menu = Menu( *menuList ).font_( Font( Font.defaultSansFace, 12 ) );
 		};
 
-		menu.front;
+		if( checkedIndex.notNil ) {
+			menu.front( action: menu.actions[ checkedIndex ] ? nil );
+		} {
+			menu.front;
+		};
 
 		^menu.addDependant( ctrl );
 	}
