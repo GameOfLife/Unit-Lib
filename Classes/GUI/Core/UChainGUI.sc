@@ -1138,6 +1138,11 @@ UChainGUI {
 		var massEditWindow;
 		var upatGUI, upatCtrls, upatHeader, upatComp;
 		var uDefMenuFunc;
+		var addBetweenColor;
+
+		addBetweenColor = RoundView.skin.headerColor !? { |x|
+			x.copy.alpha_( x.alpha / 2 )
+		} ?? { Color.white.alpha_(0.25) };
 
 		uDefMenuFunc = { |unit, action, hideAction, checkCategory|
 			var uDefsList = [], ctrl, menu, checkedMenu;
@@ -1377,7 +1382,7 @@ UChainGUI {
 				.resize_(2);
 
 			if( notMassEdit ) {
-				addBefore.background_( Color.white.alpha_(0.25) );
+				addBefore.background_( addBetweenColor );
 				addBefore.canReceiveDragHandler_({ |sink|
 						var drg;
 						drg = View.currentDrag;
@@ -1421,13 +1426,13 @@ UChainGUI {
 					uDefMenuFunc.value(nil, { |def|
 						this.setUnits( units.insert( i, U( def ) ) );
 					}, {
-						addBefore.background = Color.white.alpha_(0.25);
+						addBefore.background = addBetweenColor;
 					}, if( i == 0 ) { \generator } { \modifier } );
-					addBefore.background = Color.gray(0.3).alpha_(0.5);
+					addBefore.background = addBetweenColor.copy.val_(0.5);
 				});
 
 				addBefore.mouseUpAction_({
-					addBefore.background = Color.white.alpha_(0.25);
+					addBefore.background = addBetweenColor;
 				});
 
 			} {
@@ -1653,7 +1658,7 @@ UChainGUI {
 			addLast = UDragBin( scrollView, width@7 )
 				.resize_(2)
 				.color_( Color.gray(0.2) )
-				.background_( Color.white.alpha_(0.25) )
+			    .background_( addBetweenColor )
 				.canFocus_(false);
 
 			addLast.canReceiveDragHandler_({ |sink|
@@ -1694,13 +1699,13 @@ UChainGUI {
 				uDefMenuFunc.value(nil, { |def|
 					chain.units = chain.units ++ [ U( def ) ];
 				}, {
-					addLast.background = Color.white.alpha_(0.25);
+					addLast.background = addBetweenColor;
 				}, \endpoint );
-				addLast.background = Color.gray(0.3).alpha_(0.5);
+				addLast.background =  addBetweenColor.copy.val_(0.5);
 			});
 
 			addLast.mouseUpAction_({
-				addLast.background = Color.white.alpha_(0.25);
+				addLast.background = addBetweenColor;
 			});
 		};
 
