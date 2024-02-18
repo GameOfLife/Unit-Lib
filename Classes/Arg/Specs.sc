@@ -1145,6 +1145,26 @@ HardwareBusSpec : PositiveIntegerSpec {
 
 	var <>type = \output, <>numChannels = 1;
 
+	*initClass {
+		StartUp.defer({ this.readPrefs });
+	}
+
+	*readPrefs {
+		var paths;
+		paths = [
+			"HardwareBusSpec-inDeviceDict.scd",
+			"HardwareBusSpec-outDeviceDict.scd",
+		].collect({ |fileName|
+			thisProcess.platform.userAppSupportDir +/+ fileName;
+		});
+		if( File.exists( paths[0] ) ) {
+			this.inDeviceDict = paths[0].load;
+		};
+		if( File.exists( paths[1] ) ) {
+			this.outDeviceDict = paths[1].load;
+		};
+	}
+
 	*new{ |type = \output,  numChannels = 1, maxval = 512|
 		^super.new.minval_( 0 ).type_( type ).maxval_( maxval ).numChannels_( numChannels ).default_( 0 );
 	}
