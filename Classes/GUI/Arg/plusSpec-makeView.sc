@@ -2227,6 +2227,152 @@
 
 }
 
++ HardwareBusSpec {
+
+	makeMenu { |labels, list, action|
+		var menu, menuActions = [];
+		labels = labels ?? { this.getDeviceLabels };
+		list = list ?? { this.class.makeDeviceLabelsList( labels ) };
+
+		labels.do({ |dev|
+			var ma;
+			case { dev.isKindOf( Symbol ) } {
+				menuActions = menuActions.add(
+					MenuAction( dev.asString, {
+						action.value( list.indexOf( dev ) );
+					})
+				);
+			} { dev[1].size < 3 } {
+				dev[1].do({ |id|
+					menuActions = menuActions.add(
+						MenuAction( dev[0].asString + id, {
+							action.value( list.indexOf( (dev[0].asString + id).asSymbol ) );
+						})
+					);
+				});
+			} { dev[1].size < 32 } {
+				ma = Menu().title_( dev[0].asString );
+				dev[1].do({ |id|
+					ma.addAction(
+						MenuAction( dev[0].asString + id, {
+							action.value( list.indexOf( (dev[0].asString + id).asSymbol ) );
+						})
+					);
+				});
+				menuActions = menuActions.add( ma );
+			} {
+				ma = Menu().title_( dev[0].asString );
+				dev[1].clump(16).do({ |ids, i|
+					var mai = Menu().title_( dev[0].asString + "%-%".format( ids.first, ids.last ) );
+					ids.do({ |id|
+						mai.addAction(
+							MenuAction( dev[0].asString + id, {
+								action.value( list.indexOf( (dev[0].asString + id).asSymbol ) );
+							})
+						);
+					});
+					ma.addAction( mai );
+				});
+				menuActions = menuActions.add( ma );
+			};
+		});
+		if( menuActions.size == 1 && { menuActions[0].isKindOf( Menu ) }) {
+			^menuActions[0];
+		} {
+			^Menu( *menuActions );
+		};
+	}
+
+	makeView { |parent, bounds, label, action, resize|
+		var vws, view, labelWidth;
+		var boxWidth, setColor;
+
+		bounds.isNil.if{bounds= 160 @ 18 };
+
+		vws = ();
+		#view, bounds = EZGui().prMakeMarginGap.prMakeView( parent, bounds );
+		vws[ \view ] = view;
+		vws[ \labels ] = this.getDeviceLabels;
+		vws[ \list ] = this.class.makeDeviceLabelsList( vws[ \labels ] );
+
+		vws[ \doAction ] = {
+			action.value( vws, vws[ \box ].value.asInteger );
+		};
+
+		vws[ \menu ] = this.makeMenu( vws[ \labels ], vws[ \list ], { |val|
+			vws[ \box ].value = val ? 0;
+			vws.setLabel;
+			vws.doAction;
+		});
+
+		vws[ \setLabel ] = {
+			var index, labels, lastName;
+			index = vws[ \box ].value;
+			if( numChannels == 1 ) {
+				vws[ \label ].string = " " ++ vws[ \list ][ index.asInteger ] ? "";
+			} {
+				labels = [ vws[ \list ][ index.asInteger ],  vws[ \list ][ index.asInteger + (numChannels-1) ] ]
+				.collect(_.asString);
+				if( labels[1].find( labels[0].split($ )[0] ).notNil ) {
+					vws[ \label ].string = " " ++ labels[0] ++ " - " ++ labels[1].split($ ).last;
+				} {
+					vws[ \label ].string = " " ++ labels.join( "-" );
+				};
+			};
+		};
+
+		if( label.notNil ) {
+			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
+			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ 14 )
+				.string_( label.asString ++ " " )
+				.align_( \right )
+				.resize_( 4 )
+				.applySkin( RoundView.skin );
+		} {
+			labelWidth = -4;
+		};
+
+		//boxWidth = bounds.width-(labelWidth + 2 + 40 + 2);
+		boxWidth = 45;
+
+		vws[ \box ] = SmoothNumberBox( vws[ \view ],
+				Rect(labelWidth + 2, 0, boxWidth, bounds.height)
+			)
+		    .action_({ |vw|
+		        vws.setLabel;
+			    vws.doAction;
+		    } )
+		    .allowedChars_( "" )
+			.step_( step )
+			.scroll_step_( step )
+			.alt_scale_( alt_step / step )
+			.clipLo_( this.minval )
+			.clipHi_( this.maxval );
+
+		vws[ \label ] = StaticText( vws[ \view ],
+				Rect( labelWidth + boxWidth + 4, 0, bounds.width - 2 - boxWidth - 2 - labelWidth, bounds.height)
+		).applySkin( RoundView.skin )
+		.background_( Color.white.alpha_(0.25) )
+		.resize_( 5 )
+		.mouseDownAction_({
+			vws[ \menu ].front;
+		})
+		.onClose_({
+			vws[ \menu ].destroy;
+		});
+
+		if( resize.notNil ) { vws[ \view ].resize = resize };
+		vws.setLabel;
+		^vws;
+	}
+
+	setView { |view, value, active = false|
+		view[ \box ].value = value;
+		{ view.setLabel; }.defer;
+		if( active ) { view[ \box ].doAction };
+	}
+}
+
 + SharedValueIDSpec {
 
 	makeView { |parent, bounds, label, action, resize|

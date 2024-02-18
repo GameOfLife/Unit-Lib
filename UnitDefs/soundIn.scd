@@ -15,14 +15,14 @@ this is an Udef definition file
 part of the Unit lib default Udefs set
 */
 
-MultiChannelUdef( \soundIn, { |bus = 0|
+var def = MultiChannelUdef( \soundIn, { |bus = 0|
 	var input;
 	input = ((..Udef.numChannels - 1) + bus).collect({ |item| SoundIn.ar( item ) });
 	input = input.collect({ |input|
 		input * if( bus > (NumInputBuses.ir - 1), 0, 1 );
 	});
 	UOut.ar( 0, input );
-} ).setSpec( \bus, PositiveIntegerSpec( 0 ) )
+} )
 	.shouldPlayOnFunc_({ |unit, target|
 		// only use a local server, unless no local servers are available
 		if( ULib.servers.any(_.isLocal) ) {
@@ -32,3 +32,9 @@ MultiChannelUdef( \soundIn, { |bus = 0|
 		};
 	})
 	.category_( \input );
+
+def.udefs.do({ |def|
+	def.setSpec( \bus, HardwareBusSpec(\input, def.name ) );
+});
+
+def

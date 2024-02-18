@@ -11,15 +11,36 @@ this is an Udef definition file
 part of the Unit lib default Udefs set
 */
 
-Udef( \auxOut, { |bus = 0, amp = 1, useUChainGain = 1|
-	var input;
-	input = UIn.ar(0);
-	amp = amp / if( useUChainGain, // quick workaround until UEnv supports useUChainGain
-		1,
-		UIn.getControl( \kr, UIn.getControlName( ), 'gain', 0, 0.5 ).dbamp.max(1.0e-12)
-	);
-	Out.ar( bus + FirstPrivateBus.ir + 32, input * amp * UEnv.kr( extraSilence: 0.2, useGlobalGain: 0 ) );
-})
-	.category_( \output )
-    .setSpec( \useUChainGain, BoolSpec(true) )
-	.setSpec( \bus, PositiveIntegerSpec( 0, 0, 32 ) )
+(
+var defs, def;
+
+defs = [
+	Udef( \internal, { |bus = 0, amp = 1, useUChainGain = 1|
+		var input;
+		input = UIn.ar(0);
+		amp = amp / if( useUChainGain, // quick workaround until UEnv supports useUChainGain
+			1,
+			UIn.getControl( \kr, UIn.getControlName( ), 'gain', 0, 0.5 ).dbamp.max(1.0e-12)
+		);
+		Out.ar( bus + FirstPrivateBus.ir + 32, input * amp * UEnv.kr( extraSilence: 0.2, useGlobalGain: 0 ) );
+	}, addToAll: false, extraPrefix: \auxOut_ )
+	.setSpec( \useUChainGain, BoolSpec(true) )
+	.setSpec( \bus, PositiveIntegerSpec( 0, 0, 32 ) ),
+
+	Udef( \external, { |bus = 0, amp = 1, useUChainGain = 1|
+		var input;
+		input = UIn.ar(0);
+		amp = amp / if( useUChainGain, // quick workaround until UEnv supports useUChainGain
+			1,
+			UIn.getControl( \kr, UIn.getControlName( ), 'gain', 0, 0.5 ).dbamp.max(1.0e-12)
+		);
+		Out.ar( bus, input * amp * UEnv.kr( extraSilence: 0.2, useGlobalGain: 0 ) );
+	}, addToAll: false, extraPrefix: \auxOut_ )
+	.setSpec( \useUChainGain, BoolSpec(true) )
+	.setSpec( \bus, HardwareBusSpec( \output, 1 ) ),
+];
+
+def = MultiUdef( \auxOut, defs, \output, \type, false );
+
+def;
+)

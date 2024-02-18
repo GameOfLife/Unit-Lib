@@ -1139,6 +1139,61 @@ PositiveIntegerSpec : IntegerSpec {
 
 }
 
+HardwareBusSpec : PositiveIntegerSpec {
+
+	classvar <>inDeviceDict, <>outDeviceDict;
+
+	var <>type = \output, <>numChannels = 1;
+
+	*new{ |type = \output,  numChannels = 1, maxval = 512|
+		^super.new.minval_( 0 ).type_( type ).maxval_( maxval ).numChannels_( numChannels ).default_( 0 );
+	}
+
+	constrain { |value|
+		^value.clip(0, maxval).asInteger;
+	}
+
+	*addDeviceLabels { |type = \output, device, labels|
+		device = device ? 'system';
+		switch( type,
+			\output, {
+				if( outDeviceDict.isNil ) { outDeviceDict = () };
+				outDeviceDict[ device.asSymbol ] = labels;
+			},
+			\input, {
+				if( inDeviceDict.isNil ) { inDeviceDict = () };
+				inDeviceDict[ device.asSymbol ] = labels;
+			}
+		);
+	}
+
+	getDeviceLabels {
+		var dict, list, device;
+		switch( type,
+			\output, {
+				dict = outDeviceDict ?? {()};
+				device = Server.default.options.outDevice ? 'system';
+			},
+			\input, {
+				dict = inDeviceDict ?? {()};
+				device = Server.default.options.inDevice ? 'system';
+			}
+		);
+		^dict[ device.asSymbol ] ?? {
+			[ [ type, (1..Server.default.options.numOutputBusChannels) ] ];
+		}
+	}
+
+	*makeDeviceLabelsList { |labels|
+		^labels.collect({ |label| label.asArray.flop }).flatten(1).collect({ |item|
+			item.join(" ").asSymbol
+		});
+	}
+
+	storeArgs { ^[type, maxval] }
+
+}
+
 SharedValueIDSpec : PositiveIntegerSpec {
 
 	*umap_name { ^'shared_in' }

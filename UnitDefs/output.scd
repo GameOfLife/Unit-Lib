@@ -15,7 +15,7 @@ this is an Udef definition file
 part of the Unit lib default Udefs set
 */
 
-MultiChannelUdef( \output, { |bus, useGlobalGain = 1|
+var def = MultiChannelUdef( \output, { |bus, useGlobalGain = 1|
 	Out.ar( bus, UGlobalEQ.ar( UIn.ar( 0, Udef.numChannels, endPoint: true ) ) * UEnv.kr(
 		extraSilence: 0.2,
 		useGlobalGain: useGlobalGain
@@ -23,7 +23,12 @@ MultiChannelUdef( \output, { |bus, useGlobalGain = 1|
 })
 	.category_( \output )
     .setSpec( \useGlobalGain, BoolSpec(true) )
-    .setSpec( \bus, PositiveIntegerSpec( 0, 0, 192 ) )
 	.shouldPlayOnFunc_({ |unit, target|
 		target.asTarget.server.isLocal; // safety measure: no output on wfs servers
-	})
+	});
+
+def.udefs.do({ |def|
+	def.setSpec( \bus, HardwareBusSpec(\output, def.name ) );
+});
+
+def

@@ -10,9 +10,27 @@ this is an Udef definition file
 part of the Unit lib default Udefs set
 */
 
-Udef( \auxIn, { |bus = 0|
-	var input;
-	input = In.ar( bus + FirstPrivateBus.ir + 32 );
-	UOut.ar( 0, input );
-} ).setSpec( \bus, PositiveIntegerSpec( 0, 0, 32 ) )
-	.category_( \input );
+(
+var defs, def;
+
+defs = [
+	Udef( \internal, { |bus = 0|
+		var input;
+		input = In.ar( bus + FirstPrivateBus.ir + 32 );
+		UOut.ar( 0, input );
+	}, addToAll: false, extraPrefix: \aux_ )
+	.setSpec( \bus, PositiveIntegerSpec( 0, 0, 32 ) ),
+
+	Udef( \external, { |bus = 0|
+		var input;
+		input = SoundIn.ar( bus );
+		input * if( bus > (NumInputBuses.ir - 1), 0, 1 );
+		UOut.ar( 0, input );
+	}, addToAll: false, extraPrefix: \auxIn_ )
+	.setSpec( \bus, HardwareBusSpec( \input, 1 ) )
+];
+
+def = MultiUdef( \auxIn, defs, \input, \type, false );
+
+def;
+)
