@@ -1278,6 +1278,13 @@ UChainGUI {
 					{ Font( Font.defaultSansFace, 12) }).boldVariant
 			);
 
+			SmoothButton( upatComp, Rect( upatComp.bounds.right - (12 + 2) - (80 + 2), 1, 80, 12 ) )
+			.label_( "as new score" )
+			.radius_( 0 )
+			.action_({ |bt|
+				chain.asUScore.gui;
+			});
+
 			SmoothButton( upatComp,
 					Rect( upatComp.bounds.right - (12 + 2), 1, 12, 12 ) )
 				.label_( '-' )
