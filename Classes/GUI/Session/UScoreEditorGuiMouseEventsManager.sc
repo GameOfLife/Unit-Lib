@@ -90,6 +90,14 @@ UScoreEditorGuiMouseEventsManager {
 		^if(events.size > 0){events}{nil}
 	}
 
+	selectedIndices {
+		var indices = [];
+		this.eventViews.do({ |ev, i|
+			if( ev.selected ) { indices = indices.add( i ) }
+		});
+		^indices;
+	}
+
 	selectedEvents {
 	    ^this.selectedEventViews.collect( _.event )
 	}

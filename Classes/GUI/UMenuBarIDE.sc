@@ -426,6 +426,10 @@ UMenuBarIDE {
 			UScoreEditorGUI.current !! { |x| x.editor.addMarker }
 		}).shortcut_( "Ctrl+M" ), "Edit" );
 
+		this.registerMenu( MenuAction( "Duplicate Selected", {
+			UScoreEditorGUI.current !! { |x| x.scoreView.duplicateSelected }
+		}).shortcut_( "Ctrl+D" ), "Edit" );
+
 		this.registerMenu( MenuAction( "Edit Selected", {
 			UScoreEditorGUI.current !! { |x| x.scoreView.editSelected }
 		}).shortcut_( "Ctrl+I" ), "Edit" );
@@ -444,6 +448,23 @@ UMenuBarIDE {
 		this.registerMenu( MenuAction( "Select Similar", {
 			UScoreEditorGUI.current !! { |x| x.scoreView.selectSimilar }
 		}), "Edit" );
+
+		this.registerMenu( MenuAction( "Select Next", {
+			UScoreEditorGUI.current !! { |x| x.scoreView.selectNext }
+		}).shortcut_( "Shift+Right" ), "Edit" );
+
+		this.registerMenu( MenuAction( "Select Previous", {
+			UScoreEditorGUI.current !! { |x| x.scoreView.selectPrev }
+		}).shortcut_( "Shift+Left" ), "Edit" );
+
+		this.registerMenu( MenuAction( "Selection Add Next", {
+			UScoreEditorGUI.current !! { |x| x.scoreView.selectAddNext; }
+		}).shortcut_( "Shift+Down" ), "Edit" );
+
+		this.registerMenu( MenuAction( "Selection Remove Last", {
+			UScoreEditorGUI.current !! { |x| x.scoreView.selectRemoveLast }
+		}).shortcut_( "Shift+Up" ), "Edit" );
+
 
 		//sort
 		this.registerMenu( MenuAction.separator("Sort"), "Edit" );

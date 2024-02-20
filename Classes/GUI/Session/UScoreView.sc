@@ -264,6 +264,50 @@ UScoreView {
 	    this.update;
 	}
 
+	select { |indices|
+		indices = indices ? [];
+		usessionMouseEventsManager.eventViews.do({ |ev, i|
+			ev.selected = indices.includes(i);
+		});
+		this.update;
+	}
+
+	selectNext {
+		var selectedIndices = usessionMouseEventsManager.selectedIndices;
+		if( selectedIndices.size > 0 ) {
+			this.select( selectedIndices + 1 );
+		} {
+			this.select([0]);
+		};
+		this.update;
+	}
+
+	selectPrev {
+		var selectedIndices = usessionMouseEventsManager.selectedIndices;
+		if( selectedIndices.size > 0 ) {
+			this.select( selectedIndices - 1 );
+		} {
+			this.select([ usessionMouseEventsManager.eventViews.size - 1 ]);
+		};
+	}
+
+	selectAddNext {
+		var selectedIndices = usessionMouseEventsManager.selectedIndices;
+		if( selectedIndices.size > 0 ) {
+			this.select( selectedIndices ++ [ selectedIndices.sort.last + 1 ] );
+		} {
+			this.select([0]);
+		};
+	}
+
+	selectRemoveLast {
+		var selectedIndices = usessionMouseEventsManager.selectedIndices;
+		if( selectedIndices.size > 1 ) {
+			selectedIndices.remove(  selectedIndices.sort.last );
+			this.select( selectedIndices );
+		};
+	}
+
     selectSimilar {
         var selectedTypes = this.selectedEvents;
         if( selectedTypes.size > 0 ) {

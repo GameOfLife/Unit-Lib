@@ -211,7 +211,8 @@ UMixer {
 							eventsFromFolder.do{ |dict|
 								dict[\event].setGain(dict[\oldLevel]+v.value);
 							};
-						});
+						})
+						.labelView.align_( \center );
 				    bt = SmoothButton(cview,32@20)
                         .states_(
                             [[ "s", Color.black, Color.clear ],
