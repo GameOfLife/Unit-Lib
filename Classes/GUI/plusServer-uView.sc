@@ -18,6 +18,7 @@
 		var infoString, oldOnClose;
 		var font;
 		var cpuMeter, composite, inactiveColor;
+		var menu;
 
 		width = width - 26;
 
@@ -32,6 +33,21 @@
 				Rect(10, named.values.indexOf(this) * 120 + 10, 390, 92));
 			w.view.decorator = FlowLayout(w.view.bounds);
 		});
+
+		menu = Menu(
+			MenuAction.separator( name.asString ),
+			Menu(
+				MenuAction("Inputs", { this.meter( this.options.numInputBusChannels, 0 ) }),
+				MenuAction("Outputs", { this.meter( 0, this.options.numOutputBusChannels ) }),
+				MenuAction("All", { this.meter }),
+			).title_( "Show Server Meter" ).font_(  Font( Font.defaultSansFace, 13 ) ),
+			MenuAction( "Show Scope", { this.scope; }),
+			MenuAction( "Show Freqscope", { this.freqscope; }),
+			MenuAction( "Dump Node Tree", { this.queryAllNodes }),
+			MenuAction( "Dump Node Tree with Controls", { this.queryAllNodes( true ) }),
+			MenuAction( "Show Node Tree", { this.plotTree; }),
+			MenuAction( "Server Dump OSC", { |action| this.dumpOSC( action.checked )  }).checked_( false ),
+		).font_(  Font( Font.defaultSansFace, 13 ) );
 
 		composite = CompositeView( w, (width + 22) @ 18 );
 		composite.background = RoundView.skin.menuStripColor ?? { Color.gray(0.9); };
@@ -77,6 +93,7 @@
 		active.string = " " ++ this.name.asString + this.uInfoString;
 		active.align = \left;
 		active.font = font;
+		active.mouseDownAction = { menu.front; };
 
 		if(this.serverRunning,running,stopped);
 
@@ -101,6 +118,7 @@
 		active.onClose = {
 			window = nil;
 			ctlr.remove;
+			menu.destroy;
 			if( isLocal.not ) {
 				this.stopAliveThread;
 			};
