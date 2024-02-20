@@ -240,6 +240,24 @@ UMenuBarIDE {
 			 BufSndFile.reloadAllGlobal;
 		}), name );
 
+		this.registerMenu( MenuAction.separator( "Global Level" ), name );
+
+		this.registerMenu( MenuAction( "Increase Level +1dB", {
+			UGlobalGain.gain = (UGlobalGain.gain + 1).min(36);
+		}).shortcut_( "Ctrl+Up" ), name );
+
+		this.registerMenu( MenuAction( "Decrease Level -1dB", {
+			UGlobalGain.gain = (UGlobalGain.gain - 1).max(-60);
+		}).shortcut_( "Ctrl+Down" ), name );
+
+		this.registerMenu( MenuAction( "Set Level 0dB", {
+			UGlobalGain.gain = 0;
+		}).shortcut_( "Ctrl+0" ), name );
+
+		this.registerMenu( MenuAction( "Drop Level -60dB", {
+			UGlobalGain.gain = -60;
+		}).shortcut_( "Ctrl+-" ), name );
+
 		this.registerMenu( MenuAction( "New Score", {
 				UScore.new.gui;
 		}).shortcut_( "Ctrl+N" ), "File" );
@@ -503,4 +521,3 @@ UMenuBarIDE {
 		};
 	}
 }
-
