@@ -222,10 +222,11 @@ UMenuBarIDE {
 
 		this.registerMenu( MenuAction( "Stop current Scores", {
 			UScoreEditorGUI.all.do({ |item| item.score.stop });
-		}), name );
+		}).shortcut_( "Ctrl+/" ), name );
 
-		this.registerMenu( MenuAction( "Stop all", {
-			CmdPeriod.run;
+		this.registerMenu( MenuAction( "Stop all (%-.)"
+			.format( if( thisProcess.platform.name === 'osx' ) { "Cmd" } { "Ctrl"} ), {
+				CmdPeriod.run;
 		}), name );
 
 		this.registerMenu( MenuAction( "Clear ULib", {
