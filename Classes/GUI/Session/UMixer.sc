@@ -30,16 +30,18 @@ UMixer {
 
         scoreList = [score];
         soloedTracks  = [];
-        font = Font( Font.defaultSansFace, 11 );
         parent = inParent ? Window("UMixer",Rect(100,100,800,372), scroll: true).front;
         if(parent.respondsTo(\onClose_)){ parent.onClose_({this.remove}) };
         bounds = inBounds ? Rect(0,0,800,372);
 
+		RoundView.pushSkin( UChainGUI.skin ?? {()} );
+		font = RoundView.skin.font ?? { Font( Font.defaultSansFace, 11 ); };
+
         this.addCurrentScoreControllers;
         unitControllers = List.new;
         mainComposite = parent;
-        mainComposite.asView.background_( Color.grey(0.8) );
-        this.makeMixerView
+        this.makeMixerView;
+		RoundView.popSkin;
 
      }
 
@@ -77,10 +79,12 @@ UMixer {
             scoreListView.remove;
             scoreListView = nil
         };
+		RoundView.pushSkin( UChainGUI.skin ?? {()} );
         if(scoreList.size > 1) {
             this.makeScoreListView;
         };
         this.makeMixerView;
+		RoundView.popSkin;
     }
 
     addtoScoreList{ |score|
@@ -160,22 +164,23 @@ UMixer {
 						.action_({ |v|
 								event.setGain(v.value);
 						});
+					sl.labelView.align_( \center );
 					bt = SmoothButton(cview,32@20)
-					    .states_(
-					        [[ "s", Color.black, Color.clear ],
-					        [  "s", Color.yellow, Color.clear ]] )
+					    .states_([
+							[ "s",nil, nil ],
+							[  "s", nil, Color.yellow.alpha_(0.75) ]
+						] )
                         .canFocus_(false)
-                        .border_(1).background_(Color.grey(0.8))
                         .value_(score.soloed.includes(event).binaryValue)
                         .action_({ |v|
                             score.solo(event, v.value.booleanValue)
                         });
                     bt = SmoothButton(cview,32@20)
-                        .states_(
-                            [[ "m", Color.black, Color.clear ],
-                            [  "m", Color.red, Color.clear ]] )
+						.states_([
+							[ "m", nil, nil ],
+							[  "m", nil, Color.red.alpha_(0.5) ]
+						] )
                         .canFocus_(false)
-                        .border_(1).background_(Color.grey(0.8))
                         .value_(score.softMuted.includes(event).binaryValue)
                         .action_({ |v|
                             score.softMute(event, v.value.booleanValue)
