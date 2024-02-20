@@ -216,7 +216,7 @@ UMenuBarIDE {
 /* MAIN */
 		this.registerMenu( MenuAction( "Preferences...", {
 			preferencesFunc.value;
-		}), name );
+		}).shortcut_( "Ctrl+P" ), name );
 
 		this.registerMenu( MenuAction.separator("Reset"), name );
 
@@ -242,11 +242,11 @@ UMenuBarIDE {
 
 		this.registerMenu( MenuAction( "New Score", {
 				UScore.new.gui;
-			}), "File" );
+		}).shortcut_( "Ctrl+N" ), "File" );
 
 		this.registerMenu( MenuAction( "Open Score...", {
 			UScore.openMultiple(nil, UScoreEditorGUI(_) )
-		}), "File" );
+		}).shortcut_( "Ctrl+O" ), "File" );
 
 		openRecentMenu = Menu().title_("Open Recent").font_( font );
 
@@ -258,11 +258,11 @@ UMenuBarIDE {
 
 		this.registerMenu( MenuAction( "Save Score", {
 			UScore.current !! _.save;
-		}), "File" );
+		}).shortcut_( "Ctrl+S" ), "File" );
 
 		this.registerMenu( MenuAction( "Save Score as...", {
 			UScore.current !! _.saveAs;
-		}), "File" );
+		}).shortcut_( "Ctrl+Shift+S" ), "File" );
 
 		this.registerMenu( MenuAction.separator("Export"), "File" );
 
@@ -391,25 +391,25 @@ UMenuBarIDE {
 /* EDIT */
 		this.registerMenu( MenuAction( "Copy", {
 	        UScoreEditorGUI.currentSelectedEvents !! UScoreEditor.copy(_)
-		}), "Edit" );
+		}).shortcut_( "Ctrl+C" ), "Edit" );
 
 		this.registerMenu( MenuAction( "Paste", {
 			UScoreEditorGUI.current !! { |x| x.scoreView.currentEditor.pasteAtCurrentPos }
-		}), "Edit" );
+		}).shortcut_( "Ctrl+V" ), "Edit" );
 
 		this.registerMenu( MenuAction.separator("Events"), "Edit" );
 
 		this.registerMenu( MenuAction( "Add Event", {
 			UScoreEditorGUI.current !! { |x| x.editor.addEvent }
-		}), "Edit" );
+		}).shortcut_( "Ctrl++" ), "Edit" );
 
 		this.registerMenu( MenuAction( "Add Marker", {
 			UScoreEditorGUI.current !! { |x| x.editor.addMarker }
-		}), "Edit" );
+		}).shortcut_( "Ctrl+M" ), "Edit" );
 
 		this.registerMenu( MenuAction( "Edit Selected", {
 			UScoreEditorGUI.current !! { |x| x.scoreView.editSelected }
-		}), "Edit" );
+		}).shortcut_( "Ctrl+I" ), "Edit" );
 
 		this.registerMenu( MenuAction( "Delete Selected", {
 			UScoreEditorGUI.current !! { |x| x.scoreView.deleteSelected }
@@ -420,7 +420,7 @@ UMenuBarIDE {
 		this.registerMenu( MenuAction( "Select All", {
 			UScoreEditorGUI.current !! { |x| x.scoreView.selectAll }
 
-		}), "Edit" );
+		}).shortcut_( "Ctrl+A" ), "Edit" );
 
 		this.registerMenu( MenuAction( "Select Similar", {
 			UScoreEditorGUI.current !! { |x| x.scoreView.selectSimilar }
@@ -477,14 +477,11 @@ UMenuBarIDE {
 
 	/* VIEW */
 
-		this.registerMenu( MenuAction( "EQ", { UGlobalEQ.gui; }), "View");
-		this.registerMenu( MenuAction( "Level (large)", { UGlobalGain.gui; }), "View");
-		this.registerMenu( MenuAction( "Udefs", { UdefsGUI(); }), "View");
+		this.registerMenu( MenuAction( "EQ", { UGlobalEQ.gui; }).shortcut_( "Ctrl+E" ), "View");
+		this.registerMenu( MenuAction( "Level (large)", { UGlobalGain.gui; }).shortcut_( "Ctrl+L" ), "View");
+		this.registerMenu( MenuAction( "Udefs", { UdefsGUI(); }).shortcut_( "Ctrl+U" ), "View");
 		this.registerMenu( MenuAction( "Environment", {
 			ULib.envirWindow;
-		}), "View");
-		this.registerMenu( MenuAction( "Level meters", {
-			ULib.servers.first.meter;
 		}), "View");
 
 		windowsMenu = Menu().title_( "Windows" ).font_( font );
