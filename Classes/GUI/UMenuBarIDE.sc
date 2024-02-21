@@ -203,6 +203,7 @@ UMenuBarIDE {
 			toolBar !? _.close;
 			toolBar = nil;
 		};
+		skipJack !? _.stop; skipJack = nil;
 	}
 
 	*new { |name = "Unit Lib"|
@@ -526,11 +527,9 @@ UMenuBarIDE {
 
 		windowsMenu = Menu().title_( "Windows" ).font_( font );
 
-		windowsCtrl.remove;
-		windowsCtrl = SimpleController( windowsMenu )
-		.put( \aboutToShow, {
-			this.fillWindowsMenu;
-		});
+		skipJack !? _.stop;
+
+		skipJack = SkipJack( { this.fillWindowsMenu; }, 1.0, false, "ulib_menu" );
 
 		this.registerMenu( windowsMenu, "View" );
 	}
