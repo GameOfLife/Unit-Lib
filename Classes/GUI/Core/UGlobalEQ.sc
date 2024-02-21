@@ -63,7 +63,7 @@ UGlobalEQ {
 	*gui { |parent, bounds|
 		if( view.isNil or: { view.view.isClosed } ) {
 			RoundView.useWithSkin( UChainGUI.skin, {
-				view = EQView( parent ? "UGlobalEQ", bounds ? Rect(500, 10, 332, 165), eqSetting, presets );
+				view = EQView( parent ? "UGlobalEQ", bounds ? Rect(500, 10, 332, 158 ), eqSetting, presets );
 			});
 			^view;
 		} {
