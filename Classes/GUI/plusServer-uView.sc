@@ -58,8 +58,8 @@
 				.canFocus_( false )
 				.radius_(2);
 				booter.states = [
-					[ \power, Color.gray(0.2), Color.clear],
-					[ \power, Color.gray(0.2), onColor.copy.alpha_(0.5) ]
+					[ \power, nil, Color.clear],
+					[ \power, nil, onColor.copy.alpha_(0.5) ]
 				];
 			} { booter = Button( composite, Rect(0,0,18,18));
 				booter.states = [[ "B"],[ "Q", onColor ]];

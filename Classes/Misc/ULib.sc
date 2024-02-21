@@ -130,7 +130,7 @@ ULib {
 		RoundView.pushSkin( UChainGUI.skin );
 
 		if( UMenuBarIDE.hasMenus ) {
-			menuView = UMenuBarIDE.createMenuStrip( w, (width-8) @ 18, [0,-4,0,0] );
+			menuView = UMenuBarIDE.createMenuStrip( w, (width-8) @ 18, [-4,-4,-4,0] );
 		};
 
 		ULib.servers.do{ |s, i|
