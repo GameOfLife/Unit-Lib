@@ -22,7 +22,7 @@
 LoadBalancer {
 
 	classvar <>all;
-	classvar <>bootDelay = 5;
+	classvar <>bootDelay = 1;
 
 	var <servers;
 	var <>name;
@@ -58,7 +58,7 @@ LoadBalancer {
 			bootRoutine.stop;
 			bootRoutine = {
 				beforeBootAction.value( this );
-				servers.do({ |srv| srv.bootSync; });
+				servers.do({ |srv| srv.bootSync; bootDelay.wait; });
 				afterBootAction.value( this );
 			}.fork( AppClock );
 		}
@@ -71,7 +71,7 @@ LoadBalancer {
 			bootRoutine.stop;
 			bootRoutine = {
 				beforeBootAction.value( this );
-				servers.do({ |srv| srv.bootSync; });
+				servers.do({ |srv| srv.bootSync; bootDelay.wait; });
 				afterBootAction.value( this );
 
 				condition.test = true;
