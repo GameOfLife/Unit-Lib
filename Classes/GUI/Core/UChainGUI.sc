@@ -335,6 +335,14 @@ UChainGUI {
 				} ]
 		 	);
 
+		if( UMenuBarIDE.hasMenus ) {
+			views.startButton.setContextMenuActions(
+				*UMenuBarIDE.allMenus.atAll(
+					[ UMenuBarIDE.currentMenuName.asSymbol, \File, \Edit, \View ]
+				)
+			);
+		};
+
 		 composite.decorator.shift( bounds.width - 14 - 90 - 32, 0 );
 
 		if( chain.isKindOf( MassEditUChain ) ) {
