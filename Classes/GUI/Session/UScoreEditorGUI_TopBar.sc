@@ -101,6 +101,7 @@ UScoreEditorGui_TopBar {
 		SmoothButton( header, size@size )
 			.states_( [[ \i, nil, Color.blue.alpha_(0.125) ]] )
 			.canFocus_(false)
+		    .toolTip_( "Edit selected Event(s)" )
 			.action_({ |b|
 				scoreView.editSelected;
 			});
@@ -109,7 +110,8 @@ UScoreEditorGui_TopBar {
 
 		SmoothButton( header, size@size )
 			.states_( [[ '-' ]] )
-			.canFocus_(false)
+		    .canFocus_(false)
+		    .toolTip_( "Delete selected Event(s)" )
 			.action_({
 				scoreView.deleteSelected;
 			});
@@ -117,6 +119,7 @@ UScoreEditorGui_TopBar {
 		SmoothButton( header, size@size )
 			.states_( [[ '+' ]] )
 			.canFocus_(false)
+		    .toolTip_( "Add Event" )
 			.action_({
 			    if(scoreView.selectedEvents.notNil) {
 				    scoreView.duplicateSelected;
@@ -141,6 +144,7 @@ UScoreEditorGui_TopBar {
 
 			 } ]] )
 			.canFocus_(false)
+		    .toolTip_( "Add Marker" )
 			.action_({
 			     scoreView.currentEditor.addMarker
 			});
@@ -153,6 +157,7 @@ UScoreEditorGui_TopBar {
 			.radius_( 0 )
 			.font_( Font( font.name, 10 ).boldVariant )
 			.radius_([9,0,0,9])
+		    .toolTip_( "Clip selected Event(s) startTime to score position" )
 			.action_({
 				this.selectedEventsOrAll !? { |x| this.scoreEditor.trimEventsStartAtPos( x ) }
 			});
@@ -164,6 +169,7 @@ UScoreEditorGui_TopBar {
 			.canFocus_(false)
 			.radius_(0)
 			.font_( Font( font.name, 12 ).boldVariant )
+		    .toolTip_( "Slice selected Event(s) at score position" )
 			.action_({
 				this.selectedEventsOrAll !? { |x| this.scoreEditor.splitEventsAtPos( x ) }
 			});
@@ -175,6 +181,7 @@ UScoreEditorGui_TopBar {
 			.canFocus_(false)
 			.radius_([0,9,9,0])
 			.font_( Font( font.name, 10 ).boldVariant )
+		    .toolTip_( "Clip selected Event(s) endTime to score position" )
 			.action_({
 			    this.selectedEventsOrAll !? { |x| this.scoreEditor.trimEventsEndAtPos( x ) }
 		    });
@@ -187,6 +194,7 @@ UScoreEditorGui_TopBar {
 			.canFocus_(false)
 			.enabled_(false)
 		    .stringColor_( [ Color.gray(0.5), stringColor ][ UScoreEditor.enableUndo.binaryValue ] )
+		    .toolTip_( "Undo" )
 			.action_({
 				this.scoreEditor.undo
 			});
@@ -199,6 +207,7 @@ UScoreEditorGui_TopBar {
 			.canFocus_(false)
 			.enabled_(false)
 			.stringColor_( [ Color.gray(0.5), stringColor ][ UScoreEditor.enableUndo.binaryValue ] )
+		    .toolTip_( "Redo" )
 			.action_({
 				this.scoreEditor.redo
 			});
@@ -210,6 +219,7 @@ UScoreEditorGui_TopBar {
 			.hiliteColor_( nil )
 			.value_( UScoreEditor.enableUndo.binaryValue )
 			.canFocus_(false)
+		    .toolTip_( "Enable/disable undo" )
 			.action_({ |bt|
 				switch( bt.value,
 					1, {
@@ -229,6 +239,7 @@ UScoreEditorGui_TopBar {
 		SmoothButton( header, size@size  )
 			.states_( [[ \speaker, nil, Color.clear ]] )
 			.canFocus_(false)
+		    .toolTip_( "Enable/disable selected Event(s)" )
 			.action_({ |b|
 				this.selectedEvents !? { |x|  this.scoreEditor.toggleDisableEvents( x ) }
 			});
@@ -236,6 +247,7 @@ UScoreEditorGui_TopBar {
 		SmoothButton( header, size@size  )
 			.states_( [[ \lock, nil, Color.clear ]] )
 			.canFocus_(false)
+		    .toolTip_( "Lock startTime of selected Event(s)" )
 			.action_({ |b|
 				this.selectedEvents !? { |x|  this.scoreEditor.toggleLockEvents( x ) }
 			});
@@ -246,6 +258,7 @@ UScoreEditorGui_TopBar {
 		.states_( [[ "folder", nil, Color.clear ]] )
 			.canFocus_(false)
 		    .radius_( [1,0,0,1] * (size/2) )
+		    .toolTip_( "Pack selected Event(s) in to Folder Event" )
 			.action_({
 			    this.selectedEvents !? { |x|
                         	this.scoreEditor.folderFromEvents(x);
@@ -256,6 +269,7 @@ UScoreEditorGui_TopBar {
 			.states_( [[ "unfold", nil, Color.clear ]] )
 			.canFocus_(false)
 		    .radius_( [0,1,1,0] * (size/2) )
+		    .toolTip_( "Unpack selected Folder Event(s)" )
 			.action_({
 			    this.selectedEvents !? { |x|
                         	this.scoreEditor.unpackSelectedFolders(x)
@@ -267,6 +281,7 @@ UScoreEditorGui_TopBar {
 		SmoothButton( header, 40@size  )
 			.states_( [[ "mixer", nil, Color.clear ]] )
 			.canFocus_(false)
+	        .toolTip_( "Open Mixer" )
 			.action_({ |b|
 			    if( umixer.notNil && { umixer.parent.isClosed.not } ) {
 				   umixer.parent.front;
@@ -294,6 +309,7 @@ UScoreEditorGui_TopBar {
 			.font_( font )
 			.resize_(3)
 			.value_(11)
+		    .toolTip_( "Snap resolution" )
 			.action_({ |v|
 				if (v.value == 0)
 					{ scoreView.snapActive = false; }
@@ -311,6 +327,7 @@ UScoreEditorGui_TopBar {
 			.font_( font )
 			.resize_(3)
 			.value_(0)
+		    .toolTip_( "Snap filter" )
 			.action_({ |v|
 				scoreView.usessionMouseEventsManager.mode = v.items[v.value].asSymbol;
 			});
@@ -319,6 +336,7 @@ UScoreEditorGui_TopBar {
 			.label_( "Q" )
 			.resize_(3)
 			.canFocus_(false)
+		    .toolTip_( "Quantize startTime of selected Event(s) to snap resolution" )
 			.action_({
 				this.selectedEvents !? { |x|
 					this.scoreEditor.quantizeEvents(

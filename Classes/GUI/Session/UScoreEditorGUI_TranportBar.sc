@@ -180,6 +180,7 @@ UScoreEditorGui_TransportBar {
 			    [ \stop, nil, Color.green.alpha_(0.5) ],
 			    [ \play, Color.blue, Color.red.alpha_(0.5) ]] )
 			.canFocus_(false)
+		    .toolTip_( "Play/stop" )
 			//.changeStateWhenPressed_(false)
 			.action_({  |v,c,d,e|
 
@@ -201,6 +202,7 @@ UScoreEditorGui_TransportBar {
 			    [ \pause, Color.red,Color.green.alpha_(0.5) ],
 			    [ \pause, Color.blue,Color.red.alpha_(0.5) ]] )
 			.canFocus_(false)
+		    .toolTip_( "Pause timeline" )
 			.action_({ |v|
 			    switch( v.value)
 			    {0}{
@@ -220,6 +222,7 @@ UScoreEditorGui_TransportBar {
 			.states_( [[\return, nil, Color.clear ]])
 			.canFocus_(false)
 			.radius_( [ size/2, 0, 0, size/2 ] )
+		    .toolTip_( "Jump to previous Marker" )
 			.action_({
 			    this.score.toPrevMarker;
 			});
@@ -228,6 +231,7 @@ UScoreEditorGui_TransportBar {
 			.states_( [[\skip, nil, Color.clear ]])
 			.canFocus_(false)
 			.radius_( [ 0, size/2, size/2, 0 ] )
+		    .toolTip_( "Jump to next Marker" )
 			.action_({
 			    this.score.toNextMarker;
 			});
@@ -236,6 +240,7 @@ UScoreEditorGui_TransportBar {
         			.states_( [[\roundArrow, nil, Color.clear ],
         			[\roundArrow, nil, Color.green.alpha_(0.5) ]])
         			.value_( this.score.loop.binaryValue )
+		            .toolTip_( "Loop on/off" )
         			.canFocus_(false)
         			.action_({ |v| this.score.loop = v.value.booleanValue;  });
 
@@ -252,6 +257,7 @@ UScoreEditorGui_TransportBar {
 			.charSelectColor_( Color.white.alpha_(0.5) )
 			.autoScale_( true )
 			.visible_( scoreView.showTempoMap.not )
+		    .toolTip_( "Score position" )
             .action_({ |v|
                 if(this.score.isStopped) {
                     this.score.pos = v.value
@@ -271,11 +277,16 @@ UScoreEditorGui_TransportBar {
 				};
 			});
 
+	   views[\barMap].views[\bar].toolTip_( "Bar" );
+	   views[\barMap].views[\division].toolTip_( "Division (beat)" );
+	   views[\barMap].views[\sub].toolTip_( "Sub (1/1000 division)" );
+
 	   views[\timeMode ] = PopUpMenu( view, 50@size )
 			.items_( [ "time", "bar" ] )
 			.canFocus_(false)
 			.font_( font )
 			.value_( scoreView.showTempoMap.binaryValue )
+		    .toolTip_( "Time mode" )
 			.action_({ |v|
 				scoreView.showTempoMap = v.value.booleanValue;
 				views[\signature].visible = scoreView.showTempoMap;
@@ -292,6 +303,7 @@ UScoreEditorGui_TransportBar {
 			.autoScale_(true)
 			.align_( \center )
 			.value_( this.score.tempoMap.signatureAtTime( this.score.pos ) )
+		    .toolTip_( "Time signature" )
 			.action_({ |vw|
 				this.score.tempoMap.setSignatureAtTime( vw.value, this.score.pos );
 			});
@@ -301,6 +313,7 @@ UScoreEditorGui_TransportBar {
 			.clipLo_(1)
 			.autoScale_(true)
 			.value_( this.score.tempoMap.bpmAtTime( this.score.pos ).round(0.001) )
+		    .toolTip_( "Tempo" )
 			.action_({ |vw|
 				var beats;
 				if(this.score.isStopped && (views[ \lockToTempo ].value == 1) ) {
@@ -326,6 +339,7 @@ UScoreEditorGui_TransportBar {
 			.canFocus_( false )
 			.background_( nil )
 			.border_( 0 )
+		    .toolTip_( "Lock event startTimes to bar/beats position" )
 			.visible_( scoreView.showTempoMap );
 
 		views[\editTempo ] = SmoothButton( view, 28@size )
@@ -333,6 +347,7 @@ UScoreEditorGui_TransportBar {
 			.label_( "edit" )
 			.canFocus_(false)
 			.visible_( scoreView.showTempoMap )
+		    .toolTip_( "Edit TempoMap" )
 			.action_({ |b|
 				views[\tempoEditor ] = UScoreTempoMapGUI( score: scoreView.currentScore );
 			});
@@ -344,6 +359,7 @@ UScoreEditorGui_TransportBar {
             .hiliteColor_( Color.green.alpha_(0.5) )
             .value_( scoreView.followPos.binaryValue )
             .radius_( bounds.height / 8 )
+		.toolTip_( "Set 'active' arg on/off.\nApplies to all UMaps that have an 'active' arg, i.e. midi_cc, envir_get etc.." )
             .action_({ |bt| this.score.setUMapsActive( bt.value.booleanValue ) })
             .resize_(3)
             .canFocus_(false);
@@ -354,6 +370,7 @@ UScoreEditorGui_TransportBar {
             .value_( scoreView.followPos.binaryValue )
             .radius_( bounds.height / 8 )
             .action_({ |bt| scoreView.followPos = bt.value.booleanValue; })
+		    .toolTip_( "Follow score position on/off" )
             .resize_(3)
             .canFocus_(false);
 
@@ -362,6 +379,7 @@ UScoreEditorGui_TransportBar {
             .hiliteColor_( Color.green.alpha_(0.5) )
             .value_(this.score.oscSetter.notNil.binaryValue )
             .radius_( bounds.height / 8 )
+		    .toolTip_( "OSC control on/off" )
             .action_({ |bt| switch( bt.value.asInteger,
 	            	1, { this.score.enableOSC },
 	            	0, {  this.score.disableOSC }
