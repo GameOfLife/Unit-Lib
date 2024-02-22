@@ -57,6 +57,9 @@ UScoreEditor {
 
 	*copy{ |events|
 	    clipboard = events.collect( _.deepCopy );
+		if( thisProcess.platform.name === 'osx' ) {
+			"echo % | pbcopy".format( clipboard.cs.shellQuote ).unixCmd;
+		};
 	}
 
 	paste { |pos|
