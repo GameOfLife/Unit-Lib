@@ -39,7 +39,7 @@ UMenuBarIDE {
 	}
 
 	*fillWindowsMenu {
-		if( windowsMenu.notNil ) {
+		if( windowsMenu.notNil && { windowsMenu.visible.not }) {
 			windowsMenu.clear;
 
 			UScoreEditorGUI.all.do({ |gui|
