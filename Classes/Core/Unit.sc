@@ -102,6 +102,7 @@ Udef : GenericDef {
 	var <>inputIsEndPoint = false;
 	var <>dontStoreArgNames;
 	var <>dontStoreSynthDef = false;
+	var <>infoString;
 
 	*initClass{
 		defsFolders = [
@@ -480,6 +481,27 @@ Udef : GenericDef {
 			};
 		});
 		^synths;
+	}
+
+	getInfoString {
+		var str;
+		if( infoString.isNil ) {
+			if( this.filePath.notNil ) {
+				File.use( this.filePath, "r", { |f|
+					str = f.readAllString;
+				});
+				if( str.find( "/*" ).notNil ) {
+					infoString = str[ str.find( "/*" ) + 2 .. str.find( "*/" ) - 1 ];
+					^infoString
+				} {
+					^nil
+				}
+			} {
+				^nil
+			}
+		} {
+			^infoString;
+		}
 	}
 
 	printOn { arg stream;

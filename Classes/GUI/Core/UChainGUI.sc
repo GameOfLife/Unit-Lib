@@ -28,6 +28,7 @@ UChainGUI {
 	classvar <>startTimeMode = \time; // \time, \bar
 	classvar <>durationMode = \duration; // \duration, \endTime, \endBar
 	classvar <>nowBuildingChain;
+	classvar <>showInfoStrings = true;
 
 	var <chain, <score, <parentScore;
 
@@ -1378,7 +1379,7 @@ UChainGUI {
 		};
 
 		ug = units.collect({ |unit, i|
-			var header, comp, uview, plus, min, defs, io;
+			var header, comp, infoString, uview, plus, min, defs, io;
 			var addBefore, indexLabel, ugui;
 			var currentUMaps;
 			var massEditWindowButton;
@@ -1486,6 +1487,14 @@ UChainGUI {
 
 			uview = UDragBin( comp, comp.bounds.moveTo(0,0).insetAll( 16,0,0,0) );
 			uview.color_( Color.gray(0.2) );
+
+			if( showInfoStrings ) {
+				infoString = unit.def.getInfoString;
+
+				if( infoString.notNil  ) {
+					uview.toolTip_( infoString );
+				};
+			};
 
 			uview.mouseDownAction_({
 				uDefMenuFunc.value(unit, { |def| unit.def = def }, { uview.background = nil; });

@@ -67,6 +67,7 @@ UMapGUI : UGUI {
 		var boldFont;
 		var umapdragbinInsert;
 		var umapdragbinReplace;
+		var infoString;
 		var dragging;
 
 		header = CompositeView( composite, bounds.width @ viewHeight )
@@ -164,6 +165,15 @@ UMapGUI : UGUI {
 			unit.stop;
 			unit.def = View.currentDrag;
 		});
+
+
+		if( UChainGUI.showInfoStrings ) {
+			infoString = unit.def.getInfoString;
+
+			if( infoString.notNil  ) {
+				umapdragbinReplace.toolTip_( infoString );
+			};
+		};
 
 		umapdragbinReplace.mouseDownAction_({
 			this.makeUMapDefMenu({ |def|
