@@ -1489,7 +1489,7 @@ UChainGUI {
 			uview.color_( Color.gray(0.2) );
 
 			if( showInfoStrings ) {
-				infoString = unit.def.getInfoString;
+				infoString = unit.def !? _.getInfoString;
 
 				if( infoString.notNil  ) {
 					uview.toolTip_( infoString );

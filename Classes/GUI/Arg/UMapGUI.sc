@@ -168,7 +168,7 @@ UMapGUI : UGUI {
 
 
 		if( UChainGUI.showInfoStrings ) {
-			infoString = unit.def.getInfoString;
+			infoString = unit.def !? _.getInfoString;
 
 			if( infoString.notNil  ) {
 				umapdragbinReplace.toolTip_( infoString );
