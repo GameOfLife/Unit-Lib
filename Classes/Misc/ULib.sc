@@ -21,6 +21,7 @@ ULib {
     classvar <>servers;
 	classvar <>lastPath;
 	classvar <>window, <>eWindow;
+	classvar <>envirSpecs;
 
     *initClass {
         servers = [Server.default]
@@ -303,7 +304,18 @@ ULib {
     }
 
 	*envirWindow {
-		var w, bounds;
+		var w, bounds, addViews, labelWidth;
+
+		envirSpecs = envirSpecs ?? {
+			[
+				'value', [0,1].asSpec,
+				'freq', FreqSpec(2,20000),
+				'amp', \amp.asSpec,
+				'integer', IntegerSpec(),
+				'boolean', BoolSpec(),
+				'time', SMPTESpec()
+			]
+		};
 
 		if( eWindow.notNil && { eWindow.isClosed.not }) {
 			bounds = eWindow.bounds;
@@ -320,8 +332,13 @@ ULib {
 		StaticText( w, (bounds.width - 12)@14 )
 		.string_( " Environment" )
 		.applySkin( RoundView.skin )
-		.background_( Color.white.alpha_(0.5) );
-		w.asView.decorator.shift( -18, 0 );
+		.background_( RoundView.skin.headerColor ? Color.white.alpha_(0.5) );
+		w.asView.decorator.shift( -36, 0 );
+		SmoothButton( w, 14@14 ).label_( '+' )
+		.action_({ |bt|
+			addViews.do(_.visible_( true ));
+			bt.enabled_(false);
+		});
 		SmoothButton( w, 14@14 ).label_( 'roundArrow' )
 		.action_({ { this.envirWindow; }.defer(0.1); });
 		~u_specs !? _.sortedKeysValuesDo({ |key, spec|
@@ -338,6 +355,27 @@ ULib {
 				" no Environment variables to display"
 			).applySkin( RoundView.skin );
 		};
+		addViews = ();
+		labelWidth = RoundView.skin.labelWidth ? 80;
+		addViews[ \label ] = StaticText( w, 20@14 ).string_("~").align_(\right).applySkin( RoundView.skin );
+		addViews[ \textBox ] = TextField( w, (labelWidth - 28) @ 14 )
+		.applySkin( RoundView.skin );
+		addViews[ \popUp ] = PopUpMenu( w, (bounds.width - 8 - labelWidth - 48) @ 14 )
+		.items_( envirSpecs[0,2..] )
+		.applySkin( RoundView.skin );
+		addViews[ \add ] = SmoothButton( w, 40@14 )
+		.label_( "add" )
+		.radius_( 0 )
+		.action_({
+			var spec, key;
+			if( addViews[ \textBox ].string.size > 0 ) {
+				key = addViews[ \textBox ].string.asSymbol;
+				spec = envirSpecs[ (addViews[ \popUp ].value * 2) + 1 ];
+				key.uEnvirPut( spec.default, spec );
+				{ this.envirWindow; }.defer(0.1);
+			};
+		});
+		addViews.do(_.visible_(false));
 		RoundView.popSkin;
 	}
 
