@@ -23,6 +23,7 @@ FilePathView {
 	var <views, <view;
 	var <viewHeight = 14;
 	var <>action;
+	var <>defaultStringColor;
 
 	*new { |parent, bounds, filePath|
 		^super.new.makeView( parent, bounds );
@@ -64,13 +65,13 @@ FilePathView {
 	}
 
 	stringColor_ { |color|
-		this.setStringColor( color );
+		this.setStringColor( color ? defaultStringColor );
 	}
 
 	setStringColor { |color|
 		{
-			views[ \basename ].stringColor = color;
-			views[ \dirname ].stringColor = color;
+			views[ \basename ].stringColor = color ? defaultStringColor;
+			views[ \dirname ].stringColor = color ? defaultStringColor;
 		}.defer;
 	}
 
@@ -81,6 +82,8 @@ FilePathView {
 	doAction { action.value( this ) }
 
 	makeView { |parent, bounds, resize|
+
+		defaultStringColor = RoundView.skin.stringColor ?? { Clor.black };
 
 		bounds = bounds ?? { 350 @ (this.class.viewNumLines * (viewHeight + 4)) };
 

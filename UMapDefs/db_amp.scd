@@ -26,6 +26,6 @@ HybridUMapDef( \db_amp, { |db = 64, mute = 0|
 	.canUseUMapFunc_({ |unit, key, umapdef|
 		var spec;
 		spec = unit.getSpec( key );
-		spec.isKindOf( ControlSpec ) && { (spec.minval == 0) && { spec.maxval < inf } };
+	spec.isKindOf( ControlSpec ) && { spec.default.size < 2 && { (spec.minval == 0) && { spec.maxval < inf } } };
 	})
 	.category_( 'convert' );
