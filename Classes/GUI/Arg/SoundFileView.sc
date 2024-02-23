@@ -380,6 +380,7 @@ BufSndFileView {
 		views[ \startSecond ] = SMPTEBox( views[ \startComp ],
 				views[ \startComp ].bounds.moveTo(0,0) )
 			.applySmoothSkin
+		    .applySkin( RoundView.skin ? () )
 			.resize_( 5 )
 			.clipLo_( 0 )
 			.action_({ |nb|
@@ -403,6 +404,7 @@ BufSndFileView {
 		views[ \endSecond ] = SMPTEBox( views[ \endComp ],
 				views[ \endComp ].bounds.moveTo(0,0) )
 			.applySmoothSkin
+		    .applySkin( RoundView.skin ? () )
 			.resize_( 5 )
 			.clipLo_( 0 )
 			.action_({ |nb|
