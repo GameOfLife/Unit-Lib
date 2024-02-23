@@ -304,7 +304,7 @@ ULib {
     }
 
 	*envirWindow {
-		var w, bounds, addViews, labelWidth;
+		var w, bounds, addViews, addButton, labelWidth;
 
 		envirSpecs = envirSpecs ?? {
 			[
@@ -334,23 +334,31 @@ ULib {
 		.applySkin( RoundView.skin )
 		.background_( RoundView.skin.headerColor ? Color.white.alpha_(0.5) );
 		w.asView.decorator.shift( -36, 0 );
-		SmoothButton( w, 14@14 ).label_( '+' )
+		addButton = SmoothButton( w, 14@14 ).label_( '+' )
 		.action_({ |bt|
 			addViews.do(_.visible_( true ));
 			bt.enabled_(false);
 		});
 		SmoothButton( w, 14@14 ).label_( 'roundArrow' )
 		.action_({ { this.envirWindow; }.defer(0.1); });
-		~u_specs !? _.sortedKeysValuesDo({ |key, spec|
-			var view, ctrl;
-			view = spec.makeView( w, (bounds.width - 12)@14, "~" ++ key, { |vw, val|
-				key.uEnvirPut( val );
-			});
-			spec.setView( view, key.envirGet );
-			ctrl = SimpleController( currentEnvironment )
-			.put( key, { spec.setView( view, key.envirGet ); });
-			w.onClose = w.onClose.addFunc({ ctrl.remove; });
-		}) ?? {
+		if( ~u_specs.notNil && { ~u_specs.size > 0 }) {
+			~u_specs.sortedKeysValuesDo({ |key, spec|
+				var view, ctrl;
+				view = spec.makeView( w, (bounds.width - 30)@14, "~" ++ key, { |vw, val|
+					key.uEnvirPut( val );
+				});
+				spec.setView( view, key.envirGet );
+				ctrl = SimpleController( currentEnvironment )
+				.put( key, { spec.setView( view, key.envirGet ); });
+				w.onClose = w.onClose.addFunc({ ctrl.remove; });
+				SmoothButton( w, 14@14 )
+				.label_( '-' )
+				.action_({
+					~u_specs.removeAt( key );
+					{ this.envirWindow; }.defer(0.1);
+				});
+			})
+		} {
 			StaticText( w, (bounds.width - 12)@20 ).string_(
 				" no Environment variables to display"
 			).applySkin( RoundView.skin );
@@ -360,7 +368,7 @@ ULib {
 		addViews[ \label ] = StaticText( w, 20@14 ).string_("~").align_(\right).applySkin( RoundView.skin );
 		addViews[ \textBox ] = TextField( w, (labelWidth - 28) @ 14 )
 		.applySkin( RoundView.skin );
-		addViews[ \popUp ] = PopUpMenu( w, (bounds.width - 8 - labelWidth - 48) @ 14 )
+		addViews[ \popUp ] = PopUpMenu( w, (bounds.width - 8 - labelWidth - 48 - 18) @ 14 )
 		.items_( envirSpecs[0,2..] )
 		.applySkin( RoundView.skin );
 		addViews[ \add ] = SmoothButton( w, 40@14 )
@@ -374,6 +382,11 @@ ULib {
 				key.uEnvirPut( spec.default, spec );
 				{ this.envirWindow; }.defer(0.1);
 			};
+		});
+		addViews[ \rmv ] = SmoothButton( w, 14@14 ).label_( '-' )
+		.action_({
+			addViews.do(_.visible_(false));
+			addButton.enabled_( true );
 		});
 		addViews.do(_.visible_(false));
 		RoundView.popSkin;
