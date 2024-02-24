@@ -285,6 +285,7 @@ UScoreEditorGui_TransportBar {
 			.items_( [ "time", "bar" ] )
 			.canFocus_(false)
 			.font_( font )
+		    .applySkin( RoundView.skin )
 			.value_( scoreView.showTempoMap.binaryValue )
 		    .toolTip_( "Time mode" )
 			.action_({ |v|

@@ -153,7 +153,25 @@ UScoreEditorGUI : UAbstractWindow {
 		view.minWidth = 675;
 		view.minHeight = 150;
 
-		RoundView.pushSkin( UChainGUI.skin );
+		if( UChainGUI.skin == UChainGUI.skins.light ) {
+			RoundView.pushSkin( UChainGUI.skin ++ (
+				SmoothButton: (
+					border: 0.75,
+					background:  Gradient( Color.gray(0.95), Color.gray(0.7), \v ),
+					hiliteColor: Color.green.alpha_(0.5),
+				),
+				SmoothSimpleButton: (
+					border: 0.75,
+					background:  Gradient( Color.gray(0.95), Color.gray(0.7), \v ),
+					hiliteColor: Color.green.alpha_(0.5),
+				),
+				PopUpMenu: (
+					background: Color.gray( 0.8 ),
+				)
+			) );
+		} {
+			RoundView.pushSkin( UChainGUI.skin );
+		};
 
 		if( UMenuBarIDE.hasMenus ) {
 			menuView = UMenuBarIDE.createMenuStrip( view, (bounds.width-8) @ menuH, [-4,-4,-4,0] );

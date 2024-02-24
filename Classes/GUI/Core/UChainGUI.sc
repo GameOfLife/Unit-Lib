@@ -53,7 +53,7 @@ UChainGUI {
 				headerColor: Color.white.alpha_(0.5),
 				stringColor: Color.black,
 				hiliteColor: Color.black.alpha_(0.33),
-				scoreEditorWindow: Color.gray(0.6),
+				scoreEditorWindow: Color.gray(0.65),
 				RoundButton: (
 					border: 0.75,
 					background:  Gradient( Color.white, Color.gray(0.85), \v ),
