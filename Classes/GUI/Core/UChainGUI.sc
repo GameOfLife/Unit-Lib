@@ -168,7 +168,7 @@ UChainGUI {
 			} {
 				parent = Window(
 					parent,
-					bounds ?? { Rect(425 rrand: 525, 300 rrand: 350, 372, 600) },
+					bounds ?? { Rect(425, 300, 372, 600) },
 					scroll: false
 				).front;
 				this.makeViews( bounds );
@@ -201,6 +201,7 @@ UChainGUI {
 			this.makeViews();
 			this.makeCurrent;
 			this.addToAll;
+			parent.asView.minWidth_( 372 ).minHeight_(200);
 		}.defer;
 	}
 
