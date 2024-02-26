@@ -53,14 +53,17 @@ UAbstractWindow {
     newWindow { |bounds, title, onClose, background, margin, gap|
 
 		var font = Font( Font.defaultSansFace, 11 );
-        bounds = bounds ? Rect(230 + 20.rand2, 230 + 20.rand2, 680, 300);
-
-        window = Window(title, bounds).front;
+		if( bounds.isKindOf( View ) ) {
+			window = bounds;
+		} {
+			bounds = bounds ? Rect(230 + 20.rand2, 230 + 20.rand2, 680, 300);
+			window = Window(title, bounds).front;
+		};
         window.onClose_(onClose);
 		window.toFrontAction_({ this.class.changed(\activeWindow, this); currentDict[this.class] = this });
         margin = margin ? 4;
         gap = gap ? 2;
-        view = window.view;
+        view = window.asView;
 		if( thisProcess.platform.name === \osx ) {
 			view.background_( background ? Color.grey(0.45,0.75) );
 		} {

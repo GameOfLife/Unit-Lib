@@ -38,10 +38,10 @@ UScoreEditorGUI : UAbstractWindow {
 		});
 	}
 
-	*new { |scoreEditor, bounds|
-		^super.new.init( scoreEditor)
+	*new { |scoreEditor, bounds, parent|
+		^super.new.init( scoreEditor )
 			.addToAll
-			.makeGui(bounds)
+			.makeGui(bounds, parent)
 	}
 
 	*currentSelectedEvents{
@@ -105,7 +105,7 @@ UScoreEditorGUI : UAbstractWindow {
     remove {
         scoreController.remove;
     }
-	makeGui { |bounds|
+	makeGui { |bounds, parent|
 
 		var font = Font( Font.defaultSansFace, 11 ), header, windowTitle, margin, gap, topBarH, tranBarH, centerView, centerBounds;
 		var menuH, menuView;
