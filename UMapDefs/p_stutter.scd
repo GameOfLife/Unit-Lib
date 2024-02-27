@@ -14,7 +14,7 @@ part of the Unit lib default UMapDefs set
 */
 
 UPatDef( \p_stutter, { |unit, input = 0, n = 1|
-	Pstutter( n, input ).asStream;
+	Pdup( n, input ).asStream;
 })
 	.setSpec( \input, UAdaptSpec() )
 	.setSpec( \n, IntegerSpec(1, 1,((2**31) - 1).asInteger) )
