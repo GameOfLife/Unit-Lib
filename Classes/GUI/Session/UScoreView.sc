@@ -35,8 +35,8 @@ UScoreView {
      var <scoreEditorsList;
      var <usessionMouseEventsManager;
      var <>snapActive, <>snapH;
-     var <>numTracks = 12;
-     var <>minTracks = 12;
+     var <>numTracks = 4;
+     var <>minTracks = 4;
      var <scoreView, <scoreListView, <mainComposite, font, <parent, <bounds;
      var <>scoreList;
      var <currentScoreEditorController, <scoreController, <eventControllers = #[];
