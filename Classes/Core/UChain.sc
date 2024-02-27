@@ -546,7 +546,7 @@ UChain : UEvent {
 	bounce { |index = 0, path, action, replace = true, single = true|
 		var tempChain, playbackUnit, dur, newAction;
 		var usedBuses;
-		path = path.getGPath.replaceExtension( "aiff" );
+		path = path.getGPath.replaceExtension( "wav" );
 		dur = this.duration;
 
 		tempChain = this.deepCopy;
@@ -567,7 +567,7 @@ UChain : UEvent {
 		if( replace == true ) {
 			playbackUnit = U( \diskSoundFile, [ \soundFile, DiskSndFile.newBasic(
 					path,
-					(dur * 44100).floor,
+					(dur * Server.default.sampleRate).floor,
 					usedBuses.size
 				) ]
 			);
