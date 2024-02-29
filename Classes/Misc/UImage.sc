@@ -52,7 +52,7 @@ UImage {
 					[ 0, 0 ];
 				};
 			});
-			image = Image.color( peaks.size, height, color.blend( Color.white, 0.75 ).alpha_(0.5) );
+			image = Image.color( peaks.size, height, Color.clear );
 			peaks.do({ |prms,xx|
 				prms.do({ |yy, ii|
 					var size;
@@ -77,21 +77,28 @@ UImage {
 }
 
 USoundFileOverview : UImage {
-	var <>duration = 1;
+	classvar <>defaultColor;
+	var <>duration = 1, <>color;
 
-	*new { |filePath, duration = 1|
-		^super.new.init( filePath ).duration_( duration ? 1 );
+	*initClass {
+		StartUp.defer({
+			defaultColor = Color.green(0.75).blend( Color.white, 0.75 ).alpha_(0.5);
+		});
 	}
 
-	storeArgs { ^[ filePath.formatGPath, duration ] }
+	*new { |filePath, duration = 1, color|
+		^super.new.init( filePath ).duration_( duration ? 1 ).color_( color );
+	}
+
+	storeArgs { ^[ filePath.formatGPath, duration, color ] }
 
 	penFill { |rect, alpha, fromRect| // fromRect contains duration
 		var toRect;
 		toRect = rect.copy;
 		fromRect = fromRect ?? { rect.copy.width_( duration ); };
 		toRect.width = toRect.width * ( duration / fromRect.width );
+		(color ? defaultColor).penFill( rect, alpha, fromRect );
 		image !? _.drawInRect( toRect );
 	}
-
 
 }
