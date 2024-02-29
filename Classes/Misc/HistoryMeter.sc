@@ -31,7 +31,7 @@ HistoryMeter : UserViewHolder {
 
 	color_ { |aColor| color = aColor; this.refresh }
 
-	value { history[ pos ] }
+	value { ^history.wrapAt( pos-1 ) }
 	value_ { |val = 0|
 		if( this.isClosed.not ) {
 			latestValue = val;
@@ -52,6 +52,10 @@ HistoryMeter : UserViewHolder {
 				this.refresh;
 			};
 		}
+	}
+
+	lastN { |n = 1|
+		^history.wrapAt( pos + ( n.neg .. -1) );
 	}
 
 	start {

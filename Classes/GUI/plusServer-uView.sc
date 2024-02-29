@@ -78,6 +78,7 @@
 			booter.value = this.serverRunning.binaryValue;
 		});
 
+		/*
 		cpuMeter = LevelIndicator( composite, Rect( 22, 0, width, 18 ) )
 		//.numTicks_( 9 ) // includes 0;
 		//.numMajorTicks_( 5 )
@@ -88,6 +89,18 @@
 		.drawsPeak_( true )
 		.warning_( 0.8 )
 		.critical_( 1 );
+		*/
+
+		cpuMeter = HistoryMeter( composite, Rect( 22, 0, width, 18 ) )
+		//.numTicks_( 9 ) // includes 0;
+		//.numMajorTicks_( 5 )
+		.color_( onColor.copy.alpha_(0.25) );
+		//.criticalColor_( Color( 1,0.2,alpha: 0.4 ) )
+		//.warningColor_( Color.yellow( 1,1, alpha: 0.4 ) )
+		//.background_( Color.clear )
+		//.drawsPeak_( true )
+		//.warning_( 0.8 )
+		//.critical_( 1 );
 
 		active = StaticText(composite, Rect(22,2, width, 16));
 		active.string = " " ++ this.name.asString + this.uInfoString;
@@ -131,11 +144,20 @@
 		ctlr = SimpleController(this)
 		.put(\serverRunning, {	if(this.serverRunning,running,stopped) })
 		.put(\counts,{
+			var last;
 			active.string = " " ++ this.name.asString + this.uInfoString;
 			//infoString.string = this.uInfoString;
 			cpuMeter !? {
-				cpuMeter.value = this.avgCPU / 100;
-				cpuMeter.peakLevel = this.peakCPU / 100;
+				//cpuMeter.value = this.avgCPU / 100;
+				cpuMeter.value = this.peakCPU / 100;
+				last = cpuMeter.lastN( 10 ).maxItem;
+				case { last < 0.8 } {
+					cpuMeter.color = onColor.copy.alpha_(0.25);
+				} { last < 1 } {
+					cpuMeter.color = Color.yellow( 1,1, alpha: 0.4 );
+				} {
+					cpuMeter.color = Color( 1,0.2,alpha: 0.4 )
+				};
 			};
 		});
 
