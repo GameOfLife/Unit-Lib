@@ -543,13 +543,16 @@ UChain : UEvent {
         }
 	}
 
-	bounce { |index = 0, path, action, replace = true, single = true|
+	bounce { |index, path, action, replace = true, single = true|
 		var tempChain, playbackUnit, dur, newAction;
 		var usedBuses;
 		path = path.getGPath.replaceExtension( "wav" );
 		dur = this.duration;
 
 		tempChain = this.deepCopy;
+		index = index ?? {
+			tempChain.units.lastIndexForWhich({ |unit| unit.audioOuts.size > 0 });
+		} ? 0;
 		tempChain.units = tempChain.units[..index];
 
 		if( single == true ) {
