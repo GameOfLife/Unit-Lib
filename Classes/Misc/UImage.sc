@@ -28,19 +28,29 @@ UImage {
 		filePath = path;
 	}
 
-	soundFilePlot { |path, color, width = 5000, height = 100, write = true|
+	soundFilePlot { |path, color, width = 5000, height = 100, duration, write = true|
 		color = color ? Color.green(0.75);
 		path = path.getGPath;
 		SoundFile.use( path, { |f|
-			var arr, size, peaks;
-			size = (f.numFrames / width).ceil.asInteger;
+			var arr, size, peaks, numFrames;
+			if( duration.isNil ) {
+				numFrames = f.numFrames;
+			} {
+				numFrames = (duration * f.sampleRate).ceil.asInteger;
+			};
+			size = (numFrames / width).ceil.asInteger;
 			arr = FloatArray.newClear( size * f.numChannels );
-			peaks = (f.numFrames / size).ceil.asInteger.collect({ |i|
+			peaks = (numFrames / size).ceil.asInteger.collect({ |i|
 				var chunk;
 				i = i * size;
-				f.readData( arr );
-				chunk = arr.abs;
-				[ chunk.maxItem, chunk.mean ];
+				if( i < (f.numFrames * f.numChannels ) ) {
+					f.readData( arr );
+					chunk = arr.abs;
+					if( arr.size == 0 ) { arr = [0] };
+					[ chunk.maxItem, chunk.mean ];
+				} {
+					[ 0, 0 ];
+				};
 			});
 			image = Image.color( peaks.size, height, color.blend( Color.white, 0.75 ).alpha_(0.5) );
 			peaks.do({ |prms,xx|
@@ -63,5 +73,25 @@ UImage {
 	}
 
 	storeArgs { ^[ filePath.formatGPath ] }
+
+}
+
+USoundFileOverview : UImage {
+	var <>duration = 1;
+
+	*new { |filePath, duration = 1|
+		^super.new.init( filePath ).duration_( duration ? 1 );
+	}
+
+	storeArgs { ^[ filePath.formatGPath, duration ] }
+
+	penFill { |rect, alpha, fromRect| // fromRect contains duration
+		var toRect;
+		toRect = rect.copy;
+		fromRect = fromRect ?? { rect.copy.width_( duration ); };
+		toRect.width = toRect.width * ( duration / fromRect.width );
+		image !? _.drawInRect( toRect );
+	}
+
 
 }
