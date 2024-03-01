@@ -6,7 +6,7 @@ UImage {
 	var <>filePath;
 
 	*new { |filePath|
-		^super.new.init( filePath ).addToAll;
+		^super.new.init( filePath );
 	}
 
 	addToAll {
@@ -52,7 +52,7 @@ UImage {
 					[ 0, 0 ];
 				};
 			});
-			image = Image.color( peaks.size, height, Color.clear );
+			image = Image( peaks.size, height);
 			peaks.do({ |prms,xx|
 				prms.do({ |yy, ii|
 					var size;
@@ -78,26 +78,54 @@ UImage {
 
 USoundFileOverview : UImage {
 	classvar <>defaultColor;
-	var <>duration = 1, <>color;
+	var <>dur = 1, <>color;
 
 	*initClass {
 		StartUp.defer({
-			defaultColor = Color.green(0.75).blend( Color.white, 0.75 ).alpha_(0.5);
+			defaultColor = Color.green(0.75);
 		});
 	}
 
 	*new { |filePath, duration = 1, color|
-		^super.new.init( filePath ).duration_( duration ? 1 ).color_( color );
+		^super.new.init( filePath ).dur_( duration ? 1 ).color_( color );
 	}
 
-	storeArgs { ^[ filePath.formatGPath, duration, color ] }
+	getColor { ^color ? defaultColor }
+
+	fromUChain { |chain, path, action, setDisplayColor = true|
+		var bouncePath, imagePath;
+		if( path.isNil ) {
+			ULib.savePanel({ |pth|
+				this.fromUChain( chain, pth, action );
+			});
+		} {
+			switch( chain.getTypeColor.class,
+				Color, { this.color = chain.getTypeColor; },
+				this.class, { this.color = chain.getTypeColor.color; }
+			);
+			path = path.getGPath.replaceExtension( "wav" );
+			chain.bounce(nil, path, {
+				{ this.prApplyOverview( chain, path, action, setDisplayColor ); }.defer;
+			}, false, false );
+		};
+	}
+
+	prApplyOverview { |chain, path, action, setDisplayColor = true|
+		this.dur = chain.dur;
+		this.soundFilePlot( path, this.getColor, duration: chain.dur );
+		File.delete( path.standardizePath );
+		if( setDisplayColor ) { chain.displayColor = this; };
+		action.value( this );
+	}
+
+	storeArgs { ^[ filePath.formatGPath, dur, color ] }
 
 	penFill { |rect, alpha, fromRect| // fromRect contains duration
 		var toRect;
 		toRect = rect.copy;
-		fromRect = fromRect ?? { rect.copy.width_( duration ); };
-		toRect.width = toRect.width * ( duration / fromRect.width );
-		(color ? defaultColor).penFill( rect, alpha, fromRect );
+		fromRect = fromRect ?? { rect.copy.width_( dur ); };
+		toRect.width = toRect.width * ( dur / fromRect.width );
+		this.getColor.blend( Color.white, 0.75 ).alpha_(0.5).penFill( rect, alpha, fromRect );
 		image !? _.drawInRect( toRect );
 	}
 
