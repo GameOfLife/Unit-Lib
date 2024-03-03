@@ -46,4 +46,4 @@ ValueUMapDef( \global_control, { |unit, ctrl|
 }, [
 	[ \controlKey, nil, UGlobalControlKeySpec() ],
 	[ \learn, false, BoolSpec() ]
-], \control );
+], \private );

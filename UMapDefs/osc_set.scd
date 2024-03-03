@@ -47,4 +47,4 @@ ValueUMapDef( \osc_set, { |unit, oscfunc|
 }, [
 	[ \message, nil, StringSpec("") ],
 	[ \mapped, false, BoolSpec(false) ]
-], \control );
+], \osc );
