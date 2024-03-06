@@ -63,28 +63,14 @@ UPatDef( \p_midi_cc, { |unit,
 		value.linlin(-1,1,*toRange.next ++ [ \none ]);
 	};
 
-	findUIDs = {
-		var dev, prt;
-		dev = device.next;
-		prt = port.next;
-		MIDIClient.sources.select({ |src|
-			src.device.find( dev ).notNil && {
-				src.name.find( prt ).notNil
-			}
-		}).collect(_.uid);
-	};
-
 	{
-		var uids, val = 0, cchan, nnum;
+		var src, val = 0, cchan, nnum;
 		UMIDIDict.start( false );
 		loop {
-			uids = findUIDs.value;
-			if( uids.size == 0 ) { uids = [\any] };
+			src = (device.next ++ "*/" ++ port.next ++ "*").asSymbol;
 			cchan = channel.next;
 			nnum = cc.next;
-			uids.do({ |uid|
-				val = UMIDIDict.getEvent( uid, \cc, cchan, nnum ) ? val;
-			});
+			val = UMIDIDict.getEvent( src, \cc, cchan, nnum ) ? val;
 			scaleFunc.value( val ? 0 ).yield;
 		};
 	}.r;

@@ -2,6 +2,7 @@ UMIDIDict {
 	classvar <>dict;
 	classvar <>midiFuncs;
 	classvar <>verbose = false;
+	classvar <>portDict;
 
 	*initClass {
 		dict = MultiLevelIdentityDictionary();
@@ -35,17 +36,18 @@ UMIDIDict {
 			midiFuncs = [
 				MIDIFunc.noteOn({ |val, num, chan, src|
 					this.addNoteOn(src,chan,num,val);
-				}),
+				}).permanent_( true ),
 				MIDIFunc.noteOff({ |val, num, chan, src|
 					this.addNoteOff(src,chan,num,val);
-				}),
+				}).permanent_( true ),
 				MIDIFunc.cc({ |val, num, chan, src|
 					this.addControl(src,chan,num,val);
-				}),
+				}).permanent_( true ),
 				MIDIFunc.bend({ |val, chan, src|
 					this.addBend(src,chan,val);
-				}),
+				}).permanent_( true ),
 			];
+			this.makePortDict;
 		};
 	}
 
@@ -56,6 +58,23 @@ UMIDIDict {
 
 	*findPort { |src|
 		^MIDIClient.sources.detect({ |item| item.uid == src });
+	}
+
+	*makePortDict {
+		portDict = portDict ?? { IdentityDictionary() };
+		MIDIClient.sources.do({ |source|
+			portDict[ source.uid ] = [ source.device, source.name ].join("/").asSymbol;
+		});
+	}
+
+	*findUIDs { |portname|
+		var uids;
+		portDict.keysValuesDo({ |uid, name|
+			if( name.matchOSCAddressPattern( portname ) ) {
+				uids = uids.add( uid );
+			};
+		});
+		^uids;
 	}
 
 	*addEvent { |src, type ...args| // chan, num, val
@@ -84,6 +103,23 @@ UMIDIDict {
 	}
 
 	*getEvent { |src, type ...args|
+		var uids;
+		if( src.isKindOf( Symbol ) ) {
+			uids = this.findUIDs( src );
+			switch( uids.size,
+				0, { ^nil },
+				1, { ^this.prGetEvent(uids[0], type, *args ) },
+				{ ^uids
+					.collect({ |uid| this.prGetEvent( uid, type, *args ) })
+					.detect(_.notNil)
+				}
+			)
+		} {
+			^this.prGetEvent( src, type, *args );
+		}
+	}
+
+	*prGetEvent { |src, type ...args|
 		^dict.at( src ? \any, type, *args );
 	}
 }
