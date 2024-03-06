@@ -104,3 +104,31 @@ ValueUMapDef : UMapDef {
 	}
 
 }
+
+
+ControllerUMapDef : ValueUMapDef {
+
+	var <>updateFunc, <model;
+
+	*new { |name, updateFunc, model, args, category, addToAll=true|
+		^this.basicNew( name, args ? [], addToAll )
+		    .updateFunc_( updateFunc )
+		    .initFuncs( model ).category_( category ? \default );
+	}
+
+	initFuncs { |inModel|
+		model = inModel ?? { currentEnvironment; };
+		this.initFunc(
+			{ |unit| model.addDependant( unit ); },
+		    { |unit| model.removeDependant( unit ); }
+		);
+	}
+
+	performUpdate { |unit ...args|
+		updateFunc.value( unit, *args );
+	}
+
+	addStartFunc { |func|
+		startFunc = startFunc.addFunc( func );
+	}
+}

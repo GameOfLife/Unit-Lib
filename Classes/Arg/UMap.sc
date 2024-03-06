@@ -256,6 +256,12 @@ UMap : U {
 
 	*defClass { ^UMapDef }
 
+	update { |...args|
+		if( this.def.respondsTo( \performUpdate ) ) {
+			this.def.performUpdate( this, *args );
+		};
+	}
+
 	asControlInput {
 		^this.def.getControlInput(this);
 	}
