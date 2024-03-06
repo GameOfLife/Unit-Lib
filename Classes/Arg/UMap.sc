@@ -134,6 +134,8 @@ UMapDef : Udef {
 
 	getNext { }
 
+	performUpdate { }
+
 	getControlInput { |unit|
 		if( this.hasBus ) {
 			if( this.numChannels > 1 ) {
@@ -257,9 +259,7 @@ UMap : U {
 	*defClass { ^UMapDef }
 
 	update { |...args|
-		if( this.def.respondsTo( \performUpdate ) ) {
-			this.def.performUpdate( this, *args );
-		};
+		this.def !? _.performUpdate( this, *args );
 	}
 
 	asControlInput {
