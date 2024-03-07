@@ -1553,6 +1553,123 @@
 
 }
 
++ DualValueSpec {
+
+	makeView { |parent, bounds, label, action, resize|
+		var vws = (), view, labelWidth, numWidth = 45, sliderWidth;
+		var cspec, numberStep, round = 0.001, background;
+
+		cspec = this.asControlSpec;
+
+		bounds.isNil.if{bounds= 320@20};
+
+		#view, bounds = EZGui().prMakeMarginGap.prMakeView( parent, bounds );
+		 vws[ \view ] = view;
+
+		vws[ \val ] = [0,1];
+
+		view.addFlowLayout( 0@0, 2@2 );
+
+		if( label.notNil ) {
+			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
+			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ bounds.height )
+				.string_( label.asString ++ " " )
+				.align_( \right )
+				.resize_( 4 )
+				.applySkin( RoundView.skin );
+		} {
+			labelWidth = 0;
+		};
+
+		sliderWidth = bounds.width - labelWidth - (numWidth * 3) - 12;
+
+		numberStep = this.guessNumberStep;
+
+		vws[ \num1 ] = SmoothNumberBox( view, numWidth @ bounds.height )
+		.step_( numberStep ).scroll_step_( numberStep )
+		.action_({ |nb|
+			vws[ \val ][0] = nb.value;
+			vws[ \val ] = this.constrain( vws[ \val ] );
+			vws.setVal;
+			action.value( vws, vws[ \val ] );
+		});
+		vws[ \slider1 ] = SmoothSlider( view, sliderWidth @ (bounds.height / 2) )
+		.centered_( true )
+		.knobSize_(0.5)
+		.action_({ |sl|
+			vws[ \val ][0] = cspec.map( sl.value );
+			vws.setVal;
+			vws.doAction;
+		});
+		view.decorator.shift( sliderWidth.neg - 2, bounds.height / 2 );
+		vws[ \slider2 ] = SmoothSlider( view, sliderWidth @ (bounds.height / 2) )
+		.centered_( true )
+		.knobSize_(0.5)
+		.action_({ |sl|
+			vws[ \val ][1] = cspec.map( sl.value );
+			vws.setVal;
+			vws.doAction;
+		});
+		view.decorator.shift( 0, bounds.height / -2 );
+		vws[ \num2 ] = SmoothNumberBox( view, numWidth @ bounds.height )
+		.step_( numberStep ).scroll_step_( numberStep )
+		.action_({ |nb|
+			vws[ \val ][1] = nb.value;
+			vws[ \val ] = this.constrain( vws[ \val ] );
+			vws.setVal;
+			vws.doAction;
+		});
+		SmoothButton( view, numWidth @ bounds.height )
+		.label_( "invert" )
+		.radius_(2)
+		.action_({
+			vws[ \val ] = vws[ \val ].reverse;
+			vws.setVal;
+			vws.doAction;
+		});
+
+		vws[ \setVal ] = { |evt|
+			evt[ \num1 ].value = evt.val[0].round( round );
+			evt[ \num2 ].value = evt.val[1].round( round );
+			evt[ \slider1 ].value = cspec.unmap( evt.val[0] );
+			evt[ \slider2 ].value = cspec.unmap( evt.val[1] );
+			evt[ \slider1 ].centerPos = evt[ \slider2 ].value;
+			evt[ \slider2 ].centerPos = evt[ \slider1 ].value;
+		};
+
+		vws[ \doAction ] = { action.value( vws, vws[ \val ] ); }
+
+		^vws;
+
+	}
+
+	setView { |vws, value, active = false|
+		vws[ \val ] = value;
+		vws.setVal;
+		if( active ) { vws.doAction };
+	}
+
+	mapSetView { |vws, value, active = false|
+		vws[ \val ] = this.map(value);
+		vws.setVal;
+		if( active ) { vws.doAction };
+	}
+
+	adaptFromObject { |object|
+		if( object.isArray.not ) {
+			^this.asControlSpec.adaptFromObject( object );
+		} {
+			if(  (object.minItem < minval) or: (object.maxItem > maxval) ) {
+				^this.copy
+					.minval_( minval.min( object.minItem ) )
+					.maxval_( maxval.max( object.maxItem ) )
+			};
+			^this;
+		};
+	}
+
+}
+
 + RangeSpec {
 
 	makeView { |parent, bounds, label, action, resize|

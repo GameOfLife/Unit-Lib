@@ -628,6 +628,77 @@ RectSpec : Spec {
 	}
 }
 
+DualValueSpec : ControlSpec {
+	var realDefault;
+
+	// a range is an Array of two values [a,b], where:
+	// a <= b, maxRange >= (b-a) >= minRange
+	// the spec is a ControlSpec or possibly a ListSpec with numbers
+
+	*new { |minval=0.0, maxval=1.0, warp='lin', step=0.0,
+			 default, units|
+		^super.new( minval, maxval, warp, step, default ? [minval,maxval], units )
+	}
+
+	*newFrom { arg similar; // can be ControlSpec too
+		^this.new(similar.minval, similar.maxval,
+			similar.warp.asSpecifier,
+			similar.step, similar.default, similar.units)
+	}
+
+	*testObject { |obj|
+		^obj.isArray && { (obj.size == 2) && { obj.every(_.isNumber) } };
+	}
+
+	*newFromObject { |obj|
+		var cspecs;
+		cspecs = obj.collect({ |item| ControlSpec.newFromObject( item ) });
+		^this.new(
+			cspecs.collect(_.minval).minItem,
+			cspecs.collect(_.maxval).maxItem,
+			\lin,
+			cspecs.collect(_.step).minItem,
+			obj
+			);
+	}
+
+
+	default_ { |range| realDefault = default = this.constrain( range ); }
+	default { ^realDefault ??
+		{ realDefault = this.constrain( default ? [minval, maxval] ); } } // in case of a bad default
+
+	storeArgs { ^[minval, maxval, warp.asSpecifier, step, this.default, units] }
+
+	constrain { arg value;
+		var array;
+		array = value.asArray.copy.sort;
+		if( array.size != 2 ) { array = array.extend( 2, array.last ); };
+		array = array.collect({ |item| item.asFloat.clip( clipLo, clipHi ); });
+		^array.round(step); // step may mess up the min/maxrange
+	}
+
+	uconstrain { |val| ^this.constrain( val ) }
+
+	map { arg value;
+		// maps a value from [0..1] to spec range
+		^this.constrain( warp.map(value) );
+	}
+
+	unmap { arg value;
+		// maps a value from spec range to [0..1]
+		^warp.unmap( this.constrain(value) );
+	}
+
+	asControlSpec {
+		if( this.units == " Hz" ) {
+			^FreqSpec.newFrom( this ).default_( this.default[0] );
+		} {
+			^ControlSpec.newFrom( this ).default_( this.default[0] );
+		};
+	}
+	asArrayControlSpec { ^ArrayControlSpec.newFrom( this ); }
+}
+
 RangeSpec : ControlSpec {
 	var <>minRange, <>maxRange;
 	var realDefault;
