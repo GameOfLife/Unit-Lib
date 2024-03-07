@@ -60,10 +60,18 @@ UMIDIDict {
 		^MIDIClient.sources.detect({ |item| item.uid == src });
 	}
 
+	*makePortName { |device, port|
+		if( device.isKindOf( MIDIEndPoint ) ) {
+			port = device.name;
+			device = device.device;
+		};
+		^[ device, name ].join("/").asSymbol
+	}
+
 	*makePortDict {
 		portDict = portDict ?? { IdentityDictionary() };
 		MIDIClient.sources.do({ |source|
-			portDict[ source.uid ] = [ source.device, source.name ].join("/").asSymbol;
+			portDict[ source.uid ] = this.makePortName( source );
 		});
 	}
 
@@ -121,5 +129,18 @@ UMIDIDict {
 
 	*prGetEvent { |src, type ...args|
 		^dict.at( src ? \any, type, *args );
+	}
+
+	*matchEvent { |testArray, eventArray|
+		if( eventArray[0].matchOSCAddressPattern( testArray[0] ? '*/*' ) ) {
+			eventArray[1..].do({ |item,i|
+				if( testArray[i+1].notNil ) {
+					if( testArray[i+1] != item ) { ^false };
+				};
+			});
+		} {
+			^false
+		};
+		^true;
 	}
 }
