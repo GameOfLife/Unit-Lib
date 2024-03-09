@@ -671,7 +671,7 @@ DualValueSpec : ControlSpec {
 
 	constrain { arg value;
 		var array;
-		array = value.asArray.copy.sort;
+		array = value.asArray;
 		if( array.size != 2 ) { array = array.extend( 2, array.last ); };
 		array = array.collect({ |item| item.asFloat.clip( clipLo, clipHi ); });
 		^array.round(step); // step may mess up the min/maxrange

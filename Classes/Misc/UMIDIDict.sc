@@ -56,6 +56,12 @@ UMIDIDict {
 		midiFuncs = nil;
 	}
 
+	*restart {
+		MIDIClient.init;
+		MIDIIn.connectAll;
+		this.start( true );
+	}
+
 	*findPort { |src|
 		^MIDIClient.sources.detect({ |item| item.uid == src });
 	}
@@ -65,7 +71,7 @@ UMIDIDict {
 			port = device.name;
 			device = device.device;
 		};
-		^[ device, name ].join("/").asSymbol
+		^[ device, port ].join("/").asSymbol
 	}
 
 	*makePortDict {
@@ -132,6 +138,9 @@ UMIDIDict {
 	}
 
 	*matchEvent { |testArray, eventArray|
+		if( eventArray[0].isKindOf( Symbol ).not ) {
+			eventArray[0] = this.portDict[ eventArray[0] ] ? '*/*';
+		};
 		if( eventArray[0].matchOSCAddressPattern( testArray[0] ? '*/*' ) ) {
 			eventArray[1..].do({ |item,i|
 				if( testArray[i+1].notNil ) {
