@@ -49,7 +49,19 @@ UMIDIFilterSpec : Spec {
 		^learnFunc;
 	}
 
-	viewNumLines { ^3 }
+	viewNumLines { ^2 }
+
+	*formatDeviceString { |inString|
+		case { inString.size == 0 } {
+			^"*/*";
+		} { inString.find( "/" ).isNil } {
+			^inString ++ "/*";
+		} { inString.split( $/ ).first.size == 0 } {
+			^"*" ++ inString;
+		} { inString.split( $/ ).last.size == 0 } {
+			^inString ++ "*";
+		} { ^inString }
+	}
 
 	makeView { |parent, bounds, label, action, resize|
 		var vws, view, labelWidth, numchanWidth;
@@ -170,44 +182,18 @@ UMIDIFilterSpec : Spec {
 		.string_( "device " ).align_( \right ).applySkin( RoundView.skin )
 		.background_( Color.white.alpha_(0.25) );
 		vws[ \device ] = TextField( view, bounds.width - 44 - (labelWidth+4) @ 14 )
-		.string_( "*" )
+		.string_( this.class.formatDeviceString )
 		.action_({ |vw|
-			if( vw.string.size == 0 ) {
-				vw.string = "*";
-			};
-			vws[ \val ][ 0 ] = (vws[ \device ].string +/+ vws[ \port ].string).asSymbol;
+			var string;
+			string = this.class.formatDeviceString( vw.string );
+			vw.string = string;
+			vws[ \val ][ 0 ] = string.asSymbol;
 			vws.doAction;
 		})
-		.applySkin( RoundView.skin );
-
-		vws[ \view ].decorator.nextLine;
-		if( label.notNil ) { vws[ \view ].decorator.shift( labelWidth + 4, 0 ); };
-		vws[ \portLabel ] = StaticText( vws[ \view ], 40@14 )
-		.mouseDownAction_({
-			makeMenu.value({ |res|
-				vws[ \val ][ 0 ] = res;
-				vws.setViews;
-				vws.doAction;
-			});
-		})
-		.string_( "port " ).align_( \right ).applySkin( RoundView.skin )
-		.background_( Color.white.alpha_(0.25) );
-		vws[ \port ] = TextField( view, bounds.width - 44 - (labelWidth+4) @ 14 )
-		.action_({ |vw|
-			if( vw.string.size == 0 ) {
-				vw.string = "*";
-			};
-			vws[ \val ][ 0 ] = (vws[ \device ].string +/+ vws[ \port ].string).asSymbol;
-			vws.doAction;
-		})
-		.string_( "*" )
 		.applySkin( RoundView.skin );
 
 		vws[ \setViews ] = {
-			var devStrings;
-			devStrings = vws[ \val ][ 0 ].asString.split($/);
-			vws[ \device ].string = devStrings.first;
-			vws[ \port ].string = devStrings.last;
+			vws[ \device ].string = vws[ \val ][ 0 ].asString;
 			if( vws[ \val ][ 2 ].notNil ) {
 				vws[ \chan ].value = vws[ \val ][ 2 ]+1;
 			} {
@@ -222,8 +208,9 @@ UMIDIFilterSpec : Spec {
 	}
 
 	setView { |view, value, active = false|
-		//view[ \sndFileView ].value = value;
-		//if( active ) { view.doAction };
+		view[ \val ] = value;
+		{ view.setViews }.defer;
+		if( active ) { view.doAction };
 	}
 
 }
