@@ -2575,23 +2575,181 @@
 
 	makeView { |parent, bounds, label, action, resize|
 		var vws, view, labelWidth;
-		var localStep;
-		var modeFunc;
 		var font;
-		var editAction;
 		var tempVal;
+		var makeMenu;
+
 		vws = ();
 
 		font =  (RoundView.skin ? ()).font ?? { Font( Font.defaultSansFace, 10 ); };
 
-		localStep = step.copy;
-		if( step == 0 ) { localStep = 1 };
 		bounds.isNil.if{bounds= 320@20};
 
 		view = EZCompositeView( parent, bounds, gap: 2@2 );
 		bounds = view.asView.bounds;
 
+		makeMenu = {
+			var mv1, mv2, sls, menus = [], currentValue, transpFunc;
+
+			currentValue = vws[ \val ];
+
+			RoundView.pushSkin( UChainGUI.skin ++ (labelWidth: 80) );
+
+			menus = menus.add(
+				MenuAction( "default (%)".format( this.default ), { vws.setVal( this.default ); vws.doAction });
+			);
+
+			menus = menus.add(
+				Menu( *(this.minval.cpsmidi.ceil.asInteger..this.maxval.cpsmidi.asInteger).clump(12).collect({ |item|
+					Menu( *item.collect({ |num| MenuAction( "% (%)".format( num, num.midiname ), {
+						vws.setVal( num.midicps );
+						vws.doAction;
+					} ) }) )
+					.title_( "%-%".format( item.first, item.last ) );
+				})
+				).title_( "MIDI note" )
+			);
+
+			menus = menus.add(
+				Menu( *[ "C", "D", "E", "F", "G", "A", "B" ].collect({ |letter|
+					Menu( *[ "bb", "b", "", "#", "##" ].collect({ |add|
+						Menu( *(((this.minval.cpsmidi.round(1)/12).floor-2).asInteger..
+							((this.maxval.cpsmidi.round(1)/12).floor-2).asInteger).collect({ |octave|
+							MenuAction( letter ++ add ++ octave, {
+								vws.setVal( (letter ++ add ++ octave).namecps );
+								vws.doAction;
+							})
+						})
+						).title_( letter ++ add )
+					})
+					).title_( letter )
+				})
+				).title_( "named note" )
+			);
+
+			if( this.maxval <= 300 ) {
+				mv1 = 2.collect({ View().minWidth_(300).minHeight_(20); });
+				EZSmoothSlider(mv1[0], Rect( 0, 2, 300, 16 ), "period", [1/this.maxval,1/this.minval,\exp,0,0].asSpec )
+				.value_( 1/currentValue )
+				.action_({ |sl|
+					vws.setVal( 1/sl.value );
+					vws.doAction;
+				}).sliderView.centered_( true );
+				EZSmoothSlider(mv1[1], Rect( 0, 2, 300, 16 ), "bpm", [this.minval*60,this.maxval*60,\exp,0.1,0].asSpec )
+				.value_( currentValue * 60 )
+				.action_({ |sl|
+					vws.setVal( sl.value / 60 );
+					vws.doAction;
+				}).sliderView.centered_( true );
+
+				menus = menus.add(
+					Menu( *mv1.collect({ |v| CustomViewAction( v ) }) ).title_( "time" )
+				);
+			};
+
+			mv2 = 3.collect({ View().minWidth_(300).minHeight_(20); });
+			transpFunc = {
+				vws.setVal(
+						this.constrain(
+							currentValue *
+							((sls[0].value * 12) + (sls[1].value) + (sls[2].value/100)).midiratio
+						)
+					);
+					vws.doAction;
+			};
+			sls = [
+				EZSmoothSlider(mv2[0], Rect( 0, 2, 300, 16 ), "octaves", [-6,6,\lin,1,0].asSpec )
+				.action_(transpFunc),
+				EZSmoothSlider(mv2[1], Rect( 0, 2, 300, 16 ), "semitones", [-36,36,\lin,1,0].asSpec )
+				.action_(transpFunc),
+				EZSmoothSlider(mv2[2], Rect( 0, 2, 300, 16 ), "cents", [-100,100,\lin,1,0].asSpec )
+				.action_(transpFunc);
+			];
+			sls.do({ |sl| sl.sliderView.centered = true });
+
+			menus = menus.add(
+				Menu( *mv2.collect({ |v| CustomViewAction( v ) }) ).title_( "transpose" )
+			);
+
+			RoundView.popSkin;
+
+			menus = menus.add(
+				Menu(
+					*[ 0.001, 0.01, 0.1, 1, 10 ].collect({ |item|
+						var res = currentValue.round( item );
+						MenuAction( "% (%)".format( item, res ), {
+							vws.setVal( this.constrain( res ) );
+							vws.doAction;
+						});
+					})
+				).title_( "round" );
+			);
+
+			menus = menus.add(
+				Menu(
+					*(2..16).collect({ |item|
+						var res = (currentValue / item);
+						MenuAction( "/ % (%)".format( item, res.round(0.001) ), {
+							vws.setVal( this.constrain( res ) );
+							vws.doAction;
+						});
+					})
+				).title_( "divide" );
+			);
+
+			menus = menus.add(
+				Menu(
+					*(2..16).collect({ |item|
+						var res = (currentValue * item).interpret;
+						MenuAction( "* % (%)".format( item, res.round(0.001) ), {
+							vws.setVal( this.constrain( res ) );
+							vws.doAction;
+						});
+					})
+				).title_( "multiply" );
+			);
+
+			menus = menus.add(
+				Menu( *(1..16).collect({ |item| (1..16).collect({ |x| [item,x] }) }).collect({ |item|
+					Menu(
+						*item.collect({ |item|
+							var interp, joined;
+							joined = item.join("/");
+							interp = joined.interpret.asFraction;
+							if( interp[1] == 1 ) { interp = [ interp.first ] };
+							interp = interp.join( "/" );
+							if( interp == joined ) {
+								MenuAction( joined, {
+									vws.setVal( this.constrain( currentValue * joined.interpret ) );
+									vws.doAction;
+								});
+							} {
+								MenuAction( "% (%)".format( joined, interp ), {
+									vws.setVal( this.constrain( currentValue * interp.interpret ) );
+									vws.doAction;
+								});
+							};
+						})
+					).title_( item.first.join( "/" ) + "-" + item.last.join("/") );
+				}) ).title_( "fraction" )
+			);
+
+			Menu( *menus ).front;
+		};
+
 		vws[ \view ] = view;
+
+		vws[ \val ] = this.default;
+
+		vws[ \setVal ] = { |vwx, val|
+			vws[ \val ] = val;
+			vws[ \hz ].value = val;
+			vws.setName;
+		};
+
+		vws[ \doAction ] = {
+			action.value( vws, vws[ \val ] );
+		};
 
 		if( label.notNil ) {
 			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
@@ -2604,94 +2762,59 @@
 			labelWidth = 0;
 		};
 
-		vws[ \comp ] = CompositeView( view, (bounds.width - (labelWidth + 49)) @ (bounds.height) );
-
-		vws[ \mode ] = PopUpMenu( view, 45 @ (bounds.height) )
-			.font_( font )
-			.applySkin( RoundView.skin ? () )
-			.items_([ 'hz', 'midi', 'note' ])
-			.action_({ |pu|
-				mode = pu.item;
-				this.class.changed( \mode );
-			});
-
 		// hz mode
-		vws[ \hz ] = EZSmoothSlider( vws[ \comp ],
-			vws[ \comp ].bounds.width @ (bounds.height),
-			nil,  this, { |vw| action.value( vw, vw.value ) }
-		).visible_( false );
+		vws[ \hz ] = EZSmoothSlider( vws[ \view ],
+			(bounds.width - (labelWidth + 49)) @ (bounds.height),
+			nil,  this, { |vw|
+				vws[ \val ] = vw.value;
+				vws.setName;
+				vws.doAction;
+			}
+		);
 
 		vws[ \hz ].sliderView.centered_( true ).centerPos_( this.unmap( default ) );
 
-		// midi mode
-		vws[ \midi ] =  EZSmoothSlider( vws[ \comp ],
-			vws[ \comp ].bounds.width @ (bounds.height),
-			nil,
-			[ this.minval.cpsmidi, this.maxval.cpsmidi, \lin, 0.01, this.default.cpsmidi ].asSpec,
-			{ |vw| action.value( vw, vw.value.midicps ) }
-		).visible_( false );
+		vws[ \hz ].numberView.allowedChars = "+-.AaBbCcDdEeFfGg#*/()%";
+		vws[ \hz ].numberView.interpretFunc = { |string|
+			if( string.any({ |x| "AaBbCcDdEeFfGg".includes(x) }) ) {
+				string.namecps;
+			} {
+				string.interpret;
+			};
+		};
 
-		vws[ \midi ].sliderView.centered_( true ).centerPos_(
-			vws[ \midi ].controlSpec.unmap( default.cpsmidi )
-		);
+		vws[ \name ] = StaticText( view, 45 @ (bounds.height) )
+			.font_( font )
+			.applySkin( RoundView.skin ? () )
+		    .mouseDownAction_({ makeMenu.value })
+		    .string_( " " ++ this.default.cpsname )
+		    .background_( Color.white.alpha_(0.25) );
 
-		// note mode
-		vws[ \note ] = SmoothNumberBox( vws[ \comp ], 40 @ (bounds.height) )
-			.action_({ |nb|
-				action.value( vws, nb.value.midicps * (vws[ \cents ].value / 100).midiratio );
-			})
-			.scroll_step_( localStep )
-			.clipLo_( this.minval.cpsmidi )
-			.clipHi_( this.maxval.cpsmidi )
-			.value_( 440.cpsmidi )
-			.formatFunc_({ |val|
-				val.midiname;
-			})
-			.interpretFunc_({ |string|
-				string.namemidi;
-			})
-			.allowedChars_( "abcdefgABCDEFG#-" )
-			.visible_( false );
+		vws[ \name ].setProperty(\wordWrap, false);
 
-		vws[ \cents ] = EZSmoothSlider( vws[ \comp ],
-				Rect( 44, 0, (vws[ \comp ].bounds.width - 44), bounds.height ),
-				nil, [-50,50,\lin,0.1,0].asSpec
-			).action_({ |sl|
-				action.value( vws, vws[ \note ].value.midicps * (sl.value / 100).midiratio );
-			})
-			.visible_( false );
-
-		vws[ \cents ].sliderView.centered_(true);
-
-		vws[ \ctrl ] = SimpleController( this.class )
-			.put( \mode, {
-				this.setMode( vws, mode );
-			});
-
-		vws[ \mode ].onClose_({ vws[ \ctrl ].remove });
-
-		this.setMode( vws, mode );
+		vws[ \setName ] = {
+			var name;
+			name = vws[ \val ].cpsname;
+			if( name.cents.abs >= 1 ) {
+				vws[ \name ].string = " % %%".format(
+					name, if( name.cents.isPositive ) { "+" } { "" },
+					name.cents.round(1).asInteger
+				)
+			} {
+				vws[ \name ].string = " " ++ name;
+			};
+		};
 
 		^vws;
 	}
 
-	setMode { |view, newMode|
-		[ \hz, \midi, \note ].do({ |item|
-			view[ item ].visible = (item == newMode)
-		});
-		view[ \mode ].value = view[ \mode ].items.indexOf( mode ) ? 0;
-		view[ \cents ].visible = (newMode == \note);
-	}
-
 	setView { |view, value, active = false|
+		view[ \val ] = value;
 		view[ \hz ].value = value;
-		view[ \midi ].value = value.cpsmidi;
-		view[ \note ].value = value.cpsmidi.round(1);
-		view[ \cents ].value = (value.cpsmidi - (view[ \note ].value)) * 100;
 		{
-			this.setMode( view, mode );
+			view.setName;
 		}.defer;
-		if( active ) { view[ \hz ].doAction };
+		if( active ) { view.doAction };
 	}
 
 	mapSetView { |view, value, active = false|
