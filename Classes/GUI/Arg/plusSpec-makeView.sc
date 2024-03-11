@@ -2605,7 +2605,7 @@
 						vws.setVal( num.midicps );
 						vws.doAction;
 					} ) }) )
-					.title_( "%-%".format( item.first, item.last ) );
+					.title_( "% - %".format( item.first, item.last ) );
 				})
 				).title_( "MIDI note" )
 			);
@@ -2677,7 +2677,14 @@
 				Menu(
 					*[ 0.001, 0.01, 0.1, 1, 10 ].collect({ |item|
 						var res = currentValue.round( item );
-						MenuAction( "% (%)".format( item, res ), {
+						MenuAction( "%Hz (%)".format( item, res ), {
+							vws.setVal( this.constrain( res ) );
+							vws.doAction;
+						});
+					}) ++
+					[ 1, 12 ].collect({ |item, i|
+						var res = currentValue.cpsmidi.round( item ).midicps;
+						MenuAction( "1 % (%)".format( ["semitone", "octave"][i], res ), {
 							vws.setVal( this.constrain( res ) );
 							vws.doAction;
 						});
