@@ -124,7 +124,7 @@ defs = defs.add(
 		};
 	}, UMIDIDict, [
 		[ \filter, [ '*/*', 'bend', 0, nil, nil ], UMIDIFilterSpec( 'bend', useNum: false ) ],
-		[ \fromBendRange, [0,16383], RangeSpec(0,16383,step:1) ],
+		[ \bendRange, [0,16383], RangeSpec(0,16383,step:1) ],
 	] ++ args[1..], addToAll: false )
 	.mappedArgs_([\toRange])
 	.addStartFunc({ UMIDIDict.start( false ) })
@@ -178,4 +178,4 @@ defs = defs.add(
 	.addStartFunc({ UMIDIDict.start( false ) })
 );
 
-MultiUMapDef( 'midi', defs, 'private', 'type', false ).mappedArgs_([ 'value', 'toRange' ]);
+MultiUMapDef( 'midi', defs, 'private', 'type', false ).mappedArgs_([ 'value', 'toRange' ]).canUseUMap_( false )
