@@ -19,8 +19,8 @@ ValueUMapDef : UMapDef {
 	}
 
 	*new { |name, startFunc, endFunc, args, category, addToAll=true|
-		^this.basicNew( name, args ? [], addToAll )
-			.initFunc( startFunc, endFunc ).category_( category ? \default );
+		^this.basicNew( name, args ? [], category, addToAll )
+			.initFunc( startFunc, endFunc );
 	}
 
 	initFunc { |instartFunc, inendFunc|
@@ -111,9 +111,9 @@ ControllerUMapDef : ValueUMapDef {
 	var <>updateFunc, <model;
 
 	*new { |name, updateFunc, model, args, category, addToAll=true|
-		^this.basicNew( name, args ? [], addToAll )
+		^this.basicNew( name, args ? [], category, addToAll )
 		    .updateFunc_( updateFunc )
-		    .initFuncs( model ).category_( category ? \default );
+		    .initFuncs( model );
 	}
 
 	initFuncs { |inModel|
