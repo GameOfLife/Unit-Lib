@@ -28,7 +28,7 @@ HybridUMapDef( \note_freq, { |note = 64, round = 1, base = 440, detune = 0, tran
 	.setSpec( \round, [0,12,\lin,0,1] )
 	.setSpec( \base, [68.midicps, 70.midicps,\lin,0,440] )
 	.setSpec( \detune, [-50,50,\lin,0,0, " cents"].asSpec )
-	.setSpec( \transpose, [-12,12,\lin,1,0, " semitones"].asSpec )
+	.setSpec( \transpose, [-36,36,\lin,1,0, " semitones"].asSpec )
 	.canUseUMapFunc_({ |unit, key, umapdef|
 		var spec;
 		spec = unit.getSpec( key );
