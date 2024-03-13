@@ -610,10 +610,12 @@ U : ObjectWithArgs {
     }
 
     def_ { |newDef, keepArgs = true|
+		this.deactivate;
         this.init( newDef, if( keepArgs ) { args } { [] }, mod); // keep args
     }
 
     defName_ { |newDefName, keepArgs = true|
+		this.deactivate;
         this.init( newDefName, if( keepArgs ) { args } { [] }, mod); // keep args
     }
 
