@@ -747,6 +747,7 @@ U : ObjectWithArgs {
 		var umap, insertArg;
 		umap = this.get( key );
 		if( umap.isKindOf( UMap ) ) {
+			umap.deactivate;
 			if( umap.def.canInsert ) {
 				insertArg = umap.get( umap.def.insertArgName );
 				if( insertArg.isUMap ) {
@@ -1375,6 +1376,32 @@ U : ObjectWithArgs {
 
 		if( verbose ) {
 			"% UMaps set to 'active' = %\n".postf( umaps.size, active );
+		};
+	}
+
+	deactivateUMaps { |active = true, verbose = true|
+		var umaps;
+
+		umaps = this.selectUMaps({ |umap|
+			umap.def.isKindOf( ValueUMapDef );
+		});
+
+		umaps.do( _.deactivate );
+
+		if( verbose ) {
+			"% UMaps set to 'active' = %\n".postf( umaps.size, active );
+		};
+	}
+
+	activate {
+		if( this.subDef.respondsTo( \activateUnit ) ) {
+			this.subDef.activateUnit( this );
+		}
+	}
+
+	deactivate {
+		if( this.subDef.respondsTo( \deactivateUnit ) ) {
+			this.subDef.deactivateUnit( this );
 		};
 	}
 }

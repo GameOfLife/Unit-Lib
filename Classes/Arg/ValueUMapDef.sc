@@ -61,6 +61,14 @@ ValueUMapDef : UMapDef {
 		};
 	}
 
+	deactivateUnit { |unit|
+		if( unit.get( \active ).booleanValue == true && {
+			activeUnits.keys.includes( unit );
+		}) {
+			activeUnits.put( unit, endFunc.value( unit, activeUnits[ unit ] ) );
+		};
+	}
+
 	hasBus { ^false }
 
 	isMappedArg { |name|
@@ -120,7 +128,7 @@ ControllerUMapDef : ValueUMapDef {
 		model = inModel ?? { currentEnvironment; };
 		this.initFunc(
 			{ |unit| model.addDependant( unit ); },
-		    { |unit| model.removeDependant( unit ); }
+		    { |unit| model.removeDependant( unit ); nil }
 		);
 	}
 
@@ -129,6 +137,11 @@ ControllerUMapDef : ValueUMapDef {
 	}
 
 	addStartFunc { |func|
-		startFunc = startFunc.addFunc( func );
+		var originalStartFunc;
+		originalStartFunc = startFunc;
+		startFunc = { |unit, model|
+			func.value( unit, model );
+			originalStartFunc.value( unit, model );
+		};
 	}
 }
