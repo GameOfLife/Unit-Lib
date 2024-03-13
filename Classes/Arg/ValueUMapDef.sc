@@ -11,11 +11,14 @@ ValueUMapDef : UMapDef {
 
 	*initClass {
 		activeUnits = IdentityDictionary();
-		CmdPeriod.add( this );
 	}
 
-	*cmdPeriod {
+	*stopAll {
 		activeUnits.keys.asArray.do(_.set( \active, false ));
+	}
+
+	*deactivateAll {
+		activeUnits.keys.asArray.do(_.deactivate);
 	}
 
 	*new { |name, startFunc, endFunc, args, category, addToAll=true|

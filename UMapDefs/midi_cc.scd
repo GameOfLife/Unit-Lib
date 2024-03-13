@@ -86,7 +86,7 @@ ValueUMapDef( \midi_cc, { |unit, midifunc|
 				};
 			};
 		};
-	});
+	}).permanent_( true );
 }, { |unit, midifunc|
 	midifunc.free;
 	nil;

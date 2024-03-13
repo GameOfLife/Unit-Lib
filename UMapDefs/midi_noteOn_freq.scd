@@ -61,7 +61,7 @@ ValueUMapDef( \midi_noteOn_freq, { |unit, midifunc|
 				};
 			};
 		};
-	});
+	}).permanent_( true );
 }, { |unit, midifunc|
 	midifunc.free;
 	nil;

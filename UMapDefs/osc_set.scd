@@ -40,7 +40,7 @@ ValueUMapDef( \osc_set, { |unit, oscfunc|
 		} {
 			unit.set( \value, spec.constrain( msg[1] ) );
 		};
-	}, message)
+	}, message).permanent_( true )
 }, { |unit, oscfunc|
 	oscfunc.free;
 	nil;

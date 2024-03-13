@@ -77,7 +77,7 @@ ValueUMapDef( \midi_touch, { |unit, midifunc|
 				};
 			};
 		};
-	});
+	}).permanent_( true );
 }, { |unit, midifunc|
 	midifunc.free;
 	nil;

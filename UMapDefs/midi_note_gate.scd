@@ -82,7 +82,7 @@ ValueUMapDef( \midi_note_gate, { |unit, midifuncs|
 				};
 			};
 		};
-	}),
+	}).permanent_( true ),
 	MIDIFunc.noteOff({ |velo, nn, chan, src|
 		var fromRange, value = 0, endPoint;
 		endPoint = MIDIClient.sources.detect({ |ep| ep.uid == src });
@@ -113,7 +113,7 @@ ValueUMapDef( \midi_note_gate, { |unit, midifuncs|
 				};
 			};
 		};
-	})
+	}).permanent_( true )
 	];
 }, { |unit, midifuncs|
 	midifuncs.do(_.free);

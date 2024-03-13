@@ -76,7 +76,7 @@ ValueUMapDef( \midi_noteOn, { |unit, midifunc|
 				};
 			};
 		};
-	});
+	}).permanent_( true );
 }, { |unit, midifunc|
 	midifunc.free;
 	nil;
