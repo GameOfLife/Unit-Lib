@@ -56,7 +56,37 @@ defs = [
 		.setSpec( \range, spec.asControlSpec.asRangeSpec );
 });
 
-def = MultiUdef( \shared_value, defs, \shared_io, \type, false );
+def = MultiUdef( \shared_value, defs, \shared_io, \type, false )
+.prepareArgsFunc_({ |args|
+	var range = args.pairsAt( \range );
+	if( range.notNil ) {
+		switch( args.pairsAt( \type ),
+			\freq, {
+				if( range.every(_ >= 2) ) {
+					args;
+				} {
+					args.pairsPut( \range, FreqSpec(2,20000).map( range ) );
+				};
+			},
+			\value, {
+				if( range.any(_ > 1) ) {
+					args.pairsPut( \range, FreqSpec(2,20000).unmap( range ) );
+				} {
+					args
+				};
+			},
+			\amp, {
+				if( range.any(_ > 1) ) {
+					args.pairsPut( \range, \amp.asSpec.map( FreqSpec(2,20000).unmap( range ) ); );
+				} {
+					args
+				};
+			},
+		)
+	} {
+		args;
+	};
+});
 
 def
 )
