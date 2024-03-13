@@ -2,18 +2,21 @@ UMIDIFilterSpec : Spec {
 
 	classvar <>learnFuncs, <>lastUpdate;
 
-	var <>default, <>type = 'cc';
+	var <>default, <>type = 'cc', <>useNum = true;
 
 	// srcName, type, chan, num, val
 
-	*new { |type = 'cc'|
-		^super.new.type_( type ).default_( [ '*/*', type, 0, 0, nil ] );
+	*new { |type = 'cc', useNum = true|
+		^super.new.type_( type ).useNum_( useNum ).default_( [ '*/*', type, 0, if( useNum ) { 0 } { nil }, nil ] );
 	}
 
 	constrain { |input|
 		input = input.asArray.extend( 5, nil );
 		if( type.notNil && { input[1] != type }) {
 			input[1] = type;
+		};
+		if( useNum == false) {
+			input[3] = nil;
 		};
 		^input;
 	}
@@ -129,29 +132,47 @@ UMIDIFilterSpec : Spec {
 			action.value( vwx, vws[ \val ] );
 		};
 
-		numchanWidth = ((bounds.width - (3 * 44) - 4 - (labelWidth+4)) / 2).floor.asInteger;
+		numchanWidth = ((bounds.width - (44 + 49) - ( 2 * 36 ) - 4 - (labelWidth+4)) / 2).floor.asInteger;
 
-		vws[ \numLabel ] = StaticText( vws[ \view ], 40@14 )
-		.string_( "num " ).align_( \right ).applySkin( RoundView.skin );
+		vws[\typeLabel ] = StaticText( vws[ \view ], 45@14 )
+		.string_( "% ".format( this.type ) ).align_( \right ).applySkin( RoundView.skin )
+		.font_( (RoundView.skin.font ? Font.default).copy.italic_( true ) );
+
+		vws[ \numLabel ] = StaticText( vws[ \view ], 32@14 )
+		.string_( "num" ).align_( \right ).applySkin( RoundView.skin );
 		vws[ \num ] = SmoothNumberBox( vws[ \view ], numchanWidth@14 )
 		.action_({ |nb|
-			vws[ \val ][ 3 ] = nb.value.asInteger;
-			vws.doAction;
-		})
-		.clipLo_( 0 ).clipHi_(127);
-		vws[ \chanLabel ] = StaticText( vws[ \view ], 40@14 )
-		.string_( "chan " ).align_( \right ).applySkin( RoundView.skin );
-		vws[ \chan ] = PopUpMenu( vws[ \view ], numchanWidth@14 )
-		.action_({ |pu|
-			if( pu.value == 0 ) {
-				vws[ \val ][ 2 ] = nil;
+			if( nb.value.asInteger == -1 ) {
+				vws[ \val ][ 3 ] = nil;
 			} {
-				vws[ \val ][ 2 ] = (pu.value - 1).asInteger;
+				vws[ \val ][ 3 ] = nb.value.asInteger;
 			};
 			vws.doAction;
 		})
-		.items_( [ "any" ] ++ (0..15).collect(_.asString) )
-		.applySkin( RoundView.skin );
+		.clipLo_( -1 ).clipHi_(127)
+		.allowedChars_( "+-.eE*/()%any" )
+		.interpretFunc_({ |string|
+			if( "any".any( string.includes( _ ) ) ) { -1 } { string.interpret; };
+		})
+		.formatFunc_({ |val| if( val == -1 ) { "any" } { val.asInteger.asString } });
+		if( useNum == false ) { vws[ \numLabel ].visible_( false );  vws[ \num ].visible_( false );  };
+		vws[ \chanLabel ] = StaticText( vws[ \view ], 32@14 )
+		.string_( "chan" ).align_( \right ).applySkin( RoundView.skin );
+		vws[ \chan ] = SmoothNumberBox( vws[ \view ], numchanWidth@14 )
+		.action_({ |nb|
+			if( nb.value.asInteger == -1 ) {
+				vws[ \val ][ 2 ] = nil;
+			} {
+				vws[ \val ][ 2 ] = nb.value.asInteger;
+			};
+			vws.doAction;
+		})
+		.clipLo_( -1 ).clipHi_(15)
+		.allowedChars_( "+-.eE*/()%any" )
+		.interpretFunc_({ |string|
+			if( "any".any( string.includes( _ ) ) ) { -1 } { string.interpret; };
+		})
+		.formatFunc_({ |val| if( val == -1 ) { "any" } { val.asInteger.asString } });
 
 		vws[ \learn ] = SmoothButton( vws[ \view ], 40@14 )
 		.label_( [ "learn", "learn" ] )
@@ -159,7 +180,7 @@ UMIDIFilterSpec : Spec {
 		.action_({ |bt|
 			switch( bt.value,
 				1, { vws[ \learnFunc ] = this.learn({ |...learned|
-					vws[ \val ] = learned;
+					vws[ \val ] = this.constrain( learned ) ? -1;
 					{ vws.setViews; }.defer;
 					vws.doAction;
 					bt.value = 0;
@@ -171,7 +192,7 @@ UMIDIFilterSpec : Spec {
 
 		vws[ \view ].decorator.nextLine;
 		if( label.notNil ) { vws[ \view ].decorator.shift( labelWidth + 4, 0 ); };
-		vws[ \devLabel ] = StaticText( vws[ \view ], 40@14 )
+		vws[ \devLabel ] = StaticText( vws[ \view ], 45@14 )
 		.mouseDownAction_({
 			makeMenu.value({ |res|
 				vws[ \val ][ 0 ] = res;
@@ -181,7 +202,7 @@ UMIDIFilterSpec : Spec {
 		})
 		.string_( "device " ).align_( \right ).applySkin( RoundView.skin )
 		.background_( Color.white.alpha_(0.25) );
-		vws[ \device ] = TextField( view, bounds.width - 44 - (labelWidth+4) @ 14 )
+		vws[ \device ] = TextField( view, bounds.width - 49 - (labelWidth+4) @ 14 )
 		.string_( this.class.formatDeviceString )
 		.action_({ |vw|
 			var string;
@@ -194,12 +215,8 @@ UMIDIFilterSpec : Spec {
 
 		vws[ \setViews ] = {
 			vws[ \device ].string = vws[ \val ][ 0 ].asString;
-			if( vws[ \val ][ 2 ].notNil ) {
-				vws[ \chan ].value = vws[ \val ][ 2 ]+1;
-			} {
-				vws[ \chan ].value = 0;
-			};
-			vws[ \num ].value = vws[ \val ][ 3 ];
+			vws[ \chan ].value = vws[ \val ][ 2 ] ? -1;
+			vws[ \num ].value = vws[ \val ][ 3 ] ? -1;
 		};
 
 		vws.setViews;

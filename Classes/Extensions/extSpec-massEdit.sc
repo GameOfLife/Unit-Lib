@@ -144,6 +144,31 @@
 
 }
 
++ DualValueSpec {
+
+	massEditSpec { |inArray|
+		var minmax;
+		minmax = this.massEditValue( inArray );
+		^RangeSpec( minval, maxval, 1.0e-11, inf, warp, step, minmax, units );
+	}
+
+	massEditValue { |inArray|
+		if( inArray.notNil ) {
+			^[ inArray.flat.minItem, inArray.flat.maxItem ];
+		} {
+			^[minval, maxval];
+		};
+	}
+
+	massEdit { |inArray, params|
+		var linlinArgs;
+		linlinArgs = this.unmap( this.massEditValue( inArray ) ) ++ this.unmap( params );
+		^inArray.collect({ |item|
+			this.map( this.unmap( item ).linlin( *linlinArgs ) );
+		});
+ 	}
+}
+
 + RangeSpec {
 
 	massEditSpec { |inArray|

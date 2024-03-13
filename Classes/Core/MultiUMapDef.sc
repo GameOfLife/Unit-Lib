@@ -260,4 +260,8 @@ MultiUMapDef : UMapDef {
 		^this.findUdefFor( unit ).argSpecs( unit ) ++ argSpecs;
 	}
 
+	performUpdate { |unit ...args|
+		this.findUdefFor( unit ).performUpdate( unit, *args );
+	}
+
 }

@@ -46,6 +46,15 @@ UMIDIDict {
 				MIDIFunc.bend({ |val, chan, src|
 					this.addBend(src,chan,val);
 				}).permanent_( true ),
+				MIDIFunc.touch({ |val, chan, src|
+					this.addTouch(src,chan,val);
+				}).permanent_( true ),
+				MIDIFunc.polytouch({ |val, num, chan, src|
+					this.addPolytouch(src,chan,num,val);
+				}).permanent_( true ),
+				MIDIFunc.program({ |val, chan, src|
+					this.addProgram(src,chan,val);
+				})
 			];
 			this.makePortDict;
 		};
@@ -112,9 +121,22 @@ UMIDIDict {
 		this.addEvent( src, \cc, chan, num, val );
 	}
 
-	*addBend { |src, chan, num, val|
-		this.addEvent( src, \bend, chan, num, val );
+	*addBend { |src, chan, val|
+		this.addEvent( src, \bend, chan, val );
 	}
+
+	*addTouch { |src, chan, val|
+		this.addEvent( src, \touch, chan, val );
+	}
+
+	*addPolytouch { |src, chan, num, val|
+		this.addEvent( src, \polytouch, chan, num, val );
+	}
+
+	*addProgram { |src, chan, val|
+		this.addEvent( src, \program, chan, val );
+	}
+
 
 	*getEvent { |src, type ...args|
 		var uids;
