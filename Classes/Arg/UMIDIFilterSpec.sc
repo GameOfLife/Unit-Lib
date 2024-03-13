@@ -59,6 +59,8 @@ UMIDIFilterSpec : Spec {
 			^"*/*";
 		} { inString.find( "/" ).isNil } {
 			^inString ++ "/*";
+		} { inString == "/" } {
+			^"*/*"
 		} { inString.split( $/ ).first.size == 0 } {
 			^"*" ++ inString;
 		} { inString.split( $/ ).last.size == 0 } {
