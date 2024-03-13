@@ -105,5 +105,24 @@ ValueUMapDef( \midi_cc, { |unit, midifunc|
 	[ \learnDevice, true, BoolSpec( true ) ],
 	[ \learnPort, true, BoolSpec( true ) ],
 ]  )
-	.mappedArgs_([\toRange])
-	.category_(\midi);
+.uchainInitFunc_({ |umap, unit|
+	var filter, invert, active;
+	if( umap.def.category == \private ) {
+		filter = [
+			UMIDIFilterSpec.formatDeviceString( umap.get( \device ) ++ "*/" ++ umap.get( \port ) ++ "*" ).asSymbol,
+			'cc',
+			umap.get( \channel ),
+			umap.get( \cc ),
+			nil
+		];
+		invert = umap.get( \invert ) == true;
+		active = umap.get( \active ) == true;
+		if( active ) { umap.set( \active, false ) };
+		umap.defName = \midi;
+		if( invert ) { umap.set( \toRange, umap.get( \toRange ).reverse ) };
+		umap.set( \filter, filter );
+		if( active ) { umap.set( \active, true ) };
+	}
+})
+.mappedArgs_([\value,\toRange])
+.category_(\midi);

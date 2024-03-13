@@ -76,4 +76,27 @@ ValueUMapDef( \midi_noteOn_freq, { |unit, midifunc|
 	[ \scale, 1, [0.25,4,\exp,0,1].asSpec ],
 	[ \invert, false, BoolSpec(false) ],
 ]  )
-	.category_(\midi);
+.uchainInitFunc_({ |umap, unit|
+	var filter, base, transpose, scale, range, toRange, active;
+	if( umap.def.category == \private ) {
+		base = umap.get( \a );
+		transpose = umap.get( \transpose );
+		scale = umap.get( \scale );
+		range = umap.get( \range );
+		toRange = range.collect({ |item| ((item - 69 * scale + 69) + transpose).midicps * base / 440 });
+		if( umap.get( \invert ) == true ) { toRange = toRange.reverse };
+		filter = [
+			UMIDIFilterSpec.formatDeviceString( umap.get( \device ) ++ "*/" ++ umap.get( \port ) ++ "*" ).asSymbol,
+			'noteOn',
+			umap.get( \channel ),
+			nil,
+			nil
+		];
+		active = umap.get( \active ) == true;
+		if( active ) { umap.set( \active, false ) };
+		umap.defName = \midi;
+		umap.set( \type, \note, \fromRange, range, \toRange, toRange, \filter, filter );
+		if( active ) { umap.set( \active, true ) };
+	};
+})
+.category_(\midi);

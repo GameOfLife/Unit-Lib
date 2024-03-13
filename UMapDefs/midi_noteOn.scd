@@ -92,5 +92,25 @@ ValueUMapDef( \midi_noteOn, { |unit, midifunc|
 	[ \clipMode, \ignore, ListSpec( [ \ignore, \clip, \fold, \wrap, \none ] ) ],
 	[ \clipSoftness, 0, [0,1].asSpec ],
 ]  )
-	.mappedArgs_([\toRange])
-	.category_(\midi);
+.uchainInitFunc_({ |umap, unit|
+	var filter, invert, active;
+	if( umap.def.category == \private ) {
+		filter = [
+			UMIDIFilterSpec.formatDeviceString( umap.get( \device ) ++ "*/" ++ umap.get( \port ) ++ "*" ).asSymbol,
+			'noteOn',
+			umap.get( \channel ),
+			nil,
+			nil
+		];
+		invert = umap.get( \invert ) == true;
+		active = umap.get( \active ) == true;
+		if( active ) { umap.set( \active, false ) };
+		umap.defName = \midi;
+		if( invert ) { umap.set( \toRange, umap.get( \toRange ).reverse ) };
+		umap.set( \type, \note );
+		umap.set( \filter, filter );
+		if( active ) { umap.set( \active, true ) };
+	}
+})
+.mappedArgs_([\toRange])
+.category_(\midi);

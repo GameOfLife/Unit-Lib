@@ -93,5 +93,26 @@ ValueUMapDef( \midi_bend, { |unit, midifunc|
 	[ \clipMode, \clip, ListSpec( [ \ignore, \clip, \fold, \wrap, \none ] ) ],
 	[ \clipSoftness, 0, [0,1].asSpec ],
 ]  )
-	.mappedArgs_([\toRange])
-	.category_(\midi);
+.uchainInitFunc_({ |umap, unit|
+	var filter, range, invert, active;
+	if( umap.def.category == \private ) {
+		filter = [
+			UMIDIFilterSpec.formatDeviceString( umap.get( \device ) ++ "*/" ++ umap.get( \port ) ++ "*" ).asSymbol,
+			'bend',
+			umap.get( \channel ),
+			nil,
+			nil
+		];
+		range = umap.get( \fromRange );
+		invert = umap.get( \invert ) == true;
+		active = umap.get( \active ) == true;
+		if( active ) { umap.set( \active, false ) };
+		umap.defName = \midi;
+		if( invert ) { umap.set( \toRange, umap.get( \toRange ).reverse ) };
+		umap.set( \type, 'bend' );
+		umap.set( \bendRange, range );
+		if( active ) { umap.set( \active, true ) };
+	}
+})
+.mappedArgs_([\value, \toRange])
+.category_(\midi);
