@@ -162,7 +162,7 @@ UGUI {
 						});
 
 						umapdragbin.mouseDownAction_({
-							this.makeUMapDefMenu({ |def| unit.canUseUMap( key, def ); }, { |def| unit.insertUMap( key, def ); }, { umapdragbin.background = nil; });
+							this.makeUMapDefMenu({ |def| unit.canUseUMap( key, def ); }, { |def, args| unit.insertUMap( key, def ); if( args.notNil ) { unit[ key ].set( *args ) } }, { umapdragbin.background = nil; });
 							umapdragbin.background = Color.blue(0.9).alpha_(0.25);
 						});
 
@@ -252,12 +252,30 @@ UGUI {
 					var checked;
 					checked = matchTest.value( def ) ? false;
 					if( checked ) { includesChecked = true; };
-					MenuAction( def.name, {
-						action.value( def );
-						menu.removeDependant( ctrl );
-						menu.destroy;
-					}).enabled_( checked.not ).font_( Font( Font.defaultSansFace, 12 ) );
-				})).title_( if( includesChecked ) { item[0] ++ " *" } { item[0] } );
+					if( def.isKindOf( MultiUMapDef ) && {
+						def.getArgSpec( def.defNameKey ).private.not;
+					}) {
+						Menu(
+							MenuAction.separator(  def.defNameKey.asString ),
+							*def.getSpec( def.defNameKey ).list.collect({ |subdefkey|
+								MenuAction( subdefkey.asString, {
+									action.value( def, [ def.defNameKey, subdefkey ] );
+									menu.removeDependant( ctrl );
+									menu.destroy;
+								}).font_( Font( Font.defaultSansFace, 12 ) );
+							})
+						).title_( def.name )
+						.enabled_( checked.not ).font_( Font( Font.defaultSansFace, 12 ) );
+					} {
+						MenuAction( def.name, {
+							action.value( def );
+							menu.removeDependant( ctrl );
+							menu.destroy;
+						}).enabled_( checked.not ).font_( Font( Font.defaultSansFace, 12 ) );
+					};
+				})).title_( if( includesChecked ) { item[0] ++ " *" } { item[0] } )
+				.font_( Font( Font.defaultSansFace, 12 ) );
+
 				if( includesChecked ) { checkedIndex = i };
 				submenu;
 			}

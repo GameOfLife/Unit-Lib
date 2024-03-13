@@ -1197,12 +1197,29 @@ UChainGUI {
 						var checked;
 						checked = unit !? { unit.def.name == def.name; } ? false;
 						if( checked ) { includesChecked = true; };
-						MenuAction( def.name, {
-							action.value( def );
-							menu.removeDependant( ctrl );
-							menu.destroy;
-						}).enabled_( checked.not ).font_( Font( Font.defaultSansFace, 12 ) );
-					})).title_( if( includesChecked ) { item[0] ++ " *" } { item[0] } );
+						if( def.isKindOf( MultiUdef ) && {
+							def.getArgSpec( def.defNameKey ).private.not;
+						}) {
+							Menu(
+								MenuAction.separator(  def.defNameKey.asString ),
+								*def.getSpec( def.defNameKey ).list.collect({ |subdefkey|
+									MenuAction( subdefkey.asString, {
+										action.value( def, [ def.defNameKey, subdefkey ] );
+										menu.removeDependant( ctrl );
+										menu.destroy;
+									}).font_( Font( Font.defaultSansFace, 12 ) );
+								})
+							).title_( def.name )
+							.enabled_( checked.not ).font_( Font( Font.defaultSansFace, 12 ) );
+						} {
+							MenuAction( def.name, {
+								action.value( def );
+								menu.removeDependant( ctrl );
+								menu.destroy;
+							}).enabled_( checked.not ).font_( Font( Font.defaultSansFace, 12 ) );
+						};
+					})).title_( if( includesChecked ) { item[0] ++ " *" } { item[0] } )
+					.font_( Font( Font.defaultSansFace, 12 ) );
 					if( includesChecked ) { checkedMenu = i };
 					submenu;
 				}
@@ -1440,8 +1457,8 @@ UChainGUI {
 					});
 
 				addBefore.mouseDownAction_({
-					uDefMenuFunc.value(nil, { |def|
-						this.setUnits( units.insert( i, U( def ) ) );
+					uDefMenuFunc.value(nil, { |def, args|
+						this.setUnits( units.insert( i, U( def, args ) ) );
 					}, {
 						addBefore.background = addBetweenColor;
 					}, if( i == 0 ) { \generator } { \modifier } );
@@ -1498,7 +1515,10 @@ UChainGUI {
 			};
 
 			uview.mouseDownAction_({
-				uDefMenuFunc.value(unit, { |def| unit.def = def }, { uview.background = nil; });
+				uDefMenuFunc.value(unit, { |def, args|
+					unit.def = def;
+					if(args.notNil) { unit.set(*args); }
+				}, { uview.background = nil; });
 				uview.background = Color.gray(0.3).alpha_(0.5);
 			});
 
@@ -1721,8 +1741,8 @@ UChainGUI {
 				});
 
 			addLast.mouseDownAction_({
-				uDefMenuFunc.value(nil, { |def|
-					chain.units = chain.units ++ [ U( def ) ];
+				uDefMenuFunc.value(nil, { |def, args|
+					chain.units = chain.units ++ [ U( def, args ) ];
 				}, {
 					addLast.background = addBetweenColor;
 				}, \endpoint );

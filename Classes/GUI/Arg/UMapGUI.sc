@@ -138,10 +138,10 @@ UMapGUI : UGUI {
 		umapdragbinInsert.mouseDownAction_({
 			this.makeUMapDefMenu({ |def|
 				(parentUnit !? (_.canUseUMap( unit.unitArgName, def )) ? false) && { def.canInsert };
-			}, { |def|
+			}, { |def, args|
 				unit.stop;
 				UMapSetChecker.stall = true;
-				parentUnit.insertUMap( unit.unitArgName, def );
+				parentUnit.insertUMap( unit.unitArgName, def, args );
 				UMapSetChecker.stall = false;
 			}, {
 				umapdragbinInsert.background = nil;
@@ -176,11 +176,12 @@ UMapGUI : UGUI {
 		};
 
 		umapdragbinReplace.mouseDownAction_({
-			this.makeUMapDefMenu({ |def|
+			this.makeUMapDefMenu({ |def, args|
 				parentUnit !? (_.canUseUMap( unit.unitArgName, def )) ? false;
-			}, { |def|
+			}, { |def, args|
 				unit.stop;
 				unit.def = def;
+				if( args.notNil ) { unit.set( *args ) };
 			}, {
 				umapdragbinReplace.background = nil;
 			}, { |def|
