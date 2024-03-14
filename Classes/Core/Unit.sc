@@ -1390,8 +1390,12 @@ U : ObjectWithArgs {
 
 		umaps.do( _.deactivate );
 
-		if( verbose ) {
-			"% UMaps deactivated\n".postf( umaps.size );
+		if( verbose && { umaps.size > 0 } ) {
+			"% UMap% deactivated for %\n".postf(
+				umaps.size,
+				if( umaps.size > 1 ) { "s" } { "" },
+				this
+			);
 		};
 	}
 

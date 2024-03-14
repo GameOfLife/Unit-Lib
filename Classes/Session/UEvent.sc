@@ -298,9 +298,13 @@ UEvent : UArchivable {
 
 		umaps.do( _.deactivate );
 
-		if( verbose ) {
-			"% UMaps deactivated for %\n".postf( umaps.size, this );
-		};
+		if( verbose && { umaps.size > 0 } ) {
+			"% UMap% deactivated for %\n".postf(
+				umaps.size,
+				if( umaps.size > 1 ) { "s" } { "" },
+				this
+			);
+		}
 	}
 
 	//// UOSCsetter support
