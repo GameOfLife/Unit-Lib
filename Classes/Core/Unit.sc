@@ -1371,7 +1371,7 @@ U : ObjectWithArgs {
 		var umaps;
 
 		umaps = this.selectUMaps({ |umap|
-			umap.def.isKindOf( ValueUMapDef );
+			umap.keys.any(_ == \active);
 		});
 
 		umaps.do( _.set( \active, active ) );
@@ -1381,17 +1381,17 @@ U : ObjectWithArgs {
 		};
 	}
 
-	deactivateUMaps { |active = true, verbose = true|
+	deactivateUMaps { |verbose = true|
 		var umaps;
 
 		umaps = this.selectUMaps({ |umap|
-			umap.def.isKindOf( ValueUMapDef );
+			umap.keys.any(_ == \active) && { umap.active == true }
 		});
 
 		umaps.do( _.deactivate );
 
 		if( verbose ) {
-			"% UMaps set to 'active' = %\n".postf( umaps.size, active );
+			"% UMaps deactivated\n".postf( umaps.size );
 		};
 	}
 

@@ -279,13 +279,27 @@ UEvent : UArchivable {
 		var umaps;
 
 		umaps = this.selectUMaps({ |umap|
-			umap.def.isKindOf( ValueUMapDef );
+			umap.keys.any(_ == \active);
 		});
 
 		umaps.do( _.set( \active, active ) );
 
 		if( verbose ) {
 			"% UMaps set to 'active' = %\n".postf( umaps.size, active );
+		};
+	}
+
+	deactivateUMaps { |verbose = true|
+		var umaps;
+
+		umaps = this.selectUMaps({ |umap|
+			umap.keys.any(_ == \active) && { umap.active == true }
+		});
+
+		umaps.do( _.deactivate );
+
+		if( verbose ) {
+			"% UMaps deactivated for %\n".postf( umaps.size, this );
 		};
 	}
 
