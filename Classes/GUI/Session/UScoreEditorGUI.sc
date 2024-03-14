@@ -128,19 +128,28 @@ UScoreEditorGUI : UAbstractWindow {
             topBar.remove;
             scoreView.remove;
             tranportBar.remove;
-            {
-                if( (this.score.events.size != 0) && (this.score.isDirty) && askForSave ) {
-                    SCAlert( "Do you want to save your score? (" ++ this.score.name ++ ")" ,
-                        [ [ "Don't save" ], [ "Cancel" ], [ "Save" ],[ "Save as"] ],
-						[ 	{ if( UScore.storeRecentScorePaths ) { { URecentScorePaths.fillMenu }.defer(0.1) } },
-                            { UScoreEditorGUI(scoreEditor) },
-                            { this.score.save(nil, {UScoreEditorGUI(scoreEditor)} ) },
-                            { this.score.saveAs(nil,nil, {UScoreEditorGUI(scoreEditor)} ) }
+			{
+				if( (this.score.events.size != 0) && (this.score.isDirty) && askForSave ) {
+					SCAlert( "Do you want to save your score? (" ++ this.score.name ++ ")" ,
+						[ [ "Don't save" ], [ "Cancel" ], [ "Save" ],[ "Save as"] ],
+						[ {
+							this.score.deactivateUMaps;
+							if( UScore.storeRecentScorePaths ) { { URecentScorePaths.fillMenu }.defer(0.1) }
+						},
+						{ UScoreEditorGUI(scoreEditor) },
+						{
+							this.score.save({ this.score.deactivateUMaps; }, {UScoreEditorGUI(scoreEditor)} );
+						},
+						{
+							this.score.saveAs(nil, { this.score.deactivateUMaps; }, {UScoreEditorGUI(scoreEditor)} );
+							this.score.deactivateUMaps;
+						}
 					], background: UChainGUI.skin[ 'SCAlert' ] !? _.background  );
-                } {
-					if( UScore.storeRecentScorePaths ) { { URecentScorePaths.fillMenu }.defer(0.1) }
+				} {
+					if( UScore.storeRecentScorePaths ) { { URecentScorePaths.fillMenu }.defer(0.1) };
+					if( askForSave ) { this.score.deactivateUMaps; };
 				};
-            }.defer(0.1)
+			}.defer(0.1)
         }, UChainGUI.skin.scoreEditorWindow, margin:margin, gap:gap);
         view.addFlowLayout(margin@margin,gap@gap);
         bounds = window.bounds;
