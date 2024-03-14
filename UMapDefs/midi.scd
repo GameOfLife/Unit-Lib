@@ -151,7 +151,7 @@ defs = defs.add(
 		var src, type, chan, num, value;
 		#type, src, chan, num, value = args;
 		if( type === \polytouch ) {
-			if( UMIDIDict.matchEvent( unit.get( \filter );, [ src, type, chan, num ] ) ) {
+			if( UMIDIDict.matchEvent( unit.get( \filter ), [ src, type, chan, num ] ) ) {
 				mapFunc.value( unit, value, unit.get( \fromRange ) );
 			};
 		};
