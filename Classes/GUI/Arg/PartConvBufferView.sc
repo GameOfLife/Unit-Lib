@@ -98,6 +98,8 @@ PartConvBufferView {
 
 	makeView { |parent, bounds, resize|
 
+		var currentSkin;
+
 		if( bounds.isNil ) { bounds= 350 @ (this.class.viewNumLines * (viewHeight + 4)) };
 
 		view = EZCompositeView( parent, bounds, gap: 4@4 );
@@ -105,6 +107,8 @@ PartConvBufferView {
 		view.onClose_({ this.remove; });
 		view.resize_( resize ? 5 );
 		views = ();
+
+		currentSkin = RoundView.skin;
 
 		views[ \path ] = FilePathView( view, bounds.width @ ( (viewHeight * 2) + 4) )
 			.resize_( 2 )
@@ -165,7 +169,8 @@ PartConvBufferView {
 						if( views[ \genWindow ].isNil or: { views[ \genWindow ].isClosed } ) {
 							views[ \genWindow ] = Window( "danstowell", Rect(592, 534, 294, 102) ).front;
 							views[ \genWindow ].addFlowLayout;
-							StaticText( views[ \genWindow ], 50@18 ).string_( "duration" );
+						    RoundView.pushSkin( currentSkin );
+						    StaticText( views[ \genWindow ], 50@18 ).string_( "duration" ).applySkin( RoundView.skin );
 							views[ \genDur ] = SMPTEBox( views[ \genWindow ], 80@18 )
 								.value_(1.3)
 								.applySmoothSkin;
@@ -186,6 +191,8 @@ PartConvBufferView {
 										)
 									});
 								});
+
+						    RoundView.popSkin;
 
 							closeFunc = { views[ \genWindow ] !? (_.close); };
 
@@ -269,7 +276,7 @@ PartConvBufferView {
 				f = this.performPartConvBuffer( \asSoundFile );
 
 				w = Window(f.path, Rect(200, 200, 850, 400), scroll: false);
-				a = SCSoundFileView.new(w, w.view.bounds);
+				a = SoundFileView.new(w, w.view.bounds);
 				a.resize_(5);
 				a.soundfile = f;
 				a.read(0, f.numFrames);
