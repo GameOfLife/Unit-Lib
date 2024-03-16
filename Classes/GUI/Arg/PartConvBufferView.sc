@@ -94,7 +94,7 @@ PartConvBufferView {
 		};
 	}
 
-	*viewNumLines { ^4 }
+	*viewNumLines { ^2 }
 
 	makeView { |parent, bounds, resize|
 
@@ -110,7 +110,7 @@ PartConvBufferView {
 
 		currentSkin = RoundView.skin;
 
-		views[ \path ] = FilePathView( view, bounds.width @ ( (viewHeight * 2) + 4) )
+		views[ \path ] = FilePathView( view, bounds.width @ viewHeight )
 			.resize_( 2 )
 			.action_({ |fv|
 				if( fv.value.notNil && {
@@ -295,13 +295,11 @@ PartConvBufferView {
 
 			});
 
-		view.view.decorator.nextLine;
-
 		views[ \durationLabel ] = StaticText( view, 40 @ viewHeight )
 			.applySkin( RoundView.skin ? () )
 			.string_( "duration" );
 
-		views[ \duration ] = StaticText( view, (bounds.width - 88) @ viewHeight )
+		views[ \duration ] = StaticText( view, (bounds.width - 88 - 84) @ viewHeight )
 			.resize_( 2 )
 			.applySkin( RoundView.skin ? () );
 

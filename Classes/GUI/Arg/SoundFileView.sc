@@ -111,7 +111,8 @@ BufSndFileView {
 		views[ \rateRatio ].value = inSndFile.rate;
 		views[ \rateSemitones ].value = inSndFile.rate.ratiomidi.round( 1e-6);
 
-		{ views[ \numChannels ].string = "% channel%".format(
+		{ views[ \numChannels ].string = " % (% channel%)".format(
+			    inSndFile.fileDuration.asSMPTEString(1000),
 				inSndFile.numChannels,
 				if( inSndFile.numChannels == 1 ) { "" } { "s" }
 			)
@@ -126,7 +127,7 @@ BufSndFileView {
 				views[ \startFrame ].visible_( false );
 				views[ \endSecond ].visible_( true );
 				views[ \endFrame ].visible_( false );
-				{ views[ \timeMode ].value = 0 }.defer;
+				{ views[ \timeMode ].string = " s" }.defer;
 
 			},
 			$f, { // \frames
@@ -134,7 +135,7 @@ BufSndFileView {
 				views[ \startFrame ].visible_( true );
 				views[ \endSecond ].visible_( false );
 				views[ \endFrame ].visible_( true );
-				{ views[ \timeMode ].value = 1 }.defer;
+				{ views[ \timeMode ].string = " smp" }.defer;
 			}
 		);
 	}
@@ -144,12 +145,12 @@ BufSndFileView {
 			$r, { // \ratio
 				views[ \rateRatio ].visible_( true );
 				views[ \rateSemitones ].visible_( false );
-				{ views[ \rateMode ].value = 0 }.defer;
+				{ views[ \rateMode ].string = " ratio" }.defer;
 			},
 			$s, {
 				views[ \rateRatio ].visible_( false );
 				views[ \rateSemitones ].visible_( true );
-				{ views[ \rateMode ].value = 1 }.defer;
+				{ views[ \rateMode ].string = " semitones" }.defer;
 			}
 		);
 	}
@@ -162,7 +163,6 @@ BufSndFileView {
 		{
 			views[ \startLabel ].font = font;
 			views[ \timeMode ].font = font;
-			views[ \loopLabel ].font = font;
 			views[ \rateLabel ].font = font;
 			views[ \rateMode ].font = font;
 		}.defer;
@@ -191,7 +191,7 @@ BufSndFileView {
 		};
 	}
 
-	*viewNumLines { ^6 }
+	*viewNumLines { ^4 }
 
 	makeView { |parent, bounds, resize|
 		var globalDepFunc, updGlobal;
@@ -206,7 +206,7 @@ BufSndFileView {
 		view.resize_( resize ? 5 );
 		views = ();
 
-		views[ \path ] = FilePathView( view, bounds.width @ ( (viewHeight * 2) + 4) )
+		views[ \path ] = FilePathView( view, bounds.width @ viewHeight )
 			.resize_( 2 )
 			.action_({ |fv|
 				this.performSndFile( \path_ , fv.value );
@@ -214,90 +214,11 @@ BufSndFileView {
 				action.value( this );
 			});
 
-		views[ \operations ] = PopUpMenu( view, 80 @ viewHeight )
+		views[ \numChannels ] = StaticText( view, 62 + 84 @ viewHeight )
 			.applySkin( RoundView.skin ? () )
-			.items_( [
-				"operations",
-				"",
-				"reveal in Finder",
-				"move to..",
-				"copy to..",
-				"save as.."
-			] )
-			.action_({ |pu|
-				var pth, ext;
-				switch( pu.value.asInteger,
-					2, {  // reveal in Finder
-						pth = this.performSndFile( \path );
-						if( pth.notNil ) {
-							pth.getGPath.asPathFromServer.revealInFinder;
-						};
-					},
-					3, { // move to..
-						pth = this.performSndFile( \path );
-						if( pth.notNil ) {
-							pth = pth.getGPath;
-							if( pth[..6] == "sounds/" ) {
-								"can't move %, try copying instead\n".postf( pth.quote );
-							};
-							ULib.savePanel({ |path|
-								var res, newName;
-								newName = path.dirname +/+ pth.basename;
-								if( File.exists( newName ).not ) {
-									res = pth.getGPath.asPathFromServer.moveTo( path.dirname );
-									if( res ) {
-										this.performSndFile( \path_ ,
-											newName
-										);
-									};
-								} {
-									"file % already exists, changing url".postf( pth.quote );
-									this.performSndFile( \path_ ,
-										path.dirname +/+ pth.basename
-									);
-								};
-							});
-						};
-					},
-					4, { // copy to..
-						pth = this.performSndFile( \path );
-						if( pth.notNil ) {
-							ULib.savePanel({ |path|
-								var res, newName;
-								newName = path.dirname +/+ pth.basename;
-								if( File.exists( newName ).not ) {
-									res = pth.getGPath.asPathFromServer.copyTo( path.dirname );
-									if( res ) {
-										this.performSndFile( \path_ ,
-											path.dirname +/+ pth.basename
-										);
-									};
-								} {
-									"file % already exists, changing url".postf( pth.quote );
-									this.performSndFile( \path_ ,
-										path.dirname +/+ pth.basename
-									);
-								};
-							});
-						};
-					},
-					5, { // save as..
-						pth = this.performSndFile( \path );
-						if( pth.notNil ) {
-							ext = pth.extension;
-							Dialog.savePanel({ |path|
-								var res;
-								path =  path.replaceExtension( ext );
-								res = pth.getGPath.asPathFromServer.copyFile( path );
-								if( res ) {
-									this.performSndFile( \path_ , path );
-								};
-							});
-						};
-					}
-				);
-				pu.value = 0;
-			});
+			.string_( "" );
+
+		view.view.decorator.shift( (bounds.width - 44) - 190, 0 );
 
 		views[ \plot ] = SmoothButton( view, 40 @ viewHeight )
 			.radius_( 3 )
@@ -343,12 +264,6 @@ BufSndFileView {
 
 			});
 
-		views[ \numChannels ] = StaticText( view, 62 @ viewHeight )
-			.applySkin( RoundView.skin ? () )
-			.string_( "" );
-
-		view.view.decorator.shift( (bounds.width - 44) - 190, 0 );
-
 		views[ \hasGlobal ] = SmoothButton( view, 40 @ viewHeight )
 				.radius_( 3 )
 				.border_( 1 )
@@ -374,7 +289,7 @@ BufSndFileView {
 			.applySkin( RoundView.skin ? () )
 			.string_( "trim" );
 
-		views[ \startComp ] = CompositeView( view, (((bounds.width - 73)/2)-2) @ viewHeight )
+		views[ \startComp ] = CompositeView( view, (((bounds.width - 73)/2).floor-2) @ viewHeight )
 			.resize_( 2 );
 
 		views[ \startSecond ] = SMPTEBox( views[ \startComp ],
@@ -398,7 +313,7 @@ BufSndFileView {
 			})
 			.visible_( false );
 
-		views[ \endComp ] = CompositeView( view, (((bounds.width - 73)/2).floor-2) @ viewHeight )
+		views[ \endComp ] = CompositeView( view, (((bounds.width - 73)/2)-2) @ viewHeight )
 			.resize_( 2 );
 
 		views[ \endSecond ] = SMPTEBox( views[ \endComp ],
@@ -422,19 +337,23 @@ BufSndFileView {
 			})
 			.visible_( false );
 
-		views[ \timeMode ] = PopUpMenu( view, 40 @ viewHeight )
-			.applySkin( RoundView.skin ? ())
-			.items_( [ "s", "smp" ] )
-			.resize_( 3 )
-			.action_({ |pu|
-				this.class.timeMode = [ \seconds, \frames ][ pu.value ];
-			});
+		views[ \timeMode ] = StaticText( view, 40 @ viewHeight )
+		.applySkin( RoundView.skin ? ())
+		.string_( " smp" )
+		.background_( Color.white.alpha_(0.25) )
+		.resize_( 3 )
+		.mouseDownAction_({
+			Menu(
+				MenuAction( "seconds", { this.class.timeMode =  \seconds }),
+				MenuAction( "frames", { this.class.timeMode =  \frames })
+			).front;
+		});
 
 		views[ \rateLabel ] = StaticText( view, 25 @ viewHeight )
 			.applySkin( RoundView.skin ? () )
 			.string_( "rate" );
 
-		views[ \rateComp ] = CompositeView( view, (bounds.width - 113) @ viewHeight )
+		views[ \rateComp ] = CompositeView( view, (((bounds.width - 73)/2).floor-2) @ viewHeight )
 			.resize_( 2 );
 
 		views[ \rateRatio ] = SmoothNumberBox( views[ \rateComp ],
@@ -457,24 +376,24 @@ BufSndFileView {
 			})
 			.visible_( false );
 
-		views[ \rateMode ] = PopUpMenu( view, 80 @ viewHeight )
-			.applySkin( RoundView.skin ? () )
-			.items_( [ "ratio", "semitones" ] )
-			.resize_( 3 )
-			.action_({ |pu|
-				this.class.rateMode = [ \ratio, \semitones ][ pu.value ];
-			});
+		views[ \rateMode ] = StaticText( view, (((bounds.width - 73)/2)-2) @ viewHeight )
+		.applySkin( RoundView.skin ? ())
+		.string_( " ratio" )
+		.background_( Color.white.alpha_(0.25) )
+		.resize_( 3 )
+		.mouseDownAction_({
+			Menu(
+				MenuAction( "ratio", { this.class.rateMode =  \ratio }),
+				MenuAction( "semitones", { this.class.rateMode =  \semitones })
+			).front;
+		});
 
-		views[ \loopLabel ] = StaticText( view, 25 @ viewHeight )
-			.applySkin( RoundView.skin )
-			.string_( "loop" );
-
-		views[ \loop ] = SmoothButton( view, viewHeight @ viewHeight )
+		views[ \loop ] = SmoothButton( view, 40 @ viewHeight )
 			.radius_( 3 )
 			.border_( 1 )
 			.resize_( 3 )
-		    .hiliteColor_( RoundView.skin.hiliteColor ?? { Color.black.alpha_(0.33) } )
-			.label_( [ "", 'x' ] )
+		    //.hiliteColor_( RoundView.skin.hiliteColor ?? { Color.black.alpha_(0.33) } )
+		    .label_( [ "loop", "loop" ] )
 			.action_({ |bt|
 				this.performSndFile( \loop_ , bt.value.booleanValue );
 				action.value( this );
