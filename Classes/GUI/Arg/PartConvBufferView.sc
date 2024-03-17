@@ -77,9 +77,7 @@ PartConvBufferView {
 			{ Font( Font.defaultSansFace, 10 ) };
 
 		{
-			views[ \durationLabel ].font = font;
 			views[ \duration ].font = font;
-			views[ \operations ].font = font;
 		}.defer;
 
 		views[ \path ].font = font;
@@ -138,132 +136,62 @@ PartConvBufferView {
 				};
 			});
 
-		views[ \operations ] = PopUpMenu( view, 80 @ viewHeight )
-			.applySkin( RoundView.skin ? () )
-			.items_( [
-				"operations",
-				"",
-				"convert ir file",
-				"generate danstowell",
-				"",
-				"reveal in Finder",
-				"move to..",
-				"copy to..",
-				"save as.."
-			] )
-			.action_({ |pu|
-				var pth, ext, closeFunc;
-				switch( pu.value.asInteger,
-					2, { // convert ir file
-						CocoaDialog.getPaths({ |paths|
-							PartConvBuffer.convertIRFile( paths[0],
-								server: ULib.servers,
-								action: { |path|
-									views[ \path ].value = path;
-									views[ \path ].doAction
-								}
-							)
-						});
-					},
-					3, { // generate danstowell
-						if( views[ \genWindow ].isNil or: { views[ \genWindow ].isClosed } ) {
-							views[ \genWindow ] = Window( "danstowell", Rect(592, 534, 294, 102) ).front;
-							views[ \genWindow ].addFlowLayout;
-						    RoundView.pushSkin( currentSkin );
-						    StaticText( views[ \genWindow ], 50@18 ).string_( "duration" ).applySkin( RoundView.skin );
-							views[ \genDur ] = SMPTEBox( views[ \genWindow ], 80@18 )
-								.value_(1.3)
-								.applySmoothSkin;
-							SmoothButton( views[ \genWindow ], 80@18 )
-								.border_(1)
-								.extrude_(false)
-								.label_( "generate" )
-								.action_({
-									Dialog.savePanel({ |path|
-										PartConvBuffer.convertIRFile(
-											PartConvBuffer.generateDanStowelIR( views[ \genDur ].value ),
-											path.replaceExtension( "partconv" ),
-											ULib.servers,
-											{ |path|
-												views[ \path ].value = path;
-												views[ \path ].doAction
-											}
-										)
-									});
-								});
+		views[ \duration ] = StaticText( view, (bounds.width - 44 - 84) @ viewHeight )
+			.resize_( 2 )
+			.applySkin( RoundView.skin ? () );
 
-						    RoundView.popSkin;
+		views[ \danStowel ] = SmoothButton( view, 80 @ viewHeight )
+		.radius_( 3 )
+		.resize_( 3 )
+		.label_( "generate" )
+		.action_({
+			var closeFunc;
+			// generate danstowell
+			if( views[ \genWindow ].isNil or: { views[ \genWindow ].isClosed } ) {
+				views[ \genWindow ] = Window( "danstowell", Rect(592, 534, 294, 102) ).front;
+				views[ \genWindow ].addFlowLayout;
+				RoundView.pushSkin( currentSkin );
+				StaticText( views[ \genWindow ], 50@18 ).string_( "duration" ).applySkin( RoundView.skin );
+				views[ \genDur ] = SMPTEBox( views[ \genWindow ], 80@18 )
+				.value_(1.3)
+				.applySmoothSkin;
+				SmoothButton( views[ \genWindow ], 80@18 )
+				.border_(1)
+				.extrude_(false)
+				.label_( "generate" )
+				.action_({
+					Dialog.savePanel({ |path|
+						PartConvBuffer.convertIRFile(
+							PartConvBuffer.generateDanStowelIR( views[ \genDur ].value ),
+							path.replaceExtension( "partconv" ),
+							ULib.servers,
+							{ |path|
+								views[ \path ].value = path;
+								views[ \path ].doAction
+							}
+						)
+					});
+				});
 
-							closeFunc = { views[ \genWindow ] !? (_.close); };
+				RoundView.popSkin;
 
-							views[ \operations ].onClose = views[ \operations ].onClose.addFunc( closeFunc );
+				closeFunc = { views[ \genWindow ] !? (_.close); };
 
-							views[ \genWindow ].onClose = {
-								views[ \operations ].onClose.removeFunc( closeFunc );
-								views[ \genWindow ] = nil;
-							};
-						} {
-							views[ \genWindow ].front;						};
-					},
-					5, {  // reveal in Finder
-						pth = this.performPartConvBuffer( \path );
-						if( pth.notNil ) {
-							pth.getGPath.asPathFromServer.revealInFinder;
-						};
-					},
-					6, { // move to..
-						pth = this.performPartConvBuffer( \path );
-						if( pth.notNil ) {
-							pth = pth.getGPath;
-							if( pth[..6] == "sounds/" ) {
-								"can't move %, try copying instead\n".postf( pth.quote );
-							};
-							Dialog.savePanel({ |path|
-								var res;
-								res = pth.asPathFromServer.moveTo( path.dirname );
-								if( res ) {
-									this.performPartConvBuffer( \path_ ,
-										path.dirname +/+ pth.basename
-									);
-								};
-							});
-						};
-					},
-					7, { // copy to..
-						pth = this.performPartConvBuffer( \path );
-						if( pth.notNil ) {
-							Dialog.savePanel({ |path|
-								var res;
-								res = pth.getGPath.asPathFromServer.copyTo( path.dirname );
-								if( res ) {
-									this.performPartConvBuffer( \path_ ,
-										path.dirname +/+ pth.basename
-									);
-								};
-							});
-						};
-					},
-					8, { // save as..
-						pth = this.performPartConvBuffer( \path );
-						if( pth.notNil ) {
-							ext = pth.extension;
-							Dialog.savePanel({ |path|
-								var res;
-								path =  path.replaceExtension( ext );
-								res = pth.getGPath.asPathFromServer.copyFile(  path );
-								if( res ) {
-									this.performPartConvBuffer( \path_ , path );
-								};
-							});
-						};
-					}
-				);
-				pu.value = 0;
-			});
+				views[ \danStowel ].onClose = views[ \danStowel ].onClose.addFunc( closeFunc );
+
+				views[ \genWindow ].onClose = {
+					views[ \danStowel ].onClose.removeFunc( closeFunc );
+					views[ \genWindow ] = nil;
+				};
+			} {
+				views[ \genWindow ].front;
+			};
+
+		});
+
 
 		views[ \plot ] = SmoothButton( view, 40 @ viewHeight )
 			.radius_( 3 )
-			.border_( 1 )
 			.resize_( 3 )
 			.label_( "plot" )
 			.action_({ |bt|
@@ -295,13 +223,6 @@ PartConvBufferView {
 
 			});
 
-		views[ \durationLabel ] = StaticText( view, 40 @ viewHeight )
-			.applySkin( RoundView.skin ? () )
-			.string_( "duration" );
-
-		views[ \duration ] = StaticText( view, (bounds.width - 88 - 84) @ viewHeight )
-			.resize_( 2 )
-			.applySkin( RoundView.skin ? () );
 
 		this.setFont;
 	}
