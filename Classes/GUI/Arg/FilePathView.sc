@@ -28,20 +28,26 @@ FilePathView {
 	var <>defaultStringColor;
 	var <font;
 
-	*new { |parent, bounds, filePath|
+	*new { |parent, bounds|
 		^super.new.makeView( parent, bounds );
 	}
 
 	*viewNumLines { ^1 }
 
+	makeString { |inPath|
+		if( inPath.size == 0 ) { inPath = nil };
+		^(inPath ? "(no file)").asString
+	}
+
 	setViews { |inPath|
+		var string = this.makeString( inPath );
 		{
-			if( (inPath ? "").bounds( font ).width > views[ \filePath ].bounds.width ) {
+			if( string.bounds( font ).width > views[ \filePath ].bounds.width ) {
 				views[ \filePath ].align_( \right );
 			} {
 				views[ \filePath ].align_( \center );
 			};
-			views[ \filePath ].string = (inPath ? "(no file)").asString ++ " ";
+			views[ \filePath ].string = string ++ " ";
 		}.defer;
 	}
 
@@ -80,6 +86,96 @@ FilePathView {
 
 	doAction { action.value( this ) }
 
+	canReceiveDragHandler {
+		^{ |vw| View.currentDrag.class == String }
+	}
+
+	browse { |action|
+		this.browseSingle( action );
+	}
+
+	browseSingle { |action|
+		ULib.openPanel( { |path|
+			action.value( path );
+		}, multipleSelection: false);
+	}
+
+	copyOrMove { |pth, mode = \copy, action, toPath| // \copy, \move, \saveAs
+		var func;
+		func = { |path|
+			var res, newName;
+			if( mode != \saveAs ) {
+				newName = path.dirname +/+ pth.basename;
+			} {
+				newName = path.replaceExtension( pth.extension );
+			};
+			if( File.exists( newName ).not ) {
+				if( mode != \move ) {
+					File.copy( pth.getGPath.asPathFromServer, newName );
+				} {
+					pth.getGPath.asPathFromServer.moveTo( path.dirname );
+				};
+				action.value( newName );
+			} {
+				"file % already exists, changing url".postf( newName.quote );
+				action.value( newName );
+			};
+		};
+		if( pth.notNil && { pth.size > 0 } ) {
+			if( toPath.isNil ) {
+				ULib.savePanel( func );
+			} {
+				func.value( toPath );
+			};
+		};
+	}
+
+	makeMenu {
+		var setAction = { |pth| this.value = pth; action.value( this ) };
+		Menu(
+			MenuAction( "Browse...", {
+				this.browse( setAction );
+			}),
+			MenuAction( this.value, {
+				SCRequestString( this.value, "Please enter file path:", { |string|
+					setAction.value( string.standardizePath );
+				})
+			}),
+			MenuAction.separator( "Operations" ),
+			MenuAction( "Show file in Finder", {
+				this.value.getGPath.asPathFromServer.dirname.openOS;
+			}).enabled_( this.value.notNil ),
+			MenuAction( "Move file to...", {
+				this.copyOrMove( this.value, \move, setAction);
+			}).enabled_( this.value.notNil && { this.value[..10] != "@resources/" } ),
+			MenuAction( "Copy file to...", {
+				this.copyOrMove( this.value, \copy, setAction);
+			}).enabled_( this.value.notNil ),
+			MenuAction( "Save file as...", {
+				this.copyOrMove( this.value, \saveAs, setAction);
+			}).enabled_( this.value.notNil ),
+			MenuAction.separator( "Clipboard" ),
+			MenuAction( "Copy pathname", {
+				if( thisProcess.platform.name === \osx ) {
+					"echo \"%\" | pbcopy".format( this.value.cs.escapeChar($") ).unixCmd;
+				} {
+					this.class.clipboard = this.value
+				};
+			}),
+			MenuAction( "Paste pathname", {
+				var res;
+				if( thisProcess.platform.name === \osx ) {
+					res = { "pbpaste".unixCmdGetStdOut.interpret }.try;
+					if( res.isKindOf( String ) ) { setAction.value( res ); };
+				} {
+					if( this.class.clipboard.notNil ) {
+						setAction.value( this.class.clipboard );
+					};
+				};
+			}),
+		).front;
+	}
+
 	makeView { |parent, bounds, resize|
 
 		defaultStringColor = RoundView.skin.stringColor ?? { Color.black };
@@ -96,110 +192,12 @@ FilePathView {
 		.align_( \center )
 		.resize_( 2 )
 		.background_( Color.white.alpha_(0.25) )
-		.canReceiveDragHandler_({ |vw| View.currentDrag.class == String })
+		.canReceiveDragHandler_( this.canReceiveDragHandler )
 		.receiveDragHandler_({ |vw|
 			this.value = View.currentDrag;
 			action.value( this );
 		})
-		.mouseDownAction_({
-			Menu(
-				MenuAction( "Browse...", {
-					ULib.openPanel( { |path|
-						this.value = path;
-						action.value( this );
-					}, multipleSelection: false);
-				}),
-				MenuAction( this.value, {
-					SCRequestString( this.value, "Please enter file path:", { |string|
-						this.value = string.standardizePath;
-						action.value( this );
-					})
-				}),
-				MenuAction.separator( "Operations" ),
-				MenuAction( "Show file in Finder", {
-					this.value.getGPath.asPathFromServer.dirname.openOS;
-				}),
-				MenuAction( "Move file to...", {
-					var pth = this.value;
-					if( pth.notNil && { pth.size > 0 } ) {
-						ULib.savePanel({ |path|
-							var res, newName;
-							newName = path.dirname +/+ pth.basename;
-							if( File.exists( newName ).not ) {
-								res = pth.getGPath.asPathFromServer.moveTo( path.dirname );
-								if( res ) {
-									this.value = newName;
-									action.value( this );
-								};
-							} {
-								"file % already exists, changing url".postf( newName.quote );
-								this.value = path.dirname +/+ pth.basename;
-								action.value( this );
-							};
-						});
-					};
-				}).enabled_( this.value.notNil && { this.value[..10] != "@resources/" } ),
-				MenuAction( "Copy file to...", {
-					var pth = this.value;
-					if( pth.notNil && { pth.size > 0 } ) {
-						ULib.savePanel({ |path|
-							var newName;
-							newName = path.dirname +/+ pth.basename;
-							if( File.exists( newName ).not ) {
-								File.copy( pth.getGPath.asPathFromServer, newName );
-								this.value = newName;
-								action.value( this );
-							} {
-								"file % already exists, changing url".postf( newName.quote );
-								this.value = path.dirname +/+ pth.basename;
-								action.value( this );
-							};
-						});
-					};
-				}).enabled_( this.value.notNil ),
-				MenuAction( "Save file as...", {
-					var pth = this.value;
-					if( pth.notNil && { pth.size > 0 } ) {
-						ULib.savePanel({ |path|
-							var newName;
-							newName = path.replaceExtension( pth.extension );
-							if( File.exists( newName ).not ) {
-								File.copy( pth.getGPath.asPathFromServer, newName );
-								this.value = newName;
-								action.value( this );
-							} {
-								"file % already exists, changing url".postf( newName.quote );
-								this.value = path.dirname +/+ pth.basename;
-								action.value( this );
-							};
-						});
-					};
-				}).enabled_( this.value.notNil ),
-				MenuAction.separator( "Clipboard" ),
-				MenuAction( "Copy pathname", {
-					if( thisProcess.platform.name === \osx ) {
-						"echo \"%\" | pbcopy".format( this.value.cs.escapeChar($") ).unixCmd;
-					} {
-						this.class.clipboard = this.value
-					};
-				}),
-				MenuAction( "Paste pathname", {
-					var res;
-					if( thisProcess.platform.name === \osx ) {
-						res = { "pbpaste".unixCmdGetStdOut.interpret }.try;
-						if( res.isKindOf( String ) ) {
-							this.value = res;
-							action.value( this );
-						};
-					} {
-						if( this.class.clipboard.notNil ) {
-							this.value = this.class.clipboard;
-							action.value( this );
-						};
-					};
-				}),
-			).front;
-		});
+		.mouseDownAction_({ this.makeMenu });
 
 		views[ \filePath ].setProperty(\wordWrap, false);
 
@@ -208,14 +206,140 @@ FilePathView {
 			.border_(0)
 			.resize_( 3 )
 			.label_( 'folder' )
-			.action_({
-				ULib.openPanel( { |path|
-				  this.value = path;
-				  action.value( this );
-				}, multipleSelection: false);
-			});
+		    .action_({ this.browse({ |pth| this.value = pth; action.value( this ); }) });
 
 		this.setFont;
 	}
+
+}
+
+MultiFilePathView : FilePathView {
+
+	var <>fixedSize = true;
+
+	makeString { |inPaths|
+		if( inPaths.isString ) { inPaths = [ inPaths ] };
+		if( inPaths.every({ |item| item == inPaths.first }) ) {
+			if( inPaths.first.size == 0 ) {
+				^"(no files)";
+			} {
+				^inPaths.first.asString + "(% files)".format( inPaths.size );
+			}
+		} {
+			^"(mixed, % files)".format( inPaths.size );
+		};
+	}
+
+	canReceiveDragHandler { ^false }
+
+	browse { |action|
+		ULib.openPanel( { |paths|
+			var newVal, string, single = false;
+			if( this.fixedSize && { paths.size < (this.value.size) } ) {
+
+				string = "You selected % for % units.\n" ++
+				"Use only for the first %,\n" ++
+				"or % for all?";
+
+				if( paths.size == 1 ) {
+					string = string.format( "one file", this.value.size, "unit", "the same" )
+				} {
+					string = string.format(
+						"% files".format( paths.size ), this.value.size,
+						"% units".format( paths.size ), "wrap around"
+					);
+				};
+
+				SCAlert( string,
+					[ "cancel", "first %".format( paths.size ), "all" ],
+					[ {}, {
+						newVal = this.value;
+						paths = paths[..newVal.size-1];
+						paths.do({ |item, i|
+							newVal[i] = item;
+						});
+						action.value( newVal );
+					}, {
+						action.value(
+							this.value.collect({ |item, i|
+								paths.wrapAt(i);
+							})
+						)
+					} ]
+				);
+			} {
+				action.value( paths[..this.value.size-1] );
+			};
+		}, multipleSelection: true);
+	}
+
+	makeMenu {
+		var setSingle = { |pth, index = 0|
+			this.value[ index ] = pth;
+			this.value = this.value;
+			action.value( this );
+		};
+		Menu(
+			MenuAction( "Browse...", {
+				this.browse({ |paths| this.value = paths; action.value( this ) });
+			}),
+			Menu(
+				*this.value.collect({ |pth, i|
+					var menu = Menu(
+						MenuAction( "Browse...", {
+							this.browseSingle( { |px| setSingle.value( px, i ) } );
+						}),
+						MenuAction( "Enter String...", {
+							SCRequestString( pth, "Please enter file path:", { |string|
+								setSingle.value( string.standardizePath, i )
+							});
+						}),
+						MenuAction.separator( "Operations" ),
+						MenuAction( "Show file in Finder", {
+							pth.getGPath.asPathFromServer.dirname.openOS;
+						}).enabled_( pth.notNil ),
+						MenuAction( "Move file to...", {
+							this.copyOrMove( pth, \move, { |px| setSingle.value( px, i ) } );
+						}).enabled_( pth.notNil && { pth[..10] != "@resources/" } ),
+						MenuAction( "Copy file to...", {
+							this.copyOrMove( pth, \copy, { |px| setSingle.value( px, i ) } );
+						}).enabled_( pth.notNil ),
+						MenuAction( "Save file as...", {
+							this.copyOrMove( pth, \saveAs, { |px| setSingle.value( px, i ) } );
+						}).enabled_( pth.notNil ),
+					).title_( "%: %".format( i, pth ) );
+					if( fixedSize == false ) {
+						menu.addAction( MenuAction.separator );
+						menu.addAction( MenuAction( "Remove", {
+							this.value.removeAt( i );
+							this.value = this.value;
+							action.value( this );
+						}) );
+						menu.addAction( MenuAction( "Add...", {
+							this.browseSingle({ |px|
+								this.value = this.value.insert( i, px );
+								action.value( this );
+							});
+						}) );
+					};
+					menu;
+				});
+			).title_( "Pathnames (% files)".format( this.value.size ) ),
+			MenuAction.separator,
+			MenuAction( "Copy all files to...", {
+				ULib.savePanel({ |path|
+					this.value.do({ |px, i|
+						this.copyOrMove( px, \copy, { |pth|
+							this.value[ i ] = pth;
+						}, path );
+					});
+					this.value = this.value;
+					action.value( this );
+				});
+			}).enabled_( this.value.notNil ),
+		).front;
+	}
+
+
 
 }
