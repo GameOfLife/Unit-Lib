@@ -2,7 +2,6 @@
 \soundIn
 
 Read sound from a hardware audio input.
-WFSCollider users: This unit will only get sound input on the master server. To send the sound to the rendering servers, use a \wfsMasterOut unit, and a new UChain starting with a \wfsServerIn.
 
 bus: the bus that you want to use to read audio from. Starts counting from 0; 0 means the first input of your audio device.
 numChannels: number of channels (*).
