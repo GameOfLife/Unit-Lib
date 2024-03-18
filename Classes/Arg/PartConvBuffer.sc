@@ -133,6 +133,19 @@ PartConvBuffer : AbstractRichBuffer {
 				action.value( res );
 			}.fork;
 		} {
+			{
+				var cond = Condition( false ), res;
+				inPath.collect({ |pth, i|
+					cond.test = false;
+					this.convertIRFile( pth, outPath !? _[i], server, { |rs|
+						res = res.add( rs );
+						cond.test = true;
+						cond.signal;
+					});
+					cond.wait;
+				});
+				action.value( res );
+			}.fork;
 		}
 	}
 

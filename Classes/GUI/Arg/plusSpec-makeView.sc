@@ -2238,15 +2238,18 @@
 		var font;
 		var editAction;
 		var viewHeight;
+		var currentSkin;
 		vws = ();
 
 		font =  (RoundView.skin ? ()).font ?? { Font( Font.defaultSansFace, 10 ); };
+
+		currentSkin = RoundView.skin;
 
 		bounds.isNil.if{bounds= 350 @ (this.viewNumLines * 18) };
 
 		viewHeight = (bounds.height / this.viewNumLines).floor - 2;
 
-		view = EZCompositeView( parent, bounds, gap: 2@2 );
+		view = EZCompositeView( parent, bounds, gap: 4@4 );
 		bounds = view.asView.bounds;
 
 		vws[ \view ] = view;
@@ -2328,7 +2331,7 @@
 		view.view.decorator.nextLine;
 		view.view.decorator.shift( labelWidth, 0 );
 
-		vws[ \amount ] = StaticText( view, 60 @ viewHeight )
+		vws[ \amount ] = StaticText( view, (bounds.width - 44 - 84 - labelWidth) @ viewHeight )
 			.applySkin( RoundView.skin )
 			.font_( font );
 
@@ -2339,6 +2342,65 @@
 				{ vws[ \amount ].string = " % files".format( value.size ); }.defer;
 			};
 		};
+
+		vws[ \danStowel ] = SmoothButton( view, 80 @ viewHeight )
+		.radius_( 3 )
+		.resize_( 3 )
+		.label_( "generate" )
+		.action_({
+			var closeFunc;
+			// generate danstowell
+			if( vws[ \genWindow ].isNil or: { vws[ \genWindow ].isClosed } ) {
+				vws[ \genWindow ] = Window( "danstowell (%)".format( vws[\val].size ), Rect(592, 534, 294, 102) ).front;
+				vws[ \genWindow ].addFlowLayout;
+
+				RoundView.pushSkin( currentSkin );
+
+				StaticText( vws[ \genWindow ], 50@18 ).string_( "duration" ).applySkin( RoundView.skin );
+				vws[ \genDur ] = SMPTEBox( vws[ \genWindow ], 80@18 )
+				.value_(1.3)
+				.applySmoothSkin;
+				SmoothButton( vws[ \genWindow ], 80@18 )
+				.border_(1)
+				.extrude_(false)
+				.label_( [ "generate" ] )
+				.action_({
+					Dialog.savePanel({ |path|
+						{ vws[ \genWindow ].name = "danstowel (generating)"; }.defer;
+						path = path.removeExtension;
+						PartConvBuffer.convertIRFileMulti(
+							vws[ \val ].size.collect({
+								PartConvBuffer.generateDanStowelIR( vws[ \genDur ].value )
+							}),
+							vws[ \val ].size.collect({ |i|
+								path ++ "_%.partconv".format(i);
+							}),
+							ULib.servers,
+							{ |paths|
+								vws[ \val ] = paths.collect({ |pth| PartConvBuffer.new( pth ) });
+								action.value( vws, vws[ \val ] );
+								{ closeFunc.value; }.defer;
+							}
+						);
+					});
+				});
+
+				RoundView.popSkin;
+
+				closeFunc = { vws[ \genWindow ] !? (_.close); };
+
+				vws[ \danStowel ].onClose = vws[ \danStowel ].onClose.addFunc( closeFunc );
+
+				vws[ \genWindow ].onClose = {
+					vws[ \danStowel ].onClose.removeFunc( closeFunc );
+					vws[ \genWindow ] = nil;
+				};
+			} {
+				vws[ \genWindow ].front;
+			};
+
+		});
+
 
 		^vws;
 	}
