@@ -23,5 +23,5 @@ MultiChannelUdef( \selectChannel, {
 	fadeTime = \fadeTime.ukr( 0, 0, 1, \lin );
 	in = UIn.ar( 0, Udef.numChannels, true );
 	UOut.ar( 0, SelectCF.ar( index, in, fadeTime ) );
-}, channels: [ 2,3,4,5,6,7,8 ])
+}, channels: [ 2,3,4,5,6,7,8,10,12,16,24,32])
 	.category_( \utility )
