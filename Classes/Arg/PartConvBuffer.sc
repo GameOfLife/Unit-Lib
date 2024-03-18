@@ -79,6 +79,59 @@ PartConvBuffer : AbstractRichBuffer {
 		};
 	}
 
+	*convertIRFileMulti { |inPath, outPath, server, action|
+		var sf, test;
+		case { inPath.isString } {
+			sf = SoundFile.new;
+			test = sf.openRead( inPath.getGPath.asPathFromServer );
+			sf.close; // close if it wasn't ope
+			if( test == true ) {
+				{
+					var cond = Condition( false ), res;
+					var channelnames;
+					case { inPath.find("OSD.SDIR").notNil } {
+						channelnames = #[ l, r, lc, rc, lm, rm, ls, rs, c, cs ][..sf.numChannels-1];
+					} { inPath.find("OBF.SDIR").notNil } {
+						channelnames = #[ w, x, y, z ][..sf.numChannels-1];
+					} {
+						channelnames = (..sf.numChannels-1);
+					};
+					res = channelnames.collect({ |name, ch|
+						var outPth;
+						cond.test = false;
+						outPth =(outPath ?? { inPath.replaceExtension( "partconv" ) }).getGPath;
+						outPth = outPth.split($.);
+						outPth[ outPth.size - 2 ] = outPth[ outPth.size - 2 ] ++ "_%".format( name );
+						outPth = outPth.join( "." );
+						this.convertIRFile( inPath, outPth, server, {
+							cond.test = true; cond.signal;
+						}, ch);
+						cond.wait;
+						outPth;
+					});
+					action.value( res );
+				}.fork;
+			} {
+				"PartConvBuffer.convertIRFileMulti: can't open file %\n".postf( inPath );
+			};
+		} { inPath.isArray && { inPath[0].isString } } {
+			{
+				var cond = Condition( false ), res;
+				inPath.collect({ |pth, i|
+					cond.test = false;
+					this.convertIRFileMulti( pth, outPath !? _[i], server, { |rs|
+						res = res.addAll( rs );
+						cond.test = true;
+						cond.signal;
+					});
+					cond.wait;
+				});
+				action.value( res );
+			}.fork;
+		} {
+		}
+	}
+
 
 	*convertIRFile { |inPath, outPath, server, action, channel = 0|
 		var i = 0;

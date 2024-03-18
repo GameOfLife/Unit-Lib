@@ -225,6 +225,22 @@
 
 }
 
++ PartConvBufferSpec {
+
+	massEditSpec { |inArray|
+		^MultiPartConvBufferSpec(inArray, true );
+	}
+
+	massEditValue { |inArray|
+		^inArray
+	}
+
+	massEdit { |inArray, params|
+		^params;
+	}
+
+}
+
 
 + DiskSndFileSpec {
 

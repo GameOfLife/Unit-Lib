@@ -169,7 +169,8 @@ PartConvBufferView {
 								views[ \path ].value = path;
 								views[ \path ].doAction
 							}
-						)
+						);
+						closeFunc.value;
 					});
 				});
 

@@ -2017,7 +2017,7 @@
 
 + MultiSndFileSpec {
 
-	viewNumLines { ^3 }
+	viewNumLines { ^4 }
 
 	makeView { |parent, bounds, label, action, resize|
 		var vws, view, labelWidth;
@@ -2061,104 +2061,30 @@
 			action.value( vws, vws[ \val ] );
 		};
 
-		vws[ \list ] = SmoothButton( view, 40 @ viewHeight )
-			.label_( "list" )
-			.border_( 1 )
-			.radius_( 2 )
-			.font_( font )
-			.action_({
-				var missing;
+		vws[ \path ] = MultiFilePathView( view, (view.bounds.width - labelWidth - 4) @ viewHeight );
+		vws[ \path ].fixedSize = fixedAmount;
 
-				if( vws[ \listdoc ].notNil ) {
-					vws[ \listdoc ].close;
-				};
-
-				missing = vws[ \val ].select({ |x| x.exists.not }).collect(_.path);
-				if( missing.size > 0 ) {
-					missing = "missing files:\n" ++ missing.join("\n") ++ "\n\n";
-				} {
-					missing = "";
-				};
-
-				vws[ \listdoc ] = Document().string_(
-					missing ++ "all soundfile paths:\n" ++
-					vws[ \val ].collect(_.path).join("\n")
-				).promptToSave_(false);
-			});
-
-		view.view.onClose_({
-			if( vws[ \listdoc ].notNil ) {
-				vws[ \listdoc ].close;
+		if( fixedAmount ) {
+			vws[ \path ].action = { |vw|
+				vws[ \val ].do({ |item, i|
+					item.path = vw.value[i];
+					item.fromFile;
+			    });
 			};
-		});
-
-		vws[ \copy ] = SmoothButton( view, 60 @ viewHeight )
-			.label_( "copy all" )
-			.border_( 1 )
-			.radius_( 2 )
-			.font_( font )
-			.action_({
-				var paths;
-				ULib.savePanel({ |path|
-					path = path.dirname;
-					paths = vws[ \val ].collect({ |item|
-						item.path.getGPath.asSymbol
-					}).as(Set).as(Array).do({ |pth|
-						pth.asString.copyTo( path );
-					});
-					vws[ \val ].do({ |item|
-						item.path = path +/+ item.path.basename;
-					});
-				});
-			});
-
-		vws[ \browse ] = SmoothButton( view, 20 @ viewHeight )
-			.label_( 'folder' )
-			.border_( 1 )
-			.radius_( 2 )
-			.font_( font );
-
-		if( fixedAmount == true ) {
-			vws[ \browse ].action_({
-				var paths;
-				ULib.openPanel({ |paths|
-					case { paths.size >= vws[ \val ].size } {
-						vws[ \val ].do({ |item, i|
-							item.path = paths[i];
-							item.fromFile;
-						});
-					} { paths.size == 1 } {
-						SCAlert( "You selected one soundfile for % units.\nUse only on the first unit,\nor the same for all?".format( vws[ \val ].size ), [ "cancel", "first", "all" ], [ {}, {
-							vws[ \val ][0].path = paths[0];
-							vws[ \val ][0].fromFile;
-						}, {
-							vws[ \val ].do({ |item, i|
-								item.path = paths[0];
-								item.fromFile;
-							});
-						} ] );
-					} { SCAlert( "You selected % soundfiles for % units.\nUse them only for the first % units,\nor wrap around for all?".format( paths.size, vws[ \val ].size, paths.size ), [ "cancel", "first %".format( paths.size ), "all" ], [ {}, {
-							paths.do({ |item, i|
-								vws[ \val ][i].path = item;
-								vws[ \val ][i].fromFile;
-							});
-						}, {
-							vws[ \val ].do({ |item, i|
-								item.path = paths.wrapAt(i);
-								item.fromFile;
-							});
-						} ] );
-					};
-				}, {}, true);
-			});
 		} {
-			vws[ \browse ].action_({
-				var paths;
-				ULib.openPanel({ |paths|
-					action.value( vws, paths.collect({ |path| sndFileClass.new( path ) }) )
-				}, {}, true);
-			});
+			vws[ \path ].action = { |vw|
+				if( vws[ \val ].size != vw.value.size ) {
+					action.value( vws, vw.value.collect({ |path| sndFileClass.new( path ) }) );
+				} {
+					vws[ \val ].do({ |item, i|
+						item.path = vw.value[i];
+						item.fromFile;
+					});
+				};
+			};
 		};
+		view.view.decorator.nextLine;
+		view.view.decorator.shift( labelWidth, 0 );
 
 		vws[ \amount ] = StaticText( view, 60 @ viewHeight )
 			.applySkin( RoundView.skin )
@@ -2173,7 +2099,7 @@
 		};
 
 		if( sndFileClass != DiskSndFileSpec ) {
-			view.view.decorator.left = view.bounds.width - 40;
+			view.view.decorator.left = view.bounds.width - 42;
 
 			vws[ \global ] = SmoothButton( view, 40 @ viewHeight )
 				.label_( ["global", "global" ] )
@@ -2249,6 +2175,7 @@
 
 	setView { |view, value, active = false|
 		view[ \val ] = value;
+		view[ \path ].value = value.collect( _.path );
 		view.setLoop( value );
 		view.setRate( value );
 		view.setGlobal( value );
@@ -2296,6 +2223,96 @@
 	setView { |view, value, active = false|
 		view[ \bufferView ].value = value;
 		if( active ) { view.doAction };
+	}
+}
+
+
++ MultiPartConvBufferSpec {
+
+	viewNumLines { ^2 }
+
+	makeView { |parent, bounds, label, action, resize|
+		var vws, view, labelWidth;
+		var localStep;
+		var font;
+		var editAction;
+		var viewHeight;
+		vws = ();
+
+		font =  (RoundView.skin ? ()).font ?? { Font( Font.defaultSansFace, 10 ); };
+
+		bounds.isNil.if{bounds= 350 @ (this.viewNumLines * 18) };
+
+		viewHeight = (bounds.height / this.viewNumLines).floor - 2;
+
+		view = EZCompositeView( parent, bounds, gap: 2@2 );
+		bounds = view.asView.bounds;
+
+		vws[ \view ] = view;
+
+		vws[ \val ] = this.default ? [];
+
+		if( label.notNil ) {
+			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
+			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ viewHeight )
+				.string_( label.asString ++ " " )
+				.align_( \right )
+				.resize_( 4 )
+				.applySkin( RoundView.skin );
+		} {
+			labelWidth = 0;
+		};
+
+
+		editAction = { |vw|
+			vws[ \val ] = vw.object;
+			action.value( vws, vws[ \val ] );
+		};
+
+		vws[ \path ] = MultiFilePathView( view, (view.bounds.width - labelWidth - 4) @ viewHeight );
+		vws[ \path ].fixedSize = fixedAmount;
+
+		if( fixedAmount ) {
+			vws[ \path ].action = { |vw|
+				vws[ \val ].do({ |item, i|
+					item.path = vw.value[i];
+					item.fromFile;
+			    });
+			};
+		} {
+			vws[ \path ].action = { |vw|
+				if( vws[ \val ].size != vw.value.size ) {
+					action.value( vws, vw.value.collect({ |path| PartConvBuffer.new( path ) }) );
+				} {
+					vws[ \val ].do({ |item, i|
+						item.path = vw.value[i];
+						item.fromFile;
+					});
+				};
+			};
+		};
+		view.view.decorator.nextLine;
+		view.view.decorator.shift( labelWidth, 0 );
+
+		vws[ \amount ] = StaticText( view, 60 @ viewHeight )
+			.applySkin( RoundView.skin )
+			.font_( font );
+
+		if( fixedAmount ) {
+			vws[ \amount ].string = " % files".format( default.size );
+		} {
+			vws[ \setAmount ] = { |vws, value|
+				{ vws[ \amount ].string = " % files".format( value.size ); }.defer;
+			};
+		};
+
+		^vws;
+	}
+
+	setView { |view, value, active = false|
+		view[ \val ] = value;
+		view[ \path ].value = value.collect( _.path );
+		view.setAmount( value );
 	}
 }
 

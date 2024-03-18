@@ -1050,6 +1050,32 @@ PartConvBufferSpec : RichBufferSpec {
 
 }
 
+MultiPartConvBufferSpec : Spec {
+
+	var <>default, <>fixedAmount = true;
+
+	*new { |default, fixedAmount = false|
+		^super.new
+			.default_( default )
+			.fixedAmount_( fixedAmount );
+	}
+
+	*testObject { |obj|
+		^obj.isCollection && { obj[0].isKindOf(PartConvBuffer) };
+	}
+
+	constrain { |value|
+		^value;
+	}
+
+	*newFromObject { |obj|
+		^this.new;
+	}
+
+
+}
+
+
 UMIDIFileSpec : Spec {
 
 	*testObject { |obj|

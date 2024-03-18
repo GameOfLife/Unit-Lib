@@ -314,7 +314,7 @@ MultiFilePathView : FilePathView {
 							this.value.removeAt( i );
 							this.value = this.value;
 							action.value( this );
-						}) );
+						}).enabled_( this.value.size > 1 ) );
 						menu.addAction( MenuAction( "Add...", {
 							this.browseSingle({ |px|
 								this.value = this.value.insert( i, px );
