@@ -38,7 +38,9 @@
 			vws[ \valueView ] =
 				EZSmoothSlider( parent, bounds, label !? { label.asString ++ " " },
 					this, { |vw| action.value( vw, vw.value ) },
-					labelWidth: (RoundView.skin ? ()).labelWidth ? 80 );
+					labelWidth: (RoundView.skin ? ()).labelWidth ? 80,
+				    numberWidth: (RoundView.skin ? ()).numberWidth ? 40,
+			);
 
 			vws[ \view ] = vws[ \valueView ].view;
 			vws[ \sliderView ] = vws[ \valueView ].sliderView;
@@ -313,7 +315,7 @@
 				vws[ \setPlotter ].value;
 				vws[ \setMeanSlider ].value;
 				action.value( vws, vws[ \val ] );
-			}
+			}, numberWidth: (RoundView.skin ? ()).numberWidth ? 40,
 		);
 
 		vws[ \setRangeSlider ] = {
@@ -1556,7 +1558,7 @@
 + DualValueSpec {
 
 	makeView { |parent, bounds, label, action, resize|
-		var vws = (), view, labelWidth, numWidth = 45, sliderWidth;
+		var vws = (), view, labelWidth, numWidth = 40, sliderWidth;
 		var cspec, numberStep, round = 0.001, background;
 
 		cspec = this.asControlSpec;
@@ -1570,6 +1572,8 @@
 
 		view.addFlowLayout( 0@0, 2@2 );
 
+		numWidth = RoundView.skin.numberWidth ? 40;
+
 		if( label.notNil ) {
 			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
 			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ bounds.height )
@@ -1581,7 +1585,7 @@
 			labelWidth = 0;
 		};
 
-		sliderWidth = bounds.width - labelWidth - (numWidth * 3) - 12;
+		sliderWidth = bounds.width - labelWidth - ((numWidth + 2) * 3) - 2;
 
 		numberStep = this.guessNumberStep;
 
@@ -1676,7 +1680,8 @@
 		var vw = EZSmoothRanger( parent, bounds, label !? { label.asString ++ " " },
 			this.asControlSpec,
 			{ |sl| sl.value = this.constrain( sl.value ); action.value(sl, sl.value) },
-			labelWidth: (RoundView.skin ? ()).labelWidth ? 80
+			labelWidth: (RoundView.skin ? ()).labelWidth ? 80,
+			numberWidth: RoundView.skin.numberWidth ? 40,
 			).value_( this.default );
 		// later incorporate rangeSpec into EZSmoothRanger
 		if( resize.notNil ) { vw.view.resize = resize };
@@ -2889,7 +2894,7 @@
 				vws[ \val ] = vw.value;
 				vws.setName;
 				vws.doAction;
-			}
+			}, numberWidth: RoundView.skin.numberWidth ? 40
 		);
 
 		vws[ \hz ].sliderView.centered_( true ).centerPos_( this.unmap( default ) );
@@ -2993,7 +2998,8 @@
 			nil,
 			[ this.minval / pi, this.maxval / pi, \lin, step / pi, this.default / pi, "pi" ].asSpec,
 			{ |vw| action.value( vw, vw.value * pi ) },
-			unitWidth: 45
+			unitWidth: RoundView.skin.numberWidth ? 40,
+			numberWidth: RoundView.skin.numberWidth ? 40
 		).visible_( false );
 
 		vws[ \rad ].sliderView
@@ -3007,7 +3013,8 @@
 			nil,
 			[ this.minval * degMul, this.maxval * degMul, \lin, step * degMul,
 				this.default * degMul ].asSpec,
-			{ |vw| action.value( vw, vw.value / degMul ) }
+			{ |vw| action.value( vw, vw.value / degMul ) },
+			numberWidth: RoundView.skin.numberWidth ? 40
 		).visible_( false );
 
 		vws[ \deg ].sliderView
