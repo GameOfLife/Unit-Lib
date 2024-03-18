@@ -2273,6 +2273,39 @@
 		vws[ \path ] = MultiFilePathView( view, (view.bounds.width - labelWidth - 4) @ viewHeight );
 		vws[ \path ].fixedSize = fixedAmount;
 
+		vws[ \path ].preProcessPathsFunc = { |fv, paths, action|
+			if( paths.notNil && { paths.any({ |pth| pth.extension.toLower != "partconv"  }) }) {
+				SCAlert( "One or move files appear not to be a .partconv file\ndo you want to convert them?",
+					[ "use anyway", "convert" ],
+					[{ action.value( paths ) }, {
+						{
+							var cond = Condition( false );
+							var res;
+							paths.do({ |pth|
+								if( pth.extension.toLower != "partconv" ) {
+									cond.test = false;
+									PartConvBuffer.convertIRFileMulti( pth,
+										server: ULib.servers,
+										action: { |paths|
+											res = res.addAll( paths );
+											cond.test = true;
+											cond.signal;
+										}
+									);
+									cond.wait;
+								} {
+									res = res.add( pth );
+								};
+							});
+							action.value( res );
+						}.fork;
+					}]
+				);
+			} {
+				action.value( paths )
+			};
+		};
+
 		if( fixedAmount ) {
 			vws[ \path ].action = { |vw|
 				vws[ \val ].do({ |item, i|

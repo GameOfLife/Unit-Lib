@@ -85,24 +85,27 @@ PartConvBuffer : AbstractRichBuffer {
 		case { inPath.isString } {
 			sf = SoundFile.new;
 			test = sf.openRead( inPath.getGPath.asPathFromServer );
-			sf.close; // close if it wasn't ope
+			sf.close; // close if it wasn't open
 			if( test == true ) {
 				{
 					var cond = Condition( false ), res;
 					var channelnames;
-					case { inPath.find("OSD.SDIR").notNil } {
-						channelnames = #[ l, r, lc, rc, lm, rm, ls, rs, c, cs ][..sf.numChannels-1];
+					case { sf.numChannels == 1 } {
+						channelnames = [""];
+					} { inPath.find("OSD.SDIR").notNil } {
+						channelnames = #[ l, r, lc, rc, lm, rm, ls, rs, c, cs ][..sf.numChannels-1]
+						.collect("_" ++ _ );
 					} { inPath.find("OBF.SDIR").notNil } {
-						channelnames = #[ w, x, y, z ][..sf.numChannels-1];
+						channelnames = #[ w, x, y, z ][..sf.numChannels-1].collect("_" ++ _ );
 					} {
-						channelnames = (..sf.numChannels-1);
+						channelnames = (..sf.numChannels-1).collect("_" ++ _ );
 					};
 					res = channelnames.collect({ |name, ch|
 						var outPth;
 						cond.test = false;
 						outPth =(outPath ?? { inPath.replaceExtension( "partconv" ) }).getGPath;
 						outPth = outPth.split($.);
-						outPth[ outPth.size - 2 ] = outPth[ outPth.size - 2 ] ++ "_%".format( name );
+						outPth[ outPth.size - 2 ] = outPth[ outPth.size - 2 ] ++ name;
 						outPth = outPth.join( "." );
 						this.convertIRFile( inPath, outPth, server, {
 							cond.test = true; cond.signal;

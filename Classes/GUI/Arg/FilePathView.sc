@@ -90,6 +90,13 @@ FilePathView {
 		^{ |vw| View.currentDrag.class == String }
 	}
 
+	receiveDragHandler {
+		^{
+			this.value = View.currentDrag;
+			action.value( this );
+		};
+	}
+
 	browse { |action|
 		this.browseSingle( action );
 	}
@@ -193,10 +200,7 @@ FilePathView {
 		.resize_( 2 )
 		.background_( Color.white.alpha_(0.25) )
 		.canReceiveDragHandler_( this.canReceiveDragHandler )
-		.receiveDragHandler_({ |vw|
-			this.value = View.currentDrag;
-			action.value( this );
-		})
+		.receiveDragHandler_( this.receiveDragHandler )
 		.mouseDownAction_({ this.makeMenu });
 
 		views[ \filePath ].setProperty(\wordWrap, false);
@@ -216,6 +220,7 @@ FilePathView {
 MultiFilePathView : FilePathView {
 
 	var <>fixedSize = true;
+	var <>preProcessPathsFunc;
 
 	makeString { |inPaths|
 		if( inPaths.isString ) { inPaths = [ inPaths ] };
@@ -230,46 +235,72 @@ MultiFilePathView : FilePathView {
 		};
 	}
 
-	canReceiveDragHandler { ^false }
+	canReceiveDragHandler {
+		^{ |vw| [ String, Array ].includes( View.currentDrag.class ) }
+	}
+
+	receiveDragHandler {
+		^{
+			var paths;
+			if( View.currentDrag.isString ) {
+				paths = [ View.currentDrag ];
+			} {
+				paths = View.currentDrag
+			};
+			this.setPaths( paths, { |paths| this.value = paths; action.value( this ) } );
+		};
+	}
+
+	setPaths { |paths, action, preProcess = true|
+		var newVal, string, single = false;
+		if( preProcess == true && { preProcessPathsFunc.notNil }) {
+			preProcessPathsFunc.value( this, paths, { |ppaths|
+				this.setPaths( ppaths, action, false );
+			})
+			^this;
+		};
+
+		if( this.fixedSize && { paths.size < (this.value.size) } ) {
+
+			string = "You selected % for % units.\n" ++
+			"Use only for the first %,\n" ++
+			"or % for all?";
+
+			if( paths.size == 1 ) {
+				string = string.format( "one file", this.value.size, "unit", "the same" )
+			} {
+				string = string.format(
+					"% files".format( paths.size ), this.value.size,
+					"% units".format( paths.size ), "wrap around"
+				);
+			};
+
+			SCAlert( string,
+				[ "cancel", "first %".format( paths.size ), "all" ],
+				[ {}, {
+					newVal = this.value;
+					paths = paths[..newVal.size-1];
+					paths.do({ |item, i|
+						newVal[i] = item;
+					});
+					action.value( newVal );
+				}, {
+					action.value(
+						this.value.collect({ |item, i|
+							paths.wrapAt(i);
+						})
+					)
+				} ]
+			);
+		} {
+			action.value( paths[..this.value.size-1] );
+		};
+	}
+
 
 	browse { |action|
 		ULib.openPanel( { |paths|
-			var newVal, string, single = false;
-			if( this.fixedSize && { paths.size < (this.value.size) } ) {
-
-				string = "You selected % for % units.\n" ++
-				"Use only for the first %,\n" ++
-				"or % for all?";
-
-				if( paths.size == 1 ) {
-					string = string.format( "one file", this.value.size, "unit", "the same" )
-				} {
-					string = string.format(
-						"% files".format( paths.size ), this.value.size,
-						"% units".format( paths.size ), "wrap around"
-					);
-				};
-
-				SCAlert( string,
-					[ "cancel", "first %".format( paths.size ), "all" ],
-					[ {}, {
-						newVal = this.value;
-						paths = paths[..newVal.size-1];
-						paths.do({ |item, i|
-							newVal[i] = item;
-						});
-						action.value( newVal );
-					}, {
-						action.value(
-							this.value.collect({ |item, i|
-								paths.wrapAt(i);
-							})
-						)
-					} ]
-				);
-			} {
-				action.value( paths[..this.value.size-1] );
-			};
+			this.setPaths( paths, action );
 		}, multipleSelection: true);
 	}
 
