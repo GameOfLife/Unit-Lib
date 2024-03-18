@@ -2041,7 +2041,8 @@
 
 		vws[ \val ] = this.default ? [];
 
-		loopSpec = BoolSpec(true).massEditSpec( vws[ \val ].collect(_.loop) );
+		loopSpec = BoolSpec(true).trueLabel_("loop").falseLabel_("loop")
+		.massEditSpec( vws[ \val ].collect(_.loop) );
 		rateSpec = [-96,96].asSpec.massEditSpec( vws[ \val ].collect({|x| x.rate.ratiomidi }) );
 
 		if( label.notNil ) {
