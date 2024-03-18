@@ -20,6 +20,7 @@
 PartConvBuffer : AbstractRichBuffer {
 
 	classvar <>fftSize = 2048; // changing this requires all data files to be rewritten
+	classvar <>verbose = true;
 	var <path;
 
 	*new{ |path, numFrames|
@@ -166,7 +167,10 @@ PartConvBuffer : AbstractRichBuffer {
 				srv.sync;
 				irbuf.free;
 				i=i+1;
-				if( server.size == i ) { action.value( outPath ) };
+				if( server.size == i ) {
+					if( verbose ) { "created partconv file from channel %\n%\n".postf( channel, outPath ) };
+					action.value( outPath )
+				};
 			}.fork;
 		});
 		^outPath;

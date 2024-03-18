@@ -123,9 +123,9 @@ PartConvBufferView {
 							this.performPartConvBuffer( \fromFile );
 							action.value( this );
 						}, {
-							PartConvBuffer.convertIRFile( fv.value,
+							PartConvBuffer.convertIRFileMulti( fv.value,
 								server: ULib.servers,
-								action: { |path| fv.value = path; fv.doAction }
+							    action: { |paths| fv.value = paths[0]; fv.doAction }
 							);
 						}]
 					);
