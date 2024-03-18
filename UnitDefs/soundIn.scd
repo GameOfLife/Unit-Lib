@@ -23,14 +23,6 @@ var def = MultiChannelUdef( \soundIn, { |bus = 0|
 	});
 	UOut.ar( 0, input );
 } )
-	.shouldPlayOnFunc_({ |unit, target|
-		// only use a local server, unless no local servers are available
-		if( ULib.servers.any(_.isLocal) ) {
-			target.asTarget.server.isLocal;
-		} {
-			true;
-		};
-	})
 	.category_( \input );
 
 def.udefs.do({ |def|
