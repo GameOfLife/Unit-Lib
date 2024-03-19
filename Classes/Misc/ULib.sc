@@ -436,7 +436,7 @@ ULib {
 					};
 				});
 				StaticText( w, (bounds.width - 12)@20 ).string_(
-					" Unused:"
+					" Not used in any open UScore:"
 				).applySkin( RoundView.skin );
 				BufSndFile.global.sortedKeysValuesDo({ |key, buf|
 					if( usedKeys.includes( key ).not ) {
