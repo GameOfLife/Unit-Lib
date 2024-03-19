@@ -1128,6 +1128,27 @@ U : ObjectWithArgs {
 	getSpecMode { |key| ^this.def.getArgSpec( key, this ) !? _.mode }
 	getDefault { |key| ^this.def.getDefault( key, this ); }
 
+	getAllArgsForSpecClasses { |specs, searchUMaps = true|
+		var out = [];
+		if( specs.isArray.not ) { specs = [ specs ] };
+		this.args.pairsDo({ |key, val|
+			if( searchUMaps ) {
+				if( val.isUMap ) {
+					out = out.addAll( val.getAllArgsForSpecClasses( specs, true ) );
+				} {
+					if( specs.includes( this.getSpec( key ).class ) ) {
+						out = out.add( val );
+					};
+				}
+			} {
+				if( specs.includes( this.getSpec( key ).class ) ) {
+					out = out.add( val );
+				};
+			}
+		});
+		^out;
+	}
+
 	indexOf { |obj|  // returns key of first arg found to be equal to object
 		var keyIndex;
 		keyIndex = this.values.indexOf( obj );
@@ -1409,6 +1430,11 @@ U : ObjectWithArgs {
 		if( this.subDef.respondsTo( \deactivateUnit ) ) {
 			this.subDef.deactivateUnit( this );
 		};
+	}
+
+	getGlobalBufferIDs {
+		^this.getAllArgsForSpecClasses( [ BufSndFileSpec, MonoBufSndFileSpec, MultiSndFileSpec ] )
+		.flatten(1).select(_.hasGlobal).collect(_.id);
 	}
 }
 

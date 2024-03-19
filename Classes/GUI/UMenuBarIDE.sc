@@ -238,8 +238,14 @@ UMenuBarIDE {
 			ULib.setAllScoresActive( true );
 		}), name );
 
-		this.registerMenu( MenuAction( "Reload global buffers", {
+		this.registerMenu( MenuAction.separator( "Global Buffers" ), name );
+
+		this.registerMenu( MenuAction( "Reload global Buffers", {
 			 BufSndFile.reloadAllGlobal;
+		}), name );
+
+		this.registerMenu( MenuAction( "Dispose unused global Buffers", {
+			BufSndFile.disposeUnusedGlobal;
 		}), name );
 
 		this.registerMenu( MenuAction.separator( "Global Level" ), name );

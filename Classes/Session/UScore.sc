@@ -1178,4 +1178,9 @@ UScore : UEvent {
 		^lib;
 	}
 
+	getGlobalBufferIDs {
+		^this.events.select(_.respondsTo( \getGlobalBufferIDs )).collect(_.getGlobalBufferIDs).flatten(1);
+	}
+
+
 }

@@ -1104,6 +1104,10 @@ UChain : UEvent {
 		}).flatten(1);
 	}
 
+	getGlobalBufferIDs {
+		^this.units.collect(_.getGlobalBufferIDs).flatten(1)
+	}
+
 	getInitArgs {
 		var numPreArgs = -1;
 		if( releaseSelf != true ) {

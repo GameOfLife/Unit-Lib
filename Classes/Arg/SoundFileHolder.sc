@@ -545,6 +545,7 @@ BufSndFile : AbstractSndFile {
 					this.makeBuffer( srv, 0, act.getAction, add: false );
 				});
 				global.changed( id );
+				"loading global Buffer %\n".postf( id );
 			});
 		} {
 			global.changed( id );
@@ -560,15 +561,23 @@ BufSndFile : AbstractSndFile {
 			});
 			global[ id ] = nil;
 			global.changed( id );
+			"disposed global Buffer %\n".postf( id );
 		});
 	}
 
 	*disposeAllGlobal {
 		global.keys.as(Array).do({ |key|
+			this.disposeGlobal( key );
+		});
+	}
+
+	*disposeGlobal { |key|
+		if( key.notNil ) {
 			global[ key ].do(_.free);
 			global[ key ] = nil;
 			global.changed( key );
-		});
+			"disposed global Buffer %\n".postf( key );
+		};
 	}
 
 	*reloadAllGlobal {
@@ -576,6 +585,16 @@ BufSndFile : AbstractSndFile {
 		keys = global.keys.asArray;
 		this.disposeAllGlobal;
 		keys.do({ |key| this.fromID( key ).loadGlobal( replace: true ); });
+	}
+
+	*disposeUnusedGlobal {
+		var usedKeys = UScoreEditorGUI.all
+		.collect({ |item| item.score.getGlobalBufferIDs }).flatten(1).as(Set);
+		global.keys.as(Array).do({ |key|
+			if( usedKeys.includes( key ).not ) {
+				this.disposeGlobal( key );
+			};
+		});
 	}
 
 	findGlobal { |server|
