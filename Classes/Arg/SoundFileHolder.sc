@@ -588,8 +588,8 @@ BufSndFile : AbstractSndFile {
 	}
 
 	*disposeUnusedGlobal {
-		var usedKeys = UScoreEditorGUI.all
-		.collect({ |item| item.score.getGlobalBufferIDs }).flatten(1).as(Set);
+		var usedKeys = (UScoreEditorGUI.all
+		.collect({ |item| item.score.getGlobalBufferIDs }) ? []).flatten(1).as(Set);
 		global.keys.as(Array).do({ |key|
 			if( usedKeys.includes( key ).not ) {
 				this.disposeGlobal( key );
