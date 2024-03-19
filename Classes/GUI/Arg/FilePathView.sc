@@ -139,19 +139,16 @@ FilePathView {
 	}
 
 	makeMenu {
-		var setAction = { |pth| this.value = pth; action.value( this ) };
-		Menu(
+		var menu, setAction = { |pth| this.value = pth; action.value( this ) };
+		menu = Menu(
 			MenuAction( "Browse...", {
 				this.browse( setAction );
 			}),
-			MenuAction( this.value, {
+			MenuAction( this.value ? "Enter path...", {
 				SCRequestString( this.value, "Please enter file path:", { |string|
 					setAction.value( string.standardizePath );
 				})
 			}),
-			MenuAction( "Remove", {
-				setAction.value( nil );
-			}).enabled_( allowEmpty ),
 			MenuAction.separator( "Operations" ),
 			MenuAction( "Show file in Finder", {
 				this.value.getGPath.asPathFromServer.dirname.openOS;
@@ -184,7 +181,14 @@ FilePathView {
 					};
 				};
 			}),
-		).front;
+		);
+
+		if( allowEmpty ) {
+			menu.insertAction( 2,
+				MenuAction( "Remove", { setAction.value( nil ); }).enabled_( this.value.notNil );
+			);
+		};
+		menu.front;
 	}
 
 	makeView { |parent, bounds, resize|
