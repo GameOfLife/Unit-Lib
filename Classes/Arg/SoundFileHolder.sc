@@ -587,9 +587,12 @@ BufSndFile : AbstractSndFile {
 		keys.do({ |key| this.fromID( key ).loadGlobal( replace: true ); });
 	}
 
+	*getUsedGlobalKeys {
+		^(UScoreEditorGUI.all.collect({ |item| item.score.getGlobalBufferIDs }) ? []).flatten(1).as(Set);
+	}
+
 	*disposeUnusedGlobal {
-		var usedKeys = (UScoreEditorGUI.all
-		.collect({ |item| item.score.getGlobalBufferIDs }) ? []).flatten(1).as(Set);
+		var usedKeys = this.getUsedGlobalKeys;
 		global.keys.as(Array).do({ |key|
 			if( usedKeys.includes( key ).not ) {
 				this.disposeGlobal( key );

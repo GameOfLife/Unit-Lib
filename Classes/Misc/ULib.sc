@@ -305,6 +305,7 @@ ULib {
 
 	*envirWindow {
 		var w, bounds, addViews, addButton, labelWidth;
+		var usedKeys, makeGBView;
 
 		envirSpecs = envirSpecs ?? {
 			[
@@ -330,7 +331,7 @@ ULib {
 
 		RoundView.pushSkin( UChainGUI.skin );
 		StaticText( w, (bounds.width - 12)@14 )
-		.string_( " Environment" )
+		.string_( " Environment (%)".format( ~u_specs.size ) )
 		.applySkin( RoundView.skin )
 		.background_( RoundView.skin.headerColor ? Color.white.alpha_(0.5) );
 		w.asView.decorator.shift( -36, 0 );
@@ -389,6 +390,66 @@ ULib {
 			addButton.enabled_( true );
 		});
 		addViews.do(_.visible_(false));
+
+		StaticText( w, (bounds.width - 12)@14 )
+		.string_( " Global Buffers (%)".format( BufSndFile.global.keys.size )  )
+		.applySkin( RoundView.skin )
+		.background_( RoundView.skin.headerColor ? Color.white.alpha_(0.5) );
+		w.asView.decorator.shift( -36, 0 );
+		SmoothButton( w, 14@14 ).label_( '+' )
+		.action_({ |bt|
+			ULib.openPanel( { |path|
+				BufSndFile.new( path ).hasGlobal_( true );
+				{ this.envirWindow; }.defer(0.1);
+			}, multipleSelection: false);
+		});
+		SmoothButton( w, 14@14 ).label_( 'roundArrow' )
+		.action_({ { this.envirWindow; }.defer(0.1); });
+		if( BufSndFile.global.keys.size > 0 ) {
+			usedKeys = BufSndFile.getUsedGlobalKeys;
+			makeGBView = { |key, buf|
+				var view;
+				view = StaticText( w, w.view.bounds.width - 30 @ 14 )
+				.string_( key.asString )
+				.background_( Color.white.alpha_(0.25) )
+				.align_( \center )
+				.applySkin( RoundView.skin );
+				view.setProperty(\wordWrap, false);
+				if( key.asString.bounds( RoundView.skin.font ).width > view.bounds.width ) {
+					view.align_( \right ).string_( key.asString ++ " " );
+				};
+				SmoothButton( w, 14@14 )
+				.label_( '-' )
+				.action_({
+					BufSndFile.disposeGlobal( key );
+					{ this.envirWindow; }.defer(0.1);
+				});
+			};
+			if( usedKeys.size == BufSndFile.global.keys.size ) {
+				BufSndFile.global.sortedKeysValuesDo({ |key, buf|
+					makeGBView.( key, buf );
+				});
+			} {
+				BufSndFile.global.sortedKeysValuesDo({ |key, buf|
+					if( usedKeys.includes( key ) ) {
+						makeGBView.( key, buf );
+					};
+				});
+				StaticText( w, (bounds.width - 12)@20 ).string_(
+					" Unused:"
+				).applySkin( RoundView.skin );
+				BufSndFile.global.sortedKeysValuesDo({ |key, buf|
+					if( usedKeys.includes( key ).not ) {
+						makeGBView.( key, buf );
+					};
+				});
+			}
+		} {
+			StaticText( w, (bounds.width - 12)@20 ).string_(
+				" no Global Buffers to display"
+			).applySkin( RoundView.skin );
+		};
+
 		RoundView.popSkin;
 	}
 
