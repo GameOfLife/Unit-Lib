@@ -189,7 +189,7 @@ UGUI {
 	makeHeader { }
 
 	makeUMapDefMenu { |test, action, hideAction, matchTest, includePattern = true|
-		var uDefsList = [], ctrl, menuList, menu, checkedIndex;
+		var uDefsList = [], ctrl, menuList, menuSeparators, menu, checkedIndex;
 		var uDefsDict = ();
 
 		UMapDef.all !? { |all|
@@ -288,11 +288,7 @@ UGUI {
 					.font_( Font( Font.defaultSansFace, 12 ) );
 				} {
 					submenu = menuItems.first;
-					if( submenu.isKindOf( Menu ) ) {
-						submenu.title = item[1].first.name.asString;
-					} {
-						submenu.string = item[1].first.name.asString;
-					};
+					submenu.string = item[1].first.name.asString;
 				};
 
 				if( includesChecked ) { checkedIndex = i };
@@ -300,7 +296,18 @@ UGUI {
 			}
 		});
 
-		if( menuList.size == 2 ) {
+
+		menuSeparators = menuList.select({ |item| item.isKindOf( MenuAction ) && { item.separator == true } });
+
+		menuList = menuList.delimit({ |item, index|
+			item.isKindOf( MenuAction ) && { item.separator == true }
+		})[1..].collect({ |list, i|
+			[ menuSeparators[i] ].addAll(
+				list.sort({ |a,b| a.string <= b.string; })
+			)
+		}).flatten(1);
+
+		if( menuList.size == 2 && { menuList[1].isKindOf( Menu ) }) {
 			menu = menuList[1];
 			checkedIndex = menu.actions.detectIndex({ |item| item.enabled.not });
 		} {
