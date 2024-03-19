@@ -27,6 +27,7 @@ FilePathView {
 	var <>action;
 	var <>defaultStringColor;
 	var <font;
+	var <>allowEmpty = false;
 
 	*new { |parent, bounds|
 		^super.new.makeView( parent, bounds );
@@ -148,6 +149,9 @@ FilePathView {
 					setAction.value( string.standardizePath );
 				})
 			}),
+			MenuAction( "Remove", {
+				setAction.value( nil );
+			}).enabled_( allowEmpty ),
 			MenuAction.separator( "Operations" ),
 			MenuAction( "Show file in Finder", {
 				this.value.getGPath.asPathFromServer.dirname.openOS;
@@ -260,40 +264,43 @@ MultiFilePathView : FilePathView {
 			^this;
 		};
 
-		if( this.fixedSize && { paths.size < (this.value.size) } ) {
+		if( this.fixedSize ) {
+			if( paths.size < (this.value.size) ) {
+				string = "You selected % for % units.\n" ++
+				"Use only for the first %,\n" ++
+				"or % for all?";
 
-			string = "You selected % for % units.\n" ++
-			"Use only for the first %,\n" ++
-			"or % for all?";
+				if( paths.size == 1 ) {
+					string = string.format( "one file", this.value.size, "unit", "the same" )
+				} {
+					string = string.format(
+						"% files".format( paths.size ), this.value.size,
+						"% units".format( paths.size ), "wrap around"
+					);
+				};
 
-			if( paths.size == 1 ) {
-				string = string.format( "one file", this.value.size, "unit", "the same" )
-			} {
-				string = string.format(
-					"% files".format( paths.size ), this.value.size,
-					"% units".format( paths.size ), "wrap around"
+				SCAlert( string,
+					[ "cancel", "first %".format( paths.size ), "all" ],
+					[ {}, {
+						newVal = this.value;
+						paths = paths[..newVal.size-1];
+						paths.do({ |item, i|
+							newVal[i] = item;
+						});
+						action.value( newVal );
+					}, {
+						action.value(
+							this.value.collect({ |item, i|
+								paths.wrapAt(i);
+							})
+						)
+					} ]
 				);
+			} {
+				action.value( paths[..this.value.size-1] );
 			};
-
-			SCAlert( string,
-				[ "cancel", "first %".format( paths.size ), "all" ],
-				[ {}, {
-					newVal = this.value;
-					paths = paths[..newVal.size-1];
-					paths.do({ |item, i|
-						newVal[i] = item;
-					});
-					action.value( newVal );
-				}, {
-					action.value(
-						this.value.collect({ |item, i|
-							paths.wrapAt(i);
-						})
-					)
-				} ]
-			);
 		} {
-			action.value( paths[..this.value.size-1] );
+			action.value( paths );
 		};
 	}
 
