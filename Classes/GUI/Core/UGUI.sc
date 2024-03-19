@@ -252,11 +252,11 @@ UGUI {
 		};
 
 		menuList = uDefsList.collect({ |item, i|
-			var includesChecked = false, submenu;
+			var includesChecked = false, menuItems, submenu;
 			if( item.isKindOf( Symbol ) ) {
 				MenuAction.separator( item.asString );
 			} {
-				submenu = Menu( *item[1].collect({ |def|
+				menuItems = item[1].collect({ |def|
 					var checked;
 					checked = matchTest.value( def ) ? false;
 					if( checked ) { includesChecked = true; };
@@ -281,8 +281,19 @@ UGUI {
 							menu.destroy;
 						}).enabled_( checked.not ).font_( Font( Font.defaultSansFace, 12 ) );
 					};
-				})).title_( if( includesChecked ) { item[0] ++ " *" } { item[0] } )
-				.font_( Font( Font.defaultSansFace, 12 ) );
+				});
+
+				if( menuItems.size > 1 ) {
+					submenu = Menu( *menuItems ).title_( if( includesChecked ) { item[0] ++ " *" } { item[0] } )
+					.font_( Font( Font.defaultSansFace, 12 ) );
+				} {
+					submenu = menuItems.first;
+					if( submenu.isKindOf( Menu ) ) {
+						submenu.title = item[1].first.name.asString;
+					} {
+						submenu.string = item[1].first.name.asString;
+					};
+				};
 
 				if( includesChecked ) { checkedIndex = i };
 				submenu;
