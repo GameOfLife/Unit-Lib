@@ -19,6 +19,8 @@
 
 UMixer {
 
+	 classvar <>sortToTracks = false;
+
      var <mainComposite, <mixerView, <scoreListView, font, <parent, <bounds;
      var <>scoreList;
      var <scoreController, <unitControllers;
@@ -40,6 +42,15 @@ UMixer {
         this.addCurrentScoreControllers;
         unitControllers = List.new;
         mainComposite = parent;
+		SmoothButton( mainComposite, Rect( 4, 4, 80, 16 ) )
+		.label_([ "sort to tracks", "sort to tracks" ])
+		.value_( sortToTracks.binaryValue )
+		.applySkin( RoundView.skin )
+		.canFocus_( false )
+		.action_({ |bt|
+			sortToTracks = bt.value.booleanValue;
+			this.remake;
+		});
         this.makeMixerView;
 		RoundView.popSkin;
 
@@ -101,7 +112,7 @@ UMixer {
 
     makeScoreListView{
         var listSize = scoreList.size;
-        scoreListView = CompositeView(mainComposite,Rect(0,0,4 + ((60+4)*(listSize-1)) + 20,24));
+        scoreListView = CompositeView(mainComposite,Rect(88,0,4 + ((60+4)*(listSize-1)) + 20,24));
         scoreListView.addFlowLayout;
         scoreList[..(listSize-2)].do{ |score,i|
             SmoothButton(scoreListView,60@16)
@@ -128,9 +139,10 @@ UMixer {
 
      makeMixerView{
         var spec, maxTrack,count, cview,w,level,bounds, width,top,main,scroll, evs;
+		var mixerEvents, setMuteButton;
 		var score = this.currentScore;
 		var events = score.events;
-        var viewBounds;
+        var viewBounds, lastTrack;
         unitControllers.do(_.remove);
 		evs = events.select({ |x| x.canFreeSynth && x.hideInGUI.not });
         maxTrack = evs.collect{ |event| event.track }.maxItem ? 0 + 1;
@@ -143,101 +155,121 @@ UMixer {
             mixerView.remove;
         };
 
-        mixerView = CompositeView(mainComposite, Rect(0,24,44*evs.size+4,338));
+		mixerView = CompositeView(mainComposite, Rect(0,24,44*evs.size+4+(8*maxTrack),338));
         mixerView.addFlowLayout;
 
-        maxTrack.do{ |j|
-			evs.do{ |event,i|
-				var cview,faders, eventsFromFolder, ctl, sl, bt;
-				if(event.track == j){
-				if(event.isFolder.not){
-					cview = CompositeView(mixerView,40@330);
-					cview.decorator = FlowLayout(cview.bounds);
-					if( [ Color ].includes( event.getTypeColor.class ) ) {
-						cview.background_( event.getTypeColor.copy.alpha_(0.5) );
-					} {
-						cview.background_(Color(0.58208955223881, 0.70149253731343, 0.83582089552239, 1.0));
+		if( sortToTracks ) {
+			mixerEvents = [];
+			maxTrack.do({ |j|
+				evs.do({ |event, i|
+					if( event.track == j ) {
+						mixerEvents = mixerEvents.add( event );
 					};
-					cview.decorator.shift(0,24);
-					sl = EZSmoothSlider.new(cview, Rect(0,0,32,240), events.indexOf(event), spec, layout:\vert)
-						.value_(event.getGain)
-						.action_({ |v|
-								event.setGain(v.value);
-						});
-					sl.labelView.align_( \center );
-					bt = SmoothButton(cview,32@20)
-					    .states_([
-							[ "s",nil, nil ],
-							[  "s", nil, Color.yellow.alpha_(0.75) ]
-						] )
-                        .canFocus_(false)
-                        .value_(score.soloed.includes(event).binaryValue)
-                        .action_({ |v|
-                            score.solo(event, v.value.booleanValue)
-                        });
-                    bt = SmoothButton(cview,32@20)
-						.states_([
-							[ "m", nil, nil ],
-							[  "m", nil, Color.red.alpha_(0.5) ]
-						] )
-                        .canFocus_(false)
-                        .value_(score.softMuted.includes(event).binaryValue)
-                        .action_({ |v|
-                            score.softMute(event, v.value.booleanValue)
-                        });
-                    ctl = SimpleController(event)
-                        .put(\gain,{ sl.value = event.getGain; });
-                        //.put( \muted, { bt.value = event.muted.binaryValue } );
-                    unitControllers.add(ctl);
+				});
+			});
+		} {
+			mixerEvents = evs;
+		};
 
-				}{
-						eventsFromFolder = event.allEvents.select(_.canFreeSynth)
-						.collect{ |event| (\event: event,\oldLevel: event.getGain) };
-					cview = CompositeView(mixerView,40@330);
-					cview.decorator = FlowLayout(cview.bounds);
-					if( [ Color ].includes( event.getTypeColor.class ) ) {
-						cview.background_( event.getTypeColor.copy.alpha_(0.5) );
-					} {
-						cview.background_(Color(0.28208955223881, 0.50149253731343, 0.23582089552239, 1.0));
-					};
-					SmoothButton(cview,32@20).states_([["open"]])
-						.radius_(3)
-						.action_({
-							{ this.addtoScoreList(event) }.defer(0.1)
-						});
-					EZSmoothSlider.new(cview, Rect(0,0,32,240), events.indexOf(event), spec, layout:\vert)
-						.value_(0)
-						.action_({ |v|
-							eventsFromFolder.do{ |dict|
-								dict[\event].setGain(dict[\oldLevel]+v.value);
-							};
-						})
-						.labelView.align_( \center );
-				    bt = SmoothButton(cview,32@20)
-                        .states_(
-                            [[ "s", Color.black, Color.clear ],
-                            [  "s", Color.yellow, Color.clear ]] )
-                        .canFocus_(false)
-                        .border_(1).background_(Color.grey(0.8))
-                        .value_(score.soloed.includes(event).binaryValue)
-                        .action_({ |v|
-                            score.solo(event, v.value.booleanValue)
-                        });
-                    bt = SmoothButton(cview,32@20)
-                        .states_(
-                            [[ "m", Color.black, Color.clear ],
-                            [  "m", Color.red, Color.clear ]] )
-                        .canFocus_(false)
-                        .border_(1).background_(Color.grey(0.8))
-                        .value_(score.softMuted.includes(event).binaryValue)
-                        .action_({ |v|
-                            score.softMute(event, v.value.booleanValue)
-                        });
+		setMuteButton = { |event|
+			if( score.softMuted.includes(event) ) { 1 } { event.muted.binaryValue * 2 };
+		};
+
+		lastTrack = 0;
+
+		mixerEvents.do({ |event, i|
+			var cview,faders, eventsFromFolder, ctl, sl, bt;
+			if( sortToTracks && { event.track != lastTrack }) {
+				mixerView.decorator.shift(8,0);
+				lastTrack = event.track;
+			};
+			if(event.isFolder.not){
+				cview = CompositeView(mixerView,40@330);
+				cview.decorator = FlowLayout(cview.bounds);
+				if( [ Color ].includes( event.getTypeColor.class ) ) {
+					cview.background_( event.getTypeColor.copy.alpha_(0.5) );
+				} {
+					cview.background_(Color(0.58208955223881, 0.70149253731343, 0.83582089552239, 1.0));
 				};
+				cview.decorator.shift(0,20);
+				sl = EZSmoothSlider.new(cview, Rect(0,0,32,240), events.indexOf(event), spec, layout:\vert)
+				.value_(event.getGain)
+				.action_({ |v|
+					event.setGain(v.value);
+				});
+				sl.labelView.align_( \center );
+				bt = SmoothButton(cview,32@20)
+				.states_([
+					[ "s", nil, nil ],
+					[ "s", nil, Color.yellow.alpha_(0.75) ]
+				] )
+				.canFocus_(false)
+				.value_(score.soloed.includes(event).binaryValue)
+				.action_({ |v|
+					score.solo(event, v.value.booleanValue)
+				});
+				bt = SmoothButton(cview,32@20)
+				.states_([
+					[ "m", nil, nil ],
+					[ "m", nil, Color.red.alpha_(0.5) ],
+					[ "m", nil, Color.red.alpha_(0.25) ],
+				] )
+				.canFocus_(false)
+				.value_( setMuteButton.value( event ) )
+				.action_({ |v|
+					if( v.value == 2 ) { v.value = 0 };
+					score.softMute(event, v.value.booleanValue)
+				});
+				ctl = SimpleController(event)
+				.put(\gain,{ sl.value = event.getGain; })
+				.put( \muted, { bt.value = setMuteButton.value( event ) });
+				unitControllers.add(ctl);
 
-				}
-			}
-		}
+			}{
+				eventsFromFolder = event.allEvents.select(_.canFreeSynth)
+				.collect{ |event| (\event: event,\oldLevel: event.getGain) };
+				cview = CompositeView(mixerView,40@330);
+				cview.decorator = FlowLayout(cview.bounds);
+				if( [ Color ].includes( event.getTypeColor.class ) ) {
+					cview.background_( event.getTypeColor.copy.alpha_(0.5) );
+				} {
+					cview.background_(Color(0.28208955223881, 0.50149253731343, 0.23582089552239, 1.0));
+				};
+				SmoothButton(cview,32@16).states_([["open"]])
+				.radius_(3)
+				.action_({
+					{ this.addtoScoreList(event) }.defer(0.1)
+				});
+				EZSmoothSlider.new(cview, Rect(0,0,32,240), events.indexOf(event), spec, layout:\vert)
+				.value_(0)
+				.action_({ |v|
+					eventsFromFolder.do{ |dict|
+						dict[\event].setGain(dict[\oldLevel]+v.value);
+					};
+				})
+				.labelView.align_( \center );
+				bt = SmoothButton(cview,32@20)
+				.states_([
+					[ "s", nil, nil],
+					[ "s",  nil, Color.yellow.alpha_(0.75) ]
+				] )
+				.canFocus_(false)
+				.value_(score.soloed.includes(event).binaryValue)
+				.action_({ |v|
+					score.solo(event, v.value.booleanValue)
+				});
+				bt = SmoothButton(cview,32@20)
+				.states_([
+					[ "m", nil, nil ],
+					[ "m", nil, Color.red.alpha_(0.5) ]
+				] )
+				.canFocus_(false)
+				.value_(score.softMuted.includes(event).binaryValue)
+				.action_({ |v|
+					score.softMute(event, v.value.booleanValue)
+				});
+			};
+		})
 
 
     }
