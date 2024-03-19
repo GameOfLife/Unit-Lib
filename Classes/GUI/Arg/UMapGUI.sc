@@ -69,6 +69,9 @@ UMapGUI : UGUI {
 		var umapdragbinReplace;
 		var infoString;
 		var dragging;
+		var isPattern;
+
+		isPattern = UChainGUI.nowBuildingChain.isKindOf( UPattern );
 
 		header = CompositeView( composite, bounds.width @ viewHeight )
 			.resize_(2);
@@ -145,7 +148,7 @@ UMapGUI : UGUI {
 				UMapSetChecker.stall = false;
 			}, {
 				umapdragbinInsert.background = nil;
-			});
+			}, includePattern: isPattern);
 			umapdragbinInsert.background = Color.blue(0.9).alpha_(0.25);
 		});
 
@@ -186,7 +189,7 @@ UMapGUI : UGUI {
 				umapdragbinReplace.background = nil;
 			}, { |def|
 				unit.def.name == def.name
-			});
+			}, includePattern: isPattern );
 			umapdragbinReplace.background = Color.blue(0.9).alpha_(0.25);
 		});
 

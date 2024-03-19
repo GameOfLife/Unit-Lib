@@ -105,6 +105,8 @@ UGUI {
 	}
 
 	makeSubViews { |bounds|
+		var isPattern;
+		isPattern = UChainGUI.nowBuildingChain.isKindOf( UPattern );
 		views = ();
 
 		this.makeHeader(bounds);
@@ -162,7 +164,7 @@ UGUI {
 						});
 
 						umapdragbin.mouseDownAction_({
-							this.makeUMapDefMenu({ |def| unit.canUseUMap( key, def ); }, { |def, args| unit.insertUMap( key, def ); if( args.notNil ) { unit[ key ].set( *args ) } }, { umapdragbin.background = nil; });
+							this.makeUMapDefMenu({ |def| unit.canUseUMap( key, def ); }, { |def, args| unit.insertUMap( key, def ); if( args.notNil ) { unit[ key ].set( *args ) } }, { umapdragbin.background = nil; }, includePattern: isPattern );
 							umapdragbin.background = Color.blue(0.9).alpha_(0.25);
 						});
 
@@ -186,7 +188,7 @@ UGUI {
 
 	makeHeader { }
 
-	makeUMapDefMenu { |test, action, hideAction, matchTest|
+	makeUMapDefMenu { |test, action, hideAction, matchTest, includePattern = true|
 		var uDefsList = [], ctrl, menuList, menu, checkedIndex;
 		var uDefsDict = ();
 
@@ -226,7 +228,13 @@ UGUI {
 			});
 		});
 
-		[ \dynamic, \mixed, \value, \control, \pattern ].do({ |key|
+		(
+			if( includePattern ) {
+				[ \dynamic, \mixed, \value, \control, \pattern ]
+			} {
+				[ \dynamic, \mixed, \value, \control ]
+			}
+		).do({ |key|
 			if( uDefsDict.keys.includes( key ) ) {
 				uDefsList = uDefsList.add( key );
 				uDefsDict[ key ] !? _.sortedKeysValuesDo({ |key, value|
