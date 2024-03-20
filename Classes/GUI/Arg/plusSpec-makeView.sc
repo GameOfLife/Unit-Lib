@@ -160,7 +160,321 @@
 
 + ArrayControlSpec {
 
-	 makeView { |parent, bounds, label, action, resize|
+	makeMenu { |hasEdit = true, inView, action|
+		var currentVals, operations;
+		var funcs = (), makeItem;
+		var menu;
+
+		RoundView.pushSkin( UChainGUI.skin ++ ( labelWidth: 60 ));
+
+		currentVals = this.unmap( inView[ \val ] );
+
+		operations = OEM(
+			\invert, { |values|
+				values = this.unmap( values );
+				values = values.linlin(
+					values.minItem, values.maxItem, values.maxItem, values.minItem
+				);
+				this.map( values );
+			},
+			\reverse, { |values|
+				values.reverse;
+			},
+			\sort, { |values|
+				values.sort;
+			},
+			\scramble, { |values|
+				values.scramble;
+			},
+			\random, { |values|
+				var min, max;
+				#min, max = this.unmap( [values.minItem, values.maxItem] );
+				values = values.collect({ 0.0 rrand: 1 }).normalize(min, max);
+				this.map( values );
+			},
+			\line, { |values|
+				var min, max;
+				#min, max = this.unmap( [values.minItem, values.maxItem] );
+				values = (0..values.size-1).linlin(0,values.size-1, min, max );
+				this.map( values );
+			}
+		);
+
+		funcs[ \rotate ] = (
+			settings: [0],
+			labels: ["rotate"],
+			specs: [ [ currentVals.size.neg, currentVals.size,\lin,1,0].asSpec ],
+			calculate: { |evt, values|
+				values.rotate( evt[ \settings ][ 0 ].asInteger )
+			},
+		);
+
+		funcs[ \curve ] = (
+			settings: [0, 0],
+			labels: ["curve", "s-curve"],
+			specs: [ [-16,16,\lin,0,0].asSpec, [-16,16,\lin,0,0].asSpec ],
+			calculate: { |evt, values|
+				var min, max, half, curve, scurve;
+				min = values.minItem;
+				max = values.maxItem;
+				#curve, scurve = evt.settings;
+				values = values.lincurve( min,max,min,max,curve );
+				if( scurve != 0 ) {
+					half = [ min, max ].mean;
+					values.collect({ |val|
+						if( val >= half ) {
+							val.lincurve( half, max, half, max, scurve );
+						} {
+							val.lincurve( min, half, min, half, scurve.neg );
+						};
+					});
+				} {
+					values
+				};
+			},
+		);
+
+		funcs[ \quantize ] = (
+			settings: [0],
+			labels: ["quantize"],
+			specs: [ [0, this.maxval, this.map(0.5).calcCurve(0, this.maxval),0,0].asSpec ],
+			calculate: { |evt, values|
+				this.unmap( this.map( values ).round( evt.settings[0] ) );
+			},
+		);
+
+		funcs[ \smooth ] = (
+			settings: [0,0.3],
+			labels: ["smooth", "window"],
+			specs: [ [-1,1,\lin,0,0].asSpec, [0,1,\lin,0,0.3].asSpec ],
+			calculate: { |evt, values|
+				var n, win, smoothed;
+				n = (evt.settings[1] * values.size).max(3);
+				win = ({ |i|
+					i.linlin(0,(n-1).max(2),-0.5pi,1.5pi).sin.linlin(-1,1,0,1)
+				}!n.max(2)).normalizeSum;
+				smoothed = values.collect({ |item, i|
+					(values.clipAt( (i + (n/ -2).ceil .. i + (n/2).ceil - 1) ) * win).sum;
+				});
+				values.blend( smoothed, evt.settings[0] );
+			},
+		);
+
+		funcs[ \flat ] = (
+			settings: [0, 0.5],
+			labels: ["blend", "center"],
+			specs: [ [0,1].asSpec, [0,1,\lin,0,0.5].asSpec ],
+			calculate: { |evt, values|
+				values.blend( evt.settings[1], evt.settings[0] );
+			},
+		);
+
+		funcs[ \sine ] = (
+			settings: [0,1,0],
+			labels: ["blend", "periods", "phase"],
+			specs: [ [0,1].asSpec, [0.25,16,\exp,0,1].asSpec, AngleSpec() ],
+			calculate: { |evt, values|
+				var min, max, size, blend, periods, phase;
+				min = values.minItem;
+				max = values.maxItem;
+				size = values.size;
+				#blend, periods, phase = evt.settings;
+				values.collect({ |item,i|
+					item.blend(
+						i.linlin(0, size-1, phase, periods * 2pi + phase ).sin.linlin(-1,1,min,max),
+						blend
+					)
+				});
+			},
+		);
+
+		funcs[ \square ] = (
+			settings: [0,1,0.5,0],
+			labels: ["blend", "periods", "width", "phase"],
+			specs: [ [0,1].asSpec, [1, (currentVals.size+1) / 2,\exp,0,1].asSpec, [0,1,\lin,0,0.5].asSpec, AngleSpec() ],
+			calculate: { |evt, values|
+				var min, max, size, blend, periods, width, phase;
+				min = values.minItem;
+				max = values.maxItem;
+				size = values.size;
+				#blend, periods, width, phase = evt.settings;
+				phase = (phase / pi) - 0.5;
+				values.collect({ |item,i|
+					item.blend(
+						(i.linlin(0, size-1, phase, periods + phase ).wrap(0,1) < width).binaryValue.linlin(0,1,min,max),
+						blend
+					)
+				});
+			},
+		);
+
+		funcs[ \triangle ] = (
+			settings: [0,1,0],
+			labels: ["blend", "periods", "phase"],
+			specs: [ [0,1].asSpec, [0.5, (currentVals.size+1) / 2,\exp,0,1].asSpec, AngleSpec() ],
+			calculate: { |evt, values|
+				var min, max, size, blend, periods, phase;
+				min = values.minItem;
+				max = values.maxItem;
+				size = values.size;
+				#blend, periods, phase = evt.settings;
+				phase = phase / pi;
+				values.collect({ |item,i|
+					item.blend(
+						i.linlin(0, size-1, phase, periods + phase ).fold(0,0.5).linlin(0,0.5,min,max),
+						blend
+					)
+				});
+			},
+		);
+
+		makeItem = { |key = 'sine'|
+			funcs[ key ].comp = View().minWidth_(300).minHeight_(
+				(funcs[ key ].specs.collect(_.viewNumLines).sum * 16) + 6
+			);
+			funcs[ key ].comp.addFlowLayout( 2@4, 2@2 );
+			funcs[ key ].specs.do({ |spec, i|
+				var vw;
+				vw = spec.makeView( funcs[ key ].comp, 294@(spec.viewNumLines * 14), funcs[ key ].labels[ i ], { |vws, val|
+					funcs[ key ].settings[ i ] = val;
+					action.value( this.map( funcs[ key ].calculate( currentVals ) ) );
+				});
+				spec.setView( vw, funcs[ key ].settings[ i ] );
+			});
+			Menu( CustomViewAction( funcs[ key ].comp ) ).title_( key.asString )
+		};
+
+		menu = Menu(
+			*operations.keys.collect({ |key|
+				MenuAction( key, {
+					action.value( operations[ key ].value( inView[ \val ] ) );
+				});
+			}) ++ [
+				makeItem.( \rotate ),
+				makeItem.( \curve ),
+				makeItem.( \quantize ),
+				makeItem.( \smooth ),
+				makeItem.( \flat ),
+				makeItem.( \sine ),
+				makeItem.( \square ),
+				makeItem.( \triangle ),
+			];
+		);
+
+		if( hasEdit ) {
+			menu.insertAction(0, MenuAction.separator( "Operations" ) );
+			menu.insertAction(0, MenuAction( "Edit", {
+				if( inView[ \editWin ].notNil && { inView[ \editWin ].w.isClosed.not } ) {
+					inView[ \editWin ].front;
+				} {
+					this.makeEditWindow( inView, inView.label, { |vals|
+						this.setView( inView, vals, true );
+					});
+				};
+			})
+			);
+		};
+
+		RoundView.popSkin;
+
+		^menu.front;
+	}
+
+	makeEditWindow { |inView, label, action|
+		var evws = ();
+
+		RoundView.pushSkin( UChainGUI.skin );
+
+		if( inView.editWin.notNil && { inView[ \editWin ].w.isClosed.not } ) {
+			inView.editWin.w.close;
+		};
+
+		evws[ \values ] = inView[ \val ].copy;
+		evws[ \key ] = label;
+
+		evws[ \w ] = Window("Edit: % (%)".format( evws[ \key ], evws[ \values ].size ) ).front;
+		evws[ \w ].addFlowLayout;
+
+		inView[ \editWin ] = evws;
+
+		evws[ \w ].onClose_({ inView[ \editWin ] = nil });
+
+		evws[ \spec ] = this.originalSpec ?? { this.asControlSpec };
+
+
+		evws[ \setValues ] = { |evt, values|
+			evt[ \values ] = values;
+			evt[ \updateViews ].value;
+		};
+
+		evws[ \multi ] = MultiSliderView( evws[ \w ], evws[ \w ].bounds.width - 8 @ 200 );
+		evws[ \multi ].resize_(2);
+
+		evws[ \updateViews ] = {
+			evws[ \multi ].value = evws[ \spec ].unmap( evws[ \values ] );
+			evws[ \views ].do({ |vw, i|
+				evws[ \spec ].setView( vw, evws[ \values ][ i ] )
+			});
+			this.setView( evws[ \massView ], evws[ \values ] );
+		};
+
+		StaticText( evws[ \w ],  evws[ \w ].view.bounds.width - 92 @ 14 )
+		.string_( " % (% values)".format( evws[ \key ], evws[ \values ].size ) )
+		.applySkin( RoundView.skin )
+		.background_( Color.white.alpha_(0.25) )
+		.font_( (RoundView.skin.font ?? { Font.default }).boldVariant )
+		.mouseDownAction_({
+			this.makeMenu( false, inView, { |vals|
+				evws[ \values ] = vals;
+				action.value( evws[ \values ] );
+			});
+		});
+
+		SmoothButton( evws[ \w ], 78@14 )
+		.radius_(2)
+		.label_(["enable edit", "enable edit"])
+		.value_( 1 )
+		.action_({ |bt| evws[ \multi ].readOnly_( bt.value.booleanValue.not ); });
+
+		evws[ \massView ] = this.makeView( evws[ \w ], (evws[ \w ].bounds.width - 12 ) @ 14, evws[ \key ], { |vws, val|
+			evws[ \values ] = val;
+			action.value( evws[ \values ] );
+		}, 2, hasEdit: false);
+
+		evws[ \scroll ] = ScrollView( evws[ \w ], evws[ \w ].bounds.width - 8 @ ( evws[ \w ].bounds.height - 200 - 18 - 18 - 12 ) );
+		evws[ \scroll ].resize_(5);
+		evws[ \scroll ].addFlowLayout;
+
+		evws[ \w ].view.minWidth_( 400 ).maxWidth_( 400 );
+
+		evws[ \views ] = evws[ \values ].size.collect({ |i|
+			evws[ \spec ].makeView( evws[ \scroll ], 370 @ 14, "% [%]".format(evws[ \key ], i), { |vws, val|
+				evws[ \values ][ i ] = val;
+				action.value( evws[ \values ] );
+			});
+		});
+
+		RoundView.popSkin( UChainGUI.skin );
+
+		evws[ \multi ].value = { 1.0.rand }!25;
+		evws[ \multi ].elasticMode_(1);
+		evws[ \multi ].indexIsHorizontal = true;
+		evws[ \multi ].showIndex = false;
+		evws[ \multi ].action = { |sl|
+			if( sl.readOnly.not ) {
+				evws[ \values ] = evws[ \spec ].map( sl.value );
+				//evws[ \updateViews ].value;
+				action.value( evws[ \values ] );
+			};
+		};
+		evws[ \multi ].readOnly_( false );
+
+		evws[ \updateViews ].value;
+
+		^evws;
+	}
+
+	makeView { |parent, bounds, label, action, resize, hasEdit = true|
 		var vws, view, labelWidth, width;
 		var localStep;
 		var modeFunc;
@@ -169,11 +483,14 @@
 		var tempVal;
 		var optionsWidth = 33, operationsOffset = 1, editWidth = 40;
 		var isMassEdit;
+		var hiliteColor;
 		vws = ();
 
 		isMassEdit = UGUI.nowBuildingUnit.isKindOf( MassEditU );
 
 		font =  (RoundView.skin ? ()).font ?? { Font( Font.defaultSansFace, 10 ); };
+
+		hiliteColor = RoundView.skin[ \SmoothSlider ] !? _.hiliteColor ?? { Color(0,0,0,0.33); };
 
 		bounds.isNil.if{bounds= 350@20};
 
@@ -183,6 +500,7 @@
 		width = bounds.width;
 
 		vws[ \view ] = view;
+		vws[ \label ] = label;
 		vws[ \val ] = default.asCollection;
 		vws[ \range ] = [ vws[ \val ] .minItem, vws[ \val ].maxItem ];
 		vws[ \doAction ] = { action.value( vws, vws[ \val ] ) };
@@ -201,115 +519,13 @@
 			};
 		};
 
-		vws[ \operations ] = OEM(
-			\edit, { |values|
-				var plotter;
-				if( vws[ \plotter ].isNil or: { vws[ \plotter ].parent.isClosed } ) {
-					plotter = vws[ \val ].plot;
-					plotter.editMode_( true )
-						.specs_( this )
-						.findSpecs_( false )
-						.plotMode_( \points )
-						.editFunc_({ |vw|
-							vws[ \val ] = vw.value;
-							vws[ \range ] = [ vws[ \val ].minItem, vws[ \val ].maxItem ];
-							vws[ \setRangeSlider ].value;
-							vws[ \setMeanSlider ].value;
-							action.value( vws, vws[ \val ] );
-						});
-
-					plotter.parent.onClose = plotter.parent.onClose.addFunc({
-						if( vws[ \plotter ] == plotter ) {
-							vws[ \plotter ] = nil;
-						};
-					});
-					vws[ \plotter ] = plotter;
-				} {
-					vws[ \plotter ].parent.front;
-				};
-				values;
-			},
-			\invert, { |values|
-				values = this.unmap( values );
-				values = values.linlin(
-					values.minItem, values.maxItem, values.maxItem, values.minItem
-				);
-				this.map( values );
-			},
-			\reverse, { |values|
-				values.reverse;
-			},
-			\sort, { |values|
-				values.sort;
-			},
-			\scramble, { |values|
-				values.scramble;
-			},
-			\rotate, { |values|
-				values.rotate(1);
-			},
-			\squared, { |values|
-				var min, max;
-				#min, max = this.unmap( [values.minItem, values.maxItem] );
-				this.map( this.unmap( values )
-					.linlin( min, max, 0, 1 ).squared
-					.linlin(0, 1, min, max )
-				);
-			},
-			\sqrt, { |values|
-				var min, max;
-				#min, max = this.unmap( [values.minItem, values.maxItem] );
-				this.map( this.unmap( values )
-					.linlin( min, max, 0, 1 ).sqrt
-					.linlin(0, 1, min, max )
-				);
-			},
-			\scurve, { |values|
-				var min, max;
-				#min, max = this.unmap( [values.minItem, values.maxItem] );
-				this.map( this.unmap( values )
-					.linlin( min, max, 0, 1 ).scurve
-					.linlin(0, 1, min, max )
-				);
-			},
-			\flat, {|values|
-				var mean;
-				mean = values.mean;
-				mean ! (values.size);
-			},
-			\random, { |values|
-				var min, max;
-				#min, max = this.unmap( [values.minItem, values.maxItem] );
-				if( min == max ) { max = vws[ \rangeSlider ].rangeSlider.hi };
-				values = values.collect({ 0.0 rrand: 1 }).normalize(min, max);
-				this.map( values );
-			},
-			\line, { |values|
-				var min, max;
-				#min, max = this.unmap( [values.minItem, values.maxItem] );
-				if( min == max ) { max = vws[ \rangeSlider ].hi; };
-				values = (0..values.size-1).linlin(0,values.size-1, min, max );
-				this.map( values );
-			}
-		);
-
-		[ 0.1, 1, 10, 100, 1000 ].do({ |item|
-			if( (step < item) && { (maxval - minval) >= item } ) {
-				vws[ \operations ][ "round(%)".format(item).asSymbol ] = { |values|
-					this.constrain( values.round(item) );
-				};
-			};
-		});
-
-		vws[ \operations ][ \post ] =  { |values| values.do(_.postln); };
-
 		if( label.notNil ) {
 			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
 			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ bounds.height )
-				.string_( label.asString ++ " " )
-				.align_( \right )
-				.resize_( 4 )
-				.applySkin( RoundView.skin );
+			.string_( label.asString ++ " " )
+			.align_( \right )
+			.resize_( 4 )
+			.applySkin( RoundView.skin );
 			width = width - labelWidth - 2;
 		} {
 			labelWidth = 0;
@@ -347,22 +563,22 @@
 			vws[ \rangeSlider ].rangeSlider.bounds.insetAll(0,0,0,
 				vws[ \rangeSlider ].rangeSlider.bounds.height * 0.6 )
 		)
-			.hiliteColor_( nil )
-			.background_( Color.white.alpha_(0.125) )
-			.knobSize_(0.6)
-			.mode_( \move )
-			.action_({ |sl|
-				var values, min, max, mean;
-				values = this.unmap( vws[ \val ] );
-				min = values.minItem;
-				max = values.maxItem;
-				mean = [ min, max ].mean;
-				values = values.normalize( *(([ min, max ] - mean) + sl.value).clip(0,1) );
-				vws[ \val ] = this.map( values );
-				vws[ \setPlotter ].value;
-				vws[ \setRangeSlider ].value;
-				action.value( vws, vws[ \val ] );
-			});
+		.hiliteColor_( nil )
+		.background_( Color.white.alpha_(0.125) )
+		.knobSize_(0.6)
+		.mode_( \move )
+		.action_({ |sl|
+			var values, min, max, mean;
+			values = this.unmap( vws[ \val ] );
+			min = values.minItem;
+			max = values.maxItem;
+			mean = [ min, max ].mean;
+			values = values.normalize( *(([ min, max ] - mean) + sl.value).clip(0,1) );
+			vws[ \val ] = this.map( values );
+			vws[ \setPlotter ].value;
+			vws[ \setRangeSlider ].value;
+			action.value( vws, vws[ \val ] );
+		});
 
 		vws[ \meanSlider ].mouseDownAction = { |sl, x,y,mod, xx, clickCount|
 			if( clickCount == 2 ) {
@@ -382,67 +598,72 @@
 
 		vws[ \setMeanSlider ].value;
 
-		vws[ \options ] = PopUpMenu( view, optionsWidth @ (bounds.height) )
-			.items_( [ "do", " " ] ++ vws[ \operations ].keys[operationsOffset..] )
-			.font_( font )
-			.applySkin( RoundView.skin )
-			.action_({ |vw|
-				var func;
-				func = vws[ \operations ][ vw.item ];
-				if( func.notNil ) {
-					vws[ \val ] = func.value( vws[ \val ] );
-					vws[ \update ].value;
-					action.value( vws, vws[ \val ] );
-				};
-				vw.value = 0;
+		vws[ \options ] = UserView( view, optionsWidth @  (bounds.height) )
+		.background_( Color.white.alpha_( 0.25 ) )
+		.drawFunc_({ |vw|
+			var bounds, vals, size, def;
+			Pen.color = hiliteColor;
+			bounds = vw.bounds.moveTo(0,0);
+			vals = this.unmap( vws[ \val ] ).linlin(0,1,bounds.height,0);
+			size = vals.size;
+			def = this.unmap( this.originalSpec !? _.default ? 0 ).linlin(0,1,bounds.height,0);
+			Pen.moveTo( bounds.left @ def );
+			vals.do({ |val, i|
+				Pen.lineTo( i.linlin(0,size,0,bounds.width) @ val );
+				Pen.lineTo( (i + 1).linlin(0,size,0,bounds.width) @ val );
 			});
+			Pen.lineTo( bounds.width @ def );
+			Pen.lineTo( bounds.left @ def );
+			Pen.fill;
+		}).mouseDownAction_({
+			this.makeMenu( hasEdit, vws, { |values|
+				vws[ \val ] = values;
+				vws[ \update ].value;
+				action.value( vws, vws[ \val ] );
+			});
+		});
 
 		if( GUI.id != \qt ) {
 			vws[ \edit ] = SmoothButton( view, editWidth @ (bounds.height) )
-				.label_( "edit" )
-				.radius_( 2 )
-				.font_( font )
-				.action_({
-					vws[ \operations ][ \edit ].value;
-				});
+			.label_( "edit" )
+			.radius_( 2 )
+			.font_( font )
+			.action_({
+				vws[ \operations ][ \edit ].value;
+			});
 			vws[ \edit ].resize_(3);
 		};
 
 		if( isMassEdit.not ) {
 			vws[ \expand ] = SmoothButton( view, 12 @ 12 )
-				.label_( '+' )
-				.action_({
-					action.value( vws, UMap( \expand ) );
-				})
-				.resize_(3);
-		};
-
-		vws[ \setPlotter ] = {
-			if( vws[ \plotter ].notNil ) {
-				{ vws[ \plotter ].value = vws[ \val ]; }.defer;
-			};
+			.label_( '+' )
+			.action_({
+				action.value( vws, UMap( \expand ) );
+			})
+			.resize_(3);
 		};
 
 		vws[ \update ] = {
 			vws[ \setRangeSlider ].value;
 			vws[ \setMeanSlider ].value;
-			vws[ \setPlotter ].value;
+			vws[ \editWin ] !? _.setValues( vws[ \val ] );
+			{ vws[ \options ] !? _.refresh; }.defer;
 		};
 
 		vws[ \rangeSlider ].view.resize_(2);
 		vws[ \meanSlider ].resize_(2);
-		vws[ \options ].resize_(3);
+		vws[ \options ] !? _.resize_(3);
 
 		view.view.onClose_({
-			if( vws[ \plotter ].notNil ) {
-				vws[ \plotter ].parent.close
+			if( vws[ \editWin ].notNil && { vws[ \editWin ].w.isClosed.not } ) {
+				vws[ \editWin ].w.close;
 			};
 		});
 
 		^vws;
-	 }
+	}
 
-	 setView { |vws, value, active = false|
+	setView { |vws, value, active = false|
 		vws[ \val ] = value.asCollection;
 		vws[ \update ].value;
 		if( active ) { vws[ \doAction ].value };
