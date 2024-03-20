@@ -291,17 +291,17 @@
 		funcs[ \square ] = (
 			settings: [0,1,0.5,0],
 			labels: ["blend", "periods", "width", "phase"],
-			specs: [ [0,1].asSpec, [1, (currentVals.size+1) / 2,\exp,0,1].asSpec, [0,1,\lin,0,0.5].asSpec, AngleSpec() ],
+			specs: [ [0,1].asSpec, [1, (currentVals.size) / 2,\exp,0,1].asSpec, [0,1,\lin,0,0.5].asSpec, AngleSpec() ],
 			calculate: { |evt, values|
 				var min, max, size, blend, periods, width, phase;
 				min = values.minItem;
 				max = values.maxItem;
 				size = values.size;
 				#blend, periods, width, phase = evt.settings;
-				phase = (phase / pi) - 0.5;
+				phase = phase / pi;
 				values.collect({ |item,i|
 					item.blend(
-						(i.linlin(0, size-1, phase, periods + phase ).wrap(0,1) < width).binaryValue.linlin(0,1,min,max),
+						(i.linlin(0, size, phase, periods + phase ).wrap(0,1) < width).binaryValue.linlin(0,1,min,max),
 						blend
 					)
 				});
@@ -347,7 +347,10 @@
 		menu = Menu(
 			*operations.keys.collect({ |key|
 				MenuAction( key, {
-					action.value( operations[ key ].value( inView[ \val ] ) );
+					var res;
+					res = operations[ key ].value( inView[ \val ] );
+					action.value( res );
+					currentVals = this.unmap( inView[ \val ] );
 				});
 			}) ++ [
 				makeItem.( \rotate ),
@@ -359,7 +362,7 @@
 				makeItem.( \square ),
 				makeItem.( \triangle ),
 			];
-		);
+		).title_( "%".format( inView[ \label ] ) ).tearOff_( true );
 
 		if( hasEdit ) {
 			menu.insertAction(0, MenuAction.separator( "Operations" ) );
@@ -367,9 +370,10 @@
 				if( inView[ \editWin ].notNil && { inView[ \editWin ].w.isClosed.not } ) {
 					inView[ \editWin ].front;
 				} {
-					this.makeEditWindow( inView, inView.label, { |vals|
+					this.makeEditWindow( inView, inView[ \val ].copy, inView.label, { |vals|
 						this.setView( inView, vals, true );
 					});
+					menu.destroy;
 				};
 			})
 			);
@@ -380,7 +384,7 @@
 		^menu.front;
 	}
 
-	makeEditWindow { |inView, label, action|
+	makeEditWindow { |inView, values, label, action|
 		var evws = ();
 
 		RoundView.pushSkin( UChainGUI.skin );
@@ -389,10 +393,10 @@
 			inView.editWin.w.close;
 		};
 
-		evws[ \values ] = inView[ \val ].copy;
+		evws[ \values ] = values;
 		evws[ \key ] = label;
 
-		evws[ \w ] = Window("Edit: % (%)".format( evws[ \key ], evws[ \values ].size ) ).front;
+		evws[ \w ] = Window("Edit: % (% values)".format( evws[ \key ], evws[ \values ].size ) ).front;
 		evws[ \w ].addFlowLayout;
 
 		inView[ \editWin ] = evws;
@@ -418,43 +422,34 @@
 			this.setView( evws[ \massView ], evws[ \values ] );
 		};
 
-		StaticText( evws[ \w ],  evws[ \w ].view.bounds.width - 92 @ 14 )
-		.string_( " % (% values)".format( evws[ \key ], evws[ \values ].size ) )
-		.applySkin( RoundView.skin )
-		.background_( Color.white.alpha_(0.25) )
-		.font_( (RoundView.skin.font ?? { Font.default }).boldVariant )
-		.mouseDownAction_({
-			this.makeMenu( false, inView, { |vals|
-				evws[ \values ] = vals;
-				action.value( evws[ \values ] );
-			});
-		});
-
-		SmoothButton( evws[ \w ], 78@14 )
-		.radius_(2)
-		.label_(["enable edit", "enable edit"])
-		.value_( 1 )
-		.action_({ |bt| evws[ \multi ].readOnly_( bt.value.booleanValue.not ); });
-
-		evws[ \massView ] = this.makeView( evws[ \w ], (evws[ \w ].bounds.width - 12 ) @ 14, evws[ \key ], { |vws, val|
+		evws[ \massView ] = this.makeView( evws[ \w ], (evws[ \w ].bounds.width - 10 ) @ 14, evws[ \key ], { |vws, val|
 			evws[ \values ] = val;
 			action.value( evws[ \values ] );
 		}, 2, hasEdit: false);
 
-		evws[ \scroll ] = ScrollView( evws[ \w ], evws[ \w ].bounds.width - 8 @ ( evws[ \w ].bounds.height - 200 - 18 - 18 - 12 ) );
+		CompositeView(  evws[ \w ], (evws[ \w ].bounds.width - 8 ) @ 2 )
+			.background_( Color.black.alpha_(0.25) )
+			.resize_(2);
+
+		evws[ \scroll ] = ScrollView( evws[ \w ], (evws[ \w ].bounds.width - 10) @ ( evws[ \w ].bounds.height - 200 - 6 - 18 - 12 ) );
 		evws[ \scroll ].resize_(5);
-		evws[ \scroll ].addFlowLayout;
+		evws[ \scroll ].addFlowLayout( 4@0, 4@4 );
+		evws[ \scroll ].hasBorder_( false );
 
 		evws[ \w ].view.minWidth_( 400 ).maxWidth_( 400 );
 
+		RoundView.pushSkin( UChainGUI.skin ++ ( labelWidth: UChainGUI.skin.labelWidth - 4 ) );
+
 		evws[ \views ] = evws[ \values ].size.collect({ |i|
-			evws[ \spec ].makeView( evws[ \scroll ], 370 @ 14, "% [%]".format(evws[ \key ], i), { |vws, val|
+			evws[ \spec ].makeView( evws[ \scroll ], (evws[ \w ].bounds.width - 58) @ 14, "% [%]".format(evws[ \key ], i), { |vws, val|
 				evws[ \values ][ i ] = val;
 				action.value( evws[ \values ] );
 			});
 		});
 
-		RoundView.popSkin( UChainGUI.skin );
+		RoundView.popSkin;
+
+		RoundView.popSkin;
 
 		evws[ \multi ].value = { 1.0.rand }!25;
 		evws[ \multi ].elasticMode_(1);
@@ -463,7 +458,6 @@
 		evws[ \multi ].action = { |sl|
 			if( sl.readOnly.not ) {
 				evws[ \values ] = evws[ \spec ].map( sl.value );
-				//evws[ \updateViews ].value;
 				action.value( evws[ \values ] );
 			};
 		};
@@ -484,6 +478,7 @@
 		var optionsWidth = 33, operationsOffset = 1, editWidth = 40;
 		var isMassEdit;
 		var hiliteColor;
+		var menu;
 		vws = ();
 
 		isMassEdit = UGUI.nowBuildingUnit.isKindOf( MassEditU );
@@ -616,7 +611,7 @@
 			Pen.lineTo( bounds.left @ def );
 			Pen.fill;
 		}).mouseDownAction_({
-			this.makeMenu( hasEdit, vws, { |values|
+			menu = this.makeMenu( hasEdit, vws, { |values|
 				vws[ \val ] = values;
 				vws[ \update ].value;
 				action.value( vws, vws[ \val ] );
@@ -658,6 +653,7 @@
 			if( vws[ \editWin ].notNil && { vws[ \editWin ].w.isClosed.not } ) {
 				vws[ \editWin ].w.close;
 			};
+			menu !? _.destroy;
 		});
 
 		^vws;
