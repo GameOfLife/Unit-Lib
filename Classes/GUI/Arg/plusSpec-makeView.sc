@@ -40,6 +40,7 @@
 					this, { |vw| action.value( vw, vw.value ) },
 					labelWidth: (RoundView.skin ? ()).labelWidth ? 80,
 				    numberWidth: (RoundView.skin ? ()).numberWidth ? 40,
+				    gap: 2@2
 			);
 
 			vws[ \view ] = vws[ \valueView ].view;
@@ -176,7 +177,7 @@
 
 		bounds.isNil.if{bounds= 350@20};
 
-		view = EZCompositeView( parent, bounds, gap: 2@2 );
+		view = EZCompositeView( parent, bounds, gap: 4@4 );
 		view.asView.resize_( resize );
 		bounds = view.asView.bounds;
 		width = bounds.width;
@@ -185,6 +186,20 @@
 		vws[ \val ] = default.asCollection;
 		vws[ \range ] = [ vws[ \val ] .minItem, vws[ \val ].maxItem ];
 		vws[ \doAction ] = { action.value( vws, vws[ \val ] ) };
+
+		if( GUI.id === \qt ) {
+			if( isMassEdit ) {
+				optionsWidth = 40; operationsOffset = 0;
+			} {
+				optionsWidth = 40; operationsOffset = 0;
+			};
+		} {
+			if( isMassEdit ) {
+				optionsWidth = editWidth = 40;
+			} {
+				optionsWidth = editWidth = 33;
+			};
+		};
 
 		vws[ \operations ] = OEM(
 			\edit, { |values|
@@ -300,7 +315,7 @@
 			labelWidth = 0;
 		};
 
-		vws[ \rangeSlider ] = EZSmoothRanger( view, (width - 84) @ (bounds.height),
+		vws[ \rangeSlider ] = EZSmoothRanger( view, (width - optionsWidth - 6) @ (bounds.height),
 			nil, this.asControlSpec, { |sl|
 				var values, min, max;
 				values = this.unmap( vws[ \val ] );
@@ -315,7 +330,7 @@
 				vws[ \setPlotter ].value;
 				vws[ \setMeanSlider ].value;
 				action.value( vws, vws[ \val ] );
-			}, numberWidth: (RoundView.skin ? ()).numberWidth ? 40,
+			}, numberWidth: (RoundView.skin ? ()).numberWidth ? 40, gap: 2@2
 		);
 
 		vws[ \setRangeSlider ] = {
@@ -367,20 +382,6 @@
 
 		vws[ \setMeanSlider ].value;
 
-		if( GUI.id === \qt ) {
-			if( isMassEdit ) {
-				optionsWidth = 80; operationsOffset = 0;
-			} {
-				optionsWidth = 65; operationsOffset = 0;
-			};
-		} {
-			if( isMassEdit ) {
-				optionsWidth = editWidth = 40;
-			} {
-				optionsWidth = editWidth = 33;
-			};
-		};
-
 		vws[ \options ] = PopUpMenu( view, optionsWidth @ (bounds.height) )
 			.items_( [ "do", " " ] ++ vws[ \operations ].keys[operationsOffset..] )
 			.font_( font )
@@ -399,7 +400,6 @@
 		if( GUI.id != \qt ) {
 			vws[ \edit ] = SmoothButton( view, editWidth @ (bounds.height) )
 				.label_( "edit" )
-				.border_( 1 )
 				.radius_( 2 )
 				.font_( font )
 				.action_({
@@ -411,7 +411,6 @@
 		if( isMassEdit.not ) {
 			vws[ \expand ] = SmoothButton( view, 12 @ 12 )
 				.label_( '+' )
-				.border_( 1 )
 				.action_({
 					action.value( vws, UMap( \expand ) );
 				})
@@ -963,7 +962,6 @@
 		};
 
 		vws[ \state ]
-				.border_( 1 )
 				.radius_( 2 )
 				.font_( font )
 				.action_({ |bt|
@@ -980,7 +978,6 @@
 
 		vws[ \invert ] = SmoothButton( view, 40@(bounds.height) )
 			.label_( "invert" )
-			.border_( 1 )
 			.radius_( 2 )
 			.font_( font )
 			.action_({ |bt|
@@ -991,7 +988,6 @@
 
 		vws[ \edit ] = SmoothButton( view, 40 @ (bounds.height) )
 			.label_( "edit" )
-			.border_( 1 )
 			.radius_( 2 )
 			.font_( font )
 			.action_({
@@ -1189,7 +1185,6 @@
 
 		vws[ \edit ] = SmoothButton( view, 40 @ (bounds.height) )
 			.label_( "edit" )
-			.border_( 1 )
 			.radius_( 2 )
 			.font_( font )
 			.action_({
@@ -1297,7 +1292,6 @@
 
 		vws[ \edit ] = SmoothButton( view, 40 @ (bounds.height) )
 			.label_( "edit" )
-			.border_( 1 )
 			.radius_( 2 )
 			.font_( font )
 			.action_({
@@ -2037,9 +2031,9 @@
 
 		bounds.isNil.if{bounds= 350 @ (this.viewNumLines * 18) };
 
-		viewHeight = (bounds.height / this.viewNumLines).floor - 2;
+		viewHeight = 14;
 
-		view = EZCompositeView( parent, bounds, gap: 2@2 );
+		view = EZCompositeView( parent, bounds, gap: 4@4 );
 		bounds = view.asView.bounds;
 
 		vws[ \view ] = view;
@@ -2067,7 +2061,7 @@
 			action.value( vws, vws[ \val ] );
 		};
 
-		vws[ \path ] = MultiFilePathView( view, (view.bounds.width - labelWidth - 4) @ viewHeight );
+		vws[ \path ] = MultiFilePathView( view, (view.bounds.width - labelWidth - 6) @ viewHeight );
 		vws[ \path ].fixedSize = fixedAmount;
 
 		if( fixedAmount ) {
@@ -2109,9 +2103,7 @@
 
 			vws[ \global ] = SmoothButton( view, 40 @ viewHeight )
 				.label_( ["global", "global" ] )
-				.border_( 1 )
 				.radius_( 2 )
-				.hiliteColor_( Color.green )
 				.font_( font )
 				.action_({ |bt|
 					switch( bt.value,
@@ -2133,7 +2125,7 @@
 
 		RoundView.pushSkin( (RoundView.skin.deepCopy ? ()).labelWidth_(30) );
 
-		vws[ \rate ] = rateSpec.makeView( view, (view.bounds.width - labelWidth) @ viewHeight,
+		vws[ \rate ] = rateSpec.makeView( view, (view.bounds.width - labelWidth - 2) @ viewHeight,
 			" rate", { |vw, val|
 				var size;
 				vws[ \updateRate ] = false;
@@ -2155,7 +2147,7 @@
 		view.view.decorator.nextLine;
 		view.view.decorator.shift( labelWidth, 0 );
 
-		vws[ \loop ] = loopSpec.makeView( view, (view.bounds.width - labelWidth) @ viewHeight,
+		vws[ \loop ] = loopSpec.makeView( view, (view.bounds.width - labelWidth - 2) @ viewHeight,
 			" loop", { |vw, val|
 				var size;
 				vws[ \updateLoop ] = false;
@@ -2349,7 +2341,7 @@
 		};
 
 		vws[ \danStowel ] = SmoothButton( view, 80 @ viewHeight )
-		.radius_( 3 )
+		.radius_( 2 )
 		.resize_( 3 )
 		.label_( "generate" )
 		.action_({
@@ -2366,7 +2358,6 @@
 				.value_(1.3)
 				.applySmoothSkin;
 				SmoothButton( vws[ \genWindow ], 80@18 )
-				.border_(1)
 				.extrude_(false)
 				.label_( [ "generate" ] )
 				.action_({
@@ -3463,7 +3454,6 @@
 
 		vws[ \browse ] = SmoothButton( view, Rect( bounds.width - 36, 0, 16, viewHeight ) )
 			.radius_( 0 )
-			.border_(1)
 			.resize_( 3 )
 			.label_( 'folder' )
 			.action_({
@@ -3476,7 +3466,6 @@
 
 		vws[ \refresh ] = SmoothButton( view, Rect( bounds.width - 16, 0, 16, viewHeight ) )
 			.radius_( 0 )
-			.border_(1)
 			.resize_( 3 )
 			.label_( 'roundArrow' )
 			.action_({
@@ -3489,7 +3478,6 @@
 		.string_( "--" );
 
 		vws[ \plot ] = SmoothButton( view, Rect( bounds.width - 36, viewHeight + 2, 36, viewHeight ) ).radius_( 0 )
-			.border_(1)
 			.resize_( 3 )
 		    .label_( "plot" )
 		.action_({

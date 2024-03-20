@@ -330,7 +330,6 @@ UChainGUI {
 		views[ \startButton ] = SmoothButton( composite, 14@14 )
 			.label_( ['power', 'power'] )
 			.radius_(7)
-			.border_(1)
 			.action_( [ {
 					chain.prepareAndStart;							}, {
 					chain.release
@@ -441,7 +440,6 @@ UChainGUI {
 
 		views[ \singleWindow ] = SmoothButton( composite, 84@14 )
 			.label_( [ "single window", "single window" ] )
-			.border_( 1 )
 			//.hiliteColor_( RoundView.skin.hiliteColor ? Color.green )
 			.value_( this.class.singleWindow.binaryValue )
 			.resize_(3)
@@ -470,7 +468,6 @@ UChainGUI {
 				});
 
 			views[ \allowPause ] = SmoothButton( composite, 80@14 )
-				.border_( 1 )
 				.radius_( 3 )
 				.label_( [ "allowPause", "allowPause" ] )
 				.hiliteColor_( Color.green )
@@ -622,7 +619,6 @@ UChainGUI {
 					});
 
 				views[ \infDur ] = SmoothButton( composite, 40@14 )
-					.border_( 1 )
 					.radius_( 3 )
 					.label_( [ "inf", "inf" ] )
 					.action_({ |bt|
@@ -638,14 +634,12 @@ UChainGUI {
 				});
 
 				views[ \fromSoundFile ] = SmoothButton( composite, 40@14 )
-					.border_( 1 )
 					.radius_( 3 )
 					.label_( "auto" )
 					.action_({ chain.useSndFileDur });
 
 
 				views[ \releaseSelf ] = SmoothButton( composite, 84@14 )
-					.border_( 1 )
 					.radius_( 3 )
 					.label_( [ "releaseSelf", "releaseSelf" ] )
 					.action_({ |bt|
@@ -816,7 +810,6 @@ UChainGUI {
 				// global
 
 				views[ \global ] = SmoothButton( composite, 40@14 )
-					.border_( 1 )
 					.radius_( 3 )
 					.label_( [ "global", "global" ] )
 					.action_({ |bt|
@@ -883,7 +876,6 @@ UChainGUI {
 				});
 
 			views[ \muted ] = SmoothButton( composite, 40@14 )
-				.border_( 1 )
 				.radius_( 3 )
 				.label_( [ "mute", "mute" ] )
 			    .hiliteColor_( Color.red(1,0.75) )
@@ -1096,7 +1088,6 @@ UChainGUI {
 		if( notMassEdit ) {
             io = SmoothButton( comp, Rect( comp.bounds.right - 40, 1, 40, 12 ) )
                 .label_( "i/o" )
-                .border_( 1 )
                 .radius_( 2 )
                 .action_({
 	                UChainIOGUI(
@@ -1108,7 +1099,6 @@ UChainGUI {
             code = SmoothButton( comp,
                     Rect( comp.bounds.right - (40 + 4 + 40), 1, 40, 12 ) )
                 .label_( "code" )
-                .border_( 1 )
                 .radius_( 2 )
                 .action_({
 	                UChainCodeGUI(
@@ -1125,7 +1115,6 @@ UChainGUI {
 				)
 			)
 			.label_( "udefs" )
-			.border_( 1 )
 			.radius_( 2 )
 			.action_({
 				UdefsGUI();
@@ -1315,7 +1304,6 @@ UChainGUI {
 			SmoothButton( upatComp,
 					Rect( upatComp.bounds.right - (12 + 2), 1, 12, 12 ) )
 				.label_( '-' )
-				.border_( 1 )
 				.action_({ |bt|
 					var new, index;
 					{
@@ -1376,7 +1364,6 @@ UChainGUI {
 				SmoothButton( upatComp,
 					Rect( upatComp.bounds.right - (12 + 2), 1, 12, 12 ) )
 				.label_( '+' )
-				.border_( 1 )
 				.action_({ |bt|
 					var new, index;
 					{
@@ -1568,7 +1555,6 @@ UChainGUI {
 						1, 18, 12 )
 					)
 					.label_( 'up' )
-					.border_( 1 )
 					.radius_( 2 )
 					.action_({
 						var allUnits, userClosed = true;
@@ -1641,7 +1627,6 @@ UChainGUI {
 				min = SmoothButton( comp,
 							Rect( comp.bounds.right - (12 + 4 + 12), 1, 12, 12 ) )
 						.label_( '-' )
-						.border_( 1 )
 						.action_({
 							var u = unit;
 							if( u.isKindOf( MassEditU ) ) {
@@ -1657,7 +1642,6 @@ UChainGUI {
 				plus = SmoothButton( comp,
 						Rect( comp.bounds.right - (12 + 2), 1, 12, 12 ) )
 					.label_( '+' )
-					.border_( 1 )
 					.action_({
 						var copy;
 						if( unit.isKindOf( MassEditU ) ) {
@@ -1673,7 +1657,6 @@ UChainGUI {
 							1, 45, 12 )
 						)
 						.label_( "bounce" )
-						.border_( 1 )
 						.radius_( 2 )
 						.action_({
 							Dialog.savePanel( { |path|

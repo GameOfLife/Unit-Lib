@@ -221,8 +221,7 @@ BufSndFileView {
 		view.view.decorator.shift( (bounds.width - 44) - 190, 0 );
 
 		views[ \plot ] = SmoothButton( view, 40 @ viewHeight )
-			.radius_( 3 )
-			.border_( 1 )
+			.radius_( 2 )
 			.label_( "plot" )
 			.action_({ |bt|
 
@@ -265,8 +264,7 @@ BufSndFileView {
 			});
 
 		views[ \hasGlobal ] = SmoothButton( view, 40 @ viewHeight )
-				.radius_( 3 )
-				.border_( 1 )
+				.radius_( 2 )
 				.label_( ["global", "global"] )
 				.action_({ |bt|
 					switch( bt.value,
@@ -389,8 +387,7 @@ BufSndFileView {
 		});
 
 		views[ \loop ] = SmoothButton( view, 40 @ viewHeight )
-			.radius_( 3 )
-			.border_( 1 )
+			.radius_( 2 )
 			.resize_( 3 )
 		    //.hiliteColor_( RoundView.skin.hiliteColor ?? { Color.black.alpha_(0.33) } )
 		    .label_( [ "loop", "loop" ] )

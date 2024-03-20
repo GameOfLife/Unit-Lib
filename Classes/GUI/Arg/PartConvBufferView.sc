@@ -141,7 +141,7 @@ PartConvBufferView {
 			.applySkin( RoundView.skin ? () );
 
 		views[ \danStowel ] = SmoothButton( view, 80 @ viewHeight )
-		.radius_( 3 )
+		.radius_( 2 )
 		.resize_( 3 )
 		.label_( "generate" )
 		.action_({
@@ -156,7 +156,6 @@ PartConvBufferView {
 				.value_(1.3)
 				.applySmoothSkin;
 				SmoothButton( views[ \genWindow ], 80@18 )
-				.border_(1)
 				.extrude_(false)
 				.label_( "generate" )
 				.action_({
@@ -192,7 +191,7 @@ PartConvBufferView {
 
 
 		views[ \plot ] = SmoothButton( view, 40 @ viewHeight )
-			.radius_( 3 )
+			.radius_( 2 )
 			.resize_( 3 )
 			.label_( "plot" )
 			.action_({ |bt|
