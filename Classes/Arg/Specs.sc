@@ -115,6 +115,9 @@ StringSpec : Spec {
 		^obj.isString
 	}
 
+	map { |value| ^value }
+	unmap { |value| ^value }
+
 }
 
 IPSpec : StringSpec {
