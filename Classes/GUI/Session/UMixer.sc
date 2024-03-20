@@ -36,6 +36,9 @@ UMixer {
         if(parent.respondsTo(\onClose_)){ parent.onClose_({this.remove}) };
         bounds = inBounds ? Rect(0,0,800,372);
 
+		parent.asView.minHeight = 372;
+		parent.asView.maxHeight = 372;
+
 		RoundView.pushSkin( UChainGUI.skin ?? {()} );
 		font = RoundView.skin.font ?? { Font( Font.defaultSansFace, 11 ); };
 
