@@ -362,7 +362,9 @@
 				makeItem.( \square ),
 				makeItem.( \triangle ),
 			];
-		).title_( "%".format( inView[ \label ] ) ).tearOff_( true );
+		).title_( "%".format( inView[ \label ] ) );
+
+		if( thisProcess.platform.name == \osx ) { menu.tearOff_( true ); };
 
 		if( hasEdit ) {
 			menu.insertAction(0, MenuAction.separator( "Operations" ) );
