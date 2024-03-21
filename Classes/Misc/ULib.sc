@@ -105,6 +105,7 @@ ULib {
 		var statusView, latencyView;
 		var width = 480;
 		var gainSlider, gainSliderCtrl;
+		var windowBottom = 10;
 
 		if( window.notNil && { window.isClosed.not }) {
 			window.close;
@@ -116,7 +117,11 @@ ULib {
 			width = 430;
 		};
 
-		w = Window(name ? "ULib servers", Rect(10, 10, width, 24 +
+		if( thisProcess.platform.name == \windows ) {
+			windowBottom = 58; // make room for the taskbar
+		};
+
+		w = Window(name ? "ULib servers", Rect(10, windowBottom, width, 24 +
 			ULib.servers.collect({ |item|
 				if( item.isKindOf( LoadBalancer ) ) {
 					item.uViewHeight + 22
