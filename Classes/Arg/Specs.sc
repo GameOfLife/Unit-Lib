@@ -75,6 +75,41 @@ ListSpec : Spec {
 
 }
 
+ArraySpec : Spec {
+	// spec for array with any type of value
+	var <>size;
+	var <>originalSpec;
+
+	constrain { |value|
+		value = value.asArray;
+		if( originalSpec.notNil ) {
+			value = value.collect({ |x|
+				originalSpec.constrain(x);
+			});
+		};
+		if( size.notNil ) {
+			^value.wrapExtend( size );
+		} {
+			^value
+		}
+	}
+
+	uconstrain { |value| ^this.constrain( value ? this.default ); }
+
+	*testObject { |obj|
+		^obj.isArray
+	}
+
+	map { |value|
+		^originalSpec !? _.map( value ) ? value;
+	}
+
+	unmap { |value|
+		^originalSpec !? _.unmap( value ) ? value;
+	}
+
+}
+
 ArrayControlSpec : ControlSpec {
 	// spec for an array of values
 	var <>size;
