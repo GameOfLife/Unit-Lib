@@ -22,6 +22,107 @@
 	adaptFromObject { ^this }
 
 	viewNumLines { ^1 }
+
+	makeEditWindow { |inView, values, label, action, spec|
+		var evws = (), canBeControlSpec = false, hasOriginalSpec = false, scrollHeight;
+
+		canBeControlSpec = this.respondsTo( \asControlSpec );
+		hasOriginalSpec = this.respondsTo( \originalSpec );
+
+		if( spec.notNil ) {
+			evws[ \spec ] = spec;
+		} {
+			case { hasOriginalSpec && { this.originalSpec.notNil  } } {
+				evws[ \spec ] = this.originalSpec;
+			} { canBeControlSpec } {
+				evws[ \spec ] = this.asControlSpec;
+			} {
+				"%:makeEditWindow : can't make window, no originalSpec specified\n".postf( this.class );
+				^nil;
+			};
+		};
+
+		RoundView.pushSkin( UChainGUI.skin );
+
+		inView[ \editWin ] !? _.close;
+
+		evws[ \close ] = { |evt| if( evt.w.isClosed.not ) { evt.w.close } };
+
+		evws[ \values ] = values;
+		evws[ \key ] = label;
+
+		evws[ \w ] = Window("Edit: % (% items)".format( evws[ \key ], evws[ \values ].size ) ).front;
+		evws[ \w ].addFlowLayout;
+
+		inView[ \editWin ] = evws;
+
+		evws[ \w ].onClose_({ inView[ \editWin ] = nil });
+
+		evws[ \setValues ] = { |evt, values|
+			evt[ \values ] = values;
+			evt[ \updateViews ].value;
+		};
+
+		if( canBeControlSpec ) {
+			evws[ \controlSpec ] = this.asControlSpec;
+			scrollHeight = evws[ \w ].bounds.height - 200 - 6 - 18 - 12;
+			evws[ \multi ] = MultiSliderView( evws[ \w ], evws[ \w ].bounds.width - 8 @ 200 );
+			evws[ \multi ].resize_(2);
+			evws[ \multi ].elasticMode_(1);
+			evws[ \multi ].indexIsHorizontal = true;
+			evws[ \multi ].showIndex = false;
+			evws[ \multi ].action = { |sl|
+				if( sl.readOnly.not ) {
+					evws[ \values ] = sl.value.collect({ |x| evws[ \spec ].map( x ); });
+					action.value( evws[ \values ] );
+				};
+			};
+			evws[ \multi ].readOnly_( false );
+		} {
+			scrollHeight = evws[ \w ].bounds.height - 2 - 18 - 12;
+		};
+
+		evws[ \updateViews ] = {
+			evws[ \multi ] !? _.value_( evws[ \values ].collect({ |x| evws[ \spec ].unmap( x ) }) );
+			evws[ \views ].do({ |vw, i|
+				evws[ \spec ].setView( vw, evws[ \values ][ i ] )
+			});
+			this.setView( evws[ \massView ], evws[ \values ] );
+		};
+
+		evws[ \massView ] = this.makeView( evws[ \w ], (evws[ \w ].bounds.width - 10 ) @ 14, evws[ \key ], { |vws, val|
+			evws[ \values ] = val;
+			action.value( evws[ \values ] );
+		}, 2, hasEdit: false);
+
+		CompositeView(  evws[ \w ], (evws[ \w ].bounds.width - 8 ) @ 2 )
+			.background_( Color.black.alpha_(0.25) )
+			.resize_(2);
+
+		evws[ \scroll ] = ScrollView( evws[ \w ], (evws[ \w ].bounds.width - 10) @ ( evws[ \w ].bounds.height - 200 - 6 - 18 - 12 ) );
+		evws[ \scroll ].resize_(5);
+		evws[ \scroll ].addFlowLayout( 4@0, 4@4 );
+		evws[ \scroll ].hasBorder_( false );
+
+		evws[ \w ].view.minWidth_( 400 ).maxWidth_( 400 );
+
+		RoundView.pushSkin( UChainGUI.skin ++ ( labelWidth: UChainGUI.skin.labelWidth - 4 ) );
+
+		evws[ \views ] = evws[ \values ].size.collect({ |i|
+			evws[ \spec ].makeView( evws[ \scroll ], (evws[ \w ].bounds.width - 58) @ 14, "% [%]".format(evws[ \key ], i), { |vws, val|
+				evws[ \values ][ i ] = val;
+				action.value( evws[ \values ] );
+			});
+		});
+
+		RoundView.popSkin;
+
+		RoundView.popSkin;
+
+		evws[ \updateViews ].value;
+
+		^evws;
+	}
 }
 
 + Nil {
@@ -235,11 +336,22 @@
 		);
 
 		funcs[ \quantize ] = (
-			settings: [0],
-			labels: ["quantize"],
-			specs: [ [0, this.maxval, this.map(0.5).calcCurve(0, this.maxval),0,0].asSpec ],
+			settings: [0,0],
+			labels: ["absolute", "relative"],
+			specs: [
+				[0, this.maxval, this.map(0.5).calcCurve(0, this.maxval),0,0].asSpec,
+				[0, 1].asSpec,
+		    ],
 			calculate: { |evt, values|
-				this.unmap( this.map( values ).round( evt.settings[0] ) );
+				var out = values;
+				if( evt.settings[0] != 0 ) {
+					out = this.unmap( this.map( values ).round( evt.settings[0] ) );
+				};
+				if( evt.settings[1] != 0 ) {
+					out = values.linlin( values.minItem, values.maxItem, 0,1 ).round( evt.settings[1] )
+					.linlin( 0, 1, values.minItem, values.maxItem )
+				};
+				out;
 			},
 		);
 
@@ -384,90 +496,6 @@
 		RoundView.popSkin;
 
 		^menu.front;
-	}
-
-	makeEditWindow { |inView, values, label, action|
-		var evws = ();
-
-		RoundView.pushSkin( UChainGUI.skin );
-
-		if( inView.editWin.notNil && { inView[ \editWin ].w.isClosed.not } ) {
-			inView.editWin.w.close;
-		};
-
-		evws[ \values ] = values;
-		evws[ \key ] = label;
-
-		evws[ \w ] = Window("Edit: % (% values)".format( evws[ \key ], evws[ \values ].size ) ).front;
-		evws[ \w ].addFlowLayout;
-
-		inView[ \editWin ] = evws;
-
-		evws[ \w ].onClose_({ inView[ \editWin ] = nil });
-
-		evws[ \spec ] = this.originalSpec ?? { this.asControlSpec };
-
-
-		evws[ \setValues ] = { |evt, values|
-			evt[ \values ] = values;
-			evt[ \updateViews ].value;
-		};
-
-		evws[ \multi ] = MultiSliderView( evws[ \w ], evws[ \w ].bounds.width - 8 @ 200 );
-		evws[ \multi ].resize_(2);
-
-		evws[ \updateViews ] = {
-			evws[ \multi ].value = evws[ \spec ].unmap( evws[ \values ] );
-			evws[ \views ].do({ |vw, i|
-				evws[ \spec ].setView( vw, evws[ \values ][ i ] )
-			});
-			this.setView( evws[ \massView ], evws[ \values ] );
-		};
-
-		evws[ \massView ] = this.makeView( evws[ \w ], (evws[ \w ].bounds.width - 10 ) @ 14, evws[ \key ], { |vws, val|
-			evws[ \values ] = val;
-			action.value( evws[ \values ] );
-		}, 2, hasEdit: false);
-
-		CompositeView(  evws[ \w ], (evws[ \w ].bounds.width - 8 ) @ 2 )
-			.background_( Color.black.alpha_(0.25) )
-			.resize_(2);
-
-		evws[ \scroll ] = ScrollView( evws[ \w ], (evws[ \w ].bounds.width - 10) @ ( evws[ \w ].bounds.height - 200 - 6 - 18 - 12 ) );
-		evws[ \scroll ].resize_(5);
-		evws[ \scroll ].addFlowLayout( 4@0, 4@4 );
-		evws[ \scroll ].hasBorder_( false );
-
-		evws[ \w ].view.minWidth_( 400 ).maxWidth_( 400 );
-
-		RoundView.pushSkin( UChainGUI.skin ++ ( labelWidth: UChainGUI.skin.labelWidth - 4 ) );
-
-		evws[ \views ] = evws[ \values ].size.collect({ |i|
-			evws[ \spec ].makeView( evws[ \scroll ], (evws[ \w ].bounds.width - 58) @ 14, "% [%]".format(evws[ \key ], i), { |vws, val|
-				evws[ \values ][ i ] = val;
-				action.value( evws[ \values ] );
-			});
-		});
-
-		RoundView.popSkin;
-
-		RoundView.popSkin;
-
-		evws[ \multi ].value = { 1.0.rand }!25;
-		evws[ \multi ].elasticMode_(1);
-		evws[ \multi ].indexIsHorizontal = true;
-		evws[ \multi ].showIndex = false;
-		evws[ \multi ].action = { |sl|
-			if( sl.readOnly.not ) {
-				evws[ \values ] = evws[ \spec ].map( sl.value );
-				action.value( evws[ \values ] );
-			};
-		};
-		evws[ \multi ].readOnly_( false );
-
-		evws[ \updateViews ].value;
-
-		^evws;
 	}
 
 	makeView { |parent, bounds, label, action, resize, hasEdit = true|
@@ -652,9 +680,7 @@
 		vws[ \options ] !? _.resize_(3);
 
 		view.view.onClose_({
-			if( vws[ \editWin ].notNil && { vws[ \editWin ].w.isClosed.not } ) {
-				vws[ \editWin ].w.close;
-			};
+			vws[ \editWin ] !? _.close;
 			menu !? _.destroy;
 		});
 
@@ -1131,7 +1157,7 @@
 
 + BoolArraySpec {
 
-	 makeView { |parent, bounds, label, action, resize|
+	 makeView { |parent, bounds, label, action, resize, hasEdit = true|
 		var vws, view, labelWidth, width;
 		var localStep;
 		var modeFunc;
@@ -1172,7 +1198,8 @@
 					[ '-', Color.black, Color.gray(0.2,0.25) ]
 				])
 		} {
-			vws[ \state ] = SmoothButton( view, 80@(bounds.height) )
+			vws[ \state ] = SmoothButton( view, (bounds.width - 86 - labelWidth )@(bounds.height) )
+			    .resize_(2)
 				.states_([
 					[ falseLabel ? "off", Color.black, Color.clear ],
 					[ trueLabel ? "on", Color.black, Color.gray(0.2,0.5) ],
@@ -1196,6 +1223,7 @@
 		view.decorator.left_( bounds.width - (40+2+40) );
 
 		vws[ \invert ] = SmoothButton( view, 40@(bounds.height) )
+		    .resize_(3)
 			.label_( "invert" )
 			.radius_( 2 )
 			.font_( font )
@@ -1205,37 +1233,26 @@
 				action.value( vws, vws[ \val ] );
 			});
 
-		vws[ \edit ] = SmoothButton( view, 40 @ (bounds.height) )
+		if( hasEdit ) {
+			vws[ \edit ] = SmoothButton( view, 40 @ (bounds.height) )
 			.label_( "edit" )
+			.resize_(3)
 			.radius_( 2 )
 			.font_( font )
 			.action_({
-				var plotter;
-				if( vws[ \plotter ].isNil or: { vws[ \plotter ].parent.isClosed } ) {
-					plotter = vws[ \val ].collect(_.binaryValue).plot;
-					plotter.editMode_( true )
-						.specs_( ControlSpec(0,1,\lin,1,1) )
-						.findSpecs_( false )
-						.plotMode_( \points )
-						.editFunc_({ |vw|
-							vws[ \val ] = vw.value.collect(_.booleanValue);
-							action.value( vws, vws[ \val ] );
-						});
-
-					plotter.parent.onClose = plotter.parent.onClose.addFunc({
-						if( vws[ \plotter ] == plotter ) {
-							vws[ \plotter ] = nil;
-						};
-					});
-					vws[ \plotter ] = plotter;
+				if( vws[ \editWin ].notNil && { vws[ \editWin ].w.isClosed.not } ) {
+					vws[ \editWin ].front;
 				} {
-					vws[ \plotter ].parent.front;
+					this.makeEditWindow( vws, vws[ \val ].copy, label, { |vals|
+						this.setView( vws, vals, true );
+					}, BoolSpec( false, trueLabel, falseLabel ) );
 				};
 			});
 
-		vws[ \setPlotter ] = {
-			if( vws[ \plotter ].notNil ) {
-				{ vws[ \plotter ].value = vws[ \val ].collect(_.binaryValue); }.defer;
+			vws[ \setPlotter ] = {
+				if( vws[ \plotter ].notNil ) {
+					{ vws[ \plotter ].value = vws[ \val ].collect(_.binaryValue); }.defer;
+				};
 			};
 		};
 
@@ -1245,13 +1262,11 @@
 			} { vws[ \val ].every(_ == false) } {
 				vws[ \state ].value = 0;
 			} { vws[ \state ].value = 2; };
-			vws[ \setPlotter ].value;
+			vws[ \editWin ] !? _.setValues( vws[ \val ] );
 		};
 
 		view.view.onClose_({
-			if( vws[ \plotter ].notNil ) {
-				vws[ \plotter ].parent.close
-			};
+			vws[ \editWin ] !? _.close;
 		});
 
 		^vws;
