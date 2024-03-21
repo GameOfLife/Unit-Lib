@@ -133,6 +133,10 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 	stop { units.do(_.stop) }
 
 	insertUMap { |key, umapdef, args|
+		var wasAutoUpdate;
+		wasAutoUpdate = autoUpdate;
+		autoUpdate = false;
+		UMapSetChecker.stall = true;
 		if( umapdef.isKindOf( UMap ) ) {
 			units.do({ |unit|
 				unit.insertUMap( key, umapdef.deepCopy, args );
@@ -142,12 +146,22 @@ MassEditU : U { // mimicks a real U, but in fact edits multiple instances of the
 				unit.insertUMap( key, umapdef, args );
 			});
 		};
+		autoUpdate = wasAutoUpdate;
+		UMapSetChecker.stall = false;
+		this.changed( \init );
 	}
 
 	removeUMap { |key|
+		var wasAutoUpdate;
+		wasAutoUpdate = autoUpdate;
+		autoUpdate = false;
+		UMapSetChecker.stall = true;
 		units.do({ |unit|
 			unit.removeUMap( key )
 		});
+		autoUpdate = wasAutoUpdate;
+		UMapSetChecker.stall = false;
+		this.changed( \init );
 	}
 
 	set { |...args|
