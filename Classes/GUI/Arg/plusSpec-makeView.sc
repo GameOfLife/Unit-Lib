@@ -315,7 +315,7 @@
 			labels: ["ratio", "type"],
 			specs: [
 				[0.125,8,\exp,0,1].asSpec,
-				ListSpec([ 'step', 'linear', 'quad', 'spline', 'bspline', 'hermite', 'sine'], 1)
+				ListSpec([ 'step', 'linear', 'spline', 'hermite', 'sine'], 1)
 			],
 			calculate: { |evt, values|
 				var ratio, type;
