@@ -310,6 +310,22 @@
 			},
 		);
 
+		funcs[ \resample ] = (
+			settings: [1,'linear'],
+			labels: ["ratio", "type"],
+			specs: [
+				[0.125,8,\exp,0,1].asSpec,
+				ListSpec([ 'step', 'linear', 'quad', 'spline', 'bspline', 'hermite', 'sine'], 1)
+			],
+			calculate: { |evt, values|
+				var ratio, type;
+				#ratio, type = evt.settings;
+				values.size.collect({ |i|
+					values.intAt( i * ratio, type );
+				});
+			},
+		);
+
 		funcs[ \curve ] = (
 			settings: [0, 0],
 			labels: ["curve", "s-curve"],
@@ -336,11 +352,12 @@
 		);
 
 		funcs[ \quantize ] = (
-			settings: [0,0],
-			labels: ["absolute", "relative"],
+			settings: [0,0,0],
+			labels: ["absolute", "relative", "division"],
 			specs: [
 				[0, this.maxval, this.map(0.5).calcCurve(0, this.maxval),0,0].asSpec,
 				[0, 1].asSpec,
+				[0,32,\lin,1,0].asSpec
 		    ],
 			calculate: { |evt, values|
 				var out = values;
@@ -349,6 +366,10 @@
 				};
 				if( evt.settings[1] != 0 ) {
 					out = values.linlin( values.minItem, values.maxItem, 0,1 ).round( evt.settings[1] )
+					.linlin( 0, 1, values.minItem, values.maxItem )
+				};
+				if( evt.settings[2] != 0 ) {
+					out = values.linlin( values.minItem, values.maxItem, 0,1 ).round( 1/evt.settings[2] )
 					.linlin( 0, 1, values.minItem, values.maxItem )
 				};
 				out;
@@ -421,22 +442,26 @@
 		);
 
 		funcs[ \triangle ] = (
-			settings: [0,1,0],
-			labels: ["blend", "periods", "phase"],
-			specs: [ [0,1].asSpec, [0.5, (currentVals.size+1) / 2,\exp,0,1].asSpec, AngleSpec() ],
+			settings: [0,1, 0.5,0],
+			labels: ["blend", "periods", "width", "phase"],
+			specs: [ [0,1].asSpec, [0.5, (currentVals.size) / 2,\exp,0,1].asSpec, [0,1,\lin,0,0.5].asSpec, AngleSpec() ],
 			calculate: { |evt, values|
-				var min, max, size, blend, periods, phase;
+				var min, max, size, blend, periods, width, phase, out;
 				min = values.minItem;
 				max = values.maxItem;
 				size = values.size;
-				#blend, periods, phase = evt.settings;
+				#blend, periods, width, phase = evt.settings;
 				phase = phase / pi;
-				values.collect({ |item,i|
-					item.blend(
-						i.linlin(0, size-1, phase, periods + phase ).fold(0,0.5).linlin(0,0.5,min,max),
-						blend
-					)
+				out = values.collect({ |item,i|
+					var val;
+					val = i.linlin(0, size, phase, periods + phase ).wrap(0.0, 1.0);
+					if( val < width ) {
+						val = val.linlin( 0, width, 0, 1 );
+					} {
+						val = val.linlin( width, 1, 1, 0 );
+					};
 				});
+				values.blend( out.normalize(0,1).linlin(0,1,min,max), blend );
 			},
 		);
 
@@ -466,6 +491,7 @@
 				});
 			}) ++ [
 				makeItem.( \rotate ),
+				makeItem.( \resample ),
 				makeItem.( \curve ),
 				makeItem.( \quantize ),
 				makeItem.( \smooth ),
