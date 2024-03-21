@@ -160,6 +160,9 @@ UEQSpec : Spec {
 		^vws;
 	}
 
+	map { |value| ^if( value.isKindOf( UEQ ) ) { value } { default.copy } }
+	unmap { |value| ^value }
+
 	setView { |view, value, active = false|
 		view[ \val ] = value;
 		if( view[ \editor ].notNil ) {

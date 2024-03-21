@@ -115,7 +115,7 @@ StringSpec : Spec {
 		^obj.isString
 	}
 
-	map { |value| ^value }
+	map { |value| ^value.asString }
 	unmap { |value| ^value }
 
 }
@@ -133,6 +133,8 @@ SymbolSpec : StringSpec {
 	*testObject { |obj|
 		^obj.isKindOf( Symbol )
 	}
+
+	map { |value| ^value.asSymbol }
 
 }
 
@@ -233,7 +235,12 @@ BoolSpec : Spec {
 	}
 
 	map { |value|
-		^value.booleanValue;
+		switch( value.class,
+			Boolean, { ^value },
+			Integer, { ^value.booleanValue },
+			Float, { ^value > 0.5 },
+			{ ^true }
+		)
 	}
 
 	unmap { |value|
