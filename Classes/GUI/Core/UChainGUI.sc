@@ -1136,7 +1136,7 @@ UChainGUI {
 		var realIndex = 0;
 		var massEditWindow;
 		var upatGUI, upatCtrls, upatHeader, upatComp;
-		var uDefMenuFunc;
+		var uDefMenuFunc, plusButtonTask;
 		var addBetweenColor;
 
 		addBetweenColor = RoundView.skin.headerColor !? { |x|
@@ -1490,7 +1490,7 @@ UChainGUI {
 						{ Font( Font.defaultSansFace, 12) }).boldVariant
 				);
 
-			uview = UDragBin( comp, comp.bounds.moveTo(0,0).insetAll( 16,0,0,0) );
+			uview = UDragBin( comp, comp.bounds.moveTo(0,0).insetAll( 16,0,48,0) );
 			uview.color_( Color.gray(0.2) );
 
 			if( showInfoStrings ) {
@@ -1640,17 +1640,80 @@ UChainGUI {
 				};
 
 				plus = SmoothButton( comp,
-						Rect( comp.bounds.right - (12 + 2), 1, 12, 12 ) )
-					.label_( '+' )
-					.action_({
-						var copy;
+					Rect( comp.bounds.right - (12 + 2), 1, 12, 12 ) )
+				.label_( '+' )
+				.mouseDownAction_({
+					plusButtonTask.stop;
+					plusButtonTask = {
+						var actions, currentSize, openAction;
+						0.5.wait;
+						currentSize = if( unit.isKindOf( MassEditU ) ) {
+							unit.units.size;
+						} {
+							1
+						};
+						actions = [1,2,3,4,5,6,7,8,10,12,16,24,32].collect({ |item|
+							var act;
+							act = MenuAction( item, {
+								if( unit.isKindOf( MassEditU ) ) {
+									if( unit.units.size != item ) {
+										case { item == 1 } {
+											unit = unit.units.first;
+											units.put( i, unit );
+										} { item > (unit.units.size) } {
+											(item - unit.units.size).do({ |ii|
+												unit.units_(
+													unit.units.add(
+														unit.units.last
+														.deepCopy.increaseIOs
+													), false
+												);
+											});
+										} {
+											unit.units_(
+												unit.units[..item-1], false
+											);
+										};
+										this.setUnits( units );
+									};
+								} {
+									if( item != 1 ) {
+										(item - 1).do({ |ii|
+											units = units
+											.insert( i+1+ii,
+												unit.deepCopy.increaseIOs( ii+1 )
+											);
+										});
+										this.setUnits( units );
+									};
+								};
+							});
+							if( item == currentSize ) {
+								act.enabled = false;
+								openAction = act;
+							};
+							act;
+						});
+						Menu(
+							MenuAction.separator( "numCopies" ),
+							*actions
+						).front( action: openAction );
+						plusButtonTask = nil;
+					}.fork( AppClock )
+				})
+				.action_({
+					var copy;
+					if( plusButtonTask.notNil ) {
+						plusButtonTask.stop;
+						plusButtonTask = nil;
 						if( unit.isKindOf( MassEditU ) ) {
 							unit.units_( unit.units.add( unit.units.last.deepCopy.increaseIOs ), false );
 						} {
 							units = units.insert( i+1, unit.deepCopy.increaseIOs );
 						};
 						this.setUnits( units );
-					}).resize_(3);
+					};
+				}).resize_(3);
 
 				if(  unit.isKindOf( MassEditU ).not && { unit.audioOuts.size > 0 } ) {					SmoothButton( comp,
 						Rect( comp.bounds.right - (45 + 4 + 12 + 4 + 12 + 4 + 12),
