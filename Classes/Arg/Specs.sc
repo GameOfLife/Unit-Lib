@@ -140,6 +140,15 @@ ArrayControlSpec : ControlSpec {
 	*testObject { |obj| ^obj.isArray && { obj.every(_.isNumber) } }
 }
 
+GenericMassEditSpec : Spec {
+	var <>originalSpec;
+	var <>size;
+	var <>default;
+
+	map { |value| ^value }
+	unmap { |value| ^value }
+}
+
 StringSpec : Spec {
 
 	var <>default = "";
@@ -849,6 +858,42 @@ RangeSpec : ControlSpec {
 		};
 	}
 	asArrayControlSpec { ^ArrayControlSpec.newFrom( this ); }
+
+}
+
+MultiRangeSpec : ControlSpec {
+	var <>minRange, <>maxRange;
+	var <>size;
+
+	*new { |minval=0.0, maxval=1.0, minRange=0, maxRange = inf, warp='lin', step=0.0,
+			 default, units|
+		^super.new( minval, maxval, warp, step, default ? [[minval,maxval]], units )
+			.minRange_( minRange ).maxRange_( maxRange )
+	}
+
+	asRangeSpec {
+		^RangeSpec.newFrom( this ).default_( this.default[0] );
+	}
+	asControlSpec { ^ControlSpec.newFrom( this ).default_( this.default.flat.mean ); }
+	asArrayControlSpec { ^this }
+
+	copy {
+		^this.class.newFrom(this);
+	}
+
+	constrain { |value|
+		var ctrlSpec = this.asRangeSpec;
+		if( size.notNil ) {
+			^value.collect({ |x| ctrlSpec.constrain(x) })
+				.wrapExtend( size );
+		} {
+			^value.collect{ |x| ctrlSpec.constrain(x) }
+		}
+	}
+
+	uconstrain { |value| ^this.constrain( value ? this.default ); }
+
+	*testObject { |obj| ^obj.isArray && { obj.every(_.isArray) } }
 
 }
 

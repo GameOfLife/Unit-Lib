@@ -352,7 +352,7 @@
 			nil;
 		};
 
-		operations[ \post ] = { |values| values.postln; };
+		operations[ \post ] = { |values| values.postcs; };
 
 		^operations;
 	}
@@ -364,7 +364,7 @@
 
 		RoundView.pushSkin( UChainGUI.skin ++ ( labelWidth: 60 ));
 
-		currentVals = this.unmap( inView[ \val ] );
+		if( this.respondsTo( \unmap ) ) { currentVals = this.unmap( inView[ \val ] ); };
 
 		operations = this.makeOperations( currentVals, action );
 
@@ -398,7 +398,7 @@
 						res = operation.value( inView[ \val ] );
 						if( res.notNil ) {
 							action.value( res );
-							currentVals = this.unmap( inView[ \val ] );
+							if( this.respondsTo( \unmap ) ) { currentVals = this.unmap( inView[ \val ] ); };
 						};
 					});
 				}
@@ -771,6 +771,162 @@
 		this.setView( vws, this.map(value), active );
 	}
 
+}
+
++ GenericMassEditSpec {
+
+	viewNumLines { ^this.originalSpec.viewNumLines }
+
+	makeView { |parent, bounds, label, action, resize, hasEdit = true|
+		var vws, view, labelWidth, width;
+		var localStep;
+		var modeFunc;
+		var font;
+		var editAction;
+		var tempVal;
+		var optionsWidth = 40;
+		var isMassEdit = true;
+		var hiliteColor;
+		var menu, compWidth;
+		var canMap = false;
+		var hasDefault;
+
+		vws = ();
+
+		font = (RoundView.skin ? ()).font ?? { Font( Font.defaultSansFace, 10 ); };
+
+		hiliteColor = RoundView.skin[ \SmoothSlider ] !? _.hiliteColor ?? { Color(0,0,0,0.33); };
+
+		hasDefault = this.originalSpec.respondsTo( \default );
+
+		bounds.isNil.if{bounds= 350@20};
+
+		view = EZCompositeView( parent, bounds, gap: 4@4 );
+		view.asView.resize_( resize );
+		bounds = view.asView.bounds;
+		width = bounds.width;
+
+		vws[ \view ] = view;
+		vws[ \label ] = label;
+		if( hasDefault ) { vws[ \val ] = [ this.originalSpec.default ]; } { vws[ \val ] = [ nil ] };
+		vws[ \doAction ] = { action.value( vws, vws[ \val ] ) };
+
+		if( originalSpec.respondsTo( \unmap ) && {
+			if( hasDefault ) {
+				originalSpec.unmap( originalSpec.default ).isNumber
+			} { false }
+		}) { canMap = true };
+
+		if( label.notNil ) {
+			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
+			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ bounds.height )
+			.string_( label.asString ++ " " )
+			.align_( \right )
+			.resize_( 4 )
+			.applySkin( RoundView.skin );
+			width = width - labelWidth - 2;
+		} {
+			labelWidth = 0;
+		};
+
+		compWidth = bounds.width - labelWidth - 8 - optionsWidth;
+
+		vws[ \specComp ] = View( view, compWidth @  (bounds.height) );
+
+		vws[ \specView ] = this.originalSpec.makeView(
+			vws[ \specComp ],
+			vws[ \specComp ].bounds.moveTo(0,0),
+			nil, { |vw, val|
+				vws[ \val ] = vws[ \val ].collect( val.deepCopy );
+			}
+		);
+
+		view.asView.decorator.shift( compWidth.neg - 4, 0 );
+
+		vws[ \mixedComp ] = View( view, compWidth @  (bounds.height) );
+
+		vws[ \mixedView ] = StaticText( vws[ \mixedComp ], vws[ \mixedComp ].bounds.moveTo(0,0).height_(14) )
+		.string_( " mixed" )
+		.applySkin( RoundView.skin );
+
+		vws[ \mixedView ].setProperty(\wordWrap, false);
+
+
+		vws[ \options ] = UserView( view, optionsWidth @ 14 )
+		.background_( Color.white.alpha_( 0.25 ) )
+		.mouseDownAction_({
+			menu = this.makeMenu( hasEdit, vws, { |values|
+				vws[ \val ] = values;
+				vws[ \update ].value;
+				action.value( vws, vws[ \val ] );
+			}, [ \reverse, \scramble, \rotate, 'code...', \post ]);
+		});
+
+		if( canMap ) {
+			vws[ \options ].drawFunc_({ |vw|
+				var bounds, vals, size, def;
+				Pen.color = hiliteColor;
+				bounds = vw.bounds.moveTo(0,0);
+				vals = vws[ \val ].collect({ |val|
+					this.originalSpec.unmap( val )
+				}).linlin(0,1,bounds.height,0);
+				size = vals.size;
+				if( hasDefault ) {
+					def = this.orinalSpec.unmap( this.originalSpec.default ).linlin(0,1,bounds.height,0);
+				} {
+					def = 0.5.linlin( 0,1, bounds.height,0 );
+				};
+				Pen.moveTo( bounds.left @ def );
+				vals.do({ |val, i|
+					Pen.lineTo( i.linlin(0,size,0,bounds.width) @ val );
+					Pen.lineTo( (i + 1).linlin(0,size,0,bounds.width) @ val );
+				});
+				Pen.lineTo( bounds.width @ def );
+				Pen.lineTo( bounds.left @ def );
+				Pen.fill;
+			});
+		};
+
+		vws[ \update ] = {
+			var isSingle, string;
+			vws[ \editWin ] !? _.setValues( vws[ \val ] );
+			isSingle = vws[ \val ].every({ |item| item == vws[ \val ][ 0 ] });
+			if( isSingle && { vws[ \val ][0].notNil } ) {
+				this.originalSpec.setView( vws[ \specView ], vws[ \val ][0], false );
+			};
+			{
+				if( isSingle ) {
+					vws[ \specComp ].visible = true;
+					vws[ \mixedComp ].visible = false;
+				} {
+					vws[ \specComp ].visible = false;
+					vws[ \mixedComp ].visible = true;
+					string =  " " ++ vws[ \val ].cs;
+					if( string.bounds( font ).width <= vws[ \mixedView ].bounds.width ) {
+						vws[ \mixedView ].string = string;
+					} {
+						vws[ \mixedView ].string = " mixed (% items)".format( vws[ \val ].size );
+					};
+				};
+				vws[ \options ].refresh;
+			}.defer;
+		};
+
+		vws[ \options ] !? _.resize_(3);
+
+		view.view.onClose_({
+			vws[ \editWin ] !? _.close;
+			menu !? _.destroy;
+		});
+
+		^vws;
+	}
+
+	setView { |vws, value, active = false|
+		vws[ \val ] = value.asCollection;
+		vws[ \update ].value;
+		if( active ) { vws[ \doAction ].value };
+	}
 }
 
 + StringSpec {
@@ -1861,7 +2017,7 @@
 
 	makeView { |parent, bounds, label, action, resize|
 		var vws = (), view, labelWidth, numWidth = 40, sliderWidth;
-		var cspec, numberStep, round = 0.001, background;
+		var cspec, numberStep, round = 0.001, background, hiliteColor;
 
 		cspec = this.asControlSpec;
 
@@ -1875,6 +2031,7 @@
 		view.addFlowLayout( 0@0, 2@2 );
 
 		numWidth = RoundView.skin.numberWidth ? 40;
+		hiliteColor = RoundView.skin.hiliteColor ?? { Color.blue.alpha_(0.5) };
 
 		if( label.notNil ) {
 			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
@@ -1901,6 +2058,7 @@
 		});
 		vws[ \slider1 ] = SmoothSlider( view, sliderWidth @ (bounds.height / 2) )
 		.centered_( true )
+		.hiliteColor_( hiliteColor )
 		.knobSize_(0.5)
 		.action_({ |sl|
 			vws[ \val ][0] = cspec.map( sl.value );
@@ -1911,6 +2069,7 @@
 		vws[ \slider2 ] = SmoothSlider( view, sliderWidth @ (bounds.height / 2) )
 		.centered_( true )
 		.knobSize_(0.5)
+		.hiliteColor_( hiliteColor )
 		.action_({ |sl|
 			vws[ \val ][1] = cspec.map( sl.value );
 			vws.setVal;
@@ -1941,6 +2100,13 @@
 			evt[ \slider2 ].value = cspec.unmap( evt.val[1] );
 			evt[ \slider1 ].centerPos = evt[ \slider2 ].value;
 			evt[ \slider2 ].centerPos = evt[ \slider1 ].value;
+			if( evt.val[0] <= evt.val[1] ) {
+				evt[ \slider1 ].hiliteColor = hiliteColor;
+				evt[ \slider2 ].hiliteColor = hiliteColor;
+			} {
+				evt[ \slider1 ].hiliteColor = hiliteColor.complementary;
+				evt[ \slider2 ].hiliteColor = hiliteColor.complementary;
+			};
 		};
 
 		vws[ \doAction ] = { action.value( vws, vws[ \val ] ); }

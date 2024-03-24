@@ -19,12 +19,19 @@
 
 + Spec {
 
-	massEditSpec { ^nil }
+	massEditSpec { |inArray|
+		^GenericMassEditSpec()
+		.default_( inArray )
+		.size_( inArray.size )
+		.originalSpec_( this )
+	}
 
-	massEditValue { ^0 }
+	massEditValue { |inArray|
+		^inArray
+	}
 
 	massEdit { |inArray, params|
-		^inArray;  // no mass editing for default spec
+		^params;
 	}
 
 }
