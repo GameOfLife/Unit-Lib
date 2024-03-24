@@ -298,7 +298,19 @@
 				#min, max = this.unmap( [values.minItem, values.maxItem] );
 				values = (0..values.size-1).linlin(0,values.size-1, min, max );
 				this.map( values );
-			}
+			},
+			\post, { |values|
+				values.postln;
+			},
+			'code...', { |values|
+				CodeEditView( object: values ).action_({ |cew|
+					var res;
+					res = this.constrain( cew.object.asArray );
+					res.postln;
+					action.value( res );
+				});
+				nil;
+			},
 		);
 
 		funcs[ \rotate ] = (
@@ -486,8 +498,10 @@
 				MenuAction( key, {
 					var res;
 					res = operations[ key ].value( inView[ \val ] );
-					action.value( res );
-					currentVals = this.unmap( inView[ \val ] );
+					if( res.notNil ) {
+						action.value( res );
+						currentVals = this.unmap( inView[ \val ] );
+					};
 				});
 			}) ++ [
 				makeItem.( \rotate ),
@@ -2958,26 +2972,11 @@
 		bounds = view.asView.bounds;
 
 		makeMenu = {
-			var mv1, mv2, sls, menus = [], currentValue, transpFunc;
+			var mv0, mv1, mv2, sls, menus = [], currentValue, transpFunc;
 
 			currentValue = vws[ \val ];
 
 			RoundView.pushSkin( UChainGUI.skin ++ (labelWidth: 80) );
-
-			menus = menus.add(
-				MenuAction( "default (%)".format( this.default ), { vws.setVal( this.default ); vws.doAction });
-			);
-
-			menus = menus.add(
-				Menu( *(this.minval.cpsmidi.ceil.asInteger..this.maxval.cpsmidi.asInteger).clump(12).collect({ |item|
-					Menu( *item.collect({ |num| MenuAction( "% (%)".format( num, num.midiname ), {
-						vws.setVal( num.midicps );
-						vws.doAction;
-					} ) }) )
-					.title_( "% - %".format( item.first, item.last ) );
-				})
-				).title_( "MIDI note" )
-			);
 
 			menus = menus.add(
 				Menu( *[ "C", "D", "E", "F", "G", "A", "B" ].collect({ |letter|
@@ -2994,6 +2993,24 @@
 					).title_( letter )
 				})
 				).title_( "named note" )
+			);
+
+			mv0 = 1.collect({ View().minWidth_(300).minHeight_(20); });
+
+			EZSmoothSlider(mv0[0], Rect( 0, 2, 300, 16 ), "midinote", [
+				this.minval.cpsmidi.ceil,
+				this.maxval.cpsmidi.floor,
+				\lin, 1,
+				this.default.cpsmidi.round(1)
+			].asSpec )
+			.value_( currentValue.cpsmidi.round(1) )
+			.action_({ |sl|
+				vws.setVal( sl.value.midicps );
+				vws.doAction;
+			}).sliderView.centered_( true );
+
+			menus = menus.add(
+				Menu( *mv0.collect({ |v| CustomViewAction( v ) }) ).title_( "MIDI note" )
 			);
 
 			if( this.maxval <= 300 ) {
@@ -3108,6 +3125,10 @@
 						})
 					).title_( item.first.join( "/" ) + "-" + item.last.join("/") );
 				}) ).title_( "fraction" )
+			);
+
+			menus = menus.add(
+				MenuAction( "default (%)".format( this.default ), { vws.setVal( this.default ); vws.doAction });
 			);
 
 			Menu( *menus ).front;

@@ -36,7 +36,7 @@
 + ControlSpec {
 
 	massEditSpec { |inArray|
-		^this.asArrayControlSpec.default_( inArray );
+		^this.asArrayControlSpec.size_( inArray.size ).default_( inArray );
 	}
 
 	massEditValue { |inArray|
@@ -52,7 +52,7 @@
 + AngleSpec {
 
 	massEditSpec { |inArray|
-		^AngleArraySpec.newFrom( this ).default_( inArray );
+		^AngleArraySpec.newFrom( this ).size_( inArray.size ).default_( inArray );
 	}
 
 	massEditValue { |inArray|

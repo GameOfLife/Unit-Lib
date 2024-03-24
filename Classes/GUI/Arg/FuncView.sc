@@ -56,7 +56,7 @@ CodeEditView {
 			.keyUpAction_( { |vw| vw.syntaxColorize; this.checkChanged } );
 
 		view.decorator.nextLine;
-		view.decorator.shift( bounds.width - (3 * (60 + gap.x)) );
+		view.decorator.shift( bounds.width - (2 * (60 + gap.x) + 2) );
 
 		revertButton = SmoothButton( view,  60@20 )
 			.label_( "revert" )
@@ -74,6 +74,8 @@ CodeEditView {
 				if( obj.notNil ) {
 					object = obj;
 					action.value( this );
+				    view.getParents.last.findWindow.close;
+				    obj = nil;
 				} {
 					failAction.value( this );
 				};
