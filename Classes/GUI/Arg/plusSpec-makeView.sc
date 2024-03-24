@@ -123,6 +123,313 @@
 
 		^evws;
 	}
+
+	makeOperations { |currentVals, action|
+		var operations;
+
+		operations = OEM(
+			\invert, { |values|
+				values = this.unmap( values );
+				values = values.linlin(
+					values.minItem, values.maxItem, values.maxItem, values.minItem
+				);
+				this.map( values );
+			},
+			\reverse, { |values|
+				values.reverse;
+			},
+			\sort, { |values|
+				values.sort;
+			},
+			\scramble, { |values|
+				values.scramble;
+			},
+			\random, { |values|
+				var min, max;
+				if( values.first.isKindOf( Number ) ) {
+					#min, max = this.unmap( [values.minItem, values.maxItem] );
+				} {
+					#min, max = [0,1];
+				};
+				values = values.collect({ 0.0 rrand: 1 }).normalize(min, max);
+				this.map( values );
+			},
+			\line, { |values|
+				var min, max;
+				if( values.first.isKindOf( Number ) ) {
+					#min, max = this.unmap( [values.minItem, values.maxItem] );
+				} {
+					#min, max = [0,1];
+				};
+				values = (0..values.size-1).linlin(0,values.size-1, min, max );
+				this.map( values );
+			},
+		);
+
+		operations[ \rotate ] = (
+			settings: [0],
+			labels: ["rotate"],
+			specs: { [ [ currentVals.size.neg, currentVals.size,\lin,1,0].asSpec ] },
+			calculate: { |evt, values|
+				values.rotate( evt[ \settings ][ 0 ].asInteger )
+			},
+		);
+
+		operations[ \resample ] = (
+			settings: [1,'linear'],
+			labels: ["ratio", "type"],
+			specs: { [
+				[0.125,8,\exp,0,1].asSpec,
+				ListSpec([ 'step', 'linear', 'spline', 'hermite', 'sine'], 1)
+			] },
+			calculate: { |evt, values|
+				var ratio, type;
+				#ratio, type = evt.settings;
+				values.size.collect({ |i|
+					values.intAt( i * ratio, type );
+				});
+			},
+		);
+
+		operations[ \curve ] = (
+			settings: [0, 0],
+			labels: ["curve", "s-curve"],
+			specs: { [ [-16,16,\lin,0,0].asSpec, [-16,16,\lin,0,0].asSpec ] },
+			calculate: { |evt, values|
+				var min, max, half, curve, scurve;
+				min = values.minItem;
+				max = values.maxItem;
+				#curve, scurve = evt.settings;
+				values = values.lincurve( min,max,min,max,curve );
+				if( scurve != 0 ) {
+					half = [ min, max ].mean;
+					values.collect({ |val|
+						if( val >= half ) {
+							val.lincurve( half, max, half, max, scurve );
+						} {
+							val.lincurve( min, half, min, half, scurve.neg );
+						};
+					});
+				} {
+					values
+				};
+			},
+		);
+
+		operations[ \quantize ] = (
+			settings: [0,0,0],
+			labels: ["absolute", "relative", "division"],
+			specs: { [
+				[0, this.maxval, this.map(0.5).calcCurve(0, this.maxval),0,0].asSpec,
+				[0, 1].asSpec,
+				[0,32,\lin,1,0].asSpec
+			] },
+			calculate: { |evt, values|
+				var out = values;
+				if( evt.settings[0] != 0 ) {
+					out = this.unmap( this.map( values ).round( evt.settings[0] ) );
+				};
+				if( evt.settings[1] != 0 ) {
+					out = values.linlin( values.minItem, values.maxItem, 0,1 ).round( evt.settings[1] )
+					.linlin( 0, 1, values.minItem, values.maxItem )
+				};
+				if( evt.settings[2] != 0 ) {
+					out = values.linlin( values.minItem, values.maxItem, 0,1 ).round( 1/evt.settings[2] )
+					.linlin( 0, 1, values.minItem, values.maxItem )
+				};
+				out;
+			},
+		);
+
+		operations[ \smooth ] = (
+			settings: [0,0.3],
+			labels: ["smooth", "window"],
+			specs: { [ [-1,1,\lin,0,0].asSpec, [0,1,\lin,0,0.3].asSpec ] },
+			calculate: { |evt, values|
+				var n, win, smoothed;
+				n = (evt.settings[1] * values.size).max(3);
+				win = ({ |i|
+					i.linlin(0,(n-1).max(2),-0.5pi,1.5pi).sin.linlin(-1,1,0,1)
+				}!n.max(2)).normalizeSum;
+				smoothed = values.collect({ |item, i|
+					(values.clipAt( (i + (n/ -2).ceil .. i + (n/2).ceil - 1) ) * win).sum;
+				});
+				values.blend( smoothed, evt.settings[0] );
+			},
+		);
+
+		operations[ \flat ] = (
+			settings: [0, 0.5],
+			labels: ["blend", "center"],
+			specs: { [ [0,1].asSpec, [0,1,\lin,0,0.5].asSpec ] },
+			calculate: { |evt, values|
+				values.blend( evt.settings[1], evt.settings[0] );
+			},
+		);
+
+		operations[ \sine ] = (
+			settings: [0,1,0],
+			labels: ["blend", "periods", "phase"],
+			specs: { [ [0,1].asSpec, [0.25,16,\exp,0,1].asSpec, AngleSpec() ] },
+			calculate: { |evt, values|
+				var min, max, size, blend, periods, phase;
+				min = values.minItem;
+				max = values.maxItem;
+				size = values.size;
+				#blend, periods, phase = evt.settings;
+				values.collect({ |item,i|
+					item.blend(
+						i.linlin(0, size-1, phase, periods * 2pi + phase ).sin.linlin(-1,1,min,max),
+						blend
+					)
+				});
+			},
+		);
+
+		operations[ \square ] = (
+			settings: [0,1,0.5,0],
+			labels: ["blend", "periods", "width", "phase"],
+			specs: { [ [0,1].asSpec, [1, (currentVals.size) / 2,\exp,0,1].asSpec, [0,1,\lin,0,0.5].asSpec, AngleSpec() ] },
+			calculate: { |evt, values|
+				var min, max, size, blend, periods, width, phase;
+				min = values.minItem;
+				max = values.maxItem;
+				size = values.size;
+				#blend, periods, width, phase = evt.settings;
+				phase = phase / pi;
+				values.collect({ |item,i|
+					item.blend(
+						(i.linlin(0, size, phase, periods + phase ).wrap(0,1) < width).binaryValue.linlin(0,1,min,max),
+						blend
+					)
+				});
+			},
+		);
+
+		operations[ \triangle ] = (
+			settings: [0,1, 0.5,0],
+			labels: ["blend", "periods", "width", "phase"],
+			specs: { [
+				[0,1].asSpec,
+				[0.5, (currentVals.size) / 2,\exp,0,1].asSpec,
+				[0,1,\lin,0,0.5].asSpec, AngleSpec()
+			] },
+			calculate: { |evt, values|
+				var min, max, size, blend, periods, width, phase, out;
+				min = values.minItem;
+				max = values.maxItem;
+				size = values.size;
+				#blend, periods, width, phase = evt.settings;
+				phase = phase / pi;
+				out = values.collect({ |item,i|
+					var val;
+					val = i.linlin(0, size, phase, periods + phase ).wrap(0.0, 1.0);
+					if( val < width ) {
+						val = val.linlin( 0, width, 0, 1 );
+					} {
+						val = val.linlin( width, 1, 1, 0 );
+					};
+				});
+				values.blend( out.normalize(0,1).linlin(0,1,min,max), blend );
+			},
+		);
+
+		operations[ 'code...' ] =  { |values|
+			CodeEditView( object: values ).action_({ |cew|
+				var res;
+				res = cew.object;
+				if( res.isKindOf( Function ) ) {
+					res = Array.fill( this.size, res );
+				};
+				res = this.constrain( res.asArray );
+				res.postln;
+				action.value( res );
+			});
+			nil;
+		};
+
+		operations[ \post ] = { |values| values.postln; };
+
+		^operations;
+	}
+
+	makeMenu { |hasEdit = true, inView, action, filter|
+		var currentVals, operations;
+		var makeItem;
+		var menu;
+
+		RoundView.pushSkin( UChainGUI.skin ++ ( labelWidth: 60 ));
+
+		currentVals = this.unmap( inView[ \val ] );
+
+		operations = this.makeOperations( currentVals, action );
+
+		makeItem = { |key = 'sine'|
+			var operation;
+			operation = operations[ key ];
+			switch( operation.class,
+				Event, {
+					operation.comp = View().minWidth_(300).minHeight_(
+						(operation.specs.collect(_.viewNumLines).sum * 16) + 6
+					);
+					operation.comp.addFlowLayout( 2@4, 2@2 );
+					operation.specs.do({ |spec, i|
+						var vw;
+						vw = spec.makeView(
+							operation.comp,
+							294@(spec.viewNumLines * 14),
+							operation.labels[ i ],
+							{ |vws, val|
+								operation.settings[ i ] = val;
+								action.value( this.map( operation.calculate( currentVals ) ) );
+							}
+						);
+						spec.setView( vw, operation.settings[ i ] );
+					});
+					Menu( CustomViewAction( operation.comp ) ).title_( key.asString )
+				},
+				Function, {
+					MenuAction( key, {
+						var res;
+						res = operation.value( inView[ \val ] );
+						if( res.notNil ) {
+							action.value( res );
+							currentVals = this.unmap( inView[ \val ] );
+						};
+					});
+				}
+			)
+		};
+
+		menu = Menu(
+			*operations.keys.select({ |key|
+				if( filter.isNil ) { true } {
+					filter.includes( key );
+				};
+			}).collect({ |key| makeItem.( key ) })
+		).title_( "%".format( inView[ \label ] ) );
+
+		if( thisProcess.platform.name == \osx ) { menu.tearOff_( true ); };
+
+		if( hasEdit ) {
+			menu.insertAction(0, MenuAction.separator( "Operations" ) );
+			menu.insertAction(0, MenuAction( "Edit", {
+				if( inView[ \editWin ].notNil && { inView[ \editWin ].w.isClosed.not } ) {
+					inView[ \editWin ].front;
+				} {
+					this.makeEditWindow( inView, inView[ \val ].copy, inView.label, { |vals|
+						this.setView( inView, vals, true );
+					});
+					menu.destroy;
+				};
+			})
+			);
+		};
+
+		RoundView.popSkin;
+
+		^menu.front;
+	}
 }
 
 + Nil {
@@ -260,283 +567,6 @@
 }
 
 + ArrayControlSpec {
-
-	makeMenu { |hasEdit = true, inView, action|
-		var currentVals, operations;
-		var funcs = (), makeItem;
-		var menu;
-
-		RoundView.pushSkin( UChainGUI.skin ++ ( labelWidth: 60 ));
-
-		currentVals = this.unmap( inView[ \val ] );
-
-		operations = OEM(
-			\invert, { |values|
-				values = this.unmap( values );
-				values = values.linlin(
-					values.minItem, values.maxItem, values.maxItem, values.minItem
-				);
-				this.map( values );
-			},
-			\reverse, { |values|
-				values.reverse;
-			},
-			\sort, { |values|
-				values.sort;
-			},
-			\scramble, { |values|
-				values.scramble;
-			},
-			\random, { |values|
-				var min, max;
-				#min, max = this.unmap( [values.minItem, values.maxItem] );
-				values = values.collect({ 0.0 rrand: 1 }).normalize(min, max);
-				this.map( values );
-			},
-			\line, { |values|
-				var min, max;
-				#min, max = this.unmap( [values.minItem, values.maxItem] );
-				values = (0..values.size-1).linlin(0,values.size-1, min, max );
-				this.map( values );
-			},
-			\post, { |values|
-				values.postln;
-			},
-			'code...', { |values|
-				CodeEditView( object: values ).action_({ |cew|
-					var res;
-					res = this.constrain( cew.object.asArray );
-					res.postln;
-					action.value( res );
-				});
-				nil;
-			},
-		);
-
-		funcs[ \rotate ] = (
-			settings: [0],
-			labels: ["rotate"],
-			specs: [ [ currentVals.size.neg, currentVals.size,\lin,1,0].asSpec ],
-			calculate: { |evt, values|
-				values.rotate( evt[ \settings ][ 0 ].asInteger )
-			},
-		);
-
-		funcs[ \resample ] = (
-			settings: [1,'linear'],
-			labels: ["ratio", "type"],
-			specs: [
-				[0.125,8,\exp,0,1].asSpec,
-				ListSpec([ 'step', 'linear', 'spline', 'hermite', 'sine'], 1)
-			],
-			calculate: { |evt, values|
-				var ratio, type;
-				#ratio, type = evt.settings;
-				values.size.collect({ |i|
-					values.intAt( i * ratio, type );
-				});
-			},
-		);
-
-		funcs[ \curve ] = (
-			settings: [0, 0],
-			labels: ["curve", "s-curve"],
-			specs: [ [-16,16,\lin,0,0].asSpec, [-16,16,\lin,0,0].asSpec ],
-			calculate: { |evt, values|
-				var min, max, half, curve, scurve;
-				min = values.minItem;
-				max = values.maxItem;
-				#curve, scurve = evt.settings;
-				values = values.lincurve( min,max,min,max,curve );
-				if( scurve != 0 ) {
-					half = [ min, max ].mean;
-					values.collect({ |val|
-						if( val >= half ) {
-							val.lincurve( half, max, half, max, scurve );
-						} {
-							val.lincurve( min, half, min, half, scurve.neg );
-						};
-					});
-				} {
-					values
-				};
-			},
-		);
-
-		funcs[ \quantize ] = (
-			settings: [0,0,0],
-			labels: ["absolute", "relative", "division"],
-			specs: [
-				[0, this.maxval, this.map(0.5).calcCurve(0, this.maxval),0,0].asSpec,
-				[0, 1].asSpec,
-				[0,32,\lin,1,0].asSpec
-		    ],
-			calculate: { |evt, values|
-				var out = values;
-				if( evt.settings[0] != 0 ) {
-					out = this.unmap( this.map( values ).round( evt.settings[0] ) );
-				};
-				if( evt.settings[1] != 0 ) {
-					out = values.linlin( values.minItem, values.maxItem, 0,1 ).round( evt.settings[1] )
-					.linlin( 0, 1, values.minItem, values.maxItem )
-				};
-				if( evt.settings[2] != 0 ) {
-					out = values.linlin( values.minItem, values.maxItem, 0,1 ).round( 1/evt.settings[2] )
-					.linlin( 0, 1, values.minItem, values.maxItem )
-				};
-				out;
-			},
-		);
-
-		funcs[ \smooth ] = (
-			settings: [0,0.3],
-			labels: ["smooth", "window"],
-			specs: [ [-1,1,\lin,0,0].asSpec, [0,1,\lin,0,0.3].asSpec ],
-			calculate: { |evt, values|
-				var n, win, smoothed;
-				n = (evt.settings[1] * values.size).max(3);
-				win = ({ |i|
-					i.linlin(0,(n-1).max(2),-0.5pi,1.5pi).sin.linlin(-1,1,0,1)
-				}!n.max(2)).normalizeSum;
-				smoothed = values.collect({ |item, i|
-					(values.clipAt( (i + (n/ -2).ceil .. i + (n/2).ceil - 1) ) * win).sum;
-				});
-				values.blend( smoothed, evt.settings[0] );
-			},
-		);
-
-		funcs[ \flat ] = (
-			settings: [0, 0.5],
-			labels: ["blend", "center"],
-			specs: [ [0,1].asSpec, [0,1,\lin,0,0.5].asSpec ],
-			calculate: { |evt, values|
-				values.blend( evt.settings[1], evt.settings[0] );
-			},
-		);
-
-		funcs[ \sine ] = (
-			settings: [0,1,0],
-			labels: ["blend", "periods", "phase"],
-			specs: [ [0,1].asSpec, [0.25,16,\exp,0,1].asSpec, AngleSpec() ],
-			calculate: { |evt, values|
-				var min, max, size, blend, periods, phase;
-				min = values.minItem;
-				max = values.maxItem;
-				size = values.size;
-				#blend, periods, phase = evt.settings;
-				values.collect({ |item,i|
-					item.blend(
-						i.linlin(0, size-1, phase, periods * 2pi + phase ).sin.linlin(-1,1,min,max),
-						blend
-					)
-				});
-			},
-		);
-
-		funcs[ \square ] = (
-			settings: [0,1,0.5,0],
-			labels: ["blend", "periods", "width", "phase"],
-			specs: [ [0,1].asSpec, [1, (currentVals.size) / 2,\exp,0,1].asSpec, [0,1,\lin,0,0.5].asSpec, AngleSpec() ],
-			calculate: { |evt, values|
-				var min, max, size, blend, periods, width, phase;
-				min = values.minItem;
-				max = values.maxItem;
-				size = values.size;
-				#blend, periods, width, phase = evt.settings;
-				phase = phase / pi;
-				values.collect({ |item,i|
-					item.blend(
-						(i.linlin(0, size, phase, periods + phase ).wrap(0,1) < width).binaryValue.linlin(0,1,min,max),
-						blend
-					)
-				});
-			},
-		);
-
-		funcs[ \triangle ] = (
-			settings: [0,1, 0.5,0],
-			labels: ["blend", "periods", "width", "phase"],
-			specs: [ [0,1].asSpec, [0.5, (currentVals.size) / 2,\exp,0,1].asSpec, [0,1,\lin,0,0.5].asSpec, AngleSpec() ],
-			calculate: { |evt, values|
-				var min, max, size, blend, periods, width, phase, out;
-				min = values.minItem;
-				max = values.maxItem;
-				size = values.size;
-				#blend, periods, width, phase = evt.settings;
-				phase = phase / pi;
-				out = values.collect({ |item,i|
-					var val;
-					val = i.linlin(0, size, phase, periods + phase ).wrap(0.0, 1.0);
-					if( val < width ) {
-						val = val.linlin( 0, width, 0, 1 );
-					} {
-						val = val.linlin( width, 1, 1, 0 );
-					};
-				});
-				values.blend( out.normalize(0,1).linlin(0,1,min,max), blend );
-			},
-		);
-
-		makeItem = { |key = 'sine'|
-			funcs[ key ].comp = View().minWidth_(300).minHeight_(
-				(funcs[ key ].specs.collect(_.viewNumLines).sum * 16) + 6
-			);
-			funcs[ key ].comp.addFlowLayout( 2@4, 2@2 );
-			funcs[ key ].specs.do({ |spec, i|
-				var vw;
-				vw = spec.makeView( funcs[ key ].comp, 294@(spec.viewNumLines * 14), funcs[ key ].labels[ i ], { |vws, val|
-					funcs[ key ].settings[ i ] = val;
-					action.value( this.map( funcs[ key ].calculate( currentVals ) ) );
-				});
-				spec.setView( vw, funcs[ key ].settings[ i ] );
-			});
-			Menu( CustomViewAction( funcs[ key ].comp ) ).title_( key.asString )
-		};
-
-		menu = Menu(
-			*operations.keys.collect({ |key|
-				MenuAction( key, {
-					var res;
-					res = operations[ key ].value( inView[ \val ] );
-					if( res.notNil ) {
-						action.value( res );
-						currentVals = this.unmap( inView[ \val ] );
-					};
-				});
-			}) ++ [
-				makeItem.( \rotate ),
-				makeItem.( \resample ),
-				makeItem.( \curve ),
-				makeItem.( \quantize ),
-				makeItem.( \smooth ),
-				makeItem.( \flat ),
-				makeItem.( \sine ),
-				makeItem.( \square ),
-				makeItem.( \triangle ),
-			];
-		).title_( "%".format( inView[ \label ] ) );
-
-		if( thisProcess.platform.name == \osx ) { menu.tearOff_( true ); };
-
-		if( hasEdit ) {
-			menu.insertAction(0, MenuAction.separator( "Operations" ) );
-			menu.insertAction(0, MenuAction( "Edit", {
-				if( inView[ \editWin ].notNil && { inView[ \editWin ].w.isClosed.not } ) {
-					inView[ \editWin ].front;
-				} {
-					this.makeEditWindow( inView, inView[ \val ].copy, inView.label, { |vals|
-						this.setView( inView, vals, true );
-					});
-					menu.destroy;
-				};
-			})
-			);
-		};
-
-		RoundView.popSkin;
-
-		^menu.front;
-	}
 
 	makeView { |parent, bounds, label, action, resize, hasEdit = true|
 		var vws, view, labelWidth, width;
@@ -712,7 +742,7 @@
 			vws[ \setRangeSlider ].value;
 			vws[ \setMeanSlider ].value;
 			vws[ \editWin ] !? _.setValues( vws[ \val ] );
-			{ vws[ \options ] !? _.refresh; }.defer;
+			{ vws[ \options ].refresh; }.defer;
 		};
 
 		vws[ \rangeSlider ].view.resize_(2);
@@ -1197,6 +1227,8 @@
 
 + BoolArraySpec {
 
+	 originalSpec { ^BoolSpec( false, trueLabel, falseLabel ) }
+
 	 makeView { |parent, bounds, label, action, resize, hasEdit = true|
 		var vws, view, labelWidth, width;
 		var localStep;
@@ -1204,9 +1236,13 @@
 		var font;
 		var editAction;
 		var tempVal;
+		var hiliteColor;
+		var menu;
 		vws = ();
 
 		font =  (RoundView.skin ? ()).font ?? { Font( Font.defaultSansFace, 10 ); };
+
+		hiliteColor = RoundView.skin[ \SmoothSlider ] !? _.hiliteColor ?? { Color(0,0,0,0.33); };
 
 		bounds.isNil.if{bounds= 350@20};
 
@@ -1238,7 +1274,7 @@
 					[ '-', Color.black, Color.gray(0.2,0.25) ]
 				])
 		} {
-			vws[ \state ] = SmoothButton( view, (bounds.width - 86 - labelWidth )@(bounds.height) )
+			vws[ \state ] = SmoothButton( view, (bounds.width - 46 - labelWidth )@(bounds.height) )
 			    .resize_(2)
 				.states_([
 					[ falseLabel ? "off", Color.black, Color.clear ],
@@ -1260,8 +1296,9 @@
 					action.value( vws, vws[ \val ] );
 				});
 
-		view.decorator.left_( bounds.width - (40+2+40) );
+		view.decorator.left_( bounds.width - 40 );
 
+		/*
 		vws[ \invert ] = SmoothButton( view, 40@(bounds.height) )
 		    .resize_(3)
 			.label_( "invert" )
@@ -1272,8 +1309,35 @@
 				vws[ \update ].value;
 				action.value( vws, vws[ \val ] );
 			});
+		*/
 
-		if( hasEdit ) {
+		vws[ \options ] = UserView( view, 40 @  (bounds.height) )
+		.background_( Color.white.alpha_( 0.25 ) )
+		.drawFunc_({ |vw|
+			var bounds, vals, size, def;
+			Pen.color = hiliteColor;
+			bounds = vw.bounds.moveTo(0,0);
+			vals = this.unmap( vws[ \val ] ).linlin(0,1,bounds.height,0);
+			size = vals.size;
+			//def = this.unmap( this.originalSpec !? _.default ? 0 ).linlin(0,1,bounds.height,0);
+			def = bounds.height/2;
+			Pen.moveTo( bounds.left @ def );
+			vals.do({ |val, i|
+				Pen.lineTo( i.linlin(0,size,0,bounds.width) @ val );
+				Pen.lineTo( (i + 1).linlin(0,size,0,bounds.width) @ val );
+			});
+			Pen.lineTo( bounds.width @ def );
+			Pen.lineTo( bounds.left @ def );
+			Pen.fill;
+		}).mouseDownAction_({
+			menu = this.makeMenu( hasEdit, vws, { |values|
+				vws[ \val ] = values;
+				vws[ \update ].value;
+				action.value( vws, vws[ \val ] );
+			}, [ \invert, \reverse, \scramble, \random, \line, \rotate, \flat, 'code...', \post ]);
+		});
+
+		/*if( hasEdit ) {
 			vws[ \edit ] = SmoothButton( view, 40 @ (bounds.height) )
 			.label_( "edit" )
 			.resize_(3)
@@ -1295,6 +1359,7 @@
 				};
 			};
 		};
+		*/
 
 		vws[ \update ] = {
 			case { vws[ \val ].every(_ == true) } {
@@ -1303,10 +1368,12 @@
 				vws[ \state ].value = 0;
 			} { vws[ \state ].value = 2; };
 			vws[ \editWin ] !? _.setValues( vws[ \val ] );
+			{ vws[ \options ].refresh }.defer;
 		};
 
 		view.view.onClose_({
 			vws[ \editWin ] !? _.close;
+			menu !? _.destroy;
 		});
 
 		^vws;

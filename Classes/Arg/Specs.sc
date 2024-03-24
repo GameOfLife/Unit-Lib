@@ -303,11 +303,25 @@ BoolArraySpec : BoolSpec {
 	// spec for an array of boolean values
 
 	constrain { |value|
-		^value.asArray.collect(_.booleanValue);
+		^value.asArray.collect({ |val|
+			switch( val.class,
+				Boolean, { ^val },
+				Integer, { ^val.booleanValue },
+				Float, { ^val > 0.5 },
+				{ ^true }
+			)
+		});
 	}
 
-	map { |value|
-		^value.asArray.collect(_.booleanValue);
+	map { |val|
+		^val.asArray.collect({ |value|
+			switch( value.class,
+				Boolean, { value },
+				Integer, { value.booleanValue },
+				Float, { value > 0.5 },
+				{ true }
+			)
+		});
 	}
 
 	unmap { |value|
