@@ -220,7 +220,20 @@ BufSndFileView {
 
 		view.view.decorator.shift( (bounds.width - 44) - 190, 0 );
 
-		views[ \plot ] = SmoothButton( view, 40 @ viewHeight )
+		views[ \hasGlobal ] = SmoothButton( view, 40 @ viewHeight )
+				.radius_( 2 )
+				.label_( ["global", "global"] )
+				.action_({ |bt|
+					switch( bt.value,
+						1, { this.performSndFile( \loadGlobal ) },
+						0, { this.performSndFile( \disposeGlobal ) }
+					);
+				});
+		updGlobal = {
+			views[ \hasGlobal ].value = this.performSndFile( \hasGlobal ).binaryValue;
+		};
+
+				views[ \plot ] = SmoothButton( view, 40 @ viewHeight )
 			.radius_( 2 )
 			.label_( "plot" )
 			.action_({ |bt|
@@ -262,19 +275,6 @@ BufSndFileView {
 				bt.onClose = bt.onClose.addFunc( closeFunc );
 
 			});
-
-		views[ \hasGlobal ] = SmoothButton( view, 40 @ viewHeight )
-				.radius_( 2 )
-				.label_( ["global", "global"] )
-				.action_({ |bt|
-					switch( bt.value,
-						1, { this.performSndFile( \loadGlobal ) },
-						0, { this.performSndFile( \disposeGlobal ) }
-					);
-				});
-		updGlobal = {
-			views[ \hasGlobal ].value = this.performSndFile( \hasGlobal ).binaryValue;
-		};
 
 		BufSndFile.global.addDependant( updGlobal );
 		views[ \hasGlobal ].onClose_({

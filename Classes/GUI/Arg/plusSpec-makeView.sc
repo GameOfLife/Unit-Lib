@@ -25,6 +25,7 @@
 
 	makeEditWindow { |inView, values, label, action, spec|
 		var evws = (), canBeControlSpec = false, hasOriginalSpec = false, scrollHeight;
+		var specViewHeight, originalViewHeight;
 
 		canBeControlSpec = this.respondsTo( \asControlSpec );
 		hasOriginalSpec = this.respondsTo( \originalSpec );
@@ -41,6 +42,9 @@
 				^nil;
 			};
 		};
+
+		specViewHeight = this.viewNumLines * 18;
+		originalViewHeight = evws[ \spec ].viewNumLines * 18;
 
 		RoundView.pushSkin( UChainGUI.skin );
 
@@ -65,7 +69,7 @@
 
 		if( canBeControlSpec ) {
 			evws[ \controlSpec ] = this.asControlSpec;
-			scrollHeight = evws[ \w ].bounds.height - 200 - 6 - 18 - 12;
+			scrollHeight = evws[ \w ].bounds.height - 200 - 6 - specViewHeight - 12;
 			evws[ \multi ] = MultiSliderView( evws[ \w ], evws[ \w ].bounds.width - 8 @ 200 );
 			evws[ \multi ].resize_(2);
 			evws[ \multi ].elasticMode_(1);
@@ -79,7 +83,7 @@
 			};
 			evws[ \multi ].readOnly_( false );
 		} {
-			scrollHeight = evws[ \w ].bounds.height - 2 - 18 - 12;
+			scrollHeight = evws[ \w ].bounds.height - 2 - specViewHeight - 12;
 		};
 
 		evws[ \updateViews ] = {
@@ -90,7 +94,7 @@
 			this.setView( evws[ \massView ], evws[ \values ] );
 		};
 
-		evws[ \massView ] = this.makeView( evws[ \w ], (evws[ \w ].bounds.width - 10 ) @ 14, evws[ \key ], { |vws, val|
+		evws[ \massView ] = this.makeView( evws[ \w ], (evws[ \w ].bounds.width - 10 ) @ (specViewHeight - 4), evws[ \key ], { |vws, val|
 			evws[ \values ] = val;
 			action.value( evws[ \values ] );
 		}, 2, hasEdit: false);
@@ -99,7 +103,7 @@
 			.background_( Color.black.alpha_(0.25) )
 			.resize_(2);
 
-		evws[ \scroll ] = ScrollView( evws[ \w ], (evws[ \w ].bounds.width - 10) @ ( evws[ \w ].bounds.height - 200 - 6 - 18 - 12 ) );
+		evws[ \scroll ] = ScrollView( evws[ \w ], (evws[ \w ].bounds.width - 10) @ scrollHeight );
 		evws[ \scroll ].resize_(5);
 		evws[ \scroll ].addFlowLayout( 4@0, 4@4 );
 		evws[ \scroll ].hasBorder_( false );
@@ -109,7 +113,7 @@
 		RoundView.pushSkin( UChainGUI.skin ++ ( labelWidth: UChainGUI.skin.labelWidth - 4 ) );
 
 		evws[ \views ] = evws[ \values ].size.collect({ |i|
-			evws[ \spec ].makeView( evws[ \scroll ], (evws[ \w ].bounds.width - 58) @ 14, "% [%]".format(evws[ \key ], i), { |vws, val|
+			evws[ \spec ].makeView( evws[ \scroll ], (evws[ \w ].bounds.width - 58) @ (originalViewHeight - 4), "% [%]".format(evws[ \key ], i), { |vws, val|
 				evws[ \values ][ i ] = val;
 				action.value( evws[ \values ] );
 			});
@@ -1298,19 +1302,6 @@
 
 		view.decorator.left_( bounds.width - 40 );
 
-		/*
-		vws[ \invert ] = SmoothButton( view, 40@(bounds.height) )
-		    .resize_(3)
-			.label_( "invert" )
-			.radius_( 2 )
-			.font_( font )
-			.action_({ |bt|
-				vws[ \val ] = vws[ \val ].collect( _.not );
-				vws[ \update ].value;
-				action.value( vws, vws[ \val ] );
-			});
-		*/
-
 		vws[ \options ] = UserView( view, 40 @  (bounds.height) )
 		.background_( Color.white.alpha_( 0.25 ) )
 		.drawFunc_({ |vw|
@@ -1336,30 +1327,6 @@
 				action.value( vws, vws[ \val ] );
 			}, [ \invert, \reverse, \scramble, \random, \line, \rotate, \flat, 'code...', \post ]);
 		});
-
-		/*if( hasEdit ) {
-			vws[ \edit ] = SmoothButton( view, 40 @ (bounds.height) )
-			.label_( "edit" )
-			.resize_(3)
-			.radius_( 2 )
-			.font_( font )
-			.action_({
-				if( vws[ \editWin ].notNil && { vws[ \editWin ].w.isClosed.not } ) {
-					vws[ \editWin ].front;
-				} {
-					this.makeEditWindow( vws, vws[ \val ].copy, label, { |vals|
-						this.setView( vws, vals, true );
-					}, BoolSpec( false, trueLabel, falseLabel ) );
-				};
-			});
-
-			vws[ \setPlotter ] = {
-				if( vws[ \plotter ].notNil ) {
-					{ vws[ \plotter ].value = vws[ \val ].collect(_.binaryValue); }.defer;
-				};
-			};
-		};
-		*/
 
 		vws[ \update ] = {
 			case { vws[ \val ].every(_ == true) } {
@@ -2267,7 +2234,7 @@
 		if( resize.notNil ) { vws[ \view ].resize = resize };
 
 		vws[ \sndFileView ] = this.viewClass.new( vws[ \view ],
-			( bounds.width - (labelWidth+4) ) @ bounds.height, { |vw|
+			( bounds.width - (labelWidth+2) ) @ bounds.height, { |vw|
 				action.value( vw, vw.value )
 			} )
 
@@ -2359,7 +2326,7 @@
 
 	viewNumLines { ^4 }
 
-	makeView { |parent, bounds, label, action, resize|
+	makeView { |parent, bounds, label, action, resize, hasEdit = true|
 		var vws, view, labelWidth;
 		var localStep;
 		var font;
@@ -2396,13 +2363,7 @@
 			labelWidth = 0;
 		};
 
-
-		editAction = { |vw|
-			vws[ \val ] = vw.object;
-			action.value( vws, vws[ \val ] );
-		};
-
-		vws[ \path ] = MultiFilePathView( view, (view.bounds.width - labelWidth - 6) @ viewHeight );
+		vws[ \path ] = MultiFilePathView( view, (view.bounds.width - labelWidth - 4) @ viewHeight );
 		vws[ \path ].fixedSize = fixedAmount;
 
 		if( fixedAmount ) {
@@ -2440,7 +2401,7 @@
 		};
 
 		if( sndFileClass != DiskSndFileSpec ) {
-			view.view.decorator.left = view.bounds.width - 42;
+			view.view.decorator.left = view.bounds.width - 84;
 
 			vws[ \global ] = SmoothButton( view, 40 @ viewHeight )
 				.label_( ["global", "global" ] )
@@ -2461,12 +2422,26 @@
 				};
 			};
 		};
+
+		if( hasEdit ) {
+			view.view.decorator.left = view.bounds.width - 40;
+
+			vws[ \edit ] = SmoothButton( view, 40 @ viewHeight )
+			.label_( "edit" )
+			.radius_( 2 )
+			.action_({
+				this.makeEditWindow( vws, vws[ \val ], label, { |vals|
+					this.setView( vws, vals, true );
+				}, BufSndFileSpec(nil) )
+			});
+		};
+
 		view.view.decorator.nextLine;
 		view.view.decorator.shift( labelWidth, 0 );
 
 		RoundView.pushSkin( (RoundView.skin.deepCopy ? ()).labelWidth_(30) );
 
-		vws[ \rate ] = rateSpec.makeView( view, (view.bounds.width - labelWidth - 2) @ viewHeight,
+		vws[ \rate ] = rateSpec.makeView( view, (view.bounds.width - labelWidth) @ viewHeight,
 			" rate", { |vw, val|
 				var size;
 				vws[ \updateRate ] = false;
@@ -2488,7 +2463,7 @@
 		view.view.decorator.nextLine;
 		view.view.decorator.shift( labelWidth, 0 );
 
-		vws[ \loop ] = loopSpec.makeView( view, (view.bounds.width - labelWidth - 2) @ viewHeight,
+		vws[ \loop ] = loopSpec.makeView( view, (view.bounds.width - labelWidth ) @ viewHeight,
 			" loop", { |vw, val|
 				var size;
 				vws[ \updateLoop ] = false;
@@ -2506,6 +2481,10 @@
 				loopSpec.setView( evt[ \loop ], value.collect(_.loop) );
 			};
 		};
+
+		view.view.onClose_({
+			vws[ \editWin ] !? _.close;
+		});
 
 		RoundView.popSkin;
 
