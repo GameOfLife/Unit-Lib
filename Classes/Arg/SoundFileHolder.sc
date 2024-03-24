@@ -825,8 +825,6 @@ DiskSndFile : AbstractSndFile {
 
     u_waitTime { ^1 }
 
-    hasGlobal { ^false }
-
 }
 
 + Object {
