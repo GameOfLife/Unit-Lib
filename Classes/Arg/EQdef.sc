@@ -377,6 +377,10 @@ EQSetting {
 		 };
 	 }
 
+	== { |that|
+		^this.compareObject(that, [\setting, \def])
+	}
+
 	 *ar { |in, setting, def|
 		 var new;
 		 if( setting.isKindOf( EQSetting ) ) {
