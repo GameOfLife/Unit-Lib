@@ -457,7 +457,7 @@ UEnvSpec : Spec {
 	}
 
 	map { |value|
-		^value;
+		^if( value.isKindOf( Env ) ) { value } { default.copy };
 	}
 
 	unmap { |value|
