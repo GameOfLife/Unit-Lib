@@ -99,11 +99,13 @@ UEQSpec : Spec {
 		var font;
 		var editAction;
 		var tempVal;
-		var skin;
+		var skin, hiliteColor;
 		vws = ();
 
 		skin = RoundView.skin;
 		font =  skin.font ?? { Font( Font.defaultSansFace, 10 ); };
+
+		hiliteColor = skin[ \SmoothSlider ] !? _.hiliteColor ?? { Color(0,0,0,0.33); };
 
 		bounds.isNil.if{bounds= 160@20};
 
@@ -140,8 +142,8 @@ UEQSpec : Spec {
 			svals = values.sum.linlin(range.neg,range, bounds.height, 0, \none);
 
 			// draw summed magResponse
-			Pen.strokeColor = Color.blue(0.5);
-			Pen.fillColor = skin.hiliteColor ? Color.gray(0.5);
+			Pen.strokeColor = Color.blue(1.0).alpha_(0.5);
+			Pen.fillColor = hiliteColor ? Color.gray(0.5);
 			Pen.moveTo( 0 @ center );
 			svals.do({ |val, i|
 				Pen.lineTo( i@val );

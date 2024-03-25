@@ -1766,15 +1766,15 @@
 
 		vws[ \edit ] = SmoothButton( view, 60 @ (bounds.height) )
 		.label_( [ { |vw, bounds|
-			var n = bounds.width.ceil.asInteger, env = vws[ \val ];
+			var n = bounds.width.ceil.asInteger - 1, env = vws[ \val ];
 			var dur = env.duration;
 
-			Pen.color = skin.stringColor ? Color.gray(0.8);
+			Pen.color = Color.blue(1.0).alpha_(0.5);
 			Pen.width = 1;
 
-			Pen.moveTo( 0 @ (env[0].linlin(0,1,bounds.height - 1,1)) );
+			Pen.moveTo( 1 @ (env[0].linlin(0,1,bounds.height - 1,1)) );
 			(n-1).do({ |i|
-				Pen.lineTo( (i+1) @ ( env[i.linlin(0,n-2,0,dur)].linlin(0,1,bounds.height - 1,1) ) );
+				Pen.lineTo( (i+2) @ ( env[i.linlin(0,n-2,0,dur)].linlin(0,1,bounds.height - 1,1) ) );
 			});
 			Pen.stroke;
 		} ] )
