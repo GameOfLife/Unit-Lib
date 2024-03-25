@@ -3,6 +3,7 @@ UMapGUI : UGUI {
 	var <>header, <>userView, <>mainComposite;
 	var <>removeAction;
 	var <>parentUnit;
+	var <removeButton;
 
 	*viewNumLines { |unit|
 		^super.viewNumLines( unit ) + 1.1;
@@ -102,7 +103,7 @@ UMapGUI : UGUI {
 				.string_( "" );
 		};
 
-			SmoothButton( header, Rect( bounds.width - 12, 2, 12, 12 ) )
+			removeButton = SmoothButton( header, Rect( bounds.width - 12, 2, 12, 12 ) )
 				.label_( '-' )
 				.canFocus_( false )
 				.action_({

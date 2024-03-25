@@ -1330,6 +1330,10 @@ UChainGUI {
 			);
 			upatGUI.mapSetAction = { chain.changed( \units ); };
 
+			if( upatGUI.views.pattern.isKindOf( UMapGUI ) ) {
+				upatGUI.views.pattern.removeButton.visible_(false)
+			};
+
 			[ \pattern, \fadeTimes ].do({ |key|
 				var item;
 				item = chain.perform( key );
@@ -1411,6 +1415,10 @@ UChainGUI {
 						upats,
 					);
 					upatGUI.mapSetAction = { chain.changed( \units ); };
+
+					if( upatGUI.views.pattern.isKindOf( UMapGUI ) ) {
+						upatGUI.views.pattern.removeButton.visible_(false)
+					};
 
 					[ \pattern, \fadeTimes ].do({ |key|
 						var item;
