@@ -124,10 +124,6 @@ UEQSpec : Spec {
 			labelWidth = 0;
 		};
 
-		StaticText( view, 60 @ (bounds.height) )
-			.applySkin( RoundView.skin )
-			.string_( def );
-
 		vws[ \edit ] = SmoothButton( view, 60 @ (bounds.height) )
 		.label_([{ |vw, bounds|
 			var freqs, center, values, eqSetting, svals, min = 20, max = 20000, range = 12;
