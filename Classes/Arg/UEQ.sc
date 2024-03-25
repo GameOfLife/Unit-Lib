@@ -142,7 +142,7 @@ UEQSpec : Spec {
 							if( vws[ \editor ] == editor ) {
 								vws[ \editor ] = nil;
 							};
-						});
+						}).action_({ |vw, val| action.value( vws, val ) });
 					RoundView.popSkin;
 					vws[ \editor ] = editor;
 				} {

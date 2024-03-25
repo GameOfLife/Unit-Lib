@@ -837,7 +837,9 @@
 			vws[ \specComp ],
 			vws[ \specComp ].bounds.moveTo(0,0),
 			nil, { |vw, val|
-				vws[ \val ] = vws[ \val ].collect( val.deepCopy );
+				vws[ \val ] = vws[ \val ].collect({ val.deepCopy });
+				vws[ \update ].value;
+				action.value( vws, vws[ \val ] );
 			}
 		);
 
