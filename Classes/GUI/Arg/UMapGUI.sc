@@ -185,7 +185,18 @@ UMapGUI : UGUI {
 			}, { |def, args|
 				unit.stop;
 				unit.def = def;
-				if( args.notNil ) { unit.set( *args ) };
+				if( args.notNil ) {
+					if( unit.isKindOf( MassEditUMap ) ) {
+						args = args.collect({ |item, i|
+							if( i.odd ) {
+								Array.fill( unit.units.size, { item });
+							} {
+								item;
+							}
+						});
+					};
+					unit.set( *args )
+				};
 			}, {
 				umapdragbinReplace.background = nil;
 			}, { |def|

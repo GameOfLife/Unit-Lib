@@ -168,7 +168,9 @@ UGUI {
 						});
 
 						umapdragbin.mouseDownAction_({
-							this.makeUMapDefMenu({ |def| unit.canUseUMap( key, def ); }, { |def, args| unit.insertUMap( key, def ); if( args.notNil ) { unit[ key ].set( *args ) } }, { umapdragbin.background = nil; }, includePattern: isPattern );
+							this.makeUMapDefMenu({ |def| unit.canUseUMap( key, def ); }, { |def, args|
+								unit.insertUMap( key, def, args );
+							}, { umapdragbin.background = nil; }, includePattern: isPattern );
 							umapdragbin.background = Color.blue(0.9).alpha_(0.25);
 						});
 
