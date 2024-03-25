@@ -1747,7 +1747,7 @@
 
 		bounds.isNil.if{bounds= 160@20};
 
-		view = EZCompositeView( parent, bounds, gap: 2@2 );
+		view = EZCompositeView( parent, bounds, gap: 4@4 );
 		bounds = view.asView.bounds;
 
 		vws[ \view ] = view;
