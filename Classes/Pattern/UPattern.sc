@@ -151,6 +151,7 @@ UPattern : UChain {
 	getSpec { |key| ^this.getArgSpec( key ) !? _.spec }
 	getSpecMode { |key| ^this.getArgSpec( key ) !? _.mode }
 	getDefault { |key| ^this.getArgSpec( key ) !? _.default }
+	dontStoreArgNames { ^[] }
 
 	removeUMap { |key|
 		switch( key,

@@ -1380,7 +1380,56 @@ UChainGUI {
 						new.gui( score: score );
 					}.defer(0.1);
 				}).resize_(3);
-			};
+			} {
+				if( chain.uchains.any(_.isKindOf( UPattern ) ) ) {
+					var upats;
+
+					upatComp = CompositeView( scrollView, width@14 )
+					.background_( Color.green.alpha_(0.11) )
+					.resize_(2);
+
+					upatHeader = StaticText( upatComp, Rect(2,0, width, 14 ) )
+					.applySkin( RoundView.skin )
+					.string_( "UPattern" )
+					.font_(
+						(RoundView.skin.tryPerform( \at, \font ) ??
+							{ Font( Font.defaultSansFace, 12) }).boldVariant
+					);
+
+					upats = chain.uchains.select( _.isKindOf( UPattern ) );
+					if( upats.size == 1 ) {
+						upats = upats[0]
+					} {
+						upats = MassEditUPattern( upats );
+					};
+
+					upatGUI = UGUI(
+						scrollView,
+						scrollView.bounds.copy.width_(
+							scrollView.bounds.width - scrollerMargin - (margin.x * 2)
+						),
+						upats,
+					);
+					upatGUI.mapSetAction = { chain.changed( \units ); };
+
+					[ \pattern, \fadeTimes ].do({ |key|
+						var item;
+						item = upats.perform( key );
+						if( item.isUMap ) {
+							upatCtrls = upatCtrls.add( SimpleController( item ).put( \init, { chain.changed( \units ) }) );
+							upatCtrls = upatCtrls.addAll(
+								item.getAllUMaps.collect({ |umap|
+									SimpleController( umap ).put( \init, { chain.changed( \units ) });
+								})
+							);
+						};
+					});
+
+					upatHeader.onClose_({
+						upatCtrls.do(_.remove);
+					});
+				};
+			}
 		};
 
 		ug = units.collect({ |unit, i|
