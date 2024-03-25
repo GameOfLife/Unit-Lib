@@ -106,7 +106,11 @@ UGUI {
 
 	makeSubViews { |bounds|
 		var isPattern;
-		isPattern = UChainGUI.nowBuildingChain.isKindOf( UPattern );
+		isPattern = UChainGUI.nowBuildingChain.isKindOf( UPattern ) or: {
+			UChainGUI.nowBuildingChain.isKindOf( MassEditUChain ) && {
+				UChainGUI.nowBuildingChain.uchains.any( _.isKindOf( UPattern ) );
+			};
+		};
 		views = ();
 
 		this.makeHeader(bounds);
