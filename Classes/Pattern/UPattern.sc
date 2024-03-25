@@ -155,8 +155,8 @@ UPattern : UChain {
 
 	removeUMap { |key|
 		switch( key,
-			'pattern', { this.pattern = this.getDefault( \pattern ) },
-			'fadeTimes', { this.fadeTimes = this.getDefault( \fadeTimes ) },
+			'pattern', { this.pattern = this.getDefault( \pattern ); this.changed( \init ) },
+			'fadeTimes', { this.fadeTimes = this.getDefault( \fadeTimes ); this.changed( \init ) },
 		);
 	}
 
