@@ -116,7 +116,7 @@
 			evws[ \spec ].makeView( evws[ \scroll ], (evws[ \w ].bounds.width - 58) @ (originalViewHeight - 4), "% [%]".format(evws[ \key ], i), { |vws, val|
 				evws[ \values ][ i ] = val;
 				action.value( evws[ \values ] );
-			});
+			}, 2);
 		});
 
 		RoundView.popSkin;
@@ -597,7 +597,7 @@
 		bounds.isNil.if{bounds= 350@20};
 
 		view = EZCompositeView( parent, bounds, gap: 4@4 );
-		view.asView.resize_( resize );
+		view.asView.resize_( resize ? 5 );
 		bounds = view.asView.bounds;
 		width = bounds.width;
 
@@ -834,7 +834,7 @@
 
 		compWidth = bounds.width - labelWidth - 8 - optionsWidth;
 
-		vws[ \specComp ] = View( view, compWidth @  (bounds.height) );
+		vws[ \specComp ] = CompositeView( view, compWidth @  (bounds.height) );
 
 		vws[ \specView ] = this.originalSpec.makeView(
 			vws[ \specComp ],
@@ -843,7 +843,7 @@
 				vws[ \val ] = vws[ \val ].collect({ val.deepCopy });
 				vws[ \update ].value;
 				action.value( vws, vws[ \val ] );
-			}
+		}, 5
 		);
 
 		view.asView.decorator.shift( compWidth.neg - 4, 0 );

@@ -218,8 +218,21 @@
 }
 
 + ArrayControlSpec {
+
 	massEditSpec { |inArray|
-		^nil
+		^GenericMassEditSpec()
+		.default_( inArray )
+		.size_( inArray.size )
+		.originalSpec_( this )
 	}
+
+	massEditValue { |inArray|
+		^inArray
+	}
+
+	massEdit { |inArray, params|
+		^params;
+	}
+
 }
 	
