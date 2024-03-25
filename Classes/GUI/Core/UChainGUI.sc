@@ -1385,7 +1385,7 @@ UChainGUI {
 					var upats;
 
 					upatComp = CompositeView( scrollView, width@14 )
-					.background_( Color.green.alpha_(0.11) )
+					.background_( Color.green.blend( Color.yellow, 0.75 ).alpha_(0.11) )
 					.resize_(2);
 
 					upatHeader = StaticText( upatComp, Rect(2,0, width, 14 ) )
