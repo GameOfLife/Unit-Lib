@@ -1366,6 +1366,7 @@
 			vws[ \buttonView ] = SmoothButton( vws[ \view ],
 					Rect( labelWidth + 2, 0, bounds.height, bounds.height ) )
 				.label_( [ "", 'x' ] )
+			    .hiliteColor_( RoundView.skin.hiliteColor ?? { Color.black.alpha_(0.33) } )
 		} {
 			vws[ \buttonView ] = SmoothButton( vws[ \view ],
 					Rect( labelWidth + 2, 0, bounds.width-(labelWidth+2), bounds.height ) )
@@ -1374,7 +1375,6 @@
 
 		vws[ \buttonView ]
 				.radius_( bounds.height / 8 )
-		        .hiliteColor_( RoundView.skin.hiliteColor ?? { Color.black.alpha_(0.33) } )
 				.value_( this.unmap( this.constrain( default ) ) )
 				.action_({ |bt| action.value( vws, this.map( bt.value ) ) })
 				.resize_( 1 );
@@ -1421,6 +1421,7 @@
 
 		vws[ \view ] = view;
 		vws[ \val ] = default.asCollection;
+		vws[ \label ] = label;
 		vws[ \doAction ] = { action.value( vws, vws[ \val ] ) };
 
 		if( label.notNil ) {
@@ -1438,17 +1439,17 @@
 		if( trueLabel.isNil && falseLabel.isNil ) {
 			vws[ \state ] = SmoothButton( view, (bounds.height)@(bounds.height) )
 				.states_([
-					[ "", Color.black, Color.clear ],
-					[ 'x', Color.black, Color.gray(0.2,0.5) ],
-					[ '-', Color.black, Color.gray(0.2,0.25) ]
-				])
+					[ "" ],
+					[ 'x' ],
+					[ '-', nil, Color.gray(0.2,0.25) ]
+			    ]).hiliteColor_( hiliteColor )
 		} {
 			vws[ \state ] = SmoothButton( view, (bounds.width - 46 - labelWidth )@(bounds.height) )
 			    .resize_(2)
 				.states_([
-					[ falseLabel ? "off", Color.black, Color.clear ],
-					[ trueLabel ? "on", Color.black, Color.gray(0.2,0.5) ],
-					[ "mixed" , Color.black, Color.gray(0.2,0.25) ]
+					[ falseLabel ? "off" ],
+					[ trueLabel ? "on" ],
+					[ "mixed" , nil, Color.gray(0.2,0.25) ]
 				])
 		};
 
