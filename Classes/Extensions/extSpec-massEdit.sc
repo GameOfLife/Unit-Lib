@@ -72,54 +72,6 @@
 
 }
 
-+ ListSpec {
-
-	massEditSpec { |inArray|
-		var default, newList;
-		default = this.massEditValue(inArray);
-		newList = list ++ [ "mixed" ];
-		default = newList.indexOfEqual( default ) ? (list.size);
-		^ListSpec( list ++ [ "mixed" ], default, labels !? { labels ++ [ "mixed" ] })
-	}
-
-	massEditValue { |inArray|
-		var first;
-		first = inArray.first;
-		if( inArray.every(_ == first) ) {
-			^first;
-		} {
-			^"mixed";
-		};
-	}
-
-	massEdit { |inArray, params|
-		if( list.includes( params ) ) {
-			^params.dup(inArray.size);
-		} {
-			if( this.massEditValue( inArray ) != "mixed" ) {
-				^{ list.choose }.dup(inArray.size); // randomize
-			} {
-				^inArray
-			};
-		};
-	}
-}
-
-+ SMPTESpec {
-
-	massEditSpec { |inArray|
-		^this.copy.default_( this.massEditValue( inArray ) );
-	}
-
-	massEditValue { |inArray|
-		^inArray.minItem;
-	}
-
-	massEdit { |inArray, params|
-		^(params - inArray.minItem) + inArray;
-	}
-}
-
 + TriggerSpec {
 
 	massEditSpec { |inArray|

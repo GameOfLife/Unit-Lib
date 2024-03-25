@@ -102,8 +102,8 @@ UEQSpec : Spec {
 		var skin;
 		vws = ();
 
-		font =  (RoundView.skin ? ()).font ?? { Font( Font.defaultSansFace, 10 ); };
 		skin = RoundView.skin;
+		font =  skin.font ?? { Font( Font.defaultSansFace, 10 ); };
 
 		bounds.isNil.if{bounds= 160@20};
 
@@ -128,8 +128,32 @@ UEQSpec : Spec {
 			.applySkin( RoundView.skin )
 			.string_( def );
 
-		vws[ \edit ] = SmoothButton( view, 40 @ (bounds.height) )
-			.label_( "edit" )
+		vws[ \edit ] = SmoothButton( view, 60 @ (bounds.height) )
+		.label_([{ |vw, bounds|
+			var freqs, center, values, eqSetting, svals, min = 20, max = 20000, range = 12;
+			eqSetting = vws[ \val ];
+			bounds = vw.bounds;
+			center = vw.bounds.height / 2;
+			freqs = ({|i| i } ! (bounds.width+1));
+			freqs = freqs.linexp(0, bounds.width, min, max );
+
+			// get magResponses
+			values = eqSetting.magResponses( freqs ).ampdb.clip(-200,200);
+
+			// sum and scale magResponses
+			svals = values.sum.linlin(range.neg,range, bounds.height, 0, \none);
+
+			// draw summed magResponse
+			Pen.strokeColor = Color.blue(0.5);
+			Pen.fillColor = skin.hiliteColor ? Color.gray(0.5);
+			Pen.moveTo( 0 @ center );
+			svals.do({ |val, i|
+				Pen.lineTo( i@val );
+			});
+			Pen.lineTo( (bounds.width) @ center );
+
+			Pen.fillStroke;
+		}])
 			.border_( 1 )
 			.radius_( 2 )
 			.font_( font )
@@ -165,6 +189,7 @@ UEQSpec : Spec {
 
 	setView { |view, value, active = false|
 		view[ \val ] = value;
+		view[ \edit ].refresh;
 		if( view[ \editor ].notNil ) {
 			view[ \editor ].value = value;
 		};

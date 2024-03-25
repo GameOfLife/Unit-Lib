@@ -168,6 +168,9 @@
 				values = (0..values.size-1).linlin(0,values.size-1, min, max );
 				this.map( values );
 			},
+			'use first for all', { |values|
+				Array.fill( values.size, { values.first.deepCopy });
+			}
 		);
 
 		operations[ \rotate ] = (
@@ -861,7 +864,7 @@
 				vws[ \val ] = values;
 				vws[ \update ].value;
 				action.value( vws, vws[ \val ] );
-			}, [ \reverse, \scramble, \rotate, 'code...', \post ]);
+			}, [ \reverse, \scramble, 'use first for all', \rotate, 'code...', \post ]);
 		});
 
 		if( canMap ) {
@@ -871,12 +874,16 @@
 				bounds = vw.bounds.moveTo(0,0);
 				vals = vws[ \val ].collect({ |val|
 					this.originalSpec.unmap( val )
-				}).linlin(0,1,bounds.height,0);
+				});
+				if( vals.any(_ > 1) ) {
+					vals = vals.normalize(0,1);
+				};
+				vals = vals.linlin(0,1,bounds.height,0);
 				size = vals.size;
 				if( hasDefault ) {
-					def = this.orinalSpec.unmap( this.originalSpec.default ).linlin(0,1,bounds.height,0);
+					def = this.originalSpec.unmap( this.originalSpec.default ).linlin(0,1,bounds.height,0);
 				} {
-					def = 0.5.linlin( 0,1, bounds.height,0 );
+					def = vals.mean.linlin( 0,1, bounds.height,0 );
 				};
 				Pen.moveTo( bounds.left @ def );
 				vals.do({ |val, i|
