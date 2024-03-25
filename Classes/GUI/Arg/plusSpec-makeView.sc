@@ -822,7 +822,7 @@
 
 		if( label.notNil ) {
 			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
-			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ bounds.height )
+			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ 14 )
 			.string_( label.asString ++ " " )
 			.align_( \right )
 			.resize_( 4 )
