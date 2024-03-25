@@ -1741,8 +1741,8 @@
 		var skin;
 		vws = ();
 
-		font =  (RoundView.skin ? ()).font ?? { Font( Font.defaultSansFace, 10 ); };
 		skin = RoundView.skin;
+		font = skin.font ?? { Font( Font.defaultSansFace, 10 ); };
 
 		bounds.isNil.if{bounds= 160@20};
 
@@ -1763,8 +1763,20 @@
 			labelWidth = 0;
 		};
 
-		vws[ \edit ] = SmoothButton( view, 40 @ (bounds.height) )
-			.label_( "edit" )
+		vws[ \edit ] = SmoothButton( view, 60 @ (bounds.height) )
+		.label_( [ { |vw, bounds|
+			var n = bounds.width.ceil.asInteger, env = vws[ \val ];
+			var dur = env.duration;
+
+			Pen.color = skin.stringColor ? Color.gray(0.8);
+			Pen.width = 1;
+
+			Pen.moveTo( 0 @ (env[0].linlin(0,1,bounds.height - 1,1)) );
+			(n-1).do({ |i|
+				Pen.lineTo( (i+1) @ ( env[i.linlin(0,n-2,0,dur)].linlin(0,1,bounds.height - 1,1) ) );
+			});
+			Pen.stroke;
+		} ] )
 			.radius_( 2 )
 			.font_( font )
 			.action_({
@@ -1776,7 +1788,11 @@
 							if( vws[ \editor ] == editor ) {
 								vws[ \editor ] = nil;
 							};
-						});
+						}).action_({ |vw|
+					vws[ \val ] = vw.env;
+					vws[ \update ].value;
+					action.value( vws, vws[ \val ] );
+				});
 					RoundView.popSkin;
 					vws[ \editor ] = editor;
 				} {
@@ -1784,6 +1800,15 @@
 				};
 
 			});
+
+		vws[ \update ] = {
+			vws[ \edit ].refresh;
+			if( vws[ \editor ].notNil && {
+				vws[ \editor ].env != vws[ \val ];
+			}) {
+				vws[ \editor ].env = vws[ \val ];
+			};
+		};
 
 		view.view.onClose_({
 			if( vws[ \editor ].notNil ) {
@@ -1796,9 +1821,7 @@
 
 	setView { |view, value, active = false|
 		view[ \val ] = value;
-		if( view[ \editor ].notNil ) {
-			view[ \editor ].env = view[ \val ];
-		};
+		view[ \update ].value;
 	}
 
 }
