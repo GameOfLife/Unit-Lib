@@ -83,6 +83,7 @@ UScoreEditorGui_TopBar {
     makeGui{ |parent, bounds|
         var font, size, marginH, marginV;
 		var umixer;
+		var plusButtonTask;
 		views = ();
 
 	    marginH = 2;
@@ -120,11 +121,28 @@ UScoreEditorGui_TopBar {
 			.states_( [[ '+' ]] )
 			.canFocus_(false)
 		    .toolTip_( "Add Event" )
+		    .mouseDownAction_({
+			    plusButtonTask.stop;
+			    if(scoreView.selectedEvents.isNil ) {
+		    	    plusButtonTask = {
+					    0.5.wait;
+					    UMenuBarIDE.allMenus[ 'Edit' ].actions
+					    .detect({ |act| act.string == "Add Multiple..." }).menu.front;
+					    plusButtonTask = nil;
+				    }.fork( AppClock );
+			    } {
+				    plusButtonTask = nil;
+			    }
+		    })
 			.action_({
 			    if(scoreView.selectedEvents.notNil) {
 				    scoreView.duplicateSelected;
 				} {
-				    scoreView.currentEditor.addEvent
+				    if( true ) {
+					    plusButtonTask !? _.stop;
+					    plusButtonTask = nil;
+				        scoreView.currentEditor.addEvent
+				    };
 				}
 			});
 

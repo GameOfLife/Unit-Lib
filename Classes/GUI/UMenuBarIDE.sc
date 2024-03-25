@@ -429,6 +429,18 @@ UMenuBarIDE {
 			UScoreEditorGUI.current !! { |x| x.editor.addEvent }
 		}).shortcut_( "Ctrl++" ), "Edit" );
 
+		this.registerMenu(
+			Menu(
+				*[1,2,3,4,5,6,7,8,10,12,16,24,32].collect({ |item, i|
+					MenuAction( "Add % Events".format( item ), {
+						UScoreEditorGUI.current !! { |x|
+							item.do({ x.editor.addEvent });
+						}
+			       })
+				})
+			).title_( "Add Multiple..."),
+		"Edit" );
+
 		this.registerMenu( MenuAction( "Add Marker", {
 			UScoreEditorGUI.current !! { |x| x.editor.addMarker }
 		}).shortcut_( "Ctrl+M" ), "Edit" );
