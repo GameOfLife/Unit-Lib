@@ -1561,7 +1561,18 @@ UChainGUI {
 			uview.mouseDownAction_({
 				uDefMenuFunc.value(unit, { |def, args|
 					unit.def = def;
-					if(args.notNil) { unit.set(*args); }
+					if(args.notNil) {
+						if( unit.isKindOf( MassEditU ) ) {
+							args = args.collect({ |item, i|
+								if( i.odd ) {
+									Array.fill( unit.units.size, { item });
+								} {
+									item;
+								}
+							})
+						};
+						unit.set(*args);
+					}
 				}, { uview.background = nil; });
 				uview.background = Color.gray(0.3).alpha_(0.5);
 			});
