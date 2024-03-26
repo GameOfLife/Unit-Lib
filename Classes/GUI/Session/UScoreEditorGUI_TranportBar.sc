@@ -290,6 +290,7 @@ UScoreEditorGui_TransportBar {
 		.background_( Color.white.alpha_(0.25) )
 		.mouseDownAction_({
 			var v = views[ \timeMode ];
+			var actions;
 			var act = { |val|
 				scoreView.showTempoMap = val.booleanValue;
 				v.string = ["time", "bar" ][ scoreView.showTempoMap.binaryValue ];
@@ -300,10 +301,11 @@ UScoreEditorGui_TransportBar {
 				views[\barMap].visible = scoreView.showTempoMap;
 				views[\counter].visible = scoreView.showTempoMap.not;
 			};
-			Menu(
-				MenuAction( "time", { act.value( 0 ) }),
-				MenuAction( "bar", { act.value( 1 ) }),
-			).front;
+			actions = [
+				MenuAction( "time", { act.value( 0 ) }).enabled_( scoreView.showTempoMap ),
+				MenuAction( "bar", { act.value( 1 ) }).enabled_( scoreView.showTempoMap.not )
+			];
+			Menu( *actions ).front( action: actions[ scoreView.showTempoMap.binaryValue ] );
 		});
 		views[ \timeMode ].bounds = views[ \timeMode ].bounds.insetBy(0,1);
 
