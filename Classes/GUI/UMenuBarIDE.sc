@@ -536,6 +536,23 @@ UMenuBarIDE {
 
 	/* VIEW */
 
+		if( thisProcess.platform.name == 'osx' ) {
+			this.registerMenu(
+				MenuAction( "Refresh All Windows", {
+					var winCorrectFunc = { |vw|
+						if( [ UserView, QUserView ].includes( vw.class ) ) {
+							vw.bounds = vw.bounds.insetAll(1,0,0,0);
+							vw.bounds = vw.
+							bounds.insetAll(-1,0,0,0);
+						};
+						vw.children.do({ |ch| winCorrectFunc.( ch ) });
+					};
+					Window.allWindows.do({ |win| winCorrectFunc.( win.view ); });
+			}), "View");
+
+			this.registerMenu( MenuAction.separator, "View");
+		};
+
 		this.registerMenu( MenuAction( "EQ", { UGlobalEQ.gui; }).shortcut_( "Ctrl+E" ), "View");
 		this.registerMenu( MenuAction( "Level (large)", { UGlobalGain.gui; }).shortcut_( "Ctrl+L" ), "View");
 		this.registerMenu( MenuAction( "Udefs", { UdefsGUI(); }).shortcut_( "Ctrl+U" ), "View");
