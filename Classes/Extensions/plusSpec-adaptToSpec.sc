@@ -6,6 +6,8 @@ UAdaptSpec : ControlSpec {
 		^super.new( 0, 1, \lin, 0.0, 0 ).func_( func );
 	}
 
+	canAdapt { |spec| ^spec.respondsTo( 'unmap' ) }
+
 	adaptToSpec { |spec|
 		^spec !? { func.value( spec ) } ? this;
 	}

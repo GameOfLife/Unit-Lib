@@ -91,7 +91,9 @@ UPatDef( \p_line, { |unit, a = 0.0, b = 1.0, curve = 0, time = 10, loop = \loop,
 	unit.isKindOf( UPattern ).not && {
 		[ SimpleNumber, Array, Point ].any({ |class|
 			unit.getDefault( key ).isKindOf( class )
-		});
+		}) && {
+			UAdaptSpec().canAdapt( unit.getSpec( key ) )
+		};
 	};
 })
 .setSpec( \loop, ListSpec( [ \off, \loop, \backwards, \alternate, \back_at_end, \hold ], 1 ) )

@@ -22,7 +22,7 @@ UPatDef( \p_stutter, { |unit, input = 0, n = 1|
 		unit.isKindOf( UPattern ).not && {
 			[ Point, SimpleNumber, Array, Symbol, Boolean ].any({ |class|
 				unit.getDefault( key ).isKindOf( class )
-			});
+		    }) && { UAdaptSpec().canAdapt( unit.getSpec( key ) ) }
 		};
 	})
 	.useMappedArgs_( false )

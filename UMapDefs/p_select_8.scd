@@ -36,7 +36,7 @@ def = UPatDef( \p_select_8, { |unit,
 	unit.isKindOf( UPattern ).not && {
 		[ Point, SimpleNumber, Array, Symbol ].any({ |class|
 			unit.getDefault( key ).isKindOf( class )
-		});
+		}) && { UAdaptSpec().canAdapt( unit.getSpec( key ) ) }
 	};
 })
 .setSpec( \index, IntegerSpec(0,0,7) )

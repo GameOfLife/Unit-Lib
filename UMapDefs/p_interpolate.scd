@@ -76,7 +76,7 @@ UPatDef( \p_interpolate, { |unit, input = 0, n = 1, type = \linear|
 		unit.isKindOf( UPattern ).not && {
 			[ Point, SimpleNumber, Array ].any({ |class|
 				unit.getDefault( key ).isKindOf( class )
-			});
+			}) && { UAdaptSpec().canAdapt( unit.getSpec( key ) ) }
 		};
 	})
 	.mappedArgs_([ \input ]).category_( 'pattern_filter' );
