@@ -316,12 +316,26 @@ MultiFilePathView : FilePathView {
 	}
 
 	makeMenu {
+		var mainmenu, uniquePaths = [];
 		var setSingle = { |pth, index = 0|
-			this.value[ index ] = pth;
+			if( index.isArray ) {
+				index.do({ |id|
+					this.value[ id ] = pth;
+				});
+			} {
+				this.value[ index ] = pth;
+			};
 			this.value = this.value;
 			action.value( this );
 		};
-		Menu(
+
+		this.value.do({ |path|
+			if( uniquePaths.includesEqual( path ).not ) {
+				uniquePaths = uniquePaths.add( path );
+			};
+		});
+
+		mainmenu = Menu(
 			MenuAction( "Browse...", {
 				this.browse({ |paths| this.value = paths; action.value( this ) });
 			}),
@@ -370,16 +384,56 @@ MultiFilePathView : FilePathView {
 			MenuAction.separator,
 			MenuAction( "Copy all files to...", {
 				ULib.savePanel({ |path|
-					this.value.do({ |px, i|
+					uniquePaths.do({ |px|
+						var indices = this.value.indicesOfEqual( px );
 						this.copyOrMove( px, \copy, { |pth|
-							this.value[ i ] = pth;
+							indices.do({ |index|
+								this.value[ index ] = pth;
+							});
+							"copied % to\n   %\n".postf( px, pth );
 						}, path );
 					});
 					this.value = this.value;
 					action.value( this );
 				});
 			}).enabled_( this.value.notNil ),
-		).front;
+		);
+
+		if( uniquePaths.size != (this.value.size) ) {
+			mainmenu.insertAction( 1, Menu(
+				*uniquePaths.collect({ |pth, i|
+					var indices = this.value.indicesOfEqual( pth );
+					var menu = Menu(
+						MenuAction( "Browse...", {
+							this.browseSingle( { |px|
+								setSingle.value( px, indices )
+							} );
+						}),
+						MenuAction( "Enter String...", {
+							SCRequestString( pth, "Please enter file path:", { |string|
+								setSingle.value( string.standardizePath, indices )
+							});
+						}),
+						MenuAction.separator( "Operations" ),
+						MenuAction( "Show file in Finder", {
+							pth.getGPath.asPathFromServer.dirname.openOS;
+						}).enabled_( pth.notNil ),
+						MenuAction( "Move file to...", {
+							this.copyOrMove( pth, \move, { |px| setSingle.value( px, indices ) } );
+						}).enabled_( pth.notNil && { pth[..10] != "@resources/" } ),
+						MenuAction( "Copy file to...", {
+							this.copyOrMove( pth, \copy, { |px| setSingle.value( px, indices ) } );
+						}).enabled_( pth.notNil ),
+						MenuAction( "Save file as...", {
+							this.copyOrMove( pth, \saveAs, { |px| setSingle.value( px, indices ) } );
+						}).enabled_( pth.notNil ),
+					).title_( "% (%)".format( pth, indices.size ) );
+					menu;
+				});
+			).title_("Unique pathnames (%)".format( uniquePaths.size ) )
+			);
+		};
+		mainmenu.front;
 	}
 
 
