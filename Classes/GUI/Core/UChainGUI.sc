@@ -55,17 +55,17 @@ UChainGUI {
 				hiliteColor: Color.black.alpha_(0.33),
 				scoreEditorWindow: Color.gray(0.65),
 				RoundButton: (
-					border: 0.75,
+					border: 0.9,
 					background:  Gradient( Color.white, Color.gray(0.85), \v ),
 					hiliteColor: Color.green.alpha_(0.5),
 				),
 				SmoothButton: (
-					border: 0.75,
+					border: 0.9,
 					background:  Gradient( Color.white, Color.gray(0.85), \v ),
 					hiliteColor: Color.green.alpha_(0.5),
 				),
 				SmoothSimpleButton: (
-					border: 0.75,
+					border: 0.9,
 					background:  Gradient( Color.white, Color.gray(0.85), \v ),
 					hiliteColor: Color.green.alpha_(0.5),
 				),
