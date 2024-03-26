@@ -1053,9 +1053,9 @@ UChain : UEvent {
 		this.changed( \units );
 	}
 
-	insert { |index, unit|
+	insert { |index, unit, active = true|
 		units = units.insert( index, unit.asUnit );
-		this.changed( \units );
+		if( active ) { this.changed( \units ); };
 
 	}
 

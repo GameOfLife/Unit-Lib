@@ -572,6 +572,68 @@ MassEditUChain {
 	last { ^units.last }
 	first { ^units.first }
 
+	unitMatch { |index = 0, unit|
+		^if( units[ index ].isKindOf( MassEditU ) ) {
+			units[ index ].units.includes( unit );
+		} {
+			units[ index ] === unit;
+		};
+	}
+
+	findInsertChains { |index = 0|
+		var chains;
+		if( index == 0 or: { index >= (units.size) }) {
+			^nil
+		};
+		if( units[ index ].isKindOf( MassEditU ) ) {
+			if( units[ index-1 ].isKindOf( MassEditU ) ) {
+				if( units[ index-1 ].units.size != (units[ index ].units.size) ) {
+					^nil
+				};
+			} {
+				^nil;
+			};
+		} {
+			if( units[ index-1 ].isKindOf( MassEditU ) ) { ^nil };
+		};
+		uchains.do({ |chain|
+			var i1, i2;
+			i1 = chain.units.detectIndex({ |unit|
+				this.unitMatch( index-1, unit );
+			});
+			if( i1.notNil ) {
+				i2 = chain.units.detectIndex({ |unit|
+					this.unitMatch( index, unit );
+				});
+				if( i2.notNil ) {
+					if( i2 - 1 == i1 ) {
+						chains = chains.add( [ chain, i2 ] );
+					};
+				};
+			};
+		});
+		if( units[ index ].isKindOf( MassEditU ) ) {
+			if( chains.size == units[ index ].units.size ) {
+				^chains; // array of chains and indices to insert
+			} {
+				^nil
+			}
+		} {
+			^chains; // array of chains and indices to insert
+		};
+	}
+
+	canInsertAt { |index = 0|
+		^this.findInsertChains( index ).notNil;
+	}
+
+	insert { |index = 0, what, args|
+		this.findInsertChains( index ).do({ |item|
+			item[0].insert( item[1], what.asUnit( args ), false );
+		});
+		this.changed( \units );
+	}
+
 	printOn { arg stream;
 		stream << "a " << this.class.name << "(" <<* units.collect(_.defName)  <<")"
 	}

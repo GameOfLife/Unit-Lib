@@ -1514,7 +1514,25 @@ UChainGUI {
 				});
 
 			} {
-				addBefore.canFocus = false;
+				if( chain.canInsertAt( i ) ) {
+					addBefore.background = addBetweenColor;
+
+					addBefore.mouseDownAction_({
+						uDefMenuFunc.value(nil, { |def, args|
+							chain.insert( i, def , args );
+						}, {
+							addBefore.background = addBetweenColor;
+						}, \modifier );
+						addBefore.background = addBetweenColor.copy.val_(0.5);
+					});
+
+					addBefore.mouseUpAction_({
+						addBefore.background = addBetweenColor;
+					});
+
+				} {
+					addBefore.canFocus = false;
+				};
 			};
 
 			comp = CompositeView( scrollView, width@14 )

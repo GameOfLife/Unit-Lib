@@ -519,7 +519,7 @@ Udef : GenericDef {
 
 	asUdef { ^this }
 
-	asUnit { ^U( this ) }
+	asUnit { |args| ^U( this, args ) }
 
 }
 
