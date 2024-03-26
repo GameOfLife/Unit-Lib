@@ -59,6 +59,7 @@ USessionGUI : UAbstractWindow {
         var size = 16;
         var margin = 4;
         var gap = 2;
+		var menuView, menuH = 22, compTop = 0;
         bounds = bounds ? Rect(100,100,700,400);
         this.newWindow(bounds, "USession - "++session.name, {
 
@@ -78,7 +79,13 @@ USessionGUI : UAbstractWindow {
                 };
             }.defer(0.1)
         }, margin:0, gap:0);
-        topBarView =  CompositeView(view, Rect(0,0,bounds.width,topBarHeigth)).resize_(2);
+
+		if( UMenuBarIDE.hasMenus ) {
+			menuView = UMenuBarIDE.createMenuStrip( view, bounds.width @ menuH, [0,0,0,0] );
+			compTop = menuH;
+		};
+
+        topBarView =  CompositeView(view, Rect(0,compTop,bounds.width,topBarHeigth)).resize_(2);
         topBarView.addFlowLayout;
 
         SmoothButton( topBarView, 40@size  )
@@ -183,7 +190,9 @@ USessionGUI : UAbstractWindow {
 			    .radius_(5)
 			    .canFocus_(false)
 			    .action_({
-                    object.gui
+				    var gui;
+				    gui = object.gui;
+				    if( gui.isKindOf( UScoreEditorGUI ) ) { gui.askForSave = false };
 			    });
 
 			comp.decorator.shift(22,0);
