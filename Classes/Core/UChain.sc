@@ -1064,10 +1064,10 @@ UChain : UEvent {
 	    this.changed( \units )
 	}
 
-	removeAt { |index|
+	removeAt { |index, active = true|
 		var out;
 		out = units.removeAt( index );
-		this.changed( \units );
+		if( active ) { this.changed( \units ); };
 		^out;
 	}
 

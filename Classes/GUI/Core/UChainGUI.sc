@@ -1813,6 +1813,15 @@ UChainGUI {
 							});
 						}).resize_(3);
 				};
+			} {
+				if( chain.canRemoveAt( i ) ) {
+					min = SmoothButton( comp,
+						Rect( comp.bounds.right - 38, 1, 12, 12 ) )
+					.label_( '-' )
+					.action_({
+						chain.removeAt( i );
+					}).resize_(3);
+				};
 			};
 
 			unit.addDependant( unitInitFunc );

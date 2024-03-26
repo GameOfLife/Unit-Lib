@@ -580,21 +580,21 @@ MassEditUChain {
 		};
 	}
 
+	unitSize { |index = 0|
+		^if(  units[ index ].isKindOf( MassEditU ) ) {
+			units[ index ].units.size;
+		} {
+			1
+		};
+	}
+
 	findInsertChains { |index = 0|
 		var chains;
 		if( index == 0 or: { index >= (units.size) }) {
 			^nil
 		};
-		if( units[ index ].isKindOf( MassEditU ) ) {
-			if( units[ index-1 ].isKindOf( MassEditU ) ) {
-				if( units[ index-1 ].units.size != (units[ index ].units.size) ) {
-					^nil
-				};
-			} {
-				^nil;
-			};
-		} {
-			if( units[ index-1 ].isKindOf( MassEditU ) ) { ^nil };
+		if( this.unitSize( index ) != this.unitSize( index - 1 ) ) {
+			^nil;
 		};
 		uchains.do({ |chain|
 			var i1, i2;
@@ -605,21 +605,15 @@ MassEditUChain {
 				i2 = chain.units.detectIndex({ |unit|
 					this.unitMatch( index, unit );
 				});
-				if( i2.notNil ) {
-					if( i2 - 1 == i1 ) {
-						chains = chains.add( [ chain, i2 ] );
-					};
+				if( (i1 + 1) == i2) {
+					chains = chains.add( [ chain, i2 ] );
 				};
 			};
 		});
-		if( units[ index ].isKindOf( MassEditU ) ) {
-			if( chains.size == units[ index ].units.size ) {
-				^chains; // array of chains and indices to insert
-			} {
-				^nil
-			}
-		} {
+		if( chains.size == this.unitSize( index ) ) {
 			^chains; // array of chains and indices to insert
+		} {
+			^nil;
 		};
 	}
 
@@ -630,6 +624,46 @@ MassEditUChain {
 	insert { |index = 0, what, args|
 		this.findInsertChains( index ).do({ |item|
 			item[0].insert( item[1], what.asUnit( args ), false );
+		});
+		this.changed( \units );
+	}
+
+	findRemoveChains { |index = 0|
+		var chains, sizes;
+		if( index == 0 or: { index >= (units.size-1) }) {
+			^nil
+		};
+		sizes = [-1,0,1].collect({ |item|
+			this.unitSize( index + item )
+		});
+		if( sizes.any( _ != sizes[0] ) ) {
+			^nil;
+		};
+		uchains.do({ |chain|
+			var i1, i2, i3;
+			#i1, i2, i3 = [-1,0,1].collect({ |item|
+				chain.units.detectIndex({ |unit|
+					this.unitMatch( index+item, unit );
+				});
+			});
+			if( i2.notNil && { i2 + 1 == i3 && { i2 - 1 == i1 } }) {
+				chains = chains.add( [ chain, i2 ] );
+			};
+		});
+		if( chains.size == sizes[1]) {
+			^chains; // array of chains and indices to remove
+		} {
+			^nil;
+		};
+	}
+
+	canRemoveAt { |index = 0|
+		^this.findRemoveChains( index ).notNil;
+	}
+
+	removeAt { |index = 0|
+		this.findRemoveChains( index ).do({ |item|
+			item[0].removeAt( item[1], false );
 		});
 		this.changed( \units );
 	}
