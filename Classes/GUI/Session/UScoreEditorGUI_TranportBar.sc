@@ -281,22 +281,31 @@ UScoreEditorGui_TransportBar {
 	   views[\barMap].views[\division].toolTip_( "Division (beat)" );
 	   views[\barMap].views[\sub].toolTip_( "Sub (1/1000 division)" );
 
-	   views[\timeMode ] = PopUpMenu( view, 50@size )
-			.items_( [ "time", "bar" ] )
-			.canFocus_(false)
-			.font_( font )
-		    .applySkin( RoundView.skin )
-			.value_( scoreView.showTempoMap.binaryValue )
-		    .toolTip_( "Time mode" )
-			.action_({ |v|
-				scoreView.showTempoMap = v.value.booleanValue;
+		views[ \timeMode ] = StaticText( view, 39@size )
+		.string_( ["time", "bar" ][ scoreView.showTempoMap.binaryValue ] )
+		.font_( font )
+		.applySkin( RoundView.skin )
+		.align_( \center )
+		.toolTip_( "Time mode" )
+		.background_( Color.white.alpha_(0.25) )
+		.mouseDownAction_({
+			var v = views[ \timeMode ];
+			var act = { |val|
+				scoreView.showTempoMap = val.booleanValue;
+				v.string = ["time", "bar" ][ scoreView.showTempoMap.binaryValue ];
 				views[\signature].visible = scoreView.showTempoMap;
 				views[\tempo].visible = scoreView.showTempoMap;
 				views[\editTempo].visible = scoreView.showTempoMap;
 				views[\lockToTempo].visible = scoreView.showTempoMap;
 				views[\barMap].visible = scoreView.showTempoMap;
 				views[\counter].visible = scoreView.showTempoMap.not;
-			});
+			};
+			Menu(
+				MenuAction( "time", { act.value( 0 ) }),
+				MenuAction( "bar", { act.value( 1 ) }),
+			).front;
+		});
+		views[ \timeMode ].bounds = views[ \timeMode ].bounds.insetBy(0,1);
 
 		views[\signature] = SignatureBox( view,35@size )
 			.applySmoothSkin
@@ -343,7 +352,7 @@ UScoreEditorGui_TransportBar {
 		    .toolTip_( "Lock event startTimes to bar/beats position" )
 			.visible_( scoreView.showTempoMap );
 
-		views[\editTempo ] = SmoothButton( view, 28@size )
+		views[\editTempo ] = SmoothButton( view, 39@size )
             	.radius_( bounds.height / 8 )
 			.label_( "edit" )
 			.canFocus_(false)

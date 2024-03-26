@@ -312,45 +312,71 @@ UScoreEditorGui_TopBar {
 		        };
 		   });
 
-		header.decorator.shift( header.decorator.indentedRemaining.width - (155 + size), 0 );
+		header.decorator.shift( header.decorator.indentedRemaining.width - (100 + size), 0 );
 
 		StaticText( header, 30@size ).string_( "snap:" ).font_( font ).align_( \right )
 			.resize_(3);
 
-		PopUpMenu( header, 55@size )
-			.items_( [
+		{
+			var snapValues, snapLabels, getLabel, setString, snapView;
+			snapValues = (1/[inf,
+				(ULib.servers[0].options.sampleRate ? 44100) / ULib.servers[0].options.blockSize,
+				1000,100,10,32,16,12,8,6,5,4,3,2,1]
+			);
+			snapLabels = [
 				"off", "cf",
 				"0.001", "0.01", "0.1",
 				"1/32", "1/16", "1/12", "1/8", "1/6", "1/5", "1/4", "1/3", "1/2", "1"
-			] )
-			.canFocus_(false)
+			];
+			getLabel = {
+				var index;
+				index = snapValues.indexOfEqual( scoreView.snapH );
+				if( index.notNil ) {
+					snapLabels[ index ]
+				} {
+					scoreView.snapH.asStringWithFrac(3);
+				}
+			};
+			setString = {
+				snapView.string = " % / %".format(
+					getLabel.value,
+					scoreView.usessionMouseEventsManager !? _.mode ? "all"
+				);
+			};
+			snapView = StaticText( header, 60@size )
 			.font_( font )
-		    .applySkin( RoundView.skin )
-			.resize_(3)
-			.value_(11)
-		    .toolTip_( "Snap resolution" )
-			.action_({ |v|
-				if (v.value == 0)
-					{ scoreView.snapActive = false; }
-					{ scoreView.snapActive = true; };
+			.align_( \center )
+			.toolTip_( "Snap resolution and mode" )
+			.applySkin( RoundView.skin )
+			.background_( Color.white.alpha_(0.25) )
+			.mouseDownAction_({
+				Menu(
+					Menu(
+						*snapLabels.collect({ |item, i|
+							MenuAction( item, {
+								scoreView.snapH = snapValues[ i ];
+								scoreView.snapActive = scoreView.snapH != 0;
+								setString.value;
+							}).enabled_( getLabel.value != item );
+						})
+					).title_( "Resolution" ),
+					Menu(
+						*[ 'all','move','resize','fades'] .collect({ |item, i|
+							MenuAction( item.asString, {
+								scoreView.usessionMouseEventsManager.mode = item;
+								setString.value;
+							}).enabled_( scoreView.usessionMouseEventsManager.mode != item );
+						})
+					).title_( "Mode" ),
+				).front;
+			})
+			.resize_(3);
 
-				scoreView.snapH = (1/[inf,
-					ULib.servers[0].options.sampleRate ? 44100 /
-					ULib.servers[0].options.blockSize,
-				1000,100,10,32,16,12,8,6,5,4,3,2,1])[ v.value ];
-				});
+			snapView.setProperty(\wordWrap, false);
+			snapView.bounds = snapView.bounds.insetBy(0,1);
+			setString.value;
+		}.value;
 
-		PopUpMenu( header, 50@size )
-			.items_( [ "all","move","resize","fades"] )
-			.canFocus_(false)
-			.font_( font )
-		    .applySkin( RoundView.skin )
-			.resize_(3)
-			.value_(0)
-		    .toolTip_( "Snap filter" )
-			.action_({ |v|
-				scoreView.usessionMouseEventsManager.mode = v.items[v.value].asSymbol;
-			});
 
 		SmoothButton( header, size@size )
 			.label_( "Q" )
