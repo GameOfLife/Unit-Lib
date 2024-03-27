@@ -140,14 +140,15 @@ ULib {
 		};
 
 		ULib.servers.do{ |s, i|
-			var ip, composite, startButton, startCtrl;
+			var ip, composite, startButton, startCtrl, killButton;
 			composite = CompositeView( w, Rect( 0,0, width - 8, 18 ) );
 			if( s.addr.isLocal ) {
-				SmoothButton(composite, Rect(width-26,0, 18, 18))
+				killButton = SmoothButton(composite, Rect(width-26,0, 18, 18))
 				.states_( [["K"]] )
 				.canFocus_( false )
 				.font_( font )
 				.action_({ Server.killAll });
+				killButton.view.toolTip_( "Kills all local Server processes\n\nUse this if Server doesn't boot" );
 				if( NetAddr.respondsTo( \myIP ) ) {
 					ip = NetAddr.myIP;
 				};
@@ -158,6 +159,10 @@ ULib {
 				composite.background = Color.gray(0.5).alpha_(0.2);
 				StaticText(composite, Rect( 22, 2, 200,16 ) )
 				.font_( font.boldVariant )
+				.toolTip_( "LoadBalancer %, % Servers\n\n".format( s.name, s.servers.size )  ++
+					"Events are automatically divided over these servers\n" ++
+					"to reach optimal CPU performance on a multi-core system"
+				)
 				.string_( " " ++ s.name + "/" + ip );
 				startButton = SmoothButton(composite, Rect(0,0,18,18))
 				.canFocus_( false )
@@ -169,6 +174,9 @@ ULib {
 						0, { s.quit }
 					);
 				});
+				startButton.view.toolTip_( "boot/quit LoadBalancer %\n\n".format( s.name ) ++
+					"When booting each Server will wait for the previous one to boot"
+				);
 				startCtrl = { |obj, what|
 					if( what === \serverRunning ) {
 						case { s.serverRunning } {
@@ -208,12 +216,17 @@ ULib {
 			    .string_("Latency")
 				.font_( font )
 			    .knobColor_( Color.black.alpha_(0.25) );
+				latencyView.sliderView.view.toolTip_( "latency (s) for starting events and changing parameters" );
 			};
 
 		};
 
 		statusView = StaticText( w, (width - 8 - 40) @ 18 )
 		.align_( \left )
+		.toolTip_(
+			"% status display\n\nShows how many events are playing and how many buffers loaded\n".format( name ) ++
+			"If the numbers here show active UChains or Units when nothing is playing, press 'clear'"
+		)
 		.font_( font );
 
 		SmoothButton( w, Rect( 0, 0, 36, 16 ) )
@@ -222,7 +235,13 @@ ULib {
 		    .canFocus_( false )
 			.action_( {
 				ULib.clear;
-		     } );
+		     } )
+		.view.toolTip_(
+			"Clear resets Servers and UChain/Unit synth/group dicts and reloads global Buffers.\n\n" ++
+			"Use after Server restart or if things appear to be playing but actually don't (usually\n" ++
+			"caused by overload). More elaborate reset options are in the WFSCollider menu"
+		);
+
 
 		gainSlider = EZSmoothSlider( w, (w.bounds.width - 8) @ 20,
 			controlSpec: [ -60, 36, \lin, 1, -12, "db" ],
@@ -239,6 +258,7 @@ ULib {
 		.align_( \right )
 		.string_("Level (dB)   ")
 		.font_( font );
+		gainSlider.sliderView.view.toolTip_( "Global level in dB" );
 
 		gainSliderCtrl = SimpleController( UGlobalGain )
 		.put( \gain, {

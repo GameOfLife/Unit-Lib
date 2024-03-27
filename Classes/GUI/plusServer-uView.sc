@@ -57,6 +57,7 @@
 				booter = SmoothButton(composite, Rect(0,0, 18, 18))
 				.canFocus_( false )
 				.radius_(2);
+				booter.view.toolTip_( "boot/quit Server %".format( this.name ) );
 				booter.states = [
 					[ \power, nil, Color.clear],
 					[ \power, nil, onColor.copy.alpha_(0.5) ]
@@ -107,6 +108,17 @@
 		active.align = \left;
 		active.font = font;
 		active.mouseDownAction = { menu.front; };
+
+		active.toolTip_( "Server % status\n\n".format( this.name ) ++
+			"% Average CPU, % Peak CPU, #s Synths, #d SynthDefs\n" ++
+			"i/o: % / %, sampleRate: %, blockSize: %\n".format(
+				this.options.numInputBusChannels,
+				this.options.numOutputBusChannels,
+				this.options.sampleRate,
+				this.options.blockSize
+			) ++
+			"Click for further options and metering"
+		);
 
 		if(this.serverRunning,running,stopped);
 
