@@ -199,31 +199,6 @@ UMIDIFilterSpec : Spec {
 
 		vws[ \view ].decorator.nextLine;
 		if( label.notNil ) { vws[ \view ].decorator.shift( labelWidth + 4, 0 ); };
-		vws[ \device ] = StaticText( vws[ \view ], bounds.width - 44 - (labelWidth+4) @ 14 )
-		.mouseDownAction_({
-			makeMenu.value({ |res|
-				vws[ \val ][ 0 ] = res;
-				vws.setViews;
-				vws.doAction;
-			});
-		})
-		.string_( "device " ).align_( \right ).applySkin( RoundView.skin )
-		.align_( \center )
-		.background_( Color.white.alpha_(0.25) );
-		vws[ \device ].setProperty(\wordWrap, false);
-
-		/*
-		vws[ \device ] = TextField( view, bounds.width - (44 + 49) - (labelWidth+4) @ 14 )
-		.string_( this.class.formatDeviceString )
-		.action_({ |vw|
-			var string;
-			string = this.class.formatDeviceString( vw.string );
-			vw.string = string;
-			vws[ \val ][ 0 ] = string.asSymbol;
-			vws.doAction;
-		})
-		.applySkin( RoundView.skin );
-		*/
 
 		vws[ \learn ] = SmoothButton( vws[ \view ], 40@14 )
 		.label_( [ "learn", "learn" ] )
@@ -240,6 +215,19 @@ UMIDIFilterSpec : Spec {
 				0, { learnFuncs.remove( vws[ \learnFunc ] ); }
 			);
 		});
+
+		vws[ \device ] = StaticText( vws[ \view ], bounds.width - 44 - (labelWidth+4) @ 14 )
+		.mouseDownAction_({
+			makeMenu.value({ |res|
+				vws[ \val ][ 0 ] = res;
+				vws.setViews;
+				vws.doAction;
+			});
+		})
+		.string_( "device " ).align_( \right ).applySkin( RoundView.skin )
+		.align_( \center )
+		.background_( Color.white.alpha_(0.25) );
+		vws[ \device ].setProperty(\wordWrap, false);
 
 		vws[ \setViews ] = {
 			{ vws[ \device ].string =  "device: %".format( vws[ \val ][ 0 ] ); }.defer;
