@@ -67,7 +67,9 @@
 			evt[ \updateViews ].value;
 		};
 
-		if( canBeControlSpec ) {
+		if( canBeControlSpec && {
+			evws[ \spec ].unmap( evws[ \spec ].default ).isNumber;
+		}) {
 			evws[ \controlSpec ] = this.asControlSpec;
 			scrollHeight = evws[ \w ].bounds.height - 200 - 6 - specViewHeight - 12;
 			evws[ \multi ] = MultiSliderView( evws[ \w ], evws[ \w ].bounds.width - 8 @ 200 );
@@ -937,6 +939,148 @@
 		if( active ) { vws[ \doAction ].value };
 	}
 }
+
+
++ MultiRangeSpec {
+
+	viewNumLines { ^1 }
+
+	originalSpec {
+		^originalSpec ?? { this.asRangeSpec };
+	}
+
+	makeView { |parent, bounds, label, action, resize, hasEdit = true|
+		var vws, view, labelWidth, width;
+		var localStep;
+		var modeFunc;
+		var font;
+		var editAction;
+		var tempVal;
+		var optionsWidth = 40;
+		var isMassEdit = true;
+		var hiliteColor;
+		var menu, compWidth;
+		var canMap = false;
+		var hasDefault;
+
+		vws = ();
+
+		font = (RoundView.skin ? ()).font ?? { Font( Font.defaultSansFace, 10 ); };
+
+		hiliteColor = RoundView.skin[ \SmoothSlider ] !? _.hiliteColor ?? { Color(0,0,0,0.33); };
+
+		hasDefault = this.originalSpec.respondsTo( \default );
+
+		bounds.isNil.if{bounds= 350@20};
+
+		view = EZCompositeView( parent, bounds, gap: 4@4 );
+		view.asView.resize_( resize );
+		bounds = view.asView.bounds;
+		width = bounds.width;
+
+		vws[ \view ] = view;
+		vws[ \label ] = label;
+		vws[ \val ] = this.default;
+		vws[ \setRange ] = {
+			vws[ \range ] = [ vws[ \val ].flat.minItem, vws[ \val ].flat.maxItem ];
+		};
+		vws[ \setRange ].value;
+		vws[ \doAction ] = { action.value( vws, vws[ \val ] ) };
+
+		canMap = true;
+
+		if( label.notNil ) {
+			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
+			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ 14 )
+			.string_( label.asString ++ " " )
+			.align_( \right )
+			.resize_( 4 )
+			.applySkin( RoundView.skin );
+			width = width - labelWidth - 2;
+		} {
+			labelWidth = 0;
+		};
+
+		compWidth = bounds.width - labelWidth - 8 - optionsWidth;
+
+		vws[ \specComp ] = CompositeView( view, compWidth @  (bounds.height) );
+
+		vws[ \specView ] = this.originalSpec.makeView(
+			vws[ \specComp ],
+			vws[ \specComp ].bounds.moveTo(0,0),
+			nil, { |vw, val|
+				var rrange, unmapped;
+				rrange = this.unmap( vws[ \range ] ++ val );
+				unmapped = this.unmap( vws[ \val ] );
+				if( vws[ \range ][ 0 ] == vws[ \range ][ 1 ] ) {
+					unmapped = unmapped.collect({ |item|
+						item + [0, 1.0e-12];
+					});
+				};
+				vws[ \val ] = this.map(	unmapped.linlin( *rrange ) );
+				vws[ \update ].value;
+				action.value( vws, vws[ \val ] );
+		}, 5
+		);
+
+		vws[ \options ] = UserView( view, optionsWidth @ 14 )
+		.background_( Color.white.alpha_( 0.25 ) )
+		.mouseDownAction_({
+			menu = this.makeMenu( hasEdit, vws, { |values|
+				vws[ \val ] = values;
+				vws[ \update ].value;
+				action.value( vws, vws[ \val ] );
+			}, [ \reverse, \scramble, 'use first for all', \rotate, 'code...', \post ]);
+		});
+
+		if( canMap ) {
+			vws[ \options ].drawFunc_({ |vw|
+				var bounds, vals, size, def;
+				Pen.color = hiliteColor;
+				bounds = vw.bounds.moveTo(0,0);
+				vals = vws[ \val ].collect({ |val|
+					this.originalSpec.unmap( val )
+				});
+				vals = vals.linlin(0,1,bounds.height,0);
+				size = vals.size;
+				Pen.moveTo( bounds.left @ vals[0][0] );
+				vals.do({ |val, i|
+					Pen.lineTo( i.linlin(0,size,0,bounds.width) @ val[0] );
+					Pen.lineTo( (i + 1).linlin(0,size,0,bounds.width) @ val[0] );
+				});
+				vals.reverseDo({ |val, i|
+					Pen.lineTo( i.linlin(0,size,bounds.width,0) @ val[1] );
+					Pen.lineTo( (i + 1).linlin(0,size,bounds.width,0) @ val[1] );
+				});
+				Pen.moveTo( bounds.left @ vals[0][0] );
+				Pen.fill;
+			});
+		};
+
+		vws[ \update ] = {
+			vws[ \editWin ] !? _.setValues( vws[ \val ] );
+			vws[ \setRange ].value;
+			this.originalSpec.setView( vws[ \specView ], vws[ \range ], false );
+			{ vws[ \options ].refresh; }.defer;
+		};
+
+		vws[ \options ] !? _.resize_(3);
+
+		view.view.onClose_({
+			vws[ \editWin ] !? _.close;
+			menu !? _.destroy;
+		});
+
+		^vws;
+	}
+
+	setView { |vws, value, active = false|
+		vws[ \val ] = value.asCollection;
+		vws[ \update ].value;
+		if( active ) { vws[ \doAction ].value };
+	}
+}
+
 
 + StringSpec {
 

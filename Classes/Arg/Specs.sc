@@ -874,6 +874,7 @@ RangeSpec : ControlSpec {
 MultiRangeSpec : ControlSpec {
 	var <>minRange, <>maxRange;
 	var <>size;
+	var <>originalSpec;
 
 	*new { |minval=0.0, maxval=1.0, minRange=0, maxRange = inf, warp='lin', step=0.0,
 			 default, units|
@@ -892,7 +893,7 @@ MultiRangeSpec : ControlSpec {
 	}
 
 	constrain { |value|
-		var ctrlSpec = this.asRangeSpec;
+		var ctrlSpec = originalSpec ?? { this.asRangeSpec; };
 		if( size.notNil ) {
 			^value.collect({ |x| ctrlSpec.constrain(x) })
 				.wrapExtend( size );
