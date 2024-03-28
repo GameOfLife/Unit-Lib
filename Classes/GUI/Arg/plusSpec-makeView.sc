@@ -3522,11 +3522,9 @@
 			actions = [
 				MenuAction( "radians (-pi - pi)", {
 					this.class.mode = \rad;
-					//this.setMode( vws, mode );
 				}).enabled_( mode != \rad ),
 				MenuAction( "degrees (-180° - 180°)", {
 					this.class.mode = \deg;
-					//this.setMode( vws, mode );
 				}).enabled_( mode != \deg ),
 			];
 			Menu( *actions ).front( action: actions[ [\rad, \deg].indexOf( mode ) ] );
