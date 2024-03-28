@@ -3406,7 +3406,7 @@
 
 		// hz mode
 		vws[ \hz ] = EZSmoothSlider( vws[ \view ],
-			(bounds.width - (labelWidth + 49)) @ (bounds.height),
+			(bounds.width - (labelWidth + 45)) @ (bounds.height),
 			nil,  this, { |vw|
 				vws[ \val ] = vw.value;
 				vws.setName;
@@ -3425,7 +3425,7 @@
 			};
 		};
 
-		vws[ \name ] = StaticText( view, 45 @ (bounds.height) )
+		vws[ \name ] = StaticText( view, 40 @ (bounds.height) )
 			.font_( font )
 			.applySkin( RoundView.skin ? () )
 		    .mouseDownAction_({ makeMenu.value })
