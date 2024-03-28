@@ -86,29 +86,29 @@ UMIDIFilterSpec : Spec {
 			sources.sortedKeysValuesDo({ |key, value|
 				var isCurrent, portIsCurrent;
 				isCurrent = (current[0] == key);
-				if( value.size == 1 ) {
-					portIsCurrent = (current[1] == value[0]);
-					menus = menus.add(
-						MenuAction( key.asString +/+ value[0], {
-							action.value( [key, value[0]].join( "/" ).asSymbol )
-						}).enabled_( portIsCurrent.not )
+				menus = menus.add(
+					Menu(
+						*value.collect({ |name|
+							portIsCurrent = (current[1] == name);
+							MenuAction( name.asString, {
+								action.value( [key, name].join( "/" ).asSymbol )
+							}).enabled_( portIsCurrent.not )
+						}) ++ [
+							MenuAction( "any port (*)", {
+								action.value( [key, "*"].join( "/" ).asSymbol )
+							}).enabled_( isCurrent.not or: { current[1] != '*' }),
+						]
+					).title_( if( isCurrent ) { key.asString + "*" } { key.asString } );
+				);
+				if( isCurrent && { menus.last.actions.every(_.enabled) } ) {
+					menus.last.addAction(
+						MenuAction( current[1].asString ).enabled_( false )
 					);
-				} {
-					menus = menus.add(
-						Menu(
-							*value.collect({ |name|
-								portIsCurrent = (current[1] == name);
-								MenuAction( name.asString, {
-									action.value( [key, name].join( "/" ).asSymbol )
-								}).enabled_( portIsCurrent.not )
-							})
-						).title_( if( isCurrent ) { key.asString + "*" } { key.asString } );
-					)
 				};
 			});
 
 			menus = menus.add(
-				MenuAction( "any (*/*)", { action.value( '*/*' ) } )
+				MenuAction( "any device/port (*/*)", { action.value( '*/*' ) } )
 				.enabled_( vws[ \val ][0] !== '*/*' )
 			);
 
