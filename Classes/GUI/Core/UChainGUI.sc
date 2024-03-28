@@ -1548,8 +1548,22 @@ UChainGUI {
 				.background_( nil )
 				.hiliteColor_( nil )
 				.value_( unit.guiCollapsed.binaryValue )
-				.action_({ |bt|
-					unit.guiCollapsed = bt.value.booleanValue;
+				.mouseUpAction_({ |bt,x,y,mod|
+				    var bool;
+				    bool = bt.value.booleanValue.not;
+				    if( mod == 524288 ) { // option / alt key; collapse all
+					    UMapSetChecker.stall = true;
+					    units.do({ |unit|
+						    unit.guiCollapsed = bool;
+						    unit.getAllUMaps.do({ |umap|
+							    umap.guiCollapsed = bool;
+						    });
+					    });
+					    UMapSetChecker.stall = false;
+					    unit.changed( \init );
+				    } {
+					    unit.guiCollapsed = bt.value.booleanValue.not;
+				    };
 				});
 
 			header = StaticText( comp, comp.bounds.moveTo(0,0).insetAll( 16,0,0,0) )

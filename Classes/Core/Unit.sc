@@ -803,12 +803,15 @@ U : ObjectWithArgs {
 		^this.get( \u_dur );
 	}
 
-	argSpecsForDisplay {
-		var out;
+	argSpecsForDisplay { |forceUMaps = true|
+		var out, showOnCollapse;
 		if( this.guiCollapsed ) {
-			(this.def !? _.showOnCollapse ? []).do({ |key|
+			showOnCollapse = this.def !? _.showOnCollapse ? [];
+			this.keys.do({ |key|
 				var argSpec;
-				if( this.keys.includes( key ) ) {
+				if( showOnCollapse.includes( key ) or: {
+					this.at( key ).isKindOf( UMap ) or: { this.at( key ).isKindOf( MassEditUMap ) };
+				}) {
 					argSpec = this.getArgSpec( key );
 					if( argSpec.private.not ) {
 						out = out.add( argSpec );
