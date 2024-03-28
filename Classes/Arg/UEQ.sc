@@ -152,8 +152,9 @@ UEQSpec : Spec {
 
 			Pen.fillStroke;
 		}])
-			.border_( 1 )
-			.radius_( 2 )
+			.border_( 0 )
+			.radius_( 0 )
+			.background_( Color.white.alpha_(0.25) )
 			.font_( font )
 			.action_({
 				var editor;
