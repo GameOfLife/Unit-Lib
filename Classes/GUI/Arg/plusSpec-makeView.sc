@@ -3474,6 +3474,7 @@
 		var editAction;
 		var tempVal;
 		var degMul = 180 / pi;
+		var ctrl;
 		vws = ();
 
 		font =  (RoundView.skin ? ()).font ?? { Font( Font.defaultSansFace, 10 ); };
@@ -3498,24 +3499,34 @@
 			labelWidth = 0;
 		};
 
-		vws[ \comp ] = CompositeView( view, (bounds.width - (labelWidth + 49)) @ (bounds.height) );
+		vws[ \comp ] = CompositeView( view, (bounds.width - (labelWidth + 44)) @ (bounds.height) );
 
-		vws[ \mode ] = PopUpMenu( view, 45 @ (bounds.height) )
-			.font_( font )
-			.applySkin( RoundView.skin ? () )
-			.items_([ 'rad', 'deg' ])
-			.action_({ |pu|
-				mode = pu.item;
-				this.setMode( vws, mode );
-			});
+		vws[ \mode ] = StaticText( view, 40 @ (bounds.height) )
+		.font_( font )
+		.string_( " pi" )
+		.applySkin( RoundView.skin ? () )
+		.background_( Color.white.alpha_( 0.25 ) )
+		.mouseDownAction_({ |pu|
+			var actions;
+			actions = [
+				MenuAction( "radians (-pi - pi)", {
+					this.class.mode = \rad;
+					//this.setMode( vws, mode );
+				}).enabled_( mode != \rad ),
+				MenuAction( "degrees (-180° - 180°)", {
+					this.class.mode = \deg;
+					//this.setMode( vws, mode );
+				}).enabled_( mode != \deg ),
+			];
+			Menu( *actions ).front( action: actions[ [\rad, \deg].indexOf( mode ) ] );
+		});
 
 		// rad mode
 		vws[ \rad ] = EZSmoothSlider( vws[ \comp ],
 			vws[ \comp ].bounds.width @ (bounds.height),
 			nil,
-			[ this.minval / pi, this.maxval / pi, \lin, step / pi, this.default / pi, "pi" ].asSpec,
+			[ this.minval / pi, this.maxval / pi, \lin, step / pi, this.default / pi ].asSpec,
 			{ |vw| action.value( vw, vw.value * pi ) },
-			unitWidth: RoundView.skin.numberWidth ? 40,
 			numberWidth: RoundView.skin.numberWidth ? 40
 		).visible_( false );
 
@@ -3541,6 +3552,11 @@
 
 		this.setMode( vws, mode );
 
+		ctrl = SimpleController( this.class )
+		.put( \mode, { { this.setMode( vws, mode ); }.defer });
+
+		vws[ \comp ].onClose_({ ctrl.remove });
+
 		^vws;
 	}
 
@@ -3548,6 +3564,7 @@
 		[ \rad, \deg ].do({ |item|
 			view[ item ].visible = (item == newMode)
 		});
+		view[ \mode ].string = ( \rad: " pi", \deg: " °" )[ newMode ];
 	}
 
 	setView { |view, value, active = false|
@@ -3555,7 +3572,7 @@
 		view[ \deg ].value = value * 180 / pi;
 		{
 			this.setMode( view, mode );
-			view[ \mode ].value = view[ \mode ].items.indexOf( mode ) ? 0;
+			// view[ \mode ].value = view[ \mode ].items.indexOf( mode ) ? 0;
 		}.defer;
 		if( active ) { view[ \rad ].doAction };
 	}
@@ -3577,6 +3594,7 @@
 					action.value( vws, value * pi )
 				};
 				spec = ArrayControlSpec( minval / pi, maxval / pi, \linear, step, default / pi );
+				spec.originalSpec = this.originalSpec;
 				vws = spec.makeView( parent, bounds, label, act, resize );
 				vws[ \mode ] = \rad;
 				vws[ \spec ] = spec;
@@ -3588,6 +3606,7 @@
 				};
 				spec = ArrayControlSpec( minval * degMul, maxval * degMul, \linear, step,
 					default * degMul );
+				spec.originalSpec = this.originalSpec;
 				vws = spec.makeView( parent, bounds, label, act, resize );
 				vws[ \mode ] = \deg;
 				vws[ \spec ] = spec;

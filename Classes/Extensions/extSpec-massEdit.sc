@@ -59,7 +59,7 @@
 + AngleSpec {
 
 	massEditSpec { |inArray|
-		^AngleArraySpec.newFrom( this ).size_( inArray.size ).default_( inArray );
+		^AngleArraySpec.newFrom( this ).size_( inArray.size ).originalSpec_( this ).default_( inArray );
 	}
 
 	massEditValue { |inArray|
