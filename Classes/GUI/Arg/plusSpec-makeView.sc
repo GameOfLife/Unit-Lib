@@ -3315,7 +3315,7 @@
 					}) ++
 					[ 1, 12 ].collect({ |item, i|
 						var res = currentValue.cpsmidi.round( item ).midicps;
-						MenuAction( "1 % (%)".format( ["semitone", "octave"][i], res ), {
+						MenuAction( "1 % (%)".format( ["semitone", "octave"][i], res.round(0.001) ), {
 							vws.setVal( this.constrain( res ) );
 							vws.doAction;
 						});
@@ -3418,8 +3418,19 @@
 
 		vws[ \hz ].numberView.allowedChars = "+-.AaBbCcDdEeFfGg#*/()%";
 		vws[ \hz ].numberView.interpretFunc = { |string|
-			if( string.any({ |x| "AaBbCcDdEeFfGg".includes(x) }) ) {
-				string.namecps;
+			var cents = 0, splits;
+			if( "AaBbCcDdEeFfGg".includes(string.first) ) {
+				if( string.indexOf( $+ ).notNil ) {
+					cents = string.split( $+ ).last.interpret;
+				} {
+					splits = string.split($-);
+					if( splits.size > 1 ) {
+						if( splits[ splits.size-2 ].last.isDecDigit ) {
+							cents = splits.last.interpret.neg;
+						};
+					};
+				};
+				string.namecps * (cents / 100).midiratio;
 			} {
 				string.interpret;
 			};
