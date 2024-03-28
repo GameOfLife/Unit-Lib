@@ -145,8 +145,18 @@ GenericMassEditSpec : Spec {
 	var <>size;
 	var <>default;
 
+	constrain { |value|
+		if( size.notNil ) {
+			^value.collect({ |x| originalSpec.constrain(x) })
+				.wrapExtend( size );
+		} {
+			^value.collect{ |x| originalSpec.constrain(x) }
+		}
+	}
+
 	map { |value| ^value }
 	unmap { |value| ^value }
+
 }
 
 StringSpec : Spec {
