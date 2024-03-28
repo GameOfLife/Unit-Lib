@@ -539,13 +539,38 @@ MassEditUMap : MassEditU {
 	var <>mixed = false;
 
 	init { |inUnits|
-		var firstDef, defs;
+		var defs, sd;
+		var dkey, dval;
 		units = inUnits.asCollection;
 		if( units.every(_.isUMap) ) {
 			defs = inUnits.collect(_.def);
-			firstDef = defs[0];
-			if( defs.every({ |item| item == firstDef }) ) {
-				def = firstDef;
+			sd = inUnits.collect(_.subDef);
+			if( sd.every({ |item| item == sd[0] }) ) {
+				def = defs[0];
+
+				if( def.isKindOf( MultiUMapDef ).not or: {
+					dkey = def.defNameKey;
+					dval = units[0].get( dkey );
+					units.every({ |unit|
+						unit.get( dkey ) == dval
+					});
+				}) {
+					argSpecs = def.argSpecs( inUnits[0] );
+				} {
+					argSpecs = [ def.getArgSpec( dkey, units[0] ) ];
+				};
+
+				if( def.isKindOf( MultiUMapDef ) ) {
+					defNameKey = def.defNameKey;
+					subDef = units[0].subDef;
+					if( units[1..].any({ |item| item.subDef != subDef }) ) {
+						subDef = nil;
+					};
+				} {
+					subDef = units[0].subDef;
+				};
+
+
 				argSpecs = units[0].argSpecs.collect({ |argSpec|
 					var values, massEditSpec;
 					values = units.collect({ |unit|
@@ -588,7 +613,7 @@ MassEditUMap : MassEditU {
 			} { "" }
 			)).asSymbol
 		} {
-			^((this.def !? { this.def.name }).asString +
+			^((this.def !? { units[0].fullDefName }).asString +
 				"(% umaps)".format( units.size )).asSymbol
 		};
 	}
