@@ -75,31 +75,52 @@ UMIDIFilterSpec : Spec {
 		vws = ();
 
 		makeMenu = { |action|
-			var sources, menus;
+			var sources, menus, current;
 			UMIDIDict.start( false );
 			sources = ();
 			menus = [];
 			MIDIClient.sources.do({ |src|
 				sources[ src.device.asSymbol ] = sources[ src.device.asSymbol ].add( src.name.asSymbol );
 			});
+			current = vws[ \val ][ 0 ].asString.split($/).collect(_.asSymbol);
 			sources.sortedKeysValuesDo({ |key, value|
+				var isCurrent, portIsCurrent;
+				isCurrent = (current[0] == key);
 				if( value.size == 1 ) {
-					menus = menus.add( MenuAction( key.asString +/+ value[0], {
-						action.value( [key, value[0]].join( "/" ).asSymbol )
-					}) );
+					portIsCurrent = (current[1] == value[0]);
+					menus = menus.add(
+						MenuAction( key.asString +/+ value[0], {
+							action.value( [key, value[0]].join( "/" ).asSymbol )
+						}).enabled_( portIsCurrent.not )
+					);
 				} {
-					menus = menus.add( Menu(
-						*value.collect({ |name|
-							MenuAction( name.asString, {
-								action.value( [key, name].join( "/" ).asSymbol )
+					menus = menus.add(
+						Menu(
+							*value.collect({ |name|
+								portIsCurrent = (current[1] == name);
+								MenuAction( name.asString, {
+									action.value( [key, name].join( "/" ).asSymbol )
+								}).enabled_( portIsCurrent.not )
 							})
-						})
-					).title_( key.asString );
+						).title_( if( isCurrent ) { key.asString + "*" } { key.asString } );
 					)
 				};
 			});
 
-			menus = menus.add( MenuAction( "any (*/*)", { action.value( '*/*' ) } ) );
+			menus = menus.add(
+				MenuAction( "any (*/*)", { action.value( '*/*' ) } )
+				.enabled_( vws[ \val ][0] !== '*/*' )
+			);
+
+			menus = menus.add(
+				MenuAction( "Edit...", {
+					SCRequestString( vws[ \val ][ 0 ].asString, "Please enter device/port name:", { |string|
+						string = this.class.formatDeviceString( string );
+						vws[ \val ][ 0 ] = string.asSymbol;
+						vws.doAction;
+					});
+				})
+			);
 
 			menus = menus.add( MenuAction.separator );
 			menus = menus.add( MenuAction( "refresh", {
@@ -178,7 +199,7 @@ UMIDIFilterSpec : Spec {
 
 		vws[ \view ].decorator.nextLine;
 		if( label.notNil ) { vws[ \view ].decorator.shift( labelWidth + 4, 0 ); };
-		vws[ \devLabel ] = StaticText( vws[ \view ], 45@14 )
+		vws[ \device ] = StaticText( vws[ \view ], bounds.width - 44 - (labelWidth+4) @ 14 )
 		.mouseDownAction_({
 			makeMenu.value({ |res|
 				vws[ \val ][ 0 ] = res;
@@ -187,7 +208,11 @@ UMIDIFilterSpec : Spec {
 			});
 		})
 		.string_( "device " ).align_( \right ).applySkin( RoundView.skin )
+		.align_( \center )
 		.background_( Color.white.alpha_(0.25) );
+		vws[ \device ].setProperty(\wordWrap, false);
+
+		/*
 		vws[ \device ] = TextField( view, bounds.width - (44 + 49) - (labelWidth+4) @ 14 )
 		.string_( this.class.formatDeviceString )
 		.action_({ |vw|
@@ -198,6 +223,7 @@ UMIDIFilterSpec : Spec {
 			vws.doAction;
 		})
 		.applySkin( RoundView.skin );
+		*/
 
 		vws[ \learn ] = SmoothButton( vws[ \view ], 40@14 )
 		.label_( [ "learn", "learn" ] )
@@ -216,7 +242,7 @@ UMIDIFilterSpec : Spec {
 		});
 
 		vws[ \setViews ] = {
-			vws[ \device ].string = vws[ \val ][ 0 ].asString;
+			{ vws[ \device ].string =  "device: %".format( vws[ \val ][ 0 ] ); }.defer;
 			vws[ \chan ].value = vws[ \val ][ 2 ] ? -1;
 			vws[ \num ].value = vws[ \val ][ 3 ] ? -1;
 		};
