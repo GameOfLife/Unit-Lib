@@ -151,16 +151,24 @@ UMarkerGUI : UChainGUI {
 		composite.decorator.nextLine;
 
 		// startTime
-		PopUpMenu( composite, labelWidth@14 )
+		StaticText( composite, labelWidth@14 )
 			.applySkin( RoundView.skin )
-			.canFocus_( false )
-			.items_( [ "startTime", "startBar" ] )
-			.action_({ |pu|
-				startTimeMode = [ \time, \bar ][ pu.value ];
-				views[ \startTime ].visible = (startTimeMode === \time );
-				views[ \startBar ].visible = (startTimeMode === \bar );
+			.align_( \right )
+			.background_( Color.white.alpha_(0.25) )
+			.mouseDownAction_({ |vw|
+				var actions, update;
+				actions = [ [ "startTime", \time ], [ "startBar", \bar ] ].collect({ |item|
+					MenuAction( item[0], {
+						startTimeMode = item[1];
+						views[ \startTime ].visible = (startTimeMode === \time );
+						views[ \startBar ].visible = (startTimeMode === \bar );
+						vw.string = item[0] ++ " ";
+					}).enabled_( startTimeMode != item[1] );
+				});
+
+				Menu( *actions ).front( action: actions[ [ \time, \bar ].indexOf( startTimeMode ) ] );
 			})
-			.value_( [ \time, \bar ].indexOf( startTimeMode ) ? 0 );
+			.string_( [ "startTime ", "startBar "][ [ \time, \bar ].indexOf( startTimeMode ) ? 0 ] );
 
 		views[ \startTime ] = SMPTEBox( composite, 84@14 )
 			.applySmoothSkin
@@ -186,7 +194,7 @@ UMarkerGUI : UChainGUI {
 
 		// action
 
-		RoundView.useWithSkin( RoundView.skin ++ ( labelWidth: 82 ), {
+		RoundView.useWithSkin( RoundView.skin, {
 			views[ \action ] = ObjectView( composite, (labelWidth + 120) @ 14,
 				chain, \action, CodeSpec({ |marker, score| }), controller
 			);
@@ -196,7 +204,7 @@ UMarkerGUI : UChainGUI {
 
 		// autoPause
 
-		RoundView.useWithSkin( RoundView.skin ++ ( labelWidth: 82 ), {
+		RoundView.useWithSkin( RoundView.skin, {
 			views[ \action ] = ObjectView( composite, (labelWidth + 120) @ 14,
 				chain, \autoPause, BoolSpec(), controller
 			);

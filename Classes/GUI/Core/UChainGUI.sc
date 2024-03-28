@@ -478,16 +478,25 @@ UChainGUI {
 			composite.decorator.nextLine;
 
 			// startTime
-			PopUpMenu( composite, labelWidth@14 )
-				.applySkin( RoundView.skin )
-				.canFocus_( false )
-				.items_( [ "startTime", "startBar" ] )
-				.action_({ |pu|
-					startTimeMode = [ \time, \bar ][ pu.value ];
-					views[ \startTime ].visible = (startTimeMode === \time );
-					views[ \startBar ].visible = (startTimeMode === \bar );
-				})
-				.value_( [ \time, \bar ].indexOf( startTimeMode ) ? 0 );
+			StaticText( composite, labelWidth@14 )
+			.applySkin( RoundView.skin )
+			.align_( \right )
+			.background_( Color.white.alpha_(0.25) )
+			.mouseDownAction_({ |vw|
+				var actions, update;
+				actions = [ [ "startTime", \time ], [ "startBar", \bar ] ].collect({ |item|
+					MenuAction( item[0], {
+						startTimeMode = item[1];
+						views[ \startTime ].visible = (startTimeMode === \time );
+						views[ \startBar ].visible = (startTimeMode === \bar );
+						vw.string = item[0] ++ " ";
+					}).enabled_( startTimeMode != item[1] );
+				});
+
+				Menu( *actions ).front( action: actions[ [ \time, \bar ].indexOf( startTimeMode ) ] );
+			})
+			.string_( [ "startTime ", "startBar "][ [ \time, \bar ].indexOf( startTimeMode ) ? 0 ] );
+
 
 			views[ \startTime ] = SMPTEBox( composite, 84@14 )
 				.applySmoothSkin
@@ -520,17 +529,24 @@ UChainGUI {
 			composite.decorator.nextLine;
 		} {
 			// startTime
+			StaticText( composite, labelWidth@14 )
+			.applySkin( RoundView.skin )
+			.align_( \right )
+			.background_( Color.white.alpha_(0.25) )
+			.mouseDownAction_({ |vw|
+				var actions, update;
+				actions = [ [ "startTime", \time ], [ "startBar", \bar ] ].collect({ |item|
+					MenuAction( item[0], {
+						startTimeMode = item[1];
+						views[ \startTime ].visible = (startTimeMode === \time );
+						views[ \startBar ].visible = (startTimeMode === \bar );
+						vw.string = item[0] ++ " ";
+					}).enabled_( startTimeMode != item[1] );
+				});
 
-			PopUpMenu( composite, labelWidth@14 )
-				.applySkin( RoundView.skin )
-				.canFocus_( false )
-				.items_( [ "startTime", "startBar" ] )
-				.action_({ |pu|
-					startTimeMode = [ \time, \bar ][ pu.value ];
-					views[ \startTime ].visible = (startTimeMode === \time );
-					views[ \startBar ].visible = (startTimeMode === \bar );
-				})
-				.value_( [ \time, \bar ].indexOf( startTimeMode ) ? 0 );
+				Menu( *actions ).front( action: actions[ [ \time, \bar ].indexOf( startTimeMode ) ] );
+			})
+			.string_( [ "startTime ", "startBar "][ [ \time, \bar ].indexOf( startTimeMode ) ? 0 ] );
 
 			views[ \startTime ] = SMPTEBox( composite, 84@14 )
 				.applySmoothSkin
@@ -563,17 +579,26 @@ UChainGUI {
 
 			if( chain.isKindOf( MassEditUChain ).not or: { chain.uchains.size > 0 } ) {
 				// duration
-				PopUpMenu( composite, labelWidth@14 )
-					.applySkin( RoundView.skin )
-					.items_( [ "duration", "endTime", "endBar" ] )
-					.canFocus_( false )
-					.action_({ |pu|
-						durationMode = [ \duration, \endTime, \endBar ][ pu.value ];
-						views[ \dur ].visible = (durationMode === \duration );
-						views[ \endTime ].visible = (durationMode === \endTime );
-						views[ \endBar ].visible = (durationMode === \endBar );
-					})
-					.value_( [ \duration, \endTime, \endBar ].indexOf( durationMode ) ? 0 );
+				StaticText( composite, labelWidth@14 )
+				.applySkin( RoundView.skin )
+				.align_( \right )
+				.background_( Color.white.alpha_(0.25) )
+				.mouseDownAction_({ |vw|
+					var actions, update;
+					actions = #[ duration, endTime, endBar ].collect({ |item|
+						MenuAction( item.asString, {
+							durationMode = item;
+							views[ \dur ].visible = (durationMode === \duration );
+							views[ \endTime ].visible = (durationMode === \endTime );
+							views[ \endBar ].visible = (durationMode === \endBar );
+							vw.string = item.asString ++ " ";
+						}).enabled_( durationMode != item );
+					});
+					Menu( *actions ).front(
+						action: actions[ #[ duration, endTime, endBar ].indexOf( durationMode ) ]
+					);
+				})
+				.string_( durationMode.asString ++ " " );
 
 				views[ \dur ] = SMPTEBox( composite, 84@14 )
 					.applySmoothSkin
