@@ -762,47 +762,57 @@ UChainGUI {
 					.string_( "ugroup" )
 					.align_( \right );
 
-				views[ \ugroup ] = PopUpMenu( composite, 84@14 )
-					.applySkin( RoundView.skin )
-					.items_( [ "-", "new..." ] )
-					.canFocus_( false )
-					.action_({ |pu|
-						case { pu.value == 0 } {
+				views[ \ugroup ] = StaticText( composite, 84@14 )
+				.applySkin( RoundView.skin )
+				.align_( \center )
+				.background_( Color.white.alpha_(0.25) )
+				.string_( chain.ugroup ? "(no ugroup)" )
+				.mouseDownAction_({ |vw|
+					var actions = [], groups, selected;
+
+					actions = actions.add(
+						MenuAction( "(no ugroup)", {
 							chain.ugroup = nil;
-						} { pu.value == (pu.items.size-1) } {
-							chain.changed( \ugroup );
-							SCRequestString( "default", "Please enter a unique name for a new UGroup",
-							{ |string|
-								string = string.asSymbol;
-								if( UGroup.all.collect(_.id) !? { |x| x.includes( string ).not } ? true ) {
-									UGroup( string );
-									chain.ugroup = string;
-								} {
-									"UGroup '%' already exists".postln;
-									chain.ugroup = string;
-								};
-							})
-						} {
-							chain.ugroup = pu.item;
+						}).enabled_( chain.ugroup.notNil )
+					);
+
+					groups = UGroup.all.collect(_.id) ? [];
+					if( chain.ugroup.notNil && { groups.includes(chain.ugroup).not }) {
+						groups = groups ++ [ chain.ugroup ]
+					};
+
+					groups.do({ |grp|
+						actions = actions.add(
+							MenuAction( grp.asString, {
+								chain.ugroup = grp;
+							});
+						);
+						if( chain.ugroup == grp ) {
+							actions.last.enabled = false;
+							selected = actions.last;
 						};
 					});
 
-				ugroupCtrl = SimpleController( UGroup )
-					.put( \all, {
-						{
-							var groups;
-							 groups = UGroup.all.collect(_.id) ? [];
-							 if( chain.ugroup.notNil && { groups.includes(chain.ugroup).not }) {
-								 groups = groups ++ [ chain.ugroup ]
-							};
-							views[ \ugroup ].items = [ "-" ] ++ groups ++ [ "new..." ];
-							views[ \ugroup ].value = views[ \ugroup ].items.indexOf( chain.ugroup ) ? 0;
-						}.defer;
-					});
+					actions = actions.add(
+						MenuAction( "New...", {
+							SCRequestString( "default", "Please enter a unique name for a new UGroup",
+								{ |string|
+									string = string.asSymbol;
+									if( UGroup.all.collect(_.id) !? { |x| x.includes( string ).not } ? true ) {
+										UGroup( string );
+										chain.ugroup = string;
+									} {
+										"UGroup '%' already exists".postln;
+										chain.ugroup = string;
+									};
+							})
+						})
+					);
 
-				views[ \ugroup ].onClose_({ ugroupCtrl.remove });
+					Menu( *actions ).front( action: selected );
+				});
 
-				UGroup.changed( \all );
+				views[ \ugroup ].setProperty(\wordWrap, false);
 
 				composite.decorator.nextLine;
 
@@ -841,47 +851,34 @@ UChainGUI {
 						chain.global = bt.value.booleanValue;
 					});
 
-				views[ \addAction ] = PopUpMenu( composite, 84@14 )
-					.applySkin( RoundView.skin )
-					.items_( [ "addBefore", "addToHead", "addToTail", "addAfter" ] )
-					.canFocus_( false )
-					.action_({ |pu|
-						chain.addAction = #[
-							addBefore,
-							addToHead,
-							addToTail,
-							addAfter,
-							mixed
-						][ pu.value ];
+				views[ \addAction ] = StaticText( composite, 84@14 )
+				.applySkin( RoundView.skin )
+				.align_( \center )
+				.background_( Color.white.alpha_(0.25) )
+				.string_( chain.addAction.asString )
+				.canFocus_( false )
+				.mouseDownAction_({ |vw|
+					var actions, selected;
+
+					actions = #[ addBefore, addToHead, addToTail, addAfter ].collect({ |item|
+						MenuAction( item, {
+							chain.addAction = item;
+						}).enabled_( chain.addAction != item );
 					});
 
-				if( chain.isKindOf( MassEditUChain ) ) {
-					views[ \setAddAction ] = {
-						var symbol;
-						symbol = this.chain.addAction;
-						if( symbol === \mixed ) {
-							views[ \addAction ].items = [ "addBefore", "addToHead", "addToTail", "addAfter", "mixed"];
-							views[ \addAction ].value = 4;
-						} {
-							views[ \addAction ].items = [ "addBefore", "addToHead", "addToTail", "addAfter" ];
-							views[ \addAction ].value = #[
-								addBefore,
-								addToHead,
-								addToTail,
-								addAfter,
-							].indexOf( symbol ) ? 0;
-						};
+					if( chain.addAction == \mixed ) {
+						actions = actions.add(
+							MenuAction( "mixed" ).enabled_( false )
+						);
 					};
-				} {
-					views[ \setAddAction ] = {
-						views[ \addAction ].value = #[
-							addBefore,
-							addToHead,
-							addToTail,
-							addAfter,
-						].indexOf( this.chain.addAction ) ? 0;
-					};
-				};
+
+					selected = actions.detect({ |item| item.enabled.not });
+
+					Menu( *actions ).front( action: selected );
+
+				});
+
+				views[ \addAction ].setProperty(\wordWrap, true);
 
 				composite.decorator.nextLine;
 			}
@@ -1028,6 +1025,8 @@ UChainGUI {
 				.put( \ugroup, {
 					var groups;
 					{
+						views[ \ugroup ].string = chain.ugroup ? "(no ugroup)";
+						/*
 						if( chain.ugroup.notNil ) {
 							if( chain.ugroup !== \mixed && {
 								UGroup.all !? { |x| x.collect(_.id).includes( chain.ugroup ).not };
@@ -1035,13 +1034,14 @@ UChainGUI {
 						} {
 							views[ \ugroup ].value = 0;
 						};
+						*/
 					}.defer;
 				})
 				.put( \global, {
 					views[ \global ].value = chain.global.binaryValue;
 				})
 				.put( \addAction, {
-					{ views[ \setAddAction ].value }.defer;
+					{ views[ \addAction ].string = chain.addAction.asString }.defer;
 				});
 			};
 
