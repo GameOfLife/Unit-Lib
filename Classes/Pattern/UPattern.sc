@@ -99,6 +99,8 @@ UPattern : UChain {
 		};
 	}
 
+	getUMapPath { ^[ \pattern ] }
+
 	set { |key, value|
 		this.perform( key.asSetter, value );
 	}
