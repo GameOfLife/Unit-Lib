@@ -644,7 +644,7 @@ UChainGUI {
 					});
 
 				views[ \infDur ] = SmoothButton( composite, 40@14 )
-					.radius_( 3 )
+					.radius_( 2 )
 					.label_( [ "inf", "inf" ] )
 					.action_({ |bt|
 						var dur;
@@ -659,13 +659,13 @@ UChainGUI {
 				});
 
 				views[ \fromSoundFile ] = SmoothButton( composite, 40@14 )
-					.radius_( 3 )
+					.radius_( 2 )
 					.label_( "auto" )
 					.action_({ chain.useSndFileDur });
 
 
 				views[ \releaseSelf ] = SmoothButton( composite, 84@14 )
-					.radius_( 3 )
+					.radius_( 2 )
 					.label_( [ "releaseSelf", "releaseSelf" ] )
 					.action_({ |bt|
 						chain.releaseSelf = bt.value.booleanValue;
@@ -756,17 +756,20 @@ UChainGUI {
 					views[ \expandFades ].visible_( false );
 				};
 
-				// ugroup
-				StaticText( composite, (82-14)@14 )
-					.applySkin( RoundView.skin )
-					.string_( "ugroup" )
-					.align_( \right );
+				composite.decorator.shift( 28, 0 );
+
+				views[ \global ] = SmoothButton( composite, 40@14 )
+					.radius_( 2 )
+					.label_( [ "global", "global" ] )
+					.action_({ |bt|
+						chain.global = bt.value.booleanValue;
+					});
 
 				views[ \ugroup ] = StaticText( composite, 84@14 )
 				.applySkin( RoundView.skin )
 				.align_( \center )
 				.background_( Color.white.alpha_(0.25) )
-				.string_( chain.ugroup ? "(no ugroup)" )
+				.string_( chain.ugroup !? "ugroup: %".format(_) ? "(no ugroup)" )
 				.mouseDownAction_({ |vw|
 					var actions = [], groups, selected;
 
@@ -840,16 +843,7 @@ UChainGUI {
 						chain.fadeOutCurve_( nb.value );
 					});
 
-				composite.decorator.shift( 44, 0 );
-
-				// global
-
-				views[ \global ] = SmoothButton( composite, 40@14 )
-					.radius_( 3 )
-					.label_( [ "global", "global" ] )
-					.action_({ |bt|
-						chain.global = bt.value.booleanValue;
-					});
+				composite.decorator.shift( 88, 0 );
 
 				views[ \addAction ] = StaticText( composite, 84@14 )
 				.applySkin( RoundView.skin )
@@ -898,7 +892,7 @@ UChainGUI {
 				});
 
 			views[ \muted ] = SmoothButton( composite, 40@14 )
-				.radius_( 3 )
+				.radius_( 2 )
 				.label_( [ "mute", "mute" ] )
 			    .hiliteColor_( Color.red(1,0.75) )
 				.action_({ |bt|
@@ -1025,16 +1019,7 @@ UChainGUI {
 				.put( \ugroup, {
 					var groups;
 					{
-						views[ \ugroup ].string = chain.ugroup ? "(no ugroup)";
-						/*
-						if( chain.ugroup.notNil ) {
-							if( chain.ugroup !== \mixed && {
-								UGroup.all !? { |x| x.collect(_.id).includes( chain.ugroup ).not };
-							} ) { UGroup( chain.ugroup ); } { UGroup.changed( \all ) };
-						} {
-							views[ \ugroup ].value = 0;
-						};
-						*/
+						views[ \ugroup ].string = chain.ugroup !? "ugroup: %".format(_) ? "(no ugroup)";
 					}.defer;
 				})
 				.put( \global, {
