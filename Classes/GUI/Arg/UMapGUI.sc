@@ -266,7 +266,8 @@ UMapGUI : UGUI {
 		});
 
 		umapdragbinInsert.mouseDownAction_({
-			this.makeUMapDefMenu({ |def|
+			var res;
+			res = this.makeUMapDefMenu({ |def|
 				(parentUnit !? (_.canUseUMap( unit.unitArgName, def )) ? false) && { def.canInsert };
 			}, { |def, args|
 				unit.stop;
@@ -276,7 +277,9 @@ UMapGUI : UGUI {
 			}, {
 				umapdragbinInsert.background = nil;
 			}, includePattern: isPattern);
-			umapdragbinInsert.background = Color.blue(0.9).alpha_(0.25);
+			if( res.notNil ) {
+				umapdragbinInsert.background = Color.blue(0.9).alpha_(0.25);
+			};
 		});
 
 		umapdragbinInsert.mouseUpAction_({
@@ -306,7 +309,8 @@ UMapGUI : UGUI {
 		};
 
 		umapdragbinReplace.mouseDownAction_({
-			this.makeUMapDefMenu({ |def, args|
+			var res;
+			res = this.makeUMapDefMenu({ |def, args|
 				parentUnit !? (_.canUseUMap( unit.unitArgName, def )) ? false;
 			}, { |def, args|
 				unit.stop;
@@ -328,7 +332,9 @@ UMapGUI : UGUI {
 			}, { |def|
 				unit.def.name == def.name
 			}, includePattern: isPattern );
-			umapdragbinReplace.background = Color.blue(0.9).alpha_(0.25);
+			if( res.notNil ) {
+				umapdragbinReplace.background = Color.blue(0.9).alpha_(0.25);
+			};
 		});
 
 		umapdragbinReplace.mouseUpAction_({

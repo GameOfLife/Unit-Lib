@@ -178,10 +178,13 @@ UGUI {
 						});
 
 						umapdragbin.mouseDownAction_({
-							this.makeUMapDefMenu({ |def| unit.canUseUMap( key, def ); }, { |def, args|
+							var res;
+							res = this.makeUMapDefMenu({ |def| unit.canUseUMap( key, def ); }, { |def, args|
 								unit.insertUMap( key, def, args );
 							}, { umapdragbin.background = nil; }, includePattern: isPattern );
-							umapdragbin.background = Color.blue(0.9).alpha_(0.25);
+							if( res.notNil ) {
+								umapdragbin.background = Color.blue(0.9).alpha_(0.25);
+							};
 						});
 
 						umapdragbin.mouseUpAction_({
@@ -330,13 +333,18 @@ UGUI {
 			menu = Menu( *menuList ).font_( Font( Font.defaultSansFace, 12 ) );
 		};
 
-		if( checkedIndex.notNil ) {
-			menu.front( action: menu.actions[ checkedIndex ] ? nil );
-		} {
-			menu.front;
-		};
+		if( menu.actions.size > 0 ) {
+			if( checkedIndex.notNil ) {
+				menu.front( action: menu.actions[ checkedIndex ] ? nil );
+			} {
+				menu.front;
+			};
 
-		^menu.addDependant( ctrl );
+			^menu.addDependant( ctrl );
+		} {
+			menu.destroy;
+			^nil;
+		}
 	}
 
 	resize_ { |resize| composite.resize_(resize) }
