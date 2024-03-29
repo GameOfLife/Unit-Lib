@@ -172,11 +172,107 @@ UAudioDeviceSpec : Spec {
 		var vw;
 		var ctrl;
 		var fillPopUps;
+		var labelWidth, labelSpace;
 		this.class.refreshDevices;
 		vw = ();
+		labelWidth = RoundView.skin.labelWidth ? 120;
+		labelSpace = labelWidth + 2;
 		if( canCheckDevices ) {
-			vw.inPu = EZPopUpMenu( parent, bounds.width @ 14, label !? { label.asString ++ " in " });
-			vw.outPu = EZPopUpMenu( parent, Rect(0,18, bounds.width,14), label !? { label.asString ++ " out " });
+			StaticText( parent, labelWidth @ 14 )
+			.string_( "% in " .format( label ) )
+			.align_( \right )
+			.applySkin( RoundView.skin );
+
+			//vw.inPu = EZPopUpMenu( parent, Rect( labelSpace, 0, bounds.width - labelSpace, 14 ) );
+			vw.inPu = StaticText( parent, Rect( labelSpace, 0, bounds.width - labelSpace, 14 ) )
+			.applySkin( RoundView.skin )
+			.background_( Color.white.alpha_(0.25) );
+			vw.inPu.setProperty(\wordWrap, false);
+
+			StaticText( parent, Rect( 0, 18, labelWidth, 14 ) )
+			.string_( "% out ".format( label ) )
+			.align_( \right )
+			.applySkin( RoundView.skin );
+
+			//vw.outPu = EZPopUpMenu( parent, Rect( labelSpace,18, bounds.width - labelSpace, 14) );
+			vw.outPu = StaticText( parent, Rect( labelSpace,18, bounds.width - labelSpace, 14) )
+			.applySkin( RoundView.skin )
+			.background_( Color.white.alpha_(0.25) );
+			vw.outPu.setProperty(\wordWrap, false);
+
+			vw.inPu.mouseDownAction_({ |st|
+				var actions, selected;
+
+				actions = [
+					MenuAction( "system default", {
+						vw.inDevice = nil;
+						vw.outDevice = nil;
+						action.value( vw, this.formatDevice( nil ) );
+					}).enabled_( vw.inDevice.notNil );
+				];
+
+				actions = actions.addAll(
+					inDevices.collect({ |device|
+						MenuAction( device.asString, {
+							vw.inDevice = device;
+							vw.outDevice = this.class.autoSelectOutDevice( device );
+							action.value( vw, this.formatDevice([ vw.inDevice, vw.outDevice ]) );
+						}).enabled_( vw.inDevice != device );
+					})
+				);
+
+				selected = actions.detect({ |x| x.enabled.not });
+
+				actions = actions.add( MenuAction.separator );
+				actions = actions.add(
+					MenuAction( "Add...", {
+						SCRequestString( "", "please enter device name:", { |string|
+							action.value( vw, this.constrain( string ) );
+						});
+					})
+				);
+
+				actions = [ MenuAction.separator( "device in" ) ] ++ actions;
+
+				Menu( *actions ).front( action: selected );
+			});
+
+			vw.outPu.mouseDownAction_({ |st|
+				var actions, selected;
+
+				actions = [
+					MenuAction( "system default", {
+						vw.outDevice = nil;
+						action.value( vw, this.formatDevice([ vw.inDevice, nil ]) );
+					}).enabled_( vw.outDevice.notNil );
+				];
+
+				actions = actions.addAll(
+					inDevices.collect({ |device|
+						MenuAction( device.asString, {
+							vw.outDevice = device;
+							action.value( vw, this.formatDevice([ vw.inDevice, vw.outDevice ]) );
+						}).enabled_( vw.outDevice != device );
+					})
+				);
+
+				selected = actions.detect({ |x| x.enabled.not });
+
+				actions = actions.add( MenuAction.separator );
+				actions = actions.add(
+					MenuAction( "Add...", {
+						SCRequestString( "", "please enter device name:", { |string|
+							action.value( vw, this.constrain( string ) );
+						});
+					})
+				);
+
+				actions = [ MenuAction.separator( "device out" ) ] ++ actions;
+
+				Menu( *actions ).front( action: selected );
+			});
+
+			/*
 			vw.fillInPu = {
 				vw.inPu.items = [
 					'system default' -> { |pu|
@@ -219,17 +315,24 @@ UAudioDeviceSpec : Spec {
 					}
 				];
 			};
+			*/
+
 			vw.setDevice = { |vwx, device|
 				device = this.unpackDevice( device );
 				vw.inDevice = device[0];
 				vw.outDevice = device[1];
+				vw.inPu.string = " %".format( vw.inDevice ? "system default" );
+				vw.outPu.string = " %".format( vw.outDevice ? "system default" );
+				/*
 				vw.inPu.value = vw.inPu.items.collect(_.key)
 				.indexOf( vw.inDevice.asSymbol ) ? 0;
 				vw.outPu.value = vw.outPu.items.collect(_.key)
 				.indexOf( vw.outDevice.asSymbol ) ? 0;
+				*/
 			};
-			vw.fillInPu;
-			vw.fillOutPu;
+			//vw.fillInPu;
+			//vw.fillOutPu;
+			/*
 			ctrl = SimpleController( this.class )
 			.put( \inDevices, {
 				{ vw.fillInPu }.defer;
@@ -237,19 +340,20 @@ UAudioDeviceSpec : Spec {
 			.put( \outDevices, {
 				{ vw.fillOutPu }.defer;
 			});
+			*/
 			vw.doAction = { vw.outPu.doAction; };
-			vw.inPu.onClose_({ ctrl.remove });
+			//vw.inPu.onClose_({ ctrl.remove });
 			vw.atAll([\inPu, \outPu]).do({ |pu|
-				pu.labelWidth = 80; // same as EZSlider
-				pu.applySkin( RoundView.skin );
-				if( resize.notNil ) { pu.view.resize = resize };
+				//pu.labelWidth = 80; // same as EZSlider
+				//pu.applySkin( RoundView.skin );
+				if( resize.notNil ) { pu.resize = resize };
 			});
 		} {
 			vw.views = [
-				StaticText( parent, 120 @ 14 ).string_( "device in " ).align_( \right ),
-				StaticText( parent, Rect( 124, 0, bounds.width - 124, 14 ) ).string_( "jack" ),
-				StaticText( parent, Rect( 0, 18, 120, 14 ) ).string_( "device out " ).align_( \right ),
-				StaticText( parent, Rect( 124, 18, bounds.width - 124, 14 ) ).string_( "jack" ),
+				StaticText( parent, labelWidth @ 14 ).string_( "device in " ).align_( \right ),
+				StaticText( parent, Rect( labelSpace, 0, bounds.width - labelSpace, 14 ) ).string_( "jack" ),
+				StaticText( parent, Rect( 0, 18, labelWidth, 14 ) ).string_( "device out " ).align_( \right ),
+				StaticText( parent, Rect( labelSpace, 18, bounds.width - labelSpace, 14 ) ).string_( "jack" ),
 			];
 			vw.views.do(_.applySkin( RoundView.skin ));
 		};
