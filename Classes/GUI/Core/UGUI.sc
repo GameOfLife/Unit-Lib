@@ -51,7 +51,7 @@ UGUI {
 			if( filterArgs.isNil or: {
 				filterArgs.includes( x.name.asSymbol );
 			}) {
-				if( unit[ x.name ].isKindOf( UMap ) ) {
+				if( unit[ x.name ].isKindOf( UMap ) or: unit[ x.name ].isKindOf( MassEditUMap ) ) {
 					UMapGUI.viewNumLines( unit[ x.name ] );
 				} {
 					x.spec.viewNumLines

@@ -591,6 +591,28 @@ MassEditUMap : MassEditU {
 				this.changed( \init );
 			} {
 				mixed = true;
+				argSpecs = units[0].argSpecs.select({ |argSpec|
+					units.every({ |item|
+						item.getArgSpec( argSpec.name ) == argSpec
+					});
+				}).collect({ |argSpec|
+					var values, massEditSpec;
+					values = units.collect({ |unit|
+						unit.get( argSpec.name );
+					});
+					if( values.any(_.isUMap) ) {
+						massEditSpec = MassEditUMapSpec( MassEditUMap( values ) );
+					} {
+						massEditSpec = argSpec.spec.massEditSpec( values );
+					};
+					if( massEditSpec.notNil ) {
+						ArgSpec( argSpec.name, massEditSpec.default, massEditSpec, argSpec.private, argSpec.mode );
+					} {
+						nil;
+					};
+				}).select(_.notNil);
+				args = argSpecs.collect({ |item| [ item.name, item.default ] }).flatten(1);
+				this.changed( \init );
 			};
 		} {
 			mixed = true;
