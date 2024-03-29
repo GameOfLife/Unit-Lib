@@ -27,7 +27,7 @@ UChainGUI {
 	classvar <>scrollViewOrigin;
 	classvar <>startTimeMode = \time; // \time, \bar
 	classvar <>durationMode = \duration; // \duration, \endTime, \endBar
-	classvar <>nowBuildingChain;
+	classvar <>nowBuildingChain, <>nowBuildingUChainGUI;
 	classvar <>showInfoStrings = true;
 
 	var <chain, <score, <parentScore;
@@ -38,7 +38,7 @@ UChainGUI {
 	var originalBounds;
 	var <packUnits = true;
 	var <>scrollView;
-	var <>massEditWindowIndex;
+	var <>massEditWindowIndex, <>massEditWindow;
 	var <>tempoMap;
 	var <>undoManager;
 
@@ -291,6 +291,7 @@ UChainGUI {
 		// var unitInitFunc;
 
 		nowBuildingChain = chain;
+		nowBuildingUChainGUI = this;
 
 		labelWidth = 80;
 
@@ -1061,6 +1062,7 @@ UChainGUI {
 		uguis = this.makeUnitViews(units, margin, gap );
 
 		nowBuildingChain = nil;
+		nowBuildingUChainGUI = nil;
 	}
 
 	makeUnitHeader { |units, margin, gap|
@@ -1144,7 +1146,6 @@ UChainGUI {
 		var notMassEdit;
 		var scrollerMargin = 16;
 		var realIndex = 0;
-		var massEditWindow;
 		var upatGUI, upatCtrls, upatHeader, upatComp;
 		var uDefMenuFunc, plusButtonTask;
 		var addBetweenColor;

@@ -28,39 +28,43 @@ UGUI {
 	var <>action;
 	var <>mapSetAction, <>mapCheckers;
 
-	*new { |parent, bounds, unit|
-		^super.newCopyArgs( unit ).init( parent, bounds );
+	*new { |parent, bounds, unit, filterArgs|
+		^super.newCopyArgs( unit ).init( parent, bounds, filterArgs );
 	}
 
-	init { |inParent, bounds|
+	init { |inParent, bounds, filterArgs|
 		parent = inParent;
 		if( parent.isNil ) { parent = Window( unit.defName ).front };
-		this.makeViews( bounds );
+		this.makeViews( bounds, filterArgs );
 	}
 
-	*getHeight { |unit, viewHeight, margin, gap|
+	*getHeight { |unit, viewHeight, margin, gap, filterArgs|
 		viewHeight = viewHeight ? 14;
 		margin = margin ?? {0@0};
 		gap = gap ??  {4@4};
-		^(margin.y * 2) + ( this.viewNumLines( unit ) * (viewHeight + gap.y) ) - gap.y;
+		^(margin.y * 2) + ( this.viewNumLines( unit, filterArgs ) * (viewHeight + gap.y) ) - gap.y;
 	}
 
-	*viewNumLines { |unit|
+	*viewNumLines { |unit, filterArgs|
 		^(unit.argSpecsForDisplay ? [])
-			.collect({|x|
+		.collect({|x|
+			if( filterArgs.isNil or: {
+				filterArgs.includes( x.name.asSymbol );
+			}) {
 				if( unit[ x.name ].isKindOf( UMap ) ) {
 					UMapGUI.viewNumLines( unit[ x.name ] );
 				} {
 					x.spec.viewNumLines
 				};
-			}).sum;
+			} { 0 }
+		}).sum;
 	}
 
-	makeViews { |bounds|
-		this.prMakeViews( bounds );
+	makeViews { |bounds, filterArgs|
+		this.prMakeViews( bounds, filterArgs );
 	}
 
-	prMakeViews { |bounds|
+	prMakeViews { |bounds, filterArgs|
 		var margin = 0@0, gap = 4@4;
 
 		nowBuildingUnit = unit;
@@ -75,7 +79,7 @@ UGUI {
 			};
 		};
 		bounds = bounds.asRect;
-		bounds.height = this.class.getHeight( unit, viewHeight, margin, gap );
+		bounds.height = this.class.getHeight( unit, viewHeight, margin, gap, filterArgs );
 		controller = SimpleController( unit );
 
 		if( unit.isKindOf( MassEditU ) ) {
@@ -99,12 +103,12 @@ UGUI {
 			mapCheckers.do(_.remove);
 		 };
 
-		 this.makeSubViews( bounds );
+		 this.makeSubViews( bounds, filterArgs );
 
 		 nowBuildingUnit = nil;
 	}
 
-	makeSubViews { |bounds|
+	makeSubViews { |bounds, filterArgs|
 		var isPattern;
 		isPattern = UChainGUI.nowBuildingChain.isKindOf( UPattern ) or: {
 			UChainGUI.nowBuildingChain.isKindOf( MassEditUChain ) && {
@@ -126,7 +130,13 @@ UGUI {
 			key = argSpec.name;
 			value = unit.at( key );
 
-			if( argSpec.notNil && (argSpec.spec.viewNumLines != 0)) {
+			if( filterArgs.notNil ) {
+				if( filterArgs.includes( key ).not ) {
+					argSpec = nil;
+				};
+			};
+
+			if( argSpec.notNil && { argSpec.spec.viewNumLines != 0 }) {
 				if( value.isUMap ) {
 					vw = UMapGUI( composite, composite.bounds.insetBy(0,-24), value );
 					vw.parentUnit = unit;

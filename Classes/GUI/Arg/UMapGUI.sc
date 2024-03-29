@@ -1,9 +1,12 @@
 UMapGUI : UGUI {
 
+	classvar <>nowBuildingUMap;
+
 	var <>header, <>userView, <>mainComposite;
 	var <>removeAction;
 	var <>parentUnit;
 	var <removeButton;
+	var <>wasBuildingUMap;
 
 	*viewNumLines { |unit|
 		^super.viewNumLines( unit ) + 1.1;
@@ -70,9 +73,22 @@ UMapGUI : UGUI {
 		var umapdragbinReplace;
 		var infoString;
 		var dragging;
-		var isPattern;
+		var isPattern, chain;
+		var massEditWindowButton, currentUChainGUI, skin;
+		var unitInitFunc;
 
-		isPattern = UChainGUI.nowBuildingChain.isKindOf( UPattern );
+		chain = UChainGUI.nowBuildingChain;
+
+		isPattern = chain.isKindOf( UPattern );
+
+		currentUChainGUI = UChainGUI.nowBuildingUChainGUI;
+		skin = RoundView.skin;
+
+		unitInitFunc = { |unit, what ...args|
+			if( what === \init ) { // close all views and create new
+				if( UMapSetChecker.stall != true ) { chain.changed( \units ); };
+			};
+		};
 
 		header = CompositeView( composite, bounds.width @ viewHeight )
 			.resize_(2);
@@ -95,12 +111,104 @@ UMapGUI : UGUI {
 
 		if( unit.isKindOf( MassEditUMap ).not ) {
 			UDragSource( header, Rect( bounds.width - 12 - 12 - 4, 2, 12, 12 ) )
-				.beginDragAction_({
-					{ UChainGUI.current.view.refresh }.defer(0.1);
-					dragging = unit.deepCopy;
-				})
-				.background_( Color.gray(0.8,0.8) )
-				.string_( "" );
+			.beginDragAction_({
+				{ UChainGUI.current.view.refresh }.defer(0.1);
+				dragging = unit.deepCopy;
+			})
+			.background_( Color.gray(0.8,0.8) )
+			.string_( "" );
+		} { // mass edit window
+			massEditWindowButton = SmoothButton( header,
+				Rect( bounds.width - 18 - 12 - 4, 2, 18, 12 )
+			)
+			.label_( 'up' )
+			.radius_( 2 )
+			.action_({
+				var allUnits, userClosed = true, massEditWindow;
+				if( currentUChainGUI.massEditWindow.notNil && {
+					currentUChainGUI.massEditWindow.isClosed.not
+				}) {
+					currentUChainGUI.massEditWindow.close;
+				};
+				RoundView.pushSkin( skin );
+				massEditWindow = Window( unit.defName,
+					currentUChainGUI.window.bounds.moveBy( currentUChainGUI.window.bounds.width + 10, 0 ),
+					scroll: true ).front;
+				massEditWindow.addFlowLayout;
+				header.onClose_({
+					if( massEditWindow.notNil && { massEditWindow.isClosed.not }) {
+						userClosed = false;
+						massEditWindow.close;
+					};
+				});
+				currentUChainGUI.massEditWindow = massEditWindow;
+				allUnits = unit.units.collect({ |item, ii|
+					var ugui;
+					//if( notMassEdit ) { ii = ii + (realIndex - unit.units.size) };
+					//ugui = item.gui( massEditWindow );
+					if( item.isUMap ) {
+						StaticText( massEditWindow,
+							(massEditWindow.bounds.width - 8 - 8) @ 14 )
+						.applySkin( RoundView.skin )
+						.string_( " % . % [ % ]".format( parentUnit.defName, unit.unitArgName, ii ) )
+						.background_( Color.white.alpha_(0.5) )
+						.resize_(2)
+						.font_(
+							(RoundView.skin.tryPerform( \at, \font ) ??
+								{ Font( Font.defaultSansFace, 12) }).boldVariant
+						);
+						massEditWindow.view.decorator.nextLine;
+						ugui = UMapGUI( massEditWindow, nil, item );
+						ugui.removeAction_({ |umap|
+							UMapSetChecker.stall = true;
+							umap.stop;
+							parentUnit.units[ ii ].removeUMap( unit.unitArgName );
+							UMapSetChecker.stall = false;
+						});
+						ugui.parentUnit = parentUnit.units[ ii ];
+						ugui.mapSetAction = {
+							chain.changed( \units );
+						};
+						[ item ] ++ item.getAllUMaps;
+					} {
+						StaticText( massEditWindow,
+							(massEditWindow.bounds.width - 8 - 8) @ 14 )
+						.applySkin( RoundView.skin )
+						.string_( " % . % [ % ]".format( parentUnit.defName, unit.unitArgName, ii ) )
+						.background_( Color.white.alpha_(0.5) )
+						.resize_(2)
+						.font_(
+							(RoundView.skin.tryPerform( \at, \font ) ??
+								{ Font( Font.defaultSansFace, 12) }).boldVariant
+						);
+						massEditWindow.view.decorator.nextLine;
+						ugui = UGUI( massEditWindow, nil, parentUnit.units[ii], [ unit.unitArgName ] );
+						ugui.mapSetAction = {
+							chain.changed( \units );
+						};
+						nil
+					};
+				}).select(_.notNil).flatten(1);
+				allUnits.do({ |item|
+					item.addDependant( unitInitFunc )
+				});
+				//massEditWindowIndex = i;
+				massEditWindow.onClose_({
+					allUnits.do(_.removeDependant(unitInitFunc));
+					/*
+					if( userClosed ) {
+						massEditWindowIndex = nil;
+					};
+					*/
+				});
+				RoundView.popSkin( skin );
+			}).resize_(3);
+
+			/*
+			if( massEditWindowIndex == i ) {
+				massEditWindowButton.doAction;
+			};
+			*/
 		};
 
 			removeButton = SmoothButton( header, Rect( bounds.width - 12, 2, 12, 12 ) )
@@ -109,6 +217,13 @@ UMapGUI : UGUI {
 				.action_({
 					removeAction.value( unit );
 				});
+
+		if( true && {
+			unit.unitArgName == \pattern;
+		}) {
+			parentUnit.postln;
+			removeButton.visible = false;
+		};
 
 			SmoothButton( header, Rect( 2, 2, 12, 12 ) )
 				.label_( ['down', 'play'] )
@@ -158,7 +273,7 @@ UMapGUI : UGUI {
 		});
 
 		umapdragbinReplace = UDragBin( header, // replace UMap
-			Rect( labelWidth + 8, 2, (bounds.width - labelWidth - 16 - 6 - 16 ), 12 )
+			Rect( labelWidth + 8, 2, (bounds.width - labelWidth - 22 - 6 - 16 ), 12 )
 		)
 		.canReceiveDragHandler_({ |vw, x,y|
 			View.currentDrag.isKindOf( UMapDef ) && {
