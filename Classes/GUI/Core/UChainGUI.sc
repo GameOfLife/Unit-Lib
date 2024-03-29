@@ -41,6 +41,7 @@ UChainGUI {
 	var <>massEditWindowIndex, <>massEditWindow;
 	var <>tempoMap;
 	var <>undoManager;
+	var <>afterBuildAction;
 
 	var <>autoRestart = false;
 
@@ -165,6 +166,7 @@ UChainGUI {
 				this.makeViews( bounds );
 				this.makeCurrent;
 				this.addToAll;
+				this.doAfterBuildAction;
 			} {
 				parent = Window(
 					parent,
@@ -174,11 +176,13 @@ UChainGUI {
 				this.makeViews( bounds );
 				this.makeCurrent;
 				this.addToAll;
+				this.doAfterBuildAction;
 			};
 		} {
 			this.makeViews( bounds );
 			this.makeCurrent;
 			this.addToAll;
+			this.doAfterBuildAction;
 		};
 
 		parent.asView.minWidth_( 372 ).minHeight_(200);
@@ -201,11 +205,18 @@ UChainGUI {
 			this.makeViews();
 			this.makeCurrent;
 			this.addToAll;
+			this.doAfterBuildAction;
 			parent.asView.minWidth_( 372 ).minHeight_(200);
 		}.defer;
 	}
 
 	makeCurrent { current = this }
+
+	doAfterBuildAction { afterBuildAction.value; afterBuildAction = nil }
+
+	addAfterBuildAction { |action|
+		afterBuildAction = afterBuildAction.addFunc( action );
+	}
 
 	addToAll { all = all.add( this ) }
 	removeFromAll { all.remove( this ) }
@@ -1697,7 +1708,7 @@ UChainGUI {
 										{ Font( Font.defaultSansFace, 12) }).boldVariant
 								);
 							massEditWindow.view.decorator.nextLine;
-							ugui = item.gui( massEditWindow );
+							ugui = item.gui( massEditWindow, (massEditWindow.bounds.width - 8 - scrollerMargin) @ 14 );
 							ugui.mapSetAction = {
 								chain.changed( \units );
 							};
@@ -1707,10 +1718,12 @@ UChainGUI {
 							item.addDependant( unitInitFunc )
 						});
 						massEditWindowIndex = i;
-						massEditWindow.onClose_({
+						massEditWindow.onClose_({ |win|
 							allUnits.do(_.removeDependant(unitInitFunc));
-							if( userClosed ) {
-								massEditWindowIndex = nil;
+						    if( userClosed && {
+							    (massEditWindow !? _.view) === win
+						    } ) {
+							massEditWindowIndex = nil;
 							};
 						});
 						RoundView.popSkin( skin );

@@ -872,6 +872,25 @@ U : ObjectWithArgs {
 		^umaps;
 	}
 
+	getUMapPath { |umap, inPath|
+		var res = [];
+		inPath = inPath ? [];
+		this.args.pairsDo({ |key, value|
+			if( value.class == umap.class ) {
+				if( value === umap ) {
+					^inPath ++ [ key ];
+				};
+			};
+		});
+		this.args.pairsDo({ |key, value|
+			if( value.class == umap.class ) {
+				res = res ++ [ value.getUMapPath( umap, inPath ++ [ key ] ) ];
+			};
+		});
+		res = res.select(_.notNil);
+		^res.first ? nil;
+	}
+
 	setUMapBuses {
 		this.getAllUMaps.do({ |item|
 			item.setUMapBus;

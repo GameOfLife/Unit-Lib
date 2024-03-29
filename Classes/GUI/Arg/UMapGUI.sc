@@ -75,9 +75,14 @@ UMapGUI : UGUI {
 		var dragging;
 		var isPattern, chain;
 		var massEditWindowButton, currentUChainGUI, skin;
-		var unitInitFunc;
+		var unitInitFunc, unitInChain, pathToUMap;
 
 		chain = UChainGUI.nowBuildingChain;
+		unitInChain = UGUI.nowBuildingUnit;
+
+		if( unitInChain.notNil ) {
+			pathToUMap = unitInChain.getUMapPath( unit );
+		};
 
 		isPattern = chain.isKindOf( UPattern );
 
@@ -124,11 +129,13 @@ UMapGUI : UGUI {
 			.label_( 'up' )
 			.radius_( 2 )
 			.action_({
-				var allUnits, userClosed = true, massEditWindow;
+				var allUnits, userClosed = true, massEditWindow, backupIndex;
 				if( currentUChainGUI.massEditWindow.notNil && {
 					currentUChainGUI.massEditWindow.isClosed.not
 				}) {
+					backupIndex = currentUChainGUI.massEditWindowIndex;
 					currentUChainGUI.massEditWindow.close;
+					currentUChainGUI.massEditWindowIndex = backupIndex;
 				};
 				RoundView.pushSkin( skin );
 				massEditWindow = Window( unit.defName,
@@ -148,9 +155,11 @@ UMapGUI : UGUI {
 					//ugui = item.gui( massEditWindow );
 					if( item.isUMap ) {
 						StaticText( massEditWindow,
-							(massEditWindow.bounds.width - 8 - 8) @ 14 )
+							(massEditWindow.bounds.width - 20 ) @ 14 )
 						.applySkin( RoundView.skin )
-						.string_( " % . % [ % ]".format( parentUnit.defName, unit.unitArgName, ii ) )
+						.string_(
+							" % [ % ]".format( pathToUMap.join("."), ii )
+						)
 						.background_( Color.white.alpha_(0.5) )
 						.resize_(2)
 						.font_(
@@ -158,7 +167,7 @@ UMapGUI : UGUI {
 								{ Font( Font.defaultSansFace, 12) }).boldVariant
 						);
 						massEditWindow.view.decorator.nextLine;
-						ugui = UMapGUI( massEditWindow, nil, item );
+						ugui = UMapGUI( massEditWindow, (massEditWindow.bounds.width - 20) @ 14, item );
 						ugui.removeAction_({ |umap|
 							UMapSetChecker.stall = true;
 							umap.stop;
@@ -172,9 +181,11 @@ UMapGUI : UGUI {
 						[ item ] ++ item.getAllUMaps;
 					} {
 						StaticText( massEditWindow,
-							(massEditWindow.bounds.width - 8 - 8) @ 14 )
+							(massEditWindow.bounds.width - 20) @ 14 )
 						.applySkin( RoundView.skin )
-						.string_( " % . % [ % ]".format( parentUnit.defName, unit.unitArgName, ii ) )
+						.string_(
+							" % [ % ]".format( pathToUMap.join("."), ii )
+						)
 						.background_( Color.white.alpha_(0.5) )
 						.resize_(2)
 						.font_(
@@ -182,7 +193,8 @@ UMapGUI : UGUI {
 								{ Font( Font.defaultSansFace, 12) }).boldVariant
 						);
 						massEditWindow.view.decorator.nextLine;
-						ugui = UGUI( massEditWindow, nil, parentUnit.units[ii], [ unit.unitArgName ] );
+						ugui = UGUI( massEditWindow, (massEditWindow.bounds.width - 20) @ 14,
+							parentUnit.units[ii], [ unit.unitArgName ] );
 						ugui.mapSetAction = {
 							chain.changed( \units );
 						};
@@ -192,23 +204,23 @@ UMapGUI : UGUI {
 				allUnits.do({ |item|
 					item.addDependant( unitInitFunc )
 				});
-				//massEditWindowIndex = i;
-				massEditWindow.onClose_({
+				currentUChainGUI.massEditWindowIndex = pathToUMap;
+				massEditWindow.onClose_({|win|
 					allUnits.do(_.removeDependant(unitInitFunc));
-					/*
-					if( userClosed ) {
-						massEditWindowIndex = nil;
+					if( userClosed && {
+						(currentUChainGUI.massEditWindow !? _.view) === win
+					}) {
+						currentUChainGUI.massEditWindowIndex = nil;
 					};
-					*/
 				});
 				RoundView.popSkin( skin );
 			}).resize_(3);
 
-			/*
-			if( massEditWindowIndex == i ) {
-				massEditWindowButton.doAction;
+			if( currentUChainGUI.massEditWindowIndex == pathToUMap ) {
+				currentUChainGUI.addAfterBuildAction({
+					massEditWindowButton.doAction;
+				});
 			};
-			*/
 		};
 
 			removeButton = SmoothButton( header, Rect( bounds.width - 12, 2, 12, 12 ) )
