@@ -525,29 +525,90 @@
 
 	makeView { |parent, bounds, label, action, resize|
 		var multipleActions = action.size > 0;
-		var vw;
-		var lbls;
-		lbls = labels.asCollection.collect(_.value);
-		vw = EZPopUpMenu( parent, bounds, label !? { label.asString ++ " " },
-			if( multipleActions ) {
-				list.collect({ |item, i|
-					(lbls[i] ? item.asSymbol) -> { |vw| action[i].value( vw, list[i] ) };
+		var vw, view;
+		var lbls, viewWidth, labelWidth;
+		if( modern ) {
+			vw = ();
+			vw[ \value_ ] = { |evt, val|
+				evt[ \index ] = val;
+				evt[ \setViews ].value;
+			};
+			vw[ \index ] = defaultIndex;
+
+			view = EZCompositeView( parent, bounds, gap: 4@4 );
+			view.asView.resize_( resize ? 5 );
+			bounds = view.asView.bounds;
+			vw[ \view ] = view;
+
+			if( label.notNil ) {
+				labelWidth = RoundView.skin.labelWidth ? 100;
+				StaticText( view, labelWidth @ (bounds.height) )
+				.applySkin( RoundView.skin )
+				.align_( \right )
+				.string_( "% ".format( label ) );
+				viewWidth = bounds.width - labelWidth - 4;
+			} {
+				viewWidth = bounds.width;
+			};
+
+			vw[ \menu ] = StaticText( view, viewWidth @ (bounds.height) )
+			.applySkin( RoundView.skin )
+			.resize_( resize ? 2 )
+			.background_( Color.white.alpha_( 0.25 ) );
+			vw[ \menu ].setProperty(\wordWrap, false);
+
+			vw[ \menu ].mouseDownAction_({
+				var actions, selected, lblx;
+				lblx = labels.asCollection.collect(_.value);
+				actions = list.collect({ |item, i|
+					MenuAction( lblx[i] ? item.asString, {
+						if( action.size > 0 ) {
+							action[i].value( vw, item );
+						} {
+							action.value( vw, item );
+						};
+						vw.value = i;
+					}).enabled_( vw[ \index ] != i )
 				});
-			} { list.collect({ |item, i|
-				(lbls[i] ? item.asSymbol) -> nil
-			})
-			},
-			initVal: defaultIndex
-		);
-		if( multipleActions.not ) {
-			vw.globalAction = { |vw| action.value( vw, list[vw.value] ) };
-		};
-		vw.labelWidth = 80; // same as EZSlider
-		vw.applySkin( RoundView.skin ); // compat with smooth views
-		vw.labelView.applySkin( RoundView.skin );
-		vw.menu.applySkin( RoundView.skin );
-		if( resize.notNil ) { vw.view.resize = resize };
-		^vw
+				if( label.notNil ) {
+					actions = [ MenuAction.separator( label ) ] ++ actions;
+				};
+				selected = actions.detect({ |x| x.enabled.not });
+				Menu( *actions ).front( QtGUI.cursorPosition - (20@0), action: selected );
+			});
+
+			vw[ \setViews ] = {
+				vw[ \menu ].string = " %".format(
+					labels.asCollection.collect(_.value)[ vw[ \index ] ] ?? {
+						list[ vw[ \index ] ]
+					}
+				)
+			};
+
+			^vw;
+		} {
+			lbls = labels.asCollection.collect(_.value);
+			vw = EZPopUpMenu( parent, bounds, label !? { label.asString ++ " " },
+				if( multipleActions ) {
+					list.collect({ |item, i|
+						(lbls[i] ? item.asSymbol) -> { |vw| action[i].value( vw, list[i] ) };
+					});
+				} { list.collect({ |item, i|
+					(lbls[i] ? item.asSymbol) -> nil
+				})
+				},
+				initVal: defaultIndex
+			);
+			if( multipleActions.not ) {
+				vw.globalAction = { |vw| action.value( vw, list[vw.value] ) };
+			};
+			vw.labelWidth = 80; // same as EZSlider
+			vw.applySkin( RoundView.skin ); // compat with smooth views
+			vw.labelView.applySkin( RoundView.skin );
+			vw.menu.applySkin( RoundView.skin );
+			if( resize.notNil ) { vw.view.resize = resize };
+			^vw
+		}
 	}
 
 	setView { |view, value, active = false|

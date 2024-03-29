@@ -18,6 +18,8 @@
 */
 
 ListSpec : Spec {
+	classvar <>modern = true;
+
 	var <list;
 	var <>defaultIndex = 0;
 	var sortedList, indexMap;
