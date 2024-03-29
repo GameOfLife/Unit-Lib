@@ -535,7 +535,7 @@
 			};
 			vw[ \index ] = defaultIndex;
 
-			view = EZCompositeView( parent, bounds, gap: 4@4 );
+			view = EZCompositeView( parent, bounds, gap: 2@2 );
 			view.asView.resize_( resize ? 5 );
 			bounds = view.asView.bounds;
 			vw[ \view ] = view;
@@ -546,7 +546,7 @@
 				.applySkin( RoundView.skin )
 				.align_( \right )
 				.string_( "% ".format( label ) );
-				viewWidth = bounds.width - labelWidth - 4;
+				viewWidth = bounds.width - labelWidth - 2;
 			} {
 				viewWidth = bounds.width;
 			};
