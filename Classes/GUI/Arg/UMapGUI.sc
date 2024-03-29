@@ -233,7 +233,6 @@ UMapGUI : UGUI {
 		if( true && {
 			unit.unitArgName == \pattern;
 		}) {
-			parentUnit.postln;
 			removeButton.visible = false;
 		};
 
