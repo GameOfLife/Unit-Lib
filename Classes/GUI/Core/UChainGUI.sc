@@ -57,17 +57,17 @@ UChainGUI {
 				scoreEditorWindow: Color.gray(0.65),
 				RoundButton: (
 					border: 0,
-					background: Color.white.alpha_(0.25),
+					background: Color.white.alpha_(0.5),
 					hiliteColor: Color.green.alpha_(0.5),
 				),
 				SmoothButton: (
 					border: 0,
-					background: Color.white.alpha_(0.25),
+					background: Color.white.alpha_(0.5),
 					hiliteColor: Color.green.alpha_(0.5),
 				),
 				SmoothSimpleButton: (
 					border: 0,
-					background: Color.white.alpha_(0.25),
+					background: Color.white.alpha_(0.5),
 					hiliteColor: Color.green.alpha_(0.5),
 				),
 			),
