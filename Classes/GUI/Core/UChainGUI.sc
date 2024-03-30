@@ -47,8 +47,8 @@ UChainGUI {
 
 	*initClass {
 
-		skins = (
-			light:  (
+		skins = OEM(
+			\light,  (
 				labelWidth: 100,
 				menuStripColor: Color.gray(0.9),
 				headerColor: Color.white.alpha_(0.5),
@@ -70,9 +70,37 @@ UChainGUI {
 					background: Color.white.alpha_(0.5),
 					hiliteColor: Color.green.alpha_(0.5),
 				),
+				qPalette: QPalette.light,
 			),
 
-			dark: (
+			\medium, (
+				labelWidth: 100,
+				menuStripColor: Color.gray(0.8),
+				headerColor: Color.white.alpha_(0.5),
+				stringColor: Color.black,
+				hiliteColor: Color.black.alpha_(0.33),
+				scoreEditorWindow: Color.gray(0.65),
+				RoundButton: (
+					border: 0,
+					background: Color.white.alpha_(0.45),
+					hiliteColor: Color.green.alpha_(0.5),
+				),
+				SmoothButton: (
+					border: 0,
+					background: Color.white.alpha_(0.45),
+					hiliteColor: Color.green.alpha_(0.5),
+				),
+				SmoothSimpleButton: (
+					border: 0,
+					background: Color.white.alpha_(0.45),
+					hiliteColor: Color.green.alpha_(0.5),
+				),
+				qPalette: QPalette.auto(Color.grey(0.75), Color.grey(0.7))
+				.base_( Color.grey(0.75) )
+				.setColor( Color.grey( 0.1 ), \shadow ),
+			),
+
+			\dark, (
 				labelWidth: 100,
 				menuStripColor: Color.gray(0.2),
 				hiliteColor: Color.black.alpha_(0.33),
@@ -116,10 +144,64 @@ UChainGUI {
 				),
 				SCAlert: (
 					background: Color.gray(0.2)
-				)
+				),
+				qPalette: QPalette.dark,
 			),
 
-			light_old:  (
+			\very_dark, (
+				labelWidth: 100,
+				menuStripColor: Color.gray(0.0),
+				hiliteColor: Color.black.alpha_(0.33),
+				headerColor: Color.white.alpha_(0.25),
+				stringColor: Color.gray(0.75),
+				scoreEditorWindow: Color.gray(0.2),
+				TextField: (
+					background: Color.gray(0.3),
+				),
+				RoundButton: (
+					border: 0,
+					background: Color.white.alpha_(0.125),
+					hiliteColor: Color.green(1.0,0.33),
+				),
+				SmoothButton: (
+					border: 0,
+					background: Color.white.alpha_(0.125),
+					hiliteColor: Color.green(1.0,0.33),
+				),
+				SmoothSimpleButton: (
+					border: 0,
+					background: Color.white.alpha_(0.125),
+				),
+				SmoothSlider: (
+					knobColor: Color.white,
+					//background:  Color.white.alpha_(0.05),
+					hiliteColor: Color.white.alpha_(0.2),
+				),
+				SmoothRangeSlider: (
+					knobColor: Color.white,
+					//background:  Color.white.alpha_(0.05),
+					hiliteColor: Color.white.alpha_(0.2),
+				),
+				SMPTEBox: (
+					background: Color.white.alpha_(0.15)
+				),
+				SmoothNumberBox: (
+					background: Color.white.alpha_(0.15),
+					normalColor: Color.white,
+					typingColor: Color.red.alpha_(0.66),
+				),
+				SCAlert: (
+					background: Color.gray(0.2)
+				),
+				qPalette: QPalette.auto( Color.grey(0.2), Color.grey(0.1) )
+				.base_( Color.grey(0.1) )
+				.baseText_( Color.gray(0.75) )
+				.windowText_( Color.gray(0.75) )
+				.setColor(Color.grey(0.08), \shadow)
+				.highlight_( Color(0.25, 0.37, 0.57) )
+			),
+
+			\light_old,  (
 				labelWidth: 100,
 				menuStripColor: Color.gray(0.9),
 				headerColor: Color.white.alpha_(0.5),
@@ -141,9 +223,10 @@ UChainGUI {
 					background:  Gradient( Color.white, Color.gray(0.85), \v ),
 					hiliteColor: Color.green.alpha_(0.5),
 				),
+				qPalette: QPalette.light,
 			),
 
-			dark_old: (
+			\dark_old, (
 				labelWidth: 100,
 				menuStripColor: Color.gray(0.2),
 				hiliteColor: Color.black.alpha_(0.33),
@@ -187,7 +270,8 @@ UChainGUI {
 				),
 				SCAlert: (
 					background: Color.gray(0.2)
-				)
+				),
+				qPalette: QPalette.dark,
 			),
 
 		);
@@ -195,8 +279,9 @@ UChainGUI {
 		skin = skins.light;
 
 		StartUp.defer({
-			skins.light.font = Font( Font.defaultSansFace, 11 );
-			skins.dark.font = skins.light.font;
+			skins.keysValuesDo({ |key, skin|
+				skin.font = Font( Font.defaultSansFace, 11 );
+			});
 		});
 
 		all = [];
