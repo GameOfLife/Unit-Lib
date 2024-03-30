@@ -56,6 +56,77 @@ UChainGUI {
 				hiliteColor: Color.black.alpha_(0.33),
 				scoreEditorWindow: Color.gray(0.65),
 				RoundButton: (
+					border: 0,
+					background: Color.white.alpha_(0.25),
+					hiliteColor: Color.green.alpha_(0.5),
+				),
+				SmoothButton: (
+					border: 0,
+					background: Color.white.alpha_(0.25),
+					hiliteColor: Color.green.alpha_(0.5),
+				),
+				SmoothSimpleButton: (
+					border: 0,
+					background: Color.white.alpha_(0.25),
+					hiliteColor: Color.green.alpha_(0.5),
+				),
+			),
+
+			dark: (
+				labelWidth: 100,
+				menuStripColor: Color.gray(0.2),
+				hiliteColor: Color.black.alpha_(0.33),
+				headerColor: Color.black.alpha_(0.25),
+				stringColor: Color.white,
+				scoreEditorWindow: Color.gray(0.4),
+				TextField: (
+					background: Color.gray(0.3),
+				),
+				RoundButton: (
+					border: 0,
+					background: Color.white.alpha_(0.25),
+					hiliteColor: Color.green(1.0,0.33),
+				),
+				SmoothButton: (
+					border: 0,
+					background: Color.white.alpha_(0.25),
+					hiliteColor: Color.green(1.0,0.33),
+				),
+				SmoothSimpleButton: (
+					border: 0,
+					background: Color.white.alpha_(0.25),
+				),
+				SmoothSlider: (
+					knobColor: Color.white,
+					//background:  Color.white.alpha_(0.05),
+					hiliteColor: Color.white.alpha_(0.2),
+				),
+				SmoothRangeSlider: (
+					knobColor: Color.white,
+					//background:  Color.white.alpha_(0.05),
+					hiliteColor: Color.white.alpha_(0.2),
+				),
+				SMPTEBox: (
+					background: Color.white.alpha_(0.15)
+				),
+				SmoothNumberBox: (
+					background: Color.white.alpha_(0.15),
+					normalColor: Color.white,
+					typingColor: Color.red.alpha_(0.66),
+				),
+				SCAlert: (
+					background: Color.gray(0.2)
+				)
+			),
+
+			light_old:  (
+				labelWidth: 100,
+				menuStripColor: Color.gray(0.9),
+				headerColor: Color.white.alpha_(0.5),
+				stringColor: Color.black,
+				hiliteColor: Color.black.alpha_(0.33),
+				scoreEditorWindow: Color.gray(0.65),
+				RoundButton: (
 					border: 0.9,
 					background:  Gradient( Color.white, Color.gray(0.85), \v ),
 					hiliteColor: Color.green.alpha_(0.5),
@@ -72,7 +143,7 @@ UChainGUI {
 				),
 			),
 
-			dark: (
+			dark_old: (
 				labelWidth: 100,
 				menuStripColor: Color.gray(0.2),
 				hiliteColor: Color.black.alpha_(0.33),
@@ -117,7 +188,8 @@ UChainGUI {
 				SCAlert: (
 					background: Color.gray(0.2)
 				)
-			)
+			),
+
 		);
 
 		skin = skins.light;
