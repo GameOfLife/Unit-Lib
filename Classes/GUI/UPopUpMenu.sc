@@ -68,7 +68,7 @@ UPopUpMenu : StaticText {
 
 	update {
 		{
-			this.string = " %".format( items !? _[ index ] ? "" );
+			this.string = " % ".format( items !? _[ index ] ? "" );
 		}.defer;
 	}
 
