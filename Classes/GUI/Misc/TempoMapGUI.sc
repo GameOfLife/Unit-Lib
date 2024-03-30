@@ -82,7 +82,7 @@ TempoMapGUI {
 
 		composite.onClose_({ ctrl.remove; });
 
-		PopUpMenu( composite, 90@viewHeight )
+		UPopUpMenu( composite, 90@viewHeight )
 			.items_( [ \time, \bar ] )
 			.value_( [ \time, \bar ].indexOf( mode ) ? 0 )
 			.font_( font )
