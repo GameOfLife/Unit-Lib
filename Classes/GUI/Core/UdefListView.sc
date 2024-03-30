@@ -212,7 +212,6 @@ UdefListView {
 			SmoothButton(comp, 50@14 )
 				.label_([ "show all", "hide all" ])
 				.hiliteColor_( Color.clear )
-				.border_(1)
 				.radius_(2)
 				.canFocus_(false)
 				.action_({ |bt|
@@ -224,7 +223,6 @@ UdefListView {
 
 			SmoothButton(comp, 50@14 )
 				.label_( "refresh" )
-				.border_(1)
 				.radius_(2)
 				.canFocus_(false)
 				.action_({ { this.rebuild }.defer( 0.01 ) });
@@ -232,7 +230,6 @@ UdefListView {
 			SmoothButton(comp, 50@14 )
 				.label_([ "load all" ])
 				.hiliteColor_( Color.clear )
-				.border_(1)
 				.radius_(2)
 				.canFocus_(false)
 				.action_({ |bt|
