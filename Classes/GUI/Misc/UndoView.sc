@@ -87,7 +87,6 @@ UndoView {
 		views = 2.collect({ |i|
 			SmoothButton( view, bounds.height @ bounds.height )
 				.radius_(2)
-				.border_(1)
 				.canFocus_(false)
 				.enabled_( false )
 				.states_([ [ ['arrow_pi', 'arrow'][i] ] ])
