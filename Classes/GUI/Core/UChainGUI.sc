@@ -84,17 +84,17 @@ UChainGUI {
 				),
 				RoundButton: (
 					border: 0,
-					background: Color.white.alpha_(0.25),
+					background: Color.white.alpha_(0.125),
 					hiliteColor: Color.green(1.0,0.33),
 				),
 				SmoothButton: (
 					border: 0,
-					background: Color.white.alpha_(0.25),
+					background: Color.white.alpha_(0.125),
 					hiliteColor: Color.green(1.0,0.33),
 				),
 				SmoothSimpleButton: (
 					border: 0,
-					background: Color.white.alpha_(0.25),
+					background: Color.white.alpha_(0.125),
 				),
 				SmoothSlider: (
 					knobColor: Color.white,
