@@ -1,5 +1,5 @@
 UPopUpMenu : StaticText {
-	var <items, <index = 0, <>extraMenuActions;
+	var <items, <index = 0, <>extraMenuActions, <>title;
 
 	*new { arg parent, bounds;
 		var obj = super.new( parent, bounds );
@@ -57,6 +57,9 @@ UPopUpMenu : StaticText {
 		actions = actions.addAll( extraMenuActions );
 
 		if( actions.size > 0 ) {
+			if( title.notNil ) {
+				actions = [ MenuAction.separator( title.asString ) ] ++ actions;
+			};
 			^Menu( *actions ).front( QtGUI.cursorPosition - (20@0), action: selected );
 		} {
 			^nil;
