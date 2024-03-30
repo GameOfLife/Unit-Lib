@@ -54,7 +54,7 @@ UPopUpMenu : StaticText {
 
 		selected = actions[ index ];
 
-		actions = actions.addAll( extraMenuActions );
+		actions = actions.addAll( extraMenuActions.value( this ) );
 
 		if( actions.size > 0 ) {
 			if( title.notNil ) {

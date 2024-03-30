@@ -71,12 +71,11 @@ PresetManagerGUI {
 			views[ \label ].font = font;
 			views[ \presets ].font = font;
 		}.defer;
-
-		views[ \read ].font = font;
-		views[ \write ].font = font;
 	}
 
 	makeView { |parent, bounds, resize|
+
+		var presetWidth;
 
 		if( bounds.isNil ) { bounds= 350 @ (this.class.viewNumLines * (viewHeight + 4)) };
 
@@ -104,33 +103,12 @@ PresetManagerGUI {
 				views[ \presets ].doAction;
 			});
 
-		views[ \presets ] = UPopUpMenu( view, 120 @ viewHeight )
-			.action_({ |pu|
-				var item;
-				if( pu.items.size > 0 ) {
-					item = pu.item;
-					presetManager.apply( item, object );
-					action.value( this );
-				};
-			});
+		presetWidth = bounds.width - labelWidth - (viewHeight * 2) - 12;
 
-		if( bounds.width < (labelWidth + 260) ) {
-			view.decorator.nextLine;
-			view.decorator.shift( labelWidth + 4, 0 );
-		};
-
-		views[ \remove ] = SmoothButton( view, viewHeight @ viewHeight )
-			.radius_( viewHeight/2 )
-			.label_( '-' )
-			.action_({
-				presetManager.removeAt( views[ \presets ].item );
-				action.value( this );
-			});
-
-		views[ \add ] = SmoothButton( view, viewHeight @ viewHeight )
-			.radius_( viewHeight/2 )
-			.label_( '+' )
-			.action_({
+		views[ \presets ] = UPopUpMenu( view, presetWidth @ viewHeight )
+		.extraMenuActions_({[
+			MenuAction.separator,
+			MenuAction( "Add...", {
 				SCRequestString(
 					(views[ \presets ].item ? "default").asString,
 					"Please enter a name for this preset:",
@@ -141,12 +119,17 @@ PresetManagerGUI {
 						action.value( this );
 					}
 				);
-			});
-
-		views[ \read ] = SmoothButton( view, 35 @ viewHeight )
-			.states_( [ [ "read", Color.black, Color.green(1,0.25) ] ] )
-			.radius_(2)
-			.action_({
+			}),
+			Menu(
+				*views[ \presets ].items.collect({ |item|
+					MenuAction( item.asString, {
+						presetManager.removeAt( item );
+						action.value( this );
+					})
+				})
+			).title_( "Remove" ),
+			MenuAction.separator,
+			MenuAction( "Read from file...", {
 				if( presetManager.filePath.notNil ) {
 					SCAlert(
 						"Do you want to read the default settings\nor import from a file?",
@@ -160,12 +143,8 @@ PresetManagerGUI {
 				} {
 					presetManager.read( action: { action.value( this ); } );
 				};
-			});
-
-		views[ \write ] = SmoothButton( view, 35 @ viewHeight )
-			.states_( [ [ "write", Color.black, Color.red(1,0.25) ] ] )
-			.radius_(2)
-			.action_({
+			}),
+			MenuAction( "Write to file...", {
 				if( presetManager.filePath.notNil ) {
 					SCAlert(
 						"Do you want to write to default settings\nor export to a file?",
@@ -180,6 +159,15 @@ PresetManagerGUI {
 					);
 				} {
 					presetManager.write( successAction: { action.value( this ); } );
+				};
+			})
+		]})
+			.action_({ |pu|
+				var item;
+				if( pu.items.size > 0 ) {
+					item = pu.item;
+					presetManager.apply( item, object );
+					action.value( this );
 				};
 			});
 
