@@ -3,7 +3,7 @@ PresetManagerGUI {
 	var <presetManager, <>object;
 
 	var <parent, <view, <views, <controller;
-	var <viewHeight = 14, <labelWidth = 50;
+	var <viewHeight = 14, <labelWidth = 58;
 	var <>action;
 	var <font;
 
