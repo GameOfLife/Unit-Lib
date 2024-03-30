@@ -104,8 +104,7 @@ PresetManagerGUI {
 				views[ \presets ].doAction;
 			});
 
-		views[ \presets ] = PopUpMenu( view, 120 @ viewHeight )
-			.applySkin( RoundView.skin ? () )
+		views[ \presets ] = UPopUpMenu( view, 120 @ viewHeight )
 			.action_({ |pu|
 				var item;
 				if( pu.items.size > 0 ) {
