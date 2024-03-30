@@ -65,11 +65,6 @@ UChainGUI {
 					background: Color.white.alpha_(0.5),
 					hiliteColor: Color.green.alpha_(0.5),
 				),
-				SmoothSimpleButton: (
-					border: 0,
-					background: Color.white.alpha_(0.5),
-					hiliteColor: Color.green.alpha_(0.5),
-				),
 				qPalette: QPalette.light,
 			),
 
@@ -86,11 +81,6 @@ UChainGUI {
 					hiliteColor: Color.green.alpha_(0.5),
 				),
 				SmoothButton: (
-					border: 0,
-					background: Color.white.alpha_(0.45),
-					hiliteColor: Color.green.alpha_(0.5),
-				),
-				SmoothSimpleButton: (
 					border: 0,
 					background: Color.white.alpha_(0.45),
 					hiliteColor: Color.green.alpha_(0.5),
@@ -119,10 +109,6 @@ UChainGUI {
 					border: 0,
 					background: Color.white.alpha_(0.125),
 					hiliteColor: Color.green(1.0,0.33),
-				),
-				SmoothSimpleButton: (
-					border: 0,
-					background: Color.white.alpha_(0.125),
 				),
 				SmoothSlider: (
 					knobColor: Color.white,
@@ -167,10 +153,6 @@ UChainGUI {
 					border: 0,
 					background: Color.white.alpha_(0.125),
 					hiliteColor: Color.green(1.0,0.33),
-				),
-				SmoothSimpleButton: (
-					border: 0,
-					background: Color.white.alpha_(0.125),
 				),
 				SmoothSlider: (
 					knobColor: Color.white,
@@ -218,11 +200,6 @@ UChainGUI {
 					background:  Gradient( Color.white, Color.gray(0.85), \v ),
 					hiliteColor: Color.green.alpha_(0.5),
 				),
-				SmoothSimpleButton: (
-					border: 0.9,
-					background:  Gradient( Color.white, Color.gray(0.85), \v ),
-					hiliteColor: Color.green.alpha_(0.5),
-				),
 				qPalette: QPalette.light,
 			),
 
@@ -245,10 +222,6 @@ UChainGUI {
 					border: 0.75,
 					background: Gradient( Color.gray(0.6), Color.gray(0.45), \v ),
 					hiliteColor: Color.green(1.0,0.33),
-				),
-				SmoothSimpleButton: (
-					border: 0.75,
-					background: Gradient( Color.gray(0.6), Color.gray(0.45), \v );
 				),
 				SmoothSlider: (
 					knobColor: Color.white,

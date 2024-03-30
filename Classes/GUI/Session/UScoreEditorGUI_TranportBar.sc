@@ -174,14 +174,14 @@ UScoreEditorGui_TransportBar {
 					.alphaWhenStopped_( 0 )
 					.canFocus_(false);
 
-		views[\play] = SmoothSimpleButton( view, 40@size  )
+		views[\play] = SmoothButton( view, 40@size  )
 			.states_( [
 			    [ \play, nil, Color.clear ],
 			    [ \stop, nil, Color.green.alpha_(0.5) ],
 			    [ \play, Color.blue, Color.red.alpha_(0.5) ]] )
 			.canFocus_(false)
 		    .toolTip_( "Play/stop" )
-			//.changeStateWhenPressed_(false)
+			.changeStateWhenPressed_(false)
 			.action_({  |v,c,d,e|
 
 			    var startedPlaying;
@@ -196,13 +196,14 @@ UScoreEditorGui_TransportBar {
 
 			});
 
-		views[\pause] = SmoothSimpleButton( view, 50@size  )
+		views[\pause] = SmoothButton( view, 50@size  )
 			.states_( [
 			    [ \pause, nil, Color.clear ],
 			    [ \pause, Color.red,Color.green.alpha_(0.5) ],
 			    [ \pause, Color.blue,Color.red.alpha_(0.5) ]] )
 			.canFocus_(false)
 		    .toolTip_( "Pause timeline" )
+		    .changeStateWhenPressed_(false)
 			.action_({ |v|
 			    switch( v.value)
 			    {0}{

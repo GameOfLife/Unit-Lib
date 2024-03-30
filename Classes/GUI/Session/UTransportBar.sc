@@ -122,7 +122,7 @@ UTransportView {
         var font = Font( Font.defaultSansFace, 11 );
 		views = ();
 
-		views[\play] = SmoothSimpleButton( parent, 40@height  )
+		views[\play] = SmoothButton( parent, 40@height  )
 			.states_( [
 			    [ \play, Color.black, Color.clear ],
 			    [ \stop, Color.black, Color.green.alpha_(0.5) ],
@@ -130,7 +130,7 @@ UTransportView {
 			.canFocus_(false)
 			.font_( font )
 			.border_(1).background_(Color.grey(0.8))
-			//.changeStateWhenPressed_(false)
+			.changeStateWhenPressed_(false)
 			.action_({  |v,c,d,e|
 
 			    var startedPlaying;
@@ -145,7 +145,7 @@ UTransportView {
 
 			});
 
-		views[\pause] = SmoothSimpleButton( parent, 50@height  )
+		views[\pause] = SmoothButton( parent, 50@height  )
 			.states_( [
 			    [ \pause, Color.black, Color.clear ],
 			    [ \pause, Color.red,Color.green.alpha_(0.5) ],
@@ -154,6 +154,7 @@ UTransportView {
 			.font_( font )
 			.border_(1)
 			.background_(Color.grey(0.8))
+		    .changeStateWhenPressed_( false )
 			.action_({ |v|
 			    switch( v.value)
 			    {0}{
