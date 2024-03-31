@@ -37,6 +37,8 @@ UMIDIFile {
 		};
 	}
 
+	== { |that| ^that.isKindOf( this.class ) && { that.path == this.path } }
+
 	midiFile {
 		^if( path.notNil ) {
 			all[ this.key ] ?? { this.init; all[ this.key ] };

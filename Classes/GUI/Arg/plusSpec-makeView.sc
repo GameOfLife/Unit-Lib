@@ -4180,10 +4180,9 @@
 			labelWidth = 0;
 		};
 
-		vws[ \menu ] = PopUpMenu( view,
+		vws[ \menu ] = UPopUpMenu( view,
 			Rect( labelWidth + 2, 0, bounds.width - (40 + labelWidth + 2), viewHeight )
 		)	.resize_(3)
-			.applySkin( RoundView.skin ? () )
 			.items_( [ "" ] )
 			.action_({ |pu|
 				if( vws[ \menuPaths ].size > 1 ) {
@@ -4218,9 +4217,9 @@
 			.resize_( 3 )
 			.label_( 'folder' )
 			.action_({
-				Dialog.getPaths( { |paths|
-				  vws[ \obj ] !? { |x| x.path_( paths[0] ); x.reload; }
-				  ?? { vws[ \obj ] = UMIDIFile( paths[0], true ) };
+				ULib.openPanel( { |path|
+				  vws[ \obj ] !? { |x| x.path_( path ); x.reload; }
+				  ?? { vws[ \obj ] = UMIDIFile( path, true ) };
 				  vws.doAction;
 				});
 			});
