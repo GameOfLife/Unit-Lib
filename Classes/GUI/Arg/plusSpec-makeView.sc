@@ -714,6 +714,32 @@
 			}, numberWidth: (RoundView.skin ? ()).numberWidth ? 40, gap: 2@2
 		);
 
+		if( warp.isKindOf( ExponentialWarp ) ) {
+			[ vws[ \rangeSlider ].loBox, vws[ \rangeSlider ].hiBox ].do({ |box|
+				box.allowedChars = "+-.AaBbCcDdEeFfGgMm#*/()%";
+				box.interpretFunc = { |string|
+					var cents = 0, splits;
+					case { "AaBbCcDdEeFfGg".includes(string.first) } {
+						if( string.indexOf( $+ ).notNil ) {
+							cents = string.split( $+ ).last.interpret;
+						} {
+							splits = string.split($-);
+							if( splits.size > 1 ) {
+								if( splits[ splits.size-2 ].last.isDecDigit ) {
+									cents = splits.last.interpret.neg;
+								};
+							};
+						};
+						string.namecps * (cents / 100).midiratio;
+					} { "Mm".includes(string.first) } {
+						string[1..].interpret.midicps;
+					} {
+						string.interpret;
+					};
+				};
+			})
+		};
+
 		vws[ \setRangeSlider ] = {
 			var min, max;
 			min = vws[ \val ].minItem;
@@ -2391,6 +2417,31 @@
 			labelWidth: (RoundView.skin ? ()).labelWidth ? 80,
 			numberWidth: RoundView.skin.numberWidth ? 40,
 			).value_( this.default );
+		if( warp.isKindOf( ExponentialWarp ) ) {
+			[ vw.loBox, vw.hiBox ].do({ |box|
+				box.allowedChars = "+-.AaBbCcDdEeFfGgMm#*/()%";
+				box.interpretFunc = { |string|
+					var cents = 0, splits;
+					case { "AaBbCcDdEeFfGg".includes(string.first) } {
+						if( string.indexOf( $+ ).notNil ) {
+							cents = string.split( $+ ).last.interpret;
+						} {
+							splits = string.split($-);
+							if( splits.size > 1 ) {
+								if( splits[ splits.size-2 ].last.isDecDigit ) {
+									cents = splits.last.interpret.neg;
+								};
+							};
+						};
+						string.namecps * (cents / 100).midiratio;
+					} { "Mm".includes(string.first) } {
+						string[1..].interpret.midicps;
+					} {
+						string.interpret;
+					};
+				};
+			})
+		};
 		// later incorporate rangeSpec into EZSmoothRanger
 		if( resize.notNil ) { vw.view.resize = resize };
 		^vw;
@@ -3623,10 +3674,10 @@
 
 		vws[ \hz ].sliderView.centered_( true ).centerPos_( this.unmap( default ) );
 
-		vws[ \hz ].numberView.allowedChars = "+-.AaBbCcDdEeFfGg#*/()%";
+		vws[ \hz ].numberView.allowedChars = "+-.AaBbCcDdEeFfGgMm#*/()%";
 		vws[ \hz ].numberView.interpretFunc = { |string|
 			var cents = 0, splits;
-			if( "AaBbCcDdEeFfGg".includes(string.first) ) {
+			case { "AaBbCcDdEeFfGg".includes(string.first) } {
 				if( string.indexOf( $+ ).notNil ) {
 					cents = string.split( $+ ).last.interpret;
 				} {
@@ -3638,6 +3689,8 @@
 					};
 				};
 				string.namecps * (cents / 100).midiratio;
+			} { "Mm".includes(string.first) } {
+				string[1..].interpret.midicps;
 			} {
 				string.interpret;
 			};
