@@ -34,23 +34,53 @@ var defs = [];
 var mapFunc, args;
 
 mapFunc = { |unit, value, fromRange|
-	var toRange, curve, clipMode, clipSoftness;
+	var toRange, invert, curve, clipMode, clipSoftness;
+	var scaleValue;
 	clipMode = unit.get( \clipMode );
 	if( (clipMode !== \ignore) or: {
 		value.inclusivelyBetween( *fromRange )
 	} ) {
 		toRange = unit.mapGet( \toRange );
+		invert = unit.get( \invert );
+		if( invert == true ) {
+			toRange = toRange.reverse;
+		};
 		curve = unit.get( \curve );
+		curve = curve.clip2(0.9999).calcCurve( -1, 1 );
 		clipSoftness = unit.get( \clipSoftness );
-		if (abs(curve) < 0.001) {
-			value = value.linlin( *fromRange ++ [ -1, 1, \none ] );
-		} {
-			value = value.lincurve( *fromRange ++ [ -1, 1, curve, \none ] );
+		scaleValue = { |val, fr, mode = \none|
+			if ( abs(curve) < 0.001 ) {
+				val.linlin( *fr ++ [ -1, 1, mode ] );
+			} {
+				val.lincurve( *fr ++ [ -1, 1, curve, mode ] );
+			};
 		};
 		switch( clipMode,
-			\clip, { value = value.softclip2(1, clipSoftness ) },
-			\fold, { value = value.softfold2(1, clipSoftness ) },
-			\wrap, { value = value.wrap2(1) }
+			\clip, { value = scaleValue.value( value, fromRange ).softclip2(1, clipSoftness ) },
+			\fold, { value = scaleValue.value( value, fromRange ).softfold2(1, clipSoftness ) },
+			\wrap, {
+				value = if( clipSoftness > 0 ) {
+					scaleValue.value( value, fromRange ).softwrap2(1, clipSoftness )
+				} {
+					scaleValue.value( value, fromRange ).wrap2(1)
+				}
+			},
+			\excess, {
+				var diff, mean, excessed;
+				diff = fromRange[1] - fromRange[0];
+				mean = fromRange.mean;
+				if ( diff < 127 ) {
+					excessed = (value - mean).excess( diff / 2);
+					value = scaleValue.value( excessed,  [0 + (diff / 2) - mean, 127 - (diff/2) - mean], \minmax )
+					.blend( scaleValue.value( value, [0,127] ), clipSoftness );
+
+				} {
+					value = scaleValue.value( mean.blend( value, clipSoftness ), [0,127], \minmax );
+				};
+			},
+			{
+				value = scaleValue.value( value, fromRange );
+			}
 		);
 		value = value.linlin(-1,1,*toRange ++ [ \none ]);
 		unit.mapSet( \value, value );
@@ -59,9 +89,10 @@ mapFunc = { |unit, value, fromRange|
 
 args = [
 	[ \fromRange, [0,127], RangeSpec(0,127,step:1) ],
-	[ \toRange, [0,1], DualValueSpec(0,1) ],
-	[ \curve, 0, [-16,16,\lin,0,0].asSpec ],
-	[ \clipMode, \clip, ListSpec( [ \ignore, \clip, \fold, \wrap, \none ] ) ],
+	[ \toRange, [0,1], RangeSpec(0,1) ],
+	[ \invert, false, BoolSpec(false) ],
+	[ \curve, 0, [-1,1,\lin,0,0].asSpec ],
+	[ \clipMode, \clip, ListSpec( [ \ignore, \clip, \fold, \wrap, \excess, \none ] ) ],
 	[ \clipSoftness, 0, [0,1].asSpec ],
 ];
 

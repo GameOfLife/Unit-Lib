@@ -84,7 +84,6 @@ ValueUMapDef( \midi_noteOn_freq, { |unit, midifunc|
 		scale = umap.get( \scale );
 		range = umap.get( \range );
 		toRange = range.collect({ |item| ((item - 69 * scale + 69) + transpose).midicps * base / 440 });
-		if( umap.get( \invert ) == true ) { toRange = toRange.reverse };
 		filter = [
 			UMIDIFilterSpec.formatDeviceString( umap.get( \device ) ++ "*/" ++ umap.get( \port ) ++ "*" ).asSymbol,
 			'noteOn',

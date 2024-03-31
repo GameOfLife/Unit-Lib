@@ -94,7 +94,7 @@ ValueUMapDef( \midi_touch, { |unit, midifunc|
 	[ \clipSoftness, 0, [0,1].asSpec ],
 ]  )
 .uchainInitFunc_({ |umap, unit|
-	var filter, invert, active;
+	var filter, invert, active, curve;
 	if( umap.def.category == \private ) {
 		filter = [
 			UMIDIFilterSpec.formatDeviceString( umap.get( \device ) ++ "*/" ++ umap.get( \port ) ++ "*" ).asSymbol,
@@ -103,11 +103,12 @@ ValueUMapDef( \midi_touch, { |unit, midifunc|
 			nil,
 			nil
 		];
-		invert = umap.get( \invert ) == true;
+		curve = umap.get( \curve );
+		curve = 0.linlin(-1,1,-1,1,curve);
 		active = umap.get( \active ) == true;
 		if( active ) { umap.set( \active, false ) };
 		umap.defName = \midi;
-		if( invert ) { umap.set( \toRange, umap.get( \toRange ).reverse ) };
+		umap.set( \curve, curve );
 		umap.set( \filter, filter );
 		if( active ) { umap.set( \active, true ) };
 	}
