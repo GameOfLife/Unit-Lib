@@ -155,14 +155,33 @@ UMIDIFilterSpec : Spec {
 			action.value( vwx, vws[ \val ] );
 		};
 
-		numchanWidth = ((bounds.width - (49+16) - ( 2 * 36 ) - 4 - (labelWidth+4)) / 2).floor.asInteger;
+		numchanWidth = ((bounds.width - (44+16) - ( 2 * 36 ) - 4 - (labelWidth+4)) / 2).floor.asInteger;
 
-		vws[\typeLabel ] = StaticText( vws[ \view ], 45@14 )
-		.string_( "% ".format( this.type ) ).align_( \right ).applySkin( RoundView.skin )
-		.font_( (RoundView.skin.font ? Font.default).copy.italic_( true ) );
+		vws[ \learn ] = SmoothButton( vws[ \view ], 40@14 )
+		.label_( [ "learn", "learn" ] )
+		.radius_(2)
+		.action_({ |bt|
+			switch( bt.value,
+				1, { vws[ \learnFunc ] = this.learn({ |...learned|
+					vws[ \val ] = this.constrain( learned ) ? -1;
+					{ vws.setViews; }.defer;
+					vws.doAction;
+					bt.value = 0;
+				});
+				},
+				0, { learnFuncs.remove( vws[ \learnFunc ] ); }
+			);
+		});
 
-		vws[ \numLabel ] = StaticText( vws[ \view ], numchanWidth@14 )
-		.string_( "num" ).align_( \right ).applySkin( RoundView.skin );
+		vws[ \numLabel ] = StaticText( vws[ \view ], (numchanWidth)@14 )
+		.string_(
+			switch( this.type,
+				'cc', "cc ",
+				'note', "note",
+				""
+			)
+		)
+		.align_( \right ).applySkin( RoundView.skin );
 		vws[ \num ] = SmoothNumberBox( vws[ \view ], 40@14 )
 		.action_({ |nb|
 			if( nb.value.asInteger == -1 ) {
@@ -178,7 +197,7 @@ UMIDIFilterSpec : Spec {
 			if( "any".any( string.includes( _ ) ) ) { -1 } { string.interpret; };
 		})
 		.formatFunc_({ |val| if( val == -1 ) { "any" } { val.asInteger.asString } });
-		if( useNum == false ) { vws[ \numLabel ].visible_( false );  vws[ \num ].visible_( false );  };
+		if( useNum == false ) { [ vws[ \num ] ].do(_.visible_( false ));  };
 		vws[ \chanLabel ] = StaticText( vws[ \view ], numchanWidth@14 )
 		.string_( "chan" ).align_( \right ).applySkin( RoundView.skin );
 		vws[ \chan ] = SmoothNumberBox( vws[ \view ], 40@14 )
@@ -200,23 +219,7 @@ UMIDIFilterSpec : Spec {
 		vws[ \view ].decorator.nextLine;
 		if( label.notNil ) { vws[ \view ].decorator.shift( labelWidth + 4, 0 ); };
 
-		vws[ \learn ] = SmoothButton( vws[ \view ], 40@14 )
-		.label_( [ "learn", "learn" ] )
-		.radius_(2)
-		.action_({ |bt|
-			switch( bt.value,
-				1, { vws[ \learnFunc ] = this.learn({ |...learned|
-					vws[ \val ] = this.constrain( learned ) ? -1;
-					{ vws.setViews; }.defer;
-					vws.doAction;
-					bt.value = 0;
-				});
-				},
-				0, { learnFuncs.remove( vws[ \learnFunc ] ); }
-			);
-		});
-
-		vws[ \device ] = StaticText( vws[ \view ], bounds.width - 44 - (labelWidth+4) @ 14 )
+		vws[ \device ] = StaticText( vws[ \view ], bounds.width - (labelWidth+4) @ 14 )
 		.mouseDownAction_({
 			makeMenu.value({ |res|
 				vws[ \val ][ 0 ] = res;
@@ -224,13 +227,12 @@ UMIDIFilterSpec : Spec {
 				vws.doAction;
 			});
 		})
-		.string_( "device " ).align_( \right ).applySkin( RoundView.skin )
-		.align_( \center )
+		.applySkin( RoundView.skin )
 		.background_( Color.white.alpha_(0.25) );
 		vws[ \device ].setProperty(\wordWrap, false);
 
 		vws[ \setViews ] = {
-			{ vws[ \device ].string =  "device: %".format( vws[ \val ][ 0 ] ); }.defer;
+			{ vws[ \device ].string =  " device: %".format( vws[ \val ][ 0 ] ); }.defer;
 			vws[ \chan ].value = vws[ \val ][ 2 ] ? -1;
 			vws[ \num ].value = vws[ \val ][ 3 ] ? -1;
 		};
