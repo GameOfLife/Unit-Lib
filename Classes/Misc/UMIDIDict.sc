@@ -137,6 +137,13 @@ UMIDIDict {
 		this.addEvent( src, \program, chan, val );
 	}
 
+	*getActiveNotes { |src = 'any', chan = 0|
+		^dict[ src, \note, chan ] !? { |x|
+			x.keys.select({ |key|
+				dict[ src, \note, chan, key ] != 0
+			}).asArray.sort;
+		}
+	}
 
 	*getEvent { |src, type ...args|
 		var uids;
