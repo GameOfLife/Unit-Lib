@@ -558,7 +558,7 @@
 			vw[ \menu ].setProperty(\wordWrap, false);
 
 			vw[ \menu ].mouseDownAction_({
-				var actions, selected, lblx;
+				var actions, selected, lblx, menu;
 				lblx = labels.asCollection.collect(_.value);
 				actions = list.collect({ |item, i|
 					MenuAction( lblx[i] ? item.asString, {
@@ -568,13 +568,15 @@
 							action.value( vw, item );
 						};
 						vw.value = i;
+						menu.destroy;
 					}).enabled_( vw[ \index ] != i )
 				});
 				if( label.notNil ) {
 					actions = [ MenuAction.separator( label ) ] ++ actions;
 				};
 				selected = actions.detect({ |x| x.enabled.not });
-				Menu( *actions ).front( QtGUI.cursorPosition - (20@0), action: selected );
+				menu = Menu( *actions );
+				menu.front( QtGUI.cursorPosition - (20@0), action: selected );
 			});
 
 			vw[ \setViews ] = {

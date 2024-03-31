@@ -38,7 +38,7 @@ UPopUpMenu : StaticText {
 	item { ^items !? _[ index ] }
 
 	makeMenu {
-		var actions, selected;
+		var actions, selected, menu;
 
 		actions = items.collect({ |item, i|
 			if( item == '' or: { item == "" } ) {
@@ -48,6 +48,7 @@ UPopUpMenu : StaticText {
 					this.value_( i, false );
 					this.doAction;
 					this.update;
+					menu.destroy;
 				}).enabled_( index != i );
 			};
 		}) ? [];
@@ -60,7 +61,8 @@ UPopUpMenu : StaticText {
 			if( title.notNil ) {
 				actions = [ MenuAction.separator( title.asString ) ] ++ actions;
 			};
-			^Menu( *actions ).front( QtGUI.cursorPosition - (20@0), action: selected );
+			menu = Menu( *actions );
+			^menu.front( QtGUI.cursorPosition - (20@0), action: selected );
 		} {
 			^nil;
 		}
