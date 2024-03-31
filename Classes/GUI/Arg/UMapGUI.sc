@@ -15,6 +15,9 @@ UMapGUI : UGUI {
 	makeViews { |bounds|
 		var margin = 0@0, gap = 4@4;
 
+		wasBuildingUMap = nowBuildingUMap;
+		nowBuildingUMap = unit;
+
 		if( bounds.isNil ) {
 			bounds = parent.asView.bounds.insetBy(4,4);
 			if( parent.asView.class.name == \SCScrollTopView ) {
@@ -65,6 +68,8 @@ UMapGUI : UGUI {
 
 		 bounds = bounds.insetAll(0,0,2,0);
 		 this.makeSubViews( bounds );
+
+		 nowBuildingUMap = wasBuildingUMap;
 	}
 
 	makeHeader { |bounds|

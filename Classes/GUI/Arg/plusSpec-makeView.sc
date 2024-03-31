@@ -3465,6 +3465,9 @@
 		var tempVal;
 		var makeMenu;
 
+		UGUI.nowBuildingUnit.postln;
+		UMapGUI.nowBuildingUMap.postln;
+
 		vws = ();
 
 		font =  (RoundView.skin ? ()).font ?? { Font( Font.defaultSansFace, 10 ); };
