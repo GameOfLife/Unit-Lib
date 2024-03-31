@@ -117,7 +117,7 @@ UMapGUI : UGUI {
 		)
 			.applySkin( RoundView.skin )
 			.font_( boldFont )
-			.string_( ":" + unit.defName );
+			.string_( ":" + unit.fullDefName );
 
 		if( unit.isKindOf( MassEditUMap ).not ) {
 			UDragSource( header, Rect( bounds.width - 12 - 12 - 4, 2, 12, 12 ) )
