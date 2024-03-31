@@ -46,7 +46,7 @@ mapFunc = { |unit, value, fromRange|
 			toRange = toRange.reverse;
 		};
 		curve = unit.get( \curve );
-		curve = curve.clip2(0.9999).calcCurve( -1, 1 );
+		curve = curve.clip2( 0.99932929973907 ).calcCurve( -1, 1 );
 		clipSoftness = unit.get( \clipSoftness );
 		scaleValue = { |val, fr, mode = \none|
 			if ( abs(curve) < 0.001 ) {
