@@ -15,9 +15,11 @@ part of the Unit lib default Udefs set
 */
 
 MultiChannelUdef( \decodeB2, {
-	var in, orientation;
+	var w,x,y, orientation, rotate, mode;
 	orientation = \orientation.ukr( 0, 0, 0.5, \lin );
-	in = UIn.ar( 0, 3, true );
-	UOut.ar( 0, DecodeB2.ar( Udef.numChannels, in[0], in[1], in[2], orientation ) );
+	rotate = \rotate.ukr( 0, AngleSpec() ) / pi;
+	#w,x,y = UIn.ar( 0, 3, true );
+	#x,y = Rotate2.ar( x, y, rotate );
+	UOut.ar( 0, DecodeB2.ar( Udef.numChannels, w, x, y, orientation ) );
 }, channels: [2,3,4,5,6,7,8,10,12,16,24,32])
 	.category_( \utility )
