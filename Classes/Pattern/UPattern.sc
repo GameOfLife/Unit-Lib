@@ -57,6 +57,7 @@ UPattern : UChain {
 						item.deactivateOnEnd = true;
 					} {
 						unit.set( key, item.value );
+						item.deactivate;
 					}
 				} {
 					this.prPatternsToValues( item );
