@@ -4,7 +4,7 @@ UVoicer : UEvent {
 
 	var <chain;
 	var <>events;
-	var <>device;
+	var <>device = '*/*';
 	var <>channel = 0;
 	var <>noteRange = #[0,127];
 
@@ -32,14 +32,18 @@ UVoicer : UEvent {
     }
 
 	update { |obj, what, src, chan, num, val|
-		if( obj == UMIDIDict && { what === \note }) {
-			if( num.inclusivelyBetween( *noteRange ) ) {
-				if( val > 0 ) {
-					this.startEvent( num, val / 127 );
-				} {
-					this.endEvent( num );
-				};
-			}
+		if( obj == UMIDIDict && {
+			what === \note
+		} && {
+			UMIDIDict.matchDevice( device, src );
+		} && {
+			num.inclusivelyBetween( *noteRange );
+		}) {
+			if( val > 0 ) {
+				this.startEvent( num, val / 127 );
+			} {
+				this.endEvent( num );
+			};
 		};
 	}
 

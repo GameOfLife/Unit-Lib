@@ -166,11 +166,15 @@ UMIDIDict {
 		^dict.at( src ? \any, type, *args );
 	}
 
-	*matchEvent { |testArray, eventArray|
-		if( eventArray[0].isKindOf( Symbol ).not ) {
-			eventArray[0] = this.portDict[ eventArray[0] ] ? '*/*';
+	*matchDevice { |testDevice, device|
+		if( device.isKindOf( Symbol ).not ) {
+			device = this.portDict[ device ] ? '*/*';
 		};
-		if( eventArray[0].matchOSCAddressPattern( testArray[0] ? '*/*' ) ) {
+		^device.matchOSCAddressPattern( testDevice ? '*/*' );
+	}
+
+	*matchEvent { |testArray, eventArray|
+		if( this.matchDevice( testArray[0], eventArray[0] ) ) {
 			eventArray[1..].do({ |item,i|
 				if( testArray[i+1].notNil ) {
 					if( testArray[i+1] != item ) { ^false };
