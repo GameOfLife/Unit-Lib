@@ -30,6 +30,7 @@ UMenuBarIDE {
 	classvar >allMenus;
 	classvar <>font;
 	classvar <>menuStripMode = \views; // or \toolbar
+	classvar <>autoUpdateWindowsMenu = true;
 
 	*initClass {
 		if ( thisProcess.platform.name !== 'osx' ) {
@@ -560,13 +561,13 @@ UMenuBarIDE {
 			ULib.envirWindow;
 		}), "View");
 
-		windowsMenu = Menu().title_( "Windows" ).font_( font );
-
 		skipJack !? _.stop;
 
-		skipJack = SkipJack( { this.fillWindowsMenu; }, 1.0, false, "ulib_menu" );
-
-		this.registerMenu( windowsMenu, "View" );
+		if( autoUpdateWindowsMenu ) {
+			windowsMenu = Menu().title_( "Windows" ).font_( font );
+			skipJack = SkipJack( { this.fillWindowsMenu; }, 1.0, false, "ulib_menu" );
+			this.registerMenu( windowsMenu, "View" );
+		};
 	}
 
 	*add { |name, function, menuName|
