@@ -4,6 +4,9 @@ UVoicer : UEvent {
 
 	var <chain;
 	var <>events;
+	var <>device;
+	var <>channel = 0;
+	var <>noteRange = #[0,127];
 
 	*new { |chain, startTime = 0, track = 0, duration = inf, releaseSelf = false|
 		chain = chain ?? { UChain.default };
@@ -27,6 +30,18 @@ UVoicer : UEvent {
 	        this.changed( \releaseSelf );
         };
     }
+
+	update { |obj, what, src, chan, num, val|
+		if( obj == UMIDIDict && { what === \note }) {
+			if( num.inclusivelyBetween( *noteRange ) ) {
+				if( val > 0 ) {
+					this.startEvent( num, val / 127 );
+				} {
+					this.endEvent( num );
+				};
+			}
+		};
+	}
 
     chain_ { |aChain|
 	    chain = aChain;
