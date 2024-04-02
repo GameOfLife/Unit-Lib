@@ -40,9 +40,9 @@ HybridUMapDef( \map, { |input = 0.5, min = 0, max = 1, warp = -1, curve = 0|
 	spec = unit.at( \u_spec ) ?? { [0,1,1,-2,0].asSpec };
 	min = min.clip(*clip);
 	max = max.clip(*clip);
-	warp = if( warp < 0, spec.warp.asSpecifier, warp );
+	warp = if( warp < 0, { spec.asControlSpec.warp.asSpecifier }, { warp });
 	if( warp.isKindOf( CurveWarp ) or: { warp == 5 }) { warp = curve };
-	ControlSpec( min, max, warp, spec.step ).map( input );
+	ControlSpec( min, max, warp, spec.asControlSpec.step ).map( input );
 })
 	.mappedArgs_( [ \min, \max, \warp ] )
 	.insertArgName_( \input )
