@@ -229,6 +229,7 @@ UMap : U {
 	var <>unitArgMode;
 	var <>unmappedKeys;
 	var <>streamID;
+	var <>deactivateOnEnd = false;
 
 	*busOffset { ^1500 }
 
@@ -505,7 +506,8 @@ UMap : U {
 		^this.asControlInput;
 	}
 
-	disposeFor {
+	disposeFor { |...args|
+		this.def.disposeFor( this, *args );
 		if( this.unit.notNil && { this.unit.synths.select(_.isKindOf( Synth ) ).size == 0 }) {
 			this.unit = nil;
 			if( this.subDef.isKindOf( TaskUMapDef ) ) { this.free; };
@@ -521,6 +523,7 @@ UMap : U {
 
 	dispose {
 	    this.free;
+		this.def.dispose( this );
 	    this.values.do{ |val|
 	        if(val.respondsTo(\dispose)) {
 	            val.dispose

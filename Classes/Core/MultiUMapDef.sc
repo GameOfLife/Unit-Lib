@@ -84,6 +84,17 @@ MultiUMapDef : UMapDef {
 		^tempDef ?? { this.findUdef( unit.get( this.defNameKey ) ); };
 	}
 
+	dispose { |unit|
+		disposeFunc.value( unit );
+		this.findUdefFor( unit ).dispose( unit );
+	}
+
+	disposeFor { |unit ...args|
+		disposeForFunc.value( unit, *args );
+		this.findUdefFor( unit ).disposeFor( unit, *args );
+	}
+
+
 	asArgsArray { |argPairs, unit, constrain = true|
 		var defName, argz, newDefName;
 		argPairs = prepareArgsFunc.value( argPairs ) ? argPairs;

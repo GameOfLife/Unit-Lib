@@ -63,12 +63,12 @@ UVoicer : UEvent {
 			item.isKindOf( UMap );
 		});
 		prepareThese.do({ |umap|
-			if( umap.def.isKindOf( UPatDef ).not ) {
+			if( umap.subDef.isKindOf( UPatDef ).not ) {
 				this.prPrepareUnit( umap );
 			};
 		});
 		prepareThese.do({ |umap|
-			 if( umap.def.isKindOf( FuncUMapDef ) ) {
+			 if( umap.subDef.isKindOf( FuncUMapDef ) ) {
 				umap.next;
 			 };
 		});
@@ -77,8 +77,12 @@ UVoicer : UEvent {
 	prPatternsToValues { |unit|
 		unit.args.pairsDo({ |key, item|
 			if( item.isKindOf( UMap ) ) {
-				if( [ FuncUMapDef, ValueUMapDef ].any({ |def| item.def.isKindOf( def ) }) ) {
-					unit.set( key, item.value );
+				if( [ FuncUMapDef, ValueUMapDef ].any({ |def| item.subDef.isKindOf( def ) }) ) {
+					if( item.subDef.isKindOf( ControllerUMapDef ) ) {
+						item.deactivateOnEnd = true;
+					} {
+						unit.set( key, item.value );
+					}
 				} {
 					this.prPatternsToValues( item );
 				};

@@ -135,6 +135,10 @@ ControllerUMapDef : ValueUMapDef {
 		);
 	}
 
+	disposeFor { |unit ...args|
+		if( unit.deactivateOnEnd ) { unit.deactivate; };
+	}
+
 	performUpdate { |unit ...args|
 		updateFunc.value( unit, *args );
 	}

@@ -103,6 +103,7 @@ Udef : GenericDef {
 	var <>dontStoreArgNames;
 	var <>dontStoreSynthDef = false;
 	var <>infoString;
+	var <>disposeFunc, <>disposeForFunc;
 
 	*initClass{
 		defsFolders = [
@@ -265,6 +266,14 @@ Udef : GenericDef {
 	}
 
 	needsPrepare { ^false }
+
+	dispose { |unit|
+		disposeFunc.value( unit );
+	}
+
+	disposeFor { |unit ...args|
+		disposeForFunc.value( unit, *args );
+	}
 
 	stop { |unit|
 		unit.synths.do(_.free);
@@ -1381,6 +1390,7 @@ U : ObjectWithArgs {
 	}
 
 	disposeArgsFor { |server|
+		this.def !? _.disposeFor( this, server );
 	    this.values.do{ |val|
 	        if(val.respondsTo(\disposeFor)) {
 	            val.disposeFor(server)

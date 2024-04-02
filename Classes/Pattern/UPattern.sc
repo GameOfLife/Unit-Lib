@@ -53,7 +53,11 @@ UPattern : UChain {
 		unit.args.pairsDo({ |key, item|
 			if( item.isKindOf( UMap ) ) {
 				if( [ FuncUMapDef, ValueUMapDef ].any({ |def| item.subDef.isKindOf( def ) }) ) {
-					unit.set( key, item.value );
+					if( item.subDef.isKindOf( ControllerUMapDef ) ) {
+						item.deactivateOnEnd = true;
+					} {
+						unit.set( key, item.value );
+					}
 				} {
 					this.prPatternsToValues( item );
 				};
