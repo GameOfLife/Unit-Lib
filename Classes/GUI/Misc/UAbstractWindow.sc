@@ -46,9 +46,12 @@ UAbstractWindow {
 
     addToAll {
         allDict[this.class] = allDict[this.class].asCollection.add( this );
+		this.class.changed( \all, allDict[ this.class ] );
     }
 
-    removeFromAll { if( allDict[this.class].notNil ) { allDict[this.class].remove( this ); }; }
+    removeFromAll { if( allDict[this.class].notNil ) { allDict[this.class].remove( this ); };
+		this.class.changed( \all, allDict[ this.class ] );
+	}
 
     newWindow { |bounds, title, onClose, background, margin, gap|
 
