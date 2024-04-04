@@ -21,7 +21,7 @@ HybridUMapDef : MultiUMapDef {
 
 	*new { |name, ugenFunc, func, category, addToAll = true, extraPrefix|
 		^super.basicNew( name, [
-			ArgSpec( this.defNameKey, \dynamic, ListSpec( [ \dynamic, \func ]), true, \nonsynth )
+			ArgSpec( this.defNameKey, \dynamic, ListSpec( [ \dynamic, \value ]), true, \nonsynth )
 		], category, addToAll )
 			.udefs_( this.makeUdefs( name, ugenFunc, func, extraPrefix ) )
 			.allowedModes_( [ \init, \sync, \normal ] )
@@ -29,7 +29,7 @@ HybridUMapDef : MultiUMapDef {
 				if( unit.unitArgMode != \init ) {
 					\dynamic;
 				} {
-					\func;
+					\value;
 				};
 			});
 	}
@@ -40,7 +40,7 @@ HybridUMapDef : MultiUMapDef {
 		dynamic = UMapDef( \dynamic, ugenFunc, extraPrefix: name ++ "_", addToAll: false );
 		^[
 			dynamic,
-			FuncUMapDef( \func, func, addToAll: false )
+			FuncUMapDef( \value, func, addToAll: false )
 				.useMappedArgs_( dynamic.useMappedArgs )
 		]
 	}
