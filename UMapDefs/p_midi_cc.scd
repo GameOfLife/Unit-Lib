@@ -71,6 +71,7 @@ UPatDef( \p_midi_cc, { |unit,
 			cchan = channel.next;
 			nnum = cc.next;
 			val = UMIDIDict.getEvent( src, \cc, cchan, nnum ) ? val;
+			if( val.size > 0 ) { val = val.first };
 			scaleFunc.value( val ? 0 ).yield;
 		};
 	}.r;

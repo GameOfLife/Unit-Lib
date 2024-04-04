@@ -147,6 +147,9 @@ UMIDIDict {
 
 	*getEvent { |src, type ...args|
 		var uids;
+		while { args.last.isNil && { args.size > 0 } } {
+			args.pop;
+		};
 		if( src.isKindOf( Symbol ) ) {
 			uids = this.findUIDs( src );
 			switch( uids.size,
@@ -163,7 +166,20 @@ UMIDIDict {
 	}
 
 	*prGetEvent { |src, type ...args|
-		^dict.at( src ? \any, type, *args );
+		var nilIndex, keys;
+		nilIndex = args.detectIndex(_.isNil);
+		if( nilIndex.isNil ) {
+			^dict.at( src ? \any, type, *args );
+		} {
+			keys = dict.at( src ? \any, type, *args[..nilIndex-1] ) !? _.keys;
+			if( keys.size > 0 ) {
+				^keys.asArray.collect({ |key|
+					this.prGetEvent( src, type, *args.copy.put( nilIndex, key ) );
+				}).select(_.notNil);
+			} {
+				^nil;
+			};
+		};
 	}
 
 	*matchDevice { |testDevice, device|

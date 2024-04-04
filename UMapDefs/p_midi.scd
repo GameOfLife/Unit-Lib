@@ -99,10 +99,17 @@ defs = defs.add(
 		fromRange = #[0,1], toRange = #[0,1], invert = false,
 		curve = 0, clipMode = \clip, clipSoftness = 0|
 		{
-			var val = 0;
+			var val = 0, newVal;
 			UMIDIDict.start( false );
 			loop {
-				val = UMIDIDict.getEvent( *filter.next[[0,1,2,3]] ) ? val;
+				newVal = UMIDIDict.getEvent( *filter.next[[0,1,2,3]] ) ? val;
+				2.do({
+					if( newVal.isKindOf( IdentityDictionary ) ) {
+						newVal = newVal.values.asArray.first;
+					};
+				});
+				if( newVal.isKindOf( Array ) ) { newVal.select(_.notNil).first };
+				val = newVal ? val;
 				mapFunc.value( val ? 0,
 					*[ fromRange, toRange, invert, curve, clipMode, clipSoftness ].collect(_.next)
 				).yield;
@@ -124,40 +131,42 @@ defs = defs.add(
 			UMIDIDict.start( false );
 			loop {
 				notes = UMIDIDict.getEvent( *filter.next[[0,1,2]] );
+				notes = (notes ? []).asPairs;
+				if( notes.any(_.isKindOf( IdentityDictionary )) ) {
+					notes = notes.clump(2).collect({ |item|
+						item[1].asPairs;
+					}).flatten(1).clump(2);
+				} {
+					notes = notes.clump(2);
+				};
+				notes = notes.select({ |x| x[1] > 0 });
 				switch( mode.next,
 					\highest, {
-						val = notes.asPairs.clump(2).select({ |x| x[1] > 0 })
-						.sort({ |a,b| a[0] <= b[0]; })
+						val = notes.sort({ |a,b| a[0] <= b[0]; })
 						.last !? _[0] ? val;
 					},
 					\lowest, {
-						val = notes.asPairs.clump(2).select({ |x| x[1] > 0 })
-						.sort({ |a,b| a[0] <= b[0]; })
+						val = notes.sort({ |a,b| a[0] <= b[0]; })
 						.first !? _[0] ? val;
 					},
 					\loudest, {
-						val = notes.asPairs.clump(2).select({ |x| x[1] > 0 })
-						.sort({ |a,b| a[1] <= b[1]; })
+						val = notes.sort({ |a,b| a[1] <= b[1]; })
 						.last !? _[0] ? val;
 					},
 					\softest, {
-						val = notes.asPairs.clump(2).select({ |x| x[1] > 0 })
-						.sort({ |a,b| a[1] <= b[1]; })
+						val = notes.sort({ |a,b| a[1] <= b[1]; })
 						.first !? _[0] ? val;
 					},
 					\random, {
-						val = notes.asPairs.clump(2).select({ |x| x[1] > 0 })
-						.choose !? _[0] ? val;
+						val = notes.choose !? _[0] ? val;
 					},
 					\arp_up, {
-						val = notes.asPairs.clump(2).select({ |x| x[1] > 0 })
-						.sort({ |a,b| a[0] <= b[0]; })
+						val = notes.sort({ |a,b| a[0] <= b[0]; })
 						.wrapAt( index ) !? _[0] ? val;
 						index = index + 1;
 					},
 					\arp_down, {
-						val = notes.asPairs.clump(2).select({ |x| x[1] > 0 })
-						.sort({ |a,b| a[0] <= b[0]; })
+						val = notes.sort({ |a,b| a[0] <= b[0]; })
 						.wrapAt( index ) !? _[0] ? val;
 						index = index - 1;
 					},
@@ -175,6 +184,79 @@ defs = defs.add(
 	] ++ args, addToAll: false )
 	.mappedArgs_([\toRange])
 );
+
+defs = defs.add(
+	UPatDef( \velocity, { |unit, filter = #[ '*/*', 'note', 0, nil, nil ],
+		mode = 'highest',
+		fromRange = #[0,1], toRange = #[0,1], invert = false,
+		curve = 0, clipMode = \clip, clipSoftness = 0|
+		{
+			var val = 0, notes, index = 0;
+			UMIDIDict.start( false );
+			loop {
+				notes = UMIDIDict.getEvent( *filter.next[[0,1,2,3]] );
+				if( notes.isArray ) {
+					notes = notes.collect({ |item| [69, item] }).flatten(1);
+				};
+				if( notes.isNumber ) { notes = [69, notes] };
+				notes = (notes ? []).asPairs;
+				if( notes.any(_.isKindOf( IdentityDictionary )) ) {
+					notes = notes.clump(2).collect({ |item|
+						item[1].asPairs;
+					}).flatten(1).clump(2);
+				} {
+					notes = notes.clump(2);
+				};
+				notes = notes.select({ |x| x[1] > 0 });
+				if( notes.size > 0 ) {
+					switch( mode.next,
+						\highest, {
+							val = notes.sort({ |a,b| a[0] <= b[0]; })
+							.last !? _[1] ? val;
+						},
+						\lowest, {
+							val = notes.sort({ |a,b| a[0] <= b[0]; })
+							.first !? _[1] ? val;
+						},
+						\loudest, {
+							val = notes.sort({ |a,b| a[1] <= b[1]; })
+							.last !? _[1] ? val;
+						},
+						\softest, {
+							val = notes.sort({ |a,b| a[1] <= b[1]; })
+							.first !? _[1] ? val;
+						},
+						\random, {
+							val = notes.choose !? _[1] ? val;
+						},
+						\arp_up, {
+							val = notes.sort({ |a,b| a[0] <= b[0]; })
+							.wrapAt( index ) !? _[1] ? val;
+							index = index + 1;
+						},
+						\arp_down, {
+							val = notes.sort({ |a,b| a[0] <= b[0]; })
+							.wrapAt( index ) !? _[1] ? val;
+							index = index - 1;
+						},
+					);
+				} {
+					val = 0;
+				};
+				mapFunc.value( val ? 0,
+					*[ fromRange, toRange, invert, curve, clipMode, clipSoftness ].collect(_.next)
+				).yield;
+			};
+		}.r;
+	}, [
+		[ \filter, [ '*/*', 'note', 0, nil, nil ], UMIDIFilterSpec( 'note', useNum: true ) ],
+		[ \mode, 'highest',
+			ListSpec(['highest', 'lowest', 'loudest', 'softest', 'random', 'arp_up', 'arp_down'])
+		],
+	] ++ args, addToAll: false )
+	.mappedArgs_([\toRange])
+);
+
 
 MultiUMapDef( 'p_midi', defs, \private, 'type', false )
 .allowedModes_(['init', 'sync', 'normal' ])
