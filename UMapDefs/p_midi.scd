@@ -96,7 +96,7 @@ args = [
 
 defs = defs.add(
 	UPatDef( \cc, { |unit, filter = #[ '*/*', 'cc', 0, 0, nil ],
-		fromRange = #[0,1], toRange = #[0,1], invert = false,
+		fromRange = #[0,127], toRange = #[0,1], invert = false,
 		curve = 0, clipMode = \clip, clipSoftness = 0|
 		{
 			var val = 0, newVal;
@@ -124,7 +124,7 @@ defs = defs.add(
 defs = defs.add(
 	UPatDef( \note, { |unit, filter = #[ '*/*', 'note', 0, nil, nil ],
 		mode = 'highest',
-		fromRange = #[0,1], toRange = #[0,1], invert = false,
+		fromRange = #[0,127], toRange = #[0,1], invert = false,
 		curve = 0, clipMode = \clip, clipSoftness = 0|
 		{
 			var val = 0, notes, index = 0;
@@ -188,7 +188,7 @@ defs = defs.add(
 defs = defs.add(
 	UPatDef( \velocity, { |unit, filter = #[ '*/*', 'note', 0, nil, nil ],
 		mode = 'highest',
-		fromRange = #[0,1], toRange = #[0,1], invert = false,
+		fromRange = #[0,127], toRange = #[0,1], invert = false,
 		curve = 0, clipMode = \clip, clipSoftness = 0|
 		{
 			var val = 0, notes, index = 0;
@@ -257,6 +257,114 @@ defs = defs.add(
 	.mappedArgs_([\toRange])
 );
 
+defs = defs.add(
+	UPatDef( \bend, { |unit, filter = #[ '*/*', 'bend', 0, nil, nil ],
+		bendRange = #[0,16383], toRange = #[0,1], invert = false,
+		curve = 0, clipMode = \clip, clipSoftness = 0|
+		{
+			var val = 0, newVal;
+			UMIDIDict.start( false );
+			loop {
+				newVal = UMIDIDict.getEvent( *filter.next[[0,1,2]] ) ? val;
+				2.do({
+					if( newVal.isKindOf( IdentityDictionary ) ) {
+						newVal = newVal.values.asArray.first;
+					};
+				});
+				if( newVal.isKindOf( Array ) ) { newVal.select(_.notNil).first };
+				val = newVal ? val;
+				mapFunc.value( val ? 0,
+					*[ bendRange, toRange, invert, curve, clipMode, clipSoftness ].collect(_.next)
+				).yield;
+			};
+		}.r;
+	}, [
+		[ \filter,  [ '*/*', 'bend', 0, 0, nil ], UMIDIFilterSpec('bend', useNum: false ) ],
+		[ \bendRange, [0,16383], RangeSpec(0,16383,step:1) ],
+	] ++ args[1..], addToAll: false )
+	.mappedArgs_([\toRange])
+);
+
+defs = defs.add(
+	UPatDef( \touch, { |unit, filter = #[ '*/*', 'touch', 0, nil, nil ],
+		fromRange = #[0,127], toRange = #[0,1], invert = false,
+		curve = 0, clipMode = \clip, clipSoftness = 0|
+		{
+			var val = 0, newVal;
+			UMIDIDict.start( false );
+			loop {
+				newVal = UMIDIDict.getEvent( *filter.next[[0,1,2]] ) ? val;
+				2.do({
+					if( newVal.isKindOf( IdentityDictionary ) ) {
+						newVal = newVal.values.asArray.first;
+					};
+				});
+				if( newVal.isKindOf( Array ) ) { newVal.select(_.notNil).first };
+				val = newVal ? val;
+				mapFunc.value( val ? 0,
+					*[ fromRange, toRange, invert, curve, clipMode, clipSoftness ].collect(_.next)
+				).yield;
+			};
+		}.r;
+	}, [
+		[ \filter,  [ '*/*', 'touch', 0, nil, nil ], UMIDIFilterSpec('touch', useNum: false ) ]
+	] ++ args, addToAll: false )
+	.mappedArgs_([\toRange])
+);
+
+defs = defs.add(
+	UPatDef( \polytouch, { |unit, filter = #[ '*/*', 'polytouch', 0, nil, nil ],
+		fromRange = #[0,127], toRange = #[0,1], invert = false,
+		curve = 0, clipMode = \clip, clipSoftness = 0|
+		{
+			var val = 0, newVal;
+			UMIDIDict.start( false );
+			loop {
+				newVal = UMIDIDict.getEvent( *filter.next[[0,1,2]] ) ? val;
+				2.do({
+					if( newVal.isKindOf( IdentityDictionary ) ) {
+						newVal = newVal.values.asArray.first;
+					};
+				});
+				if( newVal.isKindOf( Array ) ) { newVal.select(_.notNil).first };
+				val = newVal ? val;
+				mapFunc.value( val ? 0,
+					*[ fromRange, toRange, invert, curve, clipMode, clipSoftness ].collect(_.next)
+				).yield;
+			};
+		}.r;
+	}, [
+		[ \filter,  [ '*/*', 'polytouch', 0, 0, nil ], UMIDIFilterSpec( 'polytouch' ) ]
+	] ++ args, addToAll: false )
+	.mappedArgs_([\toRange])
+);
+
+defs = defs.add(
+	UPatDef( \program, { |unit, filter = #[ '*/*', 'program', 0, nil, nil ],
+		fromRange = #[0,127], toRange = #[0,1], invert = false,
+		curve = 0, clipMode = \clip, clipSoftness = 0|
+		{
+			var val = 0, newVal;
+			UMIDIDict.start( false );
+			loop {
+				newVal = UMIDIDict.getEvent( *filter.next[[0,1,2]] ) ? val;
+				2.do({
+					if( newVal.isKindOf( IdentityDictionary ) ) {
+						newVal = newVal.values.asArray.first;
+					};
+				});
+				if( newVal.isKindOf( Array ) ) { newVal.select(_.notNil).first };
+				val = newVal ? val;
+				mapFunc.value( val ? 0,
+					*[ fromRange, toRange, invert, curve, clipMode, clipSoftness ].collect(_.next)
+				).yield;
+			};
+		}.r;
+	}, [
+		[ \filter,  [ '*/*', 'program', 0, nil, nil ], UMIDIFilterSpec('program', useNum: false ) ]
+	] ++ args, addToAll: false )
+	.mappedArgs_([\toRange])
+);
 
 MultiUMapDef( 'p_midi', defs, \private, 'type', false )
 .allowedModes_(['init', 'sync', 'normal' ])
