@@ -9,7 +9,7 @@ UMapGUI : UGUI {
 	var <>wasBuildingUMap;
 
 	*viewNumLines { |unit|
-		^super.viewNumLines( unit ) + 1.1;
+		^super.viewNumLines( unit ) + 1 + (2/18);
 	}
 
 	makeViews { |bounds|
