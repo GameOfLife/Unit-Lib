@@ -127,46 +127,61 @@ defs = defs.add(
 		fromRange = #[0,127], toRange = #[0,1], invert = false,
 		curve = 0, clipMode = \clip, clipSoftness = 0|
 		{
-			var val = 0, notes, index = 0;
+			var val = 0, notes = [], newNotes, index = 0;
 			UMIDIDict.start( false );
 			loop {
-				notes = UMIDIDict.getEvent( *filter.next[[0,1,2]] );
-				notes = (notes ? []).asPairs;
-				if( notes.any(_.isKindOf( IdentityDictionary )) ) {
-					notes = notes.clump(2).collect({ |item|
+				newNotes = UMIDIDict.getEvent( *filter.next[[0,1,2]] );
+				newNotes = (newNotes ? []).asPairs;
+				if( newNotes.any(_.isKindOf( IdentityDictionary )) ) {
+					newNotes = newNotes.clump(2).collect({ |item|
 						item[1].asPairs;
 					}).flatten(1).clump(2);
 				} {
-					notes = notes.clump(2);
+					newNotes = newNotes.clump(2);
 				};
-				notes = notes.select({ |x| x[1] > 0 });
+				newNotes = newNotes.select({ |x| x[1] > 0 });
+				newNotes.do({ |item|
+					if( notes.includesEqual( item ).not ) {
+						notes = notes.add( item );
+					};
+				});
+				notes = notes.select({ |item|
+					newNotes.includesEqual( item );
+				});
 				switch( mode.next,
+					\latest, {
+						val = notes.last !? _[0] ? val;
+					},
 					\highest, {
-						val = notes.sort({ |a,b| a[0] <= b[0]; })
+						val = notes.copy.sort({ |a,b| a[0] <= b[0]; })
 						.last !? _[0] ? val;
 					},
 					\lowest, {
-						val = notes.sort({ |a,b| a[0] <= b[0]; })
+						val = notes.copy.sort({ |a,b| a[0] <= b[0]; })
 						.first !? _[0] ? val;
 					},
 					\loudest, {
-						val = notes.sort({ |a,b| a[1] <= b[1]; })
+						val = notes.copy.sort({ |a,b| a[1] <= b[1]; })
 						.last !? _[0] ? val;
 					},
 					\softest, {
-						val = notes.sort({ |a,b| a[1] <= b[1]; })
+						val = notes.copy.sort({ |a,b| a[1] <= b[1]; })
 						.first !? _[0] ? val;
 					},
 					\random, {
 						val = notes.choose !? _[0] ? val;
 					},
+					\arp, {
+						val = notes.wrapAt( index ) !? _[0] ? val;
+						index = index + 1;
+					},
 					\arp_up, {
-						val = notes.sort({ |a,b| a[0] <= b[0]; })
+						val = notes.copy.sort({ |a,b| a[0] <= b[0]; })
 						.wrapAt( index ) !? _[0] ? val;
 						index = index + 1;
 					},
 					\arp_down, {
-						val = notes.sort({ |a,b| a[0] <= b[0]; })
+						val = notes.copy.sort({ |a,b| a[0] <= b[0]; })
 						.wrapAt( index ) !? _[0] ? val;
 						index = index - 1;
 					},
@@ -178,8 +193,8 @@ defs = defs.add(
 		}.r;
 	}, [
 		[ \filter, [ '*/*', 'note', 0, nil, nil ], UMIDIFilterSpec( 'note', useNum: false ) ],
-		[ \mode, 'highest',
-			ListSpec(['highest', 'lowest', 'loudest', 'softest', 'random', 'arp_up', 'arp_down'])
+		[ \mode, 'latest',
+			ListSpec(['latest', 'highest', 'lowest', 'loudest', 'softest', 'random', 'arp', 'arp_up', 'arp_down'])
 		],
 	] ++ args, addToAll: false )
 	.mappedArgs_([\toRange])
@@ -191,53 +206,68 @@ defs = defs.add(
 		fromRange = #[0,127], toRange = #[0,1], invert = false,
 		curve = 0, clipMode = \clip, clipSoftness = 0|
 		{
-			var val = 0, notes, index = 0;
+			var val = 0, notes = [], newNotes, index = 0;
 			UMIDIDict.start( false );
 			loop {
-				notes = UMIDIDict.getEvent( *filter.next[[0,1,2,3]] );
-				if( notes.isArray ) {
-					notes = notes.collect({ |item| [69, item] }).flatten(1);
+				newNotes = UMIDIDict.getEvent( *filter.next[[0,1,2,3]] );
+				if( newNotes.isArray ) {
+					newNotes = newNotes.collect({ |item| [69, item] }).flatten(1);
 				};
-				if( notes.isNumber ) { notes = [69, notes] };
-				notes = (notes ? []).asPairs;
-				if( notes.any(_.isKindOf( IdentityDictionary )) ) {
-					notes = notes.clump(2).collect({ |item|
+				if( newNotes.isNumber ) { newNotes = [69, notes] };
+				newNotes = (newNotes ? []).asPairs;
+				if( newNotes.any(_.isKindOf( IdentityDictionary )) ) {
+					newNotes = newNotes.clump(2).collect({ |item|
 						item[1].asPairs;
 					}).flatten(1).clump(2);
 				} {
-					notes = notes.clump(2);
+					newNotes = newNotes.clump(2);
 				};
-				notes = notes.select({ |x| x[1] > 0 });
+				newNotes = newNotes.select({ |x| x[1] > 0 });
+				newNotes.do({ |item|
+					if( notes.includesEqual( item ).not ) {
+						notes = notes.add( item );
+					};
+				});
+				notes = notes.select({ |item|
+					newNotes.includesEqual( item );
+				});
 				if( notes.size > 0 ) {
 					switch( mode.next,
+						\latest, {
+							val = notes.last !? _[1] ? val;
+						},
 						\highest, {
-							val = notes.sort({ |a,b| a[0] <= b[0]; })
+							val = notes.copy.sort({ |a,b| a[0] <= b[0]; })
 							.last !? _[1] ? val;
 						},
 						\lowest, {
-							val = notes.sort({ |a,b| a[0] <= b[0]; })
+							val = notes.copy.sort({ |a,b| a[0] <= b[0]; })
 							.first !? _[1] ? val;
 						},
 						\loudest, {
-							val = notes.sort({ |a,b| a[1] <= b[1]; })
+							val = notes.copy.sort({ |a,b| a[1] <= b[1]; })
 							.last !? _[1] ? val;
 						},
 						\softest, {
-							val = notes.sort({ |a,b| a[1] <= b[1]; })
+							val = notes.copy.sort({ |a,b| a[1] <= b[1]; })
 							.first !? _[1] ? val;
 						},
 						\random, {
 							val = notes.choose !? _[1] ? val;
 						},
+						\arp, {
+							val = notes.wrapAt( index ) !? _[1] ? val;
+							index = (index + 1).wrap(0, notes.size);
+						},
 						\arp_up, {
-							val = notes.sort({ |a,b| a[0] <= b[0]; })
+							val = notes.copy.sort({ |a,b| a[0] <= b[0]; })
 							.wrapAt( index ) !? _[1] ? val;
-							index = index + 1;
+							index = (index + 1).wrap(0, notes.size);
 						},
 						\arp_down, {
-							val = notes.sort({ |a,b| a[0] <= b[0]; })
+							val = notes.copy.sort({ |a,b| a[0] <= b[0]; })
 							.wrapAt( index ) !? _[1] ? val;
-							index = index - 1;
+							index = (index + 1).wrap(0, notes.size);
 						},
 					);
 				} {
@@ -250,8 +280,8 @@ defs = defs.add(
 		}.r;
 	}, [
 		[ \filter, [ '*/*', 'note', 0, nil, nil ], UMIDIFilterSpec( 'note', useNum: true ) ],
-		[ \mode, 'highest',
-			ListSpec(['highest', 'lowest', 'loudest', 'softest', 'random', 'arp_up', 'arp_down'])
+		[ \mode, 'latest',
+			ListSpec(['latest', 'highest', 'lowest', 'loudest', 'softest', 'random', 'arp', 'arp_up', 'arp_down'])
 		],
 	] ++ args, addToAll: false )
 	.mappedArgs_([\toRange])
