@@ -479,7 +479,7 @@ UChainGUI {
 				} ]
 		 	);
 
-		if( UMenuBarIDE.hasMenus ) {
+		if( UMenuBarIDE.hasMenus && { thisProcess.platform.name == \linux } ) {
 			views.startButton.setContextMenuActions(
 				*UMenuBarIDE.allMenus.atAll(
 					[ UMenuBarIDE.currentMenuName.asSymbol, \File, \Edit, \View ]
