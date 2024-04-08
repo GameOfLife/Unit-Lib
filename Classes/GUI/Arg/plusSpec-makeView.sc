@@ -718,9 +718,10 @@
 
 		if( warp.isKindOf( ExponentialWarp ) ) {
 			[ vws[ \rangeSlider ].loBox, vws[ \rangeSlider ].hiBox ].do({ |box|
-				box.allowedChars = "+-.AaBbCcDdEeFfGgMm#*/()%";
-				box.interpretFunc = { |string|
+				box.allowedChars = "+-.AaBbCcDdEeFfGgMmTt#*/()%";
+				box.interpretFunc = { |string, val|
 					var cents = 0, splits;
+					string = string.format( val );
 					case { "AaBbCcDdEeFfGg".includes(string.first) } {
 						if( string.indexOf( $+ ).notNil ) {
 							cents = string.split( $+ ).last.interpret;
@@ -735,6 +736,8 @@
 						string.namecps * (cents / 100).midiratio;
 					} { "Mm".includes(string.first) } {
 						string[1..].interpret.midicps;
+					} { "Tt".includes(string.first) } {
+						("0" ++ string[1..]).interpret.midiratio * val;
 					} {
 						string.interpret;
 					};
@@ -3676,9 +3679,10 @@
 
 		vws[ \hz ].sliderView.centered_( true ).centerPos_( this.unmap( default ) );
 
-		vws[ \hz ].numberView.allowedChars = "+-.AaBbCcDdEeFfGgMm#*/()%";
-		vws[ \hz ].numberView.interpretFunc = { |string|
+		vws[ \hz ].numberView.allowedChars = "+-.AaBbCcDdEeFfGgMmTt#*/()%";
+		vws[ \hz ].numberView.interpretFunc = { |string, val|
 			var cents = 0, splits;
+			string = string.format( val );
 			case { "AaBbCcDdEeFfGg".includes(string.first) } {
 				if( string.indexOf( $+ ).notNil ) {
 					cents = string.split( $+ ).last.interpret;
@@ -3693,6 +3697,8 @@
 				string.namecps * (cents / 100).midiratio;
 			} { "Mm".includes(string.first) } {
 				string[1..].interpret.midicps;
+			} { "Tt".includes(string.first) } {
+				("0" ++ string[1..]).interpret.midiratio * val;
 			} {
 				string.interpret;
 			};
