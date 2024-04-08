@@ -1297,7 +1297,7 @@ UChainGUI {
 		} ?? { Color.white.alpha_(0.25) };
 
 		uDefMenuFunc = { |unit, action, hideAction, checkCategory|
-			var uDefsList = [], ctrl, menu, checkedMenu, makeItem;
+			var uDefsList = [], ctrl, menu, checkedMenu, makeItem, includesChecked = false;
 			var uDefsDict = ();
 
 			Udef.all !? { |all|
@@ -1335,22 +1335,27 @@ UChainGUI {
 			makeItem = { |def|
 				var checked;
 				checked = unit !? { unit.def.name == def.name; } ? false;
+				if( checked ) { includesChecked = true };
 				if( def.isKindOf( MultiUdef ) && {
-					def.getArgSpec( def.defNameKey ).private.not;
+					def.getArgSpec( def.defNameKey ).private.not
 				}) {
 					Menu(
-						MenuAction.separator(  def.defNameKey.asString ),
+						MenuAction.separator( def.defNameKey.asString ),
 						*def.getSpec( def.defNameKey ).list.collect({ |subdefkey|
+							var subChecked = false;
+							if( checked ) {
+								subChecked = unit !? { unit.get( def.defNameKey ) == subdefkey } ? false;
+							};
 							MenuAction( subdefkey.asString, {
 								action.value( def, [ def.defNameKey, subdefkey ] );
 								recentUdefs.remove( def );
 								recentUdefs = (recentUdefs ? []).addFirst( def )[..2];
 								menu.removeDependant( ctrl );
 								menu.destroy;
-							}).font_( Font( Font.defaultSansFace, 12 ) );
+							}).enabled_( subChecked.not ).font_( Font( Font.defaultSansFace, 12 ) );
 						})
-					).title_( def.name )
-					.enabled_( checked.not ).font_( Font( Font.defaultSansFace, 12 ) );
+					).title_( if( checked ) { def.name.asString ++ " *" } { def.name.asString } )
+					.font_( Font( Font.defaultSansFace, 12 ) );
 				} {
 					MenuAction( def.name, {
 						action.value( def );
@@ -1363,7 +1368,8 @@ UChainGUI {
 			};
 
 			menu = Menu( *uDefsList.collect({ |item, i|
-				var submenu, includesChecked = false;
+				var submenu;
+				includesChecked = false;
 				case { item.isKindOf( Symbol ) } {
 					if( checkCategory == item ) {
 						checkedMenu = i;
@@ -1373,9 +1379,7 @@ UChainGUI {
 					makeItem.value( item );
 				} {
 					submenu = Menu( *item[1].collect({ |def|
-						var mItem = makeItem.value( def );
-						if( mItem.enabled.not ) { includesChecked = true; };
-						mItem;
+						makeItem.value( def );
 					})).title_( if( includesChecked ) { item[0] ++ " *" } { item[0] } )
 					.font_( Font( Font.defaultSansFace, 12 ) );
 					if( includesChecked ) { checkedMenu = i };
