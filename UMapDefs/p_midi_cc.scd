@@ -88,4 +88,21 @@ UPatDef( \p_midi_cc, { |unit,
 	[ \clipSoftness, 0, [0,1].asSpec ],
 ]  )
 .mappedArgs_([\toRange])
+.uchainInitFunc_({ |umap, unit|
+	var filter, invert, active, curve;
+	if( umap.def.category == \private ) {
+		filter = [
+			UMIDIFilterSpec.formatDeviceString( umap.get( \device ) ++ "*/" ++ umap.get( \port ) ++ "*" ).asSymbol,
+			'cc',
+			umap.get( \channel ),
+			umap.get( \cc ),
+			nil
+		];
+		curve = umap.get( \curve );
+		curve = 0.linlin(-1,1,-1,1,curve);
+		umap.defName = \p_midi;
+		umap.set( \curve, curve );
+		umap.set( \filter, filter );
+	}
+})
 .category_(\pattern_midi);
