@@ -396,6 +396,6 @@ defs = defs.add(
 	.mappedArgs_([\toRange])
 );
 
-MultiUMapDef( 'p_midi', defs, \private, 'type', false )
+MultiUMapDef( 'p_midi', defs, 'pattern_midi', 'type', false )
 .allowedModes_(['init', 'sync', 'normal' ])
 .mappedArgs_([ 'value', 'toRange' ]);

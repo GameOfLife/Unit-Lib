@@ -114,4 +114,4 @@ ValueUMapDef( \midi_touch, { |unit, midifunc|
 	}
 })
 .mappedArgs_([\toRange])
-.category_(\midi);
+.category_(\private);

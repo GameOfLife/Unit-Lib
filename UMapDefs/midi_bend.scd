@@ -116,4 +116,4 @@ ValueUMapDef( \midi_bend, { |unit, midifunc|
 	}
 })
 .mappedArgs_([\value, \toRange])
-.category_(\midi);
+.category_(\private);

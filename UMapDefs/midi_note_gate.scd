@@ -153,4 +153,4 @@ ValueUMapDef( \midi_note_gate, { |unit, midifuncs|
 	}
 })
 .mappedArgs_([\toRange])
-.category_(\midi);
+.category_(\private);

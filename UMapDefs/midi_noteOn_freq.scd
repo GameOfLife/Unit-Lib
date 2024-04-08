@@ -98,4 +98,4 @@ ValueUMapDef( \midi_noteOn_freq, { |unit, midifunc|
 		if( active ) { umap.set( \active, true ) };
 	};
 })
-.category_(\midi);
+.category_(\private);

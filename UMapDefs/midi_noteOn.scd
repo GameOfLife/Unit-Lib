@@ -114,4 +114,4 @@ ValueUMapDef( \midi_noteOn, { |unit, midifunc|
 	}
 })
 .mappedArgs_([\toRange])
-.category_(\midi);
+.category_(\private);
