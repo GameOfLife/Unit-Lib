@@ -89,7 +89,7 @@ args = [
 	[ \fromRange, [0,127], RangeSpec(0,127,step:1) ],
 	[ \toRange, [0,1], RangeSpec(0,1) ],
 	[ \invert, false, BoolSpec(false) ],
-	[ \curve, 0, [-16,16,\lin,0,0].asSpec ],
+	[ \curve, 0, [-1,1,\lin,0,0].asSpec ],
 	[ \clipMode, \clip, ListSpec( [ \clip, \fold, \wrap, \excess, \none ] ) ],
 	[ \clipSoftness, 0, [0,1].asSpec ],
 ];
