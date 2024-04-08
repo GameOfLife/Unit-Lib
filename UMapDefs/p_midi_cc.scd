@@ -105,4 +105,4 @@ UPatDef( \p_midi_cc, { |unit,
 		umap.set( \filter, filter );
 	}
 })
-.category_(\pattern_midi);
+.category_(\private);
