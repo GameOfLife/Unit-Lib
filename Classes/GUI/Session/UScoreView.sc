@@ -376,7 +376,11 @@ UScoreView {
     }
 
     calcNumTracks {
-	    numTracks = ((this.currentScore.events.collect( _.track ).maxItem ? ( minTracks - 3)) + 3)
+		var events = this.currentScore.events;
+		if( UMarkerEventView.showLabels.not ) {
+			events = events.select({ |item| item.isKindOf( UMarker ).not });
+		};
+	    numTracks = ((events.collect( _.track ).maxItem ? ( minTracks - 3)) + 3)
 			.max( minTracks );
     }
 

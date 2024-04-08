@@ -1,5 +1,7 @@
 UMarkerEventView : UEventView {
 
+	classvar <>showLabels = true;
+
 	checkSelectionStatus { |selectionRect,shiftDown, minWidth, maxWidth|
 		//this.createRect(minWidth, maxWidth);
 		if(selectionRect.intersects(rect)) {
@@ -82,27 +84,29 @@ UMarkerEventView : UEventView {
 
 		Pen.moveTo( (rectToDraw.left - 1) @ 0 );
 		Pen.lineTo( (rectToDraw.left + 1) @ 0 );
-		Pen.lineTo( (rectToDraw.left + 1) @ (rectToDraw.top - radius) );
-		Pen.arcTo(
-			(rectToDraw.left + 1) @ (rectToDraw.top),
-			(rectToDraw.right - radius) @ (rectToDraw.top),
-			radius
-		);
-		Pen.arcTo(
-			rectToDraw.rightTop,
-			rectToDraw.right @ (rectToDraw.top + radius),
-			radius
-		);
-		Pen.arcTo(
-			rectToDraw.rightBottom,
-			(rectToDraw.left + 1 + radius) @ (rectToDraw.bottom),
-			radius
-		);
-		Pen.arcTo(
-			(rectToDraw.left + 1) @ (rectToDraw.bottom),
-			(rectToDraw.left + 1) @ height,
-			radius
-		);
+		if( showLabels ) {
+			Pen.lineTo( (rectToDraw.left + 1) @ (rectToDraw.top - radius) );
+			Pen.arcTo(
+				(rectToDraw.left + 1) @ (rectToDraw.top),
+				(rectToDraw.right - radius) @ (rectToDraw.top),
+				radius
+			);
+			Pen.arcTo(
+				rectToDraw.rightTop,
+				rectToDraw.right @ (rectToDraw.top + radius),
+				radius
+			);
+			Pen.arcTo(
+				rectToDraw.rightBottom,
+				(rectToDraw.left + 1 + radius) @ (rectToDraw.bottom),
+				radius
+			);
+			Pen.arcTo(
+				(rectToDraw.left + 1) @ (rectToDraw.bottom),
+				(rectToDraw.left + 1) @ height,
+				radius
+			);
+		};
 		Pen.lineTo( (rectToDraw.left + 1) @ height );
 		Pen.lineTo( (rectToDraw.left - 1) @ height );
 		Pen.lineTo( (rectToDraw.left - 1) @ 0 );
@@ -145,7 +149,7 @@ UMarkerEventView : UEventView {
 				event.getTypeColor.penFill(innerRect, lineAlpha * 0.75, nil, 10);
 
 				//draw name
-				if( scaledRect.height > 4 ) {
+				if( scaledRect.height > 4 && { showLabels } ) {
 					Pen.color = Color.black.alpha_( lineAlpha  );
 					if( event.lockStartTime ) {
 						DrawIcon( \lock, Rect( scaledRect.left + 2, scaledRect.top, 14, 14 ) );
