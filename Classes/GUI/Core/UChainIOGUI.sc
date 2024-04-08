@@ -92,7 +92,6 @@ UChainIOGUI : UChainGUI {
 
 		io = SmoothButton( comp, Rect( comp.bounds.right - 40, 1, 40, 12 ) )
                 .label_( "i/o" )
-                .border_( 1 )
                 .radius_( 2 )
                 .background_( RoundView.skin[ 'SmoothButton' ] !? _.hiliteColor ? Color.green )
                 .action_({
@@ -105,7 +104,6 @@ UChainIOGUI : UChainGUI {
          code = SmoothButton( comp,
                     Rect( comp.bounds.right - (40 + 4 + 40), 1, 40, 12 ) )
                 .label_( "code" )
-                .border_( 1 )
                 .radius_( 2 )
                 .action_({
 	                UChainCodeGUI(

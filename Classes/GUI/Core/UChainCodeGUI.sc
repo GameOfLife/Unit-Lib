@@ -44,7 +44,6 @@ UChainCodeGUI : UChainGUI {
 
         io = SmoothButton( comp, Rect( comp.bounds.right - 40, 1, 40, 12 ) )
                 .label_( "i/o" )
-                .border_( 1 )
                 .radius_( 2 )
                 .action_({
 	                UChainIOGUI(
@@ -56,7 +55,6 @@ UChainCodeGUI : UChainGUI {
         code = SmoothButton( comp,
                     Rect( comp.bounds.right - (40 + 4 + 40), 1, 40, 12 ) )
                 .label_( "code" )
-                .border_( 1 )
                 .radius_( 2 )
 		        .background_( RoundView.skin[ 'SmoothButton' ] !? _.hiliteColor ? Color.green )
                 .action_({
@@ -110,18 +108,15 @@ UChainCodeGUI : UChainGUI {
 						{ Font( Font.defaultSansFace, 12) }).boldVariant
 				);
             if(unit.def.class == LocalUdef) {
-                SmoothButton( comp, Rect( comp.bounds.right - (80+2+80+2), 1, 80, 12 ) )
+                SmoothButton( comp, Rect( comp.bounds.right - (80+2+80), 1, 80, 12 ) )
                     .label_( "revert" )
-                    .border_( 1 )
                     .radius_( 2 )
                     .action_({
                         unit.def = unit.def.asOriginalUdef;
                     }).resize_(3);
-            };
-			if(unit.def.class == LocalUdef) {
-                SmoothButton( comp, Rect( comp.bounds.right - (80+2), 1, 80, 12 ) )
+
+                SmoothButton( comp, Rect( comp.bounds.right - (80), 1, 80, 12 ) )
                     .label_( "save as Udef" )
-                    .border_( 1 )
                     .radius_( 2 )
                     .action_({
                         unit.def.saveAsUdef({ |x|
@@ -129,7 +124,14 @@ UChainCodeGUI : UChainGUI {
                             ULib.servers.do{ |s| unit.def.sendSynthDef(s) }
                         })
                     }).resize_(3);
-            };
+            } {
+				 SmoothButton( comp, Rect( comp.bounds.right - (80), 1, 80, 12 ) )
+				    .label_( "open Udef file" )
+                    .radius_( 2 )
+                    .action_({
+                        unit.def.openDefFile;
+                    }).resize_(3);
+			};
 			views = this.makeUnitView( unit, scrollView, i, labelWidth, width );
 
 			unit.addDependant( unitInitFunc );
@@ -148,8 +150,7 @@ UChainCodeGUI : UChainGUI {
 	makeUnitView { |unit, comp, i, labelWidth, width|
 		var ctrl;
 		var views;
-        var font = Font( Font.defaultSansFace, 10);
-
+		var font = RoundView.skin.font ?? { Font( Font.defaultSansFace, 11); };
 
 		views = ();
 
