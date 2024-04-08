@@ -29,6 +29,7 @@ UChainGUI {
 	classvar <>durationMode = \duration; // \duration, \endTime, \endBar
 	classvar <>nowBuildingChain, <>nowBuildingUChainGUI;
 	classvar <>showInfoStrings = true;
+	classvar <>recentUdefs;
 
 	var <chain, <score, <parentScore;
 
@@ -1296,7 +1297,7 @@ UChainGUI {
 		} ?? { Color.white.alpha_(0.25) };
 
 		uDefMenuFunc = { |unit, action, hideAction, checkCategory|
-			var uDefsList = [], ctrl, menu, checkedMenu;
+			var uDefsList = [], ctrl, menu, checkedMenu, makeItem;
 			var uDefsDict = ();
 
 			Udef.all !? { |all|
@@ -1309,6 +1310,11 @@ UChainGUI {
 						uDefsDict[ udef.ioType ][ category ] = uDefsDict[ udef.ioType ][ category ].add( udef );
 					};
 				});
+			};
+
+			if( recentUdefs.size > 0 ) {
+				uDefsList = uDefsList.add( \recent );
+				uDefsList = uDefsList.addAll( recentUdefs );
 			};
 
 			[ \generator, \modifier, \endpoint, \other ].do({ |key|
@@ -1326,39 +1332,50 @@ UChainGUI {
 				};
 			};
 
+			makeItem = { |def|
+				var checked;
+				checked = unit !? { unit.def.name == def.name; } ? false;
+				if( def.isKindOf( MultiUdef ) && {
+					def.getArgSpec( def.defNameKey ).private.not;
+				}) {
+					Menu(
+						MenuAction.separator(  def.defNameKey.asString ),
+						*def.getSpec( def.defNameKey ).list.collect({ |subdefkey|
+							MenuAction( subdefkey.asString, {
+								action.value( def, [ def.defNameKey, subdefkey ] );
+								recentUdefs.remove( def );
+								recentUdefs = (recentUdefs ? []).addFirst( def )[..2];
+								menu.removeDependant( ctrl );
+								menu.destroy;
+							}).font_( Font( Font.defaultSansFace, 12 ) );
+						})
+					).title_( def.name )
+					.enabled_( checked.not ).font_( Font( Font.defaultSansFace, 12 ) );
+				} {
+					MenuAction( def.name, {
+						action.value( def );
+						recentUdefs.remove( def );
+						recentUdefs = (recentUdefs ? []).addFirst( def )[..2];
+						menu.removeDependant( ctrl );
+						menu.destroy;
+					}).enabled_( checked.not ).font_( Font( Font.defaultSansFace, 12 ) );
+				};
+			};
+
 			menu = Menu( *uDefsList.collect({ |item, i|
 				var submenu, includesChecked = false;
-				if( item.isKindOf( Symbol ) ) {
+				case { item.isKindOf( Symbol ) } {
 					if( checkCategory == item ) {
 						checkedMenu = i;
 					};
 					MenuAction.separator( item.asString );
+				} { item.isKindOf( Udef ) } {
+					makeItem.value( item );
 				} {
 					submenu = Menu( *item[1].collect({ |def|
-						var checked;
-						checked = unit !? { unit.def.name == def.name; } ? false;
-						if( checked ) { includesChecked = true; };
-						if( def.isKindOf( MultiUdef ) && {
-							def.getArgSpec( def.defNameKey ).private.not;
-						}) {
-							Menu(
-								MenuAction.separator(  def.defNameKey.asString ),
-								*def.getSpec( def.defNameKey ).list.collect({ |subdefkey|
-									MenuAction( subdefkey.asString, {
-										action.value( def, [ def.defNameKey, subdefkey ] );
-										menu.removeDependant( ctrl );
-										menu.destroy;
-									}).font_( Font( Font.defaultSansFace, 12 ) );
-								})
-							).title_( def.name )
-							.enabled_( checked.not ).font_( Font( Font.defaultSansFace, 12 ) );
-						} {
-							MenuAction( def.name, {
-								action.value( def );
-								menu.removeDependant( ctrl );
-								menu.destroy;
-							}).enabled_( checked.not ).font_( Font( Font.defaultSansFace, 12 ) );
-						};
+						var mItem = makeItem.value( def );
+						if( mItem.enabled.not ) { includesChecked = true; };
+						mItem;
 					})).title_( if( includesChecked ) { item[0] ++ " *" } { item[0] } )
 					.font_( Font( Font.defaultSansFace, 12 ) );
 					if( includesChecked ) { checkedMenu = i };
