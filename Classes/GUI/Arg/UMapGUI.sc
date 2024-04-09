@@ -334,8 +334,12 @@ UMapGUI : UGUI {
 				};
 			}, {
 				umapdragbinReplace.background = nil;
-			}, { |def|
-				unit.def.name == def.name
+			}, { |def, subdefkey |
+				if( subdefkey.notNil ) {
+					unit.get( def.defNameKey ) == subdefkey;
+				} {
+					unit.def.name == def.name
+				};
 			}, includePattern: isPattern );
 			if( res.notNil ) {
 				umapdragbinReplace.background = Color.blue(0.9).alpha_(0.25);

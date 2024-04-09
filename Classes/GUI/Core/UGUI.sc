@@ -285,14 +285,16 @@ UGUI {
 						Menu(
 							MenuAction.separator(  def.defNameKey.asString ),
 							*def.getSpec( def.defNameKey ).list.collect({ |subdefkey|
+								var enabled = true;
+								if( checked ) {	enabled = matchTest.value( def, subdefkey ).not; };
 								MenuAction( subdefkey.asString, {
 									action.value( def, [ def.defNameKey, subdefkey ] );
 									menu.removeDependant( ctrl );
 									menu.destroy;
-								}).font_( Font( Font.defaultSansFace, 12 ) );
+								}).enabled_( enabled ).font_( Font( Font.defaultSansFace, 12 ) );
 							})
-						).title_( def.name )
-						.enabled_( checked.not ).font_( Font( Font.defaultSansFace, 12 ) );
+						).title_( if( checked ) { def.name.asString ++ " *" } { def.name } )
+						.font_( Font( Font.defaultSansFace, 12 ) );
 					} {
 						MenuAction( def.name, {
 							action.value( def );
