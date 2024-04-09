@@ -30,7 +30,7 @@ UMenuBarIDE {
 	classvar >allMenus;
 	classvar <>font;
 	classvar <>menuStripMode = \views; // or \toolbar
-	classvar <>autoUpdateWindowsMenu = true;
+	classvar <>autoUpdateWindowsMenu = false;
 
 	*initClass {
 		if ( thisProcess.platform.name !== 'osx' ) {
