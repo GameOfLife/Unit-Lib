@@ -68,6 +68,6 @@ HybridUMapDef( \map, { |input = 0.5, min = 0, max = 1, warp = -1, curve = 0|
 	})
 	)
 	.setSpec( \curve, [-16,16,\lin,0,0] )
-	.category_( 'map' )
+	.category_( 'convert' )
 
 

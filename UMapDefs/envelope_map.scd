@@ -26,7 +26,7 @@ def = HybridUMapDef( \envelope_map, { |index = 0.0|
 	};
 })
 	.setSpec( \env, UEnvSpec( EnvM() ) )
-	.category_( 'map' )
+	.category_( 'convert' )
 	.mappedArgs_( [ \env ] );
 
 def.udefs[1].setDefault( \env, EnvM() );

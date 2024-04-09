@@ -69,4 +69,4 @@ HybridUMapDef( \clip_scale, { |input = 0.0, fromRange = #[0.0, 1.0], toRange = #
 	.setSpec( \clipSoftness, [0,1,\lin,0,0.1].asSpec )
 	.setSpec( \curve, [-16,16,\lin,0,0].asSpec )
 	.setSpec( \invert, BoolSpec(false) )
-	.category_( 'map' )
+	.category_( 'convert' )

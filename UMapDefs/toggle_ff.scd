@@ -24,4 +24,4 @@ UMapDef( \toggle_ff, {
 })
 .mappedArgs_([ \value1, \value2 ])
 .setSpec( \trigger, TriggerSpec() )
-.category_( 'switch' )
+.category_( 'trigger_to_value' )

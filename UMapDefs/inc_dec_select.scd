@@ -55,6 +55,6 @@ defs = [ 2,3,4,5,6,7,8,10,12,16,24,32,48,64,128 ].collect({ |n|
 		.mappedArgs_([ \vals ]);
 });
 
-MultiUMapDef( \inc_dec_select, defs, \selection, \n, false )
+MultiUMapDef( \inc_dec_select, defs, \trigger_to_value, \n, false )
 	.defaultDefName_( 8 )
 	.mappedArgs_([ \vals ]);

@@ -18,7 +18,7 @@ HybridUMapDef( \scale_time, { |time = 1, factor = 1, add = 0|
 }, { |unit, time = 1, factor = 1, add = 0|
 	 (time * factor) + add
 })
-	.category_( 'map' )
+	.category_( 'convert' )
 	.valueIsMapped_( false )
 	.setSpec( \time, SMPTESpec() )
 	.setSpec( \factor, [0.1,10,\exp,0,1].asSpec )

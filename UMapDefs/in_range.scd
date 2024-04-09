@@ -27,4 +27,4 @@ HybridUMapDef( \in_range, { |input = 0.0, range = #[0.25,0.75], trueValue = 1.0,
 .setSpec( \trueValue, UAdaptSpec() )
 .setSpec( \falseValue, UAdaptSpec() )
 .mappedArgs_([ \trueValue, \falseValue ])
-.category_( 'switch' )
+.category_( 'detection' )

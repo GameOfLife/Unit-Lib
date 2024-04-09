@@ -21,4 +21,4 @@ UMapDef( \direction_change, { |value = 0.0, upValue = 1.0, downValue = 0.0|
 	UMapOut.kr( output );
 })
 .mappedArgs_([ \upValue, \downValue ])
-.category_( 'switch' )
+.category_( 'detection' )
