@@ -1415,10 +1415,9 @@
 			).blend( Color.white, 2/3 );
 		};
 
-		vws[ \menu ] = PopUpMenu( view,
+		vws[ \menu ] = UPopUpMenu( view,
 			Rect( labelWidth + 2 + 12 + strWidth + 2, 0, 60, bounds.height )
 		)	.resize_(3)
-			.applySkin( RoundView.skin ? () )
 			.items_( [ "" ] )
 			.action_({ |pu|
 				var item;
@@ -1430,6 +1429,11 @@
 					vws[ \menu ].value = vws[ \menu ].items.indexOfEqual( "~" ++ (vws[ \string ].value) ) ? 0;
 				};
 			});
+
+		vws[ \menu ].extraMenuActions = {[
+				MenuAction.separator,
+				MenuAction("Open Environment Window", { ULib.envirWindow; })
+		]};
 
 		ctrl = {
 			var currentKeys;

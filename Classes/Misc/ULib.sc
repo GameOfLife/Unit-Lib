@@ -394,7 +394,7 @@ ULib {
 		addViews[ \label ] = StaticText( w, 20@14 ).string_("~").align_(\right).applySkin( RoundView.skin );
 		addViews[ \textBox ] = TextField( w, (labelWidth - 24) @ 14 )
 		.applySkin( RoundView.skin );
-		addViews[ \popUp ] = PopUpMenu( w, (bounds.width - 8 - labelWidth - 52 - 18) @ 14 )
+		addViews[ \popUp ] = UPopUpMenu( w, (bounds.width - 8 - labelWidth - 52 - 18) @ 14 )
 		.items_( envirSpecs[0,2..] )
 		.applySkin( RoundView.skin );
 		addViews[ \add ] = SmoothButton( w, 40@14 )
