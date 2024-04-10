@@ -27,3 +27,25 @@
 	}
 
 }
+
++ MainMenu {
+
+	*registerNoUpdate {
+		|action, menu, group=\none|
+		var menuList, existingIndex;
+
+		menu = menu.asSymbol;
+		group = group.asSymbol;
+
+		menuList = this.prGetMenuGroup(menu, group);
+		existingIndex = menuList.detectIndex({ |existing| existing.string == action.string });
+		if (existingIndex.notNil) {
+			"Menu item '%' replaced an existing menu".format(action.string).warn;
+			menuList[existingIndex] = action;
+		} {
+			menuList.add(action);
+		};
+
+		//this.prUpdate();
+	}
+}

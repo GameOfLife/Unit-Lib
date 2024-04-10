@@ -64,7 +64,7 @@ UMenuBarIDE {
 		if( allMenus[ name.asSymbol ].isNil ) { menuCreated = true; };
 		allMenus[ name.asSymbol ] = allMenus[ name.asSymbol ].add( menuAction );
 		switch( mode, \mainmenu, {
-			MainMenu.register( menuAction, name.asString, 'unitlib' );
+			MainMenu.registerNoUpdate( menuAction, name.asString, 'unitlib' );
 		}, \toolbar, {
 			if( toolBar.isNil ) {
 				toolBar = ToolBar().minWidth_(300).font_( font ).front;
@@ -575,6 +575,8 @@ UMenuBarIDE {
 			skipJack = SkipJack( { this.fillWindowsMenu; }, 1.0, false, "ulib_menu" );
 			this.registerMenu( windowsMenu, "View" );
 		};
+
+		MainMenu.prUpdate();
 	}
 
 	*add { |name, function, menuName|
