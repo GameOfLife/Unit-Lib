@@ -636,7 +636,7 @@ UChainGUI {
 					}).enabled_( startTimeMode != item[1] );
 				});
 
-				Menu( *actions ).front( action: actions[ [ \time, \bar ].indexOf( startTimeMode ) ] );
+				Menu( *actions ).uFront( action: actions[ [ \time, \bar ].indexOf( startTimeMode ) ] );
 			})
 			.string_( [ "startTime ", "startBar "][ [ \time, \bar ].indexOf( startTimeMode ) ? 0 ] );
 
@@ -687,7 +687,7 @@ UChainGUI {
 					}).enabled_( startTimeMode != item[1] );
 				});
 
-				Menu( *actions ).front( action: actions[ [ \time, \bar ].indexOf( startTimeMode ) ] );
+				Menu( *actions ).uFront( action: actions[ [ \time, \bar ].indexOf( startTimeMode ) ] );
 			})
 			.string_( [ "startTime ", "startBar "][ [ \time, \bar ].indexOf( startTimeMode ) ? 0 ] );
 
@@ -737,7 +737,7 @@ UChainGUI {
 							vw.string = item.asString ++ " ";
 						}).enabled_( durationMode != item );
 					});
-					Menu( *actions ).front(
+					Menu( *actions ).uFront(
 						action: actions[ #[ duration, endTime, endBar ].indexOf( durationMode ) ]
 					);
 				})
@@ -955,7 +955,7 @@ UChainGUI {
 						})
 					);
 
-					Menu( *actions ).front( action: selected );
+					Menu( *actions ).uFront( action: selected );
 				});
 
 				views[ \ugroup ].setProperty(\wordWrap, false);
@@ -1011,7 +1011,7 @@ UChainGUI {
 
 					selected = actions.detect({ |item| item.enabled.not });
 
-					Menu( *actions ).front( action: selected );
+					Menu( *actions ).uFront( action: selected );
 
 				});
 
@@ -1328,7 +1328,7 @@ UChainGUI {
 				if( what === \aboutToHide ) {
 					hideAction.value;
 					menu.removeDependant( ctrl );
-					menu.destroy;
+					menu.deepDestroy;
 				};
 			};
 
@@ -1351,7 +1351,7 @@ UChainGUI {
 								recentUdefs.remove( def );
 								recentUdefs = (recentUdefs ? []).addFirst( def )[..2];
 								menu.removeDependant( ctrl );
-								menu.destroy;
+								menu.deepDestroy;
 							}).enabled_( subChecked.not ).font_( Font( Font.defaultSansFace, 12 ) );
 						})
 					).title_( if( checked ) { def.name.asString ++ " *" } { def.name.asString } )
@@ -1362,7 +1362,7 @@ UChainGUI {
 						recentUdefs.remove( def );
 						recentUdefs = (recentUdefs ? []).addFirst( def )[..2];
 						menu.removeDependant( ctrl );
-						menu.destroy;
+						menu.deepDestroy;
 					}).enabled_( checked.not ).font_( Font( Font.defaultSansFace, 12 ) );
 				};
 			};
@@ -1388,9 +1388,9 @@ UChainGUI {
 			})).font_( Font( Font.defaultSansFace, 12 ) );
 
 			if( checkedMenu.notNil ) {
-				menu.front( action: menu.actions[ checkedMenu ] ? nil );
+				menu.uFront( action: menu.actions[ checkedMenu ] ? nil );
 			} {
-				menu.front;
+				menu.uFront;
 			};
 
 			menu.addDependant( ctrl );
@@ -1972,7 +1972,7 @@ UChainGUI {
 						Menu(
 							MenuAction.separator( "numCopies" ),
 							*actions
-						).front( action: openAction );
+						).uFront( action: openAction );
 						plusButtonTask = nil;
 					}.fork( AppClock )
 				})

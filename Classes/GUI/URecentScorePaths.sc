@@ -83,6 +83,7 @@ URecentScorePaths {
 		var userPath;
 		menu = menu ?? { this.menu; };
 		if( menu.notNil ) {
+			menu.actions.do(_.destroy);
 			menu.clear;
 			userPath = "~".standardizePath;
 			this.pathList.do({ |path|

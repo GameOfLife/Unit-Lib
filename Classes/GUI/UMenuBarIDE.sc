@@ -41,6 +41,7 @@ UMenuBarIDE {
 
 	*fillWindowsMenu {
 		if( windowsMenu.notNil && { windowsMenu.visible.not }) {
+			windowsMenu.actions.do(_.destroy);
 			windowsMenu.clear;
 
 			UScoreEditorGUI.all.do({ |gui|
@@ -141,12 +142,12 @@ UMenuBarIDE {
 					absoluteBounds = vw.absoluteBounds;
 					boundsKnown = menu.bounds.height > 0;
 					if( boundsKnown.not ) {
-						menu.front( absoluteBounds.leftBottom );
+						menu.uFront( absoluteBounds.leftBottom );
 					};
 					if( (menu.bounds.height + absoluteBounds.bottom) > Window.availableBounds.bottom ) {
-						menu.front( absoluteBounds.leftTop - (0@menu.bounds.height) );
+						menu.uFront( absoluteBounds.leftTop - (0@menu.bounds.height) );
 					} {
-						if( boundsKnown ) { menu.front( absoluteBounds.leftBottom ); };
+						if( boundsKnown ) { menu.uFront( absoluteBounds.leftBottom ); };
 					};
 				};
 			});
@@ -169,7 +170,7 @@ UMenuBarIDE {
 				header.background = Color.clear;
 				stopTask.value;
 			});
-			header.onClose_({ ctrl.remove; stopTask.value; });
+			header.onClose_({ ctrl.remove; stopTask.value; menus.do(_.destroy); });
 		});
 		^headers;
 	}

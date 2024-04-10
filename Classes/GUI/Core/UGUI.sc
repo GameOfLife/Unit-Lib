@@ -266,7 +266,7 @@ UGUI {
 			if( what === \aboutToHide ) {
 				hideAction.value;
 				menu.removeDependant( ctrl );
-				menu.destroy;
+				menu.deepDestroy;
 			};
 		};
 
@@ -290,7 +290,7 @@ UGUI {
 								MenuAction( subdefkey.asString, {
 									action.value( def, [ def.defNameKey, subdefkey ] );
 									menu.removeDependant( ctrl );
-									menu.destroy;
+									menu.deepDestroy;
 								}).enabled_( enabled ).font_( Font( Font.defaultSansFace, 12 ) );
 							})
 						).title_( if( checked ) { def.name.asString ++ " *" } { def.name } )
@@ -299,7 +299,7 @@ UGUI {
 						MenuAction( def.name, {
 							action.value( def );
 							menu.removeDependant( ctrl );
-							menu.destroy;
+							menu.deepDestroy;
 						}).enabled_( checked.not ).font_( Font( Font.defaultSansFace, 12 ) );
 					};
 				});
@@ -337,14 +337,14 @@ UGUI {
 
 		if( menu.actions.size > 0 ) {
 			if( checkedIndex.notNil ) {
-				menu.front( action: menu.actions[ checkedIndex ] ? nil );
+				menu.uFront( action: menu.actions[ checkedIndex ] ? nil );
 			} {
-				menu.front;
+				menu.uFront;
 			};
 
 			^menu.addDependant( ctrl );
 		} {
-			menu.destroy;
+			menu.deepDestroy;
 			^nil;
 		}
 	}
