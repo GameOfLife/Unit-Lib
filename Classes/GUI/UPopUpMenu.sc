@@ -5,8 +5,8 @@ UPopUpMenu : StaticText {
 	*new { arg parent, bounds;
 		var obj = super.new( parent, bounds );
 		obj.setProperty(\wordWrap, false);
-		obj.applySkin( RoundView.skin );
 		obj.background_( Color.white.alpha_( 0.25 ) );
+		obj.applySkin( RoundView.skin );
 		obj.mouseDownAction_({ obj.openMenu; });
 		obj.onClose_({ obj.destroyMenu });
 		^obj;
