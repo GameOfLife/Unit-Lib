@@ -429,7 +429,7 @@
 					this.makeEditWindow( inView, inView[ \val ].copy, inView.label, { |vals|
 						this.setView( inView, vals, true );
 					});
-					menu.destroy;
+					menu.deepDestroy;
 				};
 			})
 			);
@@ -437,7 +437,7 @@
 
 		RoundView.popSkin;
 
-		^menu.front;
+		^menu.uFront;
 	}
 }
 
@@ -525,7 +525,7 @@
 
 	makeView { |parent, bounds, label, action, resize|
 		var multipleActions = action.size > 0;
-		var vw, view, menu, menuActions, indexOffset = 0;
+		var vw, view, makeMenu, menu, menuActions, indexOffset = 0;
 		var lbls, viewWidth, labelWidth;
 		if( modern ) {
 			vw = ();
@@ -553,41 +553,48 @@
 
 			lbls = labels.asCollection.collect(_.value);
 
-			menuActions = list.collect({ |item, i|
-				if( action.size > 0 ) {
-					MenuAction( lbls[i] ? item.asString, {
-						action[i].value( vw, item );
-						vw.value = i;
-					});
-				} {
-					MenuAction( lbls[i] ? item.asString, {
-						action.value( vw, item );
-						vw.value = i;
-					});
+			makeMenu = {
+				menuActions = list.collect({ |item, i|
+					if( action.size > 0 ) {
+						MenuAction( lbls[i] ? item.asString, {
+							action[i].value( vw, item );
+							vw.value = i;
+						});
+					} {
+						MenuAction( lbls[i] ? item.asString, {
+							action.value( vw, item );
+							vw.value = i;
+						});
+					};
+				});
+
+				if( label.notNil ) {
+					indexOffset = 1;
+					menuActions = [ MenuAction.separator( label ) ] ++ menuActions;
 				};
-			});
 
-			if( label.notNil ) {
-				indexOffset = 1;
-				menuActions = [ MenuAction.separator( label ) ] ++ menuActions;
+				menu = Menu( *menuActions );
 			};
-
-			menu = Menu( *menuActions );
 
 			vw[ \menu ] = StaticText( view, viewWidth @ (bounds.height) )
 			.applySkin( RoundView.skin )
 			.resize_( resize ? 2 )
-			.onClose_({ { menu.destroy }.defer(0.25) })
+			.onClose_({ {
+				if( menu.notNil ) {
+					menu.deepDestroy;
+				};
+			}.defer(0.25) })
 			.background_( Color.white.alpha_( 0.25 ) );
 			vw[ \menu ].setProperty(\wordWrap, false);
 
 			vw[ \menu ].mouseDownAction_({
 				var selected;
+				if( menu.isNil ) { makeMenu.value };
 				selected = menuActions[ (vw[ \index ] ? 0).asInteger + indexOffset ];
 				menuActions.do({ |action, i|
 					action.enabled_( action != selected );
 				});
-				menu.front( QtGUI.cursorPosition - (20@0), action: selected );
+				menu.uFront( QtGUI.cursorPosition - (20@0), action: selected );
 			});
 
 			vw[ \setViews ] = {
@@ -863,7 +870,7 @@
 
 		view.view.onClose_({
 			vws[ \editWin ] !? _.close;
-			menu !? _.destroy;
+			menu !? _.deepDestroy;
 		});
 
 		^vws;
@@ -1030,7 +1037,7 @@
 
 		view.view.onClose_({
 			vws[ \editWin ] !? _.close;
-			menu !? _.destroy;
+			menu !? _.deepDestroy;
 		});
 
 		^vws;
@@ -1171,7 +1178,7 @@
 
 		view.view.onClose_({
 			vws[ \editWin ] !? _.close;
-			menu !? _.destroy;
+			menu !? _.deepDestroy;
 		});
 
 		^vws;
@@ -1753,7 +1760,7 @@
 
 		view.view.onClose_({
 			vws[ \editWin ] !? _.close;
-			menu !? _.destroy;
+			menu !? _.deepDestroy;
 		});
 
 		^vws;
@@ -3375,10 +3382,10 @@
 		.background_( Color.white.alpha_(0.25) )
 		.resize_( 5 )
 		.mouseDownAction_({
-			vws[ \menu ].front;
+			vws[ \menu ] !? _.uFront;
 		})
 		.onClose_({
-			vws[ \menu ].destroy;
+			vws[ \menu ] !? _.deepDestroy;
 		});
 
 		if( resize.notNil ) { vws[ \view ].resize = resize };
@@ -3479,7 +3486,7 @@
 		var vws, view, labelWidth;
 		var font;
 		var tempVal;
-		var makeMenu;
+		var makeMenu, menu;
 
 		vws = ();
 
@@ -3650,7 +3657,7 @@
 				MenuAction( "default (%)".format( this.default ), { vws.setVal( this.default ); vws.doAction });
 			);
 
-			Menu( *menus ).front;
+			menu = Menu( *menus ).uFront;
 		};
 
 		vws[ \view ] = view;
@@ -3737,6 +3744,8 @@
 			};
 		};
 
+		vws[ \view ].onClose_({ menu !? _.deepDestroy });
+
 		^vws;
 	}
 
@@ -3806,7 +3815,7 @@
 					this.class.mode = \deg;
 				}).enabled_( mode != \deg ),
 			];
-			Menu( *actions ).front( action: actions[ [\rad, \deg].indexOf( mode ) ] );
+			Menu( *actions ).uFront( action: actions[ [\rad, \deg].indexOf( mode ) ] );
 		});
 
 		// rad mode

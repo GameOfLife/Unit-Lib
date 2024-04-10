@@ -1,12 +1,14 @@
 UPopUpMenu : StaticText {
 	var <items, <index = 0, <>extraMenuActions, <>title;
+	var <>menu, <>menuActions, <>indexOffset = 0;
 
 	*new { arg parent, bounds;
 		var obj = super.new( parent, bounds );
 		obj.setProperty(\wordWrap, false);
 		obj.applySkin( RoundView.skin );
 		obj.background_( Color.white.alpha_( 0.25 ) );
-		obj.mouseDownAction_({ obj.makeMenu; });
+		obj.mouseDownAction_({ obj.openMenu; });
+		obj.onClose_({ obj.destroyMenu });
 		^obj;
 	}
 
@@ -32,15 +34,16 @@ UPopUpMenu : StaticText {
 
 	items_ { |newItems|
 		items = newItems;
+		if( menu.notNil ) { this.makeMenu; };
 		this.update;
 	}
 
 	item { ^items !? _[ index ] }
 
 	makeMenu {
-		var actions, selected, menu;
+		this.destroyMenu;
 
-		actions = items.collect({ |item, i|
+		menuActions = items.collect({ |item, i|
 			if( item == '' or: { item == "" } ) {
 				MenuAction.separator;
 			} {
@@ -48,24 +51,44 @@ UPopUpMenu : StaticText {
 					this.value_( i, false );
 					this.doAction;
 					this.update;
-					menu.destroy;
-				}).enabled_( index != i );
+				});
 			};
 		}) ? [];
 
-		selected = actions[ index ];
+		menuActions = menuActions.addAll( extraMenuActions.value( this ) );
 
-		actions = actions.addAll( extraMenuActions.value( this ) );
-
-		if( actions.size > 0 ) {
+		if( menuActions.size > 0 ) {
 			if( title.notNil ) {
-				actions = [ MenuAction.separator( title.asString ) ] ++ actions;
+				menuActions = [ MenuAction.separator( title.asString ) ] ++ menuActions;
+				indexOffset = 1;
 			};
-			menu = Menu( *actions );
-			^menu.front( QtGUI.cursorPosition - (20@0), action: selected );
+			menu = Menu( *menuActions );
 		} {
-			^nil;
+			menu = nil;
 		}
+	}
+
+	openMenu {
+		var selected;
+		if( menu.isNil ) { this.makeMenu };
+		if( menu.notNil ) {
+			menuActions.do({ |item, i|
+				if( i == (index + indexOffset) ) {
+					item.enabled = false;
+					selected = item;
+				} {
+					item.enabled = true;
+				};
+			});
+			^menu.uFront( QtGUI.cursorPosition - (20@0), action: selected );
+		};
+	}
+
+	destroyMenu {
+		if( menu.notNil ) {
+			menu.deepDestroy;
+			menuActions = nil;
+		};
 	}
 
 	update {
