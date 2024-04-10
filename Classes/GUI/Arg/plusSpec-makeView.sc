@@ -525,7 +525,7 @@
 
 	makeView { |parent, bounds, label, action, resize|
 		var multipleActions = action.size > 0;
-		var vw, view;
+		var vw, view, menu, menuActions, indexOffset = 0;
 		var lbls, viewWidth, labelWidth;
 		if( modern ) {
 			vw = ();
@@ -551,31 +551,42 @@
 				viewWidth = bounds.width;
 			};
 
+			lbls = labels.asCollection.collect(_.value);
+
+			menuActions = list.collect({ |item, i|
+				if( action.size > 0 ) {
+					MenuAction( lbls[i] ? item.asString, {
+						action[i].value( vw, item );
+						vw.value = i;
+					});
+				} {
+					MenuAction( lbls[i] ? item.asString, {
+						action.value( vw, item );
+						vw.value = i;
+					});
+				};
+			});
+
+			if( label.notNil ) {
+				indexOffset = 1;
+				menuActions = [ MenuAction.separator( label ) ] ++ menuActions;
+			};
+
+			menu = Menu( *menuActions );
+
 			vw[ \menu ] = StaticText( view, viewWidth @ (bounds.height) )
 			.applySkin( RoundView.skin )
 			.resize_( resize ? 2 )
+			.onClose_({ { menu.destroy }.defer(0.25) })
 			.background_( Color.white.alpha_( 0.25 ) );
 			vw[ \menu ].setProperty(\wordWrap, false);
 
 			vw[ \menu ].mouseDownAction_({
-				var actions, selected, lblx, menu;
-				lblx = labels.asCollection.collect(_.value);
-				actions = list.collect({ |item, i|
-					MenuAction( lblx[i] ? item.asString, {
-						if( action.size > 0 ) {
-							action[i].value( vw, item );
-						} {
-							action.value( vw, item );
-						};
-						vw.value = i;
-						menu.destroy;
-					}).enabled_( vw[ \index ] != i )
+				var selected;
+				selected = menuActions[ (vw[ \index ] ? 0).asInteger + indexOffset ];
+				menuActions.do({ |action, i|
+					action.enabled_( action != selected );
 				});
-				if( label.notNil ) {
-					actions = [ MenuAction.separator( label ) ] ++ actions;
-				};
-				selected = actions.detect({ |x| x.enabled.not });
-				menu = Menu( *actions );
 				menu.front( QtGUI.cursorPosition - (20@0), action: selected );
 			});
 
