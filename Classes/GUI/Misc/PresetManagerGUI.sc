@@ -65,7 +65,7 @@ PresetManagerGUI {
 	setFont { |newFont|
 		font = newFont ? font ??
 			{ RoundView.skin !? { RoundView.skin.font } } ??
-			{ Font( Font.defaultSansFace, 10 ) };
+			{ Font( Font.defaultSansFace, 11 ) };
 
 		{
 			views[ \label ].font = font;
@@ -106,6 +106,7 @@ PresetManagerGUI {
 		presetWidth = bounds.width - labelWidth - (viewHeight * 2) - 12;
 
 		views[ \presets ] = UPopUpMenu( view, presetWidth @ viewHeight )
+		.resize_(5)
 		.extraMenuActions_({[
 			MenuAction.separator,
 			MenuAction( "Add...", {

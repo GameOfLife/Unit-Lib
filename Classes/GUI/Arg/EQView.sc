@@ -302,7 +302,7 @@ EQEditView {
 
 	init {
 		eqSetting = eqSetting ?? { EQSetting() };
-		font = RoundView.skin !? { RoundView.skin.font } ?? { Font( Font.defaultSansFace, 10 ); };
+		font = RoundView.skin !? { RoundView.skin.font } ?? { Font( Font.defaultSansFace, 11 ); };
 	}
 
 	removeCtrl {
@@ -343,7 +343,7 @@ EQEditView {
 		};
 	}
 
-	*viewNumLines { ^2 }
+	*viewNumLines { ^1 }
 
 	selected_ { |new|
 		if( selected != new ) {
@@ -386,29 +386,28 @@ EQEditView {
 
 		if( bounds.isNil ) { bounds = 350 @ (this.class.viewNumLines * (viewHeight + 4)) };
 
-		view = EZCompositeView( parent, bounds, margin: 0@2, gap: 2@2 );
+		view = EZCompositeView( parent, bounds, margin: 2@2, gap: 2@2 );
 		bounds = view.asView.bounds;
 		view.resize_( resize ? 5 );
 		argViews = [];
 
 		this.addCtrl;
 
-		listView = PopUpMenu( view, 80 @ viewHeight )
-			.font_( font )
+		listView = UPopUpMenu( view, 80 @ (viewHeight+2) )
 			.value_( selected ? 0 )
-			.applySkin( RoundView.skin)
-			.items_( eqSetting.names )
+		    .font_( font )
+		    .align_( \center )
+		    .items_( eqSetting.names )
 			.action_({ |pu|
 				this.selected = pu.value;
 			});
 
-		listView.onClose_({ this.removeCtrl });
+		listView.onClose = listView.onClose.addFunc({ this.removeCtrl });
 
-		view.decorator.nextLine;
+		listView.bounds = listView.bounds.insetAll( -2, -2, 0, -2 );
 
-		comp = CompositeView( view, bounds.width @ (viewHeight + 4))
-			.resize_(2)
-			.background_( Color.white.alpha_(0.25) );
+		comp = CompositeView( view, (bounds.width - 8 - 80) @ (viewHeight+2))
+			.resize_(2);
 
 		argNames = eqSetting.argNames;
 		specs = eqSetting.specs;
@@ -422,15 +421,15 @@ EQEditView {
 			var vws;
 			vws = ();
 
-			vws[ \comp ] = CompositeView( comp, bounds.width @ (viewHeight + 4) )
+			vws[ \comp ] = CompositeView( comp, bounds.width @ (viewHeight+2) )
 				.resize_(2);
 
-			vws[ \comp ].addFlowLayout( 2@2, 2@2 );
+			vws[ \comp ].addFlowLayout( 1@1, 2@2 );
 
 			argNames[i].do({ |argName, ii|
 				var spec, step;
 
-				StaticText(  vws[ \comp ], 25 @ viewHeight )
+				StaticText(  vws[ \comp ], 35 @ viewHeight )
 					.string_( argName.asString ++ " " )
 					.align_( \right )
 					.font_( font )
