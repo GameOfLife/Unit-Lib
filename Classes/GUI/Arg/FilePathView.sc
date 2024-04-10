@@ -28,6 +28,7 @@ FilePathView {
 	var <>defaultStringColor;
 	var <font;
 	var <>allowEmpty = false;
+	var <>menu;
 
 	*new { |parent, bounds|
 		^super.new.makeView( parent, bounds );
@@ -139,7 +140,8 @@ FilePathView {
 	}
 
 	makeMenu {
-		var menu, setAction = { |pth| this.value = pth; action.value( this ) };
+		var setAction = { |pth| this.value = pth; action.value( this ) };
+		if( menu.notNil ) { menu.deepDestroy };
 		menu = Menu(
 			MenuAction( "Browse...", {
 				this.browse( setAction );
@@ -188,7 +190,7 @@ FilePathView {
 				MenuAction( "Remove", { setAction.value( nil ); }).enabled_( this.value.notNil );
 			);
 		};
-		menu.front;
+		menu.uFront;
 	}
 
 	makeView { |parent, bounds, resize|
@@ -207,6 +209,7 @@ FilePathView {
 		.align_( \center )
 		.resize_( 2 )
 		.background_( Color.white.alpha_(0.25) )
+		.onClose_({ menu !? _.deepDestroy })
 		.canReceiveDragHandler_( this.canReceiveDragHandler )
 		.receiveDragHandler_( this.receiveDragHandler )
 		.mouseDownAction_({ this.makeMenu });
@@ -316,7 +319,7 @@ MultiFilePathView : FilePathView {
 	}
 
 	makeMenu {
-		var mainmenu, uniquePaths = [];
+		var uniquePaths = [];
 		var setSingle = { |pth, index = 0|
 			if( index.isArray ) {
 				index.do({ |id|
@@ -335,13 +338,15 @@ MultiFilePathView : FilePathView {
 			};
 		});
 
-		mainmenu = Menu(
+		if( menu.notNil ) { menu.deepDestroy };
+
+		menu = Menu(
 			MenuAction( "Browse...", {
 				this.browse({ |paths| this.value = paths; action.value( this ) });
 			}),
 			Menu(
 				*this.value.collect({ |pth, i|
-					var menu = Menu(
+					var xmenu = Menu(
 						MenuAction( "Browse...", {
 							this.browseSingle( { |px| setSingle.value( px, i ) } );
 						}),
@@ -365,20 +370,20 @@ MultiFilePathView : FilePathView {
 						}).enabled_( pth.notNil ),
 					).title_( "%: %".format( i, pth ) );
 					if( fixedSize == false ) {
-						menu.addAction( MenuAction.separator );
-						menu.addAction( MenuAction( "Remove", {
+						xmenu.addAction( MenuAction.separator );
+						xmenu.addAction( MenuAction( "Remove", {
 							this.value.removeAt( i );
 							this.value = this.value;
 							action.value( this );
 						}).enabled_( this.value.size > 1 ) );
-						menu.addAction( MenuAction( "Add...", {
+						xmenu.addAction( MenuAction( "Add...", {
 							this.browseSingle({ |px|
 								this.value = this.value.insert( i, px );
 								action.value( this );
 							});
 						}) );
 					};
-					menu;
+					xmenu;
 				});
 			).title_( "Pathnames (% files)".format( this.value.size ) ),
 			MenuAction.separator,
@@ -400,10 +405,10 @@ MultiFilePathView : FilePathView {
 		);
 
 		if( uniquePaths.size != (this.value.size) ) {
-			mainmenu.insertAction( 1, Menu(
+			menu.insertAction( 1, Menu(
 				*uniquePaths.collect({ |pth, i|
 					var indices = this.value.indicesOfEqual( pth );
-					var menu = Menu(
+					var submenu = Menu(
 						MenuAction( "Browse...", {
 							this.browseSingle( { |px|
 								setSingle.value( px, indices )
@@ -428,12 +433,12 @@ MultiFilePathView : FilePathView {
 							this.copyOrMove( pth, \saveAs, { |px| setSingle.value( px, indices ) } );
 						}).enabled_( pth.notNil ),
 					).title_( "% (%)".format( pth, indices.size ) );
-					menu;
+					submenu;
 				});
 			).title_("Unique pathnames (%)".format( uniquePaths.size ) )
 			);
 		};
-		mainmenu.front;
+		menu.uFront;
 	}
 
 
