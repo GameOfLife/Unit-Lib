@@ -208,6 +208,12 @@ UMenuBarIDE {
 		skipJack !? _.stop; skipJack = nil;
 	}
 
+	*isEmpty { ^allMenus.isNil }
+
+	*newOnce { |name = "Unit Lib"|
+		if( this.isEmpty.not ) { this.new( name ); };
+	}
+
 	*new { |name = "Unit Lib"|
 
 		this.clear; // clear the old menu first

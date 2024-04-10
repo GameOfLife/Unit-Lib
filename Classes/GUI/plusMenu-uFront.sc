@@ -18,3 +18,12 @@
 		this.destroy;
 	}
 }
+
++ AbstractMenuAction {
+
+	deepDestroy {
+		this.menu !? _.deepDestroy;
+		this.destroy;
+	}
+
+}
