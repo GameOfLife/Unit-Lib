@@ -318,7 +318,7 @@ UScoreEditorGui_TopBar {
 			.resize_(3);
 
 		{
-			var snapValues, snapLabels, getLabel, setString, snapView;
+			var snapValues, snapLabels, getLabel, setString, snapView, menu;
 			snapValues = (1/[inf,
 				(ULib.servers[0].options.sampleRate ? 44100) / ULib.servers[0].options.blockSize,
 				1000,100,10,32,16,12,8,6,5,4,3,2,1]
@@ -345,12 +345,16 @@ UScoreEditorGui_TopBar {
 			};
 			snapView = StaticText( header, 60@size )
 			.font_( font )
+			.onClose_({
+				menu !? _.deepDestroy;
+			})
 			.align_( \center )
 			.toolTip_( "Snap resolution and mode" )
 			.applySkin( RoundView.skin )
 			.background_( Color.white.alpha_(0.25) )
 			.mouseDownAction_({
-				Menu(
+				if( menu.notNil ) { menu.deepDestroy };
+				menu = Menu(
 					Menu(
 						*snapLabels.collect({ |item, i|
 							MenuAction( item, {
@@ -368,7 +372,8 @@ UScoreEditorGui_TopBar {
 							}).enabled_( scoreView.usessionMouseEventsManager.mode != item );
 						})
 					).title_( "Mode" ),
-				).front;
+				);
+				menu.uFront;
 			})
 			.resize_(3);
 

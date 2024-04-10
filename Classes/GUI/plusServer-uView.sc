@@ -107,7 +107,7 @@
 		active.string = " " ++ this.name.asString + this.uInfoString;
 		active.align = \left;
 		active.font = font;
-		active.mouseDownAction = { menu.front; };
+		active.mouseDownAction = { menu.uFront; };
 
 		active.toolTip_( "Server % status\n\n".format( this.name ) ++
 			"% Average CPU, % Peak CPU, #s Synths, #d SynthDefs\n" ++
@@ -143,7 +143,7 @@
 		active.onClose = {
 			window = nil;
 			ctlr.remove;
-			menu.destroy;
+			menu.deepDestroy;
 			if( isLocal.not ) {
 				this.stopAliveThread;
 			};

@@ -282,33 +282,21 @@ UScoreEditorGui_TransportBar {
 	   views[\barMap].views[\division].toolTip_( "Division (beat)" );
 	   views[\barMap].views[\sub].toolTip_( "Sub (1/1000 division)" );
 
-		views[ \timeMode ] = StaticText( view, 39@size )
-		.string_( ["time", "bar" ][ scoreView.showTempoMap.binaryValue ] )
-		.font_( font )
-		.applySkin( RoundView.skin )
+		views[ \timeMode ] = UPopUpMenu( view, 39@size )
+		.items_( [ "time", "bar" ] )
+		.value_( scoreView.showTempoMap.binaryValue )
 		.align_( \center )
 		.toolTip_( "Time mode" )
-		.background_( Color.white.alpha_(0.25) )
-		.mouseDownAction_({
-			var v = views[ \timeMode ];
-			var actions;
-			var act = { |val|
-				scoreView.showTempoMap = val.booleanValue;
-				v.string = ["time", "bar" ][ scoreView.showTempoMap.binaryValue ];
-				views[\signature].visible = scoreView.showTempoMap;
-				views[\tempo].visible = scoreView.showTempoMap;
-				views[\editTempo].visible = scoreView.showTempoMap;
-				views[\lockToTempo].visible = scoreView.showTempoMap;
-				views[\barMap].visible = scoreView.showTempoMap;
-				views[\counter].visible = scoreView.showTempoMap.not;
-			};
-			actions = [
-				MenuAction( "time", { act.value( 0 ) }).enabled_( scoreView.showTempoMap ),
-				MenuAction( "bar", { act.value( 1 ) }).enabled_( scoreView.showTempoMap.not )
-			];
-			Menu( *actions ).front( action: actions[ scoreView.showTempoMap.binaryValue ] );
+		.action_({ |pu|
+			scoreView.showTempoMap = pu.value.booleanValue;
+			views[\signature].visible = scoreView.showTempoMap;
+			views[\tempo].visible = scoreView.showTempoMap;
+			views[\editTempo].visible = scoreView.showTempoMap;
+			views[\lockToTempo].visible = scoreView.showTempoMap;
+			views[\barMap].visible = scoreView.showTempoMap;
+			views[\counter].visible = scoreView.showTempoMap.not;
 		});
-		views[ \timeMode ].bounds = views[ \timeMode ].bounds.insetBy(0,1);
+		//views[ \timeMode ].bounds = views[ \timeMode ].bounds.insetBy(0,1);
 
 		views[\signature] = SignatureBox( view,35@size )
 			.applySmoothSkin
