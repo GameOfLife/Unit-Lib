@@ -145,12 +145,12 @@ BufSndFileView {
 			$r, { // \ratio
 				views[ \rateRatio ].visible_( true );
 				views[ \rateSemitones ].visible_( false );
-				{ views[ \rateMode ].string = " ratio" }.defer;
+				{ views[ \rateMode ].value = 0 }.defer;
 			},
 			$s, {
 				views[ \rateRatio ].visible_( false );
 				views[ \rateSemitones ].visible_( true );
-				{ views[ \rateMode ].string = " semitones" }.defer;
+				{ views[ \rateMode ].value = 1 }.defer;
 			}
 		);
 	}
@@ -340,11 +340,15 @@ BufSndFileView {
 		.string_( " smp" )
 		.background_( Color.white.alpha_(0.25) )
 		.resize_( 3 )
+		.onClose_({ views[ \timeMenu ] !? _.deepDestroy; })
 		.mouseDownAction_({
-			Menu(
-				MenuAction( "seconds", { this.class.timeMode =  \seconds }),
+			views[ \timeMenu ] !? _.deepDestroy;
+			views[ \timeMenu ] = Menu(
+				MenuAction( "seconds", { this.class.timeMode = \seconds })
+				.enabled_( this.class.timeMode != \seconds ),
 				MenuAction( "frames", { this.class.timeMode =  \frames })
-			).front;
+				.enabled_( this.class.timeMode != \frames )
+			).uFront;
 		});
 
 		views[ \rateLabel ] = StaticText( view, 25 @ viewHeight )
@@ -374,17 +378,10 @@ BufSndFileView {
 			})
 			.visible_( false );
 
-		views[ \rateMode ] = StaticText( view, (((bounds.width - 73)/2)-2) @ viewHeight )
-		.applySkin( RoundView.skin ? ())
-		.string_( " ratio" )
-		.background_( Color.white.alpha_(0.25) )
-		.resize_( 3 )
-		.mouseDownAction_({
-			Menu(
-				MenuAction( "ratio", { this.class.rateMode =  \ratio }),
-				MenuAction( "semitones", { this.class.rateMode =  \semitones })
-			).front;
-		});
+		views[ \rateMode ] = UPopUpMenu( view, (((bounds.width - 73)/2)-2) @ viewHeight )
+		.items_( ['ratio', 'semitones' ] )
+		.item_( this.class.rateMode )
+		.action_({ |pu| this.class.rateMode = pu.item });
 
 		views[ \loop ] = SmoothButton( view, 40 @ viewHeight )
 			.radius_( 2 )
