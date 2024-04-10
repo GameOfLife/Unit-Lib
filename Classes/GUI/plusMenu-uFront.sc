@@ -2,7 +2,7 @@
 	uFront {
 		|point, action|
 		var tempAction;
-		point = point ?? QtGUI.cursorPosition;
+		point = point ?? { QtGUI.cursorPosition; };
 		action = action ?? { tempAction = MenuAction(); };
 		this.invokeMethod(\popup, [point, action]);
 		tempAction !? _.destroy;
