@@ -40,6 +40,16 @@ UPopUpMenu : StaticText {
 
 	item { ^items !? _[ index ] }
 
+	item_ { |inItem|
+		var id;
+		id = items.indexOfEqual( inItem );
+		if( id.isNil ) {
+			this.items = items ++ [ inItem ];
+			id = items.indexOfEqual( inItem );
+		};
+		this.value = id;
+	}
+
 	makeMenu {
 		this.destroyMenu;
 

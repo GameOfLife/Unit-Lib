@@ -886,8 +886,13 @@ UChainGUI {
 				.align_( \center )
 				.background_( Color.white.alpha_(0.25) )
 				.string_( chain.ugroup !? "ugroup: %".format(_) ? "(no ugroup)" )
+				.onClose_({
+					views[ \ugroup_menu ] !? _.deepDestroy;
+				})
 				.mouseDownAction_({ |vw|
 					var actions = [], groups, selected;
+
+					views[ \ugroup_menu ] !? _.deepDestroy;
 
 					actions = actions.add(
 						MenuAction( "(no ugroup)", {
@@ -928,7 +933,7 @@ UChainGUI {
 						})
 					);
 
-					Menu( *actions ).uFront( action: selected );
+					views[ \ugroup_menu ] = Menu( *actions ).uFront( action: selected );
 				});
 
 				views[ \ugroup ].setProperty(\wordWrap, false);
@@ -961,34 +966,21 @@ UChainGUI {
 
 				composite.decorator.shift( 88, 0 );
 
-				views[ \addAction ] = StaticText( composite, 84@14 )
-				.applySkin( RoundView.skin )
+				views[ \addAction ] = UPopUpMenu( composite, 84@14 )
 				.align_( \center )
-				.background_( Color.white.alpha_(0.25) )
-				.string_( chain.addAction.asString )
-				.canFocus_( false )
-				.mouseDownAction_({ |vw|
-					var actions, selected;
-
-					actions = #[ addBefore, addToHead, addToTail, addAfter ].collect({ |item|
-						MenuAction( item, {
-							chain.addAction = item;
-						}).enabled_( chain.addAction != item );
-					});
-
-					if( chain.addAction == \mixed ) {
-						actions = actions.add(
-							MenuAction( "mixed" ).enabled_( false )
-						);
+				.title_( "addAction" )
+				.items_( #[ addBefore, addToHead, addToTail, addAfter, mixed ] )
+				.value_( #[ addBefore, addToHead, addToTail, addAfter, mixed ].indexOf( chain.addAction ) )
+				.action_({ |pu|
+					chain.addAction = pu.item ?? { pu.items[1]; };
+					if( pu.items.includes( \mixed ) && { chain.addAction != \mixed } ) {
+						pu.items = #[ addBefore, addToHead, addToTail, addAfter ];
 					};
-
-					selected = actions.detect({ |item| item.enabled.not });
-
-					Menu( *actions ).uFront( action: selected );
-
 				});
 
-				views[ \addAction ].setProperty(\wordWrap, true);
+				if( chain.addAction != \mixed ) {
+					views[ \addAction ].items = #[ addBefore, addToHead, addToTail, addAfter ];
+				};
 
 				composite.decorator.nextLine;
 			}
@@ -1142,7 +1134,7 @@ UChainGUI {
 					views[ \global ].value = chain.global.binaryValue;
 				})
 				.put( \addAction, {
-					{ views[ \addAction ].string = chain.addAction.asString }.defer;
+					{ views[ \addAction ].item = chain.addAction }.defer;
 				});
 			};
 
