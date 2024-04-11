@@ -3282,12 +3282,6 @@
 			action.value( vws, vws[ \box ].value.asInteger );
 		};
 
-		vws[ \menu ] = this.makeMenu( vws[ \labels ], vws[ \list ], { |val|
-			vws[ \box ].value = val ? 0;
-			vws.setLabel;
-			vws.doAction;
-		});
-
 		vws[ \setLabel ] = {
 			var index, labels, lastName;
 			index = vws[ \box ].value;
@@ -3338,6 +3332,13 @@
 		.background_( Color.white.alpha_(0.25) )
 		.resize_( 5 )
 		.mouseDownAction_({
+			if( vws[ \menu ].isNil ) {
+				vws[ \menu ] = this.makeMenu( vws[ \labels ], vws[ \list ], { |val|
+					vws[ \box ].value = val ? 0;
+					vws.setLabel;
+					vws.doAction;
+				});
+			};
 			vws[ \menu ] !? _.uFront;
 		})
 		.onClose_({
