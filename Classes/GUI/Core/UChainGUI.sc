@@ -2105,7 +2105,7 @@ UChainGUI {
 				composite.bounds.width @ PresetManagerGUI.getHeight,
 				UChain.presetManager,
 				chain
-			).resize_(7)
+			).resize_(8)
 		};
 
 		^this.makeUnitSubViews( scrollView, units, margin, gap );

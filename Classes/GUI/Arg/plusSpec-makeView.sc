@@ -2627,7 +2627,8 @@
 			vws[ \val ] = pm.object;
 			vws[ \updateViews ].value;
 			action.value( vws, vws[ \val ] );
-		});
+		})
+		.resize_( 2 );
 
 		^vws;
 	}
