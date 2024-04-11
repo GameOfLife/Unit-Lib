@@ -172,7 +172,7 @@ UAudioDeviceSpec : Spec {
 		var vw;
 		var ctrl;
 		var fillPopUps;
-		var labelWidth, labelSpace;
+		var labelWidth, labelSpace, extraMenuActions;
 		this.class.refreshDevices;
 		vw = ();
 		labelWidth = RoundView.skin.labelWidth ? 120;
@@ -183,100 +183,62 @@ UAudioDeviceSpec : Spec {
 			.align_( \right )
 			.applySkin( RoundView.skin );
 
-			vw.inPu = StaticText( parent, Rect( labelSpace, 0, bounds.width - labelSpace, 14 ) );
+			vw.inPu = UPopUpMenu( parent, Rect( labelSpace, 0, bounds.width - labelSpace, 14 ) );
 
 			StaticText( parent, Rect( 0, 18, labelWidth, 14 ) )
 			.string_( "% out ".format( label ) )
 			.align_( \right )
 			.applySkin( RoundView.skin );
 
-			vw.outPu = StaticText( parent, Rect( labelSpace,18, bounds.width - labelSpace, 14) );
+			vw.outPu = UPopUpMenu( parent, Rect( labelSpace, 18, bounds.width - labelSpace, 14 ) );
 
-			vw.inPu.mouseDownAction_({ |st|
-				var actions, selected;
+			extraMenuActions = {[
+				MenuAction.separator,
+				MenuAction( "Add...", {
+					SCRequestString( "", "please enter device name:", { |string|
+						action.value( vw, this.constrain( string ) );
+					});
+				})
+			]};
 
-				actions = [
-					MenuAction( "system default", {
-						vw.inDevice = nil;
-						vw.outDevice = nil;
-						action.value( vw, this.formatDevice( nil ) );
-					}).enabled_( vw.inDevice.notNil );
-				];
-
-				actions = actions.addAll(
-					inDevices.collect({ |device|
-						MenuAction( device.asString, {
-							vw.inDevice = device;
-							vw.outDevice = this.class.autoSelectOutDevice( device );
-							action.value( vw, this.formatDevice([ vw.inDevice, vw.outDevice ]) );
-						}).enabled_( vw.inDevice != device );
-					})
-				);
-
-				selected = actions.detect({ |x| x.enabled.not });
-
-				actions = actions.add( MenuAction.separator );
-				actions = actions.add(
-					MenuAction( "Add...", {
-						SCRequestString( "", "please enter device name:", { |string|
-							action.value( vw, this.constrain( string ) );
-						});
-					})
-				);
-
-				actions = [ MenuAction.separator( "device in" ) ] ++ actions;
-
-				Menu( *actions ).front( action: selected );
+			vw.inPu.items_([ "system default" ] ++ inDevices)
+			.extraMenuActions_( extraMenuActions )
+			.action_({ |pu|
+				if( pu.value == 0 ) {
+					vw.inDevice = nil;
+					vw.outDevice = nil;
+					action.value( vw, this.formatDevice( nil ) );
+				} {
+					vw.inDevice = pu.item;
+					vw.outDevice = this.class.autoSelectOutDevice( vw.inDevice );
+					action.value( vw, this.formatDevice([ vw.inDevice, vw.outDevice ]) );
+				};
 			});
 
-			vw.outPu.mouseDownAction_({ |st|
-				var actions, selected;
-
-				actions = [
-					MenuAction( "system default", {
-						vw.outDevice = nil;
-						action.value( vw, this.formatDevice([ vw.inDevice, nil ]) );
-					}).enabled_( vw.outDevice.notNil );
-				];
-
-				actions = actions.addAll(
-					inDevices.collect({ |device|
-						MenuAction( device.asString, {
-							vw.outDevice = device;
-							action.value( vw, this.formatDevice([ vw.inDevice, vw.outDevice ]) );
-						}).enabled_( vw.outDevice != device );
-					})
-				);
-
-				selected = actions.detect({ |x| x.enabled.not });
-
-				actions = actions.add( MenuAction.separator );
-				actions = actions.add(
-					MenuAction( "Add...", {
-						SCRequestString( "", "please enter device name:", { |string|
-							action.value( vw, this.constrain( string ) );
-						});
-					})
-				);
-
-				actions = [ MenuAction.separator( "device out" ) ] ++ actions;
-
-				Menu( *actions ).front( QtGUI.cursorPosition - (20@0), action: selected );
+			vw.outPu.items_([ "system default" ] ++ outDevices)
+			.extraMenuActions_( extraMenuActions )
+			.action_({ |pu|
+				if( pu.value == 0 ) {
+					vw.outDevice = nil;
+					action.value( vw, this.formatDevice([ vw.inDevice, nil ]) );
+				} {
+					vw.outDevice = pu.item;
+					action.value( vw, this.formatDevice([ vw.inDevice, vw.outDevice ]) );
+					action.value( vw, this.formatDevice([ vw.inDevice, vw.outDevice ]) );
+				};
 			});
 
 			vw.setDevice = { |vwx, device|
 				device = this.unpackDevice( device );
 				vw.inDevice = device[0];
 				vw.outDevice = device[1];
-				vw.inPu.string = " %".format( vw.inDevice ? "system default" );
-				vw.outPu.string = " %".format( vw.outDevice ? "system default" );
+				vw.inPu.item = vw.inDevice ? "system default";
+				vw.outPu.item = vw.outDevice ? "system default";
 			};
 
 			vw.doAction = { action.value( vw, this.formatDevice([ vw.inDevice, vw.outDevice ]) ); };
 
 			vw.atAll([\inPu, \outPu]).do({ |pu|
-				pu.applySkin( RoundView.skin ).background_( Color.white.alpha_(0.25) );
-				pu.setProperty(\wordWrap, false);
 				if( resize.notNil ) { pu.resize = resize };
 			});
 		} {
