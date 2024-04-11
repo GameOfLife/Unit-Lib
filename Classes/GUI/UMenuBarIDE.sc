@@ -576,7 +576,7 @@ UMenuBarIDE {
 			this.registerMenu( windowsMenu, "View" );
 		};
 
-		MainMenu.prUpdate();
+		if( this.mode == \mainmenu ) { MainMenu.prUpdate(); };
 	}
 
 	*add { |name, function, menuName|
