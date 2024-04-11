@@ -14,6 +14,7 @@ UMapGUI : UGUI {
 
 	makeViews { |bounds|
 		var margin = 0@0, gap = 4@4;
+		var labelWidth;
 
 		wasBuildingUMap = nowBuildingUMap;
 		nowBuildingUMap = unit;
@@ -45,11 +46,40 @@ UMapGUI : UGUI {
 
 		userView = UserView( mainComposite, bounds.moveTo(0,0) ).resize_(2);
 
+		labelWidth = RoundView.skin.labelWidth ? 80;
+
 		userView.drawFunc = { |vw|
+			var rect, points, lastPoint;
 			Pen.width = 1;
 			Pen.fillColor = unit.guiColor;
 			Pen.strokeColor = Color.black.alpha_(0.5);
-			Pen.roundedRect( vw.bounds.moveTo(0,0).insetBy(0.5,0.5), 3 );
+			rect = vw.bounds.moveTo(0,0).insetBy(0.5,0.5);
+			//Pen.roundedRect( vw.bounds.moveTo(0,0).insetBy(0.5,0.5), 3 );
+
+			if( bounds.height < (2 * viewHeight) ) {
+				points = [
+					(rect.left + labelWidth + 2) @ rect.top,
+					rect.rightTop, rect.rightBottom,
+					(rect.left + labelWidth + 2) @ rect.bottom,
+				];
+			} {
+				points = [
+					(rect.left + labelWidth + 2) @ rect.top,
+					rect.rightTop, rect.rightBottom, rect.leftBottom,
+					rect.left @ (rect.top + 15),
+					(rect.left + labelWidth + 2) @ (rect.top + 15),
+				];
+			};
+
+			lastPoint = points.last;
+
+			Pen.moveTo( points.wrapAt( -2 ) + (3@0) );
+
+			points.do({ |point,i|
+				Pen.arcTo( lastPoint, point, 3 );
+				lastPoint = point;
+			});
+
 			Pen.fillStroke;
 		};
 
@@ -106,18 +136,18 @@ UMapGUI : UGUI {
 		boldFont = (RoundView.skin.tryPerform( \at, \font ) ??
 			{ Font( Font.defaultSansFace, 12) }).boldVariant;
 
-		StaticText( header, labelWidth @ viewHeight )
+		StaticText( header, Rect(0,1,labelWidth,viewHeight) )
 			.applySkin( RoundView.skin )
 			//.font_( boldFont )
-			.string_( unit.unitArgName.asString )
+		    .string_( unit.unitArgName.asString ++ " " )
 			.align_( \right );
 
 		StaticText( header,
-			Rect( labelWidth + 4, 0, (bounds.width - labelWidth), viewHeight )
+			Rect( labelWidth + 4 + 12, 1, (bounds.width - labelWidth - 12), viewHeight )
 		)
 			.applySkin( RoundView.skin )
 			.font_( boldFont )
-			.string_( ":" + unit.fullDefName );
+			.string_( "" + unit.fullDefName );
 
 		if( unit.isKindOf( MassEditUMap ).not ) {
 			UDragSource( header, Rect( bounds.width - 12 - 12 - 4, 2, 12, 12 ) )
@@ -241,7 +271,7 @@ UMapGUI : UGUI {
 			removeButton.visible = false;
 		};
 
-			SmoothButton( header, Rect( 2, 2, 12, 12 ) )
+			SmoothButton( header, Rect( labelWidth + 4, 1, 12, 12 ) )
 				.label_( ['down', 'play'] )
 				.border_( 0 )
 				.background_( nil )
@@ -292,7 +322,7 @@ UMapGUI : UGUI {
 		});
 
 		umapdragbinReplace = UDragBin( header, // replace UMap
-			Rect( labelWidth + 8, 2, (bounds.width - labelWidth - 22 - 6 - 16 ), 12 )
+			Rect( labelWidth + 6 + 12, 2, (bounds.width - labelWidth - 22 - 6 - 16 - 12 ), 12 )
 		)
 		.canReceiveDragHandler_({ |vw, x,y|
 			View.currentDrag.isKindOf( UMapDef ) && {
