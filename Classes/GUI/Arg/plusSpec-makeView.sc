@@ -75,6 +75,7 @@
 			evws[ \multi ] = MultiSliderView( evws[ \w ], evws[ \w ].bounds.width - 8 @ 200 );
 			evws[ \multi ].resize_(2);
 			evws[ \multi ].elasticMode_(1);
+			evws[ \multi ].isFilled_( true );
 			evws[ \multi ].indexIsHorizontal = true;
 			evws[ \multi ].showIndex = false;
 			evws[ \multi ].action = { |sl|
@@ -90,6 +91,7 @@
 
 		evws[ \updateViews ] = {
 			evws[ \multi ] !? _.value_( evws[ \values ].collect({ |x| evws[ \spec ].unmap( x ) }) );
+			evws[ \multi ] !? _.reference_( evws[ \spec ].unmap( evws[ \spec ].default ) ! evws[ \values ].size );
 			evws[ \views ].do({ |vw, i|
 				evws[ \spec ].setView( vw, evws[ \values ][ i ] )
 			});
