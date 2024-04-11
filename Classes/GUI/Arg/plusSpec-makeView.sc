@@ -527,20 +527,12 @@
 
 	makeView { |parent, bounds, label, action, resize|
 		var multipleActions = action.size > 0;
-		var vw, view, makeMenu, menu, menuActions, indexOffset = 0;
+		var vw, view, menu;
 		var lbls, viewWidth, labelWidth;
 		if( modern ) {
-			vw = ();
-			vw[ \value_ ] = { |evt, val|
-				evt[ \index ] = val;
-				evt[ \setViews ].value;
-			};
-			vw[ \index ] = defaultIndex;
-
 			view = EZCompositeView( parent, bounds, gap: 2@2 );
 			view.asView.resize_( resize ? 5 );
 			bounds = view.asView.bounds;
-			vw[ \view ] = view;
 
 			if( label.notNil ) {
 				labelWidth = RoundView.skin.labelWidth ? 100;
@@ -553,61 +545,19 @@
 				viewWidth = bounds.width;
 			};
 
-			lbls = labels.asCollection.collect(_.value);
-
-			makeMenu = {
-				menuActions = list.collect({ |item, i|
-					if( action.size > 0 ) {
-						MenuAction( lbls[i] ? item.asString, {
-							action[i].value( vw, item );
-							vw.value = i;
-						});
-					} {
-						MenuAction( lbls[i] ? item.asString, {
-							action.value( vw, item );
-							vw.value = i;
-						});
-					};
-				});
-
-				if( label.notNil ) {
-					indexOffset = 1;
-					menuActions = [ MenuAction.separator( label ) ] ++ menuActions;
-				};
-
-				menu = Menu( *menuActions );
-			};
-
-			vw[ \menu ] = StaticText( view, viewWidth @ (bounds.height) )
-			.applySkin( RoundView.skin )
+			menu = UPopUpMenu( view, viewWidth @ (bounds.height) )
 			.resize_( resize ? 2 )
-			.onClose_({ {
-				if( menu.notNil ) {
-					menu.deepDestroy;
-				};
-			}.defer(0.25) })
-			.background_( Color.white.alpha_( 0.25 ) );
-			vw[ \menu ].setProperty(\wordWrap, false);
+			.items_( labels !? { |x| x.asCollection.collect(_.value); } ? list );
 
-			vw[ \menu ].mouseDownAction_({
-				var selected;
-				if( menu.isNil ) { makeMenu.value };
-				selected = menuActions[ (vw[ \index ] ? 0).asInteger + indexOffset ];
-				menuActions.do({ |action, i|
-					action.enabled_( action != selected );
-				});
-				menu.uFront( QtGUI.cursorPosition - (20@0), action: selected );
-			});
-
-			vw[ \setViews ] = {
-				vw[ \menu ].string = " %".format(
-					labels.asCollection.collect(_.value)[ vw[ \index ] ] ?? {
-						list[ vw[ \index ] ]
-					}
-				)
+			if( multipleActions ) {
+				menu.action_({ |pu| action[ pu.value ].value( vw, list[ pu.value ] ) })
+			} {
+				menu.action_({ |pu| action.value( vw, list[ pu.value ] ) })
 			};
 
-			^vw;
+			if( label.notNil ) { menu.title_( label ) };
+
+			^menu
 		} {
 			lbls = labels.asCollection.collect(_.value);
 			vw = EZPopUpMenu( parent, bounds, label !? { label.asString ++ " " },
