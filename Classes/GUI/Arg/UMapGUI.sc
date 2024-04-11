@@ -62,6 +62,8 @@ UMapGUI : UGUI {
 					rect.rightTop, rect.rightBottom,
 					(rect.left + labelWidth + 2) @ rect.bottom,
 				];
+
+				Pen.moveTo( points.wrapAt( -2 ) + (-3 @ 0) );
 			} {
 				points = [
 					(rect.left + labelWidth + 2) @ rect.top,
@@ -69,11 +71,11 @@ UMapGUI : UGUI {
 					rect.left @ (rect.top + 15),
 					(rect.left + labelWidth + 2) @ (rect.top + 15),
 				];
+
+				Pen.moveTo( points.wrapAt( -2 ) + (3@0) );
 			};
 
 			lastPoint = points.last;
-
-			Pen.moveTo( points.wrapAt( -2 ) + (3@0) );
 
 			points.do({ |point,i|
 				Pen.arcTo( lastPoint, point, 3 );
