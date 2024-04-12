@@ -2876,7 +2876,7 @@
 		view.view.decorator.nextLine;
 		view.view.decorator.shift( labelWidth, 0 );
 
-		RoundView.pushSkin( (RoundView.skin.deepCopy ? ()).labelWidth_(30) );
+		RoundView.pushSkin( RoundView.skin ++ (labelWidth: 30) );
 
 		vws[ \rate ] = rateSpec.makeView( view, (view.bounds.width - labelWidth) @ viewHeight,
 			" rate", { |vw, val|
