@@ -368,11 +368,15 @@ UMapGUI : UGUI {
 			}, {
 				umapdragbinReplace.background = nil;
 			}, { |def, subdefkey |
-				if( subdefkey.notNil ) {
-					unit.get( def.defNameKey ) == subdefkey;
+				if( unit.isKindOf( MassEditUMap ) && { unit.mixed } ) {
+					false
 				} {
-					unit.def.name == def.name
-				};
+					if( subdefkey.notNil ) {
+						unit.get( def.defNameKey ) == subdefkey;
+					} {
+						unit.def.name == def.name
+					};
+				}
 			}, includePattern: isPattern );
 			if( res.notNil ) {
 				umapdragbinReplace.background = Color.blue(0.9).alpha_(0.25);
