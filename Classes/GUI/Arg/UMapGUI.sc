@@ -286,7 +286,7 @@ UMapGUI : UGUI {
 				});
 
 		umapdragbinInsert = UDragBin( header, // insert UMap
-			Rect( 14, 2, labelWidth - 10, 12 )
+			Rect( 2, 2, labelWidth, 12 )
 		)
 		.canReceiveDragHandler_({ |vw, x,y|
 			View.currentDrag.isKindOf( UMapDef ) && {
