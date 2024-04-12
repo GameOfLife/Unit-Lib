@@ -280,6 +280,7 @@ UMapGUI : UGUI {
 				.hiliteColor_( nil )
 				.canFocus_( false )
 				.value_( unit.guiCollapsed.binaryValue )
+		        .visible_( unit.argSpecs.select({ |item| item.private.not }).size > 0 )
 				.action_({ |bt|
 					unit.guiCollapsed = bt.value.booleanValue;
 				});

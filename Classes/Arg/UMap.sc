@@ -633,14 +633,18 @@ MassEditUMap : MassEditU {
 		if( mixed ) {
 			numUMaps = units.count(_.isUMap);
 			numValues = units.size - numUMaps;
-			^("mixed" + "(% umaps%)".format( numUMaps, if( numValues > 0 ) {
-				", % values".format( numValues )
+			^("mixed" + "(% umap%%)".format( numUMaps, if(numUMaps != 1) { "s" } { "" }, if( numValues > 0 ) {
+				", % value%".format( numValues, if(numValues != 1) { "s" } { "" } )
 			} { "" }
 			)).asSymbol
 		} {
 			^((this.def !? { units[0].fullDefName }).asString +
 				"(% umaps)".format( units.size )).asSymbol
 		};
+	}
+
+	fullDefName {
+		^this.defName;
 	}
 
 	def {
