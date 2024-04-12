@@ -159,10 +159,6 @@ UAudioDeviceSpec : Spec {
 	}
 
 	constrain { |device|
-		if( this.class.checkDevice( device ).not ) {
-			"AudioDeviceSpec:constrain - device '%' does not exist on this machine.\n\tThe server will use the system default device instead\n"
-				.postf( device )
-		};
 		this.class.addDevice( device );
 		^device;
 	}
@@ -173,11 +169,15 @@ UAudioDeviceSpec : Spec {
 		var ctrl;
 		var fillPopUps;
 		var labelWidth, labelSpace, extraMenuActions;
+		var font;
 		this.class.refreshDevices;
 		vw = ();
 		labelWidth = RoundView.skin.labelWidth ? 120;
 		labelSpace = labelWidth + 2;
 		if( canCheckDevices ) {
+
+			font = RoundView.skin.font ?? { Font( Font.defaultSansFace, 11 ) };
+
 			StaticText( parent, labelWidth @ 14 )
 			.string_( "% in " .format( label ) )
 			.align_( \right )
@@ -198,6 +198,12 @@ UAudioDeviceSpec : Spec {
 					SCRequestString( "", "please enter device name:", { |string|
 						action.value( vw, this.constrain( string ) );
 					});
+				}),
+				MenuAction( "Refresh", {
+					this.class.refreshDevices;
+					vw.inPu.items_([ "system default" ] ++ inDevices);
+					vw.outPu.items_([ "system default" ] ++ outDevices);
+					vw.setDevice([ vw.inDevice, vw.outDevice ]);
 				})
 			]};
 
@@ -234,6 +240,12 @@ UAudioDeviceSpec : Spec {
 				vw.outDevice = device[1];
 				vw.inPu.item = vw.inDevice ? "system default";
 				vw.outPu.item = vw.outDevice ? "system default";
+				if( device.every(_.isNil) or: { this.class.checkDevice( device ) }) {
+					vw.inPu.font = font; vw.outPu.font = font;
+				} {
+					vw.inPu.font = font.copy.italic_( true );
+					vw.outPu.font = vw.inPu.font;
+				};
 			};
 
 			vw.doAction = { action.value( vw, this.formatDevice([ vw.inDevice, vw.outDevice ]) ); };
