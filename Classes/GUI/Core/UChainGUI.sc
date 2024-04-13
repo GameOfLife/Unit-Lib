@@ -901,17 +901,17 @@ UChainGUI {
 					.radius_( 2 )
 				.toolTip_( "'global'\n\nThe 'global' parameter is only relevant in a multi-server" +
 					"setup. In such a setup a 'global' UChain will play on all servers" +
-					"at the same time, instead of only one. The most obvious use if this" +
+					"at the same time, instead of only one.\n\nThe most obvious use if this" +
 					"is when an 'auxIn' Udef is used, receiving audio from another UChain" +
-					"with auxOut. The global setting makes sure the UChain runs on all servers" +
-					"so that the uchain with the auxOut can be on any of them. Beware that this" +
+					"with 'auxOut'. The global setting makes sure the UChain runs on all servers" +
+					"so that the uchain with the 'auxOut' can be on any of them. Beware that this" +
 					"multiplies the total CPU usage by as many times as there are servers active." +
 					"Also beware that if 'global' is used on an UChain that generates audio, the" +
 					"audio will be much louder as it is played on all servers simultaneously." +
-					"On a single-server setup (default) this parameter makes no difference," +
-					"but please beware that if you enable it it will make a difference when" +
-					"your UScore is played on a system that has multiple servers (such as an " +
-					"actual WFS system."
+					"\n\nOn a single-server setup (default) this parameter makes no difference," +
+					"but please be aware that if you enable it it will make a difference when" +
+					"your UScore is played on a system that has multiple servers (such as an" +
+					"actual WFS system)."
 				)
 					.label_( [ "global", "global" ] )
 					.action_({ |bt|
@@ -922,16 +922,18 @@ UChainGUI {
 				.applySkin( RoundView.skin )
 				.toolTip_( "UGroup\n\nUGroups are only relevant on multi-server setups." +
 					"You can create a UGroup to make sure that the UChains in it are" +
-					"played on the same server. This can be useful for example with" +
+					"played on the same server.\n\nThis can be useful for example with" +
 					"'auxIn' / 'auxOut' combinations. Beware that if you put many events" +
 					"simultaneously in a UGroup the system may be less efficient, as the" +
-					"cpu load cannot be divided over multiple cores in such occasion. If" +
+					"load cannot be divided over multiple cores in such occasion. If" +
 					"you have many events speaking to the same 'auxIn' event it is better" +
 					"to set that (receiving) event to 'global' instead and not use UGroups." +
 					"In cases however where there are only a few events it may be more efficient" +
-					"to use UGroups. On a single-server system (default) this all doesn't matter" +
-					"but beware that if you want your work to be played correctly on a multi-server" +
-					"setup (such as an actual WFS system) you should be mindful about these settings"
+					"to use UGroups.\n\nOn a single-server system (default) the UGroup setting doesn't" +
+					"make any audible or functional difference, but if you you use things" +
+					"that involve exchange of audio between multiple UChains and you want your work to" +
+					"be played correctly on a multi-server setup (such as an actual WFS system) you should" +
+					"be mindful about these settings"
 				)
 				.align_( \center )
 				.background_( Color.white.alpha_(0.25) )
@@ -1022,11 +1024,11 @@ UChainGUI {
 					"multiple UChains. It is relevant for example when using 'auxIn' / 'auxOut'" +
 					"combinations across various UChains (also on single-server systems). Typically" +
 					"a UChain sending audio via 'auxOut' should be in 'addToHead' mode (default), and" +
-					"a UChain receiving audio via 'auxIn' should be in 'addToTail' mode. There are" +
+					"a UChain receiving audio via 'auxIn' should be in 'addToTail' mode.\n\nThere are" +
 					"also 'addAfter' and 'addBefore', which are SuperCollider standard addActions" +
 					"but they don't make any real difference in the context of Unit-Lib/WFSCollider" +
 					"where they will behave more or less the same as 'addToTail' and 'addToHead'" +
-					"\nMore on addActions can be found in the SuperCollider documentation"
+					"\n\nMore on addActions can be found in the SuperCollider documentation"
 				)
 				.title_( "addAction" )
 				.items_( #[ addBefore, addToHead, addToTail, addAfter, mixed ] )
