@@ -473,6 +473,7 @@ UChainGUI {
 		views[ \startButton ] = SmoothButton( composite, 14@14 )
 			.label_( ['power', 'power'] )
 			.radius_(7)
+		    .toolTip_( "play/stop only this UChain" )
 			.action_( [ {
 					chain.prepareAndStart;							}, {
 					chain.release
@@ -503,11 +504,14 @@ UChainGUI {
 				undoManager.add( chain );
 			};
 
-			UndoView( composite, 30@14, chain, undoManager ).view.resize_(3);
+			UndoView( composite, 30@14, chain, undoManager ).view
+			.toolTip_( "undo/redo" )
+			.resize_(3);
 		};
 
 		views[ \displayColor ] = UserView( composite, 28@14 )
 			.resize_(3)
+		    .toolTip_( "set displayColor" )
 			.drawFunc_({ |vw|
 				var wd = 8, smallRect;
 				if( (score ? chain).displayColor.notNil ) {
@@ -585,6 +589,10 @@ UChainGUI {
 			.label_( [ "single window", "single window" ] )
 			//.hiliteColor_( RoundView.skin.hiliteColor ? Color.green )
 			.value_( this.class.singleWindow.binaryValue )
+		    .toolTip_( "if 'single window' is enabled any edited UChain will\n" ++
+			    "replace the current window. If disabled a new window will be created" ++
+			    "for every edited UChain"
+			)
 			.resize_(3)
 			.action_({ |bt|
 				this.class.singleWindow = bt.value.booleanValue;
@@ -654,6 +662,7 @@ UChainGUI {
 			views[ \lockStartTime ] = SmoothButton( composite, 14@14 )
 				.label_([ 'unlock', 'lock' ])
 				.radius_(2)
+			    .toolTip_( "lock/unlock startTime" )
 				.value_( score.lockStartTime.binaryValue )
 				.action_({ |bt|
 					score.lockStartTime = bt.value.booleanValue;
@@ -665,6 +674,7 @@ UChainGUI {
 			UPopUpMenu( composite, labelWidth@14 )
 			.align_( \right )
 			.items_( [ "startTime", "startBar" ] )
+			.toolTip_( "startTime or startBar" )
 			.value_( [ \time, \bar ].indexOf( startTimeMode ) ? 0 )
 			.action_({ |pu|
 				startTimeMode = [ \time, \bar ][ pu.value ];
@@ -694,6 +704,7 @@ UChainGUI {
 
 			views[ \lockStartTime ] = SmoothButton( composite, 14@14 )
 				.label_([ 'unlock', 'lock' ])
+			    .toolTip_( "lock/unlock startTime" )
 				.radius_(2)
 				.action_({ |bt|
 					chain.lockStartTime = bt.value.booleanValue;
@@ -705,6 +716,7 @@ UChainGUI {
 				// duration
 				UPopUpMenu( composite, labelWidth@14 )
 				.align_( \right )
+				.toolTip_( "duration, endTime or endBar" )
 				.items_( #[ duration, endTime, endBar ] )
 				.value_(  #[ duration, endTime, endBar ].indexOf( durationMode ) ? 0 )
 				.action_({ |pu|
@@ -762,6 +774,7 @@ UChainGUI {
 				views[ \infDur ] = SmoothButton( composite, 40@14 )
 					.radius_( 2 )
 					.label_( [ "inf", "inf" ] )
+				    .toolTip_( "set infinite duration" )
 					.action_({ |bt|
 						var dur;
 						switch( bt.value,
@@ -776,12 +789,22 @@ UChainGUI {
 
 				views[ \fromSoundFile ] = SmoothButton( composite, 40@14 )
 					.radius_( 2 )
+				    .toolTip_( "automatically match duration to the longest soundfile in the chain" )
 					.label_( "auto" )
 					.action_({ chain.useSndFileDur });
 
 
 				views[ \releaseSelf ] = SmoothButton( composite, 84@14 )
 					.radius_( 2 )
+				.toolTip_( "releaseSelf\n\nif releaseSelf is enabled the UChain will stop itself" +
+					"after the duration has passed. If releaseSelf is disabled, the UChain" +
+					"will be ended by the score or the user. This can be useful in cases" +
+					"where a Marker is used with 'autoPause' enabled; if the endTime of the" +
+					"UChain is after such a marker and the startTime before it, it will only" +
+					"be ended after the user has unpaused the UScore, making it play indefinitely" +
+					"until that moment. If releaseSelf is enabled in such a case the UChain will" +
+					"just stop after the duration is finished, regardless of the UScore playback status"
+				)
 					.label_( [ "releaseSelf", "releaseSelf" ] )
 					.action_({ |bt|
 						chain.releaseSelf = bt.value.booleanValue;
@@ -876,6 +899,20 @@ UChainGUI {
 
 				views[ \global ] = SmoothButton( composite, 40@14 )
 					.radius_( 2 )
+				.toolTip_( "'global'\n\nThe 'global' parameter is only relevant in a multi-server" +
+					"setup. In such a setup a 'global' UChain will play on all servers" +
+					"at the same time, instead of only one. The most obvious use if this" +
+					"is when an 'auxIn' Udef is used, receiving audio from another UChain" +
+					"with auxOut. The global setting makes sure the UChain runs on all servers" +
+					"so that the uchain with the auxOut can be on any of them. Beware that this" +
+					"multiplies the total CPU usage by as many times as there are servers active." +
+					"Also beware that if 'global' is used on an UChain that generates audio, the" +
+					"audio will be much louder as it is played on all servers simultaneously." +
+					"On a single-server setup (default) this parameter makes no difference," +
+					"but please beware that if you enable it it will make a difference when" +
+					"your UScore is played on a system that has multiple servers (such as an " +
+					"actual WFS system."
+				)
 					.label_( [ "global", "global" ] )
 					.action_({ |bt|
 						chain.global = bt.value.booleanValue;
@@ -883,6 +920,19 @@ UChainGUI {
 
 				views[ \ugroup ] = StaticText( composite, 84@14 )
 				.applySkin( RoundView.skin )
+				.toolTip_( "UGroup\n\nUGroups are only relevant on multi-server setups." +
+					"You can create a UGroup to make sure that the UChains in it are" +
+					"played on the same server. This can be useful for example with" +
+					"'auxIn' / 'auxOut' combinations. Beware that if you put many events" +
+					"simultaneously in a UGroup the system may be less efficient, as the" +
+					"cpu load cannot be divided over multiple cores in such occasion. If" +
+					"you have many events speaking to the same 'auxIn' event it is better" +
+					"to set that (receiving) event to 'global' instead and not use UGroups." +
+					"In cases however where there are only a few events it may be more efficient" +
+					"to use UGroups. On a single-server system (default) this all doesn't matter" +
+					"but beware that if you want your work to be played correctly on a multi-server" +
+					"setup (such as an actual WFS system) you should be mindful about these settings"
+				)
 				.align_( \center )
 				.background_( Color.white.alpha_(0.25) )
 				.string_( chain.ugroup !? "ugroup: %".format(_) ? "(no ugroup)" )
@@ -940,7 +990,7 @@ UChainGUI {
 
 				composite.decorator.nextLine;
 
-				// fadeTimes
+				// fadeCurves
 				StaticText( composite, labelWidth@14 )
 					.applySkin( RoundView.skin )
 					.string_( "fadeCurves" )
@@ -968,6 +1018,16 @@ UChainGUI {
 
 				views[ \addAction ] = UPopUpMenu( composite, 84@14 )
 				.align_( \center )
+				.toolTip_( "addAction\n\nThe addAction determines the order of execution for" +
+					"multiple UChains. It is relevant for example when using 'auxIn' / 'auxOut'" +
+					"combinations across various UChains (also on single-server systems). Typically" +
+					"a UChain sending audio via 'auxOut' should be in 'addToHead' mode (default), and" +
+					"a UChain receiving audio via 'auxIn' should be in 'addToTail' mode. There are" +
+					"also 'addAfter' and 'addBefore', which are SuperCollider standard addActions" +
+					"but they don't make any real difference in the context of Unit-Lib/WFSCollider" +
+					"where they will behave more or less the same as 'addToTail' and 'addToHead'" +
+					"\nMore on addActions can be found in the SuperCollider documentation"
+				)
 				.title_( "addAction" )
 				.items_( #[ addBefore, addToHead, addToTail, addAfter, mixed ] )
 				.value_( #[ addBefore, addToHead, addToTail, addAfter, mixed ].indexOf( chain.addAction ) )
@@ -999,6 +1059,8 @@ UChainGUI {
 					chain.setGain( nb.value );
 				});
 
+			views[ \gain ].view.toolTip_( "output gain of the UChain in dB" );
+
 			views[ \muted ] = SmoothButton( composite, 40@14 )
 				.radius_( 2 )
 				.label_( [ "mute", "mute" ] )
@@ -1020,7 +1082,7 @@ UChainGUI {
 
 			StaticText( composite, labelWidth@14 )
 				.applySkin( RoundView.skin )
-				.string_( "autoPause" )
+			    .string_( "autoPause" )
 				.align_( \right );
 
 			views[ \autoPause ] = BoolSpec(true).massEditSpec( chain.autoPause ).makeView( composite, 126@14, action: { |vws, value|
@@ -1204,9 +1266,23 @@ UChainGUI {
 				.align_( \left )
 				.resize_(2);
 
+		if( notMassEdit ) { header.toolTip_( "units\n\nEach UChain is built out of one or more Units. Each unit is a" +
+			"functional entity, creating sound, processing sound or providing audio input or output on your system." +
+			"These units are \"chained\" together to form the UChain, where each unit passes it's audio on to the next.\n\n" +
+			"The signal flow in this graphical representation is downwards; the sound is passed on from top to bottom." +
+			"For each unit you can set arguments and you can change functionality by selecting another 'Udef' from the" +
+			"menu when you click on the unit's header or from the Udefs window. Units can also be inserted, deleted or" +
+			"duplicated.\n\nThe arguments of the units can be modulated using 'UMaps'. If you click on the parameter name" +
+			"a menu will appear with the available UMap options for that parameter. The UMaps are themselves also a type of" +
+			"Unit, which means that their parameters in turn can be modulated with UMaps again, allowing nested structures of" +
+			"modulation.\n\nInformation about the functionality of each Udef can be seen in the tooltip when hovering the unit's" +
+			"header, or in the code files of the Udefs, accessible via the Udefs window or the 'code' panel in this window"
+		) };
+
 		if( notMassEdit ) {
             io = SmoothButton( comp, Rect( comp.bounds.right - 40, 1, 40, 12 ) )
                 .label_( "i/o" )
+			    .toolTip_( "open input/output bus settings between units" )
                 .radius_( 2 )
                 .action_({
 	                UChainIOGUI(
@@ -1218,6 +1294,7 @@ UChainGUI {
             code = SmoothButton( comp,
                     Rect( comp.bounds.right - (40 + 4 + 40), 1, 40, 12 ) )
                 .label_( "code" )
+			    .toolTip_( "open code edit options" )
                 .radius_( 2 )
                 .action_({
 	                UChainCodeGUI(
@@ -1234,6 +1311,9 @@ UChainGUI {
 				)
 			)
 			.label_( "udefs" )
+		    .toolTip_( "open Udefs window.\n\nYou can drag Udefs to the chain from there or open" +
+			    "their corresponding code files."
+		    )
 			.radius_( 2 )
 			.action_({
 				UdefsGUI();
@@ -1442,6 +1522,7 @@ UChainGUI {
 			SmoothButton( upatComp,
 					Rect( upatComp.bounds.right - (12 + 2), 1, 12, 12 ) )
 				.label_( '-' )
+			    .toolTip_( "convert the UPattern back into a regular UChain" )
 				.action_({ |bt|
 					var new, index;
 					{
@@ -1506,6 +1587,12 @@ UChainGUI {
 				SmoothButton( upatComp,
 					Rect( upatComp.bounds.right - (12 + 2), 1, 12, 12 ) )
 				.label_( '+' )
+				.toolTip_( "convert this UChain into an UPattern\n\n" ++
+					"UPatterns can generate multiple events based on settings of a single UChain" +
+					"When UPattern is enabled extra UMaps become available in the 'pattern' section" +
+					"These UMaps can create new values per event. Also a 'pattern' parameter becomes" +
+					"visible, allowing to determine the timing of the events in various ways"
+				)
 				.action_({ |bt|
 					var new, index;
 					{
