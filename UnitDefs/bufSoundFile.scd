@@ -1,9 +1,14 @@
 /*
 \bufSoundFile
 
-A soundfile player. This plays soundfiles of any duration, with any (*) number of channels, by loading the whole file into the memory. Use this typically for shorter (less than apx 2 minutes) audiofiles. For longer files it is advised to use \diskSoundFile instead
+A soundfile player. This plays soundfiles of any duration, with any (*) number of channels,
+by loading the whole file into the memory.
+Use this typically for shorter (less than apx 2 minutes) audiofiles.
+For longer files it is advised to use \diskSoundFile instead
 
-soundFile: a BufSndFile object, a region of an existig soundfile url on your hard drive. The object knows the duration and file path of the soundfile, and can be set to clip off the start and end of the file.
+soundFile: a BufSndFile object, a region of an existig soundfile url on your hard drive.
+The object knows the duration and file path of the soundfile, and can be set to clip
+off the start and end of the file.
 	- start: region startoffset (samples or seconds)
 	- end: end of the region (samples or seconds)
 	- loop: loop mode on or off (can be changed during playback)

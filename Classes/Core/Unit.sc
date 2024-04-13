@@ -500,7 +500,7 @@ Udef : GenericDef {
 					str = f.readAllString;
 				});
 				if( str.find( "/*" ).notNil ) {
-					infoString = str[ str.find( "/*" ) + 2 .. str.find( "*/" ) - 1 ];
+					infoString = str[ str.find( "/*" ) + 3 .. str.find( "*/" ) - 1 ];
 					^infoString
 				} {
 					^nil
