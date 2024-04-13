@@ -1271,8 +1271,10 @@ UChainGUI {
 			"These units are \"chained\" together to form the UChain, where each unit passes it's audio on to the next.\n\n" +
 			"The signal flow in this graphical representation is downwards; the sound is passed on from top to bottom." +
 			"For each unit you can set arguments and you can change functionality by selecting another 'Udef' from the" +
-			"menu when you click on the unit's header or from the Udefs window. Units can also be inserted, deleted or" +
-			"duplicated.\n\nThe arguments of the units can be modulated using 'UMaps'. If you click on the parameter name" +
+			"menu when you click on the unit's header or from the Udefs window. Units can also deleted or" +
+			"duplicated using the '+' and '-' controls, and new units can be inserted in the chain by clicking" +
+			"on the narrow bars between the existing Units." ++
+			"\n\nThe arguments of the units can be modulated using 'UMaps'. If you click on the parameter name" +
 			"a menu will appear with the available UMap options for that parameter. The UMaps are themselves also a type of" +
 			"Unit, which means that their parameters in turn can be modulated with UMaps again, allowing nested structures of" +
 			"modulation.\n\nInformation about the functionality of each Udef can be seen in the tooltip when hovering the unit's" +
