@@ -343,10 +343,13 @@ MassEditUChain {
 	uchainsOrUMarkers { if( uchains.size > 0 ) { ^uchains } { ^umarkers } }
 
 	getTypeColor {
-		^Color(
-			*this.uchainsOrUMarkers
-				.collect(_.getTypeColor).select(_.isKindOf( Color ) ).collect(_.asArray).mean
-		 );
+		var allColors;
+		allColors = this.uchainsOrUMarkers.collect(_.getTypeColor).select(_.isKindOf( Color ) );
+		if( allColors.size == 0 ) {
+			^Color.gray;
+		} {
+			^Color( *allColors.collect(_.asArray).mean );
+		};
 	}
 
 	displayColor {
@@ -358,6 +361,18 @@ MassEditUChain {
 	displayColor_ { |color|
 		this.uchainsOrUMarkers.do({ |item| item.displayColor = color });
 		this.changed( \displayColor, color );
+	}
+
+	getTypeColors {
+		^this.uchainsOrUMarkers.collect({ |item| item.getTypeColor })
+		.select({ |item| item.isKindOf( Color ) })
+	}
+
+	setDisplayColors { |colors|
+		this.uchainsOrUMarkers.select({ |item| item.getTypeColor.isKindOf( Color ) })
+		.do({ |item, i|
+			item.displayColor = colors.wrapAt(i);
+		});
 	}
 
 	fadeIn_ { |fadeIn = 0|

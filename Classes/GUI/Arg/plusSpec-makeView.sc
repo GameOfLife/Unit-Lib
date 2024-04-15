@@ -2453,7 +2453,7 @@
 
 + ColorSpec {
 
-	viewNumLines { ^10 }
+	viewNumLines { ^9 }
 
 	makeView { |parent, bounds, label, action, resize|
 		var vws, view, labelWidth;
@@ -2467,9 +2467,9 @@
 
 		font =  (RoundView.skin ? ()).font ?? { Font( Font.defaultSansFace, 10 ); };
 
-		bounds.isNil.if{bounds= 320@200};
+		bounds.isNil.if{bounds= 372@200};
 
-		view = EZCompositeView( parent, bounds, gap: 2@2 );
+		view = EZCompositeView( parent, bounds, gap: 4@4 );
 		bounds = view.asView.bounds;
 		view.asView.resize_(5);
 
@@ -2487,8 +2487,8 @@
 			labelWidth = 0;
 		};
 
-		viewHeight = (bounds.height / 8) - 4;
-		viewWidth = bounds.width - (labelWidth + 6);
+		viewHeight = (bounds.height / 9) - 4;
+		viewWidth = bounds.width - (labelWidth + 8);
 
 		vws[ \colorView ] = UserView( view, viewWidth @ viewHeight )
 			.drawFunc_({ |vw|
@@ -2629,6 +2629,144 @@
 			action.value( vws, vws[ \val ] );
 		})
 		.resize_( 2 );
+
+		^vws;
+	}
+
+	setView { |view, value, active = false|
+		view[ \val ] = value;
+		view[ \updateViews ].value;
+	}
+
+
+}
+
++ ColorArraySpec {
+
+	viewNumLines { ^9 }
+
+	makeView { |parent, bounds, label, action, resize|
+		var vws, view, labelWidth;
+		var localStep;
+		var modeFunc;
+		var font;
+		var editAction;
+		var tempVal;
+		var viewHeight, viewWidth;
+		vws = ();
+
+		font =  (RoundView.skin ? ()).font ?? { Font( Font.defaultSansFace, 10 ); };
+
+		bounds.isNil.if{bounds= 372@200};
+
+		view = EZCompositeView( parent, bounds, gap: 4@4 );
+		bounds = view.asView.bounds;
+		view.asView.resize_(5);
+
+		vws[ \view ] = view;
+		vws[ \val ] = this.default;
+
+		if( label.notNil ) {
+			labelWidth = (RoundView.skin ? ()).labelWidth ? 80;
+			vws[ \labelView ] = StaticText( vws[ \view ], labelWidth @ bounds.height )
+				.string_( label.asString ++ " " )
+				.align_( \right )
+				.resize_( 4 )
+				.applySkin( RoundView.skin );
+		} {
+			labelWidth = 0;
+		};
+
+		viewHeight = (bounds.height / 9) - 4;
+		viewWidth = bounds.width - (labelWidth + 8);
+
+		vws[ \colorView ] = UserView( view, viewWidth @ viewHeight )
+		.drawFunc_({ |vw|
+			var rect, smallRect;
+			rect = vw.drawBounds;
+			Pen.color = Color.black;
+
+			Pen.line( (rect.right * 2/5) @ (rect.top), rect.rightBottom );
+			Pen.lineTo( rect.rightTop );
+			Pen.lineTo( (rect.right * 2/5) @ (rect.top) );
+
+			Pen.fill;
+			Pen.color = Color.white;
+			Pen.line( rect.leftTop, (rect.right * 3/5) @ (rect.bottom));
+			Pen.lineTo( rect.leftBottom );
+			Pen.lineTo( rect.leftTop );
+			Pen.fill;
+
+			smallRect = rect.copy;
+			smallRect.width = (rect.width / this.size) + 1;
+
+			vws[ \val ].do({ |color, i|
+				Pen.color = color;
+				Pen.fillRect( smallRect.moveBy( i * (smallRect.width - 1), 0 )  );
+			});
+		})
+		.resize_(2);
+
+		vws[ \specs ] = ();
+
+		editAction = { |perform = \red_ |
+			{ |vw, val|
+				vws[ \val ].do({ |item, i|
+					item.perform( perform, val[i] );
+				});
+				vws[ \updateViews ].value;
+				action.value( vws, vws[ \val ] );
+			};
+		};
+
+		vws[ \actions ] = ();
+		vws[ \actions ][ \s ] = editAction.( \sat_ );
+		vws[ \actions ][ \v ]= editAction.( \val_ );
+		vws[ \actions ][ \r ] = editAction.( \red_ );
+		vws[ \actions ][ \g ] = editAction.( \green_ );
+		vws[ \actions ][ \b ] = editAction.( \blue_ );
+		vws[ \actions ][ \a ] = editAction.( \alpha_ );
+		vws[ \actions ][ \h ] = { |vw, val|
+			vws[ \val ].do({ |item, i|
+				item.hue_( val[i].min( 0.9999999999999999 ) );
+			});
+			vws[ \updateViews ].value;
+			action.value( vws, vws[ \val ] );
+		};
+
+		[
+			[ \h, 0, "hue"],
+			[ \s, 0, "saturation" ],
+			[ \v, 0, "value" ],
+			[ \r, 0, "red" ],
+			[ \g, 0, "green" ],
+			[ \b, 0, "blue" ],
+			[ \a, 1, "alpha" ]
+		].collect({ |item,i|
+			vws[ \specs ][ item[0] ] = ArrayControlSpec( 0, 1, \lin, 0, item[1] ! (this.size) );
+			vws[ item[0] ] = vws[ \specs ][ item[0] ]
+			.makeView( view, viewWidth @ viewHeight, item[2], vws[ \actions ][ item[0] ], 2 );
+		});
+
+		vws[ \updateViews ] = {
+			var setView;
+
+			setView = { |which = \h, val|
+				vws[ \specs ][ which ].setView( vws[ which ], val );
+			};
+
+			setView.value( \h, vws[ \val ].collect(_.hue) );
+			setView.value( \s, vws[ \val ].collect(_.sat) );
+			setView.value( \v, vws[ \val ].collect(_.val) );
+			setView.value( \r, vws[ \val ].collect(_.red) );
+			setView.value( \g, vws[ \val ].collect(_.green) );
+			setView.value( \b, vws[ \val ].collect(_.blue) );
+			setView.value( \a, vws[ \val ].collect(_.alpha) );
+
+			{ vws[ \colorView ].refresh }.defer;
+		};
+
+		vws[ \updateViews ].value;
 
 		^vws;
 	}

@@ -488,7 +488,7 @@ UChainGUI {
 			);
 		};
 
-		 composite.decorator.shift( bounds.width - 14 - 90 - 32, 0 );
+		 composite.decorator.shift( bounds.width - 14 - 90 - 88, 0 );
 
 		if( chain.isKindOf( MassEditUChain ) ) {
 			chain.addDependantToChains( massEditController );
@@ -509,7 +509,7 @@ UChainGUI {
 			.resize_(3);
 		};
 
-		views[ \displayColor ] = UserView( composite, 28@14 )
+		views[ \displayColor ] = UserView( composite, 84@14 )
 			.resize_(3)
 		    .toolTip_( "set displayColor" )
 			.drawFunc_({ |vw|
@@ -528,39 +528,59 @@ UChainGUI {
 					(score ? chain).getTypeColor.penFill( vw.drawBounds );
 				};
 			})
-			.mouseDownAction_({ |vw, x,y|
-				var wd = 8, smallRect;
-				smallRect = Rect( vw.bounds.width - wd, 0, wd, wd );
-				if( smallRect.containsPoint( x@y ) ) {
-					 (score ? chain).displayColor = nil;
-					 vw.refresh;
-				} {
-					if( views[ \colorEditor ].isNil ) {
+		.mouseDownAction_({ |vw, x,y|
+			var wd = 8, smallRect;
+			smallRect = Rect( vw.bounds.width - wd, 0, wd, wd );
+			if( smallRect.containsPoint( x@y ) ) {
+				(score ? chain).displayColor = nil;
+				vw.refresh;
+			} {
+				if( views[ \colorEditor ].isNil ) {
+					if( score.notNil or: { chain.isKindOf( MassEditUChain ).not }) {
 						if( (score ? chain).displayColor.isNil or: {
-								(score ? chain).displayColor.class == Color
-							} ) {
-								RoundView.pushSkin( skin );
-								views[ \colorEditor ] = ColorSpec(
-										(score ? chain).getTypeColor
-									).makeView( "UChain displayColor",
-										action: { |vws, color|
-											(score ? chain).displayColor = color;
-										}
-									);
-								views[ \colorEditor ].view.onClose = {
-									views[ \colorEditor ] = nil
-								};
-								RoundView.popSkin;
+							(score ? chain).displayColor.class == Color
+						} ) {
+							RoundView.pushSkin( skin );
+							views[ \colorEditor ] = ColorSpec(
+								(score ? chain).getTypeColor
+							).makeView( "UChain displayColor",
+								action: { |vws, color|
+									(score ? chain).displayColor = color;
+								}
+							);
+							views[ \colorEditor ].view.onClose = {
+								views[ \colorEditor ] = nil
+							};
+							RoundView.popSkin;
 						} {
 							"no editor available for %\n".postf(
 								(score ? chain).displayColor.class
 							);
 						};
 					} {
-						views[ \colorEditor ].view.findWindow.front;
+						if( chain.getTypeColors.size > 0 ) {
+							RoundView.pushSkin( skin );
+							views[ \colorEditor ] = ColorArraySpec(
+								chain.getTypeColors
+							).size_( chain.getTypeColors.size )
+							.makeView( "MassEditUChain displayColors",
+								action: { |vws, colors|
+									chain.setDisplayColors( colors );
+								}
+							);
+							views[ \colorEditor ].view.onClose = {
+								views[ \colorEditor ] = nil
+							};
+							RoundView.popSkin;
+						} {
+							"no editor available\n".postf();
+						};
 					};
+				} {
+					views[ \colorEditor ].view.findWindow.front;
 				};
-			})
+			};
+		})
 			.keyDownAction_({ |vw, a,b,cx|
 				if( cx == 127 ) { (score ? chain).displayColor = nil };
 			})

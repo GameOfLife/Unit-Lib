@@ -964,6 +964,25 @@ ColorSpec : Spec {
 
 }
 
+ColorArraySpec : ColorSpec {
+	var <>size;
+
+	constrain { |value|
+		var colorSpec = ColorSpec();
+		if( size.notNil ) {
+			^value.collect({ |x| colorSpec.constrain(x) })
+				.wrapExtend( size );
+		} {
+			^value.collect{ |x| colorSpec.constrain(x) }
+		}
+	}
+
+	uconstrain { |value| ^this.constrain( value ? this.default ); }
+
+	*testObject { |obj| ^obj.isArray && { obj.every(_.isKindOf( Color ) ) } }
+
+}
+
 RichBufferSpec : Spec {
 
 	var <>numChannels = 1; // fixed number of channels
