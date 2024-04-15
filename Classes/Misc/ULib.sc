@@ -581,13 +581,13 @@ ULib {
 		^Dialog.openPanel( func, cancelFunc, multipleSelection, lastPath );
 	}
 
-	*savePanel { arg okFunc, cancelFunc;
+	*savePanel { arg okFunc, cancelFunc, path;
 		var func;
 		func = { |path|
 			lastPath = path;
 			okFunc.( path );
 		};
-		^Dialog.savePanel( func, cancelFunc, lastPath );
+		^Dialog.savePanel( func, cancelFunc, path ? lastPath );
 	}
 
 }

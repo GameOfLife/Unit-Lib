@@ -2999,6 +2999,8 @@
 
 		currentSkin = RoundView.skin;
 
+		PartConvBufferView.findAppleIRsOnce;
+
 		bounds.isNil.if{bounds= 350 @ (this.viewNumLines * 18) };
 
 		viewHeight = (bounds.height / this.viewNumLines).floor - 2;
@@ -3085,7 +3087,7 @@
 		view.view.decorator.nextLine;
 		view.view.decorator.shift( labelWidth, 0 );
 
-		vws[ \amount ] = StaticText( view, (bounds.width - 44 - 84 - labelWidth) @ viewHeight )
+		vws[ \amount ] = StaticText( view, (bounds.width - 44 - 64 - 64 - labelWidth) @ viewHeight )
 			.applySkin( RoundView.skin )
 			.font_( font );
 
@@ -3097,7 +3099,43 @@
 			};
 		};
 
-		vws[ \danStowel ] = SmoothButton( view, 80 @ viewHeight )
+		vws[ \appleIRs ] = StaticText( view, 60 @ viewHeight );
+
+		if( PartConvBufferView.appleIRs != \notfound ) {
+			vws[ \appleIRs ]
+			.applySkin( RoundView.skin )
+			.string_( "apple IR" )
+			.align_( \center )
+			.background_( Color.white.alpha_(0.25) )
+			.mouseDownAction_({
+				vws[ \appleMenu ] !? _.deepDestroy;
+				vws[ \appleMenu ] = PartConvBufferView.makeAppleIRsMenu({ |path|
+					var savePath;
+					savePath = (ULib.lastPath ? "~/").standardizePath.withoutTrailingSlash
+					+/+ path.basename.replaceExtension( "partconv" );
+					ULib.savePanel({ |pth|
+						PartConvBuffer.convertIRFileMulti( path, pth.replaceExtension( "partconv" ),
+							server: ULib.servers,
+							action: { |paths|
+								//views[ \path ].value = paths[0]; views[ \path ].doAction
+								vws[ \val ] = vws[ \val ].collect({ |item, i|
+									if( paths[i].notNil ) {
+										PartConvBuffer.new( paths[i] )
+									} {
+										item
+									}
+								});
+								action.value( vws, vws[ \val ] );
+							}
+						);
+					}, path: savePath )
+				})
+			})
+			.onClose_({ vws[ \appleMenu ] !? _.deepDestroy; })
+		};
+
+
+		vws[ \danStowel ] = SmoothButton( view, 60 @ viewHeight )
 		.radius_( 2 )
 		.resize_( 3 )
 		.label_( "generate" )

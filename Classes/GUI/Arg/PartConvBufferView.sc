@@ -19,6 +19,8 @@
 
 PartConvBufferView {
 
+	classvar <>appleIRs;
+
 	var <partConvBuffer;
 	var <parent, <view, <views;
 	var <>action;
@@ -92,6 +94,93 @@ PartConvBufferView {
 		};
 	}
 
+	*findAppleIRsOnce {
+		if( appleIRs.notNil ) { this.findAppleIRs };
+	}
+
+	*findAppleIRs {
+		var paths, list, types, surroundTypes;
+
+		paths = "/Library/Audio/Impulse Responses/Apple/*/*/*.SDIR".pathMatch;
+
+		if( paths.size > 0 ) {
+			appleIRs = OEM();
+
+			types = (
+				'OSD': "Discrete Surround",
+				'OBF': "B-Format",
+				'OST': "Stereo",
+				'CTS': "True Stereo",
+				'CBF': "12 x B-Format"
+			);
+
+			surroundTypes = [ 'OSD', 'OBF', 'CBF' ];
+
+			paths.do({ |path|
+				var sublist, split, kkey;
+				sublist = appleIRs;
+				split = path.split($/)[5..];
+				if( types.keys.any({ |key|
+					kkey = key;
+					path.find( "-%".format(key) ).notNil;
+				}) ) {
+					if( surroundTypes.includes( kkey ) ) {
+						split = [ "% (%)".format( types[ kkey ], kkey ) ] ++ split[1..];
+					} {
+						split = [ "% (%)".format( types[ kkey ], kkey ) ] ++ split;
+					};
+				} {
+					split = [ "Stereo (old)" ] ++ split;
+				};
+				split.do({ |item, i|
+					var kkey, label;
+					if( item.find( ".SDIR" ).notNil ) {
+						sublist[ \sdirs ] = sublist[ \sdirs ].add( path );
+					} {
+						if( sublist.keys !? { |keys| keys.includes( item.asSymbol ).not } ? true ) {
+							sublist.put( item.asSymbol, OEM() );
+						};
+						sublist = sublist[ item.asSymbol ];
+					};
+				});
+			});
+		} {
+			appleIRs = \notfound;
+		};
+	}
+
+	*makeAppleIRsMenu { |action|
+		var func, menu;
+
+		this.findAppleIRsOnce;
+
+		if( appleIRs != \notfound ) {
+
+			menu = Menu();
+
+			func = { |ls, mn|
+				var sub;
+				ls.keys.do({ |key|
+					if( key == 'sdirs' ) {
+						ls[ key ].do({ |path|
+							mn.addAction( MenuAction( path.asString.basename, { action.value( path ) } ) )
+						});
+					} {
+						sub = Menu().title_( key.asString );
+						mn.addAction( sub );
+						func.value( ls[ key ], sub );
+					}
+				});
+			};
+
+			func.value( appleIRs, menu );
+
+			^menu.uFront;
+		} {
+			^nil
+		}
+	}
+
 	*viewNumLines { ^2 }
 
 	makeView { |parent, bounds, resize|
@@ -107,6 +196,8 @@ PartConvBufferView {
 		views = ();
 
 		currentSkin = RoundView.skin;
+
+		if( appleIRs != \notfound ) { this.class.findAppleIRs };
 
 		views[ \path ] = FilePathView( view, bounds.width @ viewHeight )
 			.resize_( 2 )
@@ -136,11 +227,36 @@ PartConvBufferView {
 				};
 			});
 
-		views[ \duration ] = StaticText( view, (bounds.width - 44 - 84) @ viewHeight )
+		views[ \duration ] = StaticText( view, (bounds.width - 44 - 64 - 64) @ viewHeight )
 			.resize_( 2 )
 			.applySkin( RoundView.skin ? () );
 
-		views[ \danStowel ] = SmoothButton( view, 80 @ viewHeight )
+		views[ \appleIRs ] = StaticText( view, 60 @ viewHeight );
+
+		if( appleIRs != \notfound ) {
+			views[ \appleIRs ]
+			.applySkin( RoundView.skin )
+			.string_( "apple IR" )
+			.align_( \center )
+			.background_( Color.white.alpha_(0.25) )
+			.mouseDownAction_({
+				views[ \appleMenu ] !? _.deepDestroy;
+				views[ \appleMenu ] = this.class.makeAppleIRsMenu({ |path|
+					var savePath;
+					savePath = (ULib.lastPath ? "~/").standardizePath.withoutTrailingSlash
+					+/+ path.basename.replaceExtension( "partconv" );
+					ULib.savePanel({ |pth|
+						PartConvBuffer.convertIRFileMulti( path, pth.replaceExtension( "partconv" ),
+							server: ULib.servers,
+							action: { |paths| views[ \path ].value = paths[0]; views[ \path ].doAction }
+						);
+					}, path: savePath )
+				})
+			})
+			.onClose_({ views[ \appleMenu ] !? _.deepDestroy; })
+		};
+
+		views[ \danStowel ] = SmoothButton( view, 60 @ viewHeight )
 		.radius_( 2 )
 		.resize_( 3 )
 		.label_( "generate" )

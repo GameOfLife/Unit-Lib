@@ -97,7 +97,11 @@ PartConvBuffer : AbstractRichBuffer {
 						.collect("_" ++ _ );
 					} { inPath.find("OBF.SDIR").notNil } {
 						channelnames = #[ w, x, y, z ][..sf.numChannels-1].collect("_" ++ _ );
-					} {
+					} { inPath.find("OST.SDIR").notNil } {
+						channelnames = #[ l, r ][..sf.numChannels-1].collect("_" ++ _ );
+					} { inPath.find("CTS.SDIR").notNil } {
+						channelnames = #[ ll, lr, rl, rr ][..sf.numChannels-1].collect("_" ++ _ );
+					}{
 						channelnames = (..sf.numChannels-1).collect("_" ++ _ );
 					};
 					res = channelnames.collect({ |name, ch|
