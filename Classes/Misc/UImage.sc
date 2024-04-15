@@ -1,10 +1,9 @@
 UImage {
 
-	classvar <>all;
 	classvar <>imageDict;
 
 	var image;
-	var <>filePath;
+	var <filePath;
 
 	*initClass {
 		imageDict = IdentityDictionary();
@@ -12,10 +11,6 @@ UImage {
 
 	*new { |filePath|
 		^super.new.init( filePath );
-	}
-
-	addToAll {
-		all = all.add( this );
 	}
 
 	init { |inFilePath|
@@ -27,8 +22,15 @@ UImage {
 		};
 	}
 
+	filePath_ { |newPath, init = true| if( init ) { this.init( newPath ) } { filePath = newPath } }
+
 	image { ^image ? imageDict[ filePath.asSymbol ] }
 	image_ { |newImage| image = newImage; }
+
+	clear {
+		if( filePath.notNil ) { imageDict[ filePath.asSymbol ].free; };
+		filePath = nil; imageDict[ filePath.asSymbol ] = nil;
+	}
 
 	write { |path|
 		path = (path ? filePath).getGPath;
@@ -93,6 +95,8 @@ UImage {
 
 USoundFileOverview : UImage {
 	classvar <>defaultColor;
+	classvar <>gain = 0;
+
 	var <>dur = 1, <>color;
 
 	*initClass {
@@ -109,6 +113,7 @@ USoundFileOverview : UImage {
 
 	fromUChain { |chain, path, action, setDisplayColor = true|
 		var bouncePath, imagePath;
+		this.clear;
 		if( path.isNil ) {
 			ULib.savePanel({ |pth|
 				this.fromUChain( chain, pth, action );
@@ -127,7 +132,7 @@ USoundFileOverview : UImage {
 
 	prApplyOverview { |chain, path, action, setDisplayColor = true|
 		this.dur = chain.dur;
-		this.soundFilePlot( path, this.getColor, duration: chain.dur );
+		this.soundFilePlot( path, Color.white, duration: chain.dur );
 		File.delete( path.standardizePath );
 		if( setDisplayColor ) { chain.displayColor = this; };
 		action.value( this );
@@ -136,12 +141,15 @@ USoundFileOverview : UImage {
 	storeArgs { ^[ filePath.formatGPath, dur, color ] }
 
 	penFill { |rect, alpha, fromRect| // fromRect contains duration
-		var toRect;
+		var toRect, height;
 		toRect = rect.copy;
 		fromRect = fromRect ?? { rect.copy.width_( dur ); };
 		toRect.width = toRect.width * ( dur / fromRect.width );
-		this.getColor.blend( Color.white, 0.75 ).alpha_(0.5).penFill( rect, alpha, fromRect );
-		this.image !? _.drawInRect( toRect );
+		height = toRect.height * gain.dbamp;
+		toRect.top = toRect.height - height + (toRect.top);
+		toRect.height = height;
+		this.getColor.penFill( rect, alpha, fromRect );
+		this.image !? _.drawInRect( toRect, fraction: 0.75 * alpha );
 	}
 
 }
