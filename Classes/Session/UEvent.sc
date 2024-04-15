@@ -122,7 +122,8 @@ UEvent : UArchivable {
 	toggleLockStartTime { this.lockStartTime_( lockStartTime.not ) }
 
 	displayColor_ { |color|
-		displayColor = color.copy;
+		if( color.isKindOf( Color ) ) { color = color.copy };
+		displayColor = color;
 		this.changed( \displayColor );
 	}
 

@@ -1,9 +1,14 @@
 UImage {
 
 	classvar <>all;
+	classvar <>imageDict;
 
-	var <>image;
+	var image;
 	var <>filePath;
+
+	*initClass {
+		imageDict = IdentityDictionary();
+	}
 
 	*new { |filePath|
 		^super.new.init( filePath );
@@ -16,9 +21,14 @@ UImage {
 	init { |inFilePath|
 		if( inFilePath.notNil ) {
 			filePath = inFilePath.getGPath;
-			image = Image.open( filePath );
+			if( imageDict[ filePath.asSymbol ].isNil ) {
+				imageDict[ filePath.asSymbol ] = Image.open( filePath );
+			};
 		};
 	}
+
+	image { ^image ? imageDict[ filePath.asSymbol ] }
+	image_ { |newImage| image = newImage; }
 
 	write { |path|
 		path = (path ? filePath).getGPath;
@@ -26,6 +36,11 @@ UImage {
 		image.write( path );
 		"writing %\n".postf( path );
 		filePath = path;
+		if( imageDict[ filePath.asSymbol ] !== image ) {
+			imageDict[ filePath.asSymbol ].free;
+			imageDict[ filePath.asSymbol ] = image;
+		};
+		image = nil;
 	}
 
 	soundFilePlot { |path, color, width = 5000, height = 100, duration, write = true|
@@ -69,7 +84,7 @@ UImage {
 	}
 
 	penFill { |rect|
-		image !? _.drawInRect( rect );
+		this.image !? { |img| img.drawInRect( rect ); };
 	}
 
 	storeArgs { ^[ filePath.formatGPath ] }
@@ -126,7 +141,7 @@ USoundFileOverview : UImage {
 		fromRect = fromRect ?? { rect.copy.width_( dur ); };
 		toRect.width = toRect.width * ( dur / fromRect.width );
 		this.getColor.blend( Color.white, 0.75 ).alpha_(0.5).penFill( rect, alpha, fromRect );
-		image !? _.drawInRect( toRect );
+		this.image !? _.drawInRect( toRect );
 	}
 
 }
