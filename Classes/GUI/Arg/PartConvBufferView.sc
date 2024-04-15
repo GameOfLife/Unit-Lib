@@ -94,49 +94,82 @@ PartConvBufferView {
 		};
 	}
 
-	*findAppleIRsOnce {
-		if( this.appleIRs.isNil ) { this.findAppleIRs };
-	}
-
-	*findAppleIRs {
-		var paths, list, types, surroundTypes, appleIRs;
-
+	*findExternalIRs {
+		var types, surroundTypes;
 		externalIRs = externalIRs ?? { OEM() };
 
-		paths = "/Library/Audio/Impulse Responses/Apple/*/*/*.SDIR".pathMatch;
+		// apple
+		types = (
+			'OSD': "Discrete Surround",
+			'OBF': "B-Format",
+			'OST': "Stereo",
+			'CTS': "True Stereo",
+			'CBF': "12 x B-Format"
+		);
+
+		surroundTypes = [ 'OSD', 'OBF', 'CBF' ];
+
+		externalIRs[ 'Apple Space Designer' ] = this.prFindExternalIRs( [
+			"/Library/Audio/Impulse Responses/Apple/*/*/*.SDIR"
+		], { |filename|
+			filename.find( ".SDIR" ).notNil
+		}, { |split|
+			var kkey;
+			if( types.keys.any({ |key|
+				kkey = key;
+				split.last.find( "-%".format(key) ).notNil;
+			}) ) {
+				if( surroundTypes.includes( kkey ) ) {
+					[ "% (%)".format( types[ kkey ], kkey ) ] ++ split[1..];
+				} {
+					[ "% (%)".format( types[ kkey ], kkey ) ] ++ split;
+				};
+			} {
+				[ "Mono/Stereo (old)" ] ++ split;
+			};
+		});
+
+		// ableton live Convolution Pro
+		externalIRs[ 'Ableton Live Convolution' ] = this.prFindExternalIRs( [
+			"~/Music/Ableton/Factory Packs/Convolution Reverb/IRs/*/*.aif".standardizePath,
+			"~/Music/Ableton/Factory Packs/Convolution Reverb/IRs/*/*.wav".standardizePath
+		], { |filename|
+			filename.find( ".wav" ).notNil or: (filename.find( ".aif" ).notNil)
+		} );
+
+		// Meldaproduction
+		externalIRs[ 'MeldaProduction MConvolution' ] = this.prFindExternalIRs( [
+			"/Library/Application Support/MeldaProduction/MeldaProduction IR/*/*.flac",
+			"/Library/Application Support/MeldaProduction/MeldaProduction IR/*/*/*.flac"
+		], { |filename|
+			filename.find( ".flac" ).notNil
+		} );
+	}
+
+	*findExternalIRsOnce {
+		if( externalIRs.isNil ) {
+			this.findExternalIRs
+		};
+	}
+
+	*prFindExternalIRs { |sourcePaths, isIRTest, addCategoryFunc|
+		var paths, list, types, surroundTypes, irs, pathOffset;
+
+		paths = sourcePaths.collect(_.pathMatch).flatten(1);
+
+		pathOffset = sourcePaths.first.split( $/ ).detectIndex({ |item| item.first == $* }) ? 0;
 
 		if( paths.size > 0 ) {
-			appleIRs = OEM();
-
-			types = (
-				'OSD': "Discrete Surround",
-				'OBF': "B-Format",
-				'OST': "Stereo",
-				'CTS': "True Stereo",
-				'CBF': "12 x B-Format"
-			);
-
-			surroundTypes = [ 'OSD', 'OBF', 'CBF' ];
+			irs = OEM();
 
 			paths.do({ |path|
-				var sublist, split, kkey;
-				sublist = appleIRs;
-				split = path.split($/)[5..];
-				if( types.keys.any({ |key|
-					kkey = key;
-					path.find( "-%".format(key) ).notNil;
-				}) ) {
-					if( surroundTypes.includes( kkey ) ) {
-						split = [ "% (%)".format( types[ kkey ], kkey ) ] ++ split[1..];
-					} {
-						split = [ "% (%)".format( types[ kkey ], kkey ) ] ++ split;
-					};
-				} {
-					split = [ "Mono/Stereo (old)" ] ++ split;
-				};
+				var sublist, split;
+				sublist = irs;
+				split = path.split($/)[pathOffset..];
+				split = addCategoryFunc !? _.value( split ) ? split;
 				split.do({ |item, i|
 					var kkey, label;
-					if( item.find( ".SDIR" ).notNil ) {
+					if( isIRTest.value( item ) ) {
 						sublist[ \sdirs ] = sublist[ \sdirs ].add( path );
 					} {
 						if( sublist.keys !? { |keys| keys.includes( item.asSymbol ).not } ? true ) {
@@ -147,19 +180,21 @@ PartConvBufferView {
 				});
 			});
 		} {
-			appleIRs = \notfound;
+			irs = \notfound;
 		};
-		externalIRs[ \apple ] = appleIRs;
+		^irs;
 	}
 
-	*appleIRs { ^externalIRs !? _.apple }
 
-	*makeAppleIRsMenu { |action|
+	*canImport {
+		this.findExternalIRsOnce;
+		^externalIRs.every(_ == \notfound ).not;
+	}
+
+	*makeImportMenu { |action|
 		var func, menu;
 
-		this.findAppleIRsOnce;
-
-		if( this.appleIRs != \notfound ) {
+		if( this.canImport ) {
 
 			menu = Menu();
 
@@ -178,7 +213,12 @@ PartConvBufferView {
 				});
 			};
 
-			func.value( this.appleIRs, menu );
+			externalIRs.keysValuesDo({ |key, value|
+				if( value != \notfound ) {
+					menu.addAction( MenuAction.separator( key.asString ) );
+					func.value( value, menu );
+				};
+			});
 
 			^menu.uFront;
 		} {
@@ -201,8 +241,6 @@ PartConvBufferView {
 		views = ();
 
 		currentSkin = RoundView.skin;
-
-		this.class.findAppleIRsOnce;
 
 		views[ \path ] = FilePathView( view, bounds.width @ viewHeight )
 			.resize_( 2 )
@@ -236,17 +274,17 @@ PartConvBufferView {
 			.resize_( 2 )
 			.applySkin( RoundView.skin ? () );
 
-		views[ \appleIRs ] = StaticText( view, 60 @ viewHeight );
+		views[ \import ] = StaticText( view, 60 @ viewHeight );
 
-		if( this.class.appleIRs != \notfound ) {
-			views[ \appleIRs ]
+		if( this.class.canImport ) {
+			views[ \import ]
 			.applySkin( RoundView.skin )
-			.string_( "apple IR" )
+			.string_( "import" )
 			.align_( \center )
 			.background_( Color.white.alpha_(0.25) )
 			.mouseDownAction_({
-				views[ \appleMenu ] !? _.deepDestroy;
-				views[ \appleMenu ] = this.class.makeAppleIRsMenu({ |path|
+				views[ \importMenu ] !? _.deepDestroy;
+				views[ \importMenu ] = this.class.makeImportMenu({ |path|
 					var savePath;
 					savePath = (ULib.lastPath ? "~/").standardizePath.withoutTrailingSlash
 					+/+ path.basename.replaceExtension( "partconv" );
@@ -258,7 +296,7 @@ PartConvBufferView {
 					}, path: savePath )
 				})
 			})
-			.onClose_({ views[ \appleMenu ] !? _.deepDestroy; })
+			.onClose_({ views[ \importMenu ] !? _.deepDestroy; })
 		};
 
 		views[ \danStowel ] = SmoothButton( view, 60 @ viewHeight )

@@ -2999,8 +2999,6 @@
 
 		currentSkin = RoundView.skin;
 
-		PartConvBufferView.findAppleIRsOnce;
-
 		bounds.isNil.if{bounds= 350 @ (this.viewNumLines * 18) };
 
 		viewHeight = (bounds.height / this.viewNumLines).floor - 2;
@@ -3099,17 +3097,17 @@
 			};
 		};
 
-		vws[ \appleIRs ] = StaticText( view, 60 @ viewHeight );
+		vws[ \import ] = StaticText( view, 60 @ viewHeight );
 
-		if( PartConvBufferView.appleIRs != \notfound ) {
-			vws[ \appleIRs ]
+		if( PartConvBufferView.canImport ) {
+			vws[ \import ]
 			.applySkin( RoundView.skin )
-			.string_( "apple IR" )
+			.string_( "import" )
 			.align_( \center )
 			.background_( Color.white.alpha_(0.25) )
 			.mouseDownAction_({
-				vws[ \appleMenu ] !? _.deepDestroy;
-				vws[ \appleMenu ] = PartConvBufferView.makeAppleIRsMenu({ |path|
+				vws[ \importMenu ] !? _.deepDestroy;
+				vws[ \importMenu ] = PartConvBufferView.makeImportMenu({ |path|
 					var savePath;
 					savePath = (ULib.lastPath ? "~/").standardizePath.withoutTrailingSlash
 					+/+ path.basename.replaceExtension( "partconv" );
@@ -3131,7 +3129,7 @@
 					}, path: savePath )
 				})
 			})
-			.onClose_({ vws[ \appleMenu ] !? _.deepDestroy; })
+			.onClose_({ vws[ \importMenu ] !? _.deepDestroy; })
 		};
 
 
