@@ -387,6 +387,7 @@ MultiFilePathView : FilePathView {
 				});
 			).title_( "Pathnames (% files)".format( this.value.size ) ),
 			MenuAction.separator,
+			MenuAction( "Post file paths", { this.value.do(_.postcs) }),
 			MenuAction( "Copy all files to...", {
 				ULib.savePanel({ |path|
 					uniquePaths.do({ |px|
