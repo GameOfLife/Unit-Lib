@@ -111,6 +111,17 @@ USoundFileOverview : UImage {
 
 	getColor { ^color ? defaultColor }
 
+	createFileNameFromPath { |path, index = 0|
+		path = path.getGPath;
+		case { path.isFile } {
+			path = path.dirname +/+ "overviews";
+			File.makeDir( path );
+			^path +/+ "ovw_%_%.png".format( index, Date.localtime.stamp );
+		} { path.isFolder } {
+			^path +/+ "ovw_%_%.png".format( index, Date.localtime.stamp );
+		} { ^nil }
+	}
+
 	fromUChain { |chain, path, action, setDisplayColor = true|
 		var bouncePath, imagePath;
 		this.clear;
