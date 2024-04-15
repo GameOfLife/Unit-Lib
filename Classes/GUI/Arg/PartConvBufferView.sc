@@ -19,7 +19,7 @@
 
 PartConvBufferView {
 
-	classvar <>appleIRs;
+	classvar <>externalIRs;
 
 	var <partConvBuffer;
 	var <parent, <view, <views;
@@ -95,11 +95,13 @@ PartConvBufferView {
 	}
 
 	*findAppleIRsOnce {
-		if( appleIRs.notNil ) { this.findAppleIRs };
+		if( this.appleIRs.isNil ) { this.findAppleIRs };
 	}
 
 	*findAppleIRs {
-		var paths, list, types, surroundTypes;
+		var paths, list, types, surroundTypes, appleIRs;
+
+		externalIRs = externalIRs ?? { OEM() };
 
 		paths = "/Library/Audio/Impulse Responses/Apple/*/*/*.SDIR".pathMatch;
 
@@ -130,7 +132,7 @@ PartConvBufferView {
 						split = [ "% (%)".format( types[ kkey ], kkey ) ] ++ split;
 					};
 				} {
-					split = [ "Stereo (old)" ] ++ split;
+					split = [ "Mono/Stereo (old)" ] ++ split;
 				};
 				split.do({ |item, i|
 					var kkey, label;
@@ -147,14 +149,17 @@ PartConvBufferView {
 		} {
 			appleIRs = \notfound;
 		};
+		externalIRs[ \apple ] = appleIRs;
 	}
+
+	*appleIRs { ^externalIRs !? _.apple }
 
 	*makeAppleIRsMenu { |action|
 		var func, menu;
 
 		this.findAppleIRsOnce;
 
-		if( appleIRs != \notfound ) {
+		if( this.appleIRs != \notfound ) {
 
 			menu = Menu();
 
@@ -173,7 +178,7 @@ PartConvBufferView {
 				});
 			};
 
-			func.value( appleIRs, menu );
+			func.value( this.appleIRs, menu );
 
 			^menu.uFront;
 		} {
@@ -197,7 +202,7 @@ PartConvBufferView {
 
 		currentSkin = RoundView.skin;
 
-		if( appleIRs != \notfound ) { this.class.findAppleIRs };
+		this.class.findAppleIRsOnce;
 
 		views[ \path ] = FilePathView( view, bounds.width @ viewHeight )
 			.resize_( 2 )
@@ -233,7 +238,7 @@ PartConvBufferView {
 
 		views[ \appleIRs ] = StaticText( view, 60 @ viewHeight );
 
-		if( appleIRs != \notfound ) {
+		if( this.class.appleIRs != \notfound ) {
 			views[ \appleIRs ]
 			.applySkin( RoundView.skin )
 			.string_( "apple IR" )
