@@ -124,13 +124,20 @@ USoundFileOverview : UImage {
 		} { ^nil }
 	}
 
-	fromUChain { |chain, path, action, setDisplayColor = true|
+	fromUChain { |chain, path, action, setDisplayColor = true, parentScore|
 		var bouncePath, imagePath;
 		this.clear;
 		if( path.isNil ) {
-			ULib.savePanel({ |pth|
-				this.fromUChain( chain, pth, action );
-			});
+			if( parentScore.notNil && { parentScore.filePath.notNil }) {
+				this.fromUChain( chain,
+					this.createFileNameFromPath( parentScore.filePath, parentScore.events.indexOf( chain ) ? 0 ),
+					action, setDisplayColor, parentScore
+				)
+			} {
+				ULib.savePanel({ |pth|
+					this.fromUChain( chain, pth, action, setDisplayColor, parentScore );
+				});
+			};
 		} {
 			switch( chain.getTypeColor.class,
 				Color, { this.color = chain.getTypeColor; },

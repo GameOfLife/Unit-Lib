@@ -535,50 +535,7 @@ UChainGUI {
 				(score ? chain).displayColor = nil;
 				vw.refresh;
 			} {
-				if( views[ \colorEditor ].isNil ) {
-					if( score.notNil or: { chain.isKindOf( MassEditUChain ).not }) {
-						if( (score ? chain).displayColor.isNil or: {
-							(score ? chain).displayColor.class == Color
-						} ) {
-							RoundView.pushSkin( skin );
-							views[ \colorEditor ] = ColorSpec(
-								(score ? chain).getTypeColor
-							).makeView( "UChain displayColor",
-								action: { |vws, color|
-									(score ? chain).displayColor = color;
-								}
-							);
-							views[ \colorEditor ].view.onClose = {
-								views[ \colorEditor ] = nil
-							};
-							RoundView.popSkin;
-						} {
-							"no editor available for %\n".postf(
-								(score ? chain).displayColor.class
-							);
-						};
-					} {
-						if( chain.getTypeColors.size > 0 ) {
-							RoundView.pushSkin( skin );
-							views[ \colorEditor ] = ColorArraySpec(
-								chain.getTypeColors
-							).size_( chain.getTypeColors.size )
-							.makeView( "MassEditUChain displayColors",
-								action: { |vws, colors|
-									chain.setDisplayColors( colors );
-								}
-							);
-							views[ \colorEditor ].view.onClose = {
-								views[ \colorEditor ] = nil
-							};
-							RoundView.popSkin;
-						} {
-							"no editor available\n".postf();
-						};
-					};
-				} {
-					views[ \colorEditor ].view.findWindow.front;
-				};
+				this.makeColorEditorWindow( views, score, chain, parentScore );
 			};
 		})
 			.keyDownAction_({ |vw, a,b,cx|
@@ -1169,7 +1126,7 @@ UChainGUI {
 
 		if( score.isNil ) {
 			controller
-				.put( \displayColor, { { views[ \displayColor ].refresh; }.defer; } )
+				.put( \displayColor, { { views[ \displayColor ].refresh; views.setColorEditor }.defer; } )
 				.put( \lockStartTime, {
 					views[ \lockStartTime ].value = chain.lockStartTime.binaryValue;
 				});
@@ -2244,6 +2201,113 @@ UChainGUI {
 		};
 
 		^this.makeUnitSubViews( scrollView, units, margin, gap );
+	}
+
+	makeColorEditorWindow { |views, score, chain, parentScore|
+		var isOverview, spec;
+		if( views[ \colorEditor ].isNil ) {
+			if( score.notNil or: { chain.isKindOf( MassEditUChain ).not }) {
+				if( (score ? chain).displayColor.isNil or: {
+					[ USoundFileOverview, Color ].includes( (score ? chain).displayColor.class );
+				} ) {
+					isOverview = { (score ? chain).displayColor.isKindOf( USoundFileOverview ); };
+					RoundView.pushSkin( skin );
+					spec = ColorSpec( (score ? chain).getTypeColor.asColor );
+					views[ \colorEditor ] = spec.makeView( "UChain displayColor",
+						action: { |vws, color|
+							if( isOverview.value ) {
+								(score ? chain).displayColor = (score ? chain).displayColor.color_( color );
+							} {
+								(score ? chain).displayColor = color;
+							}
+						}
+					);
+					if( score.isNil && { chain.isKindOf( UMarker ).not }) {
+						views[ \overviewButton ] = SmoothButton( views[ \colorEditor ].view.findWindow,
+							Rect( 4, views[ \colorEditor ].view.bounds.bottom - 4,
+								views[ \colorEditor ].view.bounds.width - 4 - 22, 18
+							)
+						)
+						.action_({
+							if( isOverview.value ) { chain.displayColor.clear; };
+							USoundFileOverview().fromUChain( chain, nil, nil, true, parentScore );
+						})
+						.label_( if( isOverview.value ) { "refresh overview" } { "calculate overview" });
+						views[ \overviewRemoveButton ] = SmoothButton(  views[ \colorEditor ].view.findWindow,
+							Rect( views[ \colorEditor ].view.bounds.width - 18,
+								views[ \colorEditor ].view.bounds.bottom - 4, 18, 18
+						) )
+						.action_({
+							if( isOverview.value ) {
+								chain.displayColor.clear;
+								chain.displayColor = chain.displayColor.color;
+							} {
+								chain.displayColor = nil;
+							};
+						}).label_( '-' );
+						views[ \overviewRemoveButton ].enabled_( isOverview.value );
+					};
+					views[ \colorEditor ].view.onClose = {
+						views[ \colorEditor ] = nil
+					};
+					views[ \setColorEditor ] = {
+						views[ \colorEditor ] !? { spec.setView( views[ \colorEditor ], (score ? chain).getTypeColor.asColor ) };
+						views[ \overviewRemoveButton ] !? _.enabled_( isOverview.value );
+						views[ \overviewButton ] !? _.label_(
+							if( isOverview.value ) { "refresh overview" } { "calculate overview" }
+						);
+						views[ \overviewButton ] !? _.refresh;
+					};
+					RoundView.popSkin;
+
+				} {
+					"no editor available for %\n".postf(
+						(score ? chain).displayColor.class
+					);
+				};
+			} {
+				if( chain.getTypeColors.size > 0 ) {
+					isOverview = { chain.uchains.any({ |c| c.displayColor.isKindOf( USoundFileOverview ); }) };
+					spec = ColorArraySpec( chain.getTypeColors );
+					RoundView.pushSkin( skin );
+					views[ \colorEditor ] = spec.makeView( "MassEditUChain displayColors",
+						action: { |vws, colors|
+							chain.setDisplayColors( colors );
+						}
+					);
+					if( /* score.isNil */ false ) {
+						views[ \overviewButton ] = SmoothButton( views[ \colorEditor ].view.findWindow,
+							Rect( 4, views[ \colorEditor ].view.bounds.bottom - 4,
+								views[ \colorEditor ].view.bounds.width - 4 - 22, 18
+							)
+						).label_( if( isOverview.value ) { "refresh overviews" } { "calculate overviews" });
+						views[ \overviewRemoveButton ] = SmoothButton(  views[ \colorEditor ].view.findWindow,
+							Rect( views[ \colorEditor ].view.bounds.width - 18,
+								views[ \colorEditor ].view.bounds.bottom - 4, 18, 18
+						) ).label_( '-' );
+						views[ \overviewRemoveButton ].enabled_( isOverview.value );
+					};
+					views[ \colorEditor ].view.onClose = {
+						views[ \colorEditor ] = nil
+					};
+					views[ \setColorEditor ] = {
+						views[ \colorEditor ] !? {
+							spec.setView( views[ \colorEditor ], chain.getTypeColors );
+							views[ \overviewRemoveButton ] !? _.enabled_( isOverview.value );
+							views[ \overviewButton ] !? _.label_(
+								if( isOverview.value ) { "refresh overviews" } { "calculate overviews" }
+							);
+							views[ \overviewButton ] !? _.refresh;
+						};
+					};
+					RoundView.popSkin;
+				} {
+					"no editor available\n".postf();
+				};
+			};
+		} {
+			views[ \colorEditor ].view.findWindow.front;
+		};
 	}
 
 	remove {
