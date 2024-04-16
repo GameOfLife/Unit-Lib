@@ -140,6 +140,14 @@ ArrayControlSpec : ControlSpec {
 	uconstrain { |value| ^this.constrain( value ? this.default ); }
 
 	*testObject { |obj| ^obj.isArray && { obj.every(_.isNumber) } }
+
+	storeModifiersOn { |stream|
+		[ \size, \originalSpec ].do({ |key|
+			if( this.perform( key ).notNil ) {
+				stream << ".%_(".format( key ) <<< this.perform( key ) << ")";
+			};
+		});
+	}
 }
 
 GenericMassEditSpec : Spec {
@@ -159,6 +167,12 @@ GenericMassEditSpec : Spec {
 
 	map { |value| ^value }
 	unmap { |value| ^value }
+
+	storeModifiersOn { |stream|
+		this.instVarDict.keysValuesDo({ |key, value|
+			stream << ".%_(".format( key ) <<< value << ")";
+		});
+	}
 
 }
 
