@@ -72,6 +72,26 @@
 
 }
 
++ SMPTESpec {
+
+	massEditSpec { |inArray|
+		^GenericMassEditSpec()
+		.default_( inArray )
+		.size_( inArray.size )
+		.originalSpec_( this )
+		.operations_( [ \invert, \reverse, \sort, \scramble, \random, \line, 'use first for all', \rotate, \resample, \curve, \smooth, \flat, \sine, \square, \triangle,  'code...', \post ] )
+	}
+
+	massEditValue { |inArray|
+		^inArray
+	}
+
+	massEdit { |inArray, params|
+		^params;
+	}
+
+}
+
 + TriggerSpec {
 
 	massEditSpec { |inArray|

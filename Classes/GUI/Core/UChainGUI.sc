@@ -691,7 +691,7 @@ UChainGUI {
 			composite.decorator.nextLine;
 		} {
 			// startTime
-			UPopUpMenu( composite, labelWidth@14 )
+			views[ \startMenu ] = UPopUpMenu( composite, labelWidth@14 )
 			.align_( \right )
 			.items_( [ "startTime", "startBar" ] )
 			.toolTip_( "startTime or startBar" )
@@ -701,6 +701,29 @@ UChainGUI {
 				views[ \startTime ].visible = (startTimeMode === \time );
 				views[ \startBar ].visible = (startTimeMode === \bar );
 			});
+
+			if( chain.isKindOf( MassEditUChain ) ) {
+				views[ \startMenu ].extraMenuActions = {[
+					MenuAction.separator,
+					MenuAction( "Edit", {
+						var spec, vws = (), times;
+						RoundView.pushSkin( UChainGUI.skin );
+						times = chain.uchainsOrUMarkers.collect(_.startTime);
+						spec = SMPTESpec(0,inf).massEditSpec( times );
+						spec.makeEditWindow( views, times, "startTime", { |values|
+							//views[ \editWin ].setValues( values );
+							chain.uchainsOrUMarkers.do({ |item, i|
+								item.startTime = values[i];
+							});
+						} );
+						views[ \updateEditWin ] = { |vws|
+							vws[ \editWin ] !? _.setValues( chain.uchainsOrUMarkers.collect(_.startTime) );
+						};
+						RoundView.popSkin( UChainGUI.skin );
+					})
+				]};
+				views[ \startMenu ].onClose = views[ \startMenu ].onClose.addFunc({ views[ \editWin ] !? _.close });
+			};
 
 			views[ \startTime ] = SMPTEBox( composite, 84@14 )
 				.applySmoothSkin
@@ -1162,6 +1185,7 @@ UChainGUI {
 					.put( \startTime, {
 						views[ \startTime ].value = chain.startTime ? 0;
 						views[ \startBar ].value = chain.startTime ? 0;
+						views.updateEditWin;
 						if( chain.dur == inf ) {
 							views[ \endTime ].value = chain.startTime ? 0;
 							views[ \endBar ].value = chain.startTime ? 0;

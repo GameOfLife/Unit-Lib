@@ -869,7 +869,7 @@
 		bounds.isNil.if{bounds= 350@20};
 
 		view = EZCompositeView( parent, bounds, gap: 4@4 );
-		view.asView.resize_( resize );
+		view.asView.resize_( resize ? 5 );
 		bounds = view.asView.bounds;
 		width = bounds.width;
 
@@ -928,7 +928,7 @@
 				vws[ \val ] = values;
 				vws[ \update ].value;
 				action.value( vws, vws[ \val ] );
-			}, [ \reverse, \scramble, 'use first for all', \rotate, 'code...', \post ]);
+			}, operations ?? { [ \reverse, \scramble, 'use first for all', \rotate, 'code...', \post ] });
 		});
 
 		if( canMap ) {
@@ -2471,7 +2471,7 @@
 
 		view = EZCompositeView( parent, bounds, gap: 4@4 );
 		bounds = view.asView.bounds;
-		view.asView.resize_(5);
+		view.asView.resize_( resize );
 
 		vws[ \view ] = view;
 		vws[ \val ] = this.default;

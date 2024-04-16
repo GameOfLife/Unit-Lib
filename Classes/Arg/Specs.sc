@@ -146,6 +146,7 @@ GenericMassEditSpec : Spec {
 	var <>originalSpec;
 	var <>size;
 	var <>default;
+	var <>operations;
 
 	constrain { |value|
 		if( size.notNil ) {
