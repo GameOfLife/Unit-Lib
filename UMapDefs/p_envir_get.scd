@@ -21,17 +21,12 @@ UPatDef( \p_envir_get, { |unit, key = 'a'|
 			if( kkey.notNil ) {
 				val = currentEnvironment[ kkey ] ? (spec.default);
 				fromSpec = currentEnvironment[ \u_specs ] !? _[ kkey ] ? spec;
-				if( fromSpec.isKindOf( FreqSpec ) && { spec.isKindOf( FreqSpec ) } ) {
-					fromSpec = spec;
-				};
-				if( fromSpec.isKindOf( PointSpec ) ) {
+				case { fromSpec.isKindOf( FreqSpec ) && { spec.isKindOf( FreqSpec ) } } {
+					fromSpec = spec; // map correctly within range (can be 2-20000 or 20-20000
+				} { fromSpec.isKindOf( PointSpec ) } {
 					fromSpec = fromSpec.asControlSpec;
-					if( val.isKindOf( Point ) ) { val = val.x };
-				};
-				if( fromSpec.isKindOf( SMPTESpec ) && { spec.isKindOf( SMPTESpec ) } ) {
-					fromSpec = spec.asControlSpec;
-				};
-				if( fromSpec.isKindOf( IntegerSpec ) ) {
+					if( val.isKindOf( Point ) ) { val = val.x }; // use x value
+				} { fromSpec.isKindOf( IntegerSpec ) } {
 					fromSpec = spec.asControlSpec;
 				};
 				val = fromSpec.unmap( val );
@@ -42,6 +37,7 @@ UPatDef( \p_envir_get, { |unit, key = 'a'|
 		};
 	}.r
 })
-	.setSpec( \key, EnvirSpec() )
-	.mappedArgs_([])
-	.category_( 'pattern_envir' );
+.setSpec( \key, EnvirSpec() )
+.setSpec( \value, UAdaptSpec() )
+.mappedArgs_([])
+.category_( 'pattern_envir' );

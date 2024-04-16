@@ -18,25 +18,21 @@ ValueUMapDef( \envir_get, { |unit, ctrl|
 	kkey = unit.get( \key );
 	spec = unit.getSpec( \value );
 	ctrl = SimpleController( currentEnvironment )
-		.put( kkey, {
-			spec = unit.getSpec( \value );
-			val = currentEnvironment[ kkey ] ? (spec.default);
-			fromSpec = currentEnvironment[ \u_specs ] !? _[ kkey ] ? spec;
-			if( fromSpec.isKindOf( FreqSpec ) && { spec.isKindOf( FreqSpec ) } ) {
-				fromSpec = spec;
-			};
-			if( fromSpec.isKindOf( PointSpec ) ) {
-				fromSpec = fromSpec.asControlSpec;
-				if( val.isKindOf( Point ) ) { val = val.x };
-			};
-			if( fromSpec.isKindOf( SMPTESpec ) && { spec.isKindOf( SMPTESpec ) } ) {
-				fromSpec = spec.asControlSpec;
-			};
-			if( fromSpec.isKindOf( IntegerSpec ) ) {
-				fromSpec = spec.asControlSpec;
-			};
-			unit.mapSet( \value, fromSpec.unmap( val ) );
-		});
+	.put( kkey, {
+		spec = unit.getSpec( \value );
+		val = currentEnvironment[ kkey ] ? (spec.default);
+		fromSpec = currentEnvironment[ \u_specs ] !? _[ kkey ] ? spec;
+
+		case { fromSpec.isKindOf( FreqSpec ) && { spec.isKindOf( FreqSpec ) } } {
+			fromSpec = spec; // map correctly within range (can be 2-20000 or 20-20000
+		} { fromSpec.isKindOf( PointSpec ) } {
+			fromSpec = fromSpec.asControlSpec;
+			if( val.isKindOf( Point ) ) { val = val.x }; // use x value
+		} { fromSpec.isKindOf( IntegerSpec ) } {
+			fromSpec = spec.asControlSpec;
+		};
+		unit.mapSet( \value, fromSpec.unmap( val ) );
+	});
 	currentEnvironment.changed( kkey );
 	ctrl
 },  { |unit, ctrl|
@@ -45,4 +41,5 @@ ValueUMapDef( \envir_get, { |unit, ctrl|
 },[
 	[ \key, \a, EnvirSpec('a') ]
 ], \control )
-	.category_( 'envir' );
+.setSpec( \value, UAdaptSpec() )
+.category_( 'envir' );
