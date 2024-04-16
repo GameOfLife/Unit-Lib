@@ -160,12 +160,13 @@ USoundFileOverview : UImage {
 
 	storeArgs { ^[ filePath.formatGPath, dur, color ] }
 
-	penFill { |rect, alpha, fromRect| // fromRect contains duration
-		var toRect, height;
+	penFill { |rect, alpha, fromRect, event| // fromRect contains duration
+		var toRect, height, eventGain = 0;
+		if( event.isKindOf( UChain ) ) { eventGain = event.gain };
 		toRect = rect.copy;
 		fromRect = fromRect ?? { rect.copy.width_( dur ); };
 		toRect.width = toRect.width * ( dur / fromRect.width );
-		height = toRect.height * gain.dbamp;
+		height = toRect.height * (gain + eventGain).dbamp;
 		toRect.top = toRect.height - height + (toRect.top);
 		toRect.height = height;
 		this.getColor.penFill( rect, alpha, fromRect );

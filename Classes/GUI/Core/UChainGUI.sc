@@ -516,7 +516,7 @@ UChainGUI {
 				var wd = 8, smallRect;
 				if( (score ? chain).displayColor.notNil ) {
 					Pen.roundedRect(vw.drawBounds, wd);
-					(score ? chain).displayColor.penFill(vw.drawBounds, 1, nil, 10) ;
+					(score ? chain).displayColor.penFill(vw.drawBounds, 1, nil, chain) ;
 					smallRect = Rect( vw.bounds.width - wd, 0, wd, wd );
 					Pen.color = Color.gray(0.66,0.75);
 					Pen.addOval( smallRect, 2 );
@@ -1076,7 +1076,7 @@ UChainGUI {
 
 			composite.decorator.nextLine;
 
-			controller.put( \gain, { views[ \gain ].value = chain.getGain } );
+			controller.put( \gain, { views[ \gain ].value = chain.getGain; { views[ \displayColor ].refresh }.defer; } );
 			controller.put( \muted, { views[ \muted ].value = chain.muted.binaryValue } );
 		};
 
