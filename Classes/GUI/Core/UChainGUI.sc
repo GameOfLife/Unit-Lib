@@ -2275,12 +2275,51 @@ UChainGUI {
 							chain.setDisplayColors( colors );
 						}
 					);
-					if( /* score.isNil */ false ) {
+					if( score.isNil && { chain.uchains.any( _.isMemberOf( UChain ) ) } ) {
 						views[ \overviewButton ] = SmoothButton( views[ \colorEditor ].view.findWindow,
 							Rect( 4, views[ \colorEditor ].view.bounds.bottom - 4,
 								views[ \colorEditor ].view.bounds.width - 4 - 22, 18
 							)
-						).label_( if( isOverview.value ) { "refresh overviews" } { "calculate overviews" });
+						)
+						.action_({
+							if( parentScore.isNil or: { parentScore.filePath.isNil } ) {
+								ULib.savePanel({ |pth|
+									pth = pth.dirname +/+ "overviews";
+									File.makeDir( pth );
+									{
+										var cond = Condition(false);
+										chain.uchains.select( _.isMemberOf( UChain ) ).do({ |evt, i|
+											var usn;
+											usn = USoundFileOverview();
+											usn.fromUChain( evt,
+												usn.createFileNameFromPath( pth, parentScore !? { |x| x.events.indexOf( chain ) } ? 0 ),
+												{ cond.test = true; cond.signal },
+												true, parentScore
+											);
+											cond.wait;
+											evt.changed( \displayColor );
+											cond.test = false;
+										});
+										"done creating overviews".postln;
+									}.fork;
+								});
+							} {
+								{
+									var cond = Condition(false);
+									chain.uchains.select( _.isMemberOf( UChain ) ).do({ |evt, i|
+										USoundFileOverview().fromUChain( evt, nil,
+											{ cond.test = true; cond.signal },
+											true, parentScore
+										);
+										cond.wait;
+										evt.changed( \displayColor );
+										cond.test = false;
+									});
+									"done creating overviews".postln;
+								}.fork;
+							};
+						})
+						.label_( if( isOverview.value ) { "refresh overviews" } { "calculate overviews" });
 						views[ \overviewRemoveButton ] = SmoothButton(  views[ \colorEditor ].view.findWindow,
 							Rect( views[ \colorEditor ].view.bounds.width - 18,
 								views[ \colorEditor ].view.bounds.bottom - 4, 18, 18
