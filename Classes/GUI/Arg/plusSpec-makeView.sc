@@ -270,11 +270,11 @@
 		);
 
 		operations[ \flat ] = (
-			settings: [0, 0.5],
-			labels: ["blend", "center"],
-			specs: { [ [0,1].asSpec, [0,1,\lin,0,0.5].asSpec ] },
+			settings: [0, 0],
+			labels: ["blend", "reference"],
+			specs: { [ [-1,1,\lin,0,0].asSpec, IntegerSpec(0, 0 , currentVals.size - 1) ] },
 			calculate: { |evt, values|
-				values.blend( evt.settings[1], evt.settings[0] );
+				values.blend( values[ evt.settings[1].asInteger ], evt.settings[0] );
 			},
 		);
 

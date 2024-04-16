@@ -713,7 +713,7 @@ UChainGUI {
 						spec.makeEditWindow( views, times, "startTime", { |values|
 							//views[ \editWin ].setValues( values );
 							chain.uchainsOrUMarkers.do({ |item, i|
-								item.startTime = values[i];
+								item.startTime = values[i].max(0);
 							});
 						} );
 						views[ \updateEditWin ] = { |vws|
