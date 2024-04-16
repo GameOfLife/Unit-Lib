@@ -2661,7 +2661,7 @@
 
 		view = EZCompositeView( parent, bounds, gap: 4@4 );
 		bounds = view.asView.bounds;
-		view.asView.resize_(5);
+		view.asView.resize_(resize ? 5);
 
 		vws[ \view ] = view;
 		vws[ \val ] = this.default;
