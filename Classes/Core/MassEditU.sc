@@ -342,9 +342,18 @@ MassEditUChain {
 
 	uchainsOrUMarkers { if( uchains.size > 0 ) { ^uchains } { ^umarkers } }
 
+	canSetColorIndices {
+		^this.uchainsOrUMarkers.collect({ |item|
+			var res = item.getTypeColor;
+			if( res.respondsTo( \asColor ) ) { res.asColor } { nil }
+		}).selectIndices( _.isKindOf( Color ) );
+	}
+
 	getTypeColor {
 		var allColors;
-		allColors = this.uchainsOrUMarkers.collect(_.getTypeColor).select(_.isKindOf( Color ) );
+		allColors = this.uchainsOrUMarkers[ this.canSetColorIndices ].collect({ |x|
+			x.getTypeColor.asColor;
+		});
 		if( allColors.size == 0 ) {
 			^Color.gray;
 		} {
@@ -364,14 +373,19 @@ MassEditUChain {
 	}
 
 	getTypeColors {
-		^this.uchainsOrUMarkers.collect({ |item| item.getTypeColor })
-		.select({ |item| item.isKindOf( Color ) })
+		^this.uchainsOrUMarkers[ this.canSetColorIndices ].collect({ |x|
+			x.getTypeColor.asColor;
+		});
 	}
 
 	setDisplayColors { |colors|
-		this.uchainsOrUMarkers.select({ |item| item.getTypeColor.isKindOf( Color ) })
+		this.uchainsOrUMarkers[ this.canSetColorIndices ]
 		.do({ |item, i|
-			item.displayColor = colors.wrapAt(i);
+			if( item.displayColor.isKindOf( USoundFileOverview ) ) {
+				item.displayColor = item.displayColor.color_( colors.wrapAt(i) );
+			} {
+				item.displayColor = colors.wrapAt(i);
+			}
 		});
 	}
 

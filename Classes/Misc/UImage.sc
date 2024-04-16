@@ -111,6 +111,8 @@ USoundFileOverview : UImage {
 
 	getColor { ^color ? defaultColor }
 
+	asColor { ^this.getColor }
+
 	createFileNameFromPath { |path, index = 0|
 		path = path.getGPath;
 		case { path.isFile } {
