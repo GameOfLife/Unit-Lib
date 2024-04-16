@@ -968,6 +968,10 @@ ColorSpec : Spec {
 ColorArraySpec : ColorSpec {
 	var <>size;
 
+	init {
+		size = default !? _.size;
+	}
+
 	constrain { |value|
 		var colorSpec = ColorSpec();
 		if( size.notNil ) {
