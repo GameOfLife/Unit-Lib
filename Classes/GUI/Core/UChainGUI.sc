@@ -2222,7 +2222,7 @@ UChainGUI {
 							}
 						}
 					);
-					if( score.isNil && { chain.isKindOf( UMarker ).not }) {
+					if( score.isNil && { chain.isMemberOf( UChain ) }) {
 						views[ \overviewButton ] = SmoothButton( views[ \colorEditor ].view.findWindow,
 							Rect( 4, views[ \colorEditor ].view.bounds.bottom - 4,
 								views[ \colorEditor ].view.bounds.width - 4 - 22, 18
