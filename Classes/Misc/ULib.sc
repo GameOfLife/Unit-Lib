@@ -370,6 +370,18 @@ ULib {
 	    };
     }
 
+	*readEnvir { |path, action|
+		if( path.isNil ) {
+			ULib.openPanel( { |path|
+				action.value( path );
+				path.load;
+			});
+		} {
+			action.value( path );
+			path = path.standardizePath.load;
+		};
+	}
+
 	*envirWindow {
 		var w, bounds, addViews, addButton, labelWidth;
 		var usedKeys, makeGBView;
@@ -401,7 +413,16 @@ ULib {
 		.string_( " Environment (%)".format( ~u_specs.size ) )
 		.applySkin( RoundView.skin )
 		.background_( RoundView.skin.headerColor ? Color.white.alpha_(0.5) );
-		w.asView.decorator.shift( -36, 0 );
+		w.asView.decorator.shift( -36 - 40, 0 );
+		SmoothButton( w, 40@14 ).states_( [
+			[ "read", nil, Color.green.alpha_(0.2) ]
+		] ).action_({
+			ULib.readEnvir( action: {
+				w.onClose.value;
+				{ this.envirWindow; }.defer(0.1);
+			})
+		})
+		.radius_(2).canFocus_( false );
 		addButton = SmoothButton( w, 14@14 ).label_( '+' )
 		.action_({ |bt|
 			addViews.do(_.visible_( true ));
@@ -410,6 +431,10 @@ ULib {
 		SmoothButton( w, 14@14 ).label_( 'roundArrow' )
 		.action_({ { this.envirWindow; }.defer(0.1); });
 		if( ~u_specs.notNil && { ~u_specs.size > 0 }) {
+			w.asView.decorator.shift( -36 - 88, 0 );
+			SmoothButton( w, 40@14 ).states_( [
+				[ "write", nil, Color.red.alpha_(0.2) ]
+			] ).action_({ ULib.writeEnvir }).radius_(2).canFocus_( false );
 			~u_specs.sortedKeysValuesDo({ |key, spec|
 				var view, ctrl;
 				view = spec.makeView( w, (bounds.width - 30)@14, "~" ++ key, { |vw, val|
