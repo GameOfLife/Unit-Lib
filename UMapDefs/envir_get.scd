@@ -22,7 +22,8 @@ ValueUMapDef( \envir_get, { |unit, ctrl|
 		spec = unit.getSpec( \value );
 		val = currentEnvironment[ kkey ] ? (spec.default);
 		fromSpec = currentEnvironment[ \u_specs ] !? _[ kkey ] ? spec;
-
+		if( fromSpec.respondsTo( \originalSpec ) && { fromSpec.originalSpec.notNil } ) { fromSpec = fromSpec.originalSpec };
+		if( val.isCollection ) { val = val.first };
 		case { fromSpec.isKindOf( FreqSpec ) && { spec.isKindOf( FreqSpec ) } } {
 			fromSpec = spec; // map correctly within range (can be 2-20000 or 20-20000
 		} { fromSpec.isKindOf( PointSpec ) } {

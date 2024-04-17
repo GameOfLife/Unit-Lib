@@ -14,13 +14,18 @@ part of the Unit lib default UMapDefs set
 
 UPatDef( \p_envir_get, { |unit, key = 'a'|
 	{
-		var kkey, val, spec, fromSpec;
+		var kkey, val, spec, fromSpec, ii = 0;
 		spec = unit.spec ?? { [0,1].asSpec; };
 		loop {
 			kkey = key.next.asSymbol;
 			if( kkey.notNil ) {
 				val = currentEnvironment[ kkey ] ? (spec.default);
 				fromSpec = currentEnvironment[ \u_specs ] !? _[ kkey ] ? spec;
+				if( fromSpec.respondsTo( \originalSpec ) && { fromSpec.originalSpec.notNil } ) { fromSpec = fromSpec.originalSpec };
+				if( val.isCollection ) {
+					val = val.wrapAt( ii );
+					ii = ii+1;
+				};
 				case { fromSpec.isKindOf( FreqSpec ) && { spec.isKindOf( FreqSpec ) } } {
 					fromSpec = spec; // map correctly within range (can be 2-20000 or 20-20000
 				} { fromSpec.isKindOf( PointSpec ) } {
