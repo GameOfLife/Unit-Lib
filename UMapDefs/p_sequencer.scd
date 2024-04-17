@@ -42,7 +42,7 @@ defs = [ 4,8,12,16,24,32,48,64,128 ].collect({ |n|
 		.mappedArgs_([ \vals ]);
 });
 
-MultiUMapDef( \p_sequencer, defs, \pattern, \n, false )
+MultiUMapDef( \p_sequencer, defs, \pattern_series, \n, false )
 	.mappedArgs_([ \vals ])
 	.defaultDefName_( 8 )
 	.allowedModes_([ \init, \sync, \normal ])

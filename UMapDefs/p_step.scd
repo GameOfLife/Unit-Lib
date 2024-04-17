@@ -45,4 +45,4 @@ UPatDef( \p_step, { |unit, lo = 0.0, hi = 1.0, steps = 12, loop = \loop|
 }).mappedArgs_([\lo, \hi])
 .setSpec( \steps, [-100,100,\lin].asSpec )
 .setSpec( \loop, ListSpec( [ \off, \loop, \backwards, \alternate ], 1 ) )
-.category_( 'pattern' );
+.category_( 'pattern_series' );

@@ -20,7 +20,7 @@ part of the Unit lib default UMapDefs set
 
 UPatDef( \p_int_step, { |unit, lo = 0, hi = 99, stepsize = 1, loop = \loop|
 	{
-		var current = 0, direction = 1, hist = [], arr, amb;
+		var current = 0, direction = 1, hist = [], arr, amb, lonext, hinext;
 		if( loop.next == \backwards ) { current = 1; direction = -1 };
 		current = lo.next.asInteger;
 		current.asInteger.yield;
@@ -36,11 +36,13 @@ UPatDef( \p_int_step, { |unit, lo = 0, hi = 99, stepsize = 1, loop = \loop|
 					current = current.wrap( lo.next, hi.next ); direction = -1; },
 				\alternate, {
 					current = current + (direction * stepsize.next);
-					case { current > 1 } {
-						current = current.fold(lo.next,hi.next);
+					lonext = lo.next;
+					hinext = hi.next;
+					case { current > hinext } {
+						current = current.fold(lonext,hinext);
 						direction = -1;
-					} { current < 0 } {
-						current = current.fold(lo.next,hi.next);
+					} { current < lonext } {
+						current = current.fold(lonext,hinext);
 						direction = 1;
 					};
 				},
@@ -71,4 +73,4 @@ UPatDef( \p_int_step, { |unit, lo = 0, hi = 99, stepsize = 1, loop = \loop|
 	(spec == URandSeed)
 })
 .setSpec( \loop, ListSpec( [ \off, \loop, \backwards, \alternate, \rand ], 1 ) )
-.category_( 'pattern' );
+.category_( 'pattern_series' );
