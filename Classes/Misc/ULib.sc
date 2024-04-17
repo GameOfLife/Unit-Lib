@@ -328,6 +328,48 @@ ULib {
         ^w
     }
 
+	*envirTextArchive {
+		var archive = "";
+		~u_specs !? _.keysValuesDo({ |key, spec|
+			if( spec.respondsTo( \originalSpec ) ) {
+				spec = spec.originalSpec;
+			};
+			archive = archive ++ "'%'.uEnvirPut( %, % );\n".format(
+				key,
+				key.envirGet.cs,
+				spec.cs,
+			);
+		});
+		^archive;
+	}
+
+	*writeEnvir { |path, overwrite=false, ask=true, successAction, cancelAction|
+	    var writeFunc;
+	    writeFunc = { |overwrite, ask, path|
+		    var text;
+
+		    GlobalPathDict.relativePath = path.dirname;
+		    text = this.envirTextArchive;
+		    GlobalPathDict.relativePath = nil;
+
+			path = path.replaceExtension( "uenvir" );
+
+		    File.checkDo( path, { |f|
+				f.write( text );
+				successAction.value(path);
+			}, overwrite, ask);
+	    };
+
+	    if( path.isNil ) {
+		    ULib.savePanel( { |pth|
+			    path = pth;
+			    writeFunc.value(true,false,path);
+		    }, cancelAction );
+	    } {
+		    writeFunc.value(overwrite,ask,path);
+	    };
+    }
+
 	*envirWindow {
 		var w, bounds, addViews, addButton, labelWidth;
 		var usedKeys, makeGBView;
@@ -398,7 +440,12 @@ ULib {
 			if( addViews[ \textBox ].string.size > 0 ) {
 				key = addViews[ \textBox ].string.asSymbol;
 				spec = envirSpecs[ (addViews[ \popUp ].value * 2) + 1 ];
-				key.uEnvirPut( spec.default, spec );
+				w.onClose.value; // remove controllers in case replacing a current val
+				if( addViews[ \n ].value > 1 ) {
+					key.uEnvirPut( { spec.default } ! (addViews[ \n ].value), spec );
+				} {
+					key.uEnvirPut( spec.default, spec );
+				};
 				{ this.envirWindow; }.defer(0.1);
 			};
 		})
@@ -415,10 +462,12 @@ ULib {
 			if( addViews[ \textBox ].string.size > 0 ) {
 				key = addViews[ \textBox ].string.asSymbol;
 				spec = envirSpecs[ (addViews[ \popUp ].value * 2) + 1 ];
+				w.onClose.value;
 				if( addViews[ \n ].value > 1 ) {
-					spec = spec.massEditSpec( spec.default ! ( addViews[ \n ].value.asInteger ) );
+					key.uEnvirPut( { spec.default } ! (addViews[ \n ].value), spec );
+				} {
+					key.uEnvirPut( spec.default, spec );
 				};
-				key.uEnvirPut( spec.default, spec );
 				{ this.envirWindow; }.defer(0.1);
 			};
 		});
