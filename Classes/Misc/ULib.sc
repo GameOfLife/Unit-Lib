@@ -403,9 +403,10 @@ ULib {
 			};
 		})
 		.applySkin( RoundView.skin );
-		addViews[ \popUp ] = UPopUpMenu( w, (bounds.width - 8 - labelWidth - 52 - 18) @ 14 )
+		addViews[ \popUp ] = UPopUpMenu( w, (bounds.width - 8 - labelWidth - 52 - 44 - 18) @ 14 )
 		.items_( envirSpecs[0,2..] )
 		.applySkin( RoundView.skin );
+		addViews[ \n ] = SmoothNumberBox( w, 40@14 ).clipLo_(1).value_(1);
 		addViews[ \add ] = SmoothButton( w, 40@14 )
 		.label_( "add" )
 		.radius_( 0 )
@@ -414,6 +415,9 @@ ULib {
 			if( addViews[ \textBox ].string.size > 0 ) {
 				key = addViews[ \textBox ].string.asSymbol;
 				spec = envirSpecs[ (addViews[ \popUp ].value * 2) + 1 ];
+				if( addViews[ \n ].value > 1 ) {
+					spec = spec.massEditSpec( spec.default ! ( addViews[ \n ].value.asInteger ) );
+				};
 				key.uEnvirPut( spec.default, spec );
 				{ this.envirWindow; }.defer(0.1);
 			};
