@@ -561,12 +561,12 @@ UMenuBarIDE {
 			this.registerMenu( MenuAction.separator, "View");
 		};
 
-		this.registerMenu( MenuAction( "EQ", { UGlobalEQ.gui; }).shortcut_( "Ctrl+E" ), "View");
+		this.registerMenu( MenuAction( "EQ", { UGlobalEQ.gui; }).shortcut_( "Ctrl+Shift+E" ), "View");
 		this.registerMenu( MenuAction( "Level (large)", { UGlobalGain.gui; }).shortcut_( "Ctrl+L" ), "View");
 		this.registerMenu( MenuAction( "Udefs", { UdefsGUI(); }).shortcut_( "Ctrl+U" ), "View");
 		this.registerMenu( MenuAction( "Environment", {
 			ULib.envirWindow;
-		}), "View");
+		}).shortcut_( "Ctrl+E" ), "View");
 
 		skipJack !? _.stop;
 
