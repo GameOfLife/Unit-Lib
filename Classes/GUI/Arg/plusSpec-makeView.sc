@@ -90,8 +90,10 @@
 		};
 
 		evws[ \updateViews ] = {
-			evws[ \multi ] !? _.value_( evws[ \values ].collect({ |x| evws[ \spec ].unmap( x ) }) );
-			evws[ \multi ] !? _.reference_( evws[ \spec ].unmap( evws[ \spec ].default ) ! evws[ \values ].size );
+			{
+				evws[ \multi ] !? _.value_( evws[ \values ].collect({ |x| evws[ \spec ].unmap( x ) }) );
+				evws[ \multi ] !? _.reference_( evws[ \spec ].unmap( evws[ \spec ].default ) ! evws[ \values ].size );
+			}.defer;
 			evws[ \views ].do({ |vw, i|
 				evws[ \spec ].setView( vw, evws[ \values ][ i ] )
 			});
