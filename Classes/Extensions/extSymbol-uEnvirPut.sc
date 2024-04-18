@@ -1,9 +1,10 @@
 + Symbol {
 
 	uEnvirPut { |value, spec|
+		var default;
 		value = value.value;
 		if( value.isArray && { spec.notNil } ) {
-			spec = spec.massEditSpec( value );
+			spec = spec.massEditSpec( value ).default_( { spec.default }!(value.size) );
 		};
 		currentEnvironment.put( this, value );
 		if( spec.notNil ) {

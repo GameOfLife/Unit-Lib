@@ -174,10 +174,10 @@ GenericMassEditSpec : Spec {
 
 	constrain { |value|
 		if( size.notNil ) {
-			^value.collect({ |x| originalSpec.constrain(x) })
+			^value.asCollection.collect({ |x| originalSpec.constrain(x) })
 				.wrapExtend( size );
 		} {
-			^value.collect{ |x| originalSpec.constrain(x) }
+			^value.asCollection.collect{ |x| originalSpec.constrain(x) }
 		}
 	}
 
