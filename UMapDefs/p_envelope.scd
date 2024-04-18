@@ -45,4 +45,4 @@ UPatDef( \p_envelope, { |unit, env, timeScale = 1, loop = \loop|
 .setDefault( \env, EnvM() )
 .setSpec( \timeScale, [ 0.1, 10, \exp].asSpec )
 .setSpec( \loop, ListSpec( [ \off, \loop, \backwards, \alternate ], 1 ) )
-.category_( 'pattern' );
+.category_( 'pattern_timebased' );

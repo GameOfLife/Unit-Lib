@@ -39,7 +39,7 @@ UPatDef( \p_uscore_status, { |unit, playingValue = 1, pausedValue = 0.5, stopped
 })
 	.mappedArgs_([ \playingValue, \pausedValue, \stoppedValue ])
 	.useMappedArgs_( false )
-	.category_( 'pattern_selection' )
+	.category_( 'pattern_info' )
 	.setSpec( \playingValue, UAdaptSpec() )
 	.setSpec( \pausedValue, UAdaptSpec() )
 	.setSpec( \stoppedValue, UAdaptSpec() )

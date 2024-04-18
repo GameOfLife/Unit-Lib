@@ -34,7 +34,7 @@ UPatDef( \p_sine, { |unit,
 			);
 		};
 	}.r
-}).category_( 'pattern' )
+}).category_( 'pattern_timebased' )
 	.mappedArgs_( [ \min, \max ] )
 	.setSpec( \phase, AngleSpec() )
 	.setSpec( \freq, FreqSpec(0.001,300, default: 2) )

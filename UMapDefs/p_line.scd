@@ -97,4 +97,4 @@ UPatDef( \p_line, { |unit, a = 0.0, b = 1.0, curve = 0, time = 10, loop = \loop,
 	};
 })
 .setSpec( \loop, ListSpec( [ \off, \loop, \backwards, \alternate, \back_at_end, \hold ], 1 ) )
-.category_( 'pattern_series' );
+.category_( 'pattern_timebased' );
