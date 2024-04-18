@@ -209,4 +209,7 @@ defs = defs.add(
 	.addStartFunc({ UMIDIDict.start( false ) })
 );
 
-MultiUMapDef( 'midi', defs, 'midi', 'type', false ).mappedArgs_([ 'value', 'toRange' ]).canUseUMap_( false )
+MultiUMapDef( 'midi', defs, 'midi', 'type', false )
+.allowedModes_( [ \init, \sync, \normal ] )
+.mappedArgs_([ 'value', 'toRange' ])
+.canUseUMap_( false )
