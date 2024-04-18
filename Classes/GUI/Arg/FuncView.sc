@@ -74,7 +74,7 @@ CodeEditView {
 				if( obj.notNil ) {
 					object = obj;
 					action.value( this );
-				    view.getParents.last.findWindow.close;
+				    view.getParents !? { |x| x.last.findWindow.close; };
 				    obj = nil;
 				} {
 					failAction.value( this );
