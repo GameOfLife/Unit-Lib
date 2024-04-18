@@ -7,6 +7,7 @@ The 'envir_set' Udef creates a unit that is able to globally share a value with 
 
 value: the value to share (can be UMap, but only from a function, control, midi or pattern category)
 key: the name of the variable (default: 'a')
+n: number of values. If n > 1 the value will be an Array
 type: the type of parameter (\value, \freq, \amp, \boolean, \time)
 
 --
@@ -15,7 +16,7 @@ part of the Unit lib default UDefs set
 */
 
 (
-var defs, def;
+var defs, def, sizeList = [1,2,3,4,5,6,7,8,9,10,12,16,20,24,28,32,48,64,96,128];
 defs = [
 	\value, [ 0, 1 ],
 	\freq, FreqSpec(2,20000),
@@ -24,31 +25,46 @@ defs = [
 	\boolean, BoolSpec(),
 	\time, SMPTESpec(),
 ].clump(2).collect({ |args|
-	var type, spec;
+	var type, spec, subdefs, makeUdef;
 	#type, spec = args;
 	spec = spec.asSpec;
-	HiddenFreeUdef( type, [
-		[ \value, 0, spec, false, \init ],
-		[ \key, \a, EnvirSpec() ],
-	])
-	.apxCPU_( 0 )
-	.prepareFunc_({ |server, unit, action, startPos|
-		var value;
-		value = unit.get( \value );
-		unit.get( \key ).asSymbol.uEnvirPut( value.value, spec );
-		if( value.isKindOf( UMap ) ) {
-			value.start
-		};
-		action.value;
-	})
-	.createsSynth_( false )
-	.setSynthFunc_({ |unit ...keyValuePairs|
-		unit.get( \key ).asSymbol.uEnvirPut( unit.get( \value ).value, spec );
+
+	makeUdef = { |name, argspec, default|
+		argspec = argspec ? spec;
+		FreeUdef( name, [
+			[ \value, default, argspec, false, \init ],
+			[ \key, \a, EnvirSpec() ],
+		], addToAll: false )
+		.apxCPU_( 0 )
+		.prepareFunc_({ |server, unit, action, startPos|
+			var value;
+			value = unit.get( \value );
+			unit.get( \key ).asSymbol.uEnvirPut( value.value, spec );
+			if( value.isKindOf( UMap ) ) {
+				value.start
+			};
+			action.value;
+		})
+		.createsSynth_( false )
+		.setSynthFunc_({ |unit ...keyValuePairs|
+			unit.get( \key ).asSymbol.uEnvirPut( unit.get( \value ).value, spec );
+		});
+	};
+
+	subdefs = [ makeUdef.value( sizeList[0], spec, 0 ) ];
+
+	subdefs = subdefs ++ sizeList[1..].collect({ |size|
+		makeUdef.value( size,
+			spec.massEditSpec( { spec.default } ! size ),
+			0 ! size
+		);
 	});
+
+	 MultiUdef( type, subdefs, \envir, \n, false, false )
 });
 
 def = MultiUdef( \envir_set, defs, \envir, \type, false )
-	.apxCPU_( 0 );
+.apxCPU_( 0 );
 
 def
 )

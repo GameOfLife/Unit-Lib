@@ -110,7 +110,7 @@
 + BoolSpec {
 
 	massEditSpec { |inArray|
-		^BoolArraySpec( inArray, trueLabel, falseLabel );
+		^BoolArraySpec( inArray, trueLabel, falseLabel ).size_( inArray.size );
 	}
 
 	massEditValue { |inArray|

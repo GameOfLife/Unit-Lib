@@ -37,8 +37,8 @@ FreeUdef : Udef {
 	var <>createsSynth = true;
 	var <>argSpecsFunc;
 
-	*new { |name, args, canFreeSynth = false, category|
-		^super.basicNew( name, args ? [], category ).initFree( canFreeSynth );
+	*new { |name, args, canFreeSynth = false, category, addToAll = true|
+		^super.basicNew( name, args ? [], category, addToAll ).initFree( canFreeSynth );
 	}
 
 	initFree { | canFreeSynth |

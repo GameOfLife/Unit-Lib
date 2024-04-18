@@ -129,6 +129,7 @@ ArrayControlSpec : ControlSpec {
 
 	constrain { |value|
 		var ctrlSpec = this.asControlSpec;
+		if( value.isArray.not ) { value = [ value ] };
 		if( size.notNil ) {
 			^value.collect({ |x| ctrlSpec.constrain(x) })
 				.wrapExtend( size );
@@ -336,15 +337,19 @@ BoolSpec : Spec {
 }
 
 BoolArraySpec : BoolSpec {
+	var <>size;
 	// spec for an array of boolean values
 
 	constrain { |value|
+		if( size.notNil ) {
+			value = value.asArray.wrapExtend( size );
+		};
 		^value.asArray.collect({ |val|
 			switch( val.class,
-				Boolean, { ^val },
-				Integer, { ^val.booleanValue },
-				Float, { ^val > 0.5 },
-				{ ^true }
+				Boolean, { val },
+				Integer, { val.booleanValue },
+				Float, { val > 0.5 },
+				{ true }
 			)
 		});
 	}
