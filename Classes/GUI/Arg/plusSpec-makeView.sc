@@ -263,7 +263,7 @@
 			settings: [0,0,0],
 			labels: ["absolute", "relative", "division"],
 			specs: { [
-				[0, this.maxval, this.map(0.5).calcCurve(0, this.maxval),0,0].asSpec,
+				[0, this.maxval, this.map(0.5).first.calcCurve(0, this.maxval),0,0].asSpec,
 				[0, 1].asSpec,
 				[0,32,\lin,1,0].asSpec
 			] },

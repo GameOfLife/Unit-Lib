@@ -124,7 +124,7 @@ ArrayControlSpec : ControlSpec {
 	asArrayControlSpec { ^this }
 
 	copy {
-		^this.class.newFrom(this).originalSpec_( originalSpec.copy );
+		^this.class.newFrom(this).originalSpec_( originalSpec.copy ).size_( size );
 	}
 
 	constrain { |value|
@@ -136,6 +136,21 @@ ArrayControlSpec : ControlSpec {
 		} {
 			^value.collect{ |x| ctrlSpec.constrain(x) }
 		}
+	}
+
+	map { arg value;
+		// maps a value from [0..1] to spec range
+		value = value.asArray;
+		if( size.notNil ) {
+			value = value.wrapExtend( size );
+		};
+		if( originalSpec.isNil ) {
+			^warp.map(value.clip(0.0, 1.0)).round(step);
+		} {
+			^value.collect({ |val|
+				originalSpec.map( val );
+			})
+		};
 	}
 
 	uconstrain { |value| ^this.constrain( value ? this.default ); }
