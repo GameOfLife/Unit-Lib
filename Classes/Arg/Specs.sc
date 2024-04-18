@@ -370,7 +370,9 @@ BoolArraySpec : BoolSpec {
 	}
 
 	map { |val|
-		^val.asArray.collect({ |value|
+		val = val.asArray;
+		if( size.notNil ) { val = val.wrapExtend( size ) };
+		^val.collect({ |value|
 			switch( value.class,
 				Boolean, { value },
 				Integer, { value.booleanValue },
