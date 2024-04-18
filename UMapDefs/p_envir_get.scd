@@ -13,7 +13,7 @@ this is an UMapDef definition file
 part of the Unit lib default UMapDefs set
 */
 
-UPatDef( \p_envir_get, { |unit, index = 0, key = 'a'|
+UPatDef( \p_envir_get, { |unit, key = 'a', index = 0|
 	{
 		var kkey, val, spec, fromSpec, ii = 0;
 		spec = unit.spec ?? { [0,1].asSpec; };
