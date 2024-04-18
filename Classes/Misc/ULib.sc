@@ -442,7 +442,14 @@ ULib {
 				});
 				spec.setView( view, key.envirGet );
 				ctrl = SimpleController( currentEnvironment )
-				.put( key, { spec.setView( view, key.envirGet ); });
+				.put( key, {
+					if( spec == ~u_specs[ key ].postln ) {
+						spec.setView( view, key.envirGet );
+					} {
+						w.onClose.value;
+						{ this.envirWindow; }.defer;
+					};
+				});
 				w.onClose = w.onClose.addFunc({ ctrl.remove; });
 				SmoothButton( w, 14@14 )
 				.label_( '-' )
