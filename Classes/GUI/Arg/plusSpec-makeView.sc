@@ -186,18 +186,50 @@
 			},
 		);
 
+		operations[ 'move item' ] = (
+			settings: [0,0,1],
+			labels: ["from", "to", "range"],
+			specs: { [
+				[ 0, currentVals.size - 1, \lin, 1, 0 ].asSpec,
+				[ 0, currentVals.size - 1, \lin, 1, 0 ].asSpec,
+				[ 1, currentVals.size - 1, \lin, 1, 1 ].asSpec,
+			] },
+			calculate: { |evt, values|
+				var take, from, to, range;
+				#from, to, range = evt[ \settings ].collect(_.asInteger);
+				if( from != to ) {
+					values = values.copy;
+					if( range > 1 ) {
+						from = from.min( values.size - range );
+						to = to.min( values.size - range );
+						take = range.collect({ |i|
+							values.removeAt( from );
+						}).reverse;
+						take.do({ |item|
+							values = values.insert( to, item );
+						});
+					} {
+						values.move( from, to )
+					};
+				};
+				values;
+			},
+		);
+
 		operations[ \resample ] = (
-			settings: [1,'linear'],
-			labels: ["ratio", "type"],
+			settings: [1,0,'linear'],
+			labels: ["ratio", "offset", "type"],
 			specs: { [
 				[0.125,8,\exp,0,1].asSpec,
+				[-1,1,\lin,0,0].asSpec,
 				ListSpec([ 'step', 'linear', 'spline', 'hermite', 'sine'], 1)
 			] },
 			calculate: { |evt, values|
-				var ratio, type;
-				#ratio, type = evt.settings;
+				var ratio, offset, type;
+				#ratio, offset, type = evt.settings;
+				offset = offset * values.size;
 				values.size.collect({ |i|
-					values.intAt( i * ratio, type );
+					values.intAt( i * ratio + offset, type );
 				});
 			},
 		);
@@ -928,7 +960,7 @@
 				vws[ \val ] = values;
 				vws[ \update ].value;
 				action.value( vws, vws[ \val ] );
-			}, operations ?? { [ \reverse, \scramble, 'use first for all', \rotate, 'code...', \post ] });
+			}, operations ?? { [ \reverse, \scramble, 'use first for all', \rotate, 'move item', 'code...', \post ] });
 		});
 
 		if( canMap ) {
@@ -1092,7 +1124,7 @@
 				vws[ \val ] = values;
 				vws[ \update ].value;
 				action.value( vws, vws[ \val ] );
-			}, [ \reverse, \scramble, 'use first for all', \rotate, 'code...', \post ]);
+			}, [ \reverse, \scramble, 'use first for all', \rotate, 'move item', 'code...', \post ]);
 		});
 
 		if( canMap ) {
@@ -1701,7 +1733,7 @@
 				vws[ \val ] = values;
 				vws[ \update ].value;
 				action.value( vws, vws[ \val ] );
-			}, [ \invert, \reverse, \scramble, \random, \line, \rotate, \flat, 'code...', \post ]);
+			}, [ \invert, \reverse, \scramble, \random, \line, \rotate, 'move item', \flat, 'code...', \post ]);
 		});
 
 		vws[ \update ] = {

@@ -79,7 +79,7 @@
 		.default_( inArray )
 		.size_( inArray.size )
 		.originalSpec_( this )
-		.operations_( [ \invert, \reverse, \sort, \scramble, \random, \line, 'use first for all', \rotate, \resample, \curve, \smooth, \flat, \sine, \square, \triangle,  'code...', \post ] )
+		.operations_( [ \invert, \reverse, \sort, \scramble, \random, \line, 'use first for all', \rotate, 'move item', \resample, \curve, \smooth, \flat, \sine, \square, \triangle,  'code...', \post ] )
 	}
 
 	massEditValue { |inArray|
