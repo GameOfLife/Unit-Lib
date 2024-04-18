@@ -443,7 +443,7 @@ ULib {
 				spec.setView( view, key.envirGet );
 				ctrl = SimpleController( currentEnvironment )
 				.put( key, {
-					if( spec == ~u_specs[ key ].postln ) {
+					if( spec == ~u_specs[ key ] ) {
 						spec.setView( view, key.envirGet );
 					} {
 						w.onClose.value;
