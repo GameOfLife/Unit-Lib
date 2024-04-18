@@ -78,7 +78,7 @@ UChainIOGUI : UChainGUI {
 	}
 
 	makeUnitHeader { |units, margin, gap|
-		var comp, header, code, io;
+		var comp, header, code, io, defs;
 		var audio, control;
 
 		comp = CompositeView( composite, (composite.bounds.width - (margin.x * 2))@16 )
@@ -111,6 +111,21 @@ UChainIOGUI : UChainGUI {
 	                	chain, replaceCurrent: true
 	                );
                 }).resize_(3);
+
+		defs = SmoothButton( comp,
+				Rect( comp.bounds.right - (
+					2 + 40 + (4 + 40 + 4 + 40)
+					), 1, 42, 12
+				)
+			)
+			.label_( "udefs" )
+		    .toolTip_( "open Udefs window.\n\nYou can drag Udefs to the chain from there or open" +
+			    "their corresponding code files."
+		    )
+			.radius_( 2 )
+			.action_({
+				UdefsGUI();
+			}).resize_(3);
 
 		CompositeView( comp, Rect( 0, 14, (composite.bounds.width - (margin.x * 2)), 2 ) )
 			.background_( Color.black.alpha_(0.25) )

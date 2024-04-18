@@ -30,7 +30,7 @@ UChainCodeGUI : UChainGUI {
 	getUnits { ^chain.units }
 
     makeUnitHeader { |units, margin, gap|
-        var comp, header, io, code;
+        var comp, header, io, code, defs;
 
         comp = CompositeView( composite, (composite.bounds.width - (margin.x * 2))@16 )
             .resize_(2);
@@ -64,6 +64,21 @@ UChainCodeGUI : UChainGUI {
 	                );
                 }).resize_(3);
 
+		defs = SmoothButton( comp,
+				Rect( comp.bounds.right - (
+					2 + 40 + (4 + 40 + 4 + 40)
+					), 1, 42, 12
+				)
+			)
+			.label_( "udefs" )
+		    .toolTip_( "open Udefs window.\n\nYou can drag Udefs to the chain from there or open" +
+			    "their corresponding code files."
+		    )
+			.radius_( 2 )
+			.action_({
+				UdefsGUI();
+			}).resize_(3);
+
         CompositeView( comp, Rect( 0, 14, (composite.bounds.width - (margin.x * 2)), 2 ) )
             .background_( Color.black.alpha_(0.25) )
             .resize_(2)
@@ -86,11 +101,17 @@ UChainCodeGUI : UChainGUI {
 			};
 		};
 
-		DragSource(scrollView, width@16 )
+		DragSource(scrollView, (width - 104)@16 )
 		.align_(\center)
 		.object_( chain.asCompileString )
 		.applySkin( RoundView.skin )
-		.string_( "drag me for the chain's code" );
+		.string_( "drag me for the UChain's code" );
+
+		SmoothButton(scrollView, 100@16 )
+		.label_( "post uchain code" )
+		.action_({
+			chain.postcs;
+		});
 
 		^units.collect({ |unit, i|
 			var header, comp, views, params;
