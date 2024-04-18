@@ -125,7 +125,7 @@ UChainCodeGUI : UChainGUI {
                         })
                     }).resize_(3);
             } {
-				 SmoothButton( comp, Rect( comp.bounds.right - (80), 1, 80, 12 ) )
+				 SmoothButton( comp, Rect( comp.bounds.right - (100), 1, 100, 12 ) )
 				    .label_( "open Udef file" )
                     .radius_( 2 )
                     .action_({
@@ -133,6 +133,31 @@ UChainCodeGUI : UChainGUI {
                     }).resize_(3);
 			};
 			views = this.makeUnitView( unit, scrollView, i, labelWidth, width );
+
+			unit.getAllUMaps.do({ |umap|
+				var comp, header;
+				comp = CompositeView( scrollView, width@14 )
+				.resize_(2);
+
+				header = StaticText( comp, comp.bounds.moveTo(0,0) )
+				.applySkin( RoundView.skin )
+				.string_( "     ." ++
+					unit.getUMapPath( umap ).join(".") ++
+					": " ++ umap.defName )
+				.background_( umap.guiColor )
+				.resize_(2)
+				.font_(
+					(RoundView.skin.tryPerform( \at, \font ) ??
+						{ Font( Font.defaultSansFace, 12) }).boldVariant
+				);
+
+				SmoothButton( comp, Rect( comp.bounds.right - (100), 1, 100, 12 ) )
+				.label_( "open UMapDef file" )
+				.radius_( 2 )
+				.action_({
+					umap.def.openDefFile;
+				}).resize_(3);
+			});
 
 			unit.addDependant( unitInitFunc );
 
