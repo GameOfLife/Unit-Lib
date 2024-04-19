@@ -722,7 +722,7 @@
 
 		if( warp.isKindOf( ExponentialWarp ) ) {
 			[ vws[ \rangeSlider ].loBox, vws[ \rangeSlider ].hiBox ].do({ |box|
-				box.allowedChars = "+-.AaBbCcDdEeFfGgMmTt#*/()%";
+				box.allowedChars = "+-.AaBbCcDdEeFfGgMmTtpi#*/()%";
 				box.interpretFunc = { |string, val|
 					var cents = 0, splits;
 					string = string.format( val );
@@ -742,6 +742,8 @@
 						string[1..].interpret.midicps;
 					} { "Tt".includes(string.first) } {
 						("0" ++ string[1..]).interpret.midiratio * val;
+					} { string.find( "pi" ).notNil } {
+						string.interpret;
 					} {
 						string.interpret;
 					};
@@ -4048,6 +4050,7 @@
 
 + AngleArraySpec {
 
+	/*
 	makeView { |parent, bounds, label, action, resize|
 		var mode, vws, act, spec, degMul;
 		mode = AngleSpec.mode;
@@ -4089,6 +4092,7 @@
 	mapSetView { |view, value, active = false|
 		this.setView( view, this.map( value ), active );
 	}
+	*/
 
 }
 
