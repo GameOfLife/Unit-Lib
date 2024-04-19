@@ -66,7 +66,7 @@ UChainGUI {
 					background: Color.white.alpha_(0.5),
 					hiliteColor: Color.green.alpha_(0.5),
 				),
-				qPalette: QPalette.light,
+				qPalette: { QPalette.light },
 			),
 
 			\medium, (
@@ -86,9 +86,10 @@ UChainGUI {
 					background: Color.white.alpha_(0.45),
 					hiliteColor: Color.green.alpha_(0.5),
 				),
-				qPalette: QPalette.auto(Color.grey(0.75), Color.grey(0.7))
-				.base_( Color.grey(0.75) )
-				.setColor( Color.grey( 0.1 ), \shadow ),
+				qPalette: { QPalette.auto(Color.grey(0.75), Color.grey(0.7))
+					.base_( Color.grey(0.75) )
+					.setColor( Color.grey( 0.1 ), \shadow )
+				},
 			),
 
 			\dark, (
@@ -132,7 +133,7 @@ UChainGUI {
 				SCAlert: (
 					background: Color.gray(0.2)
 				),
-				qPalette: QPalette.dark,
+				qPalette: { QPalette.dark },
 			),
 
 			\very_dark, (
@@ -176,12 +177,14 @@ UChainGUI {
 				SCAlert: (
 					background: Color.gray(0.2)
 				),
-				qPalette: QPalette.auto( Color.grey(0.2), Color.grey(0.1) )
-				.base_( Color.grey(0.1) )
-				.baseText_( Color.gray(0.75) )
-				.windowText_( Color.gray(0.75) )
-				.setColor(Color.grey(0.08), \shadow)
-				.highlight_( Color(0.25, 0.37, 0.57) )
+				qPalette: {
+					QPalette.auto( Color.grey(0.2), Color.grey(0.1) )
+					.base_( Color.grey(0.1) )
+					.baseText_( Color.gray(0.75) )
+					.windowText_( Color.gray(0.75) )
+					.setColor(Color.grey(0.08), \shadow)
+					.highlight_( Color(0.25, 0.37, 0.57) )
+				}
 			),
 
 			\light_old,  (
@@ -245,7 +248,7 @@ UChainGUI {
 				SCAlert: (
 					background: Color.gray(0.2)
 				),
-				qPalette: QPalette.dark,
+				qPalette: { QPalette.dark },
 			),
 
 		);
