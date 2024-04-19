@@ -32,6 +32,7 @@ CodeEditView {
 		if( parent.notNil ) { hasParent = true };
 		#view, bounds, margin, gap = EZGui.makeParentView( parent, bounds ? (350@100) );
 		view.addFlowLayout( 0@0, gap );
+		view.resize_(5);
 		if( label.notNil ) {
 			if( hasParent ) {
 				labelView = StaticText( view, bounds.width @ labelHeight )
