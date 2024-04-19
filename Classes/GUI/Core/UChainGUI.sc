@@ -72,19 +72,28 @@ UChainGUI {
 			\medium, (
 				labelWidth: 100,
 				menuStripColor: Color.gray(0.8),
-				headerColor: Color.white.alpha_(0.5),
+				headerColor: Color.white.alpha_(0.33),
 				stringColor: Color.black,
 				hiliteColor: Color.black.alpha_(0.33),
 				scoreEditorWindow: Color.gray(0.65),
 				RoundButton: (
 					border: 0,
-					background: Color.white.alpha_(0.45),
-					hiliteColor: Color.green.alpha_(0.5),
+					background: Color.white.alpha_(0.33),
+					hiliteColor: Color.green.alpha_(0.33),
 				),
 				SmoothButton: (
 					border: 0,
-					background: Color.white.alpha_(0.45),
-					hiliteColor: Color.green.alpha_(0.5),
+					background: Color.white.alpha_(0.33),
+					hiliteColor: Color.green.alpha_(0.33),
+				),
+				SmoothNumberBox: (
+					background: Color.white.alpha_(0.25)
+				),
+				SMPTEBox: (
+					background: Color.white.alpha_(0.25)
+				),
+				XYView: (
+					background: Color.white.alpha_(0.25)
 				),
 				qPalette: { QPalette.auto(Color.grey(0.75), Color.grey(0.7))
 					.base_( Color.grey(0.75) )
