@@ -784,7 +784,7 @@
 
 		vws[ \meanSlider ].mouseDownAction = { |sl, x,y,mod, xx, clickCount|
 			if( clickCount == 2 ) {
-				vws[ \val ] = this.map( sl.value ) ! vws[ \val ].size;
+				vws[ \val ] = this.map( sl.value ! vws[ \val ].size );
 				vws[ \setRangeSlider ].value;
 				vws[ \setPlotter ].value;
 				action.value( vws, vws[ \val ] );
