@@ -703,7 +703,7 @@
 		};
 
 		vws[ \rangeSlider ] = EZSmoothRanger( view, (width - optionsWidth - 6) @ (bounds.height),
-			nil, this.asControlSpec, { |sl|
+			nil, sliderSpec ?? { this.asControlSpec }, { |sl|
 				var values, min, max;
 				values = this.unmap( vws[ \val ] );
 				vws[ \range ] = sl.value;
@@ -771,12 +771,12 @@
 		.mode_( \move )
 		.action_({ |sl|
 			var values, min, max, mean;
-			values = this.unmap( vws[ \val ] );
+			values = (sliderSpec ? this).unmap( vws[ \val ] );
 			min = values.minItem;
 			max = values.maxItem;
 			mean = [ min, max ].mean;
 			values = values.normalize( *(([ min, max ] - mean) + sl.value).clip(0,1) );
-			vws[ \val ] = this.map( values );
+			vws[ \val ] = (sliderSpec ? this).map( values );
 			vws[ \setPlotter ].value;
 			vws[ \setRangeSlider ].value;
 			action.value( vws, vws[ \val ] );
@@ -784,7 +784,7 @@
 
 		vws[ \meanSlider ].mouseDownAction = { |sl, x,y,mod, xx, clickCount|
 			if( clickCount == 2 ) {
-				vws[ \val ] = this.map( sl.value ! vws[ \val ].size );
+				vws[ \val ] = (sliderSpec ? this).map( sl.value ! vws[ \val ].size );
 				vws[ \setRangeSlider ].value;
 				vws[ \setPlotter ].value;
 				action.value( vws, vws[ \val ] );
@@ -795,7 +795,7 @@
 			var min, max;
 			min = vws[ \val ].minItem;
 			max = vws[ \val ].maxItem;
-			vws[ \meanSlider ].value_( this.unmap( [ min, max ] ).mean );
+			vws[ \meanSlider ].value_( (sliderSpec ? this).unmap( [ min, max ] ).mean );
 		};
 
 		vws[ \setMeanSlider ].value;

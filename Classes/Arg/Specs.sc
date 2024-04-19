@@ -116,6 +116,7 @@ ArrayControlSpec : ControlSpec {
 	// spec for an array of values
 	var <>size;
 	var <>originalSpec;
+	var <>sliderSpec;
 
 	asRangeSpec {
 		^RangeSpec.newFrom( this ).default_( this.default.asCollection.wrapAt([0,1]) );
