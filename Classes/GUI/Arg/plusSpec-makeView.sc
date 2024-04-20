@@ -26,6 +26,7 @@
 	makeEditWindow { |inView, values, label, action, spec|
 		var evws = (), canBeControlSpec = false, hasOriginalSpec = false, scrollHeight;
 		var specViewHeight, originalViewHeight;
+		var viewSpec;
 
 		canBeControlSpec = this.respondsTo( \asControlSpec );
 		hasOriginalSpec = this.respondsTo( \originalSpec );
@@ -43,8 +44,14 @@
 			};
 		};
 
+		if( this.respondsTo( \sliderSpec ) ) {
+			viewSpec = this.sliderSpec ? evws[ \spec ];
+		} {
+			viewSpec = evws[ \spec ];
+		};
+
 		specViewHeight = this.viewNumLines * 18;
-		originalViewHeight = evws[ \spec ].viewNumLines * 18;
+		originalViewHeight = viewSpec.viewNumLines * 18;
 
 		RoundView.pushSkin( UChainGUI.skin );
 
@@ -119,7 +126,7 @@
 		RoundView.pushSkin( UChainGUI.skin ++ ( labelWidth: UChainGUI.skin.labelWidth - 4 ) );
 
 		evws[ \views ] = evws[ \values ].size.collect({ |i|
-			evws[ \spec ].makeView( evws[ \scroll ], (evws[ \w ].bounds.width - 58) @ (originalViewHeight - 4), "% [%]".format(evws[ \key ], i), { |vws, val|
+			viewSpec.makeView( evws[ \scroll ], (evws[ \w ].bounds.width - 58) @ (originalViewHeight - 4), "% [%]".format(evws[ \key ], i), { |vws, val|
 				evws[ \values ][ i ] = val;
 				action.value( evws[ \values ] );
 			}, 2);
