@@ -770,13 +770,17 @@
 		.knobSize_(0.6)
 		.mode_( \move )
 		.action_({ |sl|
-			var values, min, max, mean;
-			values = (sliderSpec ? this).unmap( vws[ \val ] );
+			var values, min, max, mean, slval;
+			slval = sl.value;
+			if( sliderSpec.notNil ) {
+				slval = this.unmap( sliderSpec.map( slval ) );
+			};
+			values = this.unmap( vws[ \val ] );
 			min = values.minItem;
 			max = values.maxItem;
 			mean = [ min, max ].mean;
-			values = values.normalize( *(([ min, max ] - mean) + sl.value).clip(0,1) );
-			vws[ \val ] = (sliderSpec ? this).map( values );
+			values = values.normalize( *(([ min, max ] - mean) + slval).clip(0,1) );
+			vws[ \val ] = this.map( values );
 			vws[ \setPlotter ].value;
 			vws[ \setRangeSlider ].value;
 			action.value( vws, vws[ \val ] );
@@ -795,7 +799,12 @@
 			var min, max;
 			min = vws[ \val ].minItem;
 			max = vws[ \val ].maxItem;
-			vws[ \meanSlider ].value_( (sliderSpec ? this).unmap( [ min, max ] ).mean );
+			if( sliderSpec.notNil ) {
+				vws[ \meanSlider ].value_( sliderSpec.unmap( [ min, max ].mean ) );
+			} {
+				vws[ \meanSlider ].value_( this.unmap( [ min, max ] ).mean );
+			};
+
 		};
 
 		vws[ \setMeanSlider ].value;
