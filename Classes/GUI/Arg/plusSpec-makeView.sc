@@ -950,7 +950,7 @@
 
 		compWidth = bounds.width - labelWidth - 8 - optionsWidth;
 
-		vws[ \specComp ] = CompositeView( view, compWidth @  (bounds.height) );
+		vws[ \specComp ] = CompositeView( view, compWidth @  (bounds.height) ).resize_(2);
 
 		vws[ \specView ] = this.originalSpec.makeView(
 			vws[ \specComp ],
@@ -964,10 +964,11 @@
 
 		view.asView.decorator.shift( compWidth.neg - 4, 0 );
 
-		vws[ \mixedComp ] = View( view, compWidth @  (bounds.height) );
+		vws[ \mixedComp ] = View( view, compWidth @  (bounds.height) ).resize_(2);
 
 		vws[ \mixedView ] = StaticText( vws[ \mixedComp ], vws[ \mixedComp ].bounds.moveTo(0,0).height_(14) )
 		.string_( " mixed" )
+		.resize_(5)
 		.applySkin( RoundView.skin );
 
 		vws[ \mixedView ].setProperty(\wordWrap, false);
