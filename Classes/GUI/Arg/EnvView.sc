@@ -397,9 +397,7 @@ EnvEditView {
 			} {
 				curves = env.curves.asCollection.wrapExtend( env.levels.size - 1 );
 				views[ \duration ].value = env.times.sum;
-				rangeViews[ \range ].value = spec.asSpec.map([
-					env.unmappedLevels.minItem, env.unmappedLevels.maxItem
-				]);
+				rangeViews.setValues( env.levels, env.times );
 				argViews.do({ |item, i|
 					var first;
 					first = (i == 0);
@@ -490,7 +488,7 @@ EnvEditView {
 		views = ();
 
 		// selection
-		listView = PopUpMenu( view, 80 @ viewHeight )
+		listView = UPopUpMenu( view, 80 @ viewHeight )
 			.font_( font )
 			.value_( selected ? 0 )
 			.applySkin( RoundView.skin)
@@ -506,6 +504,8 @@ EnvEditView {
 					this.selected = pu.value;
 				};
 			});
+
+		listView.bounds = listView.bounds.insetAll(0,-2,0,-2);
 
 		listView.onClose_({ this.removeCtrl });
 
@@ -679,7 +679,7 @@ EnvEditView {
 					.font_( font )
 					.applySkin( RoundView.skin );
 
-				vws[ \curveType ] = PopUpMenu( vws[ \comp ], 60 @ viewHeight  )
+				vws[ \curveType ] = UPopUpMenu( vws[ \comp ], 60 @ viewHeight  )
 					.items_([ \step, \lin, \exp, \sine, \welch, \curve, \squared, \cubed ])
 					.value_(
 						Env.shapeNumber(env.curves.asCollection.wrapAt(i-1))
@@ -778,85 +778,42 @@ EnvEditView {
 
 		rangeViews[ \comp ].addFlowLayout( 2@2, 2@2 );
 
-		// level
-		StaticText( rangeViews[ \comp ], 35 @ viewHeight )
-			.string_( "range" )
-			.align_( \right )
-			.font_( font )
-			.applySkin( RoundView.skin );
+		rangeViews[ \spec ] = spec.massEditSpec( env.levels ).size_( nil );
 
-		// range
-		rangeViews[ \range ] = EZSmoothRanger( rangeViews[ \comp ],
-			(bounds.width - 43) @ viewHeight, nil, spec.asSpec
-		)
-			.font_( font )
-			.value_( spec.asSpec.map([ env.unmappedLevels.minItem, env.unmappedLevels.maxItem]) )
-			.action_({ |sl|
-				env.unmappedLevels = env.unmappedLevels.normalize(
-					spec.asSpec.unmap( sl.value[0] ),
-					spec.asSpec.unmap( sl.value[1].max(sl.value[0]+1.0e-12) )
-				);
+		RoundView.pushSkin( RoundView.skin ++ ( labelWidth: 40 ) );
+
+		rangeViews[ \vw ] = rangeViews[ \spec ].makeView(
+			rangeViews[ \comp ],
+			rangeViews[ \comp ].bounds.width - 4 @ 14,
+			"levels",
+			{ |vw, vals|
+				env.levels = vals;
 				env.changed( \levels );
 				action.value( this, env );
-			});
-		rangeViews[ \range ].view.resize_(2);
+			}, 5
+		);
 
-		SmoothButton( rangeViews[ \comp ], 50 @ viewHeight )
-			.label_( "invert" )
-			.font_( font )
-			.radius_(2)
-			.action_({
-				var min, max;
-				min = env.unmappedLevels.minItem;
-				max = env.unmappedLevels.maxItem;
-				env.unmappedLevels = env.unmappedLevels.linlin(min,max,max,min);
-				env.changed( \levels );
-				action.value( this, env );
-			});
+		rangeViews[ \timeSpec ] = SMPTESpec().massEditSpec( env.times ).size_(nil);
 
-		SmoothButton( rangeViews[ \comp ], 50 @ viewHeight )
-			.label_( "reverse" )
-			.font_( font )
-			.radius_(2)
-			.action_({
-				env.unmappedLevels = env.unmappedLevels.reverse;
-				env.times = env.times.reverse;
-				if( env.curves.size > 0 ) {
-					env.curves = env.curves.reverse;
-				};
-				env.changed( \levels );
+		rangeViews[ \tvw ] = rangeViews[ \timeSpec ].makeView(
+			rangeViews[ \comp ],
+			rangeViews[ \comp ].bounds.width - 4 @ 14,
+			"times",
+			{ |vw, times|
+				env.times = times;
+				env.changed( \times );
 				action.value( this, env );
-			});
+			}, 5
+		);
 
-		SmoothButton( rangeViews[ \comp ], 50 @ viewHeight )
-			.label_( "random" )
-			.font_( font )
-			.radius_(2)
-			.action_({
-				var min, max, dur;
-				min = env.unmappedLevels.minItem;
-				max = env.unmappedLevels.maxItem;
-				dur = env.times.sum;
-				env.unmappedLevels = ({0.0 rrand: 1.0}!env.unmappedLevels.size).normalize(min, max);
-				env.times = ({0.1 exprand: 1.0}!env.times.size).normalizeSum * dur;
-				env.changed( \levels );
-				action.value( this, env );
-			});
+		RoundView.popSkin;
 
-		SmoothButton( rangeViews[ \comp ], 50 @ viewHeight )
-			.label_( "line" )
-			.font_( font )
-			.radius_(2)
-			.action_({
-				var min, max, dur;
-				min = env.unmappedLevels.minItem;
-				max = env.unmappedLevels.maxItem;
-				dur = env.times.sum;
-				env.unmappedLevels = (..env.unmappedLevels.size-1).normalize(min, max);
-				env.times = (1!env.times.size).normalizeSum * dur;
-				env.changed( \levels );
-				action.value( this, env );
-			});
+		rangeViews[ \setValues ] = { |evt, values, times|
+			rangeViews[ \spec ].setView( rangeViews[ \vw ], values );
+			rangeViews[ \timeSpec ].setView( rangeViews[ \tvw ], times );
+		};
+
+		rangeViews.setValues( env.levels, env.times );
 
 		rangeViews[ \comp ].visible = selected.isNil;
 	}
