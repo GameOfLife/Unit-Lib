@@ -780,7 +780,7 @@
 		.knobSize_(0.6)
 		.mode_( \move )
 		.action_({ |sl|
-			var values, min, max, mean, slval;
+			var values, min, max, mean, slval, curvedvalues, fromcurve;
 			slval = sl.value;
 			if( sliderSpec.notNil ) {
 				slval = this.unmap( sliderSpec.map( slval ) );
@@ -788,9 +788,17 @@
 			values = this.unmap( vws[ \val ] );
 			min = values.minItem;
 			max = values.maxItem;
-			mean = [ min, max ].mean;
-			values = values.normalize( *(([ min, max ] - mean) + slval).clip(0,1) );
-			vws[ \val ] = this.map( values );
+			sl.value = slval = slval.clip( min, max );
+			mean = values.mean;
+			fromcurve = mean.calcCurve( min, max );
+			curvedvalues = values.curvelin( min, max, min, max, fromcurve );
+			if( fromcurve.abs > 0.1 && { curvedvalues == values }) {
+				curvedvalues = curvedvalues.collect({ |item, i|
+					item.blend( curvedvalues.wrapAt(i+1), 0.5 );
+				});
+			};
+			curvedvalues = curvedvalues.lincurve( min, max, min, max, slval.calcCurve( min, max ) );
+			vws[ \val ] = this.map( curvedvalues );
 			vws[ \setPlotter ].value;
 			vws[ \setRangeSlider ].value;
 			action.value( vws, vws[ \val ] );
@@ -806,13 +814,13 @@
 		};
 
 		vws[ \setMeanSlider ] = {
-			var min, max;
-			min = vws[ \val ].minItem;
-			max = vws[ \val ].maxItem;
+			//var min, max;
+			//min = vws[ \val ].minItem;
+			//max = vws[ \val ].maxItem;
 			if( sliderSpec.notNil ) {
-				vws[ \meanSlider ].value_( sliderSpec.unmap( [ min, max ].mean ) );
+				vws[ \meanSlider ].value_( sliderSpec.unmap( vws[ \val ].mean ) );
 			} {
-				vws[ \meanSlider ].value_( this.unmap( [ min, max ] ).mean );
+				vws[ \meanSlider ].value_( this.unmap( vws[ \val ] ).mean );
 			};
 
 		};
