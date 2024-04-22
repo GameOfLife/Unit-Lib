@@ -3430,7 +3430,7 @@
 		    .action_({ |vw|
 		        action.value( vw, vw.value.asInteger );
 		    } ).resize_(5)
-		    .allowedChars_( "-" )
+		.allowedChars_( "+-*/()%" )
 			.step_( step )
 			.scroll_step_( step )
 			.alt_scale_( alt_step / step )
