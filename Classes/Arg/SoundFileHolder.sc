@@ -907,7 +907,7 @@ UChain(\test).gui
 
 		var scdir;
 		if( [ $/, $~ ].includes( this[0] ).not ) {
-			scdir = String.scDir;
+			scdir = Platform.resourceDir;
 			if( scdir != File.getcwd ) { // <- means this is a standalone app
 				^scdir +/+ this;
 			} {
