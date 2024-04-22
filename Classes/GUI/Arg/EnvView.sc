@@ -297,7 +297,7 @@ EnvPlotView {
 
 			bounds = vw.fromBounds.moveTo(0,0);
 
-			res = ((vw.bounds.width / bounds.width) * vw.scaleH).round(1);
+			res = ((vw.bounds.width / bounds.width) * vw.scaleH).round(1).max(1);
 
 			vw.drawTimeGrid;
 
