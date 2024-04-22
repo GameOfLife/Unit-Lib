@@ -21,4 +21,11 @@ UMapDef( \envelope_rel, {
 	sig = UEnvGenRel.kr( \env, nil, \timeScale, \loop, \delay, \trigger );
 	UMapOut.kr(sig);
 }).mappedArgs_([ \env ])
-.category_( 'automation' )
+.uchainInitFunc_({ |umap, unit|
+	var filter, invert, active, curve;
+	if( umap.def.category == \private ) {
+		umap.defName = \envelope;
+		umap.set( \timeMode, \relative )
+	}
+})
+.category_( 'private' )
