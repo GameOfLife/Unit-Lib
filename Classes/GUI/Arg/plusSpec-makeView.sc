@@ -3082,13 +3082,12 @@
 
 		vws[ \rate ] = rateSpec.makeView( view, (view.bounds.width - labelWidth) @ viewHeight,
 			" rate", { |vw, val|
-				var size;
 				vws[ \updateRate ] = false;
-				size = val.size - 1;
 				val.do({ |item, i|
-					if( i == size ) { vws[ \updateRate ] = true };
 					vws[ \val ][ i ].rate = item.midiratio;
-				})
+				});
+				vws[ \updateRate ] = true;
+				vws.setRate( vws[ \val ] );
 			}, 2 );
 
 		vws[ \rate ].labelView.align_( \left );
