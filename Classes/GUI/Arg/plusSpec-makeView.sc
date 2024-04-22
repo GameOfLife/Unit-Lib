@@ -313,7 +313,10 @@
 		operations[ \flat ] = (
 			settings: [0, 0],
 			labels: ["blend", "reference"],
-			specs: { [ [-1,1,\lin,0,0].asSpec, IntegerSpec(0, 0 , currentVals.size - 1) ] },
+			specs: { [
+				[-1,1,\lin,0,0].asSpec,
+				[0,currentVals.size - 1,\lin,1,0].asSpec
+			] },
 			calculate: { |evt, values|
 				values.blend( values[ evt.settings[1].asInteger ], evt.settings[0] );
 			},
