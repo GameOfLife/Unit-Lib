@@ -194,11 +194,13 @@ BufSndFileView {
 	*viewNumLines { ^4 }
 
 	makeView { |parent, bounds, resize|
-		var globalDepFunc, updGlobal;
+		var globalDepFunc, updGlobal, skin;
 
 		if( bounds.isNil ) { bounds= 350 @ (this.class.viewNumLines * (viewHeight + 4)) };
 
 		stringColor = RoundView.skin !? _.stringColor ?? { Color.black };
+
+		skin = RoundView.skin;
 
 		view = EZCompositeView( parent, bounds, gap: 4@4 );
 		bounds = view.asView.bounds;
@@ -233,58 +235,114 @@ BufSndFileView {
 			views[ \hasGlobal ].value = this.performSndFile( \hasGlobal ).binaryValue;
 		};
 
-				views[ \plot ] = SmoothButton( view, 40 @ viewHeight )
-			.radius_( 2 )
-			.label_( "plot" )
-			.action_({ |bt|
+		views[ \plot ] = SmoothButton( view, 40 @ viewHeight )
+		.radius_( 2 )
+		.label_( "plot" )
+		.action_({ |bt|
+			var w, f, sfv, sfZoom, mouseButton, dur;
+			var closeFunc;
 
-				// this will have to go in a separate class
-				var w, a, f, b, x;
-				var closeFunc;
+			RoundView.pushSkin( skin );
 
-				x = sndFile;
-				f = this.performSndFile( \asSoundFile );
+			f = this.performSndFile( \asSoundFile );
 
-				w = Window(f.path, Rect(200, 200, 850, 400), scroll: false);
-				a = SoundFileView.new(w, w.view.bounds);
-				a.resize_(5);
-				a.soundfile = f;
-				a.read(0, f.numFrames);
-				a.elasticMode_(1);
-				a.gridOn = true;
-				a.gridColor_( Color.gray(0.5).alpha_(0.25) );
-			    a.peakColor = Color.gray(0.8);
-			    a.rmsColor = Color.white;
+			w = Window(f.path, Rect(200, 200, 850, 400), scroll: false);
 
-				w.front;
-				a.background = Color.gray(0.6);
-				b = SmoothRangeSlider( w, a.bounds.insetAll(1,1,1,1) )
-					.knobSize_(0)
-					.resize_(5)
-					.background_( nil )
-					.hiliteColor_( Color.blue(0.2).alpha_(0.2) );
-				b.action = { |sl|
-					x.startFrame = (sl.lo * x.numFrames).round(1).asInteger;
-					x.endFrame = (sl.hi * x.numFrames).round(1).asInteger;
+			dur = f.numFrames / f.sampleRate / f.numChannels;
+
+			w.addFlowLayout( 4@4, 4@4 );
+
+			sfv = SoundFileView( w, w.bounds.insetAll( 4, 4, 4, 30 ) ).resize_(5);
+			sfZoom = SmoothRangeSlider( w, (w.bounds.width - 8) @ 14 ).resize_(8);
+
+			sfv.bounds = sfv.bounds.insetAll( -4, -4, -4, 0 );
+
+			sfv.soundfile = f;
+			sfv.read(0, f.numFrames);
+
+			sfZoom.lo_(0).range_(1)
+			.action_({ |view|
+				var divisor, rangeStart;
+				rangeStart = view.lo;
+				divisor = 1 - sfZoom.range;
+				if(divisor < 0.0001) {
+					rangeStart = 0;
+					divisor = 1;
 				};
-
-				views[ \setPlotRange ] = {
-					b.lo = x.startFrame / x.numFrames;
-					b.hi = x.endFrame / x.numFrames;
-				};
-
-				views[ \setPlotRange ].value;
-
-				closeFunc = { w.close; };
-
-				w.onClose = {
-					bt.onClose.removeFunc( closeFunc );
-					views[ \setPlotRange ] = nil;
-				};
-
-				bt.onClose = bt.onClose.addFunc( closeFunc );
-
+				sfv.xZoom_(sfZoom.range * dur)
+				.scrollTo(rangeStart / divisor)
 			});
+
+			sfv.background = Color.gray(0.6);
+			sfv.gridColor = Color.gray(0.5,0.25);
+			sfv.peakColor = Color.gray(0.8);
+			sfv.rmsColor = Color.white;
+			sfv.setSelectionColor( 0, Color.blue(0.2).alpha_(0.2) );
+			sfv.setSelectionColor( 1, Color.clear );
+			sfv.currentSelection = 1;
+
+			views[ \setPlotRange ] = {
+				{
+					sfv.setSelection( 0, [
+						sndFile.startFrame,
+						sndFile.endFrame - sndFile.startFrame
+					]);
+				}.defer;
+			};
+
+			views[ \setPlotRange ].value;
+
+			sfv.mouseDownAction = { |sfv, x, y|
+				var selection = sfv.selection(0);
+				var borders;
+				var mousePos = (
+					x.linlin( 0, sfv.bounds.width, 0, 1 ) * sfv.viewFrames +
+					(sfv.scrollPos * (sfv.numFrames - sfv.viewFrames ))
+				).asInteger;
+
+				borders = (selection[1] * [1/3,2/3]) + selection[0];
+
+				case { mousePos < borders[0] } {
+					sfv.setSelection( 0, [
+						mousePos,
+						selection[0] - mousePos + selection[1]
+					] );
+				} { mousePos > borders[1] } {
+					sfv.setSelectionSize( 0, mousePos - selection[0] );
+				} {
+					sfv.setSelectionStart( 0,
+						(mousePos - (selection[1] / 2))
+						.max(0).min( sfv.numFrames - selection[1] ) );
+				};
+			};
+
+			sfv.mouseMoveAction = sfv.mouseDownAction;
+
+			sfv.action = { |vw|
+				var selection;
+				selection = sfv.selection(0);
+				sndFile.startFrame = selection[0];
+				if( selection[1] == 0 ) {
+					sndFile.endFrame = nil;
+				} {
+					sndFile.endFrame = selection.sum;
+				};
+			};
+
+			closeFunc = { w.close; };
+
+			w.onClose = {
+				bt.onClose.removeFunc( closeFunc );
+				views[ \setPlotRange ] = nil;
+			};
+
+			bt.onClose = bt.onClose.addFunc( closeFunc );
+
+
+			w.front;
+
+			RoundView.popSkin( skin );
+		});
 
 		BufSndFile.global.addDependant( updGlobal );
 		views[ \hasGlobal ].onClose_({
