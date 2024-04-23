@@ -252,10 +252,12 @@ BufSndFileView {
 				a.read(0, f.numFrames);
 				a.elasticMode_(1);
 				a.gridOn = true;
-				a.gridColor_( Color.gray(0.5).alpha_(0.5) );
-				a.waveColors = Color.gray(0.2)!16;
+				a.gridColor_( Color.gray(0.5).alpha_(0.25) );
+			    a.peakColor = Color.gray(0.8);
+			    a.rmsColor = Color.white;
+
 				w.front;
-				a.background = Gradient( Color.white, Color.gray(0.7), \v );
+				a.background = Color.gray(0.6);
 				b = SmoothRangeSlider( w, a.bounds.insetAll(1,1,1,1) )
 					.knobSize_(0)
 					.resize_(5)
