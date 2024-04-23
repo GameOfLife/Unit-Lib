@@ -18,6 +18,15 @@ Udef( \bandPass, { |freq = 440, bw = 1, makeUp = 0.0|
 	in = in * DC.kr(1).blend( bw.explin(0.01,10,30,0,\none).dbamp, makeUp );
 	UOut.ar( 0, in );
 })
-	.category_( \filter )
+	.category_( \private )
 	.setSpec( \freq, \freq.asSpec )
 	.setSpec( \bw, [ 0.001, 10, \exp, 0, 1 ].asSpec )
+	.uchainInitFunc_({ |unit|
+		var args;
+		if( unit.def.category == \private ) {
+			args = [ \bw, unit.get( \bw ), \makeUp, unit.get( \makeUp ) ];
+			unit.defName = \filter;
+			unit.set( \type, \bandPass );
+			unit.set( *args );
+		};
+	});
