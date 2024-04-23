@@ -510,6 +510,37 @@
 			vws[ \sliderView ] = vws[ \valueView ].sliderView;
 			vws[ \sliderView ].centered_( true ).centerPos_( this.unmap( default ) );
 
+			if( warp.isKindOf( ExponentialWarp ) ) {
+				[ vws[ \valueView ].numberView ].do({ |box|
+					box.allowedChars = "+-.AaBbCcDdEeFfGgMmTtpi#*/()%";
+					box.interpretFunc = { |string, val|
+						var cents = 0, splits;
+						string = string.format( val );
+						case { "AaBbCcDdEeFfGg".includes(string.first) } {
+							if( string.indexOf( $+ ).notNil ) {
+								cents = string.split( $+ ).last.interpret;
+							} {
+								splits = string.split($-);
+								if( splits.size > 1 ) {
+									if( splits[ splits.size-2 ].last.isDecDigit ) {
+										cents = splits.last.interpret.neg;
+									};
+								};
+							};
+							string.namecps * (cents / 100).midiratio;
+						} { "Mm".includes(string.first) } {
+							string[1..].interpret.midicps;
+						} { "Tt".includes(string.first) } {
+							("0" ++ string[1..]).interpret.midiratio * val;
+						} { string.find( "pi" ).notNil } {
+							string.interpret;
+						} {
+							string.interpret;
+						};
+					};
+				})
+			};
+
 		} {
 			view = EZCompositeView( parent, bounds );
 			vws[ \view ] = view.view;
