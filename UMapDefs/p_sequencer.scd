@@ -17,7 +17,7 @@ part of the Unit lib default UMapDefs set
 
 var defs;
 
-defs = [ 4,8,12,16,24,32,48,64,128 ].collect({ |n|
+defs = [2,3,4,5,6,7,8,9,10,11,12,14,16,18,20,24,28,32,48,64,96,128 ].collect({ |n|
 	UPatDef( n, { |unit, range = #[0,7], reverse = false, loop = true, vals|
 		{
 			var current = 0, direction = 1;
@@ -35,7 +35,8 @@ defs = [ 4,8,12,16,24,32,48,64,128 ].collect({ |n|
 		}.r
 	}, addToAll: false )
 		.category_( \pattern )
-		.setSpec( \range, [0,n-1,\lin,1].asSpec.asRangeSpec )
+		.setSpec( \range, [0,n-1,\lin,1].asSpec.asRangeSpec.default_([0,n-1]) )
+		.setDefault( \range, [0,n-1] )
 		.setSpec( \reverse, BoolSpec(false) )
 	    .setSpec( \loop, BoolSpec(true) )
 		.setSpec( \vals, ArrayControlSpec(0,1,\lin,default: 0.5!n ).size_(n) )
