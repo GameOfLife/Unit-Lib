@@ -239,8 +239,8 @@ BufSndFileView {
 		.radius_( 2 )
 		.label_( "plot" )
 		.action_({ |bt|
-			var w, f, sfv, sfZoom, mouseButton, dur;
-			var closeFunc, moveRange, mouseAction, getMousePos;
+			var w, f, sfv, sfZoom, mouseButton, dur, infoView;
+			var closeFunc, moveRange, getMoveRange, mouseAction, getMousePos;
 
 			RoundView.pushSkin( skin );
 
@@ -252,8 +252,17 @@ BufSndFileView {
 
 			w.addFlowLayout( 4@4, 4@4 );
 
-			sfv = SoundFileView( w, w.bounds.insetAll( 4, 4, 4, 30 ) ).resize_(5);
+			sfv = SoundFileView( w, w.bounds.insetAll( 4, 4, 4, 40 ) ).resize_(5);
 			sfZoom = SmoothRangeSlider( w, (w.bounds.width - 8) @ 14 ).resize_(8);
+			infoView = StaticText( w, (w.bounds.width - 92) @ 14 ).resize_(8)
+			.applySkin( RoundView.skin );
+			SmoothSlider( w, 80 @ 14 )
+			.knobSize_(1)
+			.resize_(9)
+			.action_({ |sl|
+				sfv.yZoom = sl.value.linlin(0,1,0,24).dbamp;
+			});
+
 			sfZoom.knobSize = 1;
 			sfZoom.canFocus = false;
 
@@ -279,8 +288,10 @@ BufSndFileView {
 			sfv.gridColor = Color.gray(0.5,0.25);
 			sfv.peakColor = Color.gray(0.8);
 			sfv.rmsColor = Color.white;
+			sfv.timeCursorColor = Color.blue(0.2).alpha_(0.5);
 			sfv.setSelectionColor( 0, Color.blue(0.2).alpha_(0.2) );
 			sfv.setSelectionColor( 1, Color.clear );
+			sfv.setSelectionColor( 2, Color.blue(0.2).alpha_(0.3) );
 			sfv.currentSelection = 1;
 
 			views[ \setPlotRange ] = {
@@ -299,6 +310,16 @@ BufSndFileView {
 					x.linlin( 0, sfv.bounds.width, 0, 1 ) * sfv.viewFrames +
 					(sfv.scrollPos * (sfv.numFrames - sfv.viewFrames ))
 				).asInteger;
+			};
+
+			getMoveRange = { |sfv, x|
+				var selection = sfv.selection(0);
+				var mousePos = getMousePos.value( sfv, x );
+				if( mousePos.exclusivelyBetween(
+					*(selection[1] * [1/4,3/4] + selection[0] )
+				) ) {
+					(selection * [1,0.5]).sum - mousePos;
+				};
 			};
 
 			mouseAction = { |sfv, x, y|
@@ -321,24 +342,55 @@ BufSndFileView {
 							selection[0] - mousePos + selection[1]
 						] );
 					}
-				}
+				};
+				selection = sfv.selection(0);
+				infoView.string = " trim: % - % / % - %".format(
+					selection[0], selection.sum,
+					(selection[0] / f.sampleRate).asSMPTEString(1000),
+					(selection.sum / f.sampleRate).asSMPTEString(1000),
+				);
 			};
 
 			sfv.mouseDownAction = { |sfv, x, y|
-				var selection = sfv.selection(0);
-				var mousePos = getMousePos.value( sfv, x );
-				if( mousePos.exclusivelyBetween(
-					*(selection[1] * [1/4,3/4] + selection[0] )
-				) ) {
-					moveRange = (selection * [1,0.5]).sum - mousePos;
+				//var selection = sfv.selection(0);
+				//var mousePos = getMousePos.value( sfv, x );
+				moveRange = getMoveRange.value( sfv, x );
+				if( moveRange.notNil ) {
 					sfv.setSelectionColor( 0, Color.blue(0.2).alpha_(0.4) );
-				} {
-					moveRange = nil;
 				};
 				mouseAction.value( sfv, x, y );
+				sfv.timeCursorOn = false;
 			};
 
 			sfv.mouseMoveAction = mouseAction;
+
+			w.view.acceptsMouseOver = true;
+
+			sfv.mouseOverAction = { |sfv, x, y|
+				var pos, selection, border, mvr;
+				pos = getMousePos.value( sfv, x );
+				mvr = getMoveRange.value( sfv, x );
+				if( mvr.isNil ) {
+					selection = sfv.selection(0);
+					border = (selection * [1,0.5]).sum;
+					if( pos > border ) {
+						sfv.timeCursorPosition = selection.sum;
+					} {
+						sfv.timeCursorPosition = selection[0];
+					};
+					sfv.timeCursorOn = true;
+				} {
+					sfv.timeCursorOn = false;
+				};
+				infoView.string = " pos: % / %".format(
+					pos, (pos / f.sampleRate).asSMPTEString(1000)
+				);
+			};
+
+			sfv.mouseLeaveAction = { |sfv, x, y|
+				infoView.string = "";
+				sfv.timeCursorOn = false;
+			};
 
 			sfv.mouseUpAction = {
 				sfv.setSelectionColor( 0, Color.blue(0.2).alpha_(0.2) );
