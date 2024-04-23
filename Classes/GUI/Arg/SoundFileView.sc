@@ -255,6 +255,7 @@ BufSndFileView {
 			sfv = SoundFileView( w, w.bounds.insetAll( 4, 4, 4, 30 ) ).resize_(5);
 			sfZoom = SmoothRangeSlider( w, (w.bounds.width - 8) @ 14 ).resize_(8);
 			sfZoom.knobSize = 1;
+			sfZoom.canFocus = false;
 
 			sfv.bounds = sfv.bounds.insetAll( -4, -4, -4, 0 );
 
