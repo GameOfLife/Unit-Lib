@@ -240,7 +240,7 @@ BufSndFileView {
 		.label_( "plot" )
 		.action_({ |bt|
 			var w, f, sfv, sfZoom, mouseButton, dur;
-			var closeFunc;
+			var closeFunc, moveRange = false, mouseAction, getMousePos;
 
 			RoundView.pushSkin( skin );
 
@@ -248,7 +248,7 @@ BufSndFileView {
 
 			w = Window(f.path.formatGPath, Rect(200, 200, 850, 400), scroll: false);
 
-			dur = f.numFrames / f.sampleRate / f.numChannels;
+			dur = f.numFrames / f.sampleRate;
 
 			w.addFlowLayout( 4@4, 4@4 );
 
@@ -293,31 +293,46 @@ BufSndFileView {
 
 			views[ \setPlotRange ].value;
 
-			sfv.mouseDownAction = { |sfv, x, y|
-				var selection = sfv.selection(0);
-				var borders;
-				var mousePos = (
+			getMousePos = { |sfv, x|
+				(
 					x.linlin( 0, sfv.bounds.width, 0, 1 ) * sfv.viewFrames +
 					(sfv.scrollPos * (sfv.numFrames - sfv.viewFrames ))
 				).asInteger;
+			};
 
-				borders = (selection[1] * [1/3,2/3]) + selection[0];
+			mouseAction = { |sfv, x, y|
+				var selection = sfv.selection(0);
+				var border;
+				var mousePos = getMousePos.value( sfv, x );
 
-				case { mousePos < borders[0] } {
-					sfv.setSelection( 0, [
-						mousePos,
-						selection[0] - mousePos + selection[1]
-					] );
-				} { mousePos > borders[1] } {
-					sfv.setSelectionSize( 0, mousePos - selection[0] );
-				} {
+				border = (selection * [1,0.5]).sum;
+
+				case { moveRange == true } {
 					sfv.setSelectionStart( 0,
 						(mousePos - (selection[1] / 2))
 						.max(0).min( sfv.numFrames - selection[1] ) );
-				};
+				} {
+					if( mousePos > border ) {
+						sfv.setSelectionSize( 0, mousePos - selection[0] );
+					} {
+						sfv.setSelection( 0, [
+							mousePos,
+							selection[0] - mousePos + selection[1]
+						] );
+					}
+				}
 			};
 
-			sfv.mouseMoveAction = sfv.mouseDownAction;
+			sfv.mouseDownAction = { |sfv, x, y|
+				var selection = sfv.selection(0);
+				var mousePos = getMousePos.value( sfv, x );
+				moveRange = mousePos.exclusivelyBetween(
+					*(selection[1] * [1/3,2/3] + selection[0] )
+				);
+				mouseAction.value( sfv, x, y );
+			};
+
+			sfv.mouseMoveAction = mouseAction;
 
 			sfv.action = { |vw|
 				var selection;
