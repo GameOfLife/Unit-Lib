@@ -819,17 +819,22 @@
 			values = this.unmap( vws[ \val ] );
 			min = values.minItem;
 			max = values.maxItem;
-			sl.value = slval = slval.clip( min, max );
 			mean = values.mean;
-			fromcurve = mean.calcCurve( min, max );
-			curvedvalues = values.curvelin( min, max, min, max, fromcurve );
-			if( fromcurve.abs > 0.1 && { curvedvalues == values }) {
-				curvedvalues = curvedvalues.collect({ |item, i|
-					item.blend( curvedvalues.wrapAt(i+1), 0.5 );
-				});
+			if( min.equalWithPrecision( max, 0.0001 ) ) {
+				vws[ \val ] = this.map( values + (slval - mean) );
+			} {
+				sl.value = slval = slval.clip( min, max );
+				mean = values.mean;
+				fromcurve = mean.calcCurve( min, max );
+				curvedvalues = values.curvelin( min, max, min, max, fromcurve );
+				if( fromcurve.abs > 0.1 && { curvedvalues == values }) {
+					curvedvalues = curvedvalues.collect({ |item, i|
+						item.blend( curvedvalues.wrapAt(i+1), 0.5 );
+					});
+				};
+				curvedvalues = curvedvalues.lincurve( min, max, min, max, slval.calcCurve( min, max ) );
+				vws[ \val ] = this.map( curvedvalues );
 			};
-			curvedvalues = curvedvalues.lincurve( min, max, min, max, slval.calcCurve( min, max ) );
-			vws[ \val ] = this.map( curvedvalues );
 			vws[ \setPlotter ].value;
 			vws[ \setRangeSlider ].value;
 			action.value( vws, vws[ \val ] );
