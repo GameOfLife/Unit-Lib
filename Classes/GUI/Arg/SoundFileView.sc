@@ -240,7 +240,7 @@ BufSndFileView {
 		.label_( "plot" )
 		.action_({ |bt|
 			var w, f, sfv, sfZoom, mouseButton, dur;
-			var closeFunc, moveRange = false, mouseAction, getMousePos;
+			var closeFunc, moveRange, mouseAction, getMousePos;
 
 			RoundView.pushSkin( skin );
 
@@ -308,9 +308,9 @@ BufSndFileView {
 
 				border = (selection * [1,0.5]).sum;
 
-				case { moveRange == true } {
+				case { moveRange.notNil } {
 					sfv.setSelectionStart( 0,
-						(mousePos - (selection[1] / 2))
+						(mousePos - (selection[1] / 2) + moveRange )
 						.max(0).min( sfv.numFrames - selection[1] ) );
 				} {
 					if( mousePos > border ) {
@@ -327,13 +327,22 @@ BufSndFileView {
 			sfv.mouseDownAction = { |sfv, x, y|
 				var selection = sfv.selection(0);
 				var mousePos = getMousePos.value( sfv, x );
-				moveRange = mousePos.exclusivelyBetween(
-					*(selection[1] * [1/3,2/3] + selection[0] )
-				);
+				if( mousePos.exclusivelyBetween(
+					*(selection[1] * [1/4,3/4] + selection[0] )
+				) ) {
+					moveRange = (selection * [1,0.5]).sum - mousePos;
+					sfv.setSelectionColor( 0, Color.blue(0.2).alpha_(0.4) );
+				} {
+					moveRange = nil;
+				};
 				mouseAction.value( sfv, x, y );
 			};
 
 			sfv.mouseMoveAction = mouseAction;
+
+			sfv.mouseUpAction = {
+				sfv.setSelectionColor( 0, Color.blue(0.2).alpha_(0.2) );
+			};
 
 			sfv.action = { |vw|
 				var selection;
