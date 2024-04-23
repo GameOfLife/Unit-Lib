@@ -333,6 +333,7 @@ BufSndFileView {
 					sfv.setSelectionStart( 0,
 						(mousePos - (selection[1] / 2) + moveRange )
 						.max(0).min( sfv.numFrames - selection[1] ) );
+					sfv.timeCursorOn = false;
 				} {
 					if( mousePos > border ) {
 						sfv.setSelectionSize( 0, mousePos - selection[0] );
@@ -341,7 +342,9 @@ BufSndFileView {
 							mousePos,
 							selection[0] - mousePos + selection[1]
 						] );
-					}
+					};
+					sfv.timeCursorOn = true;
+					sfv.timeCursorPosition = mousePos;
 				};
 				selection = sfv.selection(0);
 				infoView.string = " trim: % - % / % - %".format(
