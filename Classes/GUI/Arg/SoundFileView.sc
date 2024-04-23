@@ -246,7 +246,7 @@ BufSndFileView {
 
 			f = this.performSndFile( \asSoundFile );
 
-			w = Window(f.path, Rect(200, 200, 850, 400), scroll: false);
+			w = Window(f.path.formatGPath, Rect(200, 200, 850, 400), scroll: false);
 
 			dur = f.numFrames / f.sampleRate / f.numChannels;
 
@@ -254,6 +254,7 @@ BufSndFileView {
 
 			sfv = SoundFileView( w, w.bounds.insetAll( 4, 4, 4, 30 ) ).resize_(5);
 			sfZoom = SmoothRangeSlider( w, (w.bounds.width - 8) @ 14 ).resize_(8);
+			sfZoom.knobSize = 1;
 
 			sfv.bounds = sfv.bounds.insetAll( -4, -4, -4, 0 );
 
