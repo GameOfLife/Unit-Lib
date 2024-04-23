@@ -339,7 +339,8 @@ AbstractSndFile : AbstractRichBuffer {
 	}
 
 	endFrame_ { |new|
-		endFrame = new.min(numFrames);
+		endFrame = (new ? numFrames).min(numFrames);
+		if( endFrame == numFrames ) { endFrame = nil; };
 		this.changed( \endFrame, endFrame );
 	}
 

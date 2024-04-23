@@ -267,12 +267,20 @@ BufSndFileView {
 					x.startFrame = (sl.lo * x.numFrames).round(1).asInteger;
 					x.endFrame = (sl.hi * x.numFrames).round(1).asInteger;
 				};
-				b.lo = x.startFrame / x.numFrames;
-				b.hi = x.endFrame / x.numFrames;
+
+				views[ \setPlotRange ] = {
+					b.lo = x.startFrame / x.numFrames;
+					b.hi = x.endFrame / x.numFrames;
+				};
+
+				views[ \setPlotRange ].value;
 
 				closeFunc = { w.close; };
 
-				w.onClose = { bt.onClose.removeFunc( closeFunc ) };
+				w.onClose = {
+					bt.onClose.removeFunc( closeFunc );
+					views[ \setPlotRange ] = nil;
+				};
 
 				bt.onClose = bt.onClose.addFunc( closeFunc );
 
@@ -300,6 +308,7 @@ BufSndFileView {
 			.clipLo_( 0 )
 			.action_({ |nb|
 				this.performSndFile( \startSecond_ , nb.value );
+				views[ \setPlotRange ].value;
 				action.value( this );
 			});
 
@@ -309,6 +318,7 @@ BufSndFileView {
 			.clipLo_( 0 )
 			.action_({ |nb|
 				this.performSndFile( \startFrame_ , nb.value );
+				views[ \setPlotRange ].value;
 				action.value( this );
 			})
 			.visible_( false );
@@ -324,6 +334,7 @@ BufSndFileView {
 			.clipLo_( 0 )
 			.action_({ |nb|
 				this.performSndFile( \endSecond_ , nb.value );
+				views[ \setPlotRange ].value;
 				action.value( this );
 			});
 
@@ -333,6 +344,7 @@ BufSndFileView {
 			.clipLo_( 0 )
 			.action_({ |nb|
 				this.performSndFile( \endFrame_ , nb.value );
+				views[ \setPlotRange ].value;
 				action.value( this );
 			})
 			.visible_( false );
@@ -349,7 +361,14 @@ BufSndFileView {
 				MenuAction( "seconds", { this.class.timeMode = \seconds })
 				.enabled_( this.class.timeMode != \seconds ),
 				MenuAction( "frames", { this.class.timeMode =  \frames })
-				.enabled_( this.class.timeMode != \frames )
+				.enabled_( this.class.timeMode != \frames ),
+				MenuAction.separator,
+				MenuAction( "Reset", {
+					this.performSndFile( \startFrame_ , 0 );
+					this.performSndFile( \endFrame_ , nil );
+					views[ \setPlotRange ].value;
+					action.value( this );
+				})
 			).uFront;
 		});
 
