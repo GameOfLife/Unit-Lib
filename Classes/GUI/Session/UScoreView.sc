@@ -669,7 +669,7 @@ UScoreView {
 				};
 			})
 			.unscaledDrawFunc_( { |v|
-				var scPos, rect, mrk, mrkrct;
+				var scPos, rect, mrk, mrkrct, markerString;
 				rect = v.view.drawBounds.moveTo(0,0);
 
 				Pen.font = Font( Font.defaultSansFace, 10 );
@@ -705,20 +705,31 @@ UScoreView {
 				Pen.color = Color.grey(0.5,1);
 				Pen.strokeRect( rect.insetBy(0.5,0.5) );
 
-			    if( score.pausedByUMarker == true ) {
-				    mrk = score.events.detect({ |item|
-					    item.isKindOf( UMarker ) && {
-						    item.startTime.equalWithPrecision( score.pos, 0.01 );
-					    };
-				    });
-				    mrkrct = rect.copy.insetAll( 0, rect.height * ((numTracks-1)/numTracks), 0, 0 );
-				    Pen.color = mrk.getTypeColor;
-				    Pen.fillRect(mrkrct);
-				    Pen.font = Font( Font.defaultSansFace, 14 );
-				    Pen.stringCenteredIn( " " + mrk.name + (mrk.notes ? "" ), mrkrct,
-					    Font( Font.defaultSansFace, 16, true ), Color.black
+			mrk = score.events.detect({ |item|
+				item.isKindOf( UMarker ) && {
+					item.autoPause == true && {
+						item.startTime >= (score.pos - 0.01);
+					}
+				};
+			});
+
+			if( mrk.notNil ) {
+				mrkrct = rect.copy.insetAll( 0, rect.height * ((numTracks-1)/numTracks), 0, 0 );
+
+				if( score.pausedByUMarker == true ) {
+					Pen.color = mrk.getTypeColor;
+					Pen.fillRect(mrkrct);
+					Pen.stringCenteredIn( " " + mrk.name + (mrk.notes ? "" ), mrkrct,
+						Font( Font.defaultSansFace, 16, true ), Color.black.alpha_(1.0)
 					);
-			    };
+				} {
+					Pen.stringCenteredIn(  "next: " + mrk.name + "(in %s)".format(
+						(mrk.startTime - score.pos).ceil.asInteger
+					), mrkrct,
+						Font( Font.defaultSansFace, 16, true ), Color.black.alpha_(0.75)
+					);
+				}
+			};
 
 			    if( enabled == false ) {
 			    	Pen.color = Color.gray(0.75, 0.75);
