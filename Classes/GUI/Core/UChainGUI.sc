@@ -1061,11 +1061,55 @@ UChainGUI {
 		};
 
 		if( chain.isKindOf( MassEditUChain ).not or: { chain.uchains.size > 0 } ) {
-			// gain
-			StaticText( composite, labelWidth@14 )
+
+			if( chain.isKindOf( MassEditUChain ) ) {
+				UPopUpMenu( composite, labelWidth@14 )
+				.items_( [ "gain" ] )
+				.align_( \right )
+				.extraMenuActions_({[
+					MenuAction.separator,
+					MenuAction( "Edit gains", {
+						var spec, gains;
+						RoundView.pushSkin( UChainGUI.skin );
+						gains = chain.uchains.collect(_.gain);
+						spec = ControlSpec(-96,24,\lin,0,0).massEditSpec( gains );
+						spec.makeEditWindow( views, gains, "gain", { |values|
+							//views[ \editWin ].setValues( values );
+							chain.uchains.do({ |item, i|
+								item.setGain( values[i] );
+							});
+							views.updateEditWin;
+						} );
+						views[ \updateEditWin ] = { |vws|
+							vws[ \editWin ] !? _.setValues( chain.uchains.collect(_.gain ) );
+						};
+						RoundView.popSkin( UChainGUI.skin );
+					}),
+					MenuAction( "Edit mutes", {
+						var spec, mutes;
+						RoundView.pushSkin( UChainGUI.skin );
+						mutes = chain.uchains.collect(_.muted);
+						spec = BoolSpec( false, "mute", "mute" ).massEditSpec( mutes );
+						spec.makeEditWindow( views, mutes, "mute", { |values|
+							//views[ \editWin ].setValues( values );
+							chain.uchains.do({ |item, i|
+								item.muted_( values[i] );
+							});
+							views.updateEditWin;
+						} );
+						views[ \updateEditWin ] = { |vws|
+							vws[ \editWin ] !? _.setValues( chain.uchains.collect(_.muted ) );
+						};
+						RoundView.popSkin( UChainGUI.skin );
+					})
+				]})
+			} {
+				// gain
+				StaticText( composite, labelWidth@14 )
 				.applySkin( RoundView.skin )
 				.string_( "gain" )
 				.align_( \right );
+			};
 
 			views[ \gain ] = SmoothNumberBox( composite, 40@14 )
 				.clipHi_(24) // just to be safe)
@@ -1088,8 +1132,15 @@ UChainGUI {
 
 			composite.decorator.nextLine;
 
-			controller.put( \gain, { views[ \gain ].value = chain.getGain; { views[ \displayColor ].refresh }.defer; } );
-			controller.put( \muted, { views[ \muted ].value = chain.muted.binaryValue } );
+			controller.put( \gain, {
+				views[ \gain ].value = chain.getGain;
+				{ views[ \displayColor ].refresh }.defer;
+				views.updateEditWin;
+			} );
+			controller.put( \muted, {
+				views[ \muted ].value = chain.muted.binaryValue;
+				views.updateEditWin;
+			} );
 		};
 
 		if( chain.isKindOf( MassEditUChain ) && { chain.umarkers.size > 0 } ) {
