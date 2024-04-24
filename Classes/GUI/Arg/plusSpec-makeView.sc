@@ -57,7 +57,11 @@
 
 		inView[ \editWin ] !? _.close;
 
-		evws[ \close ] = { |evt| if( evt.w.isClosed.not ) { evt.w.close } };
+		evws[ \close ] = { |evt| if( evt.w.isClosed.not ) {
+			evt.w.onClose.value;
+			evt.w.onClose = nil;
+			evt.w.close
+		} };
 
 		evws[ \values ] = values;
 		evws[ \key ] = label;
