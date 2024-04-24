@@ -291,7 +291,6 @@ BufSndFileView {
 			sfv.timeCursorColor = Color.blue(0.2).alpha_(0.5);
 			sfv.setSelectionColor( 0, Color.blue(0.2).alpha_(0.2) );
 			sfv.setSelectionColor( 1, Color.clear );
-			sfv.setSelectionColor( 2, Color.blue(0.2).alpha_(0.3) );
 			sfv.currentSelection = 1;
 
 			views[ \setPlotRange ] = {
@@ -362,7 +361,6 @@ BufSndFileView {
 					sfv.setSelectionColor( 0, Color.blue(0.2).alpha_(0.4) );
 				};
 				mouseAction.value( sfv, x, y );
-				sfv.timeCursorOn = false;
 			};
 
 			sfv.mouseMoveAction = mouseAction;
