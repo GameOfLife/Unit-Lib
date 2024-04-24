@@ -1,6 +1,8 @@
 UMarkerEventView : UEventView {
 
 	classvar <>showLabels = true;
+	classvar <>showIndices = false;
+	classvar <>useShortName = true; // first word only
 
 	checkSelectionStatus { |selectionRect,shiftDown, minWidth, maxWidth|
 		//this.createRect(minWidth, maxWidth);
@@ -21,6 +23,23 @@ UMarkerEventView : UEventView {
 	        noAction.value;
 	    }
 
+	}
+
+	shortName {
+		^if( useShortName ) {
+			(event.name ? "").split( $ ).first;
+		} {
+			event.name
+		}
+	}
+
+	getName {
+		if( event.name.find("#").notNil ) { ^event.name };
+		if( showIndex && { showIndices }) {
+			^i.asString ++": "++ this.shortName
+		} {
+			^this.shortName;
+		};
 	}
 
 	mouseDownEvent{ |mousePos,scaledUserView,shiftDown,mode|
@@ -160,8 +179,7 @@ UMarkerEventView : UEventView {
 							scaledRect.top, 14, 14 ) );
 						textLeft = textLeft + 12;
 				     };
-				     nme = event.name;
-				     if( nme.find("#").isNil ) { nme = this.getName };
+				    nme = this.getName;
 					Pen.stringAtPoint(
 						" " ++ nme,
 						scaledRect.leftTop.max( 0 @ -inf ) + (textLeft @ 1)
