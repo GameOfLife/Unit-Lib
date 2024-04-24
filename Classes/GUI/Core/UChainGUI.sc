@@ -1062,7 +1062,7 @@ UChainGUI {
 
 		if( chain.isKindOf( MassEditUChain ).not or: { chain.uchains.size > 0 } ) {
 
-			if( chain.isKindOf( MassEditUChain ) ) {
+			if( chain.isKindOf( MassEditUChain ) && { chain.uchains.size > 1 } ) {
 				UPopUpMenu( composite, labelWidth@14 )
 				.items_( [ "gain" ] )
 				.align_( \right )
