@@ -1,5 +1,5 @@
 UPopUpMenu : StaticText {
-	var <items, <index = 0, <>extraMenuActions, <>title;
+	var <items, <index = 0, <extraMenuActions, <>title;
 	var <>menu, <>menuActions, <>indexOffset = 0;
 
 	*new { arg parent, bounds;
@@ -34,7 +34,7 @@ UPopUpMenu : StaticText {
 
 	items_ { |newItems|
 		items = newItems;
-		if( menu.notNil ) { this.makeMenu; };
+		if( menu.notNil ) { this.destroyMenu; };
 		this.update;
 	}
 
@@ -48,6 +48,11 @@ UPopUpMenu : StaticText {
 			id = items.indexOfEqual( inItem );
 		};
 		this.value = id;
+	}
+
+	extraMenuActions_ { |function|
+		extraMenuActions = function;
+		this.destroyMenu;
 	}
 
 	makeMenu {
@@ -82,14 +87,16 @@ UPopUpMenu : StaticText {
 		var selected;
 		if( menu.isNil ) { this.makeMenu };
 		if( menu.notNil ) {
-			menuActions.do({ |item, i|
-				if( i == (index + indexOffset) ) {
-					item.enabled = false;
-					selected = item;
-				} {
-					item.enabled = true;
-				};
-			});
+			if( this.items.size > 0 ) {
+				menuActions.do({ |item, i|
+					if( i == (index + indexOffset) ) {
+						item.enabled = false;
+						selected = item;
+					} {
+						item.enabled = true;
+					};
+				});
+			};
 			^menu.uFront( QtGUI.cursorPosition - (20@0), action: selected );
 		};
 	}
@@ -98,6 +105,7 @@ UPopUpMenu : StaticText {
 		if( menu.notNil ) {
 			menu.deepDestroy;
 			menuActions = nil;
+			menu = nil;
 		};
 	}
 
