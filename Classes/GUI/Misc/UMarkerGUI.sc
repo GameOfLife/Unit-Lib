@@ -141,9 +141,10 @@ UMarkerGUI : UChainGUI {
 			.string_( "name" )
 			.align_( \right );
 
-		views[ \name ] = TextField( composite, 84@14 )
+		views[ \name ] = TextField( composite, (composite.bounds.width - labelWidth - 4)@14 )
 			.applySkin( RoundView.skin )
 			.string_( chain.name )
+			.resize_(2)
 			.action_({ |tf|
 				chain.name_( tf.string );
 			});
@@ -195,7 +196,7 @@ UMarkerGUI : UChainGUI {
 		// action
 
 		RoundView.useWithSkin( RoundView.skin, {
-			views[ \action ] = ObjectView( composite, (labelWidth + 120) @ 14,
+			views[ \action ] = ObjectView( composite, (labelWidth + 128) @ 14,
 				chain, \action, CodeSpec({ |marker, score| }), controller
 			);
 		});
@@ -205,7 +206,7 @@ UMarkerGUI : UChainGUI {
 		// autoPause
 
 		RoundView.useWithSkin( RoundView.skin, {
-			views[ \action ] = ObjectView( composite, (labelWidth + 120) @ 14,
+			views[ \action ] = ObjectView( composite, (labelWidth + 128) @ 14,
 				chain, \autoPause, BoolSpec(), controller
 			);
 		});
