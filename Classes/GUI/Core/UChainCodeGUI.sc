@@ -113,49 +113,70 @@ UChainCodeGUI : UChainGUI {
 			chain.postcs;
 		});
 
+		if( chain.isKindOf( UPattern ) && { chain.pattern.isKindOf( UMap ) } ) {
+			units = [ chain.pattern ] ++ units;
+		};
+
 		^units.collect({ |unit, i|
 			var header, comp, views, params;
 
-			comp = CompositeView( scrollView, width@14 )
+			if( unit.isKindOf( UMap ).not ) {
+
+				comp = CompositeView( scrollView, width@14 )
 				.resize_(2);
 
-			header = StaticText( comp, comp.bounds.moveTo(0,0) )
+				header = StaticText( comp, comp.bounds.moveTo(0,0) )
 				.applySkin( RoundView.skin )
 				.string_( " " ++ i ++ ": " ++ if(unit.def.class == LocalUdef){"[Local] "}{""} ++ unit.defName )
-			    .background_( RoundView.skin.headerColor ?? { Color.white.alpha_(0.5) } )
+				.background_( RoundView.skin.headerColor ?? { Color.white.alpha_(0.5) } )
 				.resize_(2)
 				.font_(
 					(RoundView.skin.tryPerform( \at, \font ) ??
 						{ Font( Font.defaultSansFace, 12) }).boldVariant
 				);
-            if(unit.def.class == LocalUdef) {
-                SmoothButton( comp, Rect( comp.bounds.right - (80+2+80), 1, 80, 12 ) )
-                    .label_( "revert" )
-                    .radius_( 2 )
-                    .action_({
-                        unit.def = unit.def.asOriginalUdef;
-                    }).resize_(3);
+				if(unit.def.class == LocalUdef) {
+					SmoothButton( comp, Rect( comp.bounds.right - (80+2+80), 1, 80, 12 ) )
+					.label_( "revert" )
+					.radius_( 2 )
+					.action_({
+						unit.def = unit.def.asOriginalUdef;
+					}).resize_(3);
 
-                SmoothButton( comp, Rect( comp.bounds.right - (80), 1, 80, 12 ) )
-                    .label_( "save as Udef" )
-                    .radius_( 2 )
-                    .action_({
-                        unit.def.saveAsUdef({ |x|
-                            unit.def_(x);
-                            ULib.servers.do{ |s| unit.def.sendSynthDef(s) }
-                        })
-                    }).resize_(3);
-            } {
-				 SmoothButton( comp, Rect( comp.bounds.right - (100), 1, 100, 12 ) )
-				    .label_( "open Udef file" )
-                    .radius_( 2 )
-                    .action_({
-                        unit.def.openDefFile;
-                    }).resize_(3);
+					SmoothButton( comp, Rect( comp.bounds.right - (80), 1, 80, 12 ) )
+					.label_( "save as Udef" )
+					.radius_( 2 )
+					.action_({
+						unit.def.saveAsUdef({ |x|
+							unit.def_(x);
+							ULib.servers.do{ |s| unit.def.sendSynthDef(s) }
+						})
+					}).resize_(3);
+				} {
+					SmoothButton( comp, Rect( comp.bounds.right - (100), 1, 100, 12 ) )
+					.label_( "open Udef file" )
+					.radius_( 2 )
+					.action_({
+						unit.def.openDefFile;
+					}).resize_(3);
+				};
+				views = this.makeUnitView( unit, scrollView, i, labelWidth, width );
+
+				unit.addDependant( unitInitFunc );
+
+				header.onClose_({
+					unit.removeDependant( unitInitFunc );
+					views[ \ctrl ].remove;
+				});
+
 			};
-			views = this.makeUnitView( unit, scrollView, i, labelWidth, width );
 
-			unit.getAllUMaps.do({ |umap|
+			(
+				if( unit.isKindOf( UMap ) ) {
+					[ unit ] ++ (unit.getAllUMaps ? [])
+				} {
+					unit.getAllUMaps
+				}
+			).do({ |umap|
 				var comp, header;
 				comp = CompositeView( scrollView, width@14 )
 				.resize_(2);
@@ -163,7 +184,7 @@ UChainCodeGUI : UChainGUI {
 				header = StaticText( comp, comp.bounds.moveTo(0,0) )
 				.applySkin( RoundView.skin )
 				.string_( "     ." ++
-					unit.getUMapPath( umap ).join(".") ++
+					(unit.getUMapPath( umap ) ? ["pattern"]).join(".") ++
 					": " ++ umap.defName )
 				.background_( umap.guiColor )
 				.resize_(2)
@@ -178,13 +199,6 @@ UChainCodeGUI : UChainGUI {
 				.action_({
 					umap.def.openDefFile;
 				}).resize_(3);
-			});
-
-			unit.addDependant( unitInitFunc );
-
-			header.onClose_({
-				unit.removeDependant( unitInitFunc );
-				views[ \ctrl ].remove;
 			});
 
 			views;
