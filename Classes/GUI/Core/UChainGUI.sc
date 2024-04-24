@@ -441,7 +441,6 @@ UChainGUI {
 		var udefController;
 		var scoreController;
 		var massEditController;
-		var ugroupCtrl;
 		// var unitInitFunc;
 
 		nowBuildingChain = chain;
@@ -930,8 +929,7 @@ UChainGUI {
 						chain.global = bt.value.booleanValue;
 					});
 
-				views[ \ugroup ] = StaticText( composite, 84@14 )
-				.applySkin( RoundView.skin )
+				views[ \ugroup ] = UPopUpMenu( composite, 84@14 )
 				.toolTip_( "UGroup\n\nUGroups are only relevant on multi-server setups." +
 					"You can create a UGroup to make sure that the UChains in it are" +
 					"played on the same server.\n\nThis can be useful for example with" +
@@ -948,59 +946,41 @@ UChainGUI {
 					"be mindful about these settings"
 				)
 				.align_( \center )
-				.background_( Color.white.alpha_(0.25) )
-				.string_( chain.ugroup !? "ugroup: %".format(_) ? "(no ugroup)" )
-				.onClose_({
-					views[ \ugroup_menu ] !? _.deepDestroy;
-				})
-				.mouseDownAction_({ |vw|
-					var actions = [], groups, selected;
+				.title_( "ugroup" )
+				.extraMenuActions_({[
+					MenuAction.separator,
+					MenuAction( "New...", {
+						SCRequestString( "default", "Please enter a unique name for a new UGroup", { |string|
+							string = string.asSymbol;
+							if( UGroup.all.collect(_.id) !? { |x| x.includes( string ).not } ? true ) {
+								UGroup( string );
+								chain.ugroup = string;
+							} {
+								"UGroup '%' already exists\n".postf( string );
+								chain.ugroup = string;
+							};
+						})
+					})
+				]})
+				.action_({ |vw|
+					if( vw.item.isString ) {
+						chain.ugroup = nil;
+					} {
+						chain.ugroup = vw.item;
+					};
+				});
 
-					views[ \ugroup_menu ] !? _.deepDestroy;
-
-					actions = actions.add(
-						MenuAction( "(no ugroup)", {
-							chain.ugroup = nil;
-						}).enabled_( chain.ugroup.notNil )
-					);
-
+				views[ \fillUGroup ] = { |vws|
+					var groups;
 					groups = UGroup.all.collect(_.id) ? [];
 					if( chain.ugroup.notNil && { groups.includes(chain.ugroup).not }) {
 						groups = groups ++ [ chain.ugroup ]
 					};
+					vws[ \ugroup ].items = [ "(no ugroup)" ] ++ groups;
+					vws[ \ugroup ].value = vws[ \ugroup ].items.indexOf( chain.ugroup ) ? 0;
+				};
 
-					groups.do({ |grp|
-						actions = actions.add(
-							MenuAction( grp.asString, {
-								chain.ugroup = grp;
-							});
-						);
-						if( chain.ugroup == grp ) {
-							actions.last.enabled = false;
-							selected = actions.last;
-						};
-					});
-
-					actions = actions.add(
-						MenuAction( "New...", {
-							SCRequestString( "default", "Please enter a unique name for a new UGroup",
-								{ |string|
-									string = string.asSymbol;
-									if( UGroup.all.collect(_.id) !? { |x| x.includes( string ).not } ? true ) {
-										UGroup( string );
-										chain.ugroup = string;
-									} {
-										"UGroup '%' already exists".postln;
-										chain.ugroup = string;
-									};
-							})
-						})
-					);
-
-					views[ \ugroup_menu ] = Menu( *actions ).uFront( action: selected );
-				});
-
-				views[ \ugroup ].setProperty(\wordWrap, false);
+				views.fillUGroup;
 
 				composite.decorator.nextLine;
 
@@ -1254,9 +1234,7 @@ UChainGUI {
 				})
 				.put( \ugroup, {
 					var groups;
-					{
-						views[ \ugroup ].string = chain.ugroup !? "ugroup: %".format(_) ? "(no ugroup)";
-					}.defer;
+					{ views.fillUGroup; }.defer;
 				})
 				.put( \global, {
 					views[ \global ].value = chain.global.binaryValue;
