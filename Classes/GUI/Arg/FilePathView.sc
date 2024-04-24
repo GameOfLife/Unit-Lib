@@ -143,10 +143,11 @@ FilePathView {
 		var setAction = { |pth| this.value = pth; action.value( this ) };
 		if( menu.notNil ) { menu.deepDestroy };
 		menu = Menu(
+			MenuAction( this.value ? "(no file)" ).enabled_( false ),
 			MenuAction( "Browse...", {
 				this.browse( setAction );
 			}),
-			MenuAction( this.value ? "Enter path...", {
+			MenuAction( "Enter String...", {
 				SCRequestString( this.value, "Please enter file path:", { |string|
 					setAction.value( string.standardizePath );
 				})
@@ -386,8 +387,28 @@ MultiFilePathView : FilePathView {
 					xmenu;
 				});
 			).title_( "Pathnames (% files)".format( this.value.size ) ),
-			MenuAction.separator,
-			MenuAction( "Post file paths", { this.value.do(_.postcs) }),
+			MenuAction.separator( "Code" ),
+			MenuAction( "Edit pathnames...", {
+				CodeEditView( object: this.value ).action_({ |cew|
+					var res;
+					res = cew.object;
+					if( res.isKindOf( Function ) ) {
+						res = Array.fill( this.size, res );
+					};
+					this.value = this.value.collect({ |item, i|
+						res.asArray.wrapAt( i ).asString.standardizePath;
+					});
+					action.value( this );
+				});
+			}),
+			MenuAction( "Post pathnames", {
+				"[".postln;
+				this.value.do({ |item|
+					"\t%,\n".postf( item.cs )
+				});
+				"]".postln;
+			}),
+			MenuAction.separator( "Operations" ),
 			MenuAction( "Copy all files to...", {
 				ULib.savePanel({ |path|
 					uniquePaths.do({ |px|
