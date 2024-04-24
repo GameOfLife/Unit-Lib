@@ -36,8 +36,22 @@ FilePathView {
 
 	*viewNumLines { ^1 }
 
+	*abbrPath { |path|
+		var std;
+		std = "~/".standardizePath;
+		if( path.find( std ) == 0 ) {
+			^"~/" ++ path[std.size..];
+		} {
+			^path;
+		};
+	}
+
 	makeString { |inPath|
-		if( inPath.size == 0 ) { inPath = nil };
+		if( inPath.size == 0 ) {
+			inPath = nil
+		} {
+			inPath = this.class.abbrPath( inPath );
+		};
 		^(inPath ? "(no file)").asString
 	}
 
@@ -143,7 +157,7 @@ FilePathView {
 		var setAction = { |pth| this.value = pth; action.value( this ) };
 		if( menu.notNil ) { menu.deepDestroy };
 		menu = Menu(
-			MenuAction( this.value ? "(no file)" ).enabled_( false ),
+			MenuAction( this.class.abbrPath( this.value ? "(no file)" ) ).enabled_( false ),
 			MenuAction( "Browse...", {
 				this.browse( setAction );
 			}),
@@ -240,7 +254,7 @@ MultiFilePathView : FilePathView {
 			if( inPaths.first.size == 0 ) {
 				^"(no files)";
 			} {
-				^inPaths.first.asString + "(% files)".format( inPaths.size );
+				^this.class.abbrPath( inPaths.first.asString ) + "(% files)".format( inPaths.size );
 			}
 		} {
 			^"(mixed, % files)".format( inPaths.size );
@@ -347,6 +361,7 @@ MultiFilePathView : FilePathView {
 			}),
 			Menu(
 				*this.value.collect({ |pth, i|
+					var abbrPath = this.class.abbrPath( pth );
 					var xmenu = Menu(
 						MenuAction( "Browse...", {
 							this.browseSingle( { |px| setSingle.value( px, i ) } );
@@ -369,7 +384,7 @@ MultiFilePathView : FilePathView {
 						MenuAction( "Save file as...", {
 							this.copyOrMove( pth, \saveAs, { |px| setSingle.value( px, i ) } );
 						}).enabled_( pth.notNil ),
-					).title_( "%: %".format( i, pth ) );
+					).title_( "%: %".format( i, abbrPath ) );
 					if( fixedSize == false ) {
 						xmenu.addAction( MenuAction.separator );
 						xmenu.addAction( MenuAction( "Remove", {
@@ -429,6 +444,7 @@ MultiFilePathView : FilePathView {
 		if( uniquePaths.size != (this.value.size) ) {
 			menu.insertAction( 1, Menu(
 				*uniquePaths.collect({ |pth, i|
+					var abbrPath = this.class.abbrPath( pth );
 					var indices = this.value.indicesOfEqual( pth );
 					var submenu = Menu(
 						MenuAction( "Browse...", {
@@ -454,7 +470,7 @@ MultiFilePathView : FilePathView {
 						MenuAction( "Save file as...", {
 							this.copyOrMove( pth, \saveAs, { |px| setSingle.value( px, indices ) } );
 						}).enabled_( pth.notNil ),
-					).title_( "% (%)".format( pth, indices.size ) );
+					).title_( "% (%)".format( abbrPath, indices.size ) );
 					submenu;
 				});
 			).title_("Unique pathnames (%)".format( uniquePaths.size ) )
