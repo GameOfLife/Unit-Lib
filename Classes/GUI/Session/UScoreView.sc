@@ -207,53 +207,50 @@ UScoreView {
     selectedEvents{ ^usessionMouseEventsManager.selectedEvents }
     selectedEventsOrAll { ^usessionMouseEventsManager.selectedEventsOrAll }
 
-    editSelected{
-        var event, events = this.selectedEvents, gui, currentScore, chains, markers;
-        switch(events.size)
-            {0}{
-	            currentScore = this.currentScore;
-	            chains = currentScore.getAllUChains;
-	            markers = currentScore.getAllUMarkers;
-	            if( chains.size > 0 or: { markers.size > 0 } ) {
-	           	 gui = MassEditUChain( chains, markers ).gui;
-	                 gui.windowName = "MassEdit : % (all % events)".format(
-	                    currentScore.name,
-	                    chains.size + markers.size
-	                 );
-	            };
-	        }
-            {1}{
-                event = events[0];
-                if(event.isFolder){
-                    gui = MassEditUChain(event.getAllUChains, event.getAllUMarkers).gui( score: event );
-                    currentScore = this.currentScore;
-                    gui.windowName = "MassEdit : % [ % ]".format(
-                    	currentScore.name,
-                    	currentScore.events.indexOf( event )
-                    );
-                } {
-                    gui = event.gui;
-                    currentScore = this.currentScore;
-                    gui.windowName = "% : % [ % ]".format(
-                    	event.class,
-                    	currentScore.name,
-                    	currentScore.events.indexOf( event )
-                    );
-                }
-            }
-            {
+	editSelected { this.class.editEvents( this.selectedEvents, this.currentScore ) }
 
-	            gui = MassEditUChain(
-	            	events.collect(_.getAllUChains).flat,
-	            	events.collect(_.getAllUMarkers).flat
-	            ).gui;
-                 gui.windowName = "MassEdit : % ( % events )".format(
-                    this.currentScore.name,
-                    gui.chain.uchains.size + gui.chain.umarkers.size
-                 );
-	       }
-
-    }
+	*editEvents { |events, score|
+		var event, gui, chains, markers;
+		switch( events.size )
+		{ 0 } {
+			chains = score.getAllUChains;
+			markers = score.getAllUMarkers;
+			if( chains.size > 0 or: { markers.size > 0 } ) {
+				gui = MassEditUChain( chains, markers ).gui;
+				gui.windowName = "MassEdit : % (all % events)".format(
+					score.name,
+					chains.size + markers.size
+				);
+			};
+		}
+		{ 1 } {
+			event = events[0];
+			if(event.isFolder){
+				gui = MassEditUChain(event.getAllUChains, event.getAllUMarkers)
+				.gui( score: event );
+				gui.windowName = "MassEdit : % [ % ]".format(
+					score.name,
+					score.events.indexOf( event )
+				);
+			} {
+				gui = event.gui;
+				gui.windowName = "% : % [ % ]".format(
+					event.class,
+					score.name,
+					score.events.indexOf( event )
+				);
+			}
+		} {
+			gui = MassEditUChain(
+				events.collect(_.getAllUChains).flat,
+				events.collect(_.getAllUMarkers).flat
+			).gui;
+			gui.windowName = "MassEdit : % ( % events )".format(
+				gui.chain.uchains.size + gui.chain.umarkers.size
+			);
+		};
+		^gui;
+	}
 
 	deleteSelected{
 	    ^this.currentEditor.deleteEvents(this.selectedEvents)

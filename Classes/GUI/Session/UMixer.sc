@@ -194,7 +194,13 @@ UMixer {
 				} {
 					cview.background_(Color(0.58208955223881, 0.70149253731343, 0.83582089552239, 1.0));
 				};
-				cview.decorator.shift(0,20);
+				cview.decorator.shift(8,0);
+				SmoothButton(cview,16@16).states_([[ \i, nil, Color.blue.alpha_(0.125) ]])
+				.canFocus_( false )
+				.action_({
+					UScoreView.editEvents( [ event ], score );
+				});
+				//cview.decorator.shift(0,20);
 				sl = EZSmoothSlider.new(cview, Rect(0,0,32,240), events.indexOf(event), spec, layout:\vert)
 				.value_(event.getGain)
 				.action_({ |v|
