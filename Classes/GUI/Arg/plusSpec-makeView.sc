@@ -545,6 +545,22 @@
 				})
 			};
 
+			if( warp.isKindOf( FaderWarp ) ) {
+				[ vws[ \valueView ].numberView ].do({ |box|
+					box.allowedChars = "+-.dbDBpi#*/()%";
+					box.interpretFunc = { |string, val|
+						var index;
+						string = string.format( val );
+						index = string.find( "d", true );
+						case { index.notNil } {
+							string[..index-1].interpret.dbamp;
+						} {
+							string.interpret;
+						};
+					};
+				})
+			};
+
 		} {
 			view = EZCompositeView( parent, bounds );
 			vws[ \view ] = view.view;
@@ -789,6 +805,22 @@
 						("0" ++ string[1..]).interpret.midiratio * val;
 					} { string.find( "pi" ).notNil } {
 						string.interpret;
+					} {
+						string.interpret;
+					};
+				};
+			})
+		};
+
+		if( warp.isKindOf( FaderWarp ) ) {
+			[ vws[ \rangeSlider ].loBox, vws[ \rangeSlider ].hiBox ].do({ |box|
+				box.allowedChars = "+-.dbDBpi#*/()%";
+				box.interpretFunc = { |string, val|
+					var index;
+					string = string.format( val );
+					index = string.find( "d", true );
+					case { index.notNil } {
+						string[..index-1].interpret.dbamp;
 					} {
 						string.interpret;
 					};
