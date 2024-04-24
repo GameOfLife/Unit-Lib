@@ -1044,7 +1044,7 @@ UChainGUI {
 
 			if( chain.isKindOf( MassEditUChain ) && { chain.uchains.size > 1 } ) {
 				UPopUpMenu( composite, labelWidth@14 )
-				.items_( [ "gain" ] )
+				.string_( "gain " )
 				.align_( \right )
 				.extraMenuActions_({[
 					MenuAction.separator,
