@@ -1287,9 +1287,6 @@ UChainGUI {
 		comp = CompositeView( composite, (composite.bounds.width - (margin.x * 2))@16 )
 			.resize_(2);
 
-		if( notMassEdit ) {
-		};
-
 		if( notMassEdit && { this.canPackUnits }) {
 			RoundButton( comp, 13 @ 13 )
 				.border_(0)
