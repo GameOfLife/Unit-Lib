@@ -52,6 +52,17 @@ FilePathView {
 		};
 	}
 
+	removeRelativeTag { |path|
+		if( relativePath.notNil ) {
+			GlobalPathDict.relativePath = relativePath;
+			path = path.getGPath;
+			GlobalPathDict.relativePath = nil;
+			^path.formatGPath;
+		} {
+			^path;
+		};
+	}
+
 	makeString { |inPath|
 		if( inPath.size == 0 ) {
 			inPath = nil
@@ -169,7 +180,7 @@ FilePathView {
 			}),
 			MenuAction( "Enter String...", {
 				SCRequestString( this.value, "Please enter file path:", { |string|
-					setAction.value( string.standardizePath );
+					setAction.value( this.removeRelativeTag( string ).standardizePath );
 				})
 			}),
 			MenuAction.separator( "Operations" ),
@@ -376,7 +387,7 @@ MultiFilePathView : FilePathView {
 						}),
 						MenuAction( "Enter String...", {
 							SCRequestString( pth, "Please enter file path:", { |string|
-								setSingle.value( string.standardizePath, i )
+								setSingle.value( this.removeRelativeTag( string ).standardizePath, i )
 							});
 						}),
 						MenuAction.separator( "Operations" ),
@@ -419,7 +430,7 @@ MultiFilePathView : FilePathView {
 						res = Array.fill( this.size, res );
 					};
 					this.value = this.value.collect({ |item, i|
-						res.asArray.wrapAt( i ).asString.standardizePath;
+						this.removeRelativeTag( res.asArray.wrapAt( i ).asString ).standardizePath;
 					});
 					action.value( this );
 				});
@@ -462,7 +473,7 @@ MultiFilePathView : FilePathView {
 						}),
 						MenuAction( "Enter String...", {
 							SCRequestString( pth, "Please enter file path:", { |string|
-								setSingle.value( string.standardizePath, indices )
+								setSingle.value( this.removeRelativeTag( string ).standardizePath , indices )
 							});
 						}),
 						MenuAction.separator( "Operations" ),
