@@ -39,11 +39,9 @@ FilePathView {
 
 	abbrPath { |path|
 		var std;
-		if( relativePath.notNil ) {
-			GlobalPathDict.relativePath = relativePath;
-			path = path.formatGPath;
-			GlobalPathDict.relativePath = nil;
-		};
+		GlobalPathDict.relativePath = relativePath;
+		path = path.formatGPath;
+		GlobalPathDict.relativePath = nil;
 		std = "~/".standardizePath;
 		if( path.find( std ) == 0 ) {
 			^"~/" ++ path[std.size..];
