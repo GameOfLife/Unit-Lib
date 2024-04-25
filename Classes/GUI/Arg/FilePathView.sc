@@ -29,6 +29,7 @@ FilePathView {
 	var <font;
 	var <>allowEmpty = false;
 	var <>menu;
+	var <>relativePath;
 
 	*new { |parent, bounds|
 		^super.new.makeView( parent, bounds );
@@ -36,8 +37,13 @@ FilePathView {
 
 	*viewNumLines { ^1 }
 
-	*abbrPath { |path|
+	abbrPath { |path|
 		var std;
+		if( relativePath.notNil ) {
+			GlobalPathDict.relativePath = relativePath;
+			path = path.formatGPath;
+			GlobalPathDict.relativePath = nil;
+		};
 		std = "~/".standardizePath;
 		if( path.find( std ) == 0 ) {
 			^"~/" ++ path[std.size..];
@@ -50,7 +56,7 @@ FilePathView {
 		if( inPath.size == 0 ) {
 			inPath = nil
 		} {
-			inPath = this.class.abbrPath( inPath );
+			inPath = this.abbrPath( inPath );
 		};
 		^(inPath ? "(no file)").asString
 	}
@@ -157,7 +163,7 @@ FilePathView {
 		var setAction = { |pth| this.value = pth; action.value( this ) };
 		if( menu.notNil ) { menu.deepDestroy };
 		menu = Menu(
-			MenuAction( this.class.abbrPath( this.value ? "(no file)" ) ).enabled_( false ),
+			MenuAction( this.abbrPath( this.value ? "(no file)" ) ).enabled_( false ),
 			MenuAction( "Browse...", {
 				this.browse( setAction );
 			}),
@@ -214,6 +220,8 @@ FilePathView {
 
 		bounds = bounds ?? { 350 @ (this.class.viewNumLines * (viewHeight + 4)) };
 
+		relativePath = UChainGUI.nowBuildingUChainGUI !? _.parentScore !? _.filePath !? _.dirname;
+
 		view = EZCompositeView( parent, bounds, gap: 4@4 );
 		view.resize_( resize ? 5 );
 		views = ();
@@ -254,7 +262,7 @@ MultiFilePathView : FilePathView {
 			if( inPaths.first.size == 0 ) {
 				^"(no files)";
 			} {
-				^this.class.abbrPath( inPaths.first.asString ) + "(% files)".format( inPaths.size );
+				^this.abbrPath( inPaths.first.asString ) + "(% files)".format( inPaths.size );
 			}
 		} {
 			^"(mixed, % files)".format( inPaths.size );
@@ -361,7 +369,7 @@ MultiFilePathView : FilePathView {
 			}),
 			Menu(
 				*this.value.collect({ |pth, i|
-					var abbrPath = this.class.abbrPath( pth );
+					var abbrPath = this.abbrPath( pth );
 					var xmenu = Menu(
 						MenuAction( "Browse...", {
 							this.browseSingle( { |px| setSingle.value( px, i ) } );
@@ -444,7 +452,7 @@ MultiFilePathView : FilePathView {
 		if( uniquePaths.size != (this.value.size) ) {
 			menu.insertAction( 1, Menu(
 				*uniquePaths.collect({ |pth, i|
-					var abbrPath = this.class.abbrPath( pth );
+					var abbrPath = this.abbrPath( pth );
 					var indices = this.value.indicesOfEqual( pth );
 					var submenu = Menu(
 						MenuAction( "Browse...", {
