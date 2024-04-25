@@ -1279,7 +1279,7 @@ UChainGUI {
 	}
 
 	makeUnitHeader { |units, margin, gap|
-		var comp, header, min, io, defs, mapdefs, code;
+		var comp, toc, header, min, io, defs, mapdefs, code;
 		var notMassEdit, headerInset = 0;
 
 		notMassEdit = chain.isKindOf( MassEditUChain ).not;
@@ -1349,6 +1349,24 @@ UChainGUI {
 	                );
                 }).resize_(3);
 		};
+
+		toc = UPopUpMenu( comp, Rect( comp.bounds.right - (
+					2 + 40 + 2 + 4 + 40 + (notMassEdit.binaryValue * (4 + 40 + 4 + 40))
+					), 1, 42, 12
+				) )
+		.valueChangesString_( false )
+		.string_( "toc" )
+		.align_( \center )
+		.title_( "Table of contents" )
+		.extraMenuActions_({
+			[
+				MenuAction( "(top)", { scrollView.visibleOrigin = 0@0 });
+			] ++ uguis.collect({ |ugui|
+				MenuAction( ugui.unit.fullDefName, {
+					scrollView.visibleOrigin = 0 @ (ugui.view.bounds.top - 18);
+				});
+			});
+		});
 
 		defs = SmoothButton( comp,
 				Rect( comp.bounds.right - (
