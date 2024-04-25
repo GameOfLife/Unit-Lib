@@ -1,6 +1,7 @@
 UPopUpMenu : StaticText {
 	var <items, <index = 0, <extraMenuActions, <>title;
 	var <>menu, <>menuActions, <>indexOffset = 0;
+	var <>valueChangesString = true;
 
 	*new { arg parent, bounds;
 		var obj = super.new( parent, bounds );
@@ -110,9 +111,11 @@ UPopUpMenu : StaticText {
 	}
 
 	update {
-		{
-			this.string = " % ".format( items !? { |item| item[ index ].asString } ? "" );
-		}.defer;
+		if( valueChangesString ) {
+			{
+				this.string = " % ".format( items !? { |item| item[ index ].asString } ? "" );
+			}.defer;
+		};
 	}
 
 	doAction { action.value( this ) }
