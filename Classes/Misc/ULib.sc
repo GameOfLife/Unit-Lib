@@ -572,7 +572,9 @@ ULib {
 		RoundView.popSkin;
 	}
 
-	*startup { |sendDefsOnInit = true, createServers = false, numServers = 4, options, startGuis = true|
+	*startup { |createServers = true, numServers = 4, options, startGuis = true|
+
+		ULib.closeServers;
 
 		UChain.makeDefaultFunc = {
 			UChain( \bufSoundFile, \stereoOutput ).useSndFileDur
@@ -582,11 +584,17 @@ ULib {
 			Platform.userAppSupportDir ++ "/UnitRacks/";
 		);
 
+		options = options ?? {
+			ServerOptions()
+			.maxSynthDefs_(2048)
+		    .numWireBufs_(2048)
+		};
+
 		if(createServers) {
 			if(numServers > 1) {
 			servers = [LoadBalancer(*numServers.collect{ |i|
-				Server("ULib server "++(i+1), NetAddr("127.0.0.1",57110+i), options)
-			})];
+				Server("ULib_"++(i+1), NetAddr("127.0.0.1",57110+i), options)
+				}).name_( "Unit Lib servers" ) ];
 			}{
 				servers = [Server("ULib server", NetAddr("127.0.0.1",57110), options)]
 			};
@@ -599,34 +607,33 @@ ULib {
 			}) {
 				UMenuBar();
 			} {
-				UMenuWindow();
+				if( UMenuBarIDE.isEmpty ) {
+					UMenuBarIDE();
+				};
 			};
-			UGlobalGain.gui;
 			UGlobalEQ.gui;
 			if( ((thisProcess.platform.ideName == "scqt") && (ULib.allServers.size == 1)).not  ) {
 				ULib.serversWindow
 			}
 		};
 
+		Udef.synthDefDir = Platform.userAppSupportDir +/+ "u_synthdefs/";
 
-		//if not sending the defs they should have been written to disk once before
-		// with writeDefaultSynthDefs
-		if( sendDefsOnInit ) {
-			var defs = this.getDefaultSynthDefs;
-			ULib.allServers.do{ |sv| sv.waitForBoot({
+		if( Udef.synthDefDir.notNil ) { File.mkdir( Udef.synthDefDir ); };
 
-				defs.do( _.load( sv ) );
+		this.loadUDefs( false );
 
-			})
-			}
-		} {
-			ULib.allServers.do(_.boot);
-			Udef.loadOnInit = false;
-			this.getDefaultUdefs;
-			Udef.loadOnInit = true;
-        };
+		if( Udef.synthDefDir.notNil ) {
+			UEvent.nrtStartBundle = UEvent.nrtStartBundle.add( [ "/d_loadDir", Udef.synthDefDir ] )
+		};
 
-		"\n\tUnit Lib started".postln
+
+		StartUp.defer({
+			{
+				ULib.servers.do(_.bootSync);
+				"\n\tUnit Lib started".postln
+			}.fork( AppClock );
+		});
 	}
 
 	*getDefaultUdefs{
@@ -649,6 +656,24 @@ ULib {
 			def.justWriteDefFile;
 		}
 	}
+
+	*loadUDefs { |loadDir = true|
+	     var defs;
+
+	     Udef.loadOnInit = false;
+
+		defs = Udef.loadAllFromDefaultDirectory.select(_.notNil).collect(_.synthDef).flat.select(_.notNil);
+		defs = defs ++ UMapDef.loadAllFromDefaultDirectory.select(_.notNil).collect(_.synthDef).flat.select(_.notNil);
+		UnitRack.loadAllFromDefaultDirectory;
+
+		Udef.loadOnInit = true;
+
+		defs.do({|def| def.justWriteDefFile( Udef.synthDefDir ); });
+
+		if( loadDir == true ) {
+			ULib.allServers.do(_.loadDirectory( Udef.synthDefDir ? SynthDef.synthDefDir ));
+		};
+     }
 
 	*openPanel { arg okFunc, cancelFunc, multipleSelection = false;
 		var func;
