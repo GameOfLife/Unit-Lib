@@ -1357,6 +1357,7 @@ UChainGUI {
 		.valueChangesString_( false )
 		.string_( "toc" )
 		.align_( \center )
+		.resize_(3)
 		.title_( "Table of contents" )
 		.extraMenuActions_({
 			[
