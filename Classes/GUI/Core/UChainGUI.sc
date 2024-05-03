@@ -76,6 +76,7 @@ UChainGUI {
 				stringColor: Color.black,
 				hiliteColor: Color.black.alpha_(0.33),
 				scoreEditorWindow: Color.gray(0.65),
+				disabledColor: Color.gray(0.69803921568627, 0.5 ),
 				RoundButton: (
 					border: 0,
 					background: Color.white.alpha_(0.33),
@@ -108,6 +109,7 @@ UChainGUI {
 				headerColor: Color.black.alpha_(0.25),
 				stringColor: Color.white,
 				scoreEditorWindow: Color.gray(0.4),
+				disabledColor: Color.gray(0.29803921568627, 0.5 ),
 				TextField: (
 					background: Color.gray(0.3),
 				),
@@ -152,6 +154,7 @@ UChainGUI {
 				headerColor: Color.white.alpha_(0.25),
 				stringColor: Color.gray(0.75),
 				scoreEditorWindow: Color.gray(0.2),
+				disabledColor: Color.gray(0.098039215686275, 0.5 ),
 				TextField: (
 					background: Color.gray(0.3),
 				),
