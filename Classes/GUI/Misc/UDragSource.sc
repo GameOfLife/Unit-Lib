@@ -9,10 +9,12 @@ UDragSource {
 		Platform.case(
 			\osx, {
 				StartUp.defer({
-					SynthDef( "UDragSource_mouseState", {
-						var state = MouseButton.kr( 0, 1, 0 );
-						FreeSelf.kr( HPZ1.kr( state ) < 0 );
-					}).writeOnce
+					if( GUI.id == \cocoa ) {
+						SynthDef( "UDragSource_mouseState", {
+							var state = MouseButton.kr( 0, 1, 0 );
+							FreeSelf.kr( HPZ1.kr( state ) < 0 );
+						}).writeOnce
+					};
 				})
 			}
 		);
