@@ -1882,7 +1882,12 @@ UChainGUI {
 
 			uview.mouseDownAction_({
 				uDefMenuFunc.value(unit, { |def, args|
-					unit.def = def;
+					var umcWas;
+					umcWas = UMapSetChecker.stall;
+					UMapSetChecker.stall = true;
+					if( unit.def != def ) {
+						unit.def = def;
+					};
 					if(args.notNil) {
 						if( unit.isKindOf( MassEditU ) ) {
 							args = args.collect({ |item, i|
@@ -1894,7 +1899,9 @@ UChainGUI {
 							})
 						};
 						unit.set(*args);
-					}
+					};
+					UMapSetChecker.stall = false;
+					unit.changed( \init );
 				}, { uview.background = nil; });
 				uview.background = Color.gray(0.3).alpha_(0.5);
 			});

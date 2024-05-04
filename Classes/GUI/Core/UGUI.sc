@@ -180,7 +180,9 @@ UGUI {
 						umapdragbin.mouseDownAction_({
 							var res;
 							res = this.makeUMapDefMenu({ |def| unit.canUseUMap( key, def ); }, { |def, args|
+								UMapSetChecker.stall = true;
 								unit.insertUMap( key, def, args );
+								UMapSetChecker.stall = false;
 							}, { umapdragbin.background = nil; }, includePattern: isPattern );
 							if( res.notNil ) {
 								umapdragbin.background = Color.blue(0.9).alpha_(0.25);

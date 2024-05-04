@@ -351,8 +351,11 @@ UMapGUI : UGUI {
 			res = this.makeUMapDefMenu({ |def, args|
 				parentUnit !? (_.canUseUMap( unit.unitArgName, def )) ? false;
 			}, { |def, args|
+				var wasStall;
 				unit.stop;
-				unit.def = def;
+				wasStall = UMapSetChecker.stall;
+				UMapSetChecker.stall = true;
+				if( unit.def != def ) { unit.def = def; };
 				if( args.notNil ) {
 					if( unit.isKindOf( MassEditUMap ) ) {
 						args = args.collect({ |item, i|
@@ -365,6 +368,8 @@ UMapGUI : UGUI {
 					};
 					unit.set( *args )
 				};
+				UMapSetChecker.stall = false;
+				unit.changed( \init );
 			}, {
 				umapdragbinReplace.background = nil;
 			}, { |def, subdefkey |
