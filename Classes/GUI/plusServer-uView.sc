@@ -19,6 +19,7 @@
 		var font;
 		var cpuMeter, composite, inactiveColor;
 		var menu;
+		var serverMeter;
 
 		width = width - 26;
 
@@ -37,9 +38,28 @@
 		menu = Menu(
 			MenuAction.separator( name.asString ),
 			Menu(
-				MenuAction("Inputs", { this.meter( this.options.numInputBusChannels, 0 ) }),
-				MenuAction("Outputs", { this.meter( 0, this.options.numOutputBusChannels ) }),
-				MenuAction("All", { this.meter }),
+				MenuAction("Inputs", {
+					if( serverMeter.notNil && { serverMeter.isClosed.not } ) {
+						serverMeter.close;
+					};
+					serverMeter = ServerMeter( this, this.options.numInputBusChannels, 0 );
+				}),
+				MenuAction("Outputs", {
+					if( serverMeter.notNil && { serverMeter.isClosed.not } ) {
+						serverMeter.close;
+					};
+					serverMeter = ServerMeter( this, 0, this.options.numOutputBusChannels );
+				}),
+				MenuAction("All", {
+					if( serverMeter.notNil && { serverMeter.isClosed.not } ) {
+						serverMeter.close;
+					};
+					serverMeter = ServerMeter(
+						this,
+						this.options.numInputBusChannels,
+						this.options.numOutputBusChannels
+					);
+				}),
 			).title_( "Show Server Meter" ).font_(  Font( Font.defaultSansFace, 13 ) ),
 			MenuAction( "Show Scope", { this.scope; }),
 			MenuAction( "Show Freqscope", { this.freqscope; }),
