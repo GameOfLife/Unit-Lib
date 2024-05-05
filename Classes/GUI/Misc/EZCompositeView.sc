@@ -73,7 +73,7 @@ EZCompositeView : EZGui {
 
 + EZGui {
 
-	findWindow { ^view.getParents.last.findWindow }
+	findWindow { ^view.getParents !? { |x| x.last.findWindow } }
 
 	setWindowName { |name|
 		this.findWindow.name = name ? "";
