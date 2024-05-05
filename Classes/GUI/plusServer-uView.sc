@@ -19,7 +19,7 @@
 		var font;
 		var cpuMeter, composite, inactiveColor;
 		var menu;
-		var serverMeter;
+		var serverMeter, scopeWindow;
 
 		width = width - 26;
 
@@ -61,7 +61,21 @@
 					);
 				}),
 			).title_( "Show Server Meter" ).font_(  Font( Font.defaultSansFace, 13 ) ),
-			MenuAction( "Show Scope", { this.scope; }),
+			MenuAction( "Show Scope", {
+				var numChannels, index = 0, bufsize = 4096, zoom = (1), rate = \audio;
+				numChannels = numChannels ?? { if (index == 0) { this.options.numOutputBusChannels } { 2 } };
+
+				if(scopeWindow.isNil) {
+					scopeWindow = Stethoscope(this, numChannels, index, bufsize, zoom, rate, nil,
+						this.options.numBuffers);
+					// prevent buffer conflicts by using reserved bufnum
+					scopeWindow.window.onClose = scopeWindow.window.onClose.addFunc({ scopeWindow = nil });
+				} {
+					scopeWindow.setProperties(numChannels, index, bufsize, zoom, rate);
+					scopeWindow.run;
+					scopeWindow.window.front;
+				};
+			}),
 			MenuAction( "Show Freqscope", { this.freqscope; }),
 			MenuAction( "Dump Node Tree", { this.queryAllNodes }),
 			MenuAction( "Dump Node Tree with Controls", { this.queryAllNodes( true ) }),
