@@ -1,16 +1,20 @@
-UPopUpMenu : StaticText {
+UPopUpMenu {
+	var <>view, <action;
 	var <items, <index = 0, <extraMenuActions, <>title;
 	var <>menu, <>menuActions, <>indexOffset = 0;
 	var <>valueChangesString = true;
 
 	*new { arg parent, bounds;
-		var obj = super.new( parent, bounds );
-		obj.setProperty(\wordWrap, false);
-		obj.background_( Color.white.alpha_( 0.25 ) );
-		obj.applySkin( RoundView.skin );
-		obj.mouseDownAction_({ obj.openMenu; });
-		obj.onClose_({ obj.destroyMenu });
-		^obj;
+		^super.new.init( parent, bounds );
+	}
+
+	init { |parent, bounds|
+		view = StaticText.new( parent, bounds );
+		view.setProperty( \wordWrap, false);
+		view.background_( Color.white.alpha_( 0.25 ) );
+		view.applySkin( RoundView.skin );
+		view.mouseDownAction_({ this.openMenu; });
+		view.onClose_({ this.destroyMenu });
 	}
 
 	value { ^index }
@@ -113,11 +117,16 @@ UPopUpMenu : StaticText {
 	update {
 		if( valueChangesString ) {
 			{
-				this.string = " % ".format( items !? { |item| item[ index ].asString } ? "" );
+				view.string = " % ".format( items !? { |item| item[ index ].asString } ? "" );
 			}.defer;
 		};
 	}
 
 	doAction { action.value( this ) }
+
+	doesNotUnderstand { arg ... args;
+		var result = view.perform( *args );
+		^if( result === view, { this }, { result }); // be sure to replace view with base
+	}
 
 }
