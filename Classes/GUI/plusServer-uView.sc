@@ -10,6 +10,33 @@
 		);
 	}
 
+	uMeter { |sm, numIns, numOuts|
+		if( sm.notNil && { sm.isClosed.not } ) {
+			sm.close;
+		};
+		numIns = numIns ?? { this.options.numInputBusChannels };
+		numOuts = numOuts ?? { this.options.numOutputBusChannels };
+		^ServerMeter( this, numIns, numOuts );
+	}
+
+	uScope { var scw, onClose, numChannels, index = 0, bufsize = 4096, zoom = (1), rate = \audio;
+
+		numChannels = numChannels ?? { if (index == 0) { this.options.numOutputBusChannels } { 2 } };
+
+		if(scw.isNil) {
+			scw = Stethoscope(this, numChannels, index, bufsize, zoom, rate, nil,
+				this.options.numBuffers);
+			// prevent buffer conflicts by using reserved bufnum
+			scw.window.onClose = scw.window.onClose.addFunc( onClose );
+		} {
+			scw.setProperties(numChannels, index, bufsize, zoom, rate);
+			scw.run;
+			scw.window.front;
+		};
+
+		^scw;
+	}
+
 	uView { arg w, width = 386, useRoundButton = true, onColor;
 		var active, booter, killer, makeDefault, running, booting, bundling, stopped;
 		var recorder, scoper;
@@ -19,7 +46,7 @@
 		var font;
 		var cpuMeter, composite, inactiveColor;
 		var menu;
-		var serverMeter, scopeWindow;
+		var serverMtr, scopeWin;
 
 		width = width - 26;
 
@@ -39,42 +66,17 @@
 			MenuAction.separator( name.asString ),
 			Menu(
 				MenuAction("Inputs", {
-					if( serverMeter.notNil && { serverMeter.isClosed.not } ) {
-						serverMeter.close;
-					};
-					serverMeter = ServerMeter( this, this.options.numInputBusChannels, 0 );
+					serverMtr = this.uMeter( serverMtr, nil, 0 );
 				}),
 				MenuAction("Outputs", {
-					if( serverMeter.notNil && { serverMeter.isClosed.not } ) {
-						serverMeter.close;
-					};
-					serverMeter = ServerMeter( this, 0, this.options.numOutputBusChannels );
+					serverMtr = this.uMeter( serverMtr, 0, nil );
 				}),
 				MenuAction("All", {
-					if( serverMeter.notNil && { serverMeter.isClosed.not } ) {
-						serverMeter.close;
-					};
-					serverMeter = ServerMeter(
-						this,
-						this.options.numInputBusChannels,
-						this.options.numOutputBusChannels
-					);
+					serverMtr = this.uMeter( serverMtr, nil, nil );
 				}),
 			).title_( "Show Server Meter" ).font_(  Font( Font.defaultSansFace, 13 ) ),
 			MenuAction( "Show Scope", {
-				var numChannels, index = 0, bufsize = 4096, zoom = (1), rate = \audio;
-				numChannels = numChannels ?? { if (index == 0) { this.options.numOutputBusChannels } { 2 } };
-
-				if(scopeWindow.isNil) {
-					scopeWindow = Stethoscope(this, numChannels, index, bufsize, zoom, rate, nil,
-						this.options.numBuffers);
-					// prevent buffer conflicts by using reserved bufnum
-					scopeWindow.window.onClose = scopeWindow.window.onClose.addFunc({ scopeWindow = nil });
-				} {
-					scopeWindow.setProperties(numChannels, index, bufsize, zoom, rate);
-					scopeWindow.run;
-					scopeWindow.window.front;
-				};
+				scopeWin = this.uScope( scopeWin, { scopeWin = nil } );
 			}),
 			MenuAction( "Show Freqscope", { this.freqscope; }),
 			MenuAction( "Dump Node Tree", { this.queryAllNodes }),
