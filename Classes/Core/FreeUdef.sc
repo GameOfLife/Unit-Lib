@@ -165,6 +165,7 @@ FreeUdef : Udef {
 			if( createsSynth != false ) {
 				^super.createSynth( unit, server, startPos );
 			} {
+				unit.preparedServers = nil;
 				^nil;
 			}
 		};

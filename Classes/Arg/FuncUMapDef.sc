@@ -91,6 +91,7 @@ FuncUMapDef : UMapDef {
 			unit.setArg( \u_prepared, true );
 		};
 		action.value;
+		unit.preparedServers = nil;
 	}
 
 	needsPrepare { ^true }

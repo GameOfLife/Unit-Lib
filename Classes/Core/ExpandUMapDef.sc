@@ -96,6 +96,7 @@ ExpandUMapDef : UMapDef {
 	needsPrepare { ^false }
 
 	makeSynth { |unit, target, startPos = 0, synthAction|
+		unit.preparedServers = nil;
 		^target;
 	}
 

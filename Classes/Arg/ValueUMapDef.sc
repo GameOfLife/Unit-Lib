@@ -48,6 +48,7 @@ ValueUMapDef : UMapDef {
 	prepare { |servers, unit, action|
 		this.activateUnit( unit ); // make sure it is running
 		action.value;
+		unit.preparedServers = nil;
 	}
 
 	needsPrepare { ^true }
