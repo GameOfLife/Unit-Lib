@@ -378,7 +378,7 @@ MultiFilePathView : FilePathView {
 			}),
 			Menu(
 				*this.value.collect({ |pth, i|
-					var abbrPath = this.abbrPath( pth );
+					var abbrPath = pth !? { this.abbrPath( pth ) };
 					var xmenu = Menu(
 						MenuAction( "Browse...", {
 							this.browseSingle( { |px| setSingle.value( px, i ) } );
@@ -401,7 +401,7 @@ MultiFilePathView : FilePathView {
 						MenuAction( "Save file as...", {
 							this.copyOrMove( pth, \saveAs, { |px| setSingle.value( px, i ) } );
 						}).enabled_( pth.notNil ),
-					).title_( "%: %".format( i, abbrPath ) );
+					).title_( "%: %".format( i, abbrPath ? "(no file)" ) );
 					if( fixedSize == false ) {
 						xmenu.addAction( MenuAction.separator );
 						xmenu.addAction( MenuAction( "Remove", {
@@ -461,7 +461,7 @@ MultiFilePathView : FilePathView {
 		if( uniquePaths.size != (this.value.size) ) {
 			menu.insertAction( 1, Menu(
 				*uniquePaths.collect({ |pth, i|
-					var abbrPath = this.abbrPath( pth );
+					var abbrPath = pth !? { this.abbrPath( pth ) };
 					var indices = this.value.indicesOfEqual( pth );
 					var submenu = Menu(
 						MenuAction( "Browse...", {
@@ -487,7 +487,7 @@ MultiFilePathView : FilePathView {
 						MenuAction( "Save file as...", {
 							this.copyOrMove( pth, \saveAs, { |px| setSingle.value( px, indices ) } );
 						}).enabled_( pth.notNil ),
-					).title_( "% (%)".format( abbrPath, indices.size ) );
+					).title_( "% (%)".format( abbrPath ? "(no file)", indices.size ) );
 					submenu;
 				});
 			).title_("Unique pathnames (%)".format( uniquePaths.size ) )
