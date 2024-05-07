@@ -537,11 +537,12 @@ U : ObjectWithArgs {
 	classvar <>loadDef = false;
 	classvar <>synthDict;
 	classvar <>uneditableCategories;
+	classvar <>preparedServersDict;
 
 	var def, defName;
 	//var <>synths;
 	var <>disposeOnFree = true;
-	var <>preparedServers;
+	//var <>preparedServers;
 	var >waitTime; // use only to override waittime from args
 	var <mod;
 	var <guiCollapsed = false;
@@ -549,6 +550,7 @@ U : ObjectWithArgs {
 
 	*initClass {
 	    synthDict = IdentityDictionary( );
+		preparedServersDict = IdentityDictionary( );
 	    uneditableCategories = [];
 	}
 
@@ -591,7 +593,7 @@ U : ObjectWithArgs {
 			args = inArgs;
 			"def '%' not found".format(in).warn;
 		};
-		preparedServers = [];
+		this.preparedServers = nil;
 		mod = inMod.asUModFor( this );
 		this.changed( \init );
 	}
@@ -1121,9 +1123,18 @@ U : ObjectWithArgs {
 		})
 	}
 
+	preparedServers {
+		^preparedServersDict[ this ];
+	}
+
+	preparedServers_ { |preparedServers|
+		if( preparedServers == [] ) { preparedServers = nil };
+		preparedServersDict[ this ] = preparedServers;
+	}
+
 	start { |target, startPos = 0, latency|
 		var targets, bundles;
-		target = target ? preparedServers ? Server.default;
+		target = target ? this.preparedServers ? Server.default;
 		targets = target.asCollection;
 		latency = latency ? 0.2;
 		this.modPerform( \start, startPos, latency );
@@ -1324,7 +1335,7 @@ U : ObjectWithArgs {
 		servers = target.collect(_.server);
 		this.set( \u_gate, 1 );
 		if( target.size > 0 ) {
-	   	    act = { preparedServers = preparedServers.addAll( servers ); action.value };
+	   	    act = { this.preparedServers = this.preparedServers.addAll( servers ); action.value };
 		    if( loadDef) {
 		        this.def.loadSynthDef( servers );
 		    };
@@ -1377,7 +1388,7 @@ U : ObjectWithArgs {
 	        }
 	    };
 	    this.modPerform( \dispose );
-	    preparedServers = [];
+	    this.preparedServers = nil;
 	}
 
 	disposeSynths {
@@ -1397,9 +1408,10 @@ U : ObjectWithArgs {
 	        }
 	    };
 	    this.modPerform( \dispose );
-	    preparedServers.remove( server );
-	    if( preparedServers.size == 0 ) {
+	    this.preparedServers.remove( server );
+	    if( this.preparedServers.size == 0 ) {
 		    parentChain = nil; // forget chain after disposing last server
+			this.preparedServers = nil;
 	    };
 	}
 

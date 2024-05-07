@@ -29,6 +29,7 @@ UChain : UEvent {
 
 	classvar <>verbose = false;
 	classvar <>groupDict;
+	classvar <>preparedServersDict;
 	classvar <>presetManager;
 
 	classvar <>makeDefaultFunc;
@@ -36,7 +37,7 @@ UChain : UEvent {
 
 	var <units; //, <>groups;
 	var <prepareTasks;
-	var <>preparedServers;
+	//var <>preparedServers;
 	var <muted = false;
 
 	var <addAction = \addToHead;
@@ -64,6 +65,7 @@ UChain : UEvent {
 		 	});
 
 		groupDict = IdentityDictionary( );
+		preparedServersDict = IdentityDictionary( );
 		makeDefaultFunc = {
 			UChain( [ \sine, [ \freq, 440 ] ], \output ).duration_(10).fadeIn_(1).fadeOut_(1);
 		};
@@ -675,11 +677,20 @@ UChain : UEvent {
 		^bundles;
 	}
 
+	preparedServers {
+		^preparedServersDict[ this ];
+	}
+
+	preparedServers_ { |preparedServers|
+		if( preparedServers == [] ) { preparedServers = nil };
+		preparedServersDict[ this ] = preparedServers;
+	}
+
 	prStartBasic { |target, startPos = 0, latency, withRelease = false|
         var targets, bundles;
         startPos = startPos ? 0;
-        target = preparedServers ? target ? ULib.servers ? Server.default;
-        preparedServers = nil;
+        target = this.preparedServers ? target ? ULib.servers ? Server.default;
+        this.preparedServers = nil;
         this.score = nil;
         targets = target.asCollection;
         if( verbose ) { "% starting on %".format( this, targets ).postln; };
@@ -798,13 +809,13 @@ UChain : UEvent {
 			tg.server.loadBalancerAddLoad(this.apxCPU(tg));
 			tg;
 		});
-		preparedServers = target;
+		this.preparedServers = target;
 		this.updateDur;
 		firstAction = action.getAction;
 		units.do( _.prepare(target, startPos, action.getAction ) );
 	     firstAction.value; // fire action at least once
 
-	     if( verbose ) { "% preparing for %".format( this, preparedServers ).postln; };
+	     if( verbose ) { "% preparing for %".format( this, this.preparedServers ).postln; };
 
 	     nowPreparingChain = nil
 
@@ -842,10 +853,10 @@ UChain : UEvent {
 
 	dispose {
 		units.do( _.dispose );
-		preparedServers.do({ |srv|
+		this.preparedServers.do({ |srv|
 			srv.asTarget.server.loadBalancerAddLoad( this.apxCPU.neg );
 		});
-		preparedServers = [];
+		this.preparedServers = nil;
 		this.score = nil;
 	}
 

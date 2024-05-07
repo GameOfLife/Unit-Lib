@@ -530,7 +530,7 @@ UMap : U {
 	        }
 	    };
 	    this.modPerform( \dispose );
-	    preparedServers = [];
+	    this.preparedServers = nil;
 	    this.unit = nil;
 	}
 

@@ -85,7 +85,7 @@ UX : U {
 		} {
 			Error("UX def '%' not found").format(in).throw;
 		};
-		preparedServers = [];
+		this.preparedServers = nil;
 		mod = inMod.asUModFor( this );
 
 		this.changed( \init );
