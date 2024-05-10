@@ -1,9 +1,14 @@
 /*
 \auxIn
 
-Read sound from one of the 32 internal 'aux' buses. The signal can be sent from a different UChain using 'auxOut'. For this to work on every system, set the receiving UChain's addAction to \addToTail or \addAfter, and enable 'global'. As an alternative to 'global', it is also possible to use an ugroup; In that case, make sure that the sending ('auxOut') unit is in the same ugroup as the receiving one ('auxIn').
+Read sound from one of the 32 internal 'aux' buses, or, in 'external' mode, from an audio input of your audio interface.
+
+In 'internal' mode, the signal can be sent from another UChain using 'auxOut'. For this to work on every system, set the receiving UChain's addAction to \addToTail or \addAfter, and enable 'global'. As an alternative to 'global', it is also possible to use an ugroup; In that case, make sure that the sending ('auxOut') unit is in the same ugroup as the receiving one ('auxIn').
+
+In 'external' mode the auxIn receives audio from an external input. This is similar to the soundIn Udef.
 
 bus: the aux bus to read from (0-31)
+type: \internal or \external
 
 --
 this is an Udef definition file
