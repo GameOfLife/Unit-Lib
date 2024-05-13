@@ -2031,6 +2031,7 @@ UChainGUI {
 							if( u.isKindOf( MassEditU ) ) {
 								u = u.units.last;
 							};
+					        u.deactivateUMaps;
 							chain.units = chain.units.select(_ != u);
 						}).resize_(3);
 
@@ -2132,7 +2133,7 @@ UChainGUI {
 						Rect( comp.bounds.right - 38, 1, 12, 12 ) )
 					.label_( '-' )
 					.action_({
-						chain.removeAt( i );
+						chain.removeAt( i ).deactivateUMaps;
 					}).resize_(3);
 				};
 			};
