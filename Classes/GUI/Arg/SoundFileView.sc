@@ -232,7 +232,9 @@ BufSndFileView {
 					);
 				});
 		updGlobal = {
-			views[ \hasGlobal ].value = this.performSndFile( \hasGlobal ).binaryValue;
+			if( views[ \hasGlobal ].visible ) {
+				views[ \hasGlobal ].value = this.performSndFile( \hasGlobal ).binaryValue;
+			};
 		};
 
 		views[ \plot ] = SmoothButton( view, 40 @ viewHeight )
