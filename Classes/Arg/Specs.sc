@@ -1490,6 +1490,24 @@ HardwareBusSpec : PositiveIntegerSpec {
 
 }
 
+MIDIOutSpec : HardwareBusSpec {
+
+	getDeviceLabels {
+		var dict, list, device;
+		if( MIDIClient.initialized.not ) {
+			MIDIIn.connectAll;
+		};
+		dict = OEM();
+
+		MIDIClient.destinations.collect({ |dest|
+			dict[ dest.device.asSymbol ] = dict[ dest.device.asSymbol ].add( dest.name );
+		});
+
+		^dict.collectAs({ |val,i| [ dict.keys[i], val ] }, Array);
+	}
+
+}
+
 SharedValueIDSpec : PositiveIntegerSpec {
 
 	*umap_name { ^'shared_in' }
