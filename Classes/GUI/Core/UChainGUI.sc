@@ -1422,6 +1422,10 @@ UChainGUI {
 				});
 			};
 
+			recentUdefs = recentUdefs.select({ |item|
+				item.name.notNil
+			});
+
 			if( recentUdefs.size > 0 ) {
 				uDefsList = uDefsList.add( \recent );
 				uDefsList = uDefsList.addAll( recentUdefs );
