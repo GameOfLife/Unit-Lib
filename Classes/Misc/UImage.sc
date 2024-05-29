@@ -17,7 +17,11 @@ UImage {
 		if( inFilePath.notNil ) {
 			filePath = inFilePath.getGPath;
 			if( imageDict[ filePath.asSymbol ].isNil ) {
-				imageDict[ filePath.asSymbol ] = Image.open( filePath );
+				if( File.exists( filePath ) ) {
+					imageDict[ filePath.asSymbol ] = Image.open( filePath );
+				} {
+					"%: file not found:\n   %\n".postf( this.class, filePath );
+				};
 			};
 		};
 	}
