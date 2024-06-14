@@ -30,17 +30,19 @@ FreeUdef( "midi_noteOut", [
 	[ \note, 64, IntegerSpec(64,0,127), false, \init ],
 	[ \velo, 64, IntegerSpec(64,1,127), false, \init ],
 	[ \midiOut, 0, IntegerSpec(0,0, 255), false, \init ],
+	[ \oneShot, false, BoolSpec(false), false, \init ],
 	[ \u_dur, inf, [0,inf,\lin,0.0,0].asControlSpec, true, \init ],
 ])
 .apxCPU_( 0 )
 .prepareFunc_({ |server, unit, action, startPos = 0|
-	var env, channel, note, velo, dur, midiOut;
+	var env, channel, note, velo, oneShot, dur, midiOut;
 	env = unit.def.env;
 	env.put( unit, () );
 	channel = unit.get( \channel );
 	note = unit.get( \note );
 	velo = unit.get( \velo );
 	midiOut = unit.get( \midiOut );
+	oneShot = unit.get( \oneShot );
 	dur = unit.get( \u_dur );
 	midiOut = midiOut.value.asInteger;
 	env[ unit ].channel = channel.value.asInteger;
@@ -49,6 +51,7 @@ FreeUdef( "midi_noteOut", [
 	env[ unit ].midiOut = midiOut;
 	env[ unit ].dur = dur;
 	env[ unit ].startPos = startPos ? 0;
+	env[ unit ].oneShot = oneShot.value.booleanValue;
 
 	if(MIDIClient.initialized.not,{ MIDIIn.connectAll });
 	if( env[ \midiOuts ].isNil ) {
@@ -66,14 +69,14 @@ FreeUdef( "midi_noteOut", [
 	action.value;
 })
 .createSynthFunc_({ |unit, server, startTime = 0 |
-	var channel, note, velo, midiOut, dur, startPos;
+	var channel, note, velo, midiOut, dur, oneShot, startPos;
 	if( unit.def.env[ unit ].notNil ) {
-		#channel, note, velo, midiOut, dur, startPos = unit.def.env[ unit ]
-		.atAll( [ \channel, \note, \velo, \midiOut, \dur, \startPos ] );
+		#channel, note, velo, midiOut, oneShot, dur, startPos = unit.def.env[ unit ]
+		.atAll( [ \channel, \note, \velo, \midiOut, \oneShot, \dur, \startPos ] );
 		unit.def.env[ unit ] = nil;
 		midiOut = unit.def.env[ \midiOuts ][ midiOut ];
 		midiOut.noteOn( channel, note, velo );
-		if( dur != inf ) {
+		if( dur != inf && { oneShot != true }) {
 			{
 				( dur - startPos ).wait;
 				midiOut.noteOff( channel, note );
