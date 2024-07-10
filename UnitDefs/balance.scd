@@ -21,11 +21,11 @@ MultiChannelUdef( \balance, { |pan = 0, width = 0.0, amount = 1.0, level = 1.0 |
 		pan = pan * 0.5;
 	};
 	pansig = PanAz.kr(
-		Udef.numChannels, DC.kr(1), pan, level,
+		Udef.numChannels, DC.kr(1), pan, 1,
 		width.linlin(0,1,2,Udef.numChannels), 0.5
 	);
 	pansig = DC.kr(1).blend( pansig, amount );
-	in = in * pansig;
+	in = in * pansig * level;
 	UOut.ar( 0, in );
 }, channels: [2,3,4,5,6,7,8,10,12,16,24,32])
 .category_( \utility )
