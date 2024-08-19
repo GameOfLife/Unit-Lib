@@ -43,6 +43,7 @@ UChainGUI {
 	var <>tempoMap;
 	var <>undoManager;
 	var <>afterBuildAction;
+	var <>canMakeCurrent = true;
 
 	var <>autoRestart = false;
 
@@ -277,8 +278,8 @@ UChainGUI {
 
 	}
 
-	*new { |parent, bounds, chain, score, replaceCurrent|
-		^super.newCopyArgs( chain, score ).init( parent, bounds, replaceCurrent );
+	*new { |parent, bounds, chain, score, replaceCurrent, canMakeCurrent = true|
+		^super.newCopyArgs( chain, score ).canMakeCurrent_( canMakeCurrent ).init( parent, bounds, replaceCurrent );
 	}
 
 	init { |inParent, bounds, replaceCurrent|
@@ -299,7 +300,7 @@ UChainGUI {
 			parent = chain.class.asString;
 		};
 		if( parent.class == String ) {
-			if( (singleWindow or: { replaceCurrent == true }) && current.notNil && { current.window.class == Window.implClass } ) {
+			if( (singleWindow and: { replaceCurrent != false }) && current.notNil && { current.window.class == Window.implClass } ) {
 				parent = current.parent.asView.findWindow;
 				oldBounds = parent.bounds;
 				oldTitle = parent.name;
@@ -319,7 +320,7 @@ UChainGUI {
 					bounds ?? { Rect(425, 300, 372, 600) },
 					scroll: false
 				).front;
-				this.makeViews( bounds );
+				this.makeViews( );
 				this.makeCurrent;
 				this.addToAll;
 				this.doAfterBuildAction;
@@ -356,7 +357,7 @@ UChainGUI {
 		}.defer;
 	}
 
-	makeCurrent { current = this }
+	makeCurrent { if( canMakeCurrent ) { current = this } }
 
 	doAfterBuildAction { afterBuildAction.value; afterBuildAction = nil }
 
@@ -588,6 +589,8 @@ UChainGUI {
 			.action_({ |bt|
 				this.class.singleWindow = bt.value.booleanValue;
 			});
+
+		if( canMakeCurrent == false ) { views[ \singleWindow ].visible = false };
 
 		if( chain.isPlaying ) {
 			views[ \startButton ].value = 1;
