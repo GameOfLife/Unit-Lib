@@ -44,6 +44,7 @@ UChainGUI {
 	var <>undoManager;
 	var <>afterBuildAction;
 	var <>canMakeCurrent = true;
+	var <>newChainAction;
 
 	var <>autoRestart = false;
 
@@ -334,6 +335,14 @@ UChainGUI {
 
 		parent.asView.minWidth_( 372 ).minHeight_(200);
 
+	}
+
+	chain_ { |newChain|
+		if( chain != newChain && { newChain.notNil } ) {
+			chain = newChain;
+			this.rebuild;
+			newChainAction.value( this, chain );
+		};
 	}
 
 	rebuild {
@@ -1608,7 +1617,8 @@ UChainGUI {
 								parentScore.changed(\something);
 							};
 						};
-						new.gui( score: score );
+					    this.chain = new;
+						//new.gui( score: score );
 					}.defer(0.1);
 				}).resize_(3);
 
@@ -1678,7 +1688,8 @@ UChainGUI {
 								parentScore.changed(\something);
 							};
 						};
-						new.gui( score: score );
+						this.chain = new;
+						//new.gui( score: score );
 					}.defer(0.1);
 				}).resize_(3);
 			} {
