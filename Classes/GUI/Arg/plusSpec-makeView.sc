@@ -917,6 +917,7 @@
 			Pen.lineTo( bounds.left @ def );
 			Pen.fill;
 		}).mouseDownAction_({
+			menu !? _.deepDestroy;
 			menu = this.makeMenu( hasEdit, vws, { |values|
 				vws[ \val ] = values;
 				vws[ \update ].value;
@@ -1060,6 +1061,7 @@
 		vws[ \options ] = UserView( view, optionsWidth @ 14 )
 		.background_( Color.white.alpha_( 0.25 ) )
 		.mouseDownAction_({
+			menu !? _.deepDestroy;
 			menu = this.makeMenu( hasEdit, vws, { |values|
 				vws[ \val ] = values;
 				vws[ \update ].value;
@@ -1224,6 +1226,7 @@
 		vws[ \options ] = UserView( view, optionsWidth @ 14 )
 		.background_( Color.white.alpha_( 0.25 ) )
 		.mouseDownAction_({
+			menu !? _.deepDestroy;
 			menu = this.makeMenu( hasEdit, vws, { |values|
 				vws[ \val ] = values;
 				vws[ \update ].value;
@@ -1833,6 +1836,7 @@
 			Pen.lineTo( bounds.left @ def );
 			Pen.fill;
 		}).mouseDownAction_({
+			menu !? _.deepDestroy;
 			menu = this.makeMenu( hasEdit, vws, { |values|
 				vws[ \val ] = values;
 				vws[ \update ].value;
@@ -3923,6 +3927,8 @@
 			menus = menus.add(
 				MenuAction( "default (%)".format( this.default ), { vws.setVal( this.default ); vws.doAction });
 			);
+
+			if( menu.notNil ) { menu.deepDestroy };
 
 			menu = Menu( *menus ).uFront;
 		};
