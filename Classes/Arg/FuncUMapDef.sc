@@ -35,7 +35,7 @@ FuncUMapDef : UMapDef {
 		argSpecs.do(_.mode_( \init ));
 		this.setSpecMode( \value, \nonsynth );
 		mappedArgs = [ \value ];
-		allowedModes = [ \init, \sync, \normal ];
+		allowedModes = [ \init, \sync, \normal, \nonsynth ];
 		this.changed( \init );
 	}
 

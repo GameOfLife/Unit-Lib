@@ -158,7 +158,8 @@ UGUI {
 					vw.testValue = { |value| value.isKindOf( UMap ).not };
 					vw.action = { action.value( this, key, value ); };
 
-					if( [ \nonsynth ].includes(argSpec.mode).not ) {						viewNumLines = argSpec.spec.viewNumLines;
+					if( true ) { // this used to be a check for nonsynth args
+						viewNumLines = argSpec.spec.viewNumLines;
 
 						composite.decorator.shift( (bounds.width * argSpec.width.neg) - 3, 0 );
 
