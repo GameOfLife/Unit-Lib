@@ -1502,6 +1502,9 @@ U : ObjectWithArgs {
 			unit.getSpec( key ).default.isMemberOf( Symbol ).not
 		}) {
 			umapdef = this.asUdef( UMapDef );
+			if( umapdef.isNil && { unit.getSpec( key ).isKindOf( UAdaptSpec ) } ) {
+				^this;
+			};
 			if( unit.canUseUMap( key, umapdef ) ) {
 				^UMap( this ).asUnitArg( unit, key );
 			} {
