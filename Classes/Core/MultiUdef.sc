@@ -105,6 +105,10 @@ MultiUdef : Udef {
 			};
 		};
 		tempDef = nil;
+
+		defName = defName.deepCopy.asUnitArg( unit, this.defNameKey );
+		if( constrain && { defName.isKindOf( UMap ).not } ) { defName = this.getArgSpec( this.defNameKey, unit ).constrain( defName ) };
+
 		^argz ++ [ this.defNameKey, defName ];
 	}
 
