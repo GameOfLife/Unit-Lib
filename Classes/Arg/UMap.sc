@@ -11,6 +11,7 @@ UMapDef : Udef {
 	var <>canUseUMapFunc;
 	var <>apxCPU = 0;
 	var >guiColor;
+	var <>numChannelsForPlayBufFunc;
 
 	*initClass{
 		this.defsFolders = [
@@ -453,6 +454,10 @@ UMap : U {
 	}
 
 	value { ^this.def.getValue( this ) }
+
+	numChannelsForPlayBuf {
+		^this.def.numChannelsForPlayBufFunc.value( this ) ? 1
+	}
 
 	/// UPat
 
