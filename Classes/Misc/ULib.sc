@@ -413,7 +413,8 @@ ULib {
 		.string_( " Environment (%)".format( ~u_specs.size ) )
 		.applySkin( RoundView.skin )
 		.background_( RoundView.skin.headerColor ? Color.white.alpha_(0.5) );
-		w.asView.decorator.shift( -36 - 40, 0 );
+		w.asView.decorator.shift( -36 - 88, 0 );
+
 		SmoothButton( w, 40@14 ).states_( [
 			[ "read", nil, Color.green.alpha_(0.2) ]
 		] ).action_({
@@ -423,6 +424,16 @@ ULib {
 			})
 		})
 		.radius_(2).canFocus_( false );
+
+		SmoothButton( w, 40@14 ).label_([ "OSC", "OSC" ]).action_({ |bt|
+			switch( bt.value,
+				1, { UOSCsetterEnvir.enable },
+				0, { UOSCsetterEnvir.disable }
+			);
+		})
+		.radius_(2).canFocus_( false )
+		.value_( UOSCsetterEnvir.default.notNil.binaryValue );
+
 		addButton = SmoothButton( w, 14@14 ).label_( '+' )
 		.action_({ |bt|
 			addViews.do(_.visible_( true ));
@@ -431,7 +442,7 @@ ULib {
 		SmoothButton( w, 14@14 ).label_( 'roundArrow' )
 		.action_({ { this.envirWindow; }.defer(0.1); });
 		if( ~u_specs.notNil && { ~u_specs.size > 0 }) {
-			w.asView.decorator.shift( -36 - 88, 0 );
+			w.asView.decorator.shift( -36 - 132, 0 );
 			SmoothButton( w, 40@14 ).states_( [
 				[ "write", nil, Color.red.alpha_(0.2) ]
 			] ).action_({ ULib.writeEnvir }).radius_(2).canFocus_( false );

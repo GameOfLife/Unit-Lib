@@ -153,3 +153,65 @@ UOSCSetterCurrent : UOSCsetter {
 		"started UOSCsetter for current score\n - messages should start with '/%/'\n - port: %\n".postf( name, recvPort ?? { NetAddr.langPort });
 	}
 }
+
+
+UOSCsetterEnvir : UOSCsetter {
+
+	classvar <>default;
+
+	*new { |recvPort, makeDefault = true|
+		^super.newCopyArgs().init( recvPort, makeDefault );
+	}
+
+	*enable {
+		if( default.isNil ) { default = this.new(); };
+	}
+
+	*disable {
+		if( default.notNil ) { default.remove };
+	}
+
+	*cleanup { // disable if no UOSCSetter is active
+		if( UOSCsetter.all.size == 0 ) {
+			this.disable;
+		}
+	}
+
+	uobject { ^currentEnvironment }
+
+	remove {
+		oscfunc.free;
+		if( default === this ) {
+			default = nil;
+		};
+	}
+
+	init { |recvPort, makeDefault = true|
+
+		name = "envir";
+
+		oscfunc = OSCFunc({ |msg|
+			var key, val;
+			key = msg[0].asString.split($/).last.asSymbol;
+			if( ~u_specs.notNil && { ~u_specs[ key ].notNil } ) {
+				val = msg[1..];
+				if( val.size == 1 ) { val = val[0] };
+
+				key.uEnvirPut( val );
+			};
+		}, this.oscPath, recvPort: recvPort, dispatcher: OSCMethodPatternDispatcher.new );
+
+		oscfunc.permanent = true;
+
+		if( makeDefault ) {
+			if( default.notNil ) {
+				default.remove;
+			};
+			default = this;
+		};
+
+		oscfunc.enable;
+		"started UOSCsetter for Environment variables\n - messages should start with '/%/'\n - port: %\n".postf( name, recvPort ?? { NetAddr.langPort });
+	}
+
+}
