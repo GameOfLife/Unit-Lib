@@ -191,12 +191,13 @@ UOSCsetterEnvir : UOSCsetter {
 		name = "envir";
 
 		oscfunc = OSCFunc({ |msg|
-			var key, val;
+			var key, val, spec;
 			key = msg[0].asString.split($/).last.asSymbol;
-			if( ~u_specs.notNil && { ~u_specs[ key ].notNil } ) {
+			spec = ~u_specs !? _[key];
+			if( spec.notNil ) {
 				val = msg[1..];
 				if( val.size == 1 ) { val = val[0] };
-
+				val = spec.constrain( val );
 				key.uEnvirPut( val );
 			};
 		}, this.oscPath, recvPort: recvPort, dispatcher: OSCMethodPatternDispatcher.new );
