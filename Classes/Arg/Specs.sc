@@ -460,7 +460,9 @@ PointSpec : Spec {
 	}
 
 	constrain { |value|
-		if( value.isCollection ) { value = value.first };
+		if( value.isCollection && { value.size != 2 } ) {
+			value = value.first;
+		};
 		^(value ?? { 0@0 }).asPoint.clip( clipRect.leftTop, clipRect.rightBottom ); //.round( step );
 	}
 
