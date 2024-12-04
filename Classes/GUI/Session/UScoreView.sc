@@ -148,13 +148,14 @@ UScoreView {
 		if( enabled ) {
 			if( updateInterval > 0 ) {
 				calledUpdate = true;
-				if( updateTask.isNil or: { updateTask.isPlaying.not } ) {
+				if( updateTask.isNil ) {
 					updateTask = Routine({
 						while { calledUpdate } {
 							this.prUpdate;
 							calledUpdate = false;
 							updateInterval.wait;
 						};
+						updateTask = nil;
 					}).play( AppClock );
 				};
 			} {
