@@ -95,7 +95,7 @@ UScoreView {
         scoreController = SimpleController( this.currentScore );
 
         scoreController.put(\pos, {
-		    { this.update }.defer;
+			{ this.update( false ); }.defer;
 		});
 
 		scoreController.put(\events, {
@@ -143,7 +143,7 @@ UScoreView {
 		scoreView.refresh;
 	}
 
-	update {
+	update { |checkZoom = true|
 		var zoom;
 		if( enabled ) {
 			if( updateInterval > 0 ) {
@@ -151,7 +151,7 @@ UScoreView {
 				if( updateTask.isNil ) {
 					updateTask = Routine({
 						while { calledUpdate } {
-							this.prUpdate;
+							this.prUpdate( checkZoom );
 							calledUpdate = false;
 							updateInterval.wait;
 						};
@@ -159,23 +159,27 @@ UScoreView {
 					}).play( AppClock );
 				};
 			} {
-				this.prUpdate;
+				this.prUpdate( checkZoom );
 			};
 		}
 	}
 
-	prUpdate {
+	prUpdate { |checkZoom = true|
 		var zoom, score, dur;
-		score = this.currentScore;
-		dur = score.displayDuration;
-		zoom = dur / 4;
-		if( scoreView.maxZoom != zoom ) {
-			scoreView.maxZoom = zoom;
-			if( scoreView.scaleH != 1 ) {
-				scoreView.updateSliders;
+		if( checkZoom ) {
+			score = this.currentScore;
+			dur = score.displayDuration;
+			zoom = dur / 4;
+			if( scoreView.maxZoom != zoom ) {
+				scoreView.maxZoom = zoom;
+				if( scoreView.scaleH != 1 ) {
+					scoreView.updateSliders;
+				};
 			};
 		};
 		if( followPos ) {
+			score = score ?? { this.currentScore };
+			dur = dur ?? { score.displayDuration; };
 			scoreView.moveH = (score.pos / dur).clip(0,1);
 		} {
 			scoreView.refresh;
@@ -742,5 +746,5 @@ UScoreView {
 		scoreView.userView.view.focus;
      }
 
-     refresh{ scoreView.refresh; }
+	refresh{ scoreView.refresh; }
 }
