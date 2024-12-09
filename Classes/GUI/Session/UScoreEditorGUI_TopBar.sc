@@ -83,6 +83,7 @@ UScoreEditorGui_TopBar {
     makeGui{ |parent, bounds|
         var font, size, marginH, marginV;
 		var umixer;
+		var umarkerList;
 		var plusButtonTask;
 		views = ();
 
@@ -311,6 +312,20 @@ UScoreEditorGui_TopBar {
 			        umixer.parent.close
 		        };
 		   });
+
+		header.decorator.shift(10);
+
+		SmoothButton( header, 60@size )
+		.states_( [ [ "markerlist", nil, Color.clear ] ] )
+		.canFocus_( false )
+		.toolTip_( "Open UMarkerListGUI" )
+		.action_({
+			if( umarkerList.notNil ) {
+				umarkerList.window.front;
+			} {
+				umarkerList = UMarkerListGUI( scoreView.currentScore ).onClose_({ umarkerList = nil });
+			};
+		});
 
 		header.decorator.shift( header.decorator.indentedRemaining.width - (100 + size), 0 );
 
