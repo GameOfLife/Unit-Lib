@@ -137,7 +137,7 @@ UScoreEditorGui_TransportBar {
             views[\loop].value = this.score.loop.binaryValue;
 		});
 
-		views[\play].value = this.score.isPlaying.binaryValue;
+		views[\play].value = (this.score.isPlaying or: { this.score.isPaused }).binaryValue;
 		views[\pause].value = this.score.isPaused.binaryValue;
 		if(this.score.isPreparing) {
 		    { views[\prepare].start }.defer
