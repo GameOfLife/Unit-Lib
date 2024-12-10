@@ -42,7 +42,7 @@ UMarkerListGUI {
 			this.findScoreEditor !? { |gui|
 				gui.askForSave = true;
 				gui.window.front
-			} ? score.gui;
+			} ?? { score.gui };
 			onClose.value( this );
 		};
 
