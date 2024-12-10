@@ -163,7 +163,7 @@ UMarkerListGUI {
 					item.treeItem == currentTV;
 				});
 				if( dict.notNil ) {
-					if( score.pos.inclusivelyBetween( dict.startTime, dict.endTime ? inf ).not ) {
+					if( score.pos < dict.startTime or: { score.pos >= (dict.endTime ? inf) } ) {
 						score.pos = dict.startTime;
 					};
 				};
