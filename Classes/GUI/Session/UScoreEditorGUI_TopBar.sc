@@ -320,10 +320,10 @@ UScoreEditorGui_TopBar {
 		.canFocus_( false )
 		.toolTip_( "Open UMarkerListGUI" )
 		.action_({
-			if( umarkerList.notNil ) {
-				umarkerList.window.front;
+			if( UMarkerListGUI.all[ scoreView.currentScore ].size > 0 ) {
+				UMarkerListGUI.all[ scoreView.currentScore ].last.window.front;
 			} {
-				umarkerList = UMarkerListGUI( scoreView.currentScore ).onClose_({ umarkerList = nil });
+				UMarkerListGUI( scoreView.currentScore );
 			};
 		});
 

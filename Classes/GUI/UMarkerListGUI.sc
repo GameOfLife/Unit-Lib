@@ -1,15 +1,34 @@
 UMarkerListGUI {
 
+	classvar <all;
+
 	var <score, <window, <views;
 	var <markerDict, <current;
 	var <>onClose;
 
+	*initClass {
+		all = IdentityDictionary();
+	}
+
 	*new { |score, bounds|
-		^super.newCopyArgs( score ).init( bounds );
+		^super.newCopyArgs( score ).init( bounds ).addToAll;
 	}
 
 	init { |bounds|
 		this.makeWindow( bounds );
+	}
+
+	addToAll {
+		if( all.at( score ).isNil or: { all.at( score ).includes( this ).not } ) {
+			all.put( score, all.at( score ).add( this ) );
+		};
+	}
+
+	removeFromAll {
+		all.at( score ).remove( this );
+		if( all.at( score ).size == 0 ) {
+			all.put( score,  nil );
+		};
 	}
 
 	closeWindow {
@@ -20,7 +39,7 @@ UMarkerListGUI {
 	}
 
 	findScoreEditor {
-		^UScoreEditorGUI.all.detect({ |item| item.score == score });
+		^UScoreEditorGUI.all.detect({ |item| item.score === score });
 	}
 
 	makeWindow { |bounds|
@@ -43,6 +62,7 @@ UMarkerListGUI {
 				gui.askForSave = true;
 				gui.window.front
 			} ?? { score.gui };
+			this.removeFromAll;
 			onClose.value( this );
 		};
 
