@@ -102,7 +102,7 @@ UTransportView {
             views[\counter].value = score.pos;
 		});
 
-		views[\play].value = score.isPlaying.binaryValue;
+		views[\play].value = (score.isPlaying or: { score.isPaused }).binaryValue;
 		views[\pause].value = score.isPaused.binaryValue;
 		if(score.isPreparing) {
 		    { views[\prepare].start }.defer
