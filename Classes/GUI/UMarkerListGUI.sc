@@ -184,6 +184,7 @@ UMarkerListGUI {
 			{
 				slider = SmoothSlider( view, view.bounds.moveTo(0,0).insetBy(1,1) )
 				.resize_( 5 )
+				.background_( nil )
 				.knobSize_( 0 )
 				.canFocus_( false );
 
