@@ -45,7 +45,7 @@ UMarkerListGUI {
 	makeWindow { |bounds|
 		var t, transportView;
 		this.closeWindow;
-		window = Window( score.name, bounds ?? { Rect(56.0, 319.0, 815.0, 700.0) } ).front;
+		window = Window( score.name, bounds ?? { Rect(50.0, 300.0, 815.0, 815.0) } ).front;
 		views = ();
 
 		this.findScoreEditor !? _.askForSave_( false );
@@ -83,12 +83,21 @@ UMarkerListGUI {
 			};
 		});
 
-		t = TreeView( window, window.bounds.insetAll(0,0,0,38).moveTo(0,0) ).resize_(5);
+		t = TreeView( window, window.bounds.insetAll(0,0,0,38+100).moveTo(0,0) ).resize_(5);
 		t.columns = ["id", "name", "time", "progress"];
 		t.setColumnWidth( 0, 80 );
 		t.setColumnWidth( 1, 300 );
 		t.font = Font( Font.defaultSansFace, 16 );
 		views[ \treeView ] = t;
+
+		views[ \large ] = StaticText( window, Rect( 0,0, window.bounds.width, 96 ) )
+		.resize_( 8 )
+		.font_( Font( Font.defaultSansFace, 40 ) )
+		.string_( "" )
+		.background_( Color.white );
+
+		views[ \large_string ] = "";
+		views[ \large_color ] = Color.white;
 
 		this.fillMarkers;
 	}
@@ -101,7 +110,32 @@ UMarkerListGUI {
 		});
 		if( current.isNil or: { current != (which !? _.index) } ) {
 			current = (which !? _.index);
-			{ views.treeView.currentItem = which !? _.treeItem; }.defer;
+			{
+				views.treeView.currentItem = which !? _.treeItem;
+			}.defer;
+
+			this.setLarge( " %".format( which !? { |item| item.marker.name } ? "" ) )
+		};
+
+		if( score.pos.equalWithPrecision( which !? _.startTime ? 0, 0.001 ) ) {
+			this.setLarge( color: which !? { |item| item.marker.displayColor ?? { Color.yellow } } ?? { Color.white } );
+		} {
+			this.setLarge( color: Color.white );
+		};
+	}
+
+	setLarge { |string, color|
+		if( string.notNil ) {
+			if( views[ \large_string ] != string ) {
+				views[ \large_string ] = string;
+				{ views[ \large ].string = string }.defer;
+			};
+		};
+		if( color.notNil ) {
+			if( views[ \large_color ] != color ) {
+				views[ \large_color ] = color;
+				{ views[ \large ].background = color }.defer;
+			};
 		};
 	}
 
@@ -193,7 +227,7 @@ UMarkerListGUI {
 				}) {
 					tv.currentItem = markerDict.values[ current ].treeItem;
 				};
-			}
+			};
 		};
 
 		views.treeView.keyDownAction = { |vw, which|
