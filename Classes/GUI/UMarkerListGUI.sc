@@ -100,6 +100,8 @@ UMarkerListGUI {
 		views[ \large_color ] = Color.white;
 
 		this.fillMarkers;
+
+		{ this.setItem; }.defer(0.2);
 	}
 
 
