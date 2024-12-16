@@ -3,8 +3,8 @@ UMarkerListGUI {
 	classvar <all;
 
 	var <score, <window, <views;
-	var <markerDict, <current;
-	var <>onClose;
+	var <markerDict, <current, <filter;
+	var <>onClose, <ctrl;
 
 	*initClass {
 		all = IdentityDictionary();
@@ -68,19 +68,30 @@ UMarkerListGUI {
 
 		views[ \transport ] = transportView;
 
-		SmoothButton(window,30@15)
-		.states_([[\up,Color.black,Color.clear]])
-		.border_(1).background_(Color.grey(0.8))
-		.radius_(5)
-		.canFocus_(false)
-		.action_({
-			var gui;
-			gui = this.findScoreEditor;
-			if( gui.notNil ) {
-				gui.window.front;
-			} {
-				score.gui.askForSave_( false );
-			};
+		window.asView.decorator.shift( window.asView.decorator.indentedRemaining.width - 124, 0 );
+
+		views[ \filter ] = UPopUpMenu( window, 120@15 )
+		.items_([ 'autoPause', 'all' ])
+		.title_( "filter" )
+		.align_( \right )
+		.resize_( 3 )
+		.action_({ |pu|
+			this.filter = pu.item;
+		})
+		.extraMenuActions_({
+			[
+				MenuAction.separator,
+				MenuAction( "Rebuild list", { this.rebuild }),
+				MenuAction( "Show score editor", {
+					var gui;
+					gui = this.findScoreEditor;
+					if( gui.notNil ) {
+						gui.window.front;
+					} {
+						score.gui.askForSave_( false );
+					};
+				})
+			];
 		});
 
 		t = TreeView( window, window.bounds.insetAll(0,0,0,38+100).moveTo(0,0) ).resize_(5);
@@ -100,6 +111,8 @@ UMarkerListGUI {
 		views[ \large_color ] = Color.white;
 
 		this.fillMarkers;
+
+		this.addCtrl;
 
 		{ this.setItem; }.defer(0.2);
 	}
@@ -141,8 +154,21 @@ UMarkerListGUI {
 		};
 	}
 
+	filter_ { |newFilter = 'autoPause', rebuild = true|
+		filter = newFilter;
+		if( rebuild ) { this.rebuild; };
+		views[ \filter ].item = filter;
+		this.changed( \filter, filter );
+	}
+
+	rebuild {
+		views[ \treeView ].clear;
+		this.fillMarkers;
+		{ this.setItem; }.defer(0.2);
+	}
+
 	fillMarkers {
-		var allMarkers, ctrl;
+		var allMarkers, ctrl, filterFunc;
 
 		markerDict = OEM();
 		allMarkers = score.events
@@ -150,13 +176,30 @@ UMarkerListGUI {
 			event.isKindOf( UMarker );
 		}).sort({ |a,b| a.startTime <= b.startTime; });
 
+		if( filter.isNil ) {
+			if( allMarkers.any({ |item| item.autoPause == true }) ) {
+				this.filter_( \autoPause, false );
+			} {
+				this.filter_( \all, false );
+			};
+		};
+
+		filterFunc = switch( filter,
+			\autoPause, { { |marker, score| marker.autoPause == true } },
+			{ if( filter.isKindOf( Function ) ) { filter } { true } }
+		);
+
 		allMarkers = allMarkers.select({ |marker|
-			marker.autoPause == true or: {
+			filterFunc.value( marker, score ) or: {
 				marker.startTime == 0;
 			} or: {
 				marker == allMarkers.last;
 			};
 		});
+
+		if( allMarkers.size == 0 or: { allMarkers.first.startTime != 0 }) { // add spoof score start marker
+			allMarkers = [ UMarker(0,0,"0.0 score start") ] ++ allMarkers;
+		};
 
 		allMarkers.do({ |marker,i|
 			var id, name, t, view, treeItem, slider, setProgressFunc;
@@ -240,7 +283,10 @@ UMarkerListGUI {
 				$,, { score.playAnyway; },
 			);
 		};
+	}
 
+	addCtrl {
+		ctrl.remove;
 		ctrl = SimpleController( score );
 		ctrl.put( \pos, {
 			markerDict.do({ |item|
