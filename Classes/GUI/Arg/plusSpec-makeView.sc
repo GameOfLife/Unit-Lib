@@ -847,7 +847,7 @@
 		.knobSize_(0.6)
 		.mode_( \move )
 		.action_({ |sl|
-			var values, min, max, mean, slval, curvedvalues, fromcurve;
+			var values, min, max, mean, slval, scaled;
 			slval = sl.value;
 			if( sliderSpec.notNil ) {
 				slval = this.unmap( sliderSpec.map( slval ) );
@@ -856,21 +856,14 @@
 			min = values.minItem;
 			max = values.maxItem;
 			mean = values.mean;
-			if( min.equalWithPrecision( max, 0.0001 ) ) {
-				vws[ \val ] = this.map( values + (slval - mean) );
-			} {
-				sl.value = slval = slval.clip( min, max );
-				mean = values.mean;
-				fromcurve = mean.calcCurve( min, max );
-				curvedvalues = values.curvelin( min, max, min, max, fromcurve );
-				if( fromcurve.abs > 0.1 && { curvedvalues == values }) {
-					curvedvalues = curvedvalues.collect({ |item, i|
-						item.blend( curvedvalues.wrapAt(i+1), 0.5 );
-					});
-				};
-				curvedvalues = curvedvalues.lincurve( min, max, min, max, slval.calcCurve( min, max ) );
-				vws[ \val ] = this.map( curvedvalues );
+			scaled = values + (slval - mean);
+			if( scaled.any(_ < 0) ) {
+				scaled = scaled.linlin( scaled.minItem, scaled.maxItem, 0, scaled.maxItem );
 			};
+			if( scaled.any(_ > 1) ) {
+				scaled = scaled.linlin( scaled.minItem, scaled.maxItem, scaled.minItem, 1);
+			};
+			vws[ \val ] = this.map( scaled );
 			vws[ \setPlotter ].value;
 			vws[ \setRangeSlider ].value;
 			action.value( vws, vws[ \val ] );
