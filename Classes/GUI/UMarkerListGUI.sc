@@ -197,7 +197,12 @@ UMarkerListGUI {
 			};
 		});
 
-		if( allMarkers.size == 0 or: { allMarkers.first.startTime != 0 }) { // add spoof score start marker
+		case { allMarkers.size == 0 } { // add spoof score start and end marker
+			allMarkers = [
+				UMarker(0,0, "0.0 score start"),
+				UMarker( score.duration,0, "1.0 score end")
+			];
+		} {  allMarkers.first.startTime != 0 } { // add spoof score start marker
 			allMarkers = [ UMarker(0,0,"0.0 score start") ] ++ allMarkers;
 		};
 
