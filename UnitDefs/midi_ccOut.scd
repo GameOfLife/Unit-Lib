@@ -5,7 +5,7 @@ Creates a Unit that can send MIDI control values over a MIDI interface connected
 
 channel: the MIDI channel (0-15)
 cc: the MIDI control number (0-127)
-val: the MIDI control value (1-127)
+val: the MIDI control value (0-127)
 midiOut: the index of the connected MIDI interface (0-..) The order of interfaces can be seen in the post window of SuperCollider and may look something like this:
 
 MIDI Destinations:
@@ -25,7 +25,7 @@ part of the Unit lib default Udefs set
 FreeUdef( "midi_ccOut", [
 	[ \channel, 0, IntegerSpec(0,0,15), false, \init ],
 	[ \cc, 64, IntegerSpec(64,0,127), false, \init ],
-	[ \val, 64, IntegerSpec(64,1,127), false, \init ],
+	[ \val, 64, IntegerSpec(64,0,127), false, \init ],
 	[ \midiOut, 0, IntegerSpec(0,0, 255), false, \init ],
 ])
 .apxCPU_( 0 )
