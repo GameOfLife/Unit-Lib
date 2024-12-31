@@ -8,7 +8,7 @@ MultiMonoUdef : Udef {
 	}
 
 	initArgs {
-		argSpecs = argSpecs.collect({ |item|
+		argSpecs.do({ |item|
 			if( item.name.asString[..1].asSymbol == 'u_' ) {
 				item.private = true;
 			};
@@ -17,8 +17,8 @@ MultiMonoUdef : Udef {
 					item.default = item.spec.constrain( item.default );
 				};
 			};
-			if( item.name != \u_index ) { item };
-		}).select( _.notNil ) ++ [ channelArgSpec ]
+		});
+		argSpecs = argSpecs.add( channelArgSpec );
 	}
 
 	*getIOArgNames { |numChannels = 1, type = 'i', selector = 'ar'|
@@ -40,17 +40,36 @@ MultiMonoUdef : Udef {
 
 	*isIOName { |name| ^"u_[io]_(ar|kr)_\\d{1,}_bus".matchRegexp( name.asString ) }
 
+	*getIOIndex { |name| ^name.asString.split( $_ )[3].interpret }
+
+	*setIOIndex { |name, val = 0|
+		name = name.asString.split( $_ );
+		name[3] = val;
+		^name.join($_).asSymbol;
+	}
+
+	addIOArgSpecs { |numChannels = 1|
+		var synthIO;
+		synthIO = argSpecs.select({ |item|
+			this.class.isIOName( item.name );
+		});
+		if( numChannels > 1 ) {
+			^argSpecs ++ (numChannels - 1).collect({ |i|
+				synthIO.collect({ |argSpec|
+					argSpec.copy
+					.name_( this.class.setIOIndex( argSpec.name, i + 1 ) )
+					.default_( i+1 );
+				});
+			}).flatten(1);
+		} {
+			^argSpecs;
+		};
+	}
+
 	argSpecs { |unit, numChannels = 1|
 		var ioArgNames;
-		numChannels = unit !? { unit.get( \numChannels ) } ? numChannels;
-		ioArgNames = this.class.getAllIOArgNames( numChannels );
-		^argSpecs.select({ |item|
-			if( this.class.isIOName( item.name ) ) {
-				ioArgNames.includes( item.name );
-			} {
-				true
-			};
-		})
+		numChannels = unit !? { unit.get( \numChannels ) } ? numChannels ? 1;
+		^this.addIOArgSpecs( numChannels );
 	}
 
 	asArgsArray { |argPairs, unit, constrain = true|
@@ -95,25 +114,67 @@ MultiMonoUdef : Udef {
 	}
 
 	setSynth { |unit ...keyValuePairs|
+		var numChannels, filteredKeyValuePairs;
 		if( keyValuePairs.includes( \numChannels ) ) {
 			unit.init( this, unit.args );
 		} {
-			this.prSetSynth( unit.synths, *keyValuePairs );
+			numChannels = unit.get( \numChannels );
+			if( numChannels > 1 ) {
+				keyValuePairs.pairsDo({ |key, value|
+					var index, newKey;
+					if( this.class.isIOName( key ) ) {
+						index = this.class.getIOIndex( key );
+						newKey = this.class.setIOIndex( key, 0 );
+						this.prSetSynth( unit.synths.collect(_[index]), newKey, value );
+					} {
+						filteredKeyValuePairs = filteredKeyValuePairs.addAll( [ key, value ] );
+					}
+				});
+				if( filteredKeyValuePairs.notNil ) {
+					this.prSetSynth( unit.synths, *keyValuePairs );
+				};
+			} {
+				this.prSetSynth( unit.synths, *keyValuePairs );
+			}
 		};
 	}
 
+	createSynthArgsArray { |inArgs, n = 1|
+		var ioArgs, otherArgs;
+
+		inArgs.pairsDo({ |key, value|
+			if( this.class.isIOName( key ) ) {
+				ioArgs = ioArgs.add( [ key, value ] );
+			} {
+				otherArgs = otherArgs.addAll( [ key, value ] );
+			};
+		});
+
+		^n.collect({ |i|
+			otherArgs ++
+			ioArgs.select({ |item|
+				this.class.getIOIndex( item[0] ) == i
+			}).collect({ |item|
+				[ this.class.setIOIndex( item[0], 0 ), item[1] ]
+			}).flatten(1)
+		});
+	}
+
 	createSynth { |unit, target, startPos = 0| // create A single synth based on server
-		var group, numChannels;
+		var group, numChannels, argsArray;
 		target = target ? Server.default;
 		numChannels =  unit.get( \numChannels );
 		if ( numChannels > 1 ) {
-			group = Group( target, \addToTail );
-			(numChannels-1).asInteger.do({ |i|
-				Synth( this.synthDefName, unit.getArgsFor( target, startPos ) ++ [ \u_index, i+1 ], group, \addToTail );
+			group = GroupWithChildren( target, \addToTail );
+			argsArray = this.createSynthArgsArray( unit.getArgsFor( target, startPos ), numChannels );
+			numChannels.asInteger.do({ |i|
+				group.addChild(
+					Synth( this.synthDefName, argsArray[i], group, \addToHead )
+				);
 			});
-			group.freeAction_({ |synth| unit.removeSynth( synth ); });
-			unit.synths = unit.synths.add( group );
-		};
-		^Synth( this.synthDefName, unit.getArgsFor( target, startPos ), target, \addToTail );
+			^group;
+		} {
+			^Synth( this.synthDefName, unit.getArgsFor( target, startPos ), target, \addToTail );
+		}
 	}
 }
