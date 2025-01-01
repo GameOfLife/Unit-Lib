@@ -1462,9 +1462,11 @@ UChainGUI {
 				var checked;
 				checked = unit !? { unit.def.name == def.name; } ? false;
 				if( checked ) { includesChecked = true };
-				if( def.isKindOf( MultiUdef ) && {
-					def.getArgSpec( def.defNameKey ).private.not
-				}) {
+				case {
+					def.isKindOf( MultiUdef ) && {
+						def.getArgSpec( def.defNameKey ).private.not
+					}
+				} {
 					Menu(
 						MenuAction.separator( def.defNameKey.asString ),
 						*def.getSpec( def.defNameKey ).list.collect({ |subdefkey|
@@ -1474,6 +1476,26 @@ UChainGUI {
 							};
 							MenuAction( subdefkey.asString, {
 								action.value( def, [ def.defNameKey, subdefkey ] );
+								recentUdefs.remove( def );
+								recentUdefs = (recentUdefs ? []).addFirst( def )[..2];
+								menu.removeDependant( ctrl );
+								menu.deepDestroy;
+							}).enabled_( subChecked.not ).font_( Font( Font.defaultSansFace, 12 ) );
+						})
+					).title_( if( checked ) { def.name.asString ++ " *" } { def.name.asString } )
+					.font_( Font( Font.defaultSansFace, 12 ) );
+				} {
+					def.isKindOf( MultiMonoUdef )
+				} {
+					Menu(
+						MenuAction.separator( 'numChannels' ),
+						*def.getSpec( 'numChannels' ).list.collect({ |subdefkey|
+							var subChecked = false;
+							if( checked ) {
+								subChecked = unit !? { unit.get( 'numChannels' ) == subdefkey } ? false;
+							};
+							MenuAction( subdefkey.asString, {
+								action.value( def, [ 'numChannels', subdefkey ] );
 								recentUdefs.remove( def );
 								recentUdefs = (recentUdefs ? []).addFirst( def )[..2];
 								menu.removeDependant( ctrl );
