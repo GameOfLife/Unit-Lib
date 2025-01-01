@@ -492,6 +492,8 @@ Udef : GenericDef {
 		^synths;
 	}
 
+	extraNames { ^nil }
+
 	getInfoString {
 		var str;
 		if( infoString.isNil ) {
@@ -650,8 +652,12 @@ U : ObjectWithArgs {
     }
 
     fullDefName {
-	    ^([ this.defName ] ++ this.subDefNames).join( " / " );
+	    ^([ this.defName ] ++ this.subDefNames ++ this.extraNames ).join( " / " );
     }
+
+	extraNames {
+		^this.def.extraNames( this );
+	}
 
     checkDef {
 	    if( this.def.notNil && { this.def.argNamesFor( this ) != this.argNames } ) {

@@ -67,6 +67,8 @@ MultiUdef : Udef {
 			.udefs_( udefs );
 	}
 
+	extraNames { |unit| ^unit.subDef.extraNames( unit ) }
+
 	findUdef{ |name|
 		^udefs.detect({ |item| item.name == name }) ? udefs[0];
 	}

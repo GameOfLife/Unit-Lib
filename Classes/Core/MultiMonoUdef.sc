@@ -48,6 +48,8 @@ MultiMonoUdef : Udef {
 		^name.join($_).asSymbol;
 	}
 
+	extraNames { |unit| ^[ unit.get( \numChannels ) ] }
+
 	addIOArgSpecs { |numChannels = 1|
 		var synthIO;
 		synthIO = argSpecs.select({ |item|
