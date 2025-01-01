@@ -13,7 +13,7 @@ part of the Unit lib default Udefs set
 
 MultiChannelUdef( \envelope_amp, {
 	var in;
-	in = UIn.ar(0);
+	in = UIn.ar(0, Udef.numChannels );
 	in = in * UEnvGen.ar( \env, \amp, \timeScale );
 	UOut.ar( 0, in );
 })
