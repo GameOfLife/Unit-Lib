@@ -116,7 +116,7 @@ MultiMonoUdef : Udef {
 	setSynth { |unit ...keyValuePairs|
 		var numChannels, filteredKeyValuePairs;
 		if( keyValuePairs.includes( \numChannels ) ) {
-			unit.init( this, unit.args );
+			unit.init( unit.def, unit.args );
 		} {
 			numChannels = unit.get( \numChannels );
 			if( numChannels > 1 ) {
