@@ -8,13 +8,12 @@ UVoicer : UEvent {
 	var <>channel = 0;
 	var <>noteRange = #[0,127];
 
-	*new { |chain, startTime = 0, track = 0, duration = inf, releaseSelf = false|
+	*new { |chain, startTime = 0, track = 0, duration = inf|
 		chain = chain ?? { UChain.default };
 		^super.newCopyArgs
 			.chain_( chain )
 			.startTime_( startTime )
 			.track_( track ? 0 )
-			.releaseSelf_( releaseSelf )
 			.duration_( duration )
 			.init
 	}
@@ -24,12 +23,20 @@ UVoicer : UEvent {
 		this.changed( \init );
 	}
 
-	releaseSelf_ { |bool|
-		if(releaseSelf != bool) {
-	        releaseSelf = bool;
-	        this.changed( \releaseSelf );
-        };
-    }
+	releaseSelf { ^false }
+	releaseSelf_ { "%:releaseSelf - can't use releaseSelf\n".postf( this.class ) }
+
+	getAllUChains { ^chain }
+
+	eventSustain { ^duration }
+
+	waitTime { ^0 }
+
+	prepare { |servers, startPos, action|
+		action.value
+	}
+
+	preparedServers { ^[] }
 
 	update { |obj, what, src, chan, num, val|
 		if( obj == UMIDIDict && {
@@ -45,6 +52,24 @@ UVoicer : UEvent {
 				this.endEvent( num );
 			};
 		};
+	}
+
+	start {
+		UMIDIDict.addDependant( this );
+	}
+
+	prepareAndStart {
+		this.start;
+	}
+
+	stop {
+		UMIDIDict.removeDependant( this );
+		this.endAll;
+	}
+
+	release { |time|
+		UMIDIDict.removeDependant( this );
+		this.endAll( time );
 	}
 
     chain_ { |aChain|
