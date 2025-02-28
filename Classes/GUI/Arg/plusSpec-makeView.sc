@@ -531,7 +531,7 @@
 									};
 								};
 							};
-							string.namecps * (cents / 100).midiratio;
+							string.uNamecps( cents );
 						} { "Mm".includes(string.first) } {
 							string[1..].interpret.midicps;
 						} { "Tt".includes(string.first) } {
@@ -798,7 +798,7 @@
 								};
 							};
 						};
-						string.namecps * (cents / 100).midiratio;
+						string.uNamecps( cents );
 					} { "Mm".includes(string.first) } {
 						string[1..].interpret.midicps;
 					} { "Tt".includes(string.first) } {
@@ -2545,7 +2545,7 @@
 								};
 							};
 						};
-						string.namecps * (cents / 100).midiratio;
+						string.uNamecps( cents );
 					} { "Mm".includes(string.first) } {
 						string[1..].interpret.midicps;
 					} {
@@ -3774,7 +3774,7 @@
 						Menu( *(((this.minval.cpsmidi.round(1)/12).floor-2).asInteger..
 							((this.maxval.cpsmidi.round(1)/12).floor-2).asInteger).collect({ |octave|
 							MenuAction( letter ++ add ++ octave, {
-								vws.setVal( (letter ++ add ++ octave).namecps );
+								vws.setVal( (letter ++ add ++ octave).uNamecps );
 								vws.doAction;
 							})
 						})
