@@ -3998,12 +3998,15 @@
 		vws[ \name ].setProperty(\wordWrap, false);
 
 		vws[ \setName ] = {
-			var name;
-			name = vws[ \val ].cpsname;
-			if( name.cents.abs >= 1 ) {
+			var name, midi, cents;
+			midi = vws[ \val ].cpsmidi;
+			name = midi.midiname;
+			cents = (midi - midi.round(1.0) * 100).round(10e-8);
+			if( cents.abs >= 1 ) {
 				vws[ \name ].string = " % %%".format(
-					name, if( name.cents.isPositive ) { "+" } { "" },
-					name.cents.round(1).asInteger
+					name,
+					if( cents.isPositive ) { "+" } { "" },
+					cents.round(1).asInteger
 				)
 			} {
 				vws[ \name ].string = " " ++ name;
