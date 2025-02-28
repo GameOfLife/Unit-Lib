@@ -149,13 +149,13 @@ ULib {
 				.font_( font )
 				.action_({ Server.killAll });
 				killButton.view.toolTip_( "Kills all local Server processes\n\nUse this if Server doesn't boot" );
-				if( NetAddr.respondsTo( \myIP ) ) {
-					ip = NetAddr.myIP;
-				};
-			} {
-				ip = s.addr.ip;
 			};
 			if( s.isKindOf( LoadBalancer ) ) {
+				if( s.addr.isLocal && { NetAddr.respondsTo( \myIP ) }) {
+					ip = NetAddr.myIP;
+				} {
+					ip = s.addr.ip;
+				};
 				composite.background = Color.gray(0.5).alpha_(0.2);
 				StaticText(composite, Rect( 22, 2, 200,16 ) )
 				.font_( font.boldVariant )
