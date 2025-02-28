@@ -202,7 +202,7 @@
 				case { last < 0.8 } {
 					cpuMeter.color = onColor.copy.alpha_(0.25);
 				} { last < 1 } {
-					cpuMeter.color = Color.yellow( 1,1, alpha: 0.4 );
+					cpuMeter.color = Color.yellow( 1, alpha: 0.4 );
 				} {
 					cpuMeter.color = Color( 1,0.2,alpha: 0.4 )
 				};
