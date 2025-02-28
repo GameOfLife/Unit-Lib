@@ -3978,7 +3978,7 @@
 						};
 					};
 				};
-				string.namecps * (cents / 100).midiratio;
+				string.uNamecps( cents );
 			} { "Mm".includes(string.first) } {
 				string[1..].interpret.midicps;
 			} { "Tt".includes(string.first) } {
