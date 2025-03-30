@@ -4098,8 +4098,11 @@
 
 		vws[ \rad ].sliderView
 			.centered_( true )
-			.centerPos_( this.unmap( default ) )
-			.clipMode_( \wrap );
+			.centerPos_( this.unmap( default ) );
+
+		if( (this.maxval - this.minval) >= 1.99pi ) {
+			vws[ \rad ].sliderView.clipMode_( \wrap );
+		};
 
 		// deg mode
 		vws[ \deg ] = EZSmoothSlider( vws[ \comp ],
@@ -4113,8 +4116,11 @@
 
 		vws[ \deg ].sliderView
 			.centered_( true )
-			.centerPos_( this.unmap( default ) )
-			.clipMode_( \wrap );
+			.centerPos_( this.unmap( default ) );
+
+		if( (this.maxval - this.minval) >= 1.99pi ) {
+			vws[ \deg ].sliderView.clipMode_( \wrap );
+		};
 
 		this.setMode( vws, mode );
 
