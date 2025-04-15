@@ -9,7 +9,7 @@
 		bottom = viewRect.bottom;
 		left = viewRect.left.ceil;
 		width = viewRect.width.ceil;
-		round = (width / 5).max(1).nearestInList(#[1,5,10,30,60,300,600]);
+		round = (width / 5).max(1).nearestInList(#[1,5,10,30,60,300,600,3600,7200, 21600, 43200]);
 		leftRounded = left.round(round);
 		left60 = left.round(60);
 		bnds = "00:00".bounds( Font( Font.defaultSansFace, 9 ) );
@@ -39,12 +39,14 @@
 			};
 		};
 
-		Pen.color = Color.white.alpha_(0.75);
-		(width / 60).ceil.do({ |i|
-			i = (i * 60) + left60;
-			Pen.line( i @ top, i @ bottom );
-		});
-		Pen.stroke;
+		if( width < 7200 ) {
+			Pen.color = Color.white.alpha_(0.75);
+			(width / 60).ceil.do({ |i|
+				i = (i * 60) + left60;
+				Pen.line( i @ top, i @ bottom );
+			});
+			Pen.stroke;
+		};
 
 		(width/round).ceil.do({ |i|
 			Pen.use({
