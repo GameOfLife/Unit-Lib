@@ -19,10 +19,13 @@
 
 USessionGUI : UAbstractWindow {
 
+	classvar <>topBarHeigth = 30;
+
 	var <session;
     var <sessionView, bounds;
     var <sessionController, objGuis;
     var <selectedObject;
+	var compTop = 0;
 
     *new { |session, bounds|
         ^super.new.init( session)
@@ -54,12 +57,11 @@ USessionGUI : UAbstractWindow {
 	makeGui { |bounds|
         var topBarView;
 		var font = Font( Font.defaultSansFace, 11 );
-
-        var topBarHeigth = 40;
         var size = 16;
         var margin = 4;
         var gap = 2;
-		var menuView, menuH = 22, compTop = 0;
+		var menuView, menuH = 22;
+		var plusButtonTask;
         bounds = bounds ? Rect(100,100,700,400);
         this.newWindow(bounds, "USession - "++session.name, {
 
@@ -111,12 +113,27 @@ USessionGUI : UAbstractWindow {
 		topBarView.decorator.shift(10);
 
         SmoothButton( topBarView, size@size )
-            .states_( [[ '-' ]] )
+            .states_( [[ '+' ]] )
             .canFocus_(false)
+		    .toolTip_( "Add Event" )
             .border_(1).background_(Color.grey(0.8))
-            .action_({
-                selectedObject !? this.removeObject(_)
-            });
+		.mouseDownAction_({
+			plusButtonTask.stop;
+			plusButtonTask = {
+				0.5.wait;
+				UMenuBarIDE.allMenus[ 'File' ].actions.detect({ |act|
+					act.string == "Add to Session"
+				}).menu.front;
+				plusButtonTask = nil;
+			}.fork( AppClock );
+		})
+		.action_({
+			plusButtonTask !? _.stop;
+			plusButtonTask = nil;
+			session.add( UScore().name_(
+				"Untitled %".format( session.objects.size + 1 )
+			) )
+		});
 
 		topBarView.decorator.nextLine;
 
@@ -124,7 +141,7 @@ USessionGUI : UAbstractWindow {
         	.background_( Color.black.alpha_(0.25) )
         	.resize_(2);
 
-        this.makeSessionView;
+		this.makeSessionView;
 
     }
 
@@ -141,13 +158,13 @@ USessionGUI : UAbstractWindow {
                     { object.saveAs(nil,{session.remove(object)}) }
                 ] );
 
-            }
+            } {
+				session.remove(object);
+			}
         }
     }
 
     makeSessionView {
-        var addLast;
-        var topBarHeigth = 40;
         var margin = 4;
         var gap = 2;
         var sessionViewsHeight = 16;
@@ -160,28 +177,63 @@ USessionGUI : UAbstractWindow {
         };
         objGuis.do(_.remove);
 
-        sessionView = CompositeView(view, Rect(0,topBarHeigth,bounds.width,bounds.height - topBarHeigth)).resize_(5);
+		sessionView = CompositeView(view, Rect(0,topBarHeigth + compTop,bounds.width,bounds.height - topBarHeigth)).resize_(5);
         sessionView.addFlowLayout(margin@margin,margin@margin);
 
         objGuis = session.objects.collect { |object,i|
             var releaseTask, but, ctl, comp, gui;
+			var titleMenu;
 
-            comp = ActiveCompositeView( sessionView, (sessionView.bounds.width - (margin*2))@(sessionViewsHeight + (margin*2)) )
+            comp = CompositeView( sessionView, (sessionView.bounds.width - (margin*2))@(sessionViewsHeight + (margin*2)) )
             		.resize_(2)
-            		.background_(Color.grey(0.9));
-            comp.mouseDownAction_({ selectedObject = object });
-            comp.uview.beginDragAction_({ object });
-            comp.canReceiveDragHandler_({ |sink|
-                [ UChain, UScore, Array ].includes(View.currentDrag.class)
-            })
-            .receiveDragHandler_({ |sink, x, y|
-                session.insertCollection(session.objects.indexOf(object)+1 ,View.currentDrag.asCollection.collect(_.deepCopy))
-            });
-
+			.background_( Color.grey(0.8).blend( object.getTypeColor, 0.5 ) );
             comp.addFlowLayout;
 
-            StaticText(comp,150@16)
-                .string_(object.class.asString++" "++object.name);
+            titleMenu = UPopUpMenu(comp,200@16)
+            .string_( " "++object.name)
+			.extraMenuActions = {
+				[
+					MenuAction( "Open...", {
+						var gui;
+						gui = object.gui;
+						if( gui.isKindOf( UScoreEditorGUI ) ) { gui.askForSave = false };
+					}),
+
+					if( object.isKindOf( UScore ) ) {
+						MenuAction( "Edit...", {
+							MassEditUChain(
+								object.getAllUChains,
+								object.getAllUMarkers
+							).gui( score: object );
+						})
+					},
+
+					MenuAction.separator,
+
+					MenuAction( "Move to top", {
+						session.insert( 0, session.objects.remove( object ) );
+					}).enabled_( i > 0 ),
+					MenuAction( "Move up", {
+						session.insert( i-1, session.objects.removeAt( i ) );
+					}).enabled_( i > 0 ),
+					MenuAction( "Move down", {
+						session.insert( i+1, session.objects.removeAt( i ) );
+					}).enabled_( i < (session.objects.size-1) ),
+					MenuAction( "Move to bottom", {
+						session.add( session.objects.remove( object ) );
+					}).enabled_( i < (session.objects.size-1) ),
+
+					MenuAction.separator,
+
+					MenuAction( "Duplicate", {
+						var copy;
+						copy = object.deepCopy;
+						if( copy.isKindOf( UScore ) ) {
+							copy.name = copy.name ++ "(copy)";
+						};
+						session.insert( i+1, copy );
+					})
+			].select(_.notNil) };
 
             SmoothButton(comp,25@16)
                 .states_([[\up,Color.black,Color.clear]])
@@ -197,21 +249,36 @@ USessionGUI : UAbstractWindow {
 
 			comp.decorator.shift(22,0);
 			gui = object.sessionGUI(comp);
+
+			comp.decorator.left_( comp.bounds.width - 20 );
+
+			SmoothButton( comp, 16@16 )
+            .states_( [[ '-' ]] )
+			.resize_( 3 )
+            .canFocus_(false)
+            .border_(1).background_(Color.grey(0.8))
+            .action_({
+                this.removeObject( object );
+            });
 			sessionView.decorator.nextLine;
+
+			ctl = SimpleController( object )
+			.put( \name, {
+				{
+					titleMenu.string_(" "++object.name)
+				}.defer;
+			})
+			.put( \displayColor, {
+				{
+					comp.background_( Color.grey(0.9).blend( object.getTypeColor, 0.5 ) );
+				}.defer;
+			});
+
+			comp.onClose_({ ctl.remove });
+
 			gui
         };
 
-        addLast = UserView( sessionView, (sessionView.bounds.width - (margin*2))@14 )
-            .resize_(2)
-            .canFocus_(false)
-            .canReceiveDragHandler_({ |sink|
-                var drg;
-                drg = View.currentDrag;
-                USession.acceptedClasses.includes(drg.class)
-            })
-            .receiveDragHandler_({ |sink, x, y|
-                session.add(View.currentDrag.deepCopy)
-            });
         window.refresh;
     }
 

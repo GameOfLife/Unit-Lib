@@ -325,7 +325,7 @@ UMenuBarIDE {
 
 		this.registerMenu( MenuAction.separator("Sessions"), "File" );
 
-		sessionMenu = Menu(
+		sessionMenu = [
 
 			MenuAction( "New Session", {
 				USession.new.gui
@@ -346,14 +346,38 @@ UMenuBarIDE {
 			MenuAction.separator,
 
 			Menu(
-				MenuAction( "Current Score", {
+				MenuAction( "New UScore", {
+					USession.current !! { |x|
+						x.add(UScore().name_(
+							"Untitled %".format( x.objects.size + 1 )
+						))
+					};
+				}),
+
+				MenuAction( "New UChain", {
+					USession.current !! _.add(UChain())
+				}),
+
+				MenuAction.separator,
+
+				MenuAction( "Open UScore(s)...", {
+					USession.current !! { |session|
+						UScore.openMultiple(nil, { |score|
+							session.add( score );
+						});
+					};
+				}),
+
+				MenuAction.separator,
+
+				MenuAction( "Current UScore", {
 					USession.current !! { |session|
 						UScore.current !! { |score|
 							session.add( score )
 						}
 					}
 				}),
-				MenuAction( "Current Score Duplicated", {
+				MenuAction( "Current UScore Duplicated", {
 					USession.current !! { |session|
 						UScore.current !! { |score|
 							session.add( score.deepCopy )
@@ -402,25 +426,13 @@ UMenuBarIDE {
 						}
 					}),
 				).title_( "Selected Events" ).font_( font )
-			).title_("Add").font_( font ),
+			).title_("Add to Session").font_( font ),
 
-			Menu(
-				MenuAction( "UChain", {
-					USession.current !! _.add(UChain())
-				}),
-				MenuAction( "UChainGroup", {
-					USession.current !! _.add(UChainGroup())
-				}),
-				MenuAction( "UScore", {
-					USession.current !! _.add(UScore())
-				}),
-				MenuAction( "UScoreList", {
-					USession.current !! _.add(UScoreList())
-				}),
-			).title_("New").font_( font ),
-		).title_("Session").font_( font );
+		];
 
-		this.registerMenu( sessionMenu, "File" );
+		sessionMenu.do({ |mn|
+			this.registerMenu( mn, "File" );
+		});
 
 /* EDIT */
 		this.registerMenu( MenuAction( "Copy", {
