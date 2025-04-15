@@ -39,6 +39,8 @@ ActiveCompositeView {
 	mouseDown { |x,y, mod| uview.mouseDown( this, x, y, mod ); }
 	mouseMove { |x,y, mod| uview.mouseMove( this, x, y, mod ); }
 
+	resize_ { |resize| view.resize_( resize ) }
+
 	doesNotUnderstand { |selector ... args|
 		var res;
 		res = topView.perform( selector, *args );
