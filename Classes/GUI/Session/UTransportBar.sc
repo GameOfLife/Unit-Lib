@@ -124,8 +124,8 @@ UTransportView {
 
 		views[\play] = SmoothButton( parent, 40@height  )
 			.states_( [
-			    [ \play, Color.black, Color.clear ],
-			    [ \stop, Color.black, Color.green.alpha_(0.5) ],
+			    [ \play, nil, Color.clear ],
+			    [ \stop, nil, Color.green.alpha_(0.5) ],
 			    [ \play, Color.blue, Color.red.alpha_(0.5) ]] )
 			.canFocus_(false)
 			.font_( font )
@@ -146,7 +146,7 @@ UTransportView {
 
 		views[\pause] = SmoothButton( parent, 50@height  )
 			.states_( [
-			    [ \pause, Color.black, Color.clear ],
+			    [ \pause, nil, Color.clear ],
 			    [ \pause, Color.red,Color.green.alpha_(0.5) ],
 			    [ \pause, Color.blue,Color.red.alpha_(0.5) ]] )
 			.canFocus_(false)
@@ -168,7 +168,7 @@ UTransportView {
 			});
 
 		views[\return] = SmoothButton( parent, 50@height  )
-			.states_( [[\return, Color.black, Color.clear ]])
+			.states_( [[\return, nil, Color.clear ]])
 			.canFocus_(false)
 			.font_( font )
 			.action_({
@@ -176,8 +176,8 @@ UTransportView {
 			});
 
         views[\loop] = SmoothButton( parent, 50@height  )
-        			.states_( [[\roundArrow, Color.black, Color.clear ],
-        			[\roundArrow, Color.black, Color.green.alpha_(0.5) ]])
+        			.states_( [[\roundArrow, nil, Color.clear ],
+        			[\roundArrow, nil, Color.green.alpha_(0.5) ]])
         			.canFocus_(false)
         			.font_( font )
         			.action_({ |v| score.loop = v.value.booleanValue;  });

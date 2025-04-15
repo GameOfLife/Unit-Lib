@@ -80,21 +80,21 @@ USessionGUI : UAbstractWindow {
                         ] );
                 };
             }.defer(0.1)
-        }, margin:0, gap:0);
+        }, UChainGUI.skin.scoreEditorWindow, margin:0, gap:0);
+
+		RoundView.pushSkin( UChainGUI.skin );
 
 		if( UMenuBarIDE.hasMenus ) {
 			menuView = UMenuBarIDE.createMenuStrip( view, bounds.width @ menuH, [0,0,0,0] );
 			compTop = menuH;
 		};
 
-		RoundView.pushSkin( UChainGUI.skin );
-
         topBarView =  CompositeView(view, Rect(0,compTop,bounds.width,topBarHeigth)).resize_(2);
         topBarView.addFlowLayout;
 
         SmoothButton( topBarView, 40@size  )
 			.states_( [
-			    [ \play, Color.black, Color.clear ]] )
+			    [ \play, nil, Color.clear ]] )
 			.canFocus_(false)
 			.font_( font )
 			.action_({
@@ -103,7 +103,7 @@ USessionGUI : UAbstractWindow {
 
 		SmoothButton( topBarView, 40@size  )
 			.states_( [
-			    [ \stop, Color.black, Color.clear ]] )
+			    [ \stop, nil, Color.clear ]] )
 			.canFocus_(false)
 			.font_( font )
 			.action_({
@@ -171,6 +171,7 @@ USessionGUI : UAbstractWindow {
         var sessionViewsHeight = 16;
         var font = Font( Font.defaultSansFace, 11 );
         var bounds = view.bounds.moveTo(0,0);
+		var boxColor, alpha;
 
         //first remove old view and controllers;
         if(sessionView.notNil) {
@@ -179,6 +180,12 @@ USessionGUI : UAbstractWindow {
         objGuis.do(_.remove);
 
 		RoundView.pushSkin( UChainGUI.skin );
+
+		boxColor =  Color.gray(0.5,0.0);
+
+		//alpha = boxColor.alpha;
+
+		//boxColor = UChainGUI.skin.scoreEditorWindow.blend( boxColor.alpha_(1), alpha );
 
 		sessionView = CompositeView(view, Rect(0,topBarHeigth + compTop,bounds.width,bounds.height - topBarHeigth)).resize_(5);
         sessionView.addFlowLayout(margin@margin,margin@margin);
@@ -189,7 +196,7 @@ USessionGUI : UAbstractWindow {
 
             comp = CompositeView( sessionView, (sessionView.bounds.width - (margin*2))@(sessionViewsHeight + (margin*2)) )
             		.resize_(2)
-			.background_( Color.grey(0.5).blend( object.getTypeColor, 0.5 ) );
+			.background_( boxColor.blend( object.getTypeColor, 0.5 ) );
             comp.addFlowLayout;
 
             titleMenu = UPopUpMenu(comp,200@16)
@@ -239,7 +246,7 @@ USessionGUI : UAbstractWindow {
 			].select(_.notNil) };
 
             SmoothButton(comp,25@16)
-                .states_([[\up,Color.black,Color.clear]])
+                .states_([[\up,nil,Color.clear]])
                 .font_( font )
 			    .radius_(5)
 			    .canFocus_(false)
@@ -271,7 +278,7 @@ USessionGUI : UAbstractWindow {
 			})
 			.put( \displayColor, {
 				{
-					comp.background_( Color.grey(0.5).blend( object.getTypeColor, 0.5 ) );
+					comp.background_( boxColor.blend( object.getTypeColor, 0.5 ) );
 				}.defer;
 			});
 
