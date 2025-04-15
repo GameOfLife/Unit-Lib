@@ -87,6 +87,8 @@ USessionGUI : UAbstractWindow {
 			compTop = menuH;
 		};
 
+		RoundView.pushSkin( UChainGUI.skin );
+
         topBarView =  CompositeView(view, Rect(0,compTop,bounds.width,topBarHeigth)).resize_(2);
         topBarView.addFlowLayout;
 
@@ -95,7 +97,6 @@ USessionGUI : UAbstractWindow {
 			    [ \play, Color.black, Color.clear ]] )
 			.canFocus_(false)
 			.font_( font )
-			.border_(1).background_(Color.grey(0.8))
 			.action_({
 			    session.prepareAndStart
 			});
@@ -105,7 +106,6 @@ USessionGUI : UAbstractWindow {
 			    [ \stop, Color.black, Color.clear ]] )
 			.canFocus_(false)
 			.font_( font )
-			.border_(1).background_(Color.grey(0.8))
 			.action_({
 			    session.release
 			});
@@ -116,7 +116,6 @@ USessionGUI : UAbstractWindow {
             .states_( [[ '+' ]] )
             .canFocus_(false)
 		    .toolTip_( "Add Event" )
-            .border_(1).background_(Color.grey(0.8))
 		.mouseDownAction_({
 			plusButtonTask.stop;
 			plusButtonTask = {
@@ -142,6 +141,8 @@ USessionGUI : UAbstractWindow {
         	.resize_(2);
 
 		this.makeSessionView;
+
+		RoundView.popSkin;
 
     }
 
@@ -177,6 +178,8 @@ USessionGUI : UAbstractWindow {
         };
         objGuis.do(_.remove);
 
+		RoundView.pushSkin( UChainGUI.skin );
+
 		sessionView = CompositeView(view, Rect(0,topBarHeigth + compTop,bounds.width,bounds.height - topBarHeigth)).resize_(5);
         sessionView.addFlowLayout(margin@margin,margin@margin);
 
@@ -186,7 +189,7 @@ USessionGUI : UAbstractWindow {
 
             comp = CompositeView( sessionView, (sessionView.bounds.width - (margin*2))@(sessionViewsHeight + (margin*2)) )
             		.resize_(2)
-			.background_( Color.grey(0.8).blend( object.getTypeColor, 0.5 ) );
+			.background_( Color.grey(0.5).blend( object.getTypeColor, 0.5 ) );
             comp.addFlowLayout;
 
             titleMenu = UPopUpMenu(comp,200@16)
@@ -238,7 +241,6 @@ USessionGUI : UAbstractWindow {
             SmoothButton(comp,25@16)
                 .states_([[\up,Color.black,Color.clear]])
                 .font_( font )
-			    .border_(1).background_(Color.grey(0.8))
 			    .radius_(5)
 			    .canFocus_(false)
 			    .action_({
@@ -256,7 +258,6 @@ USessionGUI : UAbstractWindow {
             .states_( [[ '-' ]] )
 			.resize_( 3 )
             .canFocus_(false)
-            .border_(1).background_(Color.grey(0.8))
             .action_({
                 this.removeObject( object );
             });
@@ -270,7 +271,7 @@ USessionGUI : UAbstractWindow {
 			})
 			.put( \displayColor, {
 				{
-					comp.background_( Color.grey(0.9).blend( object.getTypeColor, 0.5 ) );
+					comp.background_( Color.grey(0.5).blend( object.getTypeColor, 0.5 ) );
 				}.defer;
 			});
 
@@ -280,6 +281,8 @@ USessionGUI : UAbstractWindow {
         };
 
         window.refresh;
+
+		RoundView.popSkin;
     }
 
 }
@@ -304,7 +307,6 @@ UChainSessionView {
             .hiliteColor_( Color.green.alpha_(0.5) )
             .canFocus_(false)
             .font_( font )
-            .border_(1).background_(Color.grey(0.8))
             .action_( [ {
                 object.prepareAndStart;
             }, {
@@ -359,7 +361,6 @@ UChainGroupSessionView {
             .hiliteColor_( Color.green.alpha_(0.5) )
             .canFocus_(false)
             .font_( font )
-            .border_(1).background_(Color.grey(0.8))
             .action_( [ {
                 object.prepareAndStart;
             }, {

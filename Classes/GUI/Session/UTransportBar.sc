@@ -129,7 +129,6 @@ UTransportView {
 			    [ \play, Color.blue, Color.red.alpha_(0.5) ]] )
 			.canFocus_(false)
 			.font_( font )
-			.border_(1).background_(Color.grey(0.8))
 			.changeStateWhenPressed_(false)
 			.action_({  |v,c,d,e|
 
@@ -152,8 +151,6 @@ UTransportView {
 			    [ \pause, Color.blue,Color.red.alpha_(0.5) ]] )
 			.canFocus_(false)
 			.font_( font )
-			.border_(1)
-			.background_(Color.grey(0.8))
 		    .changeStateWhenPressed_( false )
 			.action_({ |v|
 			    switch( v.value)
@@ -174,7 +171,6 @@ UTransportView {
 			.states_( [[\return, Color.black, Color.clear ]])
 			.canFocus_(false)
 			.font_( font )
-			.border_(1).background_(Color.grey(0.8))
 			.action_({
 			    score.pos = 0;
 			});
@@ -184,22 +180,21 @@ UTransportView {
         			[\roundArrow, Color.black, Color.green.alpha_(0.5) ]])
         			.canFocus_(false)
         			.font_( font )
-        			.border_(1)
-        			.background_(Color.grey(0.8))
         			.action_({ |v| score.loop = v.value.booleanValue;  });
 
         views[\prepare] = WaitView( parent, height@height )
 					.alphaWhenStopped_( 0 )
 					.canFocus_(false);
 
-        parent.decorator.shift(20,0);
+        parent.decorator.shift(10,0);
 
 	    views[\counter] = SMPTEBox( parent, 150@height )
 			.value_( score.pos )
 			.radius_( 12 )
 			.align_( \center )
 			.clipLo_(0)
-			.background_( Color.clear )
+		    .applySmoothSkin
+		    .applySkin( RoundView.skin )
 			.charSelectColor_( Color.white.alpha_(0.5) )
 			.autoScale_( true )
             .action_({ |v|
