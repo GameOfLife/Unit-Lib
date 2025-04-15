@@ -1563,7 +1563,7 @@ UChainGUI {
 
 			header = StaticText( comp, comp.bounds.width @ 14 )
 				.applySkin( RoundView.skin )
-				.string_( " empty: drag unit or Udef here" )
+				.string_( " empty: click or drag unit or Udef here" )
 				.background_( Color.yellow.alpha_(0.125) )
 				.resize_(2)
 				.font_(
@@ -1598,7 +1598,16 @@ UChainGUI {
                     }{   [ Symbol, String ].includes( View.currentDrag.class )  } {
 						chain.units = [ U( View.currentDrag.asSymbol ) ];
 					};
-			})
+			});
+
+			uview.mouseDownAction_({
+				uDefMenuFunc.value(nil, { |def, args|
+					chain.units = chain.units.add( U( def, args ) );
+				}, {
+					uview.background = addBetweenColor;
+				}, \endpoint );
+				uview.background =  addBetweenColor.copy.val_(0.5);
+			});
 		};
 
 		if( chain.isKindOf( UPattern ) ) {
