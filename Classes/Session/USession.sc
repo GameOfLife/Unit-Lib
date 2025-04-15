@@ -77,7 +77,7 @@ USession : UArchivable{
     }
 
     remove { |item|
-        objects = objects.select( _ != item);
+        objects = objects.select( _ !== item);
         this.changed(\objectsChanged)
     }
 
