@@ -181,7 +181,7 @@ USessionGUI : UAbstractWindow {
 
 		RoundView.pushSkin( UChainGUI.skin );
 
-		boxColor =  Color.gray(0.5,0.0);
+		boxColor =  Color.gray(0.6,0.0);
 
 		//alpha = boxColor.alpha;
 
