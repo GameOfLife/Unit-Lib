@@ -748,7 +748,7 @@ MonoBufSndFile : BufSndFile {
 
 DiskSndFile : AbstractSndFile {
 
-	var <>diskBufferSize = 32768;
+	classvar <>diskBufferSize = 32768;
 
 	*new{ |path, startFrame = 0, endFrame, rate = 1, loop = false|
 		// path of existing file or SoundFile
