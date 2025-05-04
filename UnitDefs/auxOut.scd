@@ -28,10 +28,10 @@ defs = [
 			1,
 			UIn.getControl( \kr, UIn.getControlName( ), 'gain', 0, 0.5 ).dbamp.max(1.0e-12)
 		);
-		Out.ar( bus + FirstPrivateBus.ir + 32, input * amp * UEnv.kr( extraSilence: 0.2, useGlobalGain: 0 ) );
+		UAuxOut.ar( bus, input * amp * UEnv.kr( extraSilence: 0.2, useGlobalGain: 0 ) );
 	}, addToAll: false, extraPrefix: \auxOut_ )
 	.setSpec( \useUChainGain, BoolSpec(true) )
-	.setSpec( \bus, PositiveIntegerSpec( 0, 0, 32 ) ),
+	.setSpec( \bus, UAuxOut.specs[ \bus ] ),
 
 	Udef( \external, { |bus = 0, amp = 1, useUChainGain = 1|
 		var input;

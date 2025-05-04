@@ -21,10 +21,10 @@ var defs, def;
 defs = [
 	Udef( \internal, { |bus = 0|
 		var input;
-		input = In.ar( bus + FirstPrivateBus.ir + 32 );
+		input = UAuxIn.ar( bus );
 		UOut.ar( 0, input );
 	}, addToAll: false, extraPrefix: \aux_ )
-	.setSpec( \bus, PositiveIntegerSpec( 0, 0, 32 ) ),
+	.setSpec( \bus, UAuxIn.specs[ \bus ] ),
 
 	Udef( \external, { |bus = 0|
 		var input;
