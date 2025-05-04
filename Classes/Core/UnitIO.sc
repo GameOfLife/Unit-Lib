@@ -63,7 +63,7 @@ UIn {
 	*initClass {
 		Class.initClassTree(Spec);
 		specs = IdentityDictionary();
-		specs.put( \bus, PositiveIntegerSpec() );
+		specs.put( \bus, PositiveIntegerSpec(0,0,64) );
 	}
 
 

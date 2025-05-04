@@ -39,7 +39,7 @@ UChainIOGUI : UChainGUI {
 
 	updateMax {
 		var oldMax;
-		max = ((((allBuses.maxItem+1)/ 8).ceil.max(1) * 8)-1).clip(7,31);
+		max = ((((allBuses.maxItem+1)/ 8).ceil.max(1) * 8)-1).clip(7,63);
 		if( oldMax != max ) {
 			setMaxFunc.value;
 		};
@@ -330,7 +330,7 @@ UChainIOGUI : UChainGUI {
 
 			nb = SmoothNumberBox( scrollView, 45@14 )
 				.clipLo_( 0 )
-				.clipHi_( 31 )
+				.clipHi_( 63 )
 				.step_( 1 )
 				.scroll_step_( 1 )
 				.value_( val )
