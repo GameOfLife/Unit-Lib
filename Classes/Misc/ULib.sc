@@ -669,22 +669,22 @@ ULib {
 	}
 
 	*loadUDefs { |loadDir = true|
-	     var defs;
+		"ULib: loading all Udefs...".postln;
 
-	     Udef.loadOnInit = false;
+		Udef.loadOnInit = false;
 
-		defs = Udef.loadAllFromDefaultDirectory.select(_.notNil).collect(_.synthDef).flat.select(_.notNil);
-		defs = defs ++ UMapDef.loadAllFromDefaultDirectory.select(_.notNil).collect(_.synthDef).flat.select(_.notNil);
-		UnitRack.loadAllFromDefaultDirectory;
+		bench {
+			Udef.loadAllFromDefaultDirectory;
+			UMapDef.loadAllFromDefaultDirectory;
+			UnitRack.loadAllFromDefaultDirectory;
+		};
 
 		Udef.loadOnInit = true;
-
-		defs.do({|def| def.justWriteDefFile( Udef.synthDefDir ); });
 
 		if( loadDir == true ) {
 			ULib.allServers.do(_.loadDirectory( Udef.synthDefDir ? SynthDef.synthDefDir ));
 		};
-     }
+	}
 
 	*openPanel { arg okFunc, cancelFunc, multipleSelection = false;
 		var func;

@@ -104,6 +104,7 @@ Udef : GenericDef {
 	var <>dontStoreSynthDef = false;
 	var <>infoString;
 	var <>disposeFunc, <>disposeForFunc;
+	var <>makeSynthDesc = false;
 
 	*initClass{
 		defsFolders = [
@@ -165,7 +166,7 @@ Udef : GenericDef {
 		this.initArgs;
 
 		if( this.dontStoreSynthDef ) { this.synthDef = nil };
-		if( loadOnInit ) { this.loadSynthDef };
+		if( loadOnInit ) { this.loadSynthDef } { this.writeDefFile };
 		this.changed( \init );
 	}
 
@@ -207,12 +208,7 @@ Udef : GenericDef {
 			if( s.class == LoadBalancer ) {
 				if( s.servers[0].isLocal ) {
 					defs.do{ |def|
-						//write once
-						def.writeDefFile( dir: synthDefDir );
-						//load for each server
-						s.servers.do{ |s|
-							s.sendMsg("/d_load", (synthDefDir ? SynthDef.synthDefDir) ++ def.name ++ ".scsyndef")
-						}
+						def.uLoad( s.servers, dir: synthDefDir, makeSynthDesc: makeSynthDesc );
 					}
 					} {
 					s.servers.do{ |s|
@@ -222,7 +218,7 @@ Udef : GenericDef {
 
 			} {
 				if( s.isLocal ) {
-					defs.do(_.load(s, dir: synthDefDir ? SynthDef.synthDefDir));
+					defs.do(_.uLoad(s, dir: synthDefDir ? SynthDef.synthDefDir, makeSynthDesc: makeSynthDesc ));
 				} {
 					defs.do(_.send(s));
 				};
@@ -246,7 +242,7 @@ Udef : GenericDef {
 	}
 
 	writeDefFile {
-		this.synthDef.asCollection( _.writeDefFile( dir: synthDefDir ) )
+		this.synthDef.asCollection.do( _.uWriteDefFile( dir: synthDefDir, makeSynthDesc: makeSynthDesc ) )
 	}
 
 	prepare { |servers, unit, action, startPos|
