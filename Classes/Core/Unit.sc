@@ -119,10 +119,13 @@ Udef : GenericDef {
 			.extraPrefix_( extraPrefix ).category_( category ? \default );
 	}
 
-	*new { |name, func, args, category, addToAll=true, extraPrefix, makeSynthDesc=false|
+	*new { |name, func, args, category, addToAll=true, extraPrefix, makeSynthDesc=false, writeOnce = false|
 		^super.new( name, args, addToAll )
 		.extraPrefix_( extraPrefix )
-		.makeSynthDesc_( makeSynthDesc ).init( func ).category_( category ? \default );
+		.makeSynthDesc_( makeSynthDesc )
+		.writeOnce_( writeOnce )
+		.init( func )
+		.category_( category ? \default );
 	}
 
 	*prefix { ^"u_" }
