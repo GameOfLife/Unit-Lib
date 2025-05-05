@@ -52,6 +52,8 @@ MultiChannelSubUdef : Udef {
 
 	var <>prDefName;
 
+	writeOnce { ^true }
+
 	*prefix { ^"umc_" }
 
 	*new { |name, numChannels = 1, func, args, extraPrefix|

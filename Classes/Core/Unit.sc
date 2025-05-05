@@ -104,7 +104,8 @@ Udef : GenericDef {
 	var <>dontStoreSynthDef = false;
 	var <>infoString;
 	var <>disposeFunc, <>disposeForFunc;
-	var <>makeSynthDesc = false;
+	var <>makeSynthDesc = false, <>writeOnce = false;
+	var <>synthDefName;
 
 	*initClass{
 		defsFolders = [
@@ -146,18 +147,47 @@ Udef : GenericDef {
 		Udef.all.at(symbol).openDefFile
 	}
 
+	*clearArgSpecData {
+		"rm -f %/*.uargspecs".format( synthDefDir.escapeChar($ )).systemCmd;
+	}
+
     prGenerateSynthDefName {
        ^this.class.prefix ++ (extraPrefix ? "") ++ this.name.asString
     }
 
 	init { |inFunc|
-		var argNames, values;
+		var fileHash, umtaData;
 
 		func = inFunc;
 
+		synthDefName = this.prGenerateSynthDefName;
+
+		if( this.filePath.notNil ) {
+			File.use( this.filePath, "r", { |f| fileHash = f.readAllString.hash });
+		};
+
+		if( loadOnInit.not && { this.writeOnce && {
+			File.exists( synthDefDir +/+ synthDefName ++ ".uargspecs" )
+		}}) {
+			umtaData = (synthDefDir +/+ synthDefName ++ ".uargspecs").load;
+			if( umtaData[ \fileHash ].notNil && { umtaData[ \fileHash ] == fileHash }) {
+				argSpecs = umtaData[ \argSpecs ];
+				this.initArgs;
+			} {
+				this.initSynthDef( fileHash );
+			};
+		} {
+			this.initSynthDef( fileHash );
+		};
+
+		this.changed( \init );
+	}
+
+	initSynthDef { |fileHash|
+
 		this.class.buildUdef = this;
 		this.class.buildArgSpecs = [];
-		this.synthDef = SynthDef( this.prGenerateSynthDefName, func );
+		this.synthDef = SynthDef( synthDefName, func );
 		this.class.buildUdef = nil;
 
 		argSpecs = ArgSpec.fromSynthDef( this.synthDef, argSpecs ++ this.class.buildArgSpecs );
@@ -166,9 +196,14 @@ Udef : GenericDef {
 
 		this.initArgs;
 
+		if( this.writeOnce ) {
+			File.use( synthDefDir +/+ synthDefName ++ ".uargspecs", "w", { |f|
+				f.write( ( \argSpecs: argSpecs, \fileHash: fileHash ).cs );
+			});
+		};
+
 		if( this.dontStoreSynthDef ) { this.synthDef = nil };
 		if( loadOnInit ) { this.loadSynthDef } { this.writeDefFile };
-		this.changed( \init );
 	}
 
 	initArgs {
@@ -275,8 +310,6 @@ Udef : GenericDef {
 	stop { |unit|
 		unit.synths.do(_.free);
 	}
-
-	synthDefName { ^this.synthDef.name }
 
 	isUdef { ^true }
 
