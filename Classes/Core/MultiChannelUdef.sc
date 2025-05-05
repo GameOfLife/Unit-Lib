@@ -26,7 +26,7 @@ MultiChannelUdef : MultiUdef {
 	*defNameKey { ^\numChannels }
 
 	*initClass {
-		channelSpec = ListSpec([1,2,3,4,5,6,7,8,10,12,16,24,32]);
+		channelSpec = ListSpec([1,2,3,4,5,6,7,8,9,10,12,16,24,25,32,36,48,49,64]);
 	}
 
 	*new { |name, func, args, category, setterIsPrivate = false, channels, addToAll=true, extraPrefix|
