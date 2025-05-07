@@ -98,6 +98,10 @@ UTransportView {
             views[\play].value = 1;
 		});
 
+		scoreController.put(\loop, { |who,what,pos|
+            views[\loop].value = score.loop.binaryValue;
+		});
+
 		scoreController.put(\pos, { |who,what,pos|
             views[\counter].value = score.pos;
 		});
@@ -179,7 +183,7 @@ UTransportView {
         			.states_( [[\roundArrow, nil, Color.clear ],
         			[\roundArrow, nil, Color.green.alpha_(0.5) ]])
         			.canFocus_(false)
-        			.font_( font )
+		            .font_( font ).value_( score.loop.binaryValue )
         			.action_({ |v| score.loop = v.value.booleanValue;  });
 
         views[\prepare] = WaitView( parent, height@height )
