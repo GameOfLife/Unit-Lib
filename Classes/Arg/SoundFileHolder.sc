@@ -508,16 +508,30 @@ BufSndFile : AbstractSndFile {
 
 	asBufSndFile { ^this }
 
-	id { ^[ this.path, this.startFrame, this.endFrame, this.numChannels ].join( $_ ).asSymbol }
+	id {
+		^[
+			this.path,
+			this.startFrame,
+			this.endFrame,
+			this.useChannels ? this.numChannels
+		].join( $_ ).asSymbol
+	}
 
 	*fromID { |id|
-		var path, startFrame, endFrame, numChannels, obj;
+		var path, startFrame, endFrame, numChannels, obj, useChannels;
 		id = id.asString.split( $_ ).reverse;
 		path = id[3..].reverse.join( $_ );
 		#numChannels, endFrame, startFrame = id[..2].collect(_.interpret);
+		if( numChannels.isKindOf( Array ) ) {
+			useChannels = numChannels;
+		};
 		obj = this.new( path, startFrame, endFrame );
-		if( obj.numChannels != numChannels ) {
-			obj.useChannels = (..numChannels-1);
+		if( useChannels.notNil ) {
+			obj.useChannels = useChannels;
+		} {
+			if( obj.numChannels != numChannels ) {
+				obj.useChannels = (..numChannels-1);
+			};
 		};
 		^obj;
 	}
@@ -632,6 +646,10 @@ BufSndFile : AbstractSndFile {
 		^DiskSndFile.newCopyVars( this ).unit_( unit );
 	}
 
+	asSplitBufSndFile {
+		^SplitBufSndFile.newCopyVars( this );
+	}
+
     useChannels_ { |new|
         useChannels = new;
         this.changed( \useChannels, useChannels );
@@ -734,6 +752,10 @@ MonoBufSndFile : BufSndFile {
 		^BufSndFile.newCopyVars( this );
 	}
 
+	asSplitBufSndFile {
+		^SplitBufSndFile.newCopyVars( this );
+	}
+
 	numChannels { ^1 }
 
 	storeOn { arg stream;
@@ -769,6 +791,10 @@ DiskSndFile : AbstractSndFile {
 
 	asMonoBufSndFile {
 		^MonoBufSndFile.newCopyVars( this );
+	}
+
+	asSplitBufSndFile {
+		^SplitBufSndFile.newCopyVars( this );
 	}
 
 	asDiskSndFile { ^this }
@@ -857,6 +883,10 @@ DiskSndFile : AbstractSndFile {
 	asDiskSndFile {
 		^DiskSndFile.newBasic(Platform.resourceDir +/+ "sounds/a11wlk01-44_1.aiff", 107520, 1, 44100, 0, nil, 1, false)
 	}
+
+	asSplitBufSndFile {
+		^SplitBufSndFile.newBasic(Platform.resourceDir +/+ "sounds/a11wlk01-44_1.aiff", 107520, 1, 44100, 0, nil, 1, false);
+	}
 }
 
 
@@ -899,6 +929,10 @@ UChain(\test).gui
 
 	asDiskSndFile {
 		^DiskSndFile( this );
+	}
+
+	asSplitBufSndFile {
+		^SplitBufSndFile( this );
 	}
 
 	asPathFromServer {

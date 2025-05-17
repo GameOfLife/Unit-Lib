@@ -1179,6 +1179,35 @@ MultiSndFileSpec : Spec {
 
 }
 
+SplitBufSndFileSpec : BufSndFileSpec {
+
+	*testObject { |obj|
+		^obj.isKindOf( SplitBufSndFile );
+	}
+
+	constrain { |value|
+		value = value.asSplitBufSndFile;
+		if( numChannels.notNil ) {
+			if( numChannels.asCollection.includes( value.numChannels ).not ) {
+				if( numChannels.asCollection.includes( value.useChannels.size ).not ) {
+					value.useChannels = (..numChannels.asCollection[0]-1)
+						.wrap( 0, value.numChannels );
+				};
+			};
+		};
+		^value;
+	}
+
+	map { |in| ^this.constrain( in ) }
+	unmap { |in| ^in }
+
+	default {
+		^nil.asBufSndFile.asSplitBufSndFile;
+	}
+
+
+}
+
 URecSndFileSpec : BufSndFileSpec {
 
 	*testObject { |obj|
