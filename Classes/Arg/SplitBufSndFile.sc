@@ -5,6 +5,8 @@ SplitBufSndFile : BufSndFile {
 		^BufSndFile.newCopyVars( this );
 	}
 
+	asSplitBufSndFile { ^this }
+
 	asControlInputFor { |server, startPos = 0|
 		^[
 			this.findGlobal( server ) ?? { this.currentBuffer(server, startPos).first },
