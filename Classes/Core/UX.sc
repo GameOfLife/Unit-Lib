@@ -41,13 +41,13 @@ UX : U {
 	var hasIn;
 	var hasOut;
 
-	*new { |n, def, args, mod|
-		^super.new().init2(n, def, args ? [], mod )
+	*new { |n, def, args|
+		^super.new().init2(n, def, args ? [] )
 	}
 
 	init { }
 
-	init2 { |nArg, in, inArgs, inMod|
+	init2 { |nArg, in, inArgs|
 		if( nArg.isKindOf(SimpleNumber).not ) {
 			Error("UX : n must be a number ! got: %".format(nArg)).throw
 		};
@@ -86,7 +86,6 @@ UX : U {
 			Error("UX def '%' not found").format(in).throw;
 		};
 		this.preparedServers = nil;
-		mod = inMod.asUModFor( this );
 
 		this.changed( \init );
 	}

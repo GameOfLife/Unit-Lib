@@ -579,7 +579,6 @@ U : ObjectWithArgs {
 	var <>disposeOnFree = true;
 	//var <>preparedServers;
 	var >waitTime; // use only to override waittime from args
-	var <mod;
 	var <guiCollapsed = false;
 	var <>parentChain;
 
@@ -593,8 +592,8 @@ U : ObjectWithArgs {
 	    uneditableCategories = uneditableCategories !? ( _.add(category) ) ? [category]
 	}
 
-	*new { |def, args, mod|
-		^super.new.init( def, args ? [], mod )
+	*new { |def, args|
+		^super.new.init( def, args ? [] )
 	}
 
 	*defClass { ^Udef }
@@ -611,7 +610,7 @@ U : ObjectWithArgs {
 		synthDict = IdentityDictionary();
 	}
 
-	init { |in, inArgs, inMod|
+	init { |in, inArgs|
 		if( in.isKindOf( this.class.defClass ) ) {
 			def = in;
 			defName = in.name;
@@ -629,7 +628,6 @@ U : ObjectWithArgs {
 			"def '%' not found".format(in).warn;
 		};
 		this.preparedServers = nil;
-		mod = inMod.asUModFor( this );
 		this.changed( \init );
 	}
 	allKeys { ^this.keys }
@@ -657,12 +655,12 @@ U : ObjectWithArgs {
 
     def_ { |newDef, keepArgs = true|
 		this.deactivate;
-        this.init( newDef, if( keepArgs ) { args } { [] }, mod); // keep args
+        this.init( newDef, if( keepArgs ) { args } { [] }); // keep args
     }
 
     defName_ { |newDefName, keepArgs = true|
 		this.deactivate;
-        this.init( newDefName, if( keepArgs ) { args } { [] }, mod); // keep args
+        this.init( newDefName, if( keepArgs ) { args } { [] }); // keep args
     }
 
     subDef {
@@ -694,7 +692,7 @@ U : ObjectWithArgs {
 
     checkDef {
 	    if( this.def.notNil && { this.def.argNamesFor( this ) != this.argNames } ) {
-		    this.init( this.def, args, mod );
+		    this.init( this.def, args );
 	    };
     }
 
@@ -874,29 +872,6 @@ U : ObjectWithArgs {
 		};
 	}
 
-	mod_ { |newMod|
-		this.modPerform( \disconnect );
-		mod = newMod.asUModFor( this );
-	}
-
-	addMod { |newMod|
-		if( mod.isKindOf( UMod ) ) {
-			mod = UModDict( mod );
-		};
-		if( mod.notNil ) {
-			if( mod.isKindOf( UModDict ) ) {
-				this.mod = mod.add( newMod );
-			} {
-				"%:addMod - current mod % is not an UMod or UModDict, can't add %\n"
-					.postf( this.class, mod, newMod );
-			};
-		} {
-			this.mod = UModDict( newMod );
-		};
-	}
-
-	modPerform { |what ...args| mod !? _.perform( what, this, *args ); }
-
 	umapPerform { |what ...args|
 		this.getUMaps.do({ |item|
 			item.perform( what, *args );
@@ -967,9 +942,6 @@ U : ObjectWithArgs {
 			};
 		});
 	}
-
-	connect { this.modPerform( \connect ); this.changed( \connect ); }
-	disconnect {  this.modPerform( \disconnect ); this.changed( \disconnect ); }
 
 	release { |releaseTime, doneAction| // only works if def.canFreeSynth == true
 		var args;
@@ -1176,7 +1148,6 @@ U : ObjectWithArgs {
 		target = target ? this.preparedServers ? Server.default;
 		targets = target.asCollection;
 		latency = latency ? 0.2;
-		this.modPerform( \start, startPos, latency );
 		bundles = this.makeBundle( targets, startPos );
 		targets.do({ |target, i|
 			if( bundles[i].size > 0 ) {
@@ -1192,7 +1163,6 @@ U : ObjectWithArgs {
 
 	free {
 		this.def.stop( this );
-		this.modPerform( \stop );
 		this.umapPerform( \free );
 	}
 	stop { this.free }
@@ -1301,14 +1271,10 @@ U : ObjectWithArgs {
 		} {
 		    this.def
 		};
-		if( mod.notNil ) {
-			^[ initDef, initArgs, mod ];
+		if( (initArgs.size > 0) ) {
+			^[ initDef, initArgs ];
 		} {
-			if( (initArgs.size > 0) ) {
-				^[ initDef, initArgs ];
-			} {
-				^[ initDef ];
-			};
+			^[ initDef ];
 		};
 	}
 
@@ -1394,7 +1360,6 @@ U : ObjectWithArgs {
 		} {
 			this.def.doPrepareFunc( servers, this, act, startPos);
 		};
-		this.modPerform( \prepare, startPos );
 		this.setUMapBuses;
 	    ^target; // returns targets actually prepared for
     }
@@ -1426,7 +1391,6 @@ U : ObjectWithArgs {
 	            val.dispose
 	        }
 	    };
-	    this.modPerform( \dispose );
 	    this.preparedServers = nil;
 	}
 
@@ -1446,7 +1410,6 @@ U : ObjectWithArgs {
 	            val.disposeFor(server)
 	        }
 	    };
-	    this.modPerform( \dispose );
 	    this.preparedServers.remove( server );
 	    if( this.preparedServers.size == 0 ) {
 		    parentChain = nil; // forget chain after disposing last server
