@@ -96,7 +96,7 @@ UFluidNMFBaseBufferView {
 		};
 	}
 
-	*viewNumLines { ^3 }
+	*viewNumLines { ^2 }
 
 	makeView { |parent, bounds, resize|
 
@@ -108,7 +108,7 @@ UFluidNMFBaseBufferView {
 		view.resize_( resize ? 5 );
 		views = ();
 
-		views[ \path ] = FilePathView( view, bounds.width @ ( (viewHeight * 2) + 4) )
+		views[ \path ] = FilePathView( view, bounds.width @ viewHeight )
 		.resize_( 2 )
 		.action_({ |fv|
 			if( fv.value.notNil ) {
@@ -118,122 +118,62 @@ UFluidNMFBaseBufferView {
 			};
 		});
 
-		views[ \operations ] = PopUpMenu( view, 80 @ viewHeight )
-		.applySkin( RoundView.skin ? () )
-		.items_( [
-			"operations",
-			"",
-			"generate bases from file..",
-			"",
-			"reveal in Finder",
-			"move to..",
-			"copy to..",
-			"save as.."
-		] )
-		.action_({ |pu|
-			var pth, ext, closeFunc;
-			switch( pu.value.asInteger,
-				2, { // generate bases
-					if( views[ \genWindow ].isNil or: { views[ \genWindow ].isClosed } ) {
-						views[ \genWindow ] = Window( "Fluid NFM bases", Rect(592, 534, 294, 102) ).front;
-						views[ \genWindow ].addFlowLayout;
-						StaticText( views[ \genWindow ], 50@18 ).string_( "nr. of components" );
-						views[ \genNum ] = SmoothNumberBox( views[ \genWindow ], 80@18 )
-						.value_(2);
-						SmoothButton( views[ \genWindow ], 80@18 )
-						.border_(1)
-						.extrude_(false)
-						.label_( "choose soundfile" )
-						.action_({
-							var num;
-							num = views[\genNum ].value;
-							ULib.openPanel({ |path|
-								Dialog.savePanel({ |outpath|
-									UFluidNMFBaseBuffer.generateBases(
-										num,
-										path,
-										outpath,
-										{ |opath|
-											{
-												views[ \path ].value = outpath;
-											    views[ \path ].doAction;
-											}.defer(0.1);
-										}
-									)
-								}, path: path.replaceExtension( "ufbases%".format( num ) ) );
-							})
-						});
+		views[ \info ] = StaticText( view, (bounds.width - 60 - 40 - 8) @ viewHeight );
 
-						closeFunc = { views[ \genWindow ] !? (_.close); };
+		views[ \operations ] = SmoothButton( view, 60 @ viewHeight )
+		.radius_(2)
+		.label_( "generate" )
+		.action_({
+			var closeFunc;
+			if( views[ \genWindow ].isNil or: { views[ \genWindow ].isClosed } ) {
+				views[ \genWindow ] = Window( "Fluid NFM bases", Rect(592, 534, 294, 102) ).front;
+				views[ \genWindow ].addFlowLayout;
+				RoundView.pushSkin( UChainGUI.skin );
+				StaticText( views[ \genWindow ], 50@18 ).string_( "nr. of components" );
+				views[ \genNum ] = SmoothNumberBox( views[ \genWindow ], 80@18 )
+				.value_(2);
+				SmoothButton( views[ \genWindow ], 80@18 )
+				.border_(1)
+				.extrude_(false)
+				.label_( "choose soundfile" )
+				.action_({
+					var num;
+					num = views[\genNum ].value;
+					ULib.openPanel({ |path|
+						Dialog.savePanel({ |outpath|
+							UFluidNMFBaseBuffer.generateBases(
+								num,
+								path,
+								outpath,
+								{ |opath|
+									{
+										views[ \path ].value = outpath;
+										views[ \path ].doAction;
+									}.defer(0.1);
+								}
+							)
+						}, path: path.replaceExtension( "ufbases%".format( num ) ) );
+					})
+				});
 
-						views[ \operations ].onClose = views[ \operations ].onClose.addFunc( closeFunc );
+				closeFunc = { views[ \genWindow ] !? (_.close); };
 
-						views[ \genWindow ].onClose = {
-							views[ \operations ].onClose.removeFunc( closeFunc );
-							views[ \genWindow ] = nil;
-						};
-					} {
-						views[ \genWindow ].front;						};
-				},
-				4, {  // reveal in Finder
-					pth = this.performuFluidNMFBaseBuffer( \path );
-					if( pth.notNil ) {
-						pth.getGPath.asPathFromServer.revealInFinder;
-					};
-				},
-				5, { // move to..
-					pth = this.performuFluidNMFBaseBuffer( \path );
-					if( pth.notNil ) {
-						pth = pth.getGPath;
-						if( pth[..6] == "sounds/" ) {
-							"can't move %, try copying instead\n".postf( pth.quote );
-						};
-						Dialog.savePanel({ |path|
-							var res;
-							res = pth.asPathFromServer.moveTo( path.dirname );
-							if( res ) {
-								this.performuFluidNMFBaseBuffer( \path_ ,
-									path.dirname +/+ pth.basename
-								);
-							};
-						});
-					};
-				},
-				6, { // copy to..
-					pth = this.performuFluidNMFBaseBuffer( \path );
-					if( pth.notNil ) {
-						Dialog.savePanel({ |path|
-							var res;
-							res = pth.getGPath.asPathFromServer.copyTo( path.dirname );
-							if( res ) {
-								this.performuFluidNMFBaseBuffer( \path_ ,
-									path.dirname +/+ pth.basename
-								);
-							};
-						});
-					};
-				},
-				7, { // save as..
-					pth = this.performuFluidNMFBaseBuffer( \path );
-					if( pth.notNil ) {
-						ext = pth.extension;
-						Dialog.savePanel({ |path|
-							var res;
-							path =  path.replaceExtension( ext );
-							res = pth.getGPath.asPathFromServer.copyFile(  path );
-							if( res ) {
-								this.performuFluidNMFBaseBuffer( \path_ , path );
-							};
-						});
-					};
-				}
-			);
-			pu.value = 0;
+				views[ \operations ].onClose = views[ \operations ].onClose.addFunc( closeFunc );
+
+				views[ \genWindow ].onClose = {
+					views[ \operations ].onClose.removeFunc( closeFunc );
+					views[ \genWindow ] = nil;
+				};
+				RoundView.popSkin;
+			} {
+				views[ \genWindow ].front;
+
+			};
 		});
 
 		views[ \plot ] = SmoothButton( view, 40 @ viewHeight )
-			.radius_( 3 )
-			.border_( 1 )
+			.radius_( 2 )
+			//.border_( 1 )
 			.resize_( 3 )
 			.label_( "plot" )
 			.action_({ |bt|

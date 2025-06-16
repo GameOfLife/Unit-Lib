@@ -19,6 +19,8 @@
 
 UFluidNMFBaseBuffer : AbstractRichBuffer {
 
+	classvar <>extension = "ufbases%";
+
 	var <path;
 	//var <>numChannels;
 
@@ -98,7 +100,7 @@ UFluidNMFBaseBuffer : AbstractRichBuffer {
 		var server;
 		server = ULib.allServers.first;
 		fluidBufNMF = 'FluidBufNMF'.asClass;
-		outPath = outPath ?? { inPath.replaceExtension( "ufbases%".format( numComponents ) ); };
+		outPath = outPath ?? { inPath.replaceExtension( extension.format( numComponents ) ); };
 		bases = Buffer( server );
 		buf = Buffer.read( server, inPath, action: {
 			fluidBufNMF.processBlocking( server, buf,
