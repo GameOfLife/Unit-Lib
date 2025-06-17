@@ -188,7 +188,7 @@ UEvent : UArchivable {
 			oscFilePath, path, inputFilePath, sampleRate, headerFormat, sampleFormat,
 			options, action: { |res|
 				File.delete( oscFilePath );
-				action.value(res);
+				action.value(res, path);
 			};
 		);
 		Score.program = oldpgm;
