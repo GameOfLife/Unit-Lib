@@ -64,4 +64,23 @@
 		action.value( outFiles );
 		^outFiles
 	}
+
+	*uSplit { |inPath, outPath, chunkSize = 4194304, threaded = false, action, deleteOriginal = false|
+		var sf;
+		if( threaded == true && { thisThread.class != Routine } ) {
+			{ this.uSplit( inPath, outPath, chunkSize, threaded, action, deleteOriginal ) }.forkIfNeeded( AppClock )
+		} {
+			sf = this.new;
+			sf.openRead( inPath.standardizePath );
+			^sf.uSplit( threaded: threaded, action: { |files|
+				sf.close;
+				if( deleteOriginal ) { File.delete( sf.path ); };
+				"done splitting, created % files:\n%\n".postf(
+					files.size,
+					files.collect(_.path).join("\n")
+				);
+			});
+		}
+	}
+
 }

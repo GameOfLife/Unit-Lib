@@ -306,20 +306,8 @@ UMenuBarIDE {
 					x.writeAudioFile( path, action: { |res, pth|
 						"done exporting %\n".postf( pth );
 						if( pth.find( "%" ).notNil ) {
-							{
-								var sf;
-								"splitting to mono files".postln;
-								sf = SoundFile.new;
-								sf.openRead( pth );
-								sf.uSplit( threaded: true, action: { |files|
-									sf.close;
-									File.delete( sf.path );
-									"done splitting, created % files:\n%\n".postf(
-										files.size,
-										files.collect(_.path).join("\n")
-									);
-								});
-							}.fork( AppClock );
+							"splitting into mono files".postln;
+							SoundFile.uSplit( pth, threaded: true, deleteOriginal: true );
 						};
 					} );
 				});
@@ -337,20 +325,8 @@ UMenuBarIDE {
 					sc.writeAudioFile( path, action: { |res, pth|
 						"done exporting %\n".postf( pth );
 						if( pth.find( "%" ).notNil ) {
-							{
-								var sf;
-								"splitting to mono files".postln;
-								sf = SoundFile.new;
-								sf.openRead( pth );
-								sf.uSplit( threaded: true, action: { |files|
-									sf.close;
-									File.delete( sf.path );
-									"done splitting, created % files:\n%\n".postf(
-										files.size,
-										files.collect(_.path).join("\n")
-									);
-								});
-							}.fork( AppClock );
+							"splitting into mono files".postln;
+							SoundFile.uSplit( pth, threaded: true, deleteOriginal: true );
 						};
 					} );
 				});
