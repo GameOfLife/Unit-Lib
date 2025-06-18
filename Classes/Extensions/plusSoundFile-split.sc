@@ -72,7 +72,7 @@
 		} {
 			sf = this.new;
 			sf.openRead( inPath.standardizePath );
-			^sf.uSplit( threaded: threaded, action: { |files|
+			^sf.uSplit( outPath, chunkSize, threaded, { |files|
 				sf.close;
 				if( deleteOriginal ) { File.delete( sf.path ); };
 				"done splitting, created % files:\n%\n".postf(
