@@ -57,7 +57,7 @@
 				});
 			});
 			numFrames = numFrames - chunkSize;
-			if(threaded) { $|.post; 0.0001.wait; };
+			if(threaded) { $..post; 0.0001.wait; };
 		};
 		if(threaded) { $\n.postln };
 		outFiles.do(_.close);
