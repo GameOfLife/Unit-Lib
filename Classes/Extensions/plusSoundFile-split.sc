@@ -161,5 +161,104 @@
 		}
 	}
 
+	*uMerge { |inPaths, outPath, chunkSize = 262144, threaded = false, action|
+		var inFiles, outFile, maxNumFrames, totalNumChannels, rawData, pth, ext;
+		var numDigits;
+		if( threaded == true && { thisThread.class != Routine } ) {
+			{
+				this.uMerge( inPaths, outPath, chunkSize, threaded, action )
+			}.forkIfNeeded( AppClock )
+		} {
+			if( inPaths.isString ) { inPaths = [ inPaths ] };
+
+			inPaths = inPaths.collect({ |item|
+				if( item.find("*").notNil ) {
+					item.standardizePath.pathMatch;
+				} {
+					[ item.standardizePath ];
+				};
+			}).flatten(1);
+
+			inFiles = inPaths.collect({ |path|
+				SoundFile.openRead( path );
+			});
+
+			maxNumFrames = inFiles.collect( _.numFrames ).maxItem;
+			totalNumChannels = inFiles.collect( _.numChannels ).sum;
+
+			// chunkSize must be a multiple of numChannels
+			//chunkSize = (chunkSize/numChannels).floor * numChannels;
+
+			if(threaded) {
+				("_" ! (maxNumFrames / chunkSize).roundUp(1) ).join.postln;
+			};
+
+			if( outPath.isNil ) {
+				var i = -1;
+				while { inPaths.every({ |path| path.basename.find( inPaths[0].basename[..i+1] ).notNil }) } {
+					i = i+1;
+				};
+				if( i > 0 ) {
+					outPath = inPaths[0].dirname +/+ (inPaths[0].basename[..i]) ++ "_merged_%." ++ (inPaths[0].splitext.last);
+				};
+			};
+
+			#pth, ext = (outPath ?? { inFiles.first.path }).standardizePath.splitext;
+
+			if( pth.find( "%" ).isNil ) {
+				pth = pth ++ "_%";
+			};
+
+			outFile = this.new
+			.headerFormat_( inFiles.first.headerFormat )
+			.sampleFormat_( inFiles.first.sampleFormat )
+			.numChannels_( totalNumChannels )
+			.sampleRate_(inFiles.first.sampleRate);
+
+			numDigits = totalNumChannels.asString.size;
+
+			outFile.openWrite(
+				"%.%".format(
+					pth.format( totalNumChannels.asStringToBase( 10, numDigits ) ++ "ch" ),
+					ext
+				)
+			);
+
+			inFiles.do( _.seek(0, 0) );
+
+			while {
+				(maxNumFrames > 0) and: {
+					rawData = inFiles.collect({ |inFile|
+						var data;
+						data = FloatArray.newClear( chunkSize * inFile.numChannels );
+						inFile.readData( data );
+						data;
+					});
+					rawData.any({ |x| x.size > 0 });
+				}
+			} {
+				rawData = rawData.collect({ |data, i|
+					if( data.size == 0 ) { data = data.extend( inFiles[1].numChannels, 0 ); };
+					data.clump( inFiles[i].numChannels ).flop.collect({ |item|
+						item.extend( min( maxNumFrames, chunkSize ), 0.0 );
+					});
+				}).flatten(1).flop.flat.as( FloatArray );
+				//clumps = rawData.clump( numChannels ).flop.collect(_.as(FloatArray));
+				// write, and check whether successful
+				// throwing the error invokes error handling that closes the files
+				(outFile.writeData(rawData) == false).if({
+					MethodError("SoundFile writeData failed.", this).throw
+				});
+				maxNumFrames = maxNumFrames - chunkSize;
+				if(threaded) { $..post; 0.0001.wait; };
+			};
+			if(threaded) { $\n.postln };
+			outFile.close;
+			inFiles.do( _.close );
+			action.value( outFile );
+			^outFile
+		}
+	}
+
 
 }
