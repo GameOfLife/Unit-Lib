@@ -83,4 +83,83 @@
 		}
 	}
 
+	uExtractChannels { |channels = 0, outPath, chunkSize = 4194304, threaded = false, action|
+		var	rawData, numChunks, test, numFrames;
+		var outFile, pth, ext, numDigits, channelsData;
+
+		numFrames.isNil.if({ numFrames = this.numFrames });
+		numFrames = numFrames * numChannels;
+
+		channels = channels.asArray;
+		channels = channels.select({ |item| item < numChannels });
+		if( channels.size == 0 ) {
+			"SoundFile:uExtractChannels : no channels available to extract".postln; ^this;
+		};
+
+		// chunkSize must be a multiple of numChannels
+		chunkSize = (chunkSize/numChannels).floor * numChannels;
+
+		if(threaded) {
+			numChunks = (numFrames / chunkSize).roundUp(1);
+			("_"!numChunks).join.postln;
+		};
+
+		#pth, ext = (outPath ?? { this.path }).standardizePath.splitext;
+
+		if( pth.find( "%" ).isNil ) {
+			pth = pth ++ "_%";
+		};
+
+		outFile = this.class.new
+		.headerFormat_( this.headerFormat )
+		.sampleFormat_( this.sampleFormat )
+		.numChannels_( channels.size )
+		.sampleRate_(this.sampleRate);
+
+		outFile.openWrite(
+			"%.%".format( pth.format( channels ), ext )
+		);
+
+		this.seek(0, 0);
+
+		while {
+			(numFrames > 0) and: {
+				rawData = FloatArray.newClear(min(numFrames, chunkSize));
+				this.readData(rawData);
+				rawData.size > 0
+			}
+		} {
+			channelsData = rawData.clump( numChannels ).flop[ channels ].flop.flat.as(FloatArray);
+			// write, and check whether successful
+			// throwing the error invokes error handling that closes the files
+			(outFile.writeData(channelsData) == false).if({
+				MethodError("SoundFile writeData failed.", this).throw
+			});
+			numFrames = numFrames - chunkSize;
+			if(threaded) { $..post; 0.0001.wait; };
+		};
+		if(threaded) { $\n.postln };
+		outFile.close;
+		action.value( outFile );
+		^outFile
+	}
+
+	*uExtractChannels { |inPath, channels, outPath, chunkSize = 4194304, threaded = false, action, deleteOriginal = false|
+		var sf;
+		if( threaded == true && { thisThread.class != Routine } ) {
+			{
+				this.uExtractChannels( inPath, channels, outPath, chunkSize, threaded, action, deleteOriginal )
+			}.forkIfNeeded( AppClock )
+		} {
+			sf = this.new;
+			sf.openRead( inPath.standardizePath );
+			^sf.uExtractChannels( channels, outPath, chunkSize, threaded, { |file|
+				sf.close;
+				if( deleteOriginal ) { File.delete( sf.path ); };
+				"done extracting channels, created file:\n%\n".postf( file.path );
+			});
+		}
+	}
+
+
 }
