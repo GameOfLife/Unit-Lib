@@ -16,8 +16,8 @@
 
 		#pth, ext = (outPath ?? { this.path }).standardizePath.splitext;
 
-		if( pth.find( "*" ).isNil ) {
-			pth = pth ++ "_*";
+		if( pth.find( "%" ).isNil ) {
+			pth = pth ++ "_%";
 		};
 
 		outFiles = numChannels.collect({ |i|
@@ -31,9 +31,12 @@
 		numDigits = numChannels.asString.size;
 
 		outFiles.do({ |f, i|
-			f.openWrite( "%.%".format(
-				pth.replace("*", (i+1).asStringToBase( 10, numDigits )
-			), ext ) );
+			f.openWrite(
+				"%.%".format(
+					pth.format( (i+1).asStringToBase( 10, numDigits ) ),
+					ext
+				)
+			);
 		});
 
 		this.seek(0, 0);

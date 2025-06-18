@@ -305,7 +305,7 @@ UMenuBarIDE {
 				ULib.savePanel({ |path|
 					x.writeAudioFile( path, action: { |res, pth|
 						"done exporting %\n".postf( pth );
-						if( pth.find( "*" ).notNil ) {
+						if( pth.find( "%" ).notNil ) {
 							{
 								var sf;
 								"splitting to mono files".postln;
@@ -336,7 +336,7 @@ UMenuBarIDE {
 					sc = UScore( *evts );
 					sc.writeAudioFile( path, action: { |res, pth|
 						"done exporting %\n".postf( pth );
-						if( pth.find( "*" ).notNil ) {
+						if( pth.find( "%" ).notNil ) {
 							{
 								var sf;
 								"splitting to mono files".postln;
