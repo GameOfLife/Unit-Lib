@@ -195,6 +195,7 @@ BufSndFileView {
 
 	makeView { |parent, bounds, resize|
 		var globalDepFunc, updGlobal, skin;
+		var plotWindow;
 
 		if( bounds.isNil ) { bounds= 350 @ (this.class.viewNumLines * (viewHeight + 4)) };
 
@@ -241,6 +242,34 @@ BufSndFileView {
 		.radius_( 2 )
 		.label_( "plot" )
 		.action_({ |bt|
+			var closeFunc;
+
+			plotWindow !? _.close;
+
+			plotWindow = USoundFilePlotWindow(
+				this.performSndFile( \asSoundFile ),
+				this.performSndFile( \startFrame ),
+				this.performSndFile( \endFrame ) - this.performSndFile( \startFrame ),
+				{ |vw, startFrame, numFrames|
+					sndFile.startFrame = startFrame;
+					if( numFrames == 0 ) {
+						sndFile.endFrame = nil;
+					} {
+						sndFile.endFrame = startFrame + numFrames;
+					};
+				}
+			);
+
+			closeFunc = { plotWindow !? _.close; };
+
+			plotWindow.window.onClose = {
+				bt.onClose.removeFunc( closeFunc );
+				plotWindow = nil;
+			};
+
+			bt.onClose = bt.onClose.addFunc( closeFunc );
+
+			/*
 			var w, f, sfv, sfZoom, mouseButton, dur, infoView;
 			var closeFunc, moveRange, getMoveRange, mouseAction, getMousePos;
 
@@ -423,6 +452,7 @@ BufSndFileView {
 			w.front;
 
 			RoundView.popSkin( skin );
+			*/
 		});
 
 		BufSndFile.global.addDependant( updGlobal );
@@ -447,7 +477,7 @@ BufSndFileView {
 			.clipLo_( 0 )
 			.action_({ |nb|
 				this.performSndFile( \startSecond_ , nb.value );
-				views[ \setPlotRange ].value;
+			    plotWindow !? _.startFrame_( this.performSndFile( \startFrame ) );
 				action.value( this );
 			});
 
@@ -457,7 +487,7 @@ BufSndFileView {
 			.clipLo_( 0 )
 			.action_({ |nb|
 				this.performSndFile( \startFrame_ , nb.value );
-				views[ \setPlotRange ].value;
+			    plotWindow !? _.startFrame_( this.performSndFile( \startFrame ) );
 				action.value( this );
 			})
 			.visible_( false );
@@ -473,7 +503,9 @@ BufSndFileView {
 			.clipLo_( 0 )
 			.action_({ |nb|
 				this.performSndFile( \endSecond_ , nb.value );
-				views[ \setPlotRange ].value;
+			    plotWindow !? _.numFrames_(
+				     this.performSndFile( \endFrame ) - this.performSndFile( \startFrame )
+			    );
 				action.value( this );
 			});
 
@@ -483,7 +515,9 @@ BufSndFileView {
 			.clipLo_( 0 )
 			.action_({ |nb|
 				this.performSndFile( \endFrame_ , nb.value );
-				views[ \setPlotRange ].value;
+				plotWindow !? _.numFrames_(
+				     this.performSndFile( \endFrame ) - this.performSndFile( \startFrame )
+			    );
 				action.value( this );
 			})
 			.visible_( false );

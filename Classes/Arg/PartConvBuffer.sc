@@ -61,11 +61,13 @@ PartConvBuffer : AbstractRichBuffer {
 	}
 
 	asSoundFile { // convert to normal soundfile
-		^SoundFile( path.getGPath.asPathFromServer )
+		^if( path.notNil ) {
+			SoundFile( path.getGPath.asPathFromServer )
 			//.numFrames_( numFrames ? 0 )
 			.instVarPut( \numFrames,  numFrames ? 0 )
 			.numChannels_( numChannels ? 1 )
 			.sampleRate_( sampleRate ? 44100 );
+		};
 	}
 
 	makeBuffer { |server, startPos = 0, action, bufnum|

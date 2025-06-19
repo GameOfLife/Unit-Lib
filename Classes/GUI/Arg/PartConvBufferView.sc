@@ -230,7 +230,7 @@ PartConvBufferView {
 
 	makeView { |parent, bounds, resize|
 
-		var currentSkin;
+		var currentSkin, plotWindow;
 
 		if( bounds.isNil ) { bounds= 350 @ (this.class.viewNumLines * (viewHeight + 4)) };
 
@@ -350,37 +350,58 @@ PartConvBufferView {
 
 
 		views[ \plot ] = SmoothButton( view, 40 @ viewHeight )
-			.radius_( 2 )
-			.resize_( 3 )
-			.label_( "plot" )
-			.action_({ |bt|
+		.radius_( 2 )
+		.resize_( 3 )
+		.label_( "plot" )
+		.action_({ |bt|
+			var closeFunc, sf;
 
-				// this will have to go in a separate class
-				var w, a, f, b, x;
-				var closeFunc;
+			plotWindow !? _.close;
 
-				x = partConvBuffer;
-				f = this.performPartConvBuffer( \asSoundFile );
+			sf = this.performPartConvBuffer( \asSoundFile );
 
-				w = Window(f.path, Rect(200, 200, 850, 400), scroll: false);
-				a = SoundFileView.new(w, w.view.bounds);
-				a.resize_(5);
-				a.soundfile = f;
-				a.read(0, f.numFrames);
-				a.elasticMode_(1);
-				a.gridOn = true;
-				a.gridColor_( Color.gray(0.5).alpha_(0.5) );
-				a.waveColors = Color.gray(0.2)!16;
-				w.front;
-				a.background = Gradient( Color.white, Color.gray(0.7), \v );
+			if( sf.notNil ) {
+				plotWindow = USoundFilePlotWindow( sf, 0, 0)
+				.canSelect_( false );
 
-				closeFunc = { w.close; };
+				closeFunc = { plotWindow !? _.close; };
 
-				w.onClose = { bt.onClose.removeFunc( closeFunc ) };
+				plotWindow.window.onClose = {
+					bt.onClose.removeFunc( closeFunc );
+					plotWindow = nil;
+				};
 
 				bt.onClose = bt.onClose.addFunc( closeFunc );
+			};
 
-			});
+
+			/*
+			// this will have to go in a separate class
+			var w, a, f, b, x;
+			var closeFunc;
+
+			x = partConvBuffer;
+			f = this.performPartConvBuffer( \asSoundFile );
+
+			w = Window(f.path, Rect(200, 200, 850, 400), scroll: false);
+			a = SoundFileView.new(w, w.view.bounds);
+			a.resize_(5);
+			a.soundfile = f;
+			a.read(0, f.numFrames);
+			a.elasticMode_(1);
+			a.gridOn = true;
+			a.gridColor_( Color.gray(0.5).alpha_(0.5) );
+			a.waveColors = Color.gray(0.2)!16;
+			w.front;
+			a.background = Gradient( Color.white, Color.gray(0.7), \v );
+
+			closeFunc = { w.close; };
+
+			w.onClose = { bt.onClose.removeFunc( closeFunc ) };
+
+			bt.onClose = bt.onClose.addFunc( closeFunc );
+			*/
+		});
 
 
 		this.setFont;

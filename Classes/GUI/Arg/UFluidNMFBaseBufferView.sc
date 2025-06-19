@@ -68,9 +68,16 @@ UFluidNMFBaseBufferView {
 			views[ \path ].stringColor = Color.red(0.66);
 		};
 
-		/*
-		{ views[ \duration ].string = (inuFluidNMFBaseBuffer.duration ? 0).asSMPTEString(1000); }.defer;
-		*/
+		{
+			if( inuFluidNMFBaseBuffer.notNil && { inuFluidNMFBaseBuffer.numFrames.notNil }) {
+				views[ \info ].string = "% bases (%)".format(
+					inuFluidNMFBaseBuffer.numChannels,
+					(inuFluidNMFBaseBuffer.numFrames - 1) * 2,
+				)
+			} {
+				views[ \info ].string = "0 bases (-)";
+			};
+		}.defer;
 	}
 
 	setFont { |font|
@@ -99,6 +106,7 @@ UFluidNMFBaseBufferView {
 	*viewNumLines { ^2 }
 
 	makeView { |parent, bounds, resize|
+		var plotWindow;
 
 		if( bounds.isNil ) { bounds= 350 @ (this.class.viewNumLines * (viewHeight + 4)) };
 
@@ -118,7 +126,8 @@ UFluidNMFBaseBufferView {
 			};
 		});
 
-		views[ \info ] = StaticText( view, (bounds.width - 60 - 40 - 8) @ viewHeight );
+		views[ \info ] = StaticText( view, (bounds.width - 60 - 40 - 8) @ viewHeight )
+		.applySkin( RoundView.skin );
 
 		views[ \operations ] = SmoothButton( view, 60 @ viewHeight )
 		.radius_(2)
@@ -128,32 +137,71 @@ UFluidNMFBaseBufferView {
 			if( views[ \genWindow ].isNil or: { views[ \genWindow ].isClosed } ) {
 				views[ \genWindow ] = Window( "Fluid NFM bases", Rect(592, 534, 294, 102) ).front;
 				views[ \genWindow ].addFlowLayout;
+
 				RoundView.pushSkin( UChainGUI.skin );
-				StaticText( views[ \genWindow ], 50@18 ).string_( "nr. of components" );
+
+				StaticText( views[ \genWindow ], 200@18 )
+				.string_( "# components per soundfile" )
+				.applySkin( RoundView.skin )
+				.align_( \right );
 				views[ \genNum ] = SmoothNumberBox( views[ \genWindow ], 80@18 )
+				.clipLo_(1)
 				.value_(2);
-				SmoothButton( views[ \genWindow ], 80@18 )
-				.border_(1)
-				.extrude_(false)
-				.label_( "choose soundfile" )
+
+				views[ \genWindow ].asView.decorator.nextLine;
+
+				StaticText( views[ \genWindow ], 200@18 )
+				.string_( "windowSize" )
+				.applySkin( RoundView.skin )
+				.align_( \right );
+				views[ \genWinSize ] = UPopUpMenu( views[ \genWindow ], 80@18 )
+				.items_( [ 1024, 2048, 4096 ] )
+				.value_( 0 );
+
+				views[ \genWindow ].asView.decorator.nextLine;
+
+				SmoothButton( views[ \genWindow ], 284@18 )
+				.label_( "choose soundfile(s)" )
 				.action_({
-					var num;
+					var num, winSize;
 					num = views[\genNum ].value;
-					ULib.openPanel({ |path|
+					winSize = views[ \genWinSize ].item;
+					ULib.openPanel({ |paths|
 						Dialog.savePanel({ |outpath|
-							UFluidNMFBaseBuffer.generateBases(
-								num,
-								path,
-								outpath,
-								{ |opath|
-									{
-										views[ \path ].value = outpath;
-										views[ \path ].doAction;
-									}.defer(0.1);
-								}
-							)
-						}, path: path.replaceExtension( "ufbases%".format( num ) ) );
-					})
+							{
+								var ops;
+								paths.do({ |path|
+									var cond = Condition(false);
+									"generating base(s) for \n\t%\n".postf( path );
+									UFluidNMFBaseBuffer.generateBases(
+										num,
+										path,
+										nil,
+										winSize,
+										{ |opath|
+											ops = ops.add( opath );
+											cond.test = true;
+											cond.signal;
+										}
+									);
+									cond.wait;
+								});
+								if( paths.size > 1 ) {
+									"Merging files...".postln;
+									SoundFile.uMerge( ops, threaded: true, action: { |op|
+										{
+											views[ \path ].value = op.path;
+											views[ \path ].doAction;
+										}.defer(0.1);
+									});
+								} {
+									0.1.wait;
+									views[ \path ].value = ops[0];
+									views[ \path ].doAction;
+								};
+							}.fork( AppClock )
+						}, path: paths[0].replaceExtension( "ufbases" ) );
+					}, multipleSelection: true )
 				});
 
 				closeFunc = { views[ \genWindow ] !? (_.close); };
@@ -172,49 +220,30 @@ UFluidNMFBaseBufferView {
 		});
 
 		views[ \plot ] = SmoothButton( view, 40 @ viewHeight )
-			.radius_( 2 )
-			//.border_( 1 )
-			.resize_( 3 )
-			.label_( "plot" )
-			.action_({ |bt|
+		.radius_( 2 )
+		.resize_( 3 )
+		.label_( "plot" )
+		.action_({ |bt|
+			var closeFunc, sf;
 
-				// this will have to go in a separate class
-				var w, a, f, b, x;
-				var closeFunc;
+			plotWindow !? _.close;
 
-				x = uFluidNMFBaseBuffer;
-				f = this.performuFluidNMFBaseBuffer( \asSoundFile );
+			sf = this.performuFluidNMFBaseBuffer( \asSoundFile );
 
-				w = Window(f.path, Rect(200, 200, 850, 400), scroll: false);
-				a = SoundFileView.new(w, w.view.bounds);
-				a.resize_(5);
-				a.soundfile = f;
-				a.read(0, f.numFrames);
-				a.elasticMode_(1);
-				a.gridOn = true;
-				a.gridColor_( Color.gray(0.5).alpha_(0.5) );
-				a.waveColors = Color.gray(0.2)!16;
-				w.front;
-				//a.background = Gradient( Color.white, Color.gray(0.7), \v );
+			if( sf.notNil ) {
+				plotWindow = USoundFilePlotWindow( sf, 0, 0)
+				.canSelect_( false );
 
-				closeFunc = { w.close; };
+				closeFunc = { plotWindow !? _.close; };
 
-				w.onClose = { bt.onClose.removeFunc( closeFunc ) };
+				plotWindow.window.onClose = {
+					bt.onClose.removeFunc( closeFunc );
+					plotWindow = nil;
+				};
 
 				bt.onClose = bt.onClose.addFunc( closeFunc );
-			});
-
-		/*
-		view.view.decorator.nextLine;
-
-		views[ \durationLabel ] = StaticText( view, 40 @ viewHeight )
-			.applySkin( RoundView.skin ? () )
-			.string_( "duration" );
-
-		views[ \duration ] = StaticText( view, (bounds.width - 88) @ viewHeight )
-			.resize_( 2 )
-			.applySkin( RoundView.skin ? () );
-		*/
+			};
+		});
 
 		this.setFont;
 	}
