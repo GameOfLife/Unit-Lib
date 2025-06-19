@@ -1181,6 +1181,8 @@ MultiSndFileSpec : Spec {
 
 SplitBufSndFileSpec : BufSndFileSpec {
 
+	var >default;
+
 	*testObject { |obj|
 		^obj.isKindOf( SplitBufSndFile );
 	}
@@ -1202,7 +1204,7 @@ SplitBufSndFileSpec : BufSndFileSpec {
 	unmap { |in| ^in }
 
 	default {
-		^nil.asBufSndFile.asSplitBufSndFile;
+		^default ?? { nil.asBufSndFile.asSplitBufSndFile; };
 	}
 
 
