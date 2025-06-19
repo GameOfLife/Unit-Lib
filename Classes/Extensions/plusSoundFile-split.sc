@@ -83,12 +83,14 @@
 		}
 	}
 
-	uExtractChannels { |channels = 0, outPath, chunkSize = 4194304, threaded = false, action|
-		var	rawData, numChunks, test, numFrames;
+	uExtractChannels { |channels = 0, outPath, startFrame, numFrames, chunkSize = 4194304, threaded = false, action|
+		var	rawData, numChunks, test;
 		var outFile, pth, ext, numDigits, channelsData;
 
 		numFrames.isNil.if({ numFrames = this.numFrames });
 		numFrames = numFrames * numChannels;
+
+		startFrame = (startFrame ? 0) * numChannels;
 
 		channels = channels.asArray;
 		channels = channels.select({ |item| item < numChannels });
@@ -120,7 +122,7 @@
 			"%.%".format( pth.format( channels ), ext )
 		);
 
-		this.seek(0, 0);
+		this.seek(startFrame, 0);
 
 		while {
 			(numFrames > 0) and: {
