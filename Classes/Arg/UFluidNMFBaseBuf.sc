@@ -19,7 +19,7 @@
 
 UFluidNMFBaseBuffer : AbstractRichBuffer {
 
-	classvar <>extension = "ufbases%";
+	classvar <>extension = "ufbases";
 
 	var <path;
 	//var <>numChannels;
@@ -75,11 +75,13 @@ UFluidNMFBaseBuffer : AbstractRichBuffer {
 	}
 
 	asSoundFile { // convert to normal soundfile
-		^SoundFile( path.getGPath.asPathFromServer )
+		^if( path.notNil ) {
+			SoundFile( path.getGPath.asPathFromServer )
 			//.numFrames_( numFrames ? 0 )
-		    .instVarPut( \numFrames,  numFrames ? 0 )
+			.instVarPut( \numFrames,  numFrames ? 0 )
 			.numChannels_( numChannels ? 1 )
 			.sampleRate_( sampleRate ? 44100 );
+		};
 	}
 
 	makeBuffer { |server, startPos = 0, action, bufnum|
@@ -94,7 +96,7 @@ UFluidNMFBaseBuffer : AbstractRichBuffer {
 		};
 	}
 
-	*generateBases { |numComponents = 2, inPath, outPath, action| // write to local file if outPath.notNil
+	*generateBases { |numComponents = 2, inPath, outPath, windowSize = 1024, action| // write to local file if outPath.notNil
 		var bases, buf;
 		var fluidBufNMF;
 		var server;
@@ -107,14 +109,14 @@ UFluidNMFBaseBuffer : AbstractRichBuffer {
 				bases: bases,
 				resynthMode: 0,
 				components: numComponents,
+				windowSize: windowSize,
 				action: {
 					OSCFunc({  |msg, time, addr, recvPort|
 						action.value( outPath );
 					}, '/done', server.addr, nil, ['/b_write', bases.bufnum ] ).oneShot;
-					bases.write( outPath, "aiff", "float", completionMessage: { bases.freeMsg } );
+					bases.write( outPath, "wav", "float", completionMessage: { bases.freeMsg } );
 					buf.free;
 					//action.value( outPath );
-
 				}
 			);
 		});
