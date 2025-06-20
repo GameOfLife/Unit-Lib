@@ -1,6 +1,8 @@
 
 SplitBufSndFile : BufSndFile {
 
+	const <canHaveGlobal = false;
+
 	asBufSndFile {
 		^BufSndFile.newCopyVars( this );
 	}
@@ -9,7 +11,7 @@ SplitBufSndFile : BufSndFile {
 
 	asControlInputFor { |server, startPos = 0|
 		^[
-			this.findGlobal( server ) ?? { this.currentBuffer(server, startPos).first },
+			this.currentBuffer(server, startPos).first,
 			numChannels, rate, loop.binaryValue
 		]
 	}
@@ -54,7 +56,7 @@ SplitBufSndFile : BufSndFile {
 		};
 
 		if( test ) {
-			bufs = this.prReadMulti( server, path.getGPath,
+			bufs = this.prReadMulti( server, this.path.getGPath,
 				startFrame + addStartFrame, localUsedFrames,
 				this.useChannels ? numChannels, action, bufnum
 			);

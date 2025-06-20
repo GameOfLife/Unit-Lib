@@ -87,7 +87,7 @@ BufSndFileView {
 			stringColor ?? { Color.black; }
 		} { Color.red(0.66); };
 
-		if( inSndFile.respondsTo( \hasGlobal ) ) {
+		if( inSndFile.class.canHaveGlobal ) {
 			{ views[ \hasGlobal ].visible = true; }.defer;
 			views[ \hasGlobal ].value = inSndFile.hasGlobal.binaryValue;
 		} {

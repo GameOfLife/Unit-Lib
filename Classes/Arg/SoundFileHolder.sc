@@ -25,6 +25,8 @@ AbstractRichBuffer {
 	classvar <>useCheckFree = true; // safer in high-traffic situations, but not for NRT
 	classvar <>checkExists = true;
 
+	const <canHaveGlobal = false;
+
     var <numFrames, <numChannels, <sampleRate;
     var <>unitArgName;
 
@@ -492,6 +494,8 @@ BufSndFile : AbstractSndFile {
     classvar <>globalServers;
     classvar <>globalLoading;
     classvar <>autoLoadGlobal = true;
+
+	const <canHaveGlobal = true;
 
     var <useChannels, <>useStartPosForBuf = false;
 
