@@ -22,6 +22,7 @@ ULib {
 	classvar <>lastPath;
 	classvar <>window, <>eWindow;
 	classvar <>envirSpecs;
+	classvar <>sampleRate = 44100;
 
     *initClass {
         servers = [Server.default]
