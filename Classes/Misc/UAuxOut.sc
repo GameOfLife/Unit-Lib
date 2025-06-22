@@ -10,7 +10,7 @@ UAuxIn {
 	}
 
 	*ar { |bus = 0, numChannels = 1|
-		 ^In.ar( bus + FirstPrivateBus.ir + offset, numChannels );
+		 ^In.ar( bus + FirstPrivateBus.ir + this.offset, numChannels );
 	}
 
 }
@@ -18,7 +18,19 @@ UAuxIn {
 UAuxOut : UAuxIn {
 
 	*ar { |bus = 0, channelsArray|
-		 ^Out.ar( bus + FirstPrivateBus.ir + offset, channelsArray );
+		 ^Out.ar( bus + FirstPrivateBus.ir + this.offset, channelsArray );
 	}
+
+}
+
+UPrivateIn : UAuxIn {
+
+	classvar <>offset = 128;
+
+}
+
+UPrivateOut : UAuxOut {
+
+	classvar <>offset = 128;
 
 }
