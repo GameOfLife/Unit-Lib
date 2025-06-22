@@ -220,7 +220,7 @@ UGUI {
 				udef = all[ key ];
 				if( test.value( udef ) ) {
 					category = udef.category;
-					if( category != \private ) {
+					if( UChainGUI.showPrivateUdefs or: { category != \private }) {
 						uDefsDict[ udef.defType ] = uDefsDict[ udef.defType ] ?? {()};
 						uDefsDict[ udef.defType ][ category ] = uDefsDict[ udef.defType ][ category ].add( udef );
 					};

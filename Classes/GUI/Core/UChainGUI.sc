@@ -30,6 +30,7 @@ UChainGUI {
 	classvar <>nowBuildingChain, <>nowBuildingUChainGUI;
 	classvar <>showInfoStrings = true;
 	classvar <>recentUdefs;
+	classvar <>showPrivateUdefs = false;
 
 	var <chain, <score, <parentScore;
 
@@ -1427,7 +1428,7 @@ UChainGUI {
 					var category, index, udef;
 					udef = all[ key ];
 					category = udef.category;
-					if( category != \private ) {
+					if( showPrivateUdefs or: { category != \private }) {
 						uDefsDict[ udef.ioType ] = uDefsDict[ udef.ioType ] ?? {()};
 						uDefsDict[ udef.ioType ][ category ] = uDefsDict[ udef.ioType ][ category ].add( udef );
 					};
