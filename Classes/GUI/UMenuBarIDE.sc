@@ -303,7 +303,7 @@ UMenuBarIDE {
 		this.registerMenu( MenuAction( "Export as audio file..", {
 			UScore.current !! { |x|
 				ULib.savePanel({ |path|
-					x.writeAudioFile( path, action: { |res, pth|
+					x.deepCopy.writeAudioFile( path, action: { |res, pth|
 						"done exporting %\n".postf( pth );
 						if( pth.find( "%" ).notNil ) {
 							"splitting into mono files".postln;
