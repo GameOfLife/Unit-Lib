@@ -888,7 +888,7 @@ UScore : UEvent {
 
 			this.useNRT({
 
-				if( includeUMaster && { UMaster.isRunning } ) {
+				if( includeUMaster && { UMaster.hasStarted } ) {
 					masterDur = this.duration;
 					if( masterDur == inf ) { masterDur = infdur };
 					array = UMaster.collectOSCBundleFuncs( server, 0, masterDur );

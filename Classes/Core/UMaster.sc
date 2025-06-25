@@ -12,7 +12,9 @@ UMaster {
 	// of variants etc.
 
 	classvar <>objects;
+	classvar <hasStarted = false;
 	classvar <isRunning = false;
+	classvar <>verbose = true;
 
 	*initClass {
 		objects = IdentityDictionary();
@@ -23,6 +25,11 @@ UMaster {
 		this.changed( \isRunning, bool );
 	}
 
+	*hasStarted_ { |bool = true|
+		hasStarted = bool;
+		this.changed( \hasStarted, bool );
+	}
+
 	*put { |key, object|
 		var oldObject;
 		oldObject = objects.removeAt( key );
@@ -30,6 +37,14 @@ UMaster {
 		if( this.isRunning ) {
 			oldObject.stop;
 			object !? _.prepareAndStart;
+			if( verbose ) {
+				if( oldObject.notNil ) {
+					"stopping UMaster for %\n".format( key );
+				};
+				if( object.notNil ) {
+					"starting UMaster for %\n".format( key );
+				};
+			};
 		};
 	}
 
@@ -38,20 +53,39 @@ UMaster {
 		oldObject = objects.removeAt( key );
 		if( this.isRunning ) {
 			oldObject.stop;
+			if( verbose ) {
+				if( oldObject.notNil ) {
+					"stopping UMaster for %\n".format( key );
+				}
+			};
 		};
 		^oldObject;
 	}
 
+	*startObjectsIfRunning {
+		if( ULib.allServers.every(_.serverRunning) ) {
+			this.startObjects;
+		};
+	}
+
 	*startObjects {
-		objects.do(_.prepareAndStart);
+		objects.keysValuesDo({ |key, value|
+			value.prepareAndStart;
+			if( this.verbose ) { "starting UMaster for %\n".format( key ); };
+		});
+		this.isRunning = true;
 	}
 
 	*stopObjects {
-		objects.do(_.stop);
+		objects.keysValuesDo({ |key, value|
+			value.stop;
+			if( this.verbose ) { "stopping UMaster for %\n".format( key ); };
+		});
+		this.isRunning = false;
 	}
 
 	*doOnServerTree {
-		{ this.startObjects; }.defer(0.1);
+		{ this.startObjectsIfRunning; }.defer(0.1);
 	}
 
 	*doOnServerQuit {
@@ -59,17 +93,17 @@ UMaster {
 	}
 
 	*start {
-		ServerTree.add( this, \default );
-		ServerQuit.add( this, \default );
-		this.startObjects;
-		this.isRunning = true;
+		ServerTree.add( this );
+		ServerQuit.add( this );
+		this.startObjectsIfRunning;
+		this.hasStarted = true;
 	}
 
 	*stop {
 		ServerTree.remove( this );
 		ServerQuit.remove( this );
 		this.stopObjects;
-		this.isRunning = false;
+		this.hasStarted = false;
 	}
 
 	*collectOSCBundleFuncs { |server, startOffset = 0, infdur = 60|
