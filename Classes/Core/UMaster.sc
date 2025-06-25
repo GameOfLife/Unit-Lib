@@ -92,11 +92,13 @@ UMaster {
 		this.stopObjects;
 	}
 
-	*start {
+	*start { |force = false|
 		ServerTree.add( this );
 		ServerQuit.add( this );
-		this.startObjectsIfRunning;
-		this.hasStarted = true;
+		if( this.hasStarted.not or: { force == true } ) {
+			this.startObjectsIfRunning;
+			this.hasStarted = true;
+		};
 	}
 
 	*stop {
