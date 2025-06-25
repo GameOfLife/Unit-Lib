@@ -879,18 +879,26 @@ UScore : UEvent {
 		};
 	}
 
-
-	collectOSCBundles { |server, startOffset = 0, infdur = 60|
+	collectOSCBundles { |server, startOffset = 0, infdur = 60, includeUMaster = true|
 		var array, wasCheckFree, out;
+		var masterDur;
 
 		if( disabled.not ) {
 			server = server ? Server.default;
 
 			this.useNRT({
 
-				array = events.collect({ |item|
-					item.collectOSCBundleFuncs( server, item.startTime + startOffset, infdur );
-				}).flatten(1);
+				if( includeUMaster && { UMaster.isRunning } ) {
+					masterDur = this.duration;
+					if( masterDur == inf ) { masterDur = infdur };
+					array = UMaster.collectOSCBundleFuncs( server, 0, masterDur );
+				};
+
+				array = array.addAll(
+					events.collect({ |item|
+						item.collectOSCBundleFuncs( server, item.startTime + startOffset, infdur );
+					}).flatten(1)
+				);
 
 				out = array.sort({ |a,b| a[0] <= b[0] }).collect({ |item|
 					server.makeBundle( false, item[1] ).collect({ |bundle|
