@@ -39,10 +39,10 @@ UMaster {
 			object !? _.prepareAndStart;
 			if( verbose ) {
 				if( oldObject.notNil ) {
-					"stopping UMaster for %\n".format( key );
+					"stopping UMaster for '%'\n".postf( key );
 				};
 				if( object.notNil ) {
-					"starting UMaster for %\n".format( key );
+					"starting UMaster for '%'\n".postf( key );
 				};
 			};
 		};
@@ -55,7 +55,7 @@ UMaster {
 			oldObject.stop;
 			if( verbose ) {
 				if( oldObject.notNil ) {
-					"stopping UMaster for %\n".format( key );
+					"stopping UMaster for '%'\n".postf( key );
 				}
 			};
 		};
@@ -71,7 +71,7 @@ UMaster {
 	*startObjects {
 		objects.keysValuesDo({ |key, value|
 			value.prepareAndStart;
-			if( this.verbose ) { "starting UMaster for %\n".format( key ); };
+			if( this.verbose ) { "starting UMaster for '%'\n".postf( key ); };
 		});
 		this.isRunning = true;
 	}
@@ -79,7 +79,7 @@ UMaster {
 	*stopObjects {
 		objects.keysValuesDo({ |key, value|
 			value.stop;
-			if( this.verbose ) { "stopping UMaster for %\n".format( key ); };
+			if( this.verbose ) { "stopping UMaster for '%'\n".postf( key ); };
 		});
 		this.isRunning = false;
 	}
