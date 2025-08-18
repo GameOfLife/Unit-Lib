@@ -74,6 +74,7 @@ ULib {
 				ServerBoot.objects !? _.removeAt( item );
 				RootNode.roots.removeAt( item.name );
 				NodeWatcher.all.removeAt( item.name );
+				NotificationCenter.removeForListener( item );
 			}
 		});
 		servers = nil;
