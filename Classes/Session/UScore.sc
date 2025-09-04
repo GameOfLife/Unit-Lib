@@ -223,11 +223,36 @@ UScore : UEvent {
 		// args: list of keys, ending with the value to set
 		var setter, parent, res;
 		var pointCheckSet;
+		var indices, track;
 		key = key.asCollection;
 		setter = key.last;
 		key.pop;
 		if( key.size > 0 ) {
-			parent = this.at( *key );
+			if( key.first.isNumber ) {
+				parent = this.at( *key );
+			} {
+				case { key.first.asString[0].toLower == $t } {
+					track = key.first.asString[1..].interpret;
+					indices = events.selectIndices({ |evt|
+						evt.track == track;
+					});
+
+					if( indices.size > 0 ) {
+						^this.setOrPerform( [ indices ] ++ key[1..] ++ [ setter ], *value )
+					} { ^this };
+
+				} { key.first.isKindOf( SequenceableCollection ) } {
+					res = key.first.collect({ |index|
+						this.setOrPerform( [ index ] ++ key[1..] ++ [ setter ], *value )
+					});
+					if( res.every(_ == this) ) { ^this } { ^res };
+				} {
+					"UScore:set : can't set %, % to %"
+					.format( key.join( ", " ), setter, *value )
+					.warn;
+					^this
+				};
+			};
 		} {
 			parent = this;
 		};
