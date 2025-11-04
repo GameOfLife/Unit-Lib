@@ -236,6 +236,7 @@ UMarkerListGUI {
 				.resize_( 5 )
 				.background_( nil )
 				.knobSize_( 0 )
+				.align_( \right )
 				.canFocus_( false );
 
 				if( next.notNil ) {
@@ -247,10 +248,15 @@ UMarkerListGUI {
 				};
 
 				setProgressFunc = {
-					var val;
+					var val, string;
 					if( next.notNil ) {
 						val = score.pos.linlin( marker.startTime, next.startTime, 0, 1 );
 						if( slider.value != val ) { slider.value = val; };
+						string = "%  /  %".format(
+							(score.pos.clip( marker.startTime, next.startTime ) - marker.startTime).asSMPTEString(1000)[..7],
+							(next.startTime - marker.startTime).asSMPTEString(1000)[..7],
+						);
+						if( slider.string != string ) { slider.string = string };
 					};
 				};
 
