@@ -53,6 +53,8 @@ UMarkerListGUI {
 		window.asView.addFlowLayout( 0@0, 4@4 );
 		window.asView.decorator.shift(4,4);
 
+		RoundView.pushSkin( UChainGUI.skin );
+
 		transportView = UTransportView( score, window.asView, 30 );
 		transportView.views.counter.canFocus_( false );
 
@@ -113,6 +115,8 @@ UMarkerListGUI {
 		this.fillMarkers;
 
 		this.addCtrl;
+
+		RoundView.popSkin( UChainGUI.skin );
 
 		{ this.setItem; }.defer(0.2);
 	}
