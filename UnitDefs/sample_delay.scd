@@ -26,19 +26,19 @@ func = { |val, denom, step|
 defs = [
 	MultiChannelUdef( \samples, { |samples = 0, lag = 0|
 		func.value( samples.lag3( lag ), SampleRate.ir, 0.1 );
-	}, extraPrefix: \sample_delay )
+	}, extraPrefix: \sample_delay, addToAll: false )
 	.setSpec( \lag, [0,1,\lin].asSpec )
 	.setSpec( \samples, [ 0, 48000, \lin, 1, 0 ] ),
 
 	MultiChannelUdef( \ms, { |ms = 0, lag = 0|
 		func.value( ms.lag3( lag ), 1000, 0.1 );
-	}, extraPrefix: \sample_delay )
+	}, extraPrefix: \sample_delay, addToAll: false )
 	.setSpec( \lag, [0,1,\lin].asSpec )
 	.setSpec( \ms, [ 0, 1000, \lin, 0.1, 0 ] ),
 
 	MultiChannelUdef( \meters, { |meters = 0, lag = 0|
 		func.value( meters.lag3( lag ), 344, 0.1 );
-	}, extraPrefix: \sample_delay )
+	}, extraPrefix: \sample_delay, addToAll: false )
 	.setSpec( \lag, [0,1,\lin].asSpec )
 	.setSpec( \meters, [ 0, 344, \lin, 0.1, 0 ] ),
 ];
