@@ -603,11 +603,11 @@ UMenuBarIDE {
 		if( this.mode == \mainmenu ) { MainMenu.prUpdate(); };
 	}
 
-	*add { |name, function, menuName|
+	*add { |name, function, menuName, shortcut|
 		if( function === \separator ) {
 			this.registerMenu( MenuAction.separator( name ), menuName ? currentMenuName ? "Unit Lib" );
 		} {
-			this.registerMenu( MenuAction( name, function ), menuName ? currentMenuName ? "Unit Lib" );
+			this.registerMenu( MenuAction( name, function ).shortcut_( shortcut ), menuName ? currentMenuName ? "Unit Lib" );
 		};
 	}
 }
