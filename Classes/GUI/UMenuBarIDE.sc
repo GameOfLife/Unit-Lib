@@ -116,10 +116,11 @@ UMenuBarIDE {
 					loop {
 						pos = QtGUI.cursorPosition;
 						res = headers.detect({ |item|
-							item.absoluteBounds.containsPoint( pos );
+							item.absoluteBounds.insetBy(1,1).containsPoint( pos );
 						});
 						//[ name, res, pos ].postln;
 						if( res.notNil && { header != res }) {
+							0.05.wait;
 							res.mouseDown;
 							task.stop;
 						};
