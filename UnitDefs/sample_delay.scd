@@ -14,38 +14,33 @@ part of the Unit lib default Udefs set
 */
 
 
-var defs;
+var defs, func;
+
+func = { |val, denom, step|
+	var in, delayed;
+	in = UIn.ar( 0, Udef.numChannels );
+	delayed = if( val < step, in, DelayN.ar( in, 1, val / denom ) );
+	UOut.ar( 0, delayed )
+};
 
 defs = [
 	MultiChannelUdef( \samples, { |samples = 0, lag = 0|
-		var in, delayed;
-		in = UIn.ar( 0, Udef.numChannels );
-		delayed = if( samples < 1, in, DelayN.ar( in, 1, samples.lag3( lag ) / SampleRate.ir ) );
-		UOut.ar( 0, delayed )
+		func.value( samples.lag3( lag ), SampleRate.ir, 0.1 );
 	}, extraPrefix: \sample_delay )
-	.category_( \effect )
 	.setSpec( \lag, [0,1,\lin].asSpec )
 	.setSpec( \samples, [ 0, 48000, \lin, 1, 0 ] ),
 
 	MultiChannelUdef( \ms, { |ms = 0, lag = 0|
-		var in, delayed;
-		in = UIn.ar( 0, Udef.numChannels );
-		delayed = if( ms < 0.1, in, DelayN.ar( in, 1, ms.lag3( lag )  / 1000 ) );
-		UOut.ar( 0, delayed );
+		func.value( ms.lag3( lag ), 1000, 0.1 );
 	}, extraPrefix: \sample_delay )
-	.category_( \effect )
 	.setSpec( \lag, [0,1,\lin].asSpec )
 	.setSpec( \ms, [ 0, 1000, \lin, 0.1, 0 ] ),
 
 	MultiChannelUdef( \meters, { |meters = 0, lag = 0|
-		var in, delayed;
-		in = UIn.ar( 0, Udef.numChannels );
-		delayed = if( meters < (0.1/344), in, DelayN.ar( in, 200/344, meters.lag3( lag )  / 344 ) );
-		UOut.ar( 0, delayed )
+		func.value( meters.lag3( lag ), 344, 0.1 );
 	}, extraPrefix: \sample_delay )
-	.category_( \utility )
 	.setSpec( \lag, [0,1,\lin].asSpec )
-	.setSpec( \meters, [ 0, 200, \lin, 0.1, 0 ] ),
+	.setSpec( \meters, [ 0, 344, \lin, 0.1, 0 ] ),
 ];
 
 MultiUdef( 'sample_delay', defs, \utility, \type, false, true );
