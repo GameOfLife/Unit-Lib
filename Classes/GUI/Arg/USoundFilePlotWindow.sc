@@ -1,5 +1,6 @@
 USoundFilePlotWindow {
-	var <soundFile, <startFrame, <numFrames, <>action, <window, <sfv;
+	var <soundFile, <startFrame, <numFrames, <>action, <window, <sfv, <uvw;
+	var <slices, <selectedSlices, <slicesSection, <>slicesAction;
 	var <>canSelect = true;
 
 	*new { |soundFile, startFrame, numFrames, action|
@@ -16,7 +17,10 @@ USoundFilePlotWindow {
 	setPlotRange { |newStartFrame, newNumFrames|
 		startFrame = newStartFrame ? startFrame;
 		numFrames = newNumFrames ? numFrames;
-		{ sfv.setSelection( 0, [ startFrame, numFrames ]); }.defer;
+		{
+			sfv.setSelection( 0, [ startFrame, numFrames ]);
+			uvw.refresh;
+		}.defer;
 	}
 
 	startFrame_ { |newStartFrame|
@@ -41,6 +45,11 @@ USoundFilePlotWindow {
 		dur = soundFile.numFrames / soundFile.sampleRate;
 
 		window.addFlowLayout( 4@4, 4@4 );
+
+		uvw = UserView( window, window.bounds.insetAll( 4, 4, 4, 40 ) ).resize_(5);
+		uvw.background = Color.gray(0.6);
+		uvw.bounds = uvw.bounds.insetAll( -4, -4, -4, 0 );
+		window.asView.decorator.shift( 0, (window.bounds.height - 40).neg );
 
 		sfv = SoundFileView( window, window.bounds.insetAll( 4, 4, 4, 40 ) ).resize_(5);
 		sfZoom = SmoothRangeSlider( window, (window.bounds.width - 8) @ 14 ).resize_(8);
@@ -71,10 +80,11 @@ USoundFilePlotWindow {
 				divisor = 1;
 			};
 			sfv.xZoom_(sfZoom.range * dur)
-			.scrollTo(rangeStart / divisor)
+			.scrollTo(rangeStart / divisor);
+			uvw.refresh;
 		});
 
-		sfv.background = Color.gray(0.6);
+		sfv.background = Color.clear;
 		sfv.gridColor = Color.gray(0.5,0.25);
 		sfv.peakColor = Color.gray(0.8);
 		sfv.rmsColor = Color.white;
@@ -198,9 +208,182 @@ USoundFilePlotWindow {
 			action.value( this, startFrame, numFrames );
 		};
 
+		this.prFillSliceView;
+		this.showSliceView;
+
 		window.front;
 
 		RoundView.popSkin;
+	}
+
+	showSliceView {
+		if( slices.size == 0 ) {
+			if( sfv.bounds.top != 0 ) {
+				sfv.bounds = sfv.bounds.insetAll(0,-28,0,0);
+			};
+		} {
+			if( sfv.bounds.top != 28 ) {
+				sfv.bounds = sfv.bounds.insetAll(0,28,0,0);
+			};
+		};
+	}
+
+	prFillSliceView {
+		var savedSlices, clickedAt;
+
+		slicesSection = [0,0];
+		slices = slices ? [];
+
+		uvw.drawFunc = { |vw|
+			var bounds, scale, width, height, left, right, numFrames, frameToX;
+			var slicePos;
+
+			numFrames = sfv.numFrames;
+			scale = numFrames / sfv.viewFrames;
+			width = vw.bounds.width;
+			height = vw.bounds.height;
+			left = (sfv.scrollPos * ((width * scale) - width )).neg;
+			right = left + (width * scale);
+
+			frameToX = { |frame| frame.linlin(0, numFrames, left, right ); };
+
+			Pen.width = 2;
+			Pen.color = Color.yellow;
+			slicePos = slices.collect( frameToX );
+			slicePos.do({ |x, i|
+				Pen.line( x @ 0, x @ height );
+			});
+			Pen.stroke;
+			slicePos.do({ |x, i|
+				Pen.line( x @ 0, (x + 14) @ 14 );
+				Pen.lineTo( x @ 28 );
+				Pen.lineTo( (x - 14) @ 14 );
+				Pen.lineTo( x @ 0 );
+			});
+			Pen.fill;
+
+			Pen.color = Color.yellow.blend( Color.red, 0.5 );
+			slicePos.do({ |x, i|
+				if( selectedSlices.asCollection.includes(i) ) {
+					Pen.line( x @ 28, (x + 14) @ 14 );
+					Pen.lineTo( x @ 0 );
+					Pen.lineTo( (x - 14) @ 14 );
+					Pen.lineTo( x @ 28 );
+					Pen.lineTo( x @ height );
+				};
+			});
+			Pen.stroke;
+
+			Pen.color = Color.black;
+			Pen.font = Font( Font.defaultSansFace, 11 );
+			slicePos.do({ |x, i|
+				Pen.stringCenteredIn( i.asString, Rect( x - 14, 0, 28, 28) );
+			});
+
+			Pen.color = Color.white.alpha_(0.5);
+			Pen.fillRect(
+				Rect.fromPoints(
+					frameToX.( slicesSection[0] ) @ 0,
+					frameToX.( slicesSection[1] ) @ 28
+				)
+			);
+		};
+
+		uvw.mouseDownAction = { |vw, x, y, mod|
+			var bounds, scale, width, height, left, right, numFrames, frameToX;
+			var clickedSlice;
+
+			numFrames = sfv.numFrames;
+			scale = numFrames / sfv.viewFrames;
+			width = vw.bounds.width;
+			height = vw.bounds.height;
+			left = (sfv.scrollPos * ((width * scale) - width )).neg;
+			right = left + (width * scale);
+
+			frameToX = { |frame| frame.linlin(0, numFrames, left, right ); };
+
+			savedSlices = slices.copy;
+			clickedAt = nil;
+
+			slicesSection = x.linlin( left, right, 0, numFrames ).dup;
+
+			clickedSlice = slices.detectIndex({ |item|
+				var itemPos;
+				itemPos = frameToX.( item );
+				(itemPos @ 14).dist( x@y ) <= 14;
+			});
+
+			if( mod.isShift ) {
+				if( clickedSlice.notNil ) {
+					if( selectedSlices.asCollection.includes( clickedSlice ).not ) {
+						selectedSlices = selectedSlices.asCollection.add( clickedSlice );
+					} {
+						selectedSlices = selectedSlices.asCollection.select(_ != clickedSlice );
+					};
+				};
+			} {
+				if( clickedSlice.notNil ) {
+					if( selectedSlices.size <= 1 or: { selectedSlices.includes( clickedSlice ).not }) {
+						selectedSlices = [ clickedSlice ];
+					};
+					clickedAt = x;
+				} {
+					selectedSlices = nil;
+				};
+			};
+			vw.refresh;
+		};
+
+		uvw.mouseMoveAction = { |vw, x, y, mod|
+			var bounds, scale, width, height, left, right, numFrames, frameToX;
+			var selection, sortedSection;
+
+			numFrames = sfv.numFrames;
+			scale = numFrames / sfv.viewFrames;
+			width = vw.bounds.width;
+			height = vw.bounds.height;
+			left = (sfv.scrollPos * ((width * scale) - width )).neg;
+			right = left + (width * scale);
+
+			frameToX = { |frame| frame.linlin(0, numFrames, left, right ); };
+
+			if( selectedSlices.size > 0 && { clickedAt.notNil }) {
+				selection = savedSlices[ selectedSlices ];
+				selection = selection + ((x - clickedAt) / (width / sfv.viewFrames));
+				selection = selection.round(1).asInteger;
+				if( selection.any( _ < 0 ) ) { selection = selection - selection.minItem };
+				if( selection.any( _ >= numFrames) ) { selection = selection - ( selection.maxItem - numFrames ) };
+				selectedSlices.do({ |item, i|
+					slices.put( item, selection[i] );
+				});
+				this.changed( \slices, slices );
+			} {
+				slicesSection[1] = x.linlin(left, right, 0, numFrames);
+				sortedSection = slicesSection.copy.sort;
+				selectedSlices = slices.selectIndices({ |item| item.inclusivelyBetween( *sortedSection ) });
+			};
+			vw.refresh;
+		};
+
+		uvw.mouseUpAction = { |vw, x, y, mod|
+			var selected;
+			if( clickedAt.notNil ) {
+				selected = slices[ selectedSlices ].asCollection;
+				slices = slices.sort;
+				selectedSlices = selected.collect({ |item| slices.indexOf( item ) });
+				clickedAt = nil;
+				this.changed( \slices, slices );
+				slicesAction.value( this, slices );
+			};
+			slicesSection = [0,0];
+			vw.refresh;
+		};
+	}
+
+	slices_ { |newSlices|
+		slices = newSlices.asCollection;
+		this.changed( \slices, slices );
+		{ uvw.refresh; this.showSliceView }.defer;
 	}
 
 	close { if( window.notNil && { window.isClosed.not } ) { window.close }; }
