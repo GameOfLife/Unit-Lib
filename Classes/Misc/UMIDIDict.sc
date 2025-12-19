@@ -3,7 +3,7 @@ UMIDIDict {
 	classvar <>midiFuncs;
 	classvar <>verbose = false;
 	classvar <>portDict;
-	classvar <>midiOuts;
+	classvar <>midiOuts, <>indexedMIDIOuts;
 
 	*initClass {
 		dict = MultiLevelIdentityDictionary();
@@ -104,8 +104,12 @@ UMIDIDict {
 
 	*makeMIDIOuts {
 		midiOuts = midiOuts ?? { IdentityDictionary() };
+		indexedMIDIOuts = midiOuts ?? { Order() };
 		MIDIClient.destinations.do({ |destination, i|
-			midiOuts[ this.makePortName( destination ) ] = MIDIOut( i, destination.uid ).latency_(0);
+			var midiOut;
+			midiOut = MIDIOut( i, destination.uid ).latency_(0);
+			midiOuts[ this.makePortName( destination ) ] = midiOut;
+			indexedMIDIOuts[ i ] = midiOut;
 		});
 	}
 
