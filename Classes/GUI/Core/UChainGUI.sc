@@ -33,6 +33,7 @@ UChainGUI {
 	classvar <>showPrivateUdefs = false;
 
 	var <chain, <score, <parentScore;
+	var <voicer;
 
 	var <parent, <composite, <views, <startButton, <uguis;
 	var <>presetView;
@@ -341,6 +342,14 @@ UChainGUI {
 	chain_ { |newChain|
 		if( chain != newChain && { newChain.notNil } ) {
 			chain = newChain;
+			this.rebuild;
+			newChainAction.value( this, chain );
+		};
+	}
+
+	voicer_ { |newVoicer|
+		if( voicer != newVoicer ) {
+			voicer = newVoicer;
 			this.rebuild;
 			newChainAction.value( this, chain );
 		};
@@ -1412,6 +1421,7 @@ UChainGUI {
 		var scrollerMargin = 16;
 		var realIndex = 0;
 		var upatGUI, upatCtrls, upatHeader, upatComp;
+		var voicerGUI, voicerCtrls, voicerHeader, voicerComp;
 		var uDefMenuFunc, plusButtonTask;
 		var addBetweenColor;
 
@@ -1609,6 +1619,56 @@ UChainGUI {
 				}, \endpoint );
 				uview.background =  addBetweenColor.copy.val_(0.5);
 			});
+		};
+
+		if( voicer.notNil ) {
+
+			voicerComp = CompositeView( scrollView, width@14 )
+			.background_( Color(0.33, 0.0, 0.33, 0.11)  )
+			.resize_(2);
+
+			voicerHeader = StaticText( voicerComp, Rect(2,0, width, 14 ) )
+			.applySkin( RoundView.skin )
+			.string_( "UVoicer" )
+			.font_(
+				(RoundView.skin.tryPerform( \at, \font ) ??
+					{ Font( Font.defaultSansFace, 12) }).boldVariant
+			);
+
+			SmoothButton( voicerComp,
+					Rect( voicerComp.bounds.right - (12 + 2), 1, 12, 12 ) )
+				.label_( '-' )
+			    .toolTip_( "removes the UVoicer" )
+				.action_({ |bt|
+				}).resize_(3);
+
+			/*
+voicerGUI = UGUI(
+				scrollView,
+				scrollView.bounds.copy.width_(
+					scrollView.bounds.width - scrollerMargin - (margin.x * 2)
+				),
+				voicer,
+			);
+			voicerGUI.mapSetAction = { voicer.changed( \units ); };
+
+			[ \pattern, \fadeTimes ].do({ |key|
+				var item;
+				item = chain.perform( key );
+				if( item.isUMap ) {
+					upatCtrls = upatCtrls.add( SimpleController( item ).put( \init, { chain.changed( \units ) }) );
+					upatCtrls = upatCtrls.addAll(
+						item.getAllUMaps.collect({ |umap|
+							SimpleController( umap ).put( \init, { chain.changed( \units ) });
+						})
+					);
+				};
+			});
+
+			upatHeader.onClose_({
+				upatCtrls.do(_.remove);
+			});
+			*/
 		};
 
 		if( chain.isKindOf( UPattern ) ) {

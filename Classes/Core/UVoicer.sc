@@ -30,6 +30,12 @@ UVoicer : UEvent {
 
 	eventSustain { ^duration }
 
+	getTypeColor { ^Color(0.33, 0.0, 0.33, 0.75) }
+
+	name { ^chain.name }
+
+	makeView { |i,minWidth,maxWidth| ^UVoicerEventView(this,i,minWidth, maxWidth) }
+
 	waitTime { ^0 }
 
 	prepare { |servers, startPos, action|
