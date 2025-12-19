@@ -75,7 +75,7 @@ UMIDIFilterSpec : Spec {
 		vws = ();
 
 		makeMenu = { |action|
-			var sources, menus, current;
+			var sources, menus, current, extra;
 			UMIDIDict.start( false );
 			sources = ();
 			menus = [];
@@ -112,6 +112,18 @@ UMIDIFilterSpec : Spec {
 				.enabled_( vws[ \val ][0] !== '*/*' )
 			);
 
+			if( vws[ \val ][0] !== '*/*' && {
+				sources.keys.includes( current[0] ).not or: {
+					sources[ current[0] ].includes( current[1] ).not or: { current[1] !== '*' }
+				}
+			}) {
+				extra = current.join("/").asSymbol;
+				menus = menus.add(
+					MenuAction( extra.asString, { action.value( extra ) } )
+					.enabled_( vws[ \val ][0] !== extra )
+				)
+			};
+
 			menus = menus.add(
 				MenuAction( "Edit...", {
 					SCRequestString( vws[ \val ][ 0 ].asString, "Please enter device/port name:", { |string|
@@ -127,7 +139,7 @@ UMIDIFilterSpec : Spec {
 				UMIDIDict.restart;
 			} ) );
 
-			Menu(*menus).front;
+			Menu(*menus).uFront;
 		};
 
 		bounds.isNil.if{bounds= 350 @ (this.viewNumLines * 18) };
