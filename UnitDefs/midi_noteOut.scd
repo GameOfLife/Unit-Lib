@@ -53,15 +53,7 @@ FreeUdef( "midi_noteOut", [
 	env[ unit ].startPos = startPos ? 0;
 	env[ unit ].oneShot = oneShot.value.booleanValue;
 
-	if(MIDIClient.initialized.not,{ MIDIIn.connectAll });
-	if( env[ \midiOuts ].isNil ) {
-		env[ \midiOuts ] = Order();
-	};
-	if( env[ \midiOuts ][ midiOut ].isNil ) {
-		env[ \midiOuts ][ midiOut ] = MIDIOut( midiOut );
-		env[ \midiOuts ][ midiOut ].latency_(0);
-		env[ \midiOuts ][ midiOut ].connect( midiOut );
-	};
+	UMIDIDict.start(false);
 
 	[ channel, note, velo ].do({ |item|
 		if( item.isKindOf( UMap ) ) { item.start };
@@ -69,18 +61,22 @@ FreeUdef( "midi_noteOut", [
 	action.value;
 })
 .createSynthFunc_({ |unit, server, startTime = 0 |
-	var channel, note, velo, midiOut, dur, oneShot, startPos;
+	var channel, note, velo, midiOutIndex, midiOut, dur, oneShot, startPos;
 	if( unit.def.env[ unit ].notNil ) {
-		#channel, note, velo, midiOut, oneShot, dur, startPos = unit.def.env[ unit ]
+		#channel, note, velo, midiOutIndex, oneShot, dur, startPos = unit.def.env[ unit ]
 		.atAll( [ \channel, \note, \velo, \midiOut, \oneShot, \dur, \startPos ] );
 		unit.def.env[ unit ] = nil;
-		midiOut = unit.def.env[ \midiOuts ][ midiOut ];
-		midiOut.noteOn( channel, note, velo );
-		if( dur != inf && { oneShot != true }) {
-			{
-				( dur - startPos ).wait;
-				midiOut.noteOff( channel, note );
-			}.fork;
+		midiOut = UMIDIDict.indexedMIDIOuts[ midiOutIndex ];
+		if( midiOut.notNil ) {
+			midiOut.noteOn( channel, note, velo );
+			if( dur != inf && { oneShot != true }) {
+				{
+					( dur - startPos ).wait;
+					midiOut.noteOff( channel, note );
+				}.fork;
+			};
+		} {
+			"midi_noteOut: MIDI out % not connected\n".postf( midiOutIndex );
 		};
 	};
 	nil;

@@ -43,15 +43,7 @@ FreeUdef( "midi_pgmOut", [
 	env[ unit ].bank = bank.value.asInteger;
 	env[ unit ].midiOut = midiOut;
 
-	if(MIDIClient.initialized.not,{ MIDIIn.connectAll });
-	if( env[ \midiOuts ].isNil ) {
-		env[ \midiOuts ] = Order();
-	};
-	if( env[ \midiOuts ][ midiOut ].isNil ) {
-		env[ \midiOuts ][ midiOut ] = MIDIOut( midiOut );
-		env[ \midiOuts ][ midiOut ].latency_(0);
-		env[ \midiOuts ][ midiOut ].connect( midiOut );
-	};
+	UMIDIDict.start(false);
 
 	[ channel, pgm, bank ].do({ |item|
 		if( item.isKindOf( UMap ) ) { item.start };
@@ -59,15 +51,19 @@ FreeUdef( "midi_pgmOut", [
 	action.value;
 })
 .createSynthFunc_({ |unit, server, startTime = 0 |
-	var channel, pgm, bank, midiOut;
+	var channel, pgm, bank, midiOutIndex, midiOut;
 	if( unit.def.env[ unit ].notNil ) {
-		#channel, pgm, bank, midiOut = unit.def.env[ unit ].atAll( [ \channel, \pgm, \bank, \midiOut ] );
+		#channel, pgm, bank, midiOutIndex = unit.def.env[ unit ].atAll( [ \channel, \pgm, \bank, \midiOut ] );
 		unit.def.env[ unit ] = nil;
-		midiOut = unit.def.env[ \midiOuts ][ midiOut ];
-		if( bank >= 0 ) {
-			midiOut.control( channel, 0, bank );
+		midiOut = UMIDIDict.indexedMIDIOuts[ midiOutIndex ];
+		if( midiOut.notNil ) {
+			if( bank >= 0 ) {
+				midiOut.control( channel, 0, bank );
+			};
+			midiOut.program( channel, pgm );
+		} {
+			"midi_pgmOut: MIDI out % not connected\n".postf( midiOutIndex );
 		};
-		midiOut.program( channel, pgm );
 	};
 	nil;
 })
