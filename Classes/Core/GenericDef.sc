@@ -23,7 +23,6 @@ GenericDef : UArchivable {
 	classvar <>defsFolders, <>userDefsFolder;
 
 	var <>argSpecs;
-	var filePath;
 	var <>prName;
 
 	*new { |name, args, addToAll = true|

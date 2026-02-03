@@ -194,10 +194,11 @@ GenericMassEditSpec : Spec {
 }
 
 StringSpec : Spec {
+	var >default;
 
-	var <>default = "";
+	default { ^default ? "" }
 
-	constrain { |value| ^(value ? default).asString }
+	constrain { |value| ^(value ? this.default).asString }
 
 	*testObject { |obj|
 		^obj.isString
@@ -209,14 +210,14 @@ StringSpec : Spec {
 }
 
 IPSpec : StringSpec {
-	var <>default = "127.0.0.1";
+	default { ^default ? "127.0.0.1" }
 }
 
 SymbolSpec : StringSpec {
 
-	var <>default = '';
+	default { ^default ? '' }
 
-	constrain { |value| ^(value ? default).asSymbol }
+	constrain { |value| ^(value ? this.default).asSymbol }
 
 	*testObject { |obj|
 		^obj.isKindOf( Symbol )

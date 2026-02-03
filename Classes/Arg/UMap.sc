@@ -9,7 +9,6 @@ UMapDef : Udef {
 	var >insertArgName;
 	var <>allowedModes = #[ sync, normal ];
 	var <>canUseUMapFunc;
-	var <>apxCPU = 0;
 	var >guiColor;
 	var <>numChannelsForPlayBufFunc;
 
@@ -26,6 +25,8 @@ UMapDef : Udef {
 	}
 
 	defType { ^\dynamic }
+
+	*defaultApxCPU { ^0 }
 
 	*prefix { ^"umap_" } // synthdefs get another prefix to avoid overwriting
 
