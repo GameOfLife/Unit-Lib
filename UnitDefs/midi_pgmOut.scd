@@ -26,7 +26,7 @@ FreeUdef( "midi_pgmOut", [
 	[ \channel, 0, IntegerSpec(0,0,15), false, \init ],
 	[ \pgm, 0, IntegerSpec(64,0,127), false, \init ],
 	[ \bank, -1, IntegerSpec(64,-1,127), false, \init ],
-	[ \midiOut, 0, IntegerSpec(0,0, 255), false, \init ],
+	[ \midiOut, 0, UMIDIOutSpec(), false, \init ],
 ])
 .apxCPU_( 0 )
 .prepareFunc_({ |server, unit, action, startPos = 0|
@@ -37,7 +37,6 @@ FreeUdef( "midi_pgmOut", [
 	pgm = unit.get( \pgm );
 	bank = unit.get( \bank );
 	midiOut = unit.get( \midiOut );
-	midiOut = midiOut.value.asInteger;
 	env[ unit ].channel = channel.value.asInteger;
 	env[ unit ].pgm = pgm.value.asInteger;
 	env[ unit ].bank = bank.value.asInteger;
@@ -51,18 +50,18 @@ FreeUdef( "midi_pgmOut", [
 	action.value;
 })
 .createSynthFunc_({ |unit, server, startTime = 0 |
-	var channel, pgm, bank, midiOutIndex, midiOut;
+	var channel, pgm, bank, midiOut;
 	if( unit.def.env[ unit ].notNil ) {
-		#channel, pgm, bank, midiOutIndex = unit.def.env[ unit ].atAll( [ \channel, \pgm, \bank, \midiOut ] );
+		#channel, pgm, bank, midiOut = unit.def.env[ unit ].atAll( [ \channel, \pgm, \bank, \midiOut ] );
 		unit.def.env[ unit ] = nil;
-		midiOut = UMIDIDict.indexedMIDIOuts[ midiOutIndex ];
+		midiOut = UMIDIDict.getMIDIOut( midiOut );
 		if( midiOut.notNil ) {
 			if( bank >= 0 ) {
 				midiOut.control( channel, 0, bank );
 			};
 			midiOut.program( channel, pgm );
 		} {
-			"midi_pgmOut: MIDI out % not connected\n".postf( midiOutIndex );
+			"midi_pgmOut: MIDI out % not connected\n".postf( midiOut );
 		};
 	};
 	nil;

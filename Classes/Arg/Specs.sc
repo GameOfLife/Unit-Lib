@@ -1540,6 +1540,12 @@ MIDIOutSpec : HardwareBusSpec {
 		^dict.collectAs({ |val,i| [ dict.keys[i], val ] }, Array);
 	}
 
+	*makeDeviceLabelsList { |labels|
+		^labels.collect({ |label| label.asArray.flop }).flatten(1).collect({ |item|
+			item.join("/").asSymbol
+		});
+	}
+
 }
 
 SharedValueIDSpec : PositiveIntegerSpec {

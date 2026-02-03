@@ -26,7 +26,8 @@ FreeUdef( "midi_ccOut", [
 	[ \channel, 0, IntegerSpec(0,0,15), false, \init ],
 	[ \cc, 64, IntegerSpec(64,0,127), false, \init ],
 	[ \val, 64, IntegerSpec(64,0,127), false, \init ],
-	[ \midiOut, 0, IntegerSpec(0,0, 255), false, \init ],
+	[ \midiOut, 0, UMIDIOutSpec(), false, \init ],
+	[ \sendOnChange, true, BoolSpec(true), false, \init ]
 ])
 .apxCPU_( 0 )
 .prepareFunc_({ |server, unit, action, startPos = 0|
@@ -37,7 +38,6 @@ FreeUdef( "midi_ccOut", [
 	cc = unit.get( \cc );
 	val = unit.get( \val );
 	midiOut = unit.get( \midiOut );
-	midiOut = midiOut.value.asInteger;
 	env[ unit ].channel = channel.value.asInteger;
 	env[ unit ].cc = cc.value.asInteger;
 	env[ unit ].val = val.value.asInteger;
@@ -51,34 +51,36 @@ FreeUdef( "midi_ccOut", [
 	action.value;
 })
 .createSynthFunc_({ |unit, server, startTime = 0 |
-	var channel, cc, val, midiOutIndex, midiOut;
+	var channel, cc, val, midiOut;
 	if( unit.def.env[ unit ].notNil ) {
-		#channel, cc, val, midiOutIndex = unit.def.env[ unit ].atAll( [ \channel, \cc, \val, \midiOut ] );
+		#channel, cc, val, midiOut = unit.def.env[ unit ].atAll( [ \channel, \cc, \val, \midiOut ] );
 		unit.def.env[ unit ] = nil;
-		midiOut = UMIDIDict.indexedMIDIOuts[ midiOutIndex ];
+		midiOut = UMIDIDict.getMIDIOut( midiOut );
 		if( midiOut.notNil ) {
 			midiOut.control( channel, cc, val );
 		} {
-			"midi_ccOut: MIDI out % not connected\n".postf( midiOutIndex );
+			"midi_ccOut: MIDI out % not connected\n".postf( midiOut );
 		};
 	};
 	nil;
 })
-	.createsSynth_( false )
+.createsSynth_( false )
 .setSynthFunc_({ |unit ...keyValuePairs|
-	var midiOut;
+	var midiOut, midiOutIndex;
 	keyValuePairs.pairsDo({ |a,b|
 		if( a == \val ) {
-			UMIDIDict.start(false);
-			midiOut = UMIDIDict.indexedMIDIOuts[ unit.get( \midiOut ).value.asInteger ];
-			if( midiOut.notNil ) {
-				midiOut.control(
-					unit.get( \channel ).value.asInteger,
-					unit.get( \cc ).value.asInteger,
-					unit.get( \val ).value.asInteger,
-				);
+			if( unit.get( \sendOnChange ).value == true ) {
+				UMIDIDict.start(false);
+				midiOut = UMIDIDict.getMIDIOut( unit.get( \midiOut ).value );
+				if( midiOut.notNil ) {
+					midiOut.control(
+						unit.get( \channel ).value.asInteger,
+						unit.get( \cc ).value.asInteger,
+						unit.get( \val ).value.asInteger,
+					);
+				};
 			};
 		};
 	});
 })
-	.category_( 'midi' );
+.category_( 'midi' );

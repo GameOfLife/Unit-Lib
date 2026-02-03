@@ -261,3 +261,146 @@ UMIDIFilterSpec : Spec {
 	}
 
 }
+
+UMIDIOutSpec : Spec {
+	classvar <>unknown;
+	classvar <>defaultIndex = 0;
+	var >default;
+
+	// handles only Symbols and Numbers, no repetitions
+
+	*new { |default|
+		^super.newCopyArgs( default );
+	}
+
+	getAtPort { |port = 0|
+		UMIDIDict.start( false );
+		^UMIDIDict.midiOuts.findKeyForValue( UMIDIDict.midiOuts.values.detect({ |mo| mo.port == port }) );
+	}
+
+	default { ^default ?? { this.getAtPort( defaultIndex ) } }
+
+	constrain { |value|
+		case { value.isKindOf( Symbol ) } {
+			^value
+		} { value.isKindOf( Number ) } {
+			UMIDIDict.start( false );
+			^UMIDIDict.midiOuts.findKeyForValue( UMIDIDict.midiOuts.values.detect({ |mo| mo.port == value }) ) ?? { value.asInteger };
+		} { ^nil };
+	}
+
+	unmap { |value| ^value }
+
+	map { |value| ^value }
+
+	storeArgs { ^[default] }
+
+	makeList { |addUnknown = true|
+		UMIDIDict.start( false );
+		^UMIDIDict.midiOuts.keys.as(Array).sort;
+	}
+
+	addUnknown { |list|
+		if( unknown.notNil ) {
+			unknown = unknown.select({ |item|
+				list.includes( item ).not;
+			});
+			if( unknown.size > 0 ) {
+				list = list ++ [ "--unknown" ] ++ unknown;
+			};
+		};
+		^list;
+	}
+
+	makeView { |parent, bounds, label, action, resize|
+		var multipleActions = action.size > 0;
+		var vw;
+		var viewWidth, labelWidth, list;
+		vw = ();
+		vw.view = EZCompositeView( parent, bounds, gap: 2@2 );
+		vw.view.asView.resize_( resize ? 5 );
+
+		bounds = vw.view.asView.bounds;
+
+		vw.buildList = { |vwx|
+			vw.list = this.makeList;
+			vw.knownSize = vw.list.size;
+			vw.list = this.addUnknown( vw.list );
+			vw.menu.items_( vw.list ++ [ "", 'Refresh' ] );
+		};
+
+		if( label.notNil ) {
+			labelWidth = RoundView.skin.labelWidth ? 100;
+			StaticText( vw.view, labelWidth @ (bounds.height) )
+			.applySkin( RoundView.skin )
+			.align_( \right )
+			.string_( "% ".format( label ) );
+			viewWidth = bounds.width - labelWidth - 2;
+		} {
+			viewWidth = bounds.width;
+		};
+
+		vw.setValue = { |vwx, val|
+			var index;
+			if( val.isKindOf( Number ) ) {
+				if( val < vw.knownSize ) {
+					UMIDIDict.start( false );
+					vw.menu.item = UMIDIDict.midiOuts.findKeyForValue(
+						UMIDIDict.midiOuts.values.detect({ |mo| mo.port == val })
+					);
+				} {
+					if( unknown !? _.includes( val ).not ? true ) {
+						unknown = unknown.add( val );
+						vw.buildList;
+					};
+					vw.menu.item = val;
+				};
+			} {
+				index = vw.list.indexOf( val );
+				if( index.notNil ) {
+					vw.menu.value = index;
+				} {
+					if( unknown !? _.includes( val ).not ? true ) {
+						unknown = unknown.add( val );
+						vw.buildList;
+					};
+					vw.menu.item = val;
+				};
+			};
+			vw.val = val;
+		};
+
+		vw.menu = UPopUpMenu( vw.view, viewWidth @ (bounds.height) )
+		.resize_( resize ? 2 )
+		.action_({ |pu|
+			switch( pu.item,
+				'Refresh', {
+					UMIDIDict.restart;
+					vw.buildList;
+					vw.setValue( vw.val );
+				}, {
+					action.value( vw, vw.list[ pu.value ] )
+				}
+			);
+		});
+
+		vw.buildList;
+
+		vw.doAction = { |vwx|
+			action.value( vw, vw.menu.list[ vw.menu.value ] )
+		};
+
+		if( label.notNil ) { vw.menu.title_( label ) };
+
+		^vw
+	}
+
+	setView { |view, value, active = false|
+		view.setValue( value );
+		if( active ) { view.doAction };
+	}
+
+	mapSetView { |view, value, active = false|
+		this.setView( view, value, active );
+	}
+}
