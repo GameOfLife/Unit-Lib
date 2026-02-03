@@ -64,8 +64,10 @@ UPopUpMenu {
 		this.destroyMenu;
 
 		menuActions = items.collect({ |item, i|
-			if( item == '' or: { item == "" } ) {
+			case { item == '' or: { item == "" } } {
 				MenuAction.separator;
+			} { item.asString[..1] == "--" } {
+				MenuAction.separator( item.asString[2..] );
 			} {
 				MenuAction( item.asString, {
 					this.value_( i, false );
