@@ -77,7 +77,7 @@ ListSpec : Spec {
 
 }
 
-ArraySpec : Spec {
+UArraySpec : Spec {
 	// spec for array with any type of value
 	var <>size;
 	var <>originalSpec;
@@ -213,7 +213,7 @@ IPSpec : StringSpec {
 	default { ^default ? "127.0.0.1" }
 }
 
-SymbolSpec : StringSpec {
+USymbolSpec : StringSpec {
 
 	default { ^default ? '' }
 
@@ -227,7 +227,7 @@ SymbolSpec : StringSpec {
 
 }
 
-EnvirSpec : SymbolSpec {
+EnvirSpec : USymbolSpec {
 }
 
 MapSpec : Spec {
