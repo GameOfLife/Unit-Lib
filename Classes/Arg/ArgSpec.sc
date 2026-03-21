@@ -34,6 +34,36 @@ ArgSpec : Spec {
 	var <>width = 1;
 	var >label;
 
+	classvar <>specs;
+
+	*initClass {
+		specs = IdentityDictionary[
+			('verbosity' -> ControlSpec(0, 10, 'linear', 1, 0, "V")),
+			('db' -> ControlSpec(-inf, 0.0, 'db', 0.0, -inf, "dB")),
+			('widefreq' -> ControlSpec(0.1, 20000, 'exp', 0, 440, "Hz")),
+			('midinote' -> ControlSpec(0, 127, 'linear', 0.0, 60, "")),
+			('lofreq' -> ControlSpec(0.1, 100, 'exp', 0, 6, "Hz")),
+			('controlbus' -> ControlSpec(0, 16383, 'linear', 1, 0, "")),
+			('rate' -> ControlSpec(0.125, 8, 'exp', 0, 1, "")),
+			('rq' -> ControlSpec(0.001, 2, 'exp', 0, 0.707, "")),
+			('midfreq' -> ControlSpec(25, 4200, 'exp', 0, 440, "Hz")),
+			('midivelocity' -> ControlSpec(1, 127, 'linear', 0.0, 64, "")),
+			('detune' -> ControlSpec(-20, 20, 'linear', 0.0, 0, "Hz")),
+			('beats' -> ControlSpec(0, 20, 'linear', 0.0, 0, "Hz")),
+			('unipolar' -> ControlSpec(0, 1, 'linear', 0.0, 0, "")),
+			('phase' -> ControlSpec(0, 6.2831853071796, 'linear', 0.0, 0, "")),
+			('delay' -> ControlSpec(0.0001, 1, 'exp', 0, 0.3, "sec")),
+			('amp' -> ControlSpec(0, 1, 'amp', 0, 0, "")),
+			('pan' -> ControlSpec(-1, 1, 'linear', 0.0, 0, "")),
+			('midi' -> ControlSpec(0, 127, 'linear', 0.0, 64, "")),
+			('fadePx' -> ControlSpec(0, 100, 'amp', 0, 0.02, "")),
+			('audiobus' -> ControlSpec(0, 1023, 'linear', 1, 0, "")),
+			('freq' -> FreqSpec()), ('ampx4' -> ControlSpec(0, 4, 'amp', 0.0, 0, "")),
+			('boostcut' -> ControlSpec(-20, 20, 'linear', 0.0, 0, "dB")),
+			('bipolar' -> ControlSpec(-1, 1, 'linear', 0.0, 0, ""))
+		];
+	}
+
 	*new { |name, default, spec, private, mode, width = 1|
 		^super.newCopyArgs( name.asSymbol, default, spec, private ? false, mode ? \sync,
 			width ? 1 ).init;
@@ -42,21 +72,21 @@ ArgSpec : Spec {
 	init {
 		var specName;
 		if( spec.class == Symbol ) {
-			specName = ControlSpec.specs.keys.detect({ |key|
+			specName = this.class.specs.keys.detect({ |key|
 				spec.matchOSCAddressPattern( key );
 			});
 			if( specName.notNil ) {
-				spec = ControlSpec.specs[ specName ];
+				spec = this.class.specs[ specName ];
 			} {
 				spec = nil;
 			};
 		};
 		if( spec.isNil ) {
-			specName = ControlSpec.specs.keys.detect({ |key|
+			specName = this.class.specs.keys.detect({ |key|
 				name.matchOSCAddressPattern( key );
 			});
 			if( specName.notNil ) {
-				spec = ControlSpec.specs[ specName ];
+				spec = this.class.specs[ specName ];
 			} {
 				spec = Spec.forObject( default );
 			};
