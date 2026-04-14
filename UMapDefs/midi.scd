@@ -231,8 +231,8 @@ makeDefsFunc = { |name, matchType, matchFunc, argSpec, replaceToRangeArg|
 	subdefs = [ \map, \switch ].collect({ |item|
 		var func, extraArgs;
 		switch( item,
-			\map, { func = mapFunc; extraArgs = args; },
-			\switch, { func = switchFunc; extraArgs = switchArgs; }
+			\map, { func = mapFunc; extraArgs = args.copy; },
+			\switch, { func = switchFunc; extraArgs = switchArgs.copy; }
 		);
 
 		if( replaceToRangeArg.notNil ) { extraArgs[0] = replaceToRangeArg; };
