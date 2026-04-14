@@ -638,7 +638,15 @@ BufSndFile : AbstractSndFile {
 	}
 
 	hasGlobal_ { |bool = true|
-		if( bool && autoLoadGlobal ) { this.loadGlobal( replace: false ); };
+		if( bool ) {
+			if( autoLoadGlobal ) { this.loadGlobal( replace: false ); }
+		} {
+			if( this.hasGlobal ) { this.disposeGlobal; };
+		};
+	}
+
+	getAllBuffers {
+		^global[ this.id ] ?? { this.buffers; }
 	}
 
 	asMonoBufSndFile {
