@@ -262,5 +262,54 @@
 		}
 	}
 
+	uExportSelection { |outPath, newHeaderFormat, newSampleFormat,
+		startFrame = 0, numFrames, ampScale = 1.0, chunkSize = 4194304,
+		threaded = false|
+
+		var	peak, outFile;
+
+		outFile = this.class.new.headerFormat_(newHeaderFormat ?? { this.headerFormat })
+			.sampleFormat_(newSampleFormat ?? { this.sampleFormat })
+			.numChannels_(this.numChannels)
+			.sampleRate_(this.sampleRate);
+
+			// can we open soundfile for writing?
+		outFile.openWrite(outPath.standardizePath).if({
+			protect {
+				this.scaleAndWrite(outFile, ampScale, startFrame.postln, numFrames.postln, chunkSize,
+					threaded);
+				"Done writing %\n".postf( outFile.path );
+			} { outFile.close };
+			outFile.close;
+			^outFile
+		}, {
+			MethodError("Unable to write soundfile at: " ++ outPath, this).throw;
+		});
+	}
+
+	*uExportSelection { |path, outPath, newHeaderFormat, newSampleFormat,
+		startFrame = 0, numFrames, ampScale = 1.0, chunkSize = 4194304,
+		threaded = false|
+
+		var	file, outFile,
+			action = {
+				protect {
+					outFile = file.scaleAndWrite(outPath, newHeaderFormat, newSampleFormat,
+						startFrame, numFrames, ampScale, chunkSize, threaded);
+				} { file.close };
+				file.close;
+			};
+
+		(file = this.openRead(path.standardizePath)).notNil.if({
+				// need to clean up in case of error
+			if(threaded, {
+				Routine(action).play(AppClock)
+			}, action);
+			^outFile
+		}, {
+			MethodError("Unable to read soundfile at: " ++ path, this).throw;
+		});
+	}
+
 
 }
