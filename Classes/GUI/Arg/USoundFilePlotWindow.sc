@@ -53,8 +53,37 @@ USoundFilePlotWindow {
 
 		sfv = SoundFileView( window, window.bounds.insetAll( 4, 4, 4, 40 ) ).resize_(5);
 		sfZoom = SmoothRangeSlider( window, (window.bounds.width - 8) @ 14 ).resize_(8);
-		infoView = StaticText( window, (window.bounds.width - 92) @ 14 ).resize_(8)
+		/* infoView = StaticText( window, (window.bounds.width - 92) @ 14 ).resize_(8)
 		.applySkin( RoundView.skin );
+		*/
+		infoView = UPopUpMenu( window, (window.bounds.width - 92) @ 14 ).resize_(8);
+		infoView.valueChangesString = false;
+		infoView.extraMenuActions_({
+			[
+				MenuAction( "Export selection as new SoundFile...", {
+					ULib.savePanel({ |path|
+						soundFile.openRead( soundFile.path );
+						soundFile.uExportSelection( path, startFrame: startFrame, numFrames: numFrames );
+						soundFile.close;
+						}, {}, soundFile.path.dirname +/+ soundFile.path.basename.removeExtension ++ "_trimmed." ++ soundFile.path.basename.extension )
+				}),
+				MenuAction( "Split channels...", {
+					ULib.savePanel({ |path|
+						{
+							soundFile.openRead( soundFile.path );
+							soundFile.uSplit( path, action: { |files|
+								soundFile.close;
+								"done splitting, created % files:\n%\n".postf(
+									files.size,
+									files.collect(_.path).join("\n")
+								);
+							}, threaded: true );
+						}.fork( AppClock )
+						}, {}, soundFile.path.dirname +/+ soundFile.path.basename.removeExtension ++ "_%." ++ soundFile.path.basename.extension )
+				}).enabled_( soundFile.numChannels > 1 )
+			]
+		});
+
 		SmoothSlider( window, 80 @ 14 )
 		.knobSize_(1)
 		.resize_(9)
