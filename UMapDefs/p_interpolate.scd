@@ -26,57 +26,45 @@ UPatDef( \p_interpolate, { |unit, input = 0, n = 1, type = \linear|
 			c3 = (0.5 * (y3 - y0)) + (1.5 * (y1 - y2));
 			((c3 * i + c2) * i + c1) * i + c0;
 		};
+		var getNextVal;
 
 		if( unit.spec.respondsTo( \warp ) && { unit.spec.warp.asSpecifier != \lin }; ) {
-			val = unit.spec.unmap( input.next( true ) );
-			hist = [val,val,val];
-			loop {
-				if( i == 0 ) {
-					//last = val;
-					hist = hist[1..].add( val );
-					val = unit.spec.unmap( input.next );
-					nn = n.next;
-				};
-				unit.spec.map(
+			getNextVal = { unit.spec.unmap( input.next( true ) ); };
+		} {
+			getNextVal = { input.next( true ); };
+		};
+
+		hist = getNextVal.value.dup(3);
+		val = getNextVal.value;
+		nn = n.next;
+
+		loop {
+			unit.spec.map(
 					switch( type.next,
-						\step, { if( i/nn < 0.5 ) { hist.last; } { val } },
-						\linear, { hist.last.blend( val, i/nn ) },
-						\cubic, { cubic.( i/nn, *hist.add( val ) ) },
+						\step, { if( i < 0.5 ) { hist.last; } { val } },
+						\linear, { hist.last.blend( val, i ) },
+						\cubic, { cubic.( i, *hist.add( val ) ) },
 					)
 				).yield;
-				i = (i+1);
-				if( i > (nn - 1) ) { i = 0; };
-			};
-		} {
-			val = input.next( true );
-			hist = [val,val,val];
-			loop {
-				if( i == 0 ) {
-					//last = val;
+				i = i+(1/nn);
+				if( i >= 1 ) {
+					i = 0;
 					hist = hist[1..].add( val );
-					val = input.next;
+					val = getNextVal.value;
 					nn = n.next;
 				};
-				switch( type.next,
-					\step, { if( i/nn < 0.5 ) { hist.last; } { val } },
-					\linear, { hist.last.blend( val, i/nn ) },
-					\cubic, { cubic.( i/nn, *hist.add( val ) ) },
-				).yield;
-				i = (i+1);
-				if( i > (nn - 1) ) { i = 0; };
 			};
-		};
 	}.r
 })
-	.useMappedArgs_( false )
-	.setSpec( \input, UAdaptSpec() )
-	.setSpec( \n, IntegerSpec(1, 1,((2**31) - 1).asInteger) )
+.useMappedArgs_( false )
+.setSpec( \input, UAdaptSpec() )
+.setSpec( \n, IntegerSpec(1, 1,((2**31) - 1).asInteger) )
 .setSpec( \type, ListSpec([ 'step', 'linear', 'cubic' ], 1 ) )
-	.canUseUMapFunc_({ |unit, key, umapdef|
-		unit.isKindOf( UPattern ).not && {
+.canUseUMapFunc_({ |unit, key, umapdef|
+	unit.isKindOf( UPattern ).not && {
 			[ Point, SimpleNumber, Array ].any({ |class|
 				unit.getDefault( key ).isKindOf( class )
 			}) && { UAdaptSpec().canAdapt( unit.getSpec( key ) ) }
 		};
 	})
-	.mappedArgs_([ \input ]).category_( 'pattern_filter' );
+.mappedArgs_([ \input ]).category_( 'pattern_filter' );
