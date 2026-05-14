@@ -1,6 +1,6 @@
 + Buffer {
 
-	*uSendCollection { |server, collection, numChannels = 1, wait = 0.02, action|
+	*uSendCollection { |server, collection, numChannels = 1, wait = -1, action|
 		var buffer = this.alloc(server, ceil(collection.size / numChannels), numChannels);
 		var pos, collstream, collsize, bundsize;
 		if( UEvent.nrtMode != true ) {
@@ -23,4 +23,31 @@
 		^buffer;
 	}
 
+	*uReplaceBuffer { |buffer, numFrames, numChannels = 1, action, checkIfNeeded = true|
+		var newBuf;
+		if( checkIfNeeded && { buffer.numFrames == numFrames && { buffer.numChannels == numChannels } } ) {
+			newBuf = buffer;
+			action.value( newBuf );
+		} {
+			newBuf = Buffer( buffer.server, numFrames, numChannels, buffer.bufnum, buffer.sampleRate );
+			OSCFunc({ |msg, time, addr|
+				action.value( newBuf );
+			}, '/done', newBuf.server.addr, argTemplate: [ '/b_alloc', newBuf.bufnum ]).oneShot;
+			buffer.free({ newBuf.server.bufferAllocator.reserve( newBuf.bufnum ); newBuf.allocMsg });
+		}
+		^newBuf;
+	}
+
+	uAdjustNumFrames { |newNumFrames, action|
+		if( numFrames != newNumFrames ) {
+			numFrames = newNumFrames;
+			OSCFunc({ |msg, time, addr|
+				action.value( this );
+			}, '/done', server.addr, argTemplate: [ '/b_alloc', bufnum ]).oneShot;
+			//server.listSendMsg([\b_free, bufnum, this.allocMsg]);
+			this.alloc; // should be safe to alloc without freeing first
+		} {
+			action.value( this );
+		};
+	}
 }
