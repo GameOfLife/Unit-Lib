@@ -21,6 +21,8 @@ UArchivable {
 
 	var <>filePath, <lastVersionSaved;
 
+	classvar <>startWriteAction, <>endWriteAction;
+
     isDirty{
 	    ^lastVersionSaved !? { |x| this.asTextArchive !=  x} ? true
 	}
@@ -62,7 +64,9 @@ UArchivable {
 		    var text;
 
 		    GlobalPathDict.relativePath = path.dirname;
+			startWriteAction.value( this );
 		    text = this.asTextArchive;
+			endWriteAction.value( this );
 		    GlobalPathDict.relativePath = nil;
 
 		    if( this.textArchiveFileExtension.notNil ) {
