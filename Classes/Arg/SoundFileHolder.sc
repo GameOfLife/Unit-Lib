@@ -494,12 +494,16 @@ BufSndFile : AbstractSndFile {
     classvar <>globalServers;
     classvar <>globalLoading;
     classvar <>autoLoadGlobal = true;
+	classvar <>globalClassKeyDict;
 
 	const <canHaveGlobal = true;
 
     var <useChannels, <>useStartPosForBuf = false;
 
-    *initClass { global = (); }
+    *initClass {
+		global = ();
+		globalClassKeyDict = ( \sf: this );
+	}
 
 	*new{ |path, startFrame = 0, endFrame, rate = 1, loop = false, useChannels |
 		// path of existing file or SoundFile
@@ -514,8 +518,15 @@ BufSndFile : AbstractSndFile {
 
 	asBufSndFile { ^this }
 
+	*globalKey { ^globalClassKeyDict.findKeyForValue( this ) }
+
+	*classFromID { |id|
+		^globalClassKeyDict[ id.asString.split($_).first.asSymbol ]
+	}
+
 	id {
 		^[
+			this.class.globalKey,
 			this.path,
 			this.startFrame,
 			this.endFrame,
@@ -523,9 +534,9 @@ BufSndFile : AbstractSndFile {
 		].join( $_ ).asSymbol
 	}
 
-	*fromID { |id|
+	*prFromID { |id|
 		var path, startFrame, endFrame, numChannels, obj, useChannels;
-		id = id.asString.split( $_ ).reverse;
+		id = id.asString.split( $_ )[1..].reverse;
 		path = id[3..].reverse.join( $_ );
 		#numChannels, endFrame, startFrame = id[..2].collect(_.interpret);
 		if( numChannels.isKindOf( Array ) ) {
@@ -540,6 +551,10 @@ BufSndFile : AbstractSndFile {
 			};
 		};
 		^obj;
+	}
+
+	*fromID { |id|
+		^this.classFromID( id ).prFromID( id );
 	}
 
 	prepare { |servers, startPos = 0, action|
@@ -747,6 +762,10 @@ MonoBufSndFile : BufSndFile {
 
 	var <channel = 0;
 
+	 *initClass {
+		globalClassKeyDict.put( \msf, this );
+	}
+
 	useChannels { ^[ channel ] }
 	useChannels_ { |new|
 		this.channel = new.asCollection.first ? 0;
@@ -754,7 +773,7 @@ MonoBufSndFile : BufSndFile {
 	}
 
 	channel_ { |new = 0|
-		channel = new.min( numChannels );
+		channel = new;
 		this.changed( \useChannels, useChannels );
 	}
 
