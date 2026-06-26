@@ -3117,8 +3117,8 @@
 				.font_( font )
 				.action_({ |bt|
 					switch( bt.value,
-						1, { vws[ \val ].do(_.loadGlobal) },
-						0, { vws[ \val ].do(_.disposeGlobal) },
+						1, { vws[ \val ].do(_.hasGlobal_(true)) },
+						0, { vws[ \val ].do(_.hasGlobal_(false)) },
 					);
 				});
 

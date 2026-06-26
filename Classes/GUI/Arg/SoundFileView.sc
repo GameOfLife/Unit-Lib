@@ -228,8 +228,8 @@ BufSndFileView {
 				.label_( ["global", "global"] )
 				.action_({ |bt|
 					switch( bt.value,
-						1, { this.performSndFile( \loadGlobal ) },
-						0, { this.performSndFile( \disposeGlobal ) }
+						1, { this.performSndFile( \hasGlobal_, true ) },
+						0, { this.performSndFile( \hasGlobal_, false ) }
 					);
 				});
 		updGlobal = {
