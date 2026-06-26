@@ -121,25 +121,92 @@ UWaveTableBuf : UDataBuf {
 
 }
 
+USndFileSliceBuf : UDataBuf {
+
+	*initClass {
+		globalClassKeyDict.put( \ssl, this );
+	}
+
+	*new { |slices, bufSndFile, id|
+		if( bufSndFile.isKindOf( Symbol ).not ) {
+			 bufSndFile = bufSndFile !? _.path !? _.basename ? 'untitled';
+		};
+		^super.new( slices, bufSndFile, id );
+	}
+
+	slices { ^this.data }
+	slices_ { |newSlices| this.data = newSlices }
+
+	dataForBuf { ^this.slices }
+
+}
+
 SlicedBufSndFile : BufSndFile {
 
-	var <slices;
+	var <sliceBuf;
 	var <>bufSndFiles;
 
+	*initClass {
+		globalClassKeyDict.put( \ssf, this );
+	}
+
 	slices_ { |newSlices|
-		slices = newSlices;
-		this.changed( \slices, slices );
+		if( sliceBuf.isNil ) {
+			sliceBuf = USndFileSliceBuf( newSlices, this ).hasGlobal_( this.hasGlobal );
+		} {
+			sliceBuf.slices = newSlices;
+		};
+		this.changed( \slices, newSlices );
+	}
+
+	slices { ^sliceBuf !? _.slices ? nil }
+
+	makeBuffer { |server, startPos = 0, action, bufnum, add = true|
+		action = MultiActionFunc( action );
+		sliceBuf !? { |sb|
+			if( sb.hasGlobal.not ) {
+				sb.makeBuffer( server, startPos, action.getAction, bufnum, add )
+			};
+		};
+		^super.makeBuffer( server, startPos, action.getAction, bufnum, add );
+	}
+
+	freeBufferFor { |server|
+		sliceBuf !? { sliceBuf.freeBufferFor( server ) };
+		super.freeBufferFor( server );
+	}
+
+	freeAllBuffers { |server|
+		sliceBuf !? { sliceBuf.freeAllBuffers( server ) };
+		super.freeAllBuffers( server );
+	}
+
+	hasGlobal_ { |bool|
+		sliceBuf !? { sliceBuf.hasGlobal_( bool ) };
+		super.hasGlobal_( bool );
+	}
+
+	storeOn { arg stream;
+		stream << this.class.name << ".newBasic(" <<* [ // use newBasic to prevent file reading
+		    path.formatGPath.quote, numFrames, numChannels, sampleRate,
+             startFrame, endFrame, rate
+		]  << ")" <<
+		if( this.useChannels.notNil ) { ".useChannels_(%)".format( useChannels ) } { "" } <<
+		if( sliceBuf.notNil ) { ".slices_(%)".format( sliceBuf.slices.cs ) } { "" } <<
+		if( this.hasGlobal == true ) { ".hasGlobal_(true)" } { "" };
 	}
 
 	makeBufSndFile { |index = 0|
 		var start, end;
-		start = (slices ?? {[]})[index] ? 0;
-		end = (slices ?? {[]})[index+1] ?? { this.numFrames; };
+		start = (this.slices ?? {[]})[index] ? 0;
+		end = (this.slices ?? {[]})[index+1] ?? { this.numFrames; };
 		^BufSndFile.newBasic( path.formatGPath, numFrames, numChannels, sampleRate, start, end, rate, loop )
 		.useChannels_( useChannels )
 	}
 
+	asBufSndFile { ^this.as( BufSndFile ) }
+
 	fillBufSndFiles {
-		bufSndFiles = slices.collect({ |slice,i| this.makeBufSndFile( i ); });
+		bufSndFiles = this.slices.collect({ |slice,i| this.makeBufSndFile( i ); });
 	}
 }

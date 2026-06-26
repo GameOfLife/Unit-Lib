@@ -679,6 +679,8 @@ BufSndFile : AbstractSndFile {
 		^SplitBufSndFile.newCopyVars( this );
 	}
 
+	as { |class| ^class.newCopyVars( this ); }
+
     useChannels_ { |new|
         useChannels = new;
         this.changed( \useChannels, useChannels );

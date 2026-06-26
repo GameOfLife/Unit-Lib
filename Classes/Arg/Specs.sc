@@ -1122,7 +1122,25 @@ MonoBufSndFileSpec : BufSndFileSpec {
 	*newFromObject { |obj|
 		^this.new();
 	}
+}
 
+SlicedSndFileSpec : BufSndFileSpec {
+
+	*testObject { |obj|
+		^obj.isKindOf( SlicedBufSndFile );
+	}
+
+	constrain { |value|
+		^value.as( SlicedBufSndFile );
+	}
+
+	default {
+		^nil.asBufSndFile.as( SlicedBufSndFile );
+	}
+
+	*newFromObject { |obj|
+		^this.new();
+	}
 }
 
 DiskSndFileSpec : BufSndFileSpec {
