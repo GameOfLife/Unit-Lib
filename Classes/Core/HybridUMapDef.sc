@@ -37,7 +37,8 @@ HybridUMapDef : MultiUMapDef {
 	*makeUdefs { |name, ugenFunc, func, extraPrefix|
 		var dynamic;
 		if( extraPrefix.notNil ) { name = extraPrefix ++ "_" ++ (name ? "") };
-		dynamic = UMapDef( \dynamic, ugenFunc, extraPrefix: name ++ "_", addToAll: false );
+		dynamic = UMapDef( \dynamic, ugenFunc, extraPrefix: name ++ "_", addToAll: false )
+		.addArgSpec( ArgSpec( \value, 0, [0,1].asSpec, true, \nonsynth ) );
 		^[
 			dynamic,
 			FuncUMapDef( \value, func, addToAll: false )
