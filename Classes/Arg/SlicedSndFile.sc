@@ -114,7 +114,6 @@ UDataBuf : BufSndFile {
 UWaveTableBuf : UDataBuf {
 
 	*initClass {
-		globalData = ();
 		globalClassKeyDict.put( \wt, this );
 	}
 
