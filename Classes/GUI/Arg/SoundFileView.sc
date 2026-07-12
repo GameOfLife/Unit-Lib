@@ -107,15 +107,25 @@ BufSndFileView {
 		views[ \endSecond ].clipHi = inSndFile.fileDuration ? inf;
 
 		views[ \loop ].value = inSndFile.loop.binaryValue;
+		{ views[ \loop ].visible = inSndFile.isKindOf( SlicedBufSndFile ).not; }.defer;
 
 		views[ \rateRatio ].value = inSndFile.rate;
 		views[ \rateSemitones ].value = inSndFile.rate.ratiomidi.round( 1e-6);
 
-		{ views[ \numChannels ].string = " % (% channel%)".format(
-			    inSndFile.fileDuration.asSMPTEString(1000),
-				inSndFile.numChannels,
-				if( inSndFile.numChannels == 1 ) { "" } { "s" }
-			)
+		{
+			if( inSndFile.isKindOf( SlicedBufSndFile ) ) {
+				views[ \numChannels ].string = " % (% slice%)".format(
+					inSndFile.fileDuration.asSMPTEString(1000),
+					(inSndFile.slices !? []).size,
+					if( inSndFile.slices == 1 ) { "" } { "s" }
+				);
+			} {
+				views[ \numChannels ].string = " % (% channel%)".format(
+					inSndFile.fileDuration.asSMPTEString(1000),
+					inSndFile.numChannels,
+					if( inSndFile.numChannels == 1 ) { "" } { "s" }
+				);
+			}
 		}.defer;
 
 	}
@@ -196,12 +206,15 @@ BufSndFileView {
 	makeView { |parent, bounds, resize|
 		var globalDepFunc, updGlobal, skin;
 		var plotWindow;
+		var isSliced;
 
 		if( bounds.isNil ) { bounds= 350 @ (this.class.viewNumLines * (viewHeight + 4)) };
 
 		stringColor = RoundView.skin !? _.stringColor ?? { Color.black };
 
 		skin = RoundView.skin;
+
+		isSliced = { this.performSndFile( \isKindOf, SlicedBufSndFile ) ? false; };
 
 		view = EZCompositeView( parent, bounds, gap: 4@4 );
 		bounds = view.asView.bounds;
@@ -259,6 +272,13 @@ BufSndFileView {
 					};
 				}
 			);
+
+			if( isSliced.value ) {
+				plotWindow.slices = this.performSndFile( \slices ) ? [0];
+				plotWindow.slicesAction = { |pw|
+					 this.performSndFile( \slices_, pw.slices );
+				};
+			};
 
 			closeFunc = { plotWindow !? _.close; };
 

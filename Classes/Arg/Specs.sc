@@ -1124,7 +1124,7 @@ MonoBufSndFileSpec : BufSndFileSpec {
 	}
 }
 
-SlicedSndFileSpec : BufSndFileSpec {
+SlicedBufSndFileSpec : BufSndFileSpec {
 
 	*testObject { |obj|
 		^obj.isKindOf( SlicedBufSndFile );

@@ -71,6 +71,15 @@ UDataBuf : BufSndFile {
 		this.class.changed( \globalData, this.id, this.data );
 	}
 
+	asControlInputFor { |server, startPos = 0|
+		^this.findGlobal( server ) ?? { this.currentBuffer(server, startPos) };
+	}
+
+	// not used by Unit:
+	asControlInput {
+		^this.asControlInputFor( Server.default ); // assume default server
+	}
+
 	makeBuffer { |server, startPos = 0, action, bufnum, add = true|
 		var buf;
 		buf = Buffer.uSendCollection( server, this.dataForBuf, 1, -1, action: action );
@@ -184,6 +193,18 @@ SlicedBufSndFile : BufSndFile {
 	hasGlobal_ { |bool|
 		sliceBuf !? { sliceBuf.hasGlobal_( bool ) };
 		super.hasGlobal_( bool );
+	}
+
+	asControlInputFor { |server, startPos = 0|
+		^[
+			this.findGlobal( server ) ?? { this.currentBuffer(server, startPos) },
+			rate, this.sliceBuf !? _.asControlInputFor( server, startPos ) ? -1
+		]
+	}
+
+	// not used by Unit:
+	asControlInput {
+		^this.asControlInputFor( Server.default ); // assume default server
 	}
 
 	storeOn { arg stream;
