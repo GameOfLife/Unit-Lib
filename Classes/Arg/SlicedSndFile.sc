@@ -195,7 +195,7 @@ SlicedBufSndFile : BufSndFile {
 		super.hasGlobal_( bool );
 	}
 
-	asControlInputFor { |server, startPos = 0|
+	asControlInputFor { |server, startPos = 0| // bufnum, rate, sliceBuf or -1
 		^[
 			this.findGlobal( server ) ?? { this.currentBuffer(server, startPos) },
 			rate, this.sliceBuf !? _.asControlInputFor( server, startPos ) ? -1
