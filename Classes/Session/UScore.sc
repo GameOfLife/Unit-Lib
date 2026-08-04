@@ -842,23 +842,34 @@ UScore : UEvent {
 		};
 	}
 
-	playAtMarker { |markerIndex = 0, onFail, targets| // or from start if not found
-		var markerPos;
+	findMarker { |markerIndex = 0|
+		var marker;
 		case { markerIndex.isNumber } {
-			markerPos = this.markerPositions[markerIndex];
+			marker = this.sortedMarkers[markerIndex];
 		} { markerIndex.asSymbol === \next } {
-			markerPos = ([0] ++ this.markerPositions).detect({ |item| this.pos <= item });
+			marker = ([0] ++ this.sortedMarkers).detect({ |item| this.pos <= item.startTime });
 		} { markerIndex.asSymbol === \prev } {
-			markerPos = this.markerPositions.detect({ |item| this.pos > item }) ? 0;
+			marker = this.sortedMarkers.detect({ |item| this.pos > item.startTime }) ? 0;
 		} { markerIndex.asSymbol === \this_or_next } {
-			markerPos = this.markerPositions.detect({ |item|
-				this.pos.equalWithPrecision( item, 0.1 ) or:
-				{ this.pos < item }
+			marker = this.sortedMarkers.detect({ |item|
+				this.pos.equalWithPrecision( item.startTime, 0.1 ) or:
+				{ this.pos < item.startTime }
 			});
 		} {
-			markerPos = events.select({ |item|
-				item.isKindOf( UMarker );
-			}).detect({ |m| m.name.find( markerIndex.asString ).notNil }) !? _.startTime;
+			if( markerIndex.notNil ) {
+				marker = this.sortedMarkers
+				.detect({ |m| m.name.find( markerIndex.asString ).notNil });
+			};
+		};
+		^marker;
+	}
+
+	playAtMarker { |markerIndex = 0, onFail, targets| // or from start if not found
+		var markerPos;
+		if( markerIndex.isKindOf( UMarker ) ) {
+			markerPos = markerIndex.startTime;
+		} {
+			markerPos = this.findMarker( markerIndex ) !? _.startTime;
 		};
 		markerPos = markerPos ? onFail;
 		if( markerPos.notNil ) {
@@ -881,8 +892,6 @@ UScore : UEvent {
 					this.prepareAndStart( targets, markerPos );
 				};
 			};
-		} {
-			"UScore.playAtMarker: marker not found".postln;
 		};
 	}
 
@@ -967,10 +976,14 @@ UScore : UEvent {
 
 	// markers
 
-	markerPositions {
+	sortedMarkers {
 		^events.select({ |item|
 			item.isKindOf( UMarker );
-		}).collect(_.startTime).sort;
+		}).sort({ |a,b| a.startTime <= b.startTime });
+	}
+
+	markerPositions {
+		^this.sortedMarkers.collect(_.startTime);
 	}
 
 	jumpTo { |pos = 0|
