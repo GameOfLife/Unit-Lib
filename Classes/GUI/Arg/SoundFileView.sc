@@ -29,6 +29,7 @@ BufSndFileView {
 	var <viewHeight = 14;
 	var <>autoCreateSndFile = false;
 	var <>stringColor;
+	var <>plotWindow;
 
 	*new { |parent, bounds, action, sndFile|
 		^super.new.init( parent, bounds, action ).value_( sndFile ).addToAll;
@@ -205,7 +206,6 @@ BufSndFileView {
 
 	makeView { |parent, bounds, resize|
 		var globalDepFunc, updGlobal, skin;
-		var plotWindow;
 		var isSliced;
 
 		if( bounds.isNil ) { bounds= 350 @ (this.class.viewNumLines * (viewHeight + 4)) };

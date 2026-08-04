@@ -1131,7 +1131,11 @@ SlicedBufSndFileSpec : BufSndFileSpec {
 	}
 
 	constrain { |value|
-		^value.as( SlicedBufSndFile );
+		^if( value.isKindOf( SlicedBufSndFile ).not ) {
+			value.as( SlicedBufSndFile );
+		} {
+			value
+		}
 	}
 
 	default {

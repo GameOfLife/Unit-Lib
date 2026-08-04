@@ -31,6 +31,11 @@ USoundFilePlotWindow {
 		this.setPlotRange( startFrame, newNumFrames );
 	}
 
+	selectedSlices_ { |new|
+		selectedSlices = new;
+		uvw !? _.refresh;
+	}
+
 	makeWindow {
 		var dur, sfZoom, infoView;
 		var closeFunc, moveRange, getMoveRange, mouseAction, getMousePos;
