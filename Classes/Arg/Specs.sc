@@ -1615,7 +1615,9 @@ FreqSpec : ControlSpec {
 	}
 
 	*initClass {
-		specs.put( \freq, FreqSpec() ); // replace default freq spec with this
+		StartUp.add({
+			ArgSpec.specs.put( \freq, FreqSpec() ); // replace default freq spec with this
+		});
 	}
 
 }
