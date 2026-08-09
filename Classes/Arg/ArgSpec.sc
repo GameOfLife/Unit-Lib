@@ -37,6 +37,7 @@ ArgSpec : Spec {
 	classvar <>specs;
 
 	*initClass {
+		Class.initClassTree( ControlSpec );
 		specs = IdentityDictionary[
 			('verbosity' -> ControlSpec(0, 10, 'linear', 1, 0, "V")),
 			('db' -> ControlSpec(-inf, 0.0, 'db', 0.0, -inf, "dB")),
