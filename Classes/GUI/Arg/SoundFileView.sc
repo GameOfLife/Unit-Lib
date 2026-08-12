@@ -117,8 +117,8 @@ BufSndFileView {
 			if( inSndFile.isKindOf( SlicedBufSndFile ) ) {
 				views[ \numChannels ].string = " % (% slice%)".format(
 					inSndFile.fileDuration.asSMPTEString(1000),
-					(inSndFile.slices !? []).size,
-					if( inSndFile.slices == 1 ) { "" } { "s" }
+					inSndFile.slices.size,
+					if( inSndFile.slices.size == 1 ) { "" } { "s" }
 				);
 			} {
 				views[ \numChannels ].string = " % (% channel%)".format(
