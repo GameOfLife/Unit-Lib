@@ -1,6 +1,6 @@
 USoundFilePlotWindow {
 	var <soundFile, <startFrame, <numFrames, <>action, <window, <sfv, <uvw;
-	var <slices, <selectedSlices, <slicesSection, <>slicesAction;
+	var <slices, <selectedSlices, <slicesSection, <>slicesAction, <>sliceNudgeAmt = 1;
 	var <>canSelect = true;
 
 	*new { |soundFile, startFrame, numFrames, action|
@@ -264,6 +264,7 @@ USoundFilePlotWindow {
 
 	prFillSliceView {
 		var savedSlices, clickedAt;
+		var madeCopy = false;
 
 		slicesSection = [0,0];
 		slices = slices ? [];
@@ -327,6 +328,8 @@ USoundFilePlotWindow {
 			var bounds, scale, width, height, left, right, numFrames, frameToX;
 			var clickedSlice;
 
+			madeCopy = false;
+
 			numFrames = sfv.numFrames;
 			scale = numFrames / sfv.viewFrames;
 			width = vw.bounds.width;
@@ -382,6 +385,13 @@ USoundFilePlotWindow {
 			frameToX = { |frame| frame.linlin(0, numFrames, left, right ); };
 
 			if( selectedSlices.size > 0 && { clickedAt.notNil }) {
+				if( madeCopy.not && { ModKey( mod ).alt( \only ) } ) {
+					slices = slices ++ slices[ selectedSlices ];
+					savedSlices = slices.copy;
+					selectedSlices = ((slices.size) - selectedSlices.size) +
+					(..selectedSlices.size-1);
+					madeCopy = true;
+				};
 				selection = savedSlices[ selectedSlices ];
 				selection = selection + ((x - clickedAt) / (width / sfv.viewFrames));
 				selection = selection.round(1).asInteger;
@@ -412,6 +422,64 @@ USoundFilePlotWindow {
 			slicesSection = [0,0];
 			vw.refresh;
 		};
+
+		window.view.keyDownAction = { |vw, char,mod,unicode,keycode,key|
+			var arrow = key.getArrowKey;
+			var matrix, currentSelection;
+			if( slices.size > 0 ) {
+				if( arrow.notNil ) {
+					if( selectedSlices.notNil ) {
+						matrix = 0!( slices.size );
+						selectedSlices.do({ |index| matrix.put( index, sliceNudgeAmt ) });
+						switch( arrow,
+							\left, {
+								this.slices = (slices + (matrix * -1)).sort.max(0);
+								slicesAction.value( this, slices );
+							},
+							\right, {
+								this.slices = (slices + matrix).sort.max(0);
+								slicesAction.value( this, slices );
+							}
+						);
+					};
+				} {
+					if( unicode == 127 ) { char = $- };
+					switch( char,
+						$+, {
+							if( selectedSlices.notNil ) {
+								currentSelection = slices[ selectedSlices ];
+								selectedSlices.sort.reverseDo({ |item|
+									slices = slices.insert( item+1,
+										slices[ item ]
+										.blend(
+											slices[ item+1 ] ? soundFile.numFrames,
+											0.5
+										).round(1).asInteger
+									);
+								});
+								this.changed( \slices, slices );
+								this.selectedSlices = currentSelection.collect({ |item|
+									slices.indexOf( item )
+								});
+								slicesAction.value( this, slices );
+							}
+						},
+						$-, {
+							if( selectedSlices.notNil ) {
+								selectedSlices.sort.reverseDo({ |item|
+									if(slices.size > 1 ) {
+										slices.removeAt( item );
+									};
+								});
+								this.changed( \slices, slices );
+								this.selectedSlices = nil;
+								slicesAction.value( this, slices );
+							}
+						}
+					);
+				};
+			}
+		}
 	}
 
 	slices_ { |newSlices|
