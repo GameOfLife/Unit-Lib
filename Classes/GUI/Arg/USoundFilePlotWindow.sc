@@ -1,6 +1,6 @@
 USoundFilePlotWindow {
-	var <soundFile, <startFrame, <numFrames, <>action, <window, <sfv, <uvw;
-	var <slices, <selectedSlices, <slicesSection, <>slicesAction, <>sliceNudgeAmt = 1;
+	var <soundFile, <startFrame, <numFrames, <>action, <window, <sfv, <uvw, <infoView;
+	var <slices, <selectedSlices, <slicesSection, <>slicesAction, <>sliceNudgeAmt = 1, <elasticMode = false;
 	var <>canSelect = true;
 
 	*new { |soundFile, startFrame, numFrames, action|
@@ -36,10 +36,29 @@ USoundFilePlotWindow {
 		uvw !? _.refresh;
 	}
 
+	isSliced { ^slices.size > 0 }
+
+	fillInfoViewIdle {
+		infoView.string = " dur: % / %".format(
+			soundFile.numFrames, soundFile.duration.asSMPTEString(1000)
+		);
+	}
+
+	elasticMode_ { |bool = true|
+		elasticMode = bool;
+		if( infoView.menuActions.size > 0 ) {
+			{
+				infoView.menuActions.detect({ |item|
+					item.string == "Elastic mode"
+				}) !? _.checked_( bool );
+			}.defer;
+		};
+		uvw.refresh;
+	}
+
 	makeWindow {
-		var dur, sfZoom, infoView;
+		var dur, sfZoom;
 		var closeFunc, moveRange, getMoveRange, mouseAction, getMousePos;
-		var fillInfoViewIdle;
 
 		RoundView.pushSkin( UChainGUI.skin );
 
@@ -86,7 +105,26 @@ USoundFilePlotWindow {
 						}.fork( AppClock )
 						}, {}, soundFile.path.dirname +/+ soundFile.path.basename.removeExtension ++ "_%." ++ soundFile.path.basename.extension )
 				}).enabled_( soundFile.numChannels > 1 )
-			]
+			] ++ if( this.isSliced ) {
+				[
+					MenuAction.separator( "slices" ),
+					MenuAction( "Align slices", {
+						this.slices = (..slices.size-1)
+						.linlin( 0, slices.size-1, slices[0], slices.last ).collect(_.asInteger);
+					}),
+					Menu(
+						*((2..9) ++ (10,12..16) ++ (20,24..32)).collect({ |i|
+							MenuAction( "%".format( i ), {
+								selectedSlices = [];
+								this.slices = (..i-1).linlin(0,i,0, soundFile.numFrames );
+							});
+						})
+					).title_( "Make slice grid" ),
+					MenuAction( "Elastic mode", { |mn|
+						this.elasticMode = mn.checked;
+					}).checked_( elasticMode )
+				]
+			} { [] }
 		});
 
 		SmoothSlider( window, 80 @ 14 )
@@ -129,13 +167,7 @@ USoundFilePlotWindow {
 
 		this.setPlotRange;
 
-		fillInfoViewIdle = {
-			infoView.string = " dur: % / %".format(
-				soundFile.numFrames, soundFile.duration.asSMPTEString(1000)
-			);
-		};
-
-		fillInfoViewIdle.value;
+		this.fillInfoViewIdle;
 
 		getMousePos = { |sfv, x|
 			(
@@ -226,7 +258,7 @@ USoundFilePlotWindow {
 		};
 
 		sfv.mouseLeaveAction = { |sfv, x, y|
-			fillInfoViewIdle.value;
+			this.fillInfoViewIdle;
 			sfv.timeCursorOn = false;
 		};
 
@@ -263,15 +295,38 @@ USoundFilePlotWindow {
 	}
 
 	prFillSliceView {
-		var savedSlices, clickedAt;
+		var savedSlices, clickedAt, clickedSlice;
 		var madeCopy = false;
+		var fillInfoViewSlices;
+		var elasticAnchors;
 
 		slicesSection = [0,0];
 		slices = slices ? [];
 
+		fillInfoViewSlices = {
+			case { selectedSlices.size == 1 } {
+				infoView.string = "slice %: % / %".format(
+					selectedSlices[0],
+					slices[ selectedSlices[0] ],
+					(slices[ selectedSlices[0] ] / soundFile.sampleRate).asSMPTEString(1000)
+				);
+			} { selectedSlices.size > 0 } {
+				infoView.string = "% slices: % - % / % - %".format(
+					selectedSlices.size,
+					slices[ selectedSlices[0] ],
+					slices[ selectedSlices.last ],
+					(slices[ selectedSlices[0] ] / soundFile.sampleRate).asSMPTEString(1000),
+					(slices[ selectedSlices.last ] / soundFile.sampleRate).asSMPTEString(1000)
+				);
+			} {
+				this.fillInfoViewIdle;
+			};
+		};
+
 		uvw.drawFunc = { |vw|
 			var bounds, scale, width, height, left, right, numFrames, frameToX;
 			var slicePos;
+			var selectionColor;
 
 			numFrames = sfv.numFrames;
 			scale = numFrames / sfv.viewFrames;
@@ -281,6 +336,12 @@ USoundFilePlotWindow {
 			right = left + (width * scale);
 
 			frameToX = { |frame| frame.linlin(0, numFrames, left, right ); };
+
+			selectionColor = if( elasticMode ) {
+				Color.blue;
+			} {
+				Color.yellow.blend( Color.red, 0.5 );
+			};
 
 			Pen.width = 2;
 			Pen.color = Color.yellow;
@@ -297,7 +358,7 @@ USoundFilePlotWindow {
 			});
 			Pen.fill;
 
-			Pen.color = Color.yellow.blend( Color.red, 0.5 );
+			Pen.color = selectionColor;
 			slicePos.do({ |x, i|
 				if( selectedSlices.asCollection.includes(i) ) {
 					Pen.line( x @ 28, (x + 14) @ 14 );
@@ -326,7 +387,6 @@ USoundFilePlotWindow {
 
 		uvw.mouseDownAction = { |vw, x, y, mod|
 			var bounds, scale, width, height, left, right, numFrames, frameToX;
-			var clickedSlice;
 
 			madeCopy = false;
 
@@ -364,16 +424,40 @@ USoundFilePlotWindow {
 						selectedSlices = [ clickedSlice ];
 					};
 					clickedAt = x;
+					selectedSlices = selectedSlices.sort;
+					elasticAnchors = case { selectedSlices.size == 1 } {
+						case { selectedSlices[0] == 0 } {
+							[ nil, slices.last ]
+						} { selectedSlices[0] == (slices.size - 1) } {
+							[ slices.first, nil ]
+						} { [ slices.first, slices.last ] };
+					} { selectedSlices.size > 1 } {
+						[
+							slices[
+								selectedSlices[ (selectedSlices.indexOf( clickedSlice ) ? 0) - 1 ] ? 0
+							],
+							if( clickedSlice == (slices.size - 1) ) {
+								nil
+							} {
+								slices[
+									selectedSlices[
+										(selectedSlices.indexOf( clickedSlice ) ?? { selectedSlices.size }) + 1
+									] ? (slices.size-1)
+								]
+							};
+						]
+					} { [ nil, nil ] }
 				} {
 					selectedSlices = nil;
 				};
 			};
 			vw.refresh;
+			fillInfoViewSlices.value;
 		};
 
 		uvw.mouseMoveAction = { |vw, x, y, mod|
 			var bounds, scale, width, height, left, right, numFrames, frameToX;
-			var selection, sortedSection;
+			var selection, sortedSection, elasticEnv;
 
 			numFrames = sfv.numFrames;
 			scale = numFrames / sfv.viewFrames;
@@ -392,14 +476,29 @@ USoundFilePlotWindow {
 					(..selectedSlices.size-1);
 					madeCopy = true;
 				};
-				selection = savedSlices[ selectedSlices ];
-				selection = selection + ((x - clickedAt) / (width / sfv.viewFrames));
-				selection = selection.round(1).asInteger;
-				if( selection.any( _ < 0 ) ) { selection = selection - selection.minItem };
-				if( selection.any( _ >= numFrames) ) { selection = selection - ( selection.maxItem - numFrames ) };
-				selectedSlices.do({ |item, i|
-					slices.put( item, selection[i] );
-				});
+				if( elasticMode ) {
+					selection = savedSlices[ clickedSlice ];
+					elasticEnv = Env(
+						[0,0,((x - clickedAt) / (width / sfv.viewFrames)),0],
+						[ 0, elasticAnchors[0] ? savedSlices[ clickedSlice ],
+							savedSlices[ clickedSlice ],
+							elasticAnchors[1] ? inf,
+						].differentiate[1..]
+					);
+					selection = savedSlices.collect({ |item|
+						(item + elasticEnv[ item ]).round(1).asInteger;
+					});
+					slices = selection;
+				} {
+					selection = savedSlices[ selectedSlices ];
+					selection = selection + ((x - clickedAt) / (width / sfv.viewFrames));
+					selection = selection.round(1).asInteger;
+					if( selection.any( _ < 0 ) ) { selection = selection - selection.minItem };
+					if( selection.any( _ >= numFrames) ) { selection = selection - ( selection.maxItem - numFrames ) };
+					selectedSlices.do({ |item, i|
+						slices.put( item, selection[i] );
+					});
+				};
 				this.changed( \slices, slices );
 			} {
 				slicesSection[1] = x.linlin(left, right, 0, numFrames);
@@ -407,6 +506,7 @@ USoundFilePlotWindow {
 				selectedSlices = slices.selectIndices({ |item| item.inclusivelyBetween( *sortedSection ) });
 			};
 			vw.refresh;
+			fillInfoViewSlices.value;
 		};
 
 		uvw.mouseUpAction = { |vw, x, y, mod|
@@ -420,7 +520,10 @@ USoundFilePlotWindow {
 				slicesAction.value( this, slices );
 			};
 			slicesSection = [0,0];
+			elasticAnchors = nil;
+			clickedSlice = nil;
 			vw.refresh;
+			fillInfoViewSlices.value;
 		};
 
 		window.view.keyDownAction = { |vw, char,mod,unicode,keycode,key|
@@ -433,11 +536,11 @@ USoundFilePlotWindow {
 						selectedSlices.do({ |index| matrix.put( index, sliceNudgeAmt ) });
 						switch( arrow,
 							\left, {
-								this.slices = (slices + (matrix * -1)).sort.max(0);
+								this.slices = (slices + (matrix * -1)).collect(_.asInteger).sort.max(0);
 								slicesAction.value( this, slices );
 							},
 							\right, {
-								this.slices = (slices + matrix).sort.max(0);
+								this.slices = (slices + matrix).collect(_.asInteger).sort.max(0);
 								slicesAction.value( this, slices );
 							}
 						);
@@ -475,10 +578,14 @@ USoundFilePlotWindow {
 								this.selectedSlices = nil;
 								slicesAction.value( this, slices );
 							}
+						},
+						$e, {
+							this.elasticMode = elasticMode.not;
 						}
 					);
 				};
-			}
+			};
+			fillInfoViewSlices.value;
 		}
 	}
 
