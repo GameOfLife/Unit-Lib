@@ -258,6 +258,8 @@ FilePathView {
 		this.setFont;
 	}
 
+	remove { view.remove }
+
 }
 
 MultiFilePathView : FilePathView {
